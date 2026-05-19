@@ -1,0 +1,40 @@
+<template>
+    <div class="editor-container">
+        <!-- Label with Help Text -->
+        <div class="label-container">
+            <label class="slds-form-element__label" for={fieldName}>{label}</label>
+            <lightning-helptext content={helpText}></lightning-helptext>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button onclick={boldText}><b>B</b></button>
+            <button onclick={italicText}><i>I</i></button>
+            <button onclick={underlineText}><u>U</u></button>
+
+            <button onclick={alignLeft}>&#8676; Left</button>
+            <button onclick={alignCenter}>⏺ Center</button>
+            <button onclick={alignRight}>&#8677; Right</button>
+
+            <select onchange={changeFont}>
+                <option value="">Font</option>
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+
+            <select onchange={changeFontSize}>
+                <option value="">Size</option>
+                <option value="1">Small</option>
+                <option value="3">Normal</option>
+                <option value="5">Large</option>
+                <option value="7">Extra Large</option>
+            </select>
+        </div>
+
+        <!-- Editable Text Area -->
+        <div class="text-area" contenteditable="true" data-field={fieldName} oninput={handleInput}>
+            {value}
+        </div>
+    </div>
+</template>

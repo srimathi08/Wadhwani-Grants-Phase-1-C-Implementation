@@ -1,0 +1,182 @@
+/* ================= PREMIUM FORM SHELL ================= */
+.form-shell {
+    max-width: 1020px;
+    margin: 40px auto;
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 18px;
+    position: relative;
+
+    /* Rich elevation */
+    box-shadow:
+        0 14px 36px rgba(0, 0, 0, 0.10),
+        0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ✅ Brand accent line – perfectly aligned to shell */
+.form-shell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #a12026, #c13a40, #a12026);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+/* ================= FORM CONTAINER ================= */
+.form-container {
+    max-width: 980px;
+    margin: 0 auto;
+    font-family: 'Open Sans', sans-serif;
+    position: relative;
+}
+
+/* ❌ IMPORTANT: no red line here anymore */
+/* (intentionally empty – keeps structure clean) */
+
+
+/* ================= HEADER ================= */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 36px;
+    text-align: center;
+}
+
+.win-logo {
+    height: 64px;
+    object-fit: contain;
+}
+
+.custom-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #a12026;
+    letter-spacing: 0.6px;
+}
+
+/* ================= SECTION ================= */
+.section-card {
+    background: linear-gradient(180deg, #ffffff, #fafafa);
+    padding: 26px;
+    margin-bottom: 36px;
+}
+
+/* Section heading */
+.section-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: #a12026;
+    margin-bottom: 18px;
+    padding-left: 14px;
+    position: relative;
+}
+
+.section-heading::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 3px;
+    height: 70%;
+    width: 4px;
+    background: #a12026;
+    border-radius: 2px;
+}
+
+/* ================= NOTES ================= */
+.note-text {
+    background: linear-gradient(90deg, #fff4f5, #ffffff);
+    color: #a12026;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-left: 4px solid #a12026;
+    border-radius: 8px;
+    margin: 18px 0;
+}
+
+/* ================= LAYOUT ================= */
+.two-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+/* ================= INPUT OVERRIDES ================= */
+lightning-input input,
+lightning-textarea textarea,
+lightning-combobox select {
+    border-radius: 8px !important;
+}
+
+lightning-input input:focus,
+lightning-textarea textarea:focus,
+lightning-combobox select:focus {
+    border-color: #a12026 !important;
+    box-shadow: 0 0 0 1px rgba(161, 32, 38, 0.35);
+}
+
+/* ================= DUAL LISTBOX ================= */
+lightning-dual-listbox {
+    --slds-c-dual-listbox-list-height: 240px;
+}
+
+/* ================= FILE UPLOAD ================= */
+lightning-file-upload .slds-file-selector {
+    border: 1.5px dashed #a12026;
+    border-radius: 10px;
+    background: #fffafa;
+    padding: 16px;
+}
+
+.uploaded-file {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ================= SUBMIT ================= */
+.submit-wrapper {
+    text-align: center;
+    margin-top: 40px;
+}
+
+lightning-button button {
+    background: #a12026;
+    border-radius: 26px;
+    padding: 0.7rem 2.6rem;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(161, 32, 38, 0.3);
+}
+
+lightning-button button:hover {
+    background: #871a1f;
+}
+
+/* ================= SUCCESS ================= */
+.success-text {
+    text-align: center;
+    color: #2e7d32;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .form-shell {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .custom-title {
+        font-size: 20px;
+    }
+}

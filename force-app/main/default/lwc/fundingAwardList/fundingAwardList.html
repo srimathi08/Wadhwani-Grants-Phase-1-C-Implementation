@@ -1,0 +1,39 @@
+<template>
+    <div class="table-container">
+
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>COE (Awardee)</th>
+                    <th>Amount</th>
+                    <th>Awarded Date</th>
+                    <th>Comments</th>
+                    <th class="action-col">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <template for:each={awards} for:item="a">
+                    <tr key={a.Id}>
+                        <td><a href={a.link} target="_blank">{a.Name}</a></td>
+                        <td>{a.Account__r.Name}</td>
+                        <td>₹ {a.Amount__c}</td>
+                        <td>{a.Awarded_Date__c}</td>
+                        <td>{a.Comments__c}</td>
+
+                        <td class="action-col">
+                            <lightning-button 
+                                label="Fund Disburse"
+                                variant="brand-outline"
+                                data-id={a.Id}
+                                onclick={navigateToDetail}>
+                            </lightning-button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+
+    </div>
+</template>

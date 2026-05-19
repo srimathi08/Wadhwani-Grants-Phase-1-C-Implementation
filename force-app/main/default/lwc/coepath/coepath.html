@@ -1,0 +1,59 @@
+<template>
+    <!-- =========================
+         COE JOURNEY STEPPER
+         ========================= -->
+    <div class="journey-wrapper">
+        <div class="journey-steps">
+
+            <!-- STEP 1 -->
+            <div class="journey-step active">
+                <div class="circle">1</div>
+                <div class="title">COE Registration</div>
+
+                <div class="status">
+                    {registrationStatusText}
+                    <span class="status-icon">{registrationStatusIcon}</span>
+                </div>
+
+                <template if:true={showStep1Link}>
+                    <a
+                        href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/WadhwaniOrg/s/institute-register"
+                        class="action-link"
+                    >
+                        Click here to register
+                    </a>
+                </template>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="journey-step">
+                <div class="circle">2</div>
+                <div class="title">COE Proposal</div>
+
+                <div class="status">{coeProposalStatus}</div>
+
+                <template if:true={showStep2Link}>
+                    <a href={coeProposalLink} class="action-link">
+                        Click here to submit proposal
+                    </a>
+                </template>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="journey-step">
+                <div class="circle">3</div>
+                <div class="title">Project Proposals</div>
+
+                <template if:true={showStep3Links}>
+                    <a
+                        href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/WadhwaniOrg/s/project-proposal-submission"
+                        class="action-link"
+                    >
+                        Click here to submit project proposal
+                    </a>
+                </template>
+            </div>
+
+        </div>
+    </div>
+</template>

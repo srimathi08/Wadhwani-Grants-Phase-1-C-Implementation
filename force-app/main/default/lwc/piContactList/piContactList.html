@@ -1,0 +1,49 @@
+<template>
+    <lightning-card>
+
+        <!-- HEADER -->
+        <div class="header slds-p-around_medium">
+            <h2>PI Contacts ({totalRecords})</h2>
+            <p>Manage and view all registered Principal Investigators</p>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="slds-p-horizontal_medium slds-m-bottom_small">
+            <lightning-input 
+                type="search"
+                placeholder="Search by Name or Email..."
+                onchange={handleSearch}>
+            </lightning-input>
+        </div>
+
+        <!-- TABLE -->
+        <div class="slds-p-around_medium">
+            <template if:true={paginatedData.length}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={paginatedData}
+                    columns={columns}
+                    onrowaction={handleRowAction}
+                    hide-checkbox-column>
+                </lightning-datatable>
+            </template>
+
+            <!-- EMPTY STATE -->
+            <template if:false={paginatedData.length}>
+                <div class="slds-text-align_center slds-p-around_large">
+                    <p>No PI records found</p>
+                </div>
+            </template>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="slds-p-around_medium slds-text-align_center">
+            <lightning-button label="Previous" onclick={handlePrev}></lightning-button>
+            <span class="slds-m-horizontal_small">
+                Page {pageNumber} of {totalPages}
+            </span>
+            <lightning-button label="Next" onclick={handleNext}></lightning-button>
+        </div>
+
+    </lightning-card>
+</template>

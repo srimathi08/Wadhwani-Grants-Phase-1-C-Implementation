@@ -1,0 +1,11 @@
+<template>
+    <lightning-button 
+        label="Translate Proposal" 
+        title="Translate this proposal to English"
+        onclick={handleTranslate}
+        disabled={isTranslating}>
+    </lightning-button>
+    <template if:true={isTranslating}>
+        <lightning-spinner size="small"></lightning-spinner>
+    </template>
+</template>

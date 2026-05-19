@@ -1,0 +1,43 @@
+<template>
+    <template if:true={currentData}>
+        <div class="table-container">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr>
+                        <th>Current Fiscal Year Data</th>
+                        <th>Budget</th>
+                        <th>Current Projection</th>
+                        <th>Variance</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Revenue</td>
+                        <td>${currentData.Revenue_Budget__c}</td>
+                        <td>${currentData.Revenue_Projection__c}</td>
+                        <td>${currentData.Revenue_Variance__c}</td>
+                        <td>{currentData.Revenue_Explanation__c}</td>
+                    </tr>
+                    <tr>
+                        <td>Expense</td>
+                        <td>${currentData.Expense_Budget__c}</td>
+                        <td>${currentData.Expense_Projection__c}</td>
+                        <td>${currentData.Expense_Variance__c}</td>
+                        <td>{currentData.Expense_Explanation__c}</td>
+                    </tr>
+                    <tr>
+                        <td>Revenue - Expense</td>
+                        <td>${currentData.Net_Budget__c}</td>
+                        <td>${currentData.Net_Projection__c}</td>
+                        <td>${currentData.Net_Variance__c}</td>
+                        <td>{currentData.Net_Position_Explanation__c}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+    <template if:false={currentData}>
+        <p>No current fiscal year data available.</p>
+    </template>
+</template>

@@ -1,0 +1,324 @@
+/* =========================
+   Page Layout
+========================= */
+.wf-page{
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 22px 16px 40px;
+}
+
+/* =========================
+   Cards
+========================= */
+.wf-card{
+    background:#fff;
+    border:1px solid #E6E8EB;
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 6px 24px rgba(0,0,0,0.06);
+    margin-bottom:18px;
+}
+
+.wf-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+}
+
+.wf-title{
+    font-size:20px;
+    font-weight:1000;
+    color:#1f1f1f;
+    letter-spacing:0.2px;
+}
+
+.wf-sub{
+    margin-top:7px;
+    color:#6b6b6b;
+    font-size:13px;
+    font-weight:800;
+}
+
+/* =========================
+   Grid
+========================= */
+.wf-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:18px;
+}
+
+/* =========================
+   Proposal Tile (Client Attractive)
+========================= */
+.wf-tile{
+    border:1px solid #E9ECEF;
+    border-radius:22px;
+    padding:18px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
+    position:relative;
+    overflow:hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+/* subtle premium top glow */
+.wf-tile::before{
+    content:"";
+    position:absolute;
+    top:-40px;
+    right:-60px;
+    width:140px;
+    height:140px;
+    background: radial-gradient(circle, rgba(161,32,38,0.22), rgba(161,32,38,0));
+    transform: rotate(25deg);
+}
+
+/* hover wow */
+.wf-tile:hover{
+    transform: translateY(-3px);
+    border-color:#D7DDE3;
+    box-shadow:0 16px 36px rgba(0,0,0,0.10);
+}
+
+/* =========================
+   Tile Top
+========================= */
+.wf-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    position:relative;
+    z-index:1;
+}
+
+.wf-no{
+    font-weight:1000;
+    font-size:13px;
+    color:#A12026;
+    background:rgba(161,32,38,0.08);
+    padding:6px 10px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    border:1px solid rgba(161,32,38,0.12);
+}
+
+/* =========================
+   Project Title
+========================= */
+.wf-ptitle{
+    margin-top:12px;
+    font-size:14px;
+    font-weight:1000;
+    color:#1f1f1f;
+    line-height:1.55;
+    min-height:44px;
+    position:relative;
+    z-index:1;
+}
+
+/* =========================
+   Milestone Box (Premium mini table)
+========================= */
+.wf-mile{
+    margin-top:14px;
+    padding:14px 14px;
+    border-radius:18px;
+    border:1px solid #EEF1F5;
+    background:#fff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+    position:relative;
+    z-index:1;
+}
+
+.wf-mile-label{
+    font-size:11px;
+    font-weight:1000;
+    color:#6b6b6b;
+    text-transform:uppercase;
+    letter-spacing:0.9px;
+    margin-bottom:10px;
+}
+
+/* Milestone list rows */
+.wf-mile-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* each row like mini table line */
+.wf-mile-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border-radius:14px;
+    background:linear-gradient(180deg,#ffffff,#fbfbfc);
+    border:1px solid #EEF1F5;
+    transition: transform .15s ease, border-color .15s ease;
+}
+
+.wf-mile-row:hover{
+    transform: translateY(-1px);
+    border-color:#DEE5EE;
+}
+
+.wf-mile-name{
+    font-size:12px;
+    font-weight:1000;
+    color:#1f1f1f;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:70%;
+}
+
+/* empty */
+.wf-mile-empty{
+    font-size:12px;
+    font-weight:900;
+    color:#777;
+    background:#FAFBFC;
+    border:1px dashed #D9D9D9;
+}
+
+/* =========================
+   Status Badges (Glossy pills)
+========================= */
+.wf-badge{
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:1000;
+    border:1px solid transparent;
+    white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.wf-badge-default{
+    background:#F4F6F9;
+    border-color:#E6E8EB;
+    color:#1f1f1f;
+}
+
+.wf-badge-green{
+    background:linear-gradient(180deg, #E8F7EE, #DDF5E8);
+    border-color:#BFE9D0;
+    color:#0B6B2E;
+}
+
+.wf-badge-blue{
+    background:linear-gradient(180deg, #E9F2FF, #DCEBFF);
+    border-color:#C6DCFF;
+    color:#0B4AA2;
+}
+
+.wf-badge-amber{
+    background:linear-gradient(180deg, #FFF7E6, #FFF0CF);
+    border-color:#FFE1A6;
+    color:#8A5A00;
+}
+
+.wf-badge-red{
+    background:linear-gradient(180deg, #FDEBEC, #FCDCDD);
+    border-color:#F8C9CC;
+    color:#A12026;
+}
+
+.wf-badge-gray{
+    background:linear-gradient(180deg, #F2F2F2, #EAEAEA);
+    border-color:#D9D9D9;
+    color:#555;
+}
+
+/* =========================
+   Actions (Buttons)
+========================= */
+.wf-actions{
+    margin-top:16px;
+    display:flex;
+    gap:12px;
+    position:relative;
+    z-index:1;
+}
+
+.wf-btn{
+    border:none;
+    border-radius:16px;
+    padding:10px 16px;
+    font-weight:1000;
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.wf-btn:active{
+    transform: scale(0.98);
+}
+
+/* primary red */
+.wf-btn-primary{
+    background:linear-gradient(180deg,#B2262D,#8B141A);
+    color:#fff;
+    box-shadow:0 10px 20px rgba(161,32,38,0.25);
+}
+
+.wf-btn-primary:hover{
+    background:linear-gradient(180deg,#C62D35,#99171E);
+    box-shadow:0 14px 26px rgba(161,32,38,0.33);
+}
+
+/* secondary */
+.wf-btn-secondary{
+    background:#F6F8FB;
+    color:#1f1f1f;
+    border:1px solid #E6E8EB;
+}
+
+.wf-btn-secondary:hover{
+    border-color:#D7DDE3;
+    box-shadow:0 10px 20px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   Skeleton + Empty states
+========================= */
+.wf-skeleton{
+    padding:12px 14px;
+    border-radius:16px;
+    background:#F4F6F9;
+    border:1px solid #E6E8EB;
+    color:#777;
+    font-size:13px;
+    font-weight:900;
+}
+
+.wf-empty{
+    padding:12px 14px;
+    border-radius:16px;
+    background:#F4F6F9;
+    border:1px dashed #D9D9D9;
+    color:#555;
+    font-size:13px;
+    font-weight:900;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 1100px){
+    .wf-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 650px){
+    .wf-grid{ grid-template-columns: 1fr; }
+    .wf-actions{ flex-direction:column; }
+    .wf-mile-name{ max-width:64%; }
+}

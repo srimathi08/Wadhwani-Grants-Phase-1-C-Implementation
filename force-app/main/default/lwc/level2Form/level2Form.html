@@ -1,0 +1,157 @@
+<template>
+    <!-- Loading Spinner 
+    <template if:true={isLoading}>
+        <div class="slds-p-around_medium slds-text-align_center">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </template> -->
+
+    <!-- Main Form Content -->
+    <template if:true={showForm}>
+        <div class="form-container">
+            <div class="logo-section">
+                <img src={logoUrl} alt="WIN Logo" class="logo-img" />
+                <h1 class="form-title">PROJECT PROPOSAL REVIEW</h1>
+            </div>
+
+            <lightning-card>
+                <div class="slds-m-around_medium">
+
+                    <!-- Project Overview Section -->
+                    <div class="section-divider">Project Overview</div>
+                    <div class="two-column">
+                                                     
+                        <lightning-input  label="Name of the Institution" value={institutionName} name="institutionName" data-id="institutionName" id="institutionInput" disabled></lightning-input>
+                        <lightning-input label="Name of the project" value={Level2Data.Title} disabled></lightning-input>
+                        <lightning-input label="Principal Investigator (PI)" value={Level2Data.PI_Name__c} name="pi" disabled></lightning-input>                   
+                        <lightning-input label="Co-Principal Investigators(PI)" value={Level2Data.Co_Principal_Investigator_Co_PI__c} name="copi" disabled></lightning-input>
+                    </div>
+                    
+
+                    <!-- Focus Area Section -->
+                    <div class="section-divider">Focus Area</div>
+                    <div class="two-column">
+                        <lightning-combobox label="Focus Area" name="Focus_Area__c" value={Level2Data.Focus_Area__c} options={FocusAreaOptions} onchange={handleInputChange} disabled></lightning-combobox>
+                        <lightning-dual-listbox name="Sub_Focus_Area__c" label="Sub Focus Area" source-label="Available Sub Focus" selected-label="Selected Sub Focus" options={SubFocusAreaOptions} value={Level2Data.Sub_Focus_Area__c} onchange={handleInputChange} disabled></lightning-dual-listbox>
+                    </div>
+
+                    <!-- Evaluation Criteria -->
+                    <div class="section-divider">Evaluation Criteria</div>
+                    <p class="note-text">
+                        NOTE: On the scale of 1 to 10, 1 being the lowest and 10 being the highest
+                    </p>
+
+                    <div class="single-column">
+    
+                        <lightning-combobox  label="1. Innovation/Novelty"   name="Innovation_Novelty__c" value={Level2Data.Innovation_Novelty__c} options={InnovationOptions} field-level-help="Rate the uniqueness of the idea or improvement on existing solutions" onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Minimal originality<br/>4–7.9 (Moderate): Some novel aspects<br/>8–10 (High): Highly innovative</div>
+                          <lightning-textarea label="Rationale for Scoring" name="Rationale_for_Scoring__c" value={Level2Data.Rationale_for_Scoring__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <lightning-combobox label="2. Commercial Viability" name="Commercial_Viability__c" value={Level2Data.Commercial_Viability__c} options={ComericalOptions} field-level-help="Rate from 1 to 10 based on the product’s potential for successful commercialization in the market" onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Significant market barriers<br/>4–7.9 (Moderate): Some market fit<br/>8–10 (High): Strong commercial plan</div>
+                          <lightning-textarea label="Rationale for Scoring" name="Commercial_viability_Rationale__c" value={Level2Data.Commercial_viability_Rationale__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <lightning-combobox label="3. Market Potential" name="Market_Potential__c" value={Level2Data.Market_Potential__c} options={MarketOptions} field-level-help="Rate from 1-10 evaluating the anticipated demand and relevance of the product in the intended market" onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Unclear demand<br/>4–7.9 (Moderate): Moderate demand<br/>8–10 (High): Strong demand</div>
+                          <lightning-textarea label="Rationale for Scoring" name="Market_Potential_Rationale__c" value={Level2Data.Market_Potential_Rationale__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <lightning-combobox label="4. Social Impact" name="Social_Impact__c" value={Level2Data.Social_Impact__c} options={SocialOptions} field-level-help="Rate from 1 to 10 evaluating the potential of the project to improve lives, promote equity, or solve pressing social issues" onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Minimal benefit<br/>4–7.9 (Moderate): Some benefit<br/>8–10 (High): Transformative impact</div>
+                        <lightning-textarea label="Rationale for Scoring" name="Social_Impact_Rationale__c" value={Level2Data.Social_Impact_Rationale__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <lightning-combobox label="5. External Funding Potential" name="External_Funding_Potential__c" value={Level2Data.External_Funding_Potential__c} options={ExternalFundingOptions} field-level-help="Rate from 1 to 10 based on the likelihood of attracting funding from external sources" onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Not fundable<br/>4–7.9 (Moderate): Needs clarity<br/>8–10 (High): Attractive to funders</div>
+                        <lightning-textarea label="Rationale for Scoring" name="External_Funding_Potential_Rationale__c" value={Level2Data.External_Funding_Potential_Rationale__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <lightning-combobox label="6. Team Strength and Expertise" name="Team_Strength_and_Expertise__c" value={Level2Data.Team_Strength_and_Expertise__c} options={TeamStrengthOptions} field-level-help="Assess whether the team has the necessary expertise, experience, and capacity to successfully execute the project"  onchange={handleInputChange} required></lightning-combobox>
+                        <div class="rating-guide"><strong>Rating Guide:</strong><br/>1–3.9 (Low): Major gaps<br/>4–7.9 (Moderate): Some support needed<br/>8–10 (High): Highly capable team</div>
+                        <lightning-textarea label="Rationale for Scoring" name="Team_Strength_and_Expertise_Rationale__c" value={Level2Data.Team_Strength_and_Expertise_Rationale__c} onchange={handleInputChange} required></lightning-textarea>
+                          
+                      
+
+                        <div class="total-score-display slds-p-top_small">
+                            <label class="slds-form-element__label">Total Score:</label>
+                            <div class="slds-form-element__control">
+                                <span class="custom-score">{Level2Data.Total_Score__c} / 60</span>
+                            </div>
+                        </div>
+
+                        <lightning-combobox label="7. Milestone Planning" name="Milestone_Planning__c" value={Level2Data.Milestone_Planning__c} options={MilestonePlanningOptions} field-level-help="Assess whether the project includes clearly defined, realistic, and time-bound milestones aligned with its objectives" onchange={handleInputChange} required></lightning-combobox>
+                          <template if:true={showMilestoneRemarks}>
+                               <lightning-textarea label="Remarks" name="Milestone_Planning_Remarks__c" value={Level2Data.Milestone_Planning_Remarks__c} onchange={handleInputChange} required></lightning-textarea>
+                         </template>
+                        
+                        <template if:true={showMilestoneJustification}>
+                            <lightning-textarea label="If 'Partially Planned', please specify areas for improvement (100 Words)" name="Milestone_Planning_Justification__c" value={Level2Data.Milestone_Planning_Justification__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+                        <template if:true={showMilestoneJustificationNWP}>
+                            <lightning-textarea label="If 'Not Well Planned', please specify areas for improvement (100 Words)" name="Milestone_Planning_Justification_NWP__c" value={Level2Data.Milestone_Planning_Justification_NWP__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+
+                        
+
+                        <lightning-combobox label="8. Budget Adequacy" name="Budget_Requisite__c" value={Level2Data.Budget_Requisite__c} options={BudgetOptions} field-level-help="Assess whether the proposed budget is realistic, well-justified, and aligned with the project scope and activities" onchange={handleInputChange} required></lightning-combobox>
+                         <div class="rating-guide"><strong>Rating Guide:</strong><br/>Appropriate: Budget is well-aligned with the project’s scope<br/>Over-Budget: Budget exceeds what is necessary for the proposed work<br/>Under-Budget: Budget is too low to realistically achieve the project goals</div>
+                         <template if:true={showBudgetRemarks}>
+                             <lightning-textarea label="Remarks" name="Budget_Adequacy_Remarks__c" value={Level2Data.Budget_Adequacy_Remarks__c} onchange={handleInputChange} required></lightning-textarea>
+                         </template>
+                        <template if:true={showBudgetJustification}>
+                            <lightning-textarea label="If 'Over-budget', please specify areas for improvement (100 Words)" name="Budget_Requisite_Justification__c" value={Level2Data.Budget_Requisite_Justification__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+                        <template if:true={showBudgetJustificationUB}>
+                             <lightning-textarea label="If 'Under-budget', please specify areas for improvement (100 Words)" name="Budget_Requisite_Justification_UB__c" value={Level2Data.Budget_Requisite_Justification_UB__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+                        
+                    </div>
+                    
+                     
+
+                    <!-- Final Remarks -->
+                    <div class="section-divider">Final Remarks</div>
+                    <div class="single-column">
+                        <lightning-combobox label="Funding Recommendation" name="Final_recommendation_ExternalReviewer__c" value={Level2Data.Final_recommendation_ExternalReviewer__c} options={FinalRecommendationOptions} onchange={handleInputChange} required></lightning-combobox>
+                        
+                        <template if:true={showForWINTeamField}>
+                        <lightning-textarea 
+                               label="Final Recommendations on why the project has been 'Recommended for funding'" 
+                                name="ForWINTeam__c" 
+                                value={Level2Data.ForWINTeam__c} 
+                                field-level-help="This is for internal record keeping purposes for WIN Team" 
+                                onchange={handleInputChange} 
+                                required></lightning-textarea>
+                         </template>
+                        
+                         <template if:true={showCommunicateToPIField}>
+                            <lightning-textarea 
+                               label="Final Recommendations on why the project has been 'Not Recommended for funding'" 
+                                name="Final_recommendation_Not_recommended__c" 
+                                value={Level2Data.Final_recommendation_Not_recommended__c} 
+                                field-level-help="This is for internal record keeping purposes for WIN Team" 
+                                onchange={handleInputChange} 
+                                required></lightning-textarea>
+                    
+                        <lightning-textarea 
+                               label="Recommendations to be communicated to the applicant (Principal Investigator) in case the decision is 'Not Recommended for Funding' " 
+                               name="CommunicateToPI__c" 
+                               value={Level2Data.CommunicateToPI__c} 
+                               onchange={handleInputChange} 
+                               required></lightning-textarea>
+                    </template>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="button-container">
+                          <lightning-button variant="destructive-text" label="Save Draft" onclick={handleSaveDraft}></lightning-button>
+                        <lightning-button class="slds-m-left_medium" variant="destructive-text" label="Submit" onclick={handleSubmit}></lightning-button>
+                    </div>
+
+                </div>
+            </lightning-card>
+        </div>
+    </template>
+    <template if:true={alreadyReviewed}>
+    <div class="slds-box slds-theme_alert-texture slds-theme_error slds-align_absolute-center slds-text-heading_medium slds-m-around_large">
+        A review has already been submitted for this proposal.
+    </div>
+</template>
+</template>

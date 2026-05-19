@@ -1,0 +1,77 @@
+/* Main Card */
+.wrap-text {
+    max-width: 250px; 
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.milestone-card {
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* Table container */
+.milestone-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 15px;
+}
+
+/* Header row */
+.milestone-table thead th {
+    background: #f6a640; /* orange header like screenshot */
+    color: white;
+    padding: 12px 16px;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Body rows */
+.milestone-table tbody tr {
+    background: #fff8e6; /* light cream background like screenshot */
+}
+
+.milestone-table tbody tr:nth-child(even) {
+    background: #fff5d6;
+}
+
+.milestone-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0e6d6;
+    color: #333;
+}
+
+/* Row hover */
+.milestone-table tbody tr:hover {
+    background: #fdf0c6;
+    transition: 0.2s ease;
+}
+
+/* Record link styling */
+.record-link {
+    color: #0070d2;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.record-link:hover {
+    text-decoration: underline;
+}
+
+/* Buttons inside table */
+.action-btn {
+    --sds-c-button-brand-color-background: #f5a623;
+    --sds-c-button-brand-color-border: #f5a623;
+    --sds-c-button-brand-color-background-hover: #d88b16;
+    --sds-c-button-brand-color-border-hover: #d88b16;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #fff;
+}

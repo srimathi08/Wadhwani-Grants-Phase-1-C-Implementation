@@ -1,0 +1,185 @@
+<template>
+    <!-- ===== PREMIUM SHELL (visual only) ===== -->
+    <div class="form-shell">
+
+        <div class="form-container">
+
+            <!-- ================= HEADER ================= -->
+            <div class="logo-container">
+                <img src={winLogoUrl} alt="Wadhwani Foundation Logo" class="win-logo" />
+                <h1 class="custom-title">REVIEWER REGISTRATION</h1>
+            </div>
+
+            <!-- ================= BASIC INFORMATION ================= -->
+            <div class="section-card">
+                <h2 class="section-heading">Basic Information</h2>
+
+                <div class="two-column">
+                    <lightning-input label="Salutation" name="salutation"
+                        value={salutation} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="First Name" name="firstName"
+                        value={firstName} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Last Name" name="lastName"
+                        value={lastName} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Phone" name="phone"
+                        value={phone} required onchange={handleInputChange}></lightning-input>
+                </div>
+
+                <p class="note-text">
+                    Note: Primary email shall be used for all communication purposes
+                </p>
+
+                <div class="two-column">
+                    <lightning-input label="Primary Email" name="personEmail"
+                        value={personEmail} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Alternate Email" name="emailCustom"
+                        value={emailCustom} required onchange={handleInputChange}></lightning-input>
+                </div>
+
+                <div class="two-column">
+                    <lightning-input label="Current Organization" name="currentOrganization"
+                        value={currentOrganization} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Current Role" name="currentRole"
+                        value={currentRole} required onchange={handleInputChange}></lightning-input>
+                </div>
+
+                <lightning-dual-listbox
+                    name="fieldOfSpecialization"
+                    label="Field of Specialization"
+                    source-label="Available"
+                    selected-label="Selected"
+                    options={fieldOptions}
+                    value={fieldOfSpecialization}
+                    required
+                    onchange={handleMultiPicklistChange}>
+                </lightning-dual-listbox>
+
+                <lightning-input
+                    label="Profile Executive Summary"
+                    name="profileExecutiveSummary"
+                    value={profileExecutiveSummary}
+                    required
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </div>
+
+            <!-- ================= ADDRESS INFORMATION ================= -->
+            <div class="section-card">
+                <h2 class="section-heading">
+                    Address Information
+                    <lightning-helptext
+                        content="This information will be used in Non-Disclosure Agreements and honorariums.">
+                    </lightning-helptext>
+                </h2>
+
+                <lightning-input label="Street" name="billingStreet"
+                    value={billingStreet} required onchange={handleInputChange}></lightning-input>
+
+                <div class="two-column">
+                    <lightning-input label="City" name="billingCity"
+                        value={billingCity} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Postal Code" name="billingPostalCode"
+                        value={billingPostalCode} required onchange={handleInputChange}></lightning-input>
+                </div>
+
+                <div class="two-column">
+                    <lightning-combobox
+                        label="Country"
+                        name="billingCountry"
+                        value={billingCountry}
+                        options={countryOptions}
+                        required
+                        onchange={handleCountryChange}>
+                    </lightning-combobox>
+
+                    <lightning-combobox
+                        label="State"
+                        name="billingState"
+                        value={billingState}
+                        options={stateOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <!-- ================= BANKING DETAILS ================= -->
+            <div class="section-card">
+                <h2 class="section-heading">Banking & Honorarium Details</h2>
+
+                <p class="note-text">
+                    The next set of details are required to process your honorariums when applicable
+                </p>
+
+                <div class="two-column">
+                    <lightning-input label="PAN Number" name="panNumber"
+                        value={panNumber} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="IFSC Code" name="ifscCode"
+                        value={ifscCode} required onchange={handleInputChange}></lightning-input>
+                </div>
+
+                <lightning-input label="Bank Account Name" name="bankAccountName"
+                    value={bankAccountName} required onchange={handleInputChange}></lightning-input>
+
+                <lightning-input label="Account Number" name="accountNumber"
+                    value={accountNumber} required onchange={handleInputChange}></lightning-input>
+
+                <div class="two-column">
+                    <lightning-input label="Bank Name" name="bankName"
+                        value={bankName} required onchange={handleInputChange}></lightning-input>
+
+                    <lightning-input label="Branch Name" name="branchName"
+                        value={branchName} required onchange={handleInputChange}></lightning-input>
+                </div>
+            </div>
+
+            <!-- ================= CURRICULUM VITAE ================= -->
+            <div class="section-card">
+                <h2 class="section-heading">Curriculum Vitae</h2>
+
+                <lightning-input
+                    label="LinkedIn Profile URL"
+                    name="linkedInUrl"
+                    type="url"
+                    value={linkedInUrl}
+                    required
+                    onchange={handleInputChange}>
+                </lightning-input>
+
+                <lightning-file-upload
+                    label="Upload Curriculum Vitae (CV)"
+                    record-id={accountId}
+                    accept=".pdf,.doc,.docx"
+                    onuploadfinished={handleUploadFinished}>
+                </lightning-file-upload>
+
+                <template if:true={uploadedFileName}>
+                    <p class="uploaded-file">
+                        Uploaded File: <strong>{uploadedFileName}</strong>
+                    </p>
+                </template>
+            </div>
+
+            <!-- ================= SUBMIT ================= -->
+            <div class="submit-wrapper">
+                <lightning-button
+                    label="Submit"
+                    variant="brand"
+                    onclick={handleSubmit}>
+                </lightning-button>
+            </div>
+
+            <template if:true={showThankYouMessage}>
+                <p class="success-text">Thank you! Submitted.</p>
+            </template>
+
+        </div>
+    </div>
+</template>

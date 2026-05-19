@@ -1,0 +1,87 @@
+<template>
+
+    <lightning-card title="Proposal Reviews">
+
+        <div class="table-container">
+
+            <table class="review-table">
+
+                <thead>
+                    <tr>
+                        <th>Proposal Id</th>
+                        <th>Project Title</th>
+                        <th>Primary Focus Area</th>
+                        <th>Reviewer</th>
+                        <th>Recommendation</th>
+                        <template if:true={isCoeUser}>
+                            <th>Action</th>
+                        </template>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <template for:each={proposals} for:item="proposal">
+
+                        <template for:each={proposal.reviews} for:item="review">
+
+                            <tr key={review.rowKey}>
+
+                                <template if:true={review.isFirst}>
+
+                                    <!-- button instead of anchor — avoids LWC sanitization -->
+                                    <td rowspan={proposal.rowspan}>
+                                        <button
+                                            class="record-link"
+                                            data-id={proposal.proposalId}
+                                            onclick={navigateToRecord}>
+                                            {proposal.proposalName}
+                                        </button>
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan}>
+                                        {proposal.projectTitle}
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan}>
+                                        {proposal.primaryFocusArea}
+                                    </td>
+
+                                </template>
+
+                                <td>{review.reviewerName}</td>
+
+                                <td>
+                                    <span class={review.reviewStatusClass}>
+                                        {review.reviewStatus}
+                                    </span>
+                                </td>
+
+                                <template if:true={isCoeUser}>
+                                    <template if:true={review.isFirst}>
+                                        <td rowspan={proposal.rowspan}>
+                                            <lightning-button
+                                                label="Share with PI"
+                                                variant="brand"
+                                                data-id={proposal.proposalId}
+                                                onclick={handleShareWithPI}>
+                                            </lightning-button>
+                                        </td>
+                                    </template>
+                                </template>
+
+                            </tr>
+
+                        </template>
+
+                    </template>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </lightning-card>
+
+</template>

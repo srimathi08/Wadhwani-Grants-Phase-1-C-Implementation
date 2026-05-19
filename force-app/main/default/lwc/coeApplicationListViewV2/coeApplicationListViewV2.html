@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="Application List" class="dashboard-card">
+
+        <template if:true={records}>
+            <lightning-datatable
+    key-field="Id"
+    data={records}
+    columns={columns}
+    onrowaction={handleRowAction}
+    hide-checkbox-column>
+</lightning-datatable>
+        </template>
+
+        <template if:true={noData}>
+            <div class="empty-state">
+                No records found
+            </div>
+        </template>
+
+        <template if:true={error}>
+            <div class="error-box">
+                {error}
+            </div>
+        </template>
+
+        
+
+    </lightning-card>
+</template>

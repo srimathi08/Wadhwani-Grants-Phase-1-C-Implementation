@@ -1,0 +1,11 @@
+<template>
+    <template for:each={milestones} for:item="m">
+        <div key={m.Id} class="card">
+            <b>{m.Name}</b>
+            <br/>
+            Eligible ₹{m.Amount__c}
+            <input type="number" data-id={m.Id} onchange={handleAmt}/>
+            <button data-id={m.Id} onclick={disburse}>Disburse</button>
+        </div>
+    </template>
+</template>

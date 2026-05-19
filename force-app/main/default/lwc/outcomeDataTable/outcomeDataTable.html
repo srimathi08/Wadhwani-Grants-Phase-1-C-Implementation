@@ -1,0 +1,201 @@
+<template>
+    <template if:true={outcomeData}>
+        <div class="table-container">
+            <!-- Job Fulfillment Table -->
+            <template if:true={showJobFulfillment}>
+                <div class="table-title">Job Fulfilment</div>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <thead>
+                        <tr>
+                            <th>Outcome Data</th>
+                            <th>Current Fiscal year( Projections)</th>
+                            <th>Prior Fiscal Year (Current Fiscal Year-1)</th>
+                            <th>Two Years Prior (Current Fiscal Year-2)</th>
+                            <th>Three Years Prior (Current Fiscal Year-3)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>List of organizational skilling domains and durations<br>For each domain, list the # of hours of training and the duration in months.</td>
+                            <td>{outcomeData.Skills_Duration_CFY__c}</td>
+                            <td>{outcomeData.Skills_Duration_FY_1__c}</td>
+                            <td>{outcomeData.Skills_Duration_FY_2__c}</td>
+                            <td>{outcomeData.Skills_Duration_FY_3__c}</td>
+                        </tr>
+                       <tr>
+        <td># of learner enrollments</td>
+        <td>{outcomeData.Projected_Learner_Enrollments_CFY__c}</td>
+        <td>{outcomeData.Projected_Learner_Enrollments_FY_1__c}</td>
+        <td>{outcomeData.Projected_Learner_Enrollments_FY_2__c}</td>
+        <td>{outcomeData.Projected_Learner_Enrollments_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td># of learner placements</td>
+        <td>{outcomeData.Projected_Learner_Placements_CFY__c}</td>
+        <td>{outcomeData.Projected_Learner_Placements_FY_1__c}</td>
+        <td>{outcomeData.Projected_Learner_Placements_FY_2__c}</td>
+        <td>{outcomeData.Projected_Learner_Placements_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td>Learner placement %<br>Calculate this as placements/enrollments.</td>
+        <td>{outcomeData.Projected_Learner_placement_CFY__c}</td>
+        <td>{outcomeData.Projected_Learner_placement_FY_1__c}</td>
+        <td>{outcomeData.Projected_Learner_placement_FY_2__c}</td>
+        <td>{outcomeData.Projected_Learner_placement_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td>
+            Average cost per placement<br>
+            Calculate this as total organizational expense / # learner placements.
+        </td>
+        <td>{outcomeData.Avg_Cost_per_Placement_CFY__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Placement_FY_1__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Placement_FY_2__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Placement_FY_3__c}</td>
+    </tr>
+     <tr>
+        <td>
+            Placement verification via 3rd party<br>
+            Answer Y/N. If Y, then describe briefly and include evidence as an attachment.<br>
+            <b>1.</b> X3rd_Party_Placement_Verification_CFY__c (yes or no picklist)<br>
+            <b>2.</b> X3rd_Party_Verification_Description_CFY__c<br>
+        </td>
+        <td>
+             {outcomeData.X3rd_Party_Placement_Verification_CFY__c}<br>
+             {outcomeData.X3rd_Party_Verification_Description_CFY__c}<br>
+        </td>
+        <td>
+             {outcomeData.X3rd_Party_Placement_Verification_FY_1__c}<br>
+             {outcomeData.X3rd_Party_Verification_Description_FY_1__c}<br>
+        </td>
+        <td>
+            {outcomeData.X3rd_Party_Placement_Verification_FY_2__c}<br>
+            {outcomeData.X3rd_Party_Verification_Description_FY_2__c}<br>
+        </td>
+        <td>
+             {outcomeData.X3rd_Party_Placement_Verification_FY_3__c}<br>
+            {outcomeData.X3rd_Party_Verification_Description_FY_3__c}<br>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Long-term outcomes research<br>
+            (e.g., successful employment after 6 months, 12 months, etc.)<br>
+            Answer Y/N. If Y, then describe briefly and include evidence as an attachment.<br>
+            <b>1.</b> Long_Term_Outcomes_CFY__c (picklist)<br>
+            <b>2.</b> Outcome_Tracking_Details_CFY__c (rich text area)<br>
+        </td>
+        <td>
+             {outcomeData.Long_Term_Outcomes_CFY__c}<br>
+            {outcomeData.Outcome_Tracking_Details_CFY__c}<br>
+        </td>
+        <td>
+             {outcomeData.Long_Term_Outcomes_FY_1__c}<br>
+            {outcomeData.Outcome_Tracking_Details_FY_1__c}<br>
+        </td>
+        <td>
+             {outcomeData.Long_Term_Outcomes_FY_2__c}<br>
+             {outcomeData.Outcome_Tracking_Details_FY_2__c}<br>
+        </td>
+        <td>
+             {outcomeData.Long_Term_Outcomes_FY_3__c}<br>
+             {outcomeData.Outcome_Tracking_Details_FY_3__c}<br>
+        </td>
+    </tr>
+                    </tbody>
+                </table>
+            </template>
+
+            <!-- Job Creation Table -->
+            <template if:true={showJobCreation}>
+                <div class="table-title">Job Creation</div>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <thead>
+                        <tr>
+                            <th>Outcome Data</th>
+                            <th>Current Fiscal year( Projections)</th>
+                            <th>Prior Fiscal Year (Current Fiscal Year-1)</th>
+                            <th>Two Years Prior (Current Fiscal Year-2)</th>
+                            <th>Three Years Prior (Current Fiscal Year-3)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>List of Target Business sector</td>
+                            <td>{outcomeData.Target_Business_Sectors_CFY__c}</td>
+                            <td>{outcomeData.Target_Business_Sectors_FY_1__c}</td>
+                            <td>{outcomeData.Target_Business_Sectors_FY_2__c}</td>
+                            <td>{outcomeData.Target_Business_Sectors_FY_3__c}</td>
+                        </tr>
+                        <tr>
+        <td># of new businesses started</td>
+        <td>{outcomeData.Projected_New_Businesses_CFY__c}</td>
+        <td>{outcomeData.Projected_New_Businesses_FY_1__c}</td>
+        <td>{outcomeData.Projected_New_Businesses_FY_2__c}</td>
+        <td>{outcomeData.Projected_New_Businesses_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td># of jobs created by new business starts</td>
+        <td>{outcomeData.Projected_Jobs_from_New_Businesses_CFY__c}</td>
+        <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY1__c}</td>
+        <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY2__c}</td>
+        <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY3__c}</td>
+    </tr>
+    <tr>
+        <td># of existing businesses helped to grow</td>
+        <td>{outcomeData.Growing_Businesses_Supported_CFY__c}</td>
+        <td>{outcomeData.Growing_Businesses_Supported_FY_1__c}</td>
+        <td>{outcomeData.Growing_Businesses_Supported_FY_2__c}</td>
+        <td>{outcomeData.Growing_Businesses_Supported_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td># of jobs created by existing businesses helped to grow</td>
+        <td>{outcomeData.Jobs_from_Growing_Businesses_CFY__c}</td>
+        <td>{outcomeData.Jobs_from_Growing_Businesses_FY_1__c}</td>
+        <td>{outcomeData.Jobs_from_Growing_Businesses_FY_2__c}</td>
+        <td>{outcomeData.Jobs_from_Growing_Businesses_FY_3__c}</td>
+    </tr>
+    <tr>
+        <td>
+            Total average cost per job created<br>
+            Calculate this as organizational annual expense / total # of jobs created.
+        </td>
+        <td>{outcomeData.Avg_Cost_per_Job_CFY__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Job_FY_1__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Job_FY_2__c}</td>
+        <td>{outcomeData.Avg_Cost_per_Job_FY_3__c}</td>
+    </tr>
+     <tr>
+        <td>
+            Job creation verification via 3rd party<br>
+            Answer Y/N. If Y, then describe briefly and include evidence as an attachment.<br>
+            1. X3rd_Party_Placement_Verification_CFY__c (yes or no picklist)<br>
+            2. X3rd_Party_Verification_Description_CFY__c<br>
+            3. File Upload (if X3rd_Party_Placement_Verification_CFY__c = 'yes')
+        </td>
+        <td>
+            {outcomeData.Job_Verification_3rd_Party_CFY__c}<br><!--X3rd_Party_Placement_Verification_CFY__c-->
+            {outcomeData.X3rd_party_verification_details_CFY__c}<!--X3rd_Party_Verification_Description_CFY__c-->
+        </td>
+        <td>
+            {outcomeData.Job_Verification_3rd_Party_FY1__c}<br><!--X3rd_Party_Placement_Verification_FY_1__c-->
+            {outcomeData.X3rd_party_verification_details_FY1__c}<!--X3rd_Party_Verification_Description_FY_1__c-->
+        </td>
+        <td>
+             {outcomeData.Job_Verification_3rd_Party_FY2__c}<br><!--X3rd_Party_Placement_Verification_FY_2__c-->
+             {outcomeData.X3rd_party_verification_details_FY2__c}<!--X3rd_Party_Verification_Description_FY_2__c-->
+        </td>
+        <td>
+             {outcomeData.Job_Verification_3rd_Party_FY3__c}<br><!--X3rd_Party_Placement_Verification_FY_3__c-->
+             {outcomeData.X3rd_party_verification_details_FY3__c}<!--X3rd_Party_Verification_Description_FY_3__c-->
+        </td>
+    </tr>
+                    </tbody>
+                </table>
+            </template>
+        </div>
+    </template>
+    <template if:false={outcomeData}>
+        <p>No outcome data available.</p>
+    </template>
+</template>

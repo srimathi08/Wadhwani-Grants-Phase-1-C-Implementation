@@ -1,0 +1,174 @@
+<template>
+    <lightning-card title="Reviewer Assignment Report">
+
+        <!-- ================= TABSET ================= -->
+        <lightning-tabset selected-tab-value={activeTab}>
+
+            <!-- =====================================================
+                 TAB 1 : ASSIGNED PROPOSALS
+            ====================================================== -->
+            <lightning-tab
+                label="Assigned Proposals"
+                value="assigned"
+                onactive={handleTabChange}>
+
+                <!-- ACTION BAR -->
+                <div class="action-bar slds-p-around_medium slds-grid slds-gutters">
+                    <lightning-button
+                        label="Filter"
+                        variant="brand"
+                        onclick={openFilterModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Export to Excel"
+                        class="slds-m-left_small"
+                        onclick={exportExcel}>
+                    </lightning-button>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+                    <lightning-datatable
+                        key-field="rowKey"
+                        data={rows}
+                        columns={columns}
+                        hide-checkbox-column
+                        show-row-number-column>
+                    </lightning-datatable>
+                </div>
+
+            </lightning-tab>
+
+            <!-- =====================================================
+                 TAB 2 : UNASSIGNED PROPOSALS
+            ====================================================== -->
+            <lightning-tab
+                label="Unassigned Proposals"
+                value="unassigned"
+                onactive={handleTabChange}>
+
+                <!-- ACTION BAR -->
+                <div class="action-bar slds-p-around_medium slds-grid slds-gutters">
+                    <lightning-button
+                        label="Filter"
+                        variant="brand"
+                        onclick={openFilterModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Export to Excel"
+                        class="slds-m-left_small"
+                        onclick={exportUnassignedExcel}>
+                    </lightning-button>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+                    <lightning-datatable
+                        key-field="rowKey"
+                        data={unassignedRows}
+                        columns={unassignedColumns}
+                        hide-checkbox-column
+                        show-row-number-column>
+                    </lightning-datatable>
+                </div>
+
+            </lightning-tab>
+
+            <!-- =====================================================
+                 TAB 3 : PROPOSAL REVIEW REPORT
+            ====================================================== -->
+            <lightning-tab
+                label="Proposal Review Report"
+                value="proposal"
+                onactive={handleTabChange}>
+
+                <!-- ACTION BAR -->
+                <div class="action-bar slds-p-around_medium slds-grid slds-gutters">
+                    <lightning-button
+                        label="Filter"
+                        variant="brand"
+                        onclick={openFilterModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Export to Excel"
+                        class="slds-m-left_small"
+                        onclick={exportProposalExcel}>
+                    </lightning-button>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+                    <lightning-datatable
+                        key-field="rowKey"
+                        data={proposalRows}
+                        columns={proposalColumns}
+                        hide-checkbox-column
+                        show-row-number-column>
+                    </lightning-datatable>
+                </div>
+
+            </lightning-tab>
+
+        </lightning-tabset>
+
+    </lightning-card>
+
+    <!-- =====================================================
+         FILTER MODAL (USED BY ALL TABS)
+    ====================================================== -->
+    <template if:true={showFilter}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">
+                        {filterTitle}
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+
+                    <lightning-input
+                        type="date"
+                        label="From Date"
+                        value={fromDate}
+                        onchange={handleFromDate}>
+                    </lightning-input>
+
+                    <lightning-input
+                        type="date"
+                        label="To Date"
+                        class="slds-m-top_small"
+                        value={toDate}
+                        onchange={handleToDate}>
+                    </lightning-input>
+
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={closeFilterModal}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Apply"
+                        variant="brand"
+                        class="slds-m-left_small"
+                        onclick={applyFilters}>
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

@@ -1,0 +1,200 @@
+:host {
+    display: block;
+    background: #ffffff;
+}
+
+.table-container {
+    padding: 10px 15px 20px 15px;
+    overflow-x: auto;
+}
+
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.review-table thead th {
+    background: linear-gradient(to right, #f4f6f9, #eef1f6);
+    font-weight: 600;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #d8dde6;
+    letter-spacing: 0.3px;
+}
+
+.review-table tbody td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #e3e6ea;
+    vertical-align: middle;
+}
+
+.review-table tbody tr:hover {
+    background-color: #f9fbfd;
+    transition: 0.2s ease;
+}
+
+.proposal-cell {
+    font-weight: 600;
+    background-color: #f8f9fb;
+}
+
+.reviewer-cell {
+    text-align: left;
+    font-weight: 500;
+}
+
+.action-cell {
+    min-width: 150px;
+    white-space: nowrap;
+}
+
+/* Status Colors */
+
+.status-recommended {
+    color: #2e844a;
+    font-weight: 700;
+}
+
+.status-not-recommended {
+    color: #c23934;
+    font-weight: 700;
+}
+
+.status-neutral {
+    color: #5c5c5c;
+    font-weight: 600;
+}
+
+/* Proposal link */
+
+.record-link {
+    color: #0176d3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.record-link:hover {
+    text-decoration: underline;
+}
+
+/* Focus area wrapping */
+
+.focus-area-cell {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 220px;
+}
+:host {
+    display: block;
+    background: #ffffff;
+}
+
+.table-container {
+    padding: 10px 15px 20px 15px;
+    overflow-x: auto;
+}
+
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.review-table thead th {
+    background: linear-gradient(to right, #f4f6f9, #eef1f6);
+    font-weight: 600;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #d8dde6;
+}
+
+.review-table tbody td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #e3e6ea;
+}
+
+.review-table tbody tr:hover {
+    background-color: #f9fbfd;
+}
+
+.proposal-cell {
+    font-weight: 600;
+    background-color: #f8f9fb;
+}
+
+.reviewer-cell {
+    text-align: left;
+    font-weight: 500;
+}
+
+.action-cell {
+    min-width: 150px;
+}
+
+.record-link {
+    color: #0176d3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.record-link:hover {
+    text-decoration: underline;
+}
+
+.focus-area-cell {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 220px;
+}
+
+.status-recommended {
+    color: #2e844a;
+    font-weight: 700;
+}
+
+.status-not-recommended {
+    color: #c23934;
+    font-weight: 700;
+}
+
+.status-neutral {
+    color: #5c5c5c;
+    font-weight: 600;
+}
+.shared-badge-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    color: #2e844a;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.shared-check-icon {
+    --lwc-colorTextIconSuccess: #2e844a;
+}
+
+.shared-label {
+    color: #2e844a;
+}
+.record-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #0070d2;
+    cursor: pointer;
+    font-size: inherit;
+    text-decoration: underline;
+    text-align: left;
+}
+
+.record-link-btn:hover {
+    color: #005fb2;
+    text-decoration: underline;
+}

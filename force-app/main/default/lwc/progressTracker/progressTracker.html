@@ -1,0 +1,49 @@
+<template>
+    <div class="container">
+        <!-- Step 1: Institution Register -->
+        <div class="step">
+            <h3>Institution Register</h3>
+            <div class="box">
+                <template if:true={institutionCompleted}>
+                    <span>Completed</span>
+                </template>
+                <template if:false={institutionCompleted}>
+                    <a href="javascript:void(0)" onclick={navigateToInstitutionRegister}>
+                        Click to Fill
+                    </a>
+                </template>
+            </div>
+        </div>
+
+        <!-- Arrow + Step 2: COE Proposal -->
+        <template if:true={institutionCompleted}>
+            <div class="arrow">→</div>
+            <div class="step">
+                <h3>COE Proposal</h3>
+                <div class="box">
+                    <template if:true={proposalCompleted}>
+                        <span>{coeStatus}</span>
+                    </template>
+                    <template if:false={proposalCompleted}>
+                        <a href="javascript:void(0)" onclick={navigateToCOEProposal}>
+                            Click to Fill
+                        </a>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Arrow + Step 3: Project Application -->
+        <template if:true={proposalCompleted}>
+            <div class="arrow">→</div>
+            <div class="step">
+                <h3>Project Application</h3>
+                <div class="box">
+                    <a href="javascript:void(0)" onclick={navigateToProjectApplication}>
+                        Click To View
+                    </a>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

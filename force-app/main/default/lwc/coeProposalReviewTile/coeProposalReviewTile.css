@@ -1,0 +1,39 @@
+:host {
+    display: block;
+}
+
+.tile {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e6e6e6;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+.icon-wrapper {
+    background: #e8f5e9;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.tile-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.tile-subtitle {
+    font-size: 13px;
+    color: #6b6b6b;
+}

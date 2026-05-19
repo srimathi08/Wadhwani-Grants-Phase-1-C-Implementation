@@ -1,0 +1,137 @@
+<template>
+    <lightning-card title="Milestone Review">
+
+        <template if:true={proposalId}>
+
+            <!-- ✅ Proposal Header Info -->
+            <div class="header-row">
+                <template if:true={proposalInfo}>
+                    <div class="proposal-header">
+                        <div class="subtitle">
+                            <span class="headLabel">Proposal:</span> {proposalInfo.Name}
+                        </div>
+                        <div class="subtitle">
+                            <span class="headLabel">Project Title:</span> {proposalInfo.Project_Title__c}
+                        </div>
+                        <div class="subtitle">
+                            <span class="headLabel">Primary Focus Area:</span> {proposalInfo.Primary_Focus_Area__c}
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={proposalInfo}>
+                    <div class="subtitle">Loading proposal details...</div>
+                </template>
+            </div>
+
+            <!-- ✅ Milestones -->
+            <template if:true={milestones.length}>
+                <div class="tile-grid">
+                    <template for:each={milestones} for:item="m">
+                        <div key={m.Id} class="tile">
+
+                            <!-- ✅ Tile Top -->
+                            <div class="tile-top">
+                                <div class="mile-name">{m.Name}</div>
+
+                                <!-- ✅ Status + Tick (No overlap) -->
+                                <div class="rightActions">
+                                    <div class={m.statusClass}>{m.Status__c}</div>
+
+                                    <button
+                                        class={m.completeBtnClass}
+                                        title={m.completeBtnTitle}
+                                        data-id={m.Id}
+                                        onclick={handleMarkCompleted}>
+                                        ✓
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ✅ Tile Body -->
+                            <div class="tile-body">
+                                <div class="field-row">
+                                    <span class="label">Project Start Month</span>
+                                    <span class="value">{m.Project_Start_Date__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Project End Month</span>
+                                    <span class="value">{m.Project_End_Date__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Budget Req</span>
+                                    <span class="value">$ {m.Budget_Required_INR__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Disbursed</span>
+                                    <span class="value">$ {m.Disbursed_Amount__c}</span>
+                                </div>
+                            </div>
+
+                            <!-- ✅ Actions -->
+                            <div class="tile-actions">
+                                <button class="btn-outline" data-id={m.Id} onclick={handleViewDetails}>
+                                    View Details
+                                </button>
+
+                                <button class="btn-outline" data-propid={proposalId} onclick={handleReviewReport}>
+                                    Review Report
+                                </button>
+
+                                <button class="btn-primary" data-id={m.Id} onclick={handleSendToReviewer}>
+                                    Send to Reviewer
+                                </button>
+                            </div>
+
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- ✅ No milestones -->
+            <template if:false={milestones.length}>
+                <div class="empty-msg">
+                    No milestones found for this proposal.
+                </div>
+            </template>
+
+        </template>
+
+        <!-- ✅ Proposal Id Missing -->
+        <template if:false={proposalId}>
+            <div class="empty-msg">
+                Proposal Id is missing. Please go back and click "View All" again.
+            </div>
+        </template>
+
+    </lightning-card>
+
+    <!-- ✅ FLOW MODAL (opens only on button click) -->
+    <template if:true={showFlowModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium slds-hyphenate">
+                        Share Proposal with Reviewer Group
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-flow onstatuschange={handleFlowStatus}></lightning-flow>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Close" onclick={closeFlowModal}></lightning-button>
+                </footer>
+
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

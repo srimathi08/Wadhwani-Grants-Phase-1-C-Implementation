@@ -1,0 +1,580 @@
+<template>
+    
+    <!-- <div class="container">
+         Apply Now Button 
+        <lightning-button 
+                    label="Apply Now" 
+                    onclick={handleApplyNow}
+                    variant="success"
+                    disabled={isButtonDisabled}
+                    class="apply-button"></lightning-button>
+          </div> -->
+
+         
+            <!-- Apply Now Button (Hidden when form is shown) -->
+            <template if:false={showForm}>
+                <div class="slds-text-align_center">
+                    <lightning-button 
+                        label="Apply Now" 
+                        onclick={handleApplyNow}
+                        variant="success"
+                        class="apply-button">
+                    </lightning-button>
+                </div>
+            </template>
+        
+
+  
+        <template if:true={showForm}>
+            
+            <lightning-card>
+        <div class="form-container">
+            <h1 class="form-title">WIN APPLICATION FORM</h1>
+
+            
+            <!--**************************************** GENERAL INFORMATION ******************************************  -->
+           <!-- PAGE 1 -->
+            <template if:true={isPage1}>
+
+            <h2 class="section-headings">GENERAL INFORMATION</h2>
+            <lightning-layout multiple-rows>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Project Title" name="Project_Title__c" value={applicationData.Project_Title__c}  variant="standard" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+
+
+                <!-- Display the Account Name -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Institution Name" value={applicationData.Institution__c} disabled></lightning-input>
+                </lightning-layout-item> 
+
+                  <!-- Display the Contact Name -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Principal Investigator (PI)" value={applicationData.Principal_Investigator__c} disabled></lightning-input>
+                </lightning-layout-item> 
+
+                <!-- Account Name as Picklist 
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Institution Name" name="Institution__c" value={applicationData.Institution__c}  options={InstitutionOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item> -->
+
+                <!--Contact Name as Text 
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Principal Investigator (PI)" name="Principal_Investigator__c" value={applicationData.Principal_Investigator__c} variant="standard" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item> -->
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Co-Principal Investigator (Co-PI)" name="Co_Principal_Investigator_Co_PI__c" value={applicationData.Co_Principal_Investigator_Co_PI__c} variant="standard" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Project Team Members" name="Project_Team_Members__c" value={applicationData.Project_Team_Members__c} onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Primary Focus Area" name="Primary_Focus_Area__c" value={applicationData.Primary_Focus_Area__c} options={primaryFocusAreaOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Sub-Focus Area" name="Sub_Focus_Area__c"  value={applicationData.Sub_Focus_Area__c} options={subFocusAreaOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item>
+
+                <!--<lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input type="number" label="Project Duration" name="Project_Duration__c" value={applicationData.Project_Duration__c} field-level-help="Estimated time required for completion (in months)" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item> -->
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input 
+                        type="number" 
+                        label="Project Duration" 
+                        name="Project_Duration__c" 
+                        value={applicationData.Project_Duration__c} 
+                        field-level-help="Estimated time required for completion (in months)" 
+                        onchange={handleInputChange}
+                        style="--slds-c-input-helptext-text-color: maroon; --slds-c-input-helptext-color-background: white;">
+                    </lightning-input>
+                </lightning-layout-item>
+
+                
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input type="url" label="Project Website (if any)" field-level-help="Provide a link (if applicable)" name="Project_Website_if_any__c" value={applicationData.Project_Website_if_any__c} onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+            
+
+            </lightning-layout>
+
+            <!-- PREVIOUS and NEXT Button -->
+
+            <div class="button-container slds-text-align_right">
+                <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+                <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>
+                </div>
+                </template>
+
+            <!--**************************************** PROJECT DETAILS ******************************************  -->
+            <!-- PAGE 2 -->
+            <template if:true={isPage2}>
+
+            <h2 class="section-headings">PROJECT DETAILS</h2>
+            <lightning-layout multiple-rows>
+              
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Project Summary (Max 500 words)" name="Project_Summary_Max_500_words__c"  maxlength="50000" value={applicationData.Project_Summary_Max_500_words__c}  field-level-help="Briefly describe the project, objectives, and expected impact" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input type="number" label="Current Technology Readiness Level (TRL)" value={applicationData.Current_Technology_Readiness_Level_TRL__c}  field-level-help="Indicate current TRL level (Must be >3)"   min="4"  name="Current_Technology_Readiness_Level_TRL__c" onchange={handleValidateTRL}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Key Problem Being Solved" name="Key_Problem_Being_Solved__c" value={applicationData.Key_Problem_Being_Solved__c} maxlength="50000" field-level-help="Explain the problem and why it is significant" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Proposed Solution" name="Proposed_Solution__c" value={applicationData.Proposed_Solution__c} maxlength="50000" field-level-help="Describe the innovation, uniqueness, and key differentiators" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Interdisciplinary Nature" name="Interdisciplinary_Nature__c" value={applicationData.Interdisciplinary_Nature__c} maxlength="50000" field-level-help="Mention any cross-domain collaborations" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Potential for Commercialization" name="Potential_for_Commercialization__c" value={applicationData.Potential_for_Commercialization__c}  maxlength="50000" field-level-help="How will this translate into a viable product/startup?" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Target Market and Industry Application" name="Target_Market_Industry_Application__c" value={applicationData.Target_Market_Industry_Application__c} maxlength="50000" field-level-help="Describe the potential industry use cases and market opportunity" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Competitive Landscape" name="Competitive_Landscape__c" field-level-help="Who are the competitors, and how does this solution compare?" maxlength="50000" value={applicationData.Competitive_Landscape__c} onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Exit Strategy of project" name="Exit_Strategy_of_project__c" field-level-help="What are you plans on completing the project? (Startup/IP/License etc.)" maxlength="50000" value={applicationData.Exit_Strategy_of_project__c} onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Proposed WIN Grant Utilization" name="Proposed_WIN_Grant_Utilization__c" field-level-help="How will the funds be used? (WIN grants cannot be used for salaries/overheads)" maxlength="50000" value={applicationData.Proposed_WIN_Grant_Utilization__c} onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+
+                </lightning-layout>
+
+                <!-- NEXT and PREVIOUS BUTTON -->
+
+                <div class="button-container slds-text-align_right">
+                    <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>         
+                    <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>    
+                    </div> 
+                    </template>
+
+<!--**************************************** FUNDING & RESOURCES ******************************************  -->
+                <!-- PAGE 3 -->
+                <template if:true={isPage3}>
+
+               <h2 class="section-headings">FUNDING AND RESOURCES</h2>
+                <lightning-layout multiple-rows>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-combobox label="Prior Research Funding" name="Prio_Research_Funding_Yes_No__c"  value={applicationData.Prio_Research_Funding_Yes_No__c} field-level-help="Has the project received at least $500K in research funding from Govt/other sources?" options={priorResearchFundingOptions} onchange={handleInputChange}></lightning-combobox>
+                    </lightning-layout-item> 
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="List of Existing Funding Sources and Funds raised" name="List_of_Existing_Funding_Sources_and_Fun__c" maxlength="50000" value={applicationData.List_of_Existing_Funding_Sources_and_Fun__c} field-level-help="Mention any prior or ongoing funding (along with amounts raised)" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="Additional Funding Plans" name="Additional_Funding_Plans__c" value={applicationData.Additional_Funding_Plans__c} maxlength="50000" field-level-help="Will you seek additional funding? From which sources?" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="Institute Support and Facilities" name="Institute_Support_Facilities__c" value={applicationData.Institute_Support_Facilities__c} maxlength="50000" field-level-help="What infrastructure/resources are available within the institution to support your project?" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-combobox label="Collaboration with Institute Incubator" name="Collaboration_with_Institute_Incubator__c" value={applicationData.Collaboration_with_Institute_Incubator__c} field-level-help="Is this project aligned with the institution's incubator? " options={collaborationOptions} onchange={handleInputChange}></lightning-combobox>
+                    </lightning-layout-item> 
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="WIN Support" name="WIN_Support__c" value={applicationData.WIN_Support__c} field-level-help="What additional support would you require from Wadhwani Innovation network for this project (apart from funding)?" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    </lightning-layout>
+
+                    <!-- PREVIOUS AND NEXT BUTTON -->
+                    <div class="button-container slds-text-align_right">
+                        <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>                        
+                        <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>                        
+                        </div>                       
+                        </template>
+
+                 <!--**************************************** EXPECTED OUTCOMES ******************************************  -->   
+                  <!-- PAGE 4 --> 
+                  <template if:true={isPage4}>
+
+                 <h2 class="section-headings">EXPECTED OUTCOMES</h2>
+
+                 <lightning-layout multiple-rows>
+                  
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="Expected Impact (Socio-economic/Scientific/Commercial)" name="Expected_Impact_Socio_economic_Scientif__c" maxlength="50000" value={applicationData.Expected_Impact_Socio_economic_Scientif__c}  field-level-help="Describe how this project will create impact" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="Potential for Startup Formation" name="Potential_for_Startup_Formation__c" value={applicationData.Potential_for_Startup_Formation__c} maxlength="50000" field-level-help="Do you anticipate forming a startup? If yes, provide details" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="IP and Patent Potential" name="IP_Patent_Potential__c" value={applicationData.IP_Patent_Potential__c} maxlength="50000" field-level-help="Are there any patents filed or expected to be filed?" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-textarea label="Expected Revenue Model (if applicable)" name="Expected_Revenue_Model_if_applicable__c" value={applicationData.Expected_Revenue_Model_if_applicable__c} maxlength="50000" field-level-help="How will this project generate revenue post-development?" onchange={handleInputChange}></lightning-textarea>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+                     <!-- PREVIOUS AND NEXT BUTTON -->
+                     <div class="button-container slds-text-align_right">
+                        <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>                        
+                        <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>                        
+                        </div>                      
+                        
+                    </template>
+
+  <!--**************************************** Milestones and Deliverables ******************************************  -->   
+                    <!-- PAGE 5 -->
+                    <template if:true={isPage5}>
+
+                   <h2 class="section-headings">MILESTONES AND DELIVERABLES</h2>
+                   <lightning-layout multiple-rows>
+
+                    <div class="table-container">
+                        <h3 class="section-paragraph"> Key milestones, with timelines for completion </h3>
+    
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr>
+                                        <th>Milestone Description</th>
+                                        <th>Budget Required</th>
+                                        <th>Target Date</th>
+                                        <th>Justification</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={milestones} for:item="milestone">
+                                        <tr key={milestone.uniqueId}>
+                                            <td>
+                                                <lightning-input value={milestone.Milestone_Description__c} data-id={milestone.uniqueId} data-field="Milestone_Description__c" onchange={handleMilestoneChange}></lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input type="number" value={milestone.Budget_Required__c} data-id={milestone.uniqueId} data-field="Budget_Required__c" onchange={handleMilestoneChange}></lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input type="date" value={milestone.Milestone_Target_Date__c} data-id={milestone.uniqueId} data-field="Milestone_Target_Date__c" onchange={handleMilestoneChange}></lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input value={milestone.Justification__c} data-id={milestone.uniqueId} data-field="Justification__c" onchange={handleMilestoneChange}></lightning-input>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    
+                 </lightning-layout>
+
+                 <lightning-button label="Add Row" onclick={addRow} variant="destructive-text" class="slds-m-top_small"></lightning-button>
+
+            <!-- PREVIOUS AND NEXT BUTTON -->
+               <div class="button-container slds-text-align_right">
+               <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+               <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>
+               </div>
+               </template>
+
+              <!-- **************************************** FILE UPLOAD TABLE WITH HELP TEXT ****************************************** -->
+
+              <!-- PAGE 6-->
+              <template if:true={isPage6}>
+              <h2 class="section-headings">SUPPORTING DOCUMENTS</h2>
+
+<div class="file-upload-container">
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+            <tr>
+                <th>Document Type</th>
+                <th>Upload File</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={fileUploadFields} for:item="file">
+                <tr key={file.name}>
+                    <td class="file-label">
+                        {file.label}
+                        <template if:true={file.helpText}>
+                            <lightning-helptext content={file.helpText}></lightning-helptext>
+                        </template>
+                    </td>
+                    <td>
+                        <lightning-file-upload 
+                            label="Upload File"
+                            name={file.name}
+                            record-id={applicationRecordId}
+                            accept=".pdf,.doc,.docx"
+                            onuploadfinished={handleFileUpload}
+                            multiple="false">
+                        </lightning-file-upload>
+                        <template if:true={file.uploadedFileName}>
+                            <p class="file-name">Uploaded: {file.uploadedFileName}</p>
+                        </template>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- PREVIOUS AND NEXT BUTTONS -->
+
+<div class="button-container slds-text-align_right">
+    <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+    <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small" disabled={isLastPage}></lightning-button>
+    </div>
+
+        <!-- Action Buttons -->
+        <div class="button-container">
+            <lightning-button label="Preview" variant="destructive-text" onclick={handlePreview}></lightning-button>
+            <lightning-button label="Submit" variant="success" onclick={handleSubmit}></lightning-button>
+        </div>
+    </template>
+
+<!-- PREVIEW MODAL -->
+<template if:true={isPreviewVisible}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium">Application Form Preview</h2>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                
+                <!-- PAGE 1: GENERAL INFORMATION -->
+                <template if:true={isPreviewPage1}>
+                    <h2 class="section-headings">GENERAL INFORMATION</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Project Title</div>
+                            <div class="value-column">{applicationData.Project_Title__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Institution Name</div>
+                            <div class="value-column">{applicationData.Institution__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Principal Investigator</div>
+                            <div class="value-column">{applicationData.Principal_Investigator__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Co-Principal Investigator</div>
+                            <div class="value-column">{applicationData.Co_Principal_Investigator_Co_PI__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Project Team Members</div>
+                            <div class="value-column">{applicationData.Project_Team_Members__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Primary Focus Area</div>
+                            <div class="value-column">{applicationData.Primary_Focus_Area__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Sub-Focus Area</div>
+                            <div class="value-column">{applicationData.Sub_Focus_Area__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Project Duration</div>
+                            <div class="value-column">{applicationData.Project_Duration__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Project Website</div>
+                            <div class="value-column">{applicationData.Project_Website_if_any__c}</div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 2: PROJECT DETAILS -->
+                <template if:true={isPreviewPage2}>
+                    <h2 class="section-headings">PROJECT DETAILS</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Project Summary</div>
+                            <div class="value-column">{applicationData.Project_Summary_Max_500_words__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Current Technology Readiness Level</div>
+                            <div class="value-column">{applicationData.Current_Technology_Readiness_Level_TRL__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Key Problem Being Solved</div>
+                            <div class="value-column">{applicationData.Key_Problem_Being_Solved__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Proposed Solution</div>
+                            <div class="value-column">{applicationData.Proposed_Solution__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Interdisciplinary Nature</div>
+                            <div class="value-column">{applicationData.Interdisciplinary_Nature__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Commercialization</div>
+                            <div class="value-column">{applicationData.Potential_for_Commercialization__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Target Market and Industry Application</div>
+                            <div class="value-column">{applicationData.Target_Market_Industry_Application__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Competitive Landscape</div>
+                            <div class="value-column">{applicationData.Competitive_Landscape__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Exit Strategy of project</div>
+                            <div class="value-column">{applicationData.Exit_Strategy_of_project__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Proposed WIN Grant Utilization</div>
+                            <div class="value-column">{applicationData.Proposed_WIN_Grant_Utilization__c}</div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 3: FUNDING AND RESOURCES -->
+                <template if:true={isPreviewPage3}>
+                    <h2 class="section-headings">FUNDING AND RESOURCES</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Prior Research Funding</div>
+                            <div class="value-column">{applicationData.Prio_Research_Funding_Yes_No__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Existing Funding Sources</div>
+                            <div class="value-column">{applicationData.List_of_Existing_Funding_Sources_and_Fun__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Additional Funding Plans</div>
+                            <div class="value-column">{applicationData.Additional_Funding_Plans__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Institute Support and Facilities</div>
+                            <div class="value-column">{applicationData.Institute_Support_Facilities__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Collaboration with Institute Incubator</div>
+                            <div class="value-column">{applicationData.Collaboration_with_Institute_Incubator__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Commercialization</div>
+                            <div class="value-column">{applicationData.Potential_for_Commercialization__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">WIN Support</div>
+                            <div class="value-column">{applicationData.WIN_Support__c}</div>
+                        </div>
+                    </div>
+                </template>
+
+
+                <!-- PAGE 4: EXPECTED OUTCOMES -->
+                <template if:true={isPreviewPage4}>
+                    <h2 class="section-headings">EXPECTED OUTCOMES</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Expected Impact (Socio-economic/Scientific/Commercial)</div>
+                            <div class="value-column">{applicationData.Expected_Impact_Socio_economic_Scientif__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Startup Formation</div>
+                            <div class="value-column">{applicationData.Potential_for_Startup_Formation__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">IP and Patent Potential</div>
+                            <div class="value-column">{applicationData.IP_Patent_Potential__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Expected Revenue Model</div>
+                            <div class="value-column">{applicationData.Expected_Revenue_Model_if_applicable__c}</div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 5: MILESTONES AND DELIVERABLES -->
+                <template if:true={isPreviewPage5}>
+                    <h2 class="section-headings">MILESTONES AND DELIVERABLES</h2>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr>
+                                <th>Milestone Description</th>
+                                <th>Budget Required</th>
+                                <th>Target Date</th>
+                                <th>Justification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={filledMilestones} for:item="milestone">
+                                <tr key={milestone.uniqueId}>
+                                    <td class="wrapped-text">{milestone.Milestone_Description__c}</td>
+                                    <td>{milestone.Budget_Required__c}</td>
+                                    <td>{milestone.Milestone_Target_Date__c}</td>
+                                    <td class="wrapped-text">{milestone.Justification__c}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+
+                <!-- PAGE 6: SUPPORTING DOCUMENTS -->
+                <template if:true={isPreviewPage6}>
+                    <h2 class="section-headings">SUPPORTING DOCUMENTS</h2>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th>Uploaded File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={fileUploadFields} for:item="file">
+                                <tr key={file.name}>
+                                    <td class="file-label">{file.label}</td>
+                                    <td>
+                                        <template if:true={file.uploadedFileName}>
+                                            {file.uploadedFileName}
+                                        </template>
+                                        <template if:false={file.uploadedFileName}>
+                                            No file uploaded
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                
+
+            </div>
+
+            <!-- Preview Modal Footer -->
+            <footer class="slds-modal__footer">
+                <lightning-button label="Previous" onclick={handlePreviewPrevious} variant="destructive-text" disabled={isFirstPreviewPage}></lightning-button>
+                <lightning-button label="Next" onclick={handlePreviewNext} variant="destructive-text" class="slds-m-left_small" disabled={isLastPreviewPage}></lightning-button>
+                <lightning-button label="Close" onclick={handleClosePreview} variant="destructive-text" class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+</div>
+</lightning-card>  
+</template>  
+</template>

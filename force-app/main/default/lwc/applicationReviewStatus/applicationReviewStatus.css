@@ -1,0 +1,108 @@
+:host {
+    display: block;
+}
+
+/* Center the card title */
+.center-title lightning-card h2 {
+    text-align: center;
+}
+
+/* Main table container */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+}
+
+/* Table header with Wadhwani button color (teal) */
+.custom-table thead {
+    background-color: #00796b; /* Matches Download PDF button */
+}
+
+.custom-table thead th {
+    color: white;
+    font-weight: bold;
+    padding: 6px 12px;; 
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid #00796b;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Table body cells */
+.custom-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    background-color: white;
+    transition: background-color 0.3s ease;
+}
+
+/* Column alignment */
+.custom-table td:first-child {
+    text-align: left;
+}
+
+.custom-table td:nth-child(2),
+.custom-table td:nth-child(3),
+.custom-table td:last-child {
+    text-align: center;
+}
+
+/* Zebra striping */
+.custom-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Row hover */
+.custom-table tbody tr:hover {
+    background-color: #f4f6f9;
+}
+
+/* Average row */
+.custom-table .avg-row {
+    background-color: #f0f2f5;
+    font-weight: bold;
+    border-top: 2px solid #ccc;
+}
+
+/* Status badge base */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Icons inside status pills */
+.status-badge svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Completed: green */
+.status-completed {
+    background-color: #e6f9ec;
+    color: #007d47;
+}
+
+/* In Progress: blue */
+.status-in-progress {
+    background-color: #e0f0ff;
+    color: #0070d2;
+}
+
+/* Yet to Start: yellow */
+.status-yet-to-start {
+    background-color: #fff4e5;
+    color: #8a6d3b;
+}

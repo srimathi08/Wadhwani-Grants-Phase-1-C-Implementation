@@ -1,0 +1,170 @@
+/* ================================
+   STEPPER WRAPPER
+   ================================ */
+
+.journey-wrapper {
+  background: #ffffe5;
+  padding: 28px 20px 32px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin: 20px;
+}
+
+/* ================================
+   STEPS CONTAINER
+   ================================ */
+
+.journey-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* Dashed line behind circles */
+.journey-steps::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    #d1d5db,
+    #d1d5db 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  z-index: 0;
+}
+
+/* ================================
+   STEP
+   ================================ */
+
+.journey-step {
+  width: 220px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ================================
+   CIRCLE
+   ================================ */
+
+.circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin: 0 auto 8px;
+}
+
+.journey-step.active .circle {
+  background: #bf2026;
+  color: #ffffff;
+}
+
+/* ================================
+   TEXT
+   ================================ */
+
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.status {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.status-icon {
+  margin-left: 4px;
+}
+
+/* ================================
+   ACTION LINKS
+   ================================ */
+
+.action-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+/* ================================
+   INFO BANNER (ONBOARDING STYLE)
+   ================================ */
+
+.info-banner {
+  display: flex;
+  gap: 16px;
+  background: #fff4c4;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 28px 20px 20px;
+  border-left: 4px solid #f59e0b;
+  align-items: flex-start;
+}
+
+.info-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6b7280;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
+}
+
+.info-text {
+  font-size: 14px;
+  color: #374151;
+  margin: 4px 0 12px;
+}
+
+.info-button {
+  display: inline-block;
+  background: #bf2026;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.info-button:hover {
+  background: #9e191f;
+}

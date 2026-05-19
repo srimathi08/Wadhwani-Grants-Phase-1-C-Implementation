@@ -1,0 +1,30 @@
+<template>
+    <template if:true={isModalOpen}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal Header -->
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Send NDA Contract</h2>
+                    <button class="slds-button slds-button_icon slds-modal__close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </header>
+
+                <!-- Modal Body -->
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-input label="Company Name" value={companyName} disabled></lightning-input>
+                    <lightning-input label="Email Address of Requester" value={requesterEmail} disabled></lightning-input>
+                    <lightning-input label="Counterparty Name" value={counterpartyName} onchange={handleInputChange} data-field="counterpartyName"></lightning-input>
+                    <lightning-combobox label="Contract Template" options={contractOptions} value={contractTemplate} onchange={handleInputChange} data-field="contractTemplate"></lightning-combobox>
+                </div>
+
+                <!-- Modal Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" variant="neutral" onclick={closeModal}></lightning-button>
+                    <lightning-button label="Send NDA" variant="brand" onclick={handleSubmit}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

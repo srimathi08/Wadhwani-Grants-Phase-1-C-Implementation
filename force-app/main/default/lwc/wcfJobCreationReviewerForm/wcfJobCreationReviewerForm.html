@@ -1,0 +1,127 @@
+<template>
+    <!-- Loading Spinner 
+    <template if:true={isLoading}>
+        <div class="slds-p-around_medium slds-text-align_center">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </template>-->
+
+    <!-- Main Form Content -->
+    <template if:true={showForm}>
+        <div class="form-container">
+            <div class="logo-section">
+                <img src={logoUrl} alt="WIN Logo" class="logo-img" />
+                <h1 class="form-title">WCF PROJECT PROPOSAL REVIEW</h1>
+            </div>
+
+            <lightning-card>
+                <div class="slds-m-around_medium">
+
+                    <!-- Organizational Fit -->
+                    <div class="section-divider">Organizational Fit</div>
+                    <div class="single-column">
+                        <div class="rating-guide"><strong> How would you rate the organization's financial stability over the past 3 years?</strong></div>
+                        <lightning-combobox label="Rating" name="Rate_financial_stability_over_3_years__c" value={reviewData.Rate_financial_stability_over_3_years__c} options={RateStabilityOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Financial_Stability_Comments_3Y__c" value={reviewData.Financial_Stability_Comments_3Y__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>How complete and credible are the submitted financial records?</strong></div>
+                        <lightning-combobox label="Rating" name="Financial_records_credible_complete__c" value={reviewData.Financial_records_credible_complete__c} options={CredibleRecordsOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Financial_Records_Comments__c" value={reviewData.Financial_Records_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>How strong is the organization’s vision and plan for sustainability?</strong></div>
+                        <lightning-combobox label="Rating" name="How_strong_is_the_sustainability_vision__c" value={reviewData.How_strong_is_the_sustainability_vision__c} options={SustainabilityVisionOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Sustainability_Plan_Comments__c" value={reviewData.Sustainability_Plan_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    </div>
+
+                    <!-- Strategic Alignment -->
+                    <div class="section-divider">Strategic Alignment</div>
+                    <div class="single-column">
+                        <div class="rating-guide"><strong>How well are the organization's programs (Job Creation) aligned with WCF's strategic priorities?</strong></div>
+                        <lightning-combobox label="Rating" name="Program_alignment_with_WCF_priorities__c" value={reviewData.Program_alignment_with_WCF_priorities__c} options={ProgramAligmentOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Program_Job_Alignment_WCF_Comments__c" value={reviewData.Program_Job_Alignment_WCF_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>How would you rate the organization's current scale of operations in terms of the Foundation's funding strategy?(~10K placements per year OR ~5K new jobs added per year)</strong></div>
+                        <lightning-combobox label="Rating" name="Org_scale_vs_funding_goals__c" value={reviewData.Org_scale_vs_funding_goals__c} options={OrgScaleOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Org_Scale_vs_WCF_Strategy_Comments__c" value={reviewData.Org_Scale_vs_WCF_Strategy_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    </div>
+
+                    <!-- Use of Funds -->
+                    <div class="section-divider">Use of Funds</div>
+                    <div class="single-column">
+                        <div class="rating-guide"><strong>How well-articulated, feasible, and outcome-linked is the proposed use of $1M/year funding?</strong></div>
+                        <lightning-combobox label="Rating" name="X1M_plan_clear_feasible_linked__c" value={reviewData.X1M_plan_clear_feasible_linked__c} options={PlanClearOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Proposed_1M_Funding_Use_Comments__c" value={reviewData.Proposed_1M_Funding_Use_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>What is your best estimate of the increment in job placements if WCF funding is provided as requested?</strong><br>
+                                                    (Guideline: The answer should be a numerical value indicating no. of additional placments)</div>
+                        <lightning-combobox label="Rating" name="Estimated_Jobs_with_WCF_Funding__c" value={reviewData.Estimated_Jobs_with_WCF_Funding__c} options={EstdJobPlacementsOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Estd_job_placements_comments__c" value={reviewData.Estd_job_placements_comments__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>Describe your rationale for the additional job placements</strong></div>
+                        <lightning-textarea label="Comment" name="Rationale_for_Added_Placements_Comments__c" value={reviewData.Rationale_for_Added_Placements_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    </div>
+
+                    <!-- GenieAI Synergy -->
+                    <div class="section-divider">GenieAI Synergy</div>
+                    <div class="single-column">
+                        <div class="rating-guide"><strong>How strong is the potential for meaningful GenieAI adoption?</strong></div>
+                        <lightning-combobox label="Rating" name="GenieAI_adoption_potential__c" value={reviewData.GenieAI_adoption_potential__c} options={GenAIOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="GenieAI_Adoption_Strength_Comments__c" value={reviewData.GenieAI_Adoption_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    </div>
+
+                    <!-- Entrepreneurship Model & Outcomes -->
+                    <div class="section-divider">Entrepreneurship Model & Outcomes</div>
+                    <div class="single-column">
+                        <div class="rating-guide"><strong>How effectively does the model enable measurable business creation and growth?</strong></div>
+                        <lightning-combobox label="Rating" name="Business_Creation_Growth_Effectiveness__c" value={reviewData.Business_Creation_Growth_Effectiveness__c} options={BusinessCreationGrowthOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Measurable_Business_Creation_Comments__c" value={reviewData.Measurable_Business_Creation_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>How credible and well-attributed are enrollment and placement numbers over the past 3 years?</strong></div>
+                        <lightning-combobox label="Rating" name="X3yr_enrollment_placement_credibility__c" value={reviewData.X3yr_enrollment_placement_credibility__c} options={EnrollmentPlacementOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Enrollment_Placement_Credibility_Comment__c" value={reviewData.Enrollment_Placement_Credibility_Comment__c} onchange={handleInputChange} required></lightning-textarea>
+
+                        <div class="rating-guide"><strong>How credible is the evidence of third-party validation and long-term employment?</strong></div>
+                        <lightning-combobox label="Rating" name="Evidence_of_validation_long_term_jobs__c" value={reviewData.Evidence_of_validation_long_term_jobs__c} options={EvidenceValidationOptions} onchange={handleInputChange} required></lightning-combobox>
+                        <lightning-textarea label="Comment" name="Evidence_of_Validation_Jobs_Comments__c" value={reviewData.Evidence_of_Validation_Jobs_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    </div>
+
+                    <!-- Final Recommendation -->
+                    <div class="section-divider">Final Recommendation</div>
+                    <div class="single-column">
+                        <lightning-combobox label="Do you recommend this application for CEO review?" name="Recommend_for_CEO_review__c" value={reviewData.Recommend_for_CEO_review__c} options={recommendForCeoOptions} onchange={handleInputChange} required></lightning-combobox>
+
+                        <template if:true={showCeoRecommendationYes}>
+                            <div class="rating-guide"><strong>How strongly do you recommend FOR consideration of this proposal?</strong></div>
+                            <lightning-combobox label="Strength of recommendation?" name="Strength_of_recommendation__c" value={reviewData.Strength_of_recommendation__c} options={StrengthRecommendationOptions} onchange={handleInputChange} required></lightning-combobox>
+                            <lightning-textarea label="Recommendation Strength Comments" name="Recommendation_Strength_Comments__c" value={reviewData.Recommendation_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                            <lightning-textarea label="List up to 3 strengths of this proposal, in ranked order" name="Top_3_proposal_strengths_ranked__c" value={reviewData.Top_3_proposal_strengths_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                            <lightning-textarea label="List up to 3 weaknesses of this proposal, in ranked order" name="Top_3_proposal_weaknesses_ranked__c" value={reviewData.Top_3_proposal_weaknesses_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+
+                        <template if:true={showCeoRecommendationNo}>
+                            <div class="rating-guide"><strong>How strongly do you recommend AGAINST consideration of this proposal?</strong></div>
+                            <lightning-combobox label="Strength of non-recommendation?" name="Strength_of_non_recommendation__c" value={reviewData.Strength_of_non_recommendation__c} options={StrengthNoRecommendationOptions} onchange={handleInputChange} required></lightning-combobox>
+                            <lightning-textarea label="Non-Recommendation Strength Comments" name="Non_Recommendation_Strength_Comments__c" value={reviewData.Non_Recommendation_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                            <lightning-textarea label="List up to 3 strengths of this proposal, in ranked order" name="Top_3_proposal_strengths_ranked__c" value={reviewData.Top_3_proposal_strengths_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                            <lightning-textarea label="List up to 3 weaknesses of this proposal, in ranked order" name="Top_3_proposal_weaknesses_ranked__c" value={reviewData.Top_3_proposal_weaknesses_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                        </template>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="button-container">
+                        <lightning-button variant="destructive-text" label="Save Draft" onclick={handleSaveDraft}></lightning-button>
+                        <lightning-button class="slds-m-left_medium" variant="destructive-text" label="Submit" onclick={handleSubmit}></lightning-button>
+                    </div>
+
+                </div>
+            </lightning-card>
+        </div>
+    </template>
+
+    <!-- Already Reviewed Message -->
+    <template if:true={alreadyReviewed}>
+        <div class="slds-box slds-theme_alert-texture slds-theme_error slds-align_absolute-center slds-text-heading_medium slds-m-around_large">
+            A review has already been submitted for this proposal.
+        </div>
+    </template>
+</template>

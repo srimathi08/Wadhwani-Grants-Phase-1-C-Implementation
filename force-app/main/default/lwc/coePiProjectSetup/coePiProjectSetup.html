@@ -1,0 +1,47 @@
+<template>
+    <div class="section-card">
+
+        <div class="section-header">
+            <div class="header-left">
+                <span class="step">3</span>
+                <div class="title-group">
+                    <h3>PI Setup</h3>
+                    <p>Add and manage Principal Investigators</p>
+                </div>
+            </div>
+            <span class="status active">Active</span>
+        </div>
+
+        <div class="card-grid">
+
+            <!-- Add PI -->
+            <div class="action-card" onclick={navigateToAddPI}>
+                <div>
+                    <h4>Add PI</h4>
+                    <p>Register a new PI contact</p>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+
+            <!-- Registered PIs -->
+            <div class="action-card" onclick={navigateToRegisteredPIs}>
+                <div>
+                    <h4>Registered PIs</h4>
+                    <p>{registeredPiCount} registered on portal</p>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+
+            <!-- Manage PI -->
+            <div class="action-card" onclick={navigateToManagePI}>
+                <div>
+                    <h4>Manage PI</h4>
+                    <p>{addedPiCount} added &nbsp;·&nbsp; {registeredPiCount} registered</p>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+
+        </div>
+
+    </div>
+</template>

@@ -1,0 +1,180 @@
+<template>
+    <lightning-card
+        title="WIN Admin – Level 1 Approval Dashboard"
+        icon-name="standard:approval">
+
+        <!-- Top Filters Section -->
+        <div class="slds-p-around_small slds-grid slds-wrap slds-gutters">
+
+            <!-- COE Dropdown -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                <lightning-combobox
+                    label="Select COE"
+                    value={selectedCoEId}
+                    placeholder="Select COE"
+                    options={coeOptions}
+                    onchange={handleCoeChange}>
+                </lightning-combobox>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                <lightning-input
+                    type="search"
+                    label="Search Proposals"
+                    placeholder="Search by Proposal Id, Title or Focus Area"
+                    onkeyup={handleSearch}>
+                </lightning-input>
+            </div>
+
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-container">
+            <table class="review-table">
+                <thead>
+                    <tr>
+                        <th>Proposal Id</th>
+                        <th>Project Title</th>
+                        <th>Primary Focus Area</th>
+                        <th>Reviewer</th>
+                        <th>Funding Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template for:each={proposals} for:item="proposal">
+                        <template for:each={proposal.reviews} for:item="review">
+                            <tr key={review.rowKey}>
+
+                                <!-- Proposal Details (Only First Row) -->
+                                <template if:true={review.isFirst}>
+                                    <td rowspan={proposal.rowspan} class="proposal-cell">
+                                        <a href="javascript:void(0);"
+                                           data-id={proposal.proposalId}
+                                           onclick={navigateToRecord}
+                                           class="record-link">
+                                            {proposal.proposalName}
+                                        </a>
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan} class="proposal-cell">
+                                        {proposal.projectTitle}
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan} class="proposal-cell focus-area-cell">
+                                        {proposal.primaryFocusArea}
+                                    </td>
+                                </template>
+
+                                <!-- Reviewer -->
+                                <td class="reviewer-cell">
+                                    {review.reviewerName}
+                                </td>
+
+                                <!-- Funding Status -->
+                                <td>
+                                    <span class={review.reviewStatusClass}>
+                                        {review.reviewStatus}
+                                    </span>
+                                </td>
+
+                                <!-- Action Column -->
+                                <template if:true={review.isFirst}>
+                                    <td rowspan={proposal.rowspan} class="action-cell">
+
+                                        <!-- If Decision Taken -->
+                                        <template if:true={proposal.decisionTaken}>
+                                            <span class={proposal.decisionClass}>
+                                                {proposal.finalDecision}
+                                            </span>
+                                        </template>
+
+                                        <!-- If Decision NOT Taken -->
+                                        <template if:false={proposal.decisionTaken}>
+                                            <lightning-button
+                                                label="Approve"
+                                                variant="brand"
+                                                data-id={proposal.proposalId}
+                                                onclick={handleApproveClick}
+                                                disabled={proposal.disableApprove}>
+                                            </lightning-button>
+
+                                            <lightning-button
+                                                label="Reject"
+                                                variant="destructive"
+                                                icon-name="utility:close"
+                                                data-id={proposal.proposalId}
+                                                onclick={handleRejectClick}
+                                                class="slds-m-left_small">
+                                            </lightning-button>
+                                        </template>
+
+                                    </td>
+                                </template>
+
+                            </tr>
+                        </template>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+    </lightning-card>
+
+    <!-- =====================================================
+         COMMENTS MODAL
+    ====================================================== -->
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <!-- Modal Header -->
+                <header class="slds-modal__header">
+                    <button
+                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        onclick={handleModalClose}>
+                        <lightning-icon
+                            icon-name="utility:close"
+                            size="small">
+                        </lightning-icon>
+                    </button>
+                    <h2 class="slds-modal__title">
+                        {modalTitle}
+                    </h2>
+                </header>
+
+                <!-- Modal Body -->
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-textarea
+                        label="Comments"
+                        placeholder="Enter your comments here..."
+                        value={comments}
+                        onchange={handleCommentsChange}
+                        max-length="1000">
+                    </lightning-textarea>
+                </div>
+
+                <!-- Modal Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        variant="neutral"
+                        onclick={handleModalClose}>
+                    </lightning-button>
+                    <lightning-button
+                        label={modalConfirmLabel}
+                        variant={modalConfirmVariant}
+                        onclick={handleModalConfirm}
+                        class="slds-m-left_small"
+                        disabled={isSubmitting}>
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

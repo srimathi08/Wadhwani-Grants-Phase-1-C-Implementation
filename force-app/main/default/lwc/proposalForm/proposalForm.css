@@ -1,0 +1,238 @@
+.form-container {
+    padding: 1.5rem;
+    max-width: 1500px;
+    margin: 2rem auto;
+    font-family: 'Open Sans', sans-serif;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+/* Header styling */
+th {
+    background-color: #a01c21;
+    color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+ 
+
+
+/* Cell styling */
+td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+ 
+/* Merge cell styling for S No column */
+td[rowspan] {
+    vertical-align: middle; /* Centers the "2" across merged rows */
+    text-align: center;
+}
+ 
+/* Ensure subpoints (i), (ii), (iii), and (iv) align properly */
+td:nth-child(2) {
+    padding-left: 10px; /* Adjust spacing if necessary */
+   
+}
+.form-layout {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.field-spacing {
+    padding: 10px;
+}
+
+.table-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.custom-table {
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    width: 100%;
+}
+
+/* Table Header Styles */
+.custom-table th {
+    border: 1px solid #e6d8e4;
+    padding: 0.4rem 0.5rem;
+    background-color: #a12026;
+    font-size: 0.85rem;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: middle;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.3;
+}
+
+/* Table Body Styles */
+.custom-table td {
+    border: 1px solid #e6d8e4;
+    padding: 0.4rem 0.5rem;
+    background-color: white;
+    font-size: 0.85rem;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    vertical-align: middle;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
+}
+
+.custom-table th:nth-child(1),
+.custom-table td:nth-child(1) {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.custom-table th:nth-child(2),
+.custom-table td:nth-child(2) {
+    width: 300px;
+    min-width: 300px;
+    max-width: 400px;
+    text-align: left;
+    white-space: normal; /* allow wrapping */
+}
+
+.custom-table th:nth-child(3),
+.custom-table td:nth-child(3) {
+    width: auto;
+    min-width: 400px;
+    max-width: 600px;
+    text-align: left;
+    white-space: normal; /* allow wrapping */
+}
+
+/* Lightning Combobox Customization */
+.slds-combobox_compact .slds-combobox__input {
+    height: 28px;
+    padding: 0.2rem;
+    font-size: 0.85rem;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    max-width: 600px;
+    width: auto;
+}
+
+/* Notes, intro, and spacing text */
+.note-text,
+.slds-m-top_medium,
+.Intro {
+    font-size: 0.85rem;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+/* Button customization */
+.custom-btn::part(button) {
+    background-color: #a12026;
+    color: white;
+    border: 1px solid #7e191f;
+    border-radius: 4px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+/* Lightning input label customization */
+.fields {
+    font-size: 0.85rem;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.fields lightning-input label {
+    font-weight: bold;
+}
+
+/* Inputs inside table */
+.custom-table td input {
+    max-width: 100%;
+    font-size: 0.85rem;
+    font-family: 'Open Sans', sans-serif;
+    padding: 0.2rem;
+    box-sizing: border-box;
+}
+
+/* Optional: make table more mobile-friendly */
+@media (max-width: 768px) {
+    .custom-table th,
+    .custom-table td {
+        font-size: 0.8rem;
+        padding: 0.3rem;
+    }
+}
+
+/* Explicit wrapped-text class if needed */
+.wrapped-text {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    font-size: 0.85rem;
+    color: black;
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.4;
+}
+
+.thank-you {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #a12026;
+    font-family: 'Open Sans', sans-serif;
+    text-align: center;
+}
+
+.bold-label {
+    font-weight: bold;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;  /* Centers content horizontally */
+    gap: 15px;  /* Space between logo and title */
+    text-align: center;
+    position: relative; /* Allows slight positioning adjustments */
+}
+
+.win-logo {
+    height: 50px; /* Adjust logo size */
+    width: auto;
+    position: relative;
+    top: -5px; /* Moves logo up slightly (adjust as needed) */
+}
+
+.custom-title{
+    font-family: 'Open Sans', sans-serif;
+    color: #a12026;
+    font-weight: bold;
+}

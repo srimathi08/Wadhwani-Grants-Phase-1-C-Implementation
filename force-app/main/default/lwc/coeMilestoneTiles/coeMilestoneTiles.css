@@ -1,0 +1,169 @@
+/* ======================================================
+   PAGE
+====================================================== */
+
+.page {
+    padding: 24px;
+    background: #f8fafc;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.header {
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.subtitle {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* ======================================================
+   GRID
+====================================================== */
+
+.grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* ======================================================
+   TILE (CARD)
+====================================================== */
+
+.tile {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px;
+    border: 1px solid #f1f1f1;
+    border-left: 5px solid #8f1d1d;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+    transition: all .25s ease;
+}
+
+.tile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(0,0,0,0.1);
+}
+
+/* ======================================================
+   TILE TOP
+====================================================== */
+
+.tile-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tile-title {
+    font-weight: 800;
+    font-size: 16px;
+    color: #111827;
+}
+
+/* ======================================================
+   STATUS PILLS
+====================================================== */
+
+.status {
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+    background: #fef2f2;
+    color: #8f1d1d;
+}
+
+/* Success */
+.status--success {
+    background: #dcfce7;
+    color: #166534;
+    border: none;
+}
+
+/* ======================================================
+   META
+====================================================== */
+
+.tile-meta {
+    margin-top: 12px;
+    color: #374151;
+    font-size: 13px;
+    display: grid;
+    gap: 8px;
+}
+
+.lbl {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* ======================================================
+   ACTIONS
+====================================================== */
+
+.actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+/* Base button */
+
+.btn {
+    border: none;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+    transition: all .25s ease;
+}
+
+/* Primary (Manage Fund) */
+
+.btn.primary {
+    background: linear-gradient(135deg,#8f1d1d,#741414);
+    color: #ffffff;
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(143,29,29,.45);
+}
+
+/* Secondary (View Details) */
+
+.btn.secondary {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.btn.secondary:hover {
+    background: #e5e7eb;
+}
+
+/* ======================================================
+   EMPTY STATE
+====================================================== */
+
+.empty {
+    padding: 22px;
+    border: 2px dashed #e5e7eb;
+    border-radius: 14px;
+    color: #6b7280;
+    background: #fafafa;
+    text-align: center;
+}

@@ -1,0 +1,25 @@
+<template>
+    <lightning-card class="slds-p-around_small">
+        <div slot="title" class="dashboard-title">
+            My Proposals Dashboard
+        </div>
+
+        <div class="grid">
+            <template for:each={cards} for:item="c">
+                <article
+                    key={c.id}
+                    class={c.combinedClass}
+                    data-filter={c.listViewApiName}
+                    onclick={handleNavigate}
+                    title={c.label}
+                >
+                    <div class="card-header">
+                        <span class="card-title">{c.label}</span>
+                        <span class="corner-icon" aria-hidden="true">↗</span>
+                    </div>
+                    <div class="card-count">{c.count}</div>
+                </article>
+            </template>
+        </div>
+    </lightning-card>
+</template>

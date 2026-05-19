@@ -1,0 +1,25 @@
+<template>
+    <div class="status-container">
+        <template for:each={statusBoxes} for:item="box">
+            <div key={box.key} class="status-segment">
+                <div class="heading">{box.title}</div>
+                <div class={box.colorClass}>
+                    <div class="content">
+                        <template if:true={box.link}>
+                            <a href={box.link} target="_blank">Click To View</a>
+                        </template>
+                        <template if:false={box.link}>
+                            {box.value}
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <template if:true={box.showArrow}>
+                <div key={box.arrowKey} class="arrow-container">
+                    <span class={box.arrowClass} style="font-size: 50px;">&#8594;</span>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

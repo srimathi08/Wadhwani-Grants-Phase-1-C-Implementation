@@ -1,0 +1,288 @@
+<template>
+    <lightning-card title="Awardee Module Dashboard">
+
+        <!-- =================================================
+             GLOBAL FILTER BAR (ABOVE KPI)
+        ================================================= -->
+
+        <div class="filter-bar global-filter-bar">
+
+            <!-- Funding Year (Always visible) -->
+            <div class="filter-field">
+                <lightning-combobox
+                    label="Funding Year"
+                    value={selectedFundingYear}
+                    options={fundingYearOptions}
+                    onchange={handleFundingYearChange}>
+                </lightning-combobox>
+            </div>
+
+            <!-- Funding Type (COE MODE ONLY) -->
+            <template if:true={showCoeTab}>
+                <div class="filter-field">
+                    <lightning-combobox
+                        label="Funding Type"
+                        value={selectedFundingType}
+                        options={fundingTypeOptions}
+                        onchange={handleFundingTypeChange}>
+                    </lightning-combobox>
+                </div>
+            </template>
+
+            <!-- Actions -->
+            <div class="filter-actions">
+                <button class="reset-btn" onclick={handleResetFilters}>
+                    Reset
+                </button>
+                <button class="apply-btn" onclick={handleApplyFilters}>
+                    Apply
+                </button>
+            </div>
+
+        </div>
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================= -->
+
+        <div class="summary-container">
+
+            <!-- Total Proposal Cost -->
+            <div class="summary-card kpi-green">
+                <div class="kpi-icon greenIcon">$</div>
+                <div class="kpi-topline greenLine"></div>
+                <div class="summary-label">Total Proposal Cost</div>
+                <div class="summary-value greenValue">
+                    $ {totalProposalCost}
+                </div>
+            </div>
+
+            <!-- Total Funds Released -->
+            <div class="summary-card kpi-blue">
+                <div class="kpi-icon blueIcon">↗</div>
+                <div class="kpi-topline blueLine"></div>
+                <div class="summary-label">Total Funds Released</div>
+                <div class="summary-value blueValue">
+                    $ {totalFundsReleased}
+                </div>
+            </div>
+
+            <!-- Total Funds Available -->
+            <div class="summary-card kpi-orange">
+                <div class="kpi-icon orangeIcon">▦</div>
+                <div class="kpi-topline orangeLine"></div>
+                <div class="summary-label">Total Funds Available</div>
+                <div class="summary-value orangeValue">
+                    $ {totalFundsAvailable}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =================================================
+             MODE TABS (PURE CONTEXT SWITCH)
+        ================================================= -->
+
+        <div class="premium-tabs">
+            <button class={proposalTabClass} onclick={openProposalTab}>
+                Based on Proposal
+            </button>
+            <button class={coeTabClass} onclick={openCoeTab}>
+                Based on COE
+            </button>
+        </div>
+
+        <!-- =================================================
+             PROPOSAL TAB
+        ================================================= -->
+
+        <template if:true={showProposalTab}>
+
+            <div class="custom-table-container">
+                <table class="custom-table proposal-table">
+
+                    <thead>
+                        <tr>
+                            <th>Proposal Name</th>
+                            <th>Status</th>
+                            <th>Total Budget</th>
+                            <th>Account</th>
+                            <th>Report Status</th>
+                            <th class="action-col">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={proposalList} for:item="p">
+                            <tr key={p.proposalId}>
+
+                                <td>
+                                    <a
+                                        href="javascript:void(0);"
+                                        data-id={p.proposalId}
+                                        onclick={handleOpenProposal}
+                                        class="record-link"
+                                    >
+                                        {p.proposalName}
+                                        </a>
+
+                                </td>
+
+                                <td>
+                                    <span class="proposal-status-chip">
+                                        {p.status}
+                                    </span>
+                                </td>
+
+                                <td>$ {p.totalBudget}</td>
+
+                                <td>{p.accountName}</td>
+
+                                <td>
+                                    <div class="milestone-status-wrap">
+                                        <div class={p.milestoneChipClass}
+                                             style={p.milestoneStyle}>
+                                            <span class="milestone-chip-text">
+                                                <span class="ms-count">
+                                                    {p.reportSubmitted}/{p.totalMilestones}
+                                                </span>
+                                                <span class="ms-label">
+                                                    Reports Submitted
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="action-col">
+                                    <button class="viewall-btn"
+                                            data-proposal-id={p.proposalId}
+                                            data-account-id={p.accountId}
+                                            onclick={handleViewAllMilestones}>
+                                        View All →
+                                    </button>
+                                </td>
+
+                            </tr>
+                        </template>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-area">
+                <lightning-button
+                    label="Previous"
+                    onclick={handlePrevious}>
+                </lightning-button>
+
+                <lightning-button
+                    label="Next"
+                    onclick={handleNext}>
+                </lightning-button>
+            </div>
+
+        </template>
+
+        <!-- =================================================
+             COE TAB
+        ================================================= -->
+
+        <template if:true={showCoeTab}>
+
+            <div class="custom-table-container">
+                <table class="custom-table coe-table">
+
+                    <thead>
+                        <tr>
+                            <th>Account Name</th>
+                            <th>COE Name</th>
+                            <th>Requested Amount</th>
+                            <th>Status</th>
+                            <th>Date of Request</th>
+                            <th>History</th>
+                            <th class="action-col">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={coeList} for:item="c">
+                            <tr key={c.accountId}>
+
+                                <td>{c.accountName}</td>
+                                <td>{c.coeName}</td>
+
+                                <td>
+                                    <template if:true={c.requestedAmount}>
+                                        $ {c.requestedAmount}
+                                    </template>
+                                    <template if:false={c.requestedAmount}>
+                                        -
+                                    </template>
+                                </td>
+
+                                <td>
+                                    <template if:true={c.requestStatus}>
+                                        <span class="status-chip">
+                                            {c.requestStatus}
+                                        </span>
+                                    </template>
+                                    <template if:false={c.requestStatus}>
+                                        -
+                                    </template>
+                                </td>
+
+                                <td>
+                                    <template if:true={c.requestDate}>
+                                        <lightning-formatted-date-time
+                                            value={c.requestDate}
+                                            year="numeric"
+                                            month="short"
+                                            day="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </template>
+                                    <template if:false={c.requestDate}>
+                                        -
+                                    </template>
+                                </td>
+
+                                <td>
+                                    <a href={c.accountLink}
+                                       target="_blank"
+                                       class="record-link">
+                                        View All
+                                    </a>
+                                </td>
+
+                                <td class="action-col">
+                                    <button class="disburse-btn"
+                                            data-account-id={c.accountId}
+                                            onclick={handleOpenDisburseModal}>
+                                        Disburse Fund
+                                    </button>
+                                </td>
+
+                            </tr>
+                        </template>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </template>
+
+        <!-- =================================================
+             MODAL
+        ================================================= -->
+
+        <template if:true={isDisburseModalOpen}>
+            <c-disburse-fund-modal
+                selected-account-id={selectedAccountId}
+                onclosemodal={handleCloseModal}
+                onrecordsaved={handleRecordSaved}>
+            </c-disburse-fund-modal>
+        </template>
+
+    </lightning-card>
+</template>

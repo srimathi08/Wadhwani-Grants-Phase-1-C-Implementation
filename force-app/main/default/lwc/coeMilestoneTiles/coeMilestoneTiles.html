@@ -1,0 +1,84 @@
+<template>
+    <div class="page">
+
+        <div class="header">
+            <div class="title">Project Milestones</div>
+            <div class="subtitle">Manage milestone fund requests and required documents</div>
+        </div>
+
+        <template if:true={hasMilestones}>
+            <div class="grid">
+                <template for:each={milestones} for:item="m">
+                    <div key={m.milestoneId} class="tile">
+                        <div class="tile-top">
+                            <div class="tile-title">{m.name}</div>
+                            <div class={m.statusClass}>{m.status}</div>
+                        </div>
+
+                        <div class="tile-meta">
+
+                            <!-- ✅ UPDATED: Project Start & End Month -->
+                            <div>
+                                <span class="lbl">Project Start Month:</span>
+                                    {m.projectStartDate}
+                            </div>
+
+                            <div>
+                                <span class="lbl">Project End Month:</span>
+                                    {m.projectEndDate}
+                            </div>
+
+                            <div>
+                                <span class="lbl">Budget Req:</span>
+                                {m.budgetRequired}
+                            </div>
+
+                            <!-- ✅ Amount logic (UNCHANGED) -->
+                            <template if:true={m.disbursedAmount}>
+                                <div>
+                                    <span class="lbl">Disbursed Amount:</span>
+                                    {m.disbursedAmount}
+                                </div>
+                            </template>
+
+                            <template if:false={m.disbursedAmount}>
+                                <div>
+                                    <span class="lbl">Approved Amount:</span>
+                                    {m.amount}
+                                </div>
+                            </template>
+
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn secondary"
+                                data-id={m.milestoneId}
+                                onclick={handleViewDetails}>
+                                View Details
+                            </button>
+
+                            <button class="btn primary"
+                                data-id={m.milestoneId}
+                                data-name={m.name}
+                                data-budgetrequired={m.budgetRequired}
+                                onclick={handleManageFund}>
+                                Manage Fund
+                            </button>
+
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template if:false={hasMilestones}>
+            <div class="empty">
+                No milestones found for this proposal.
+            </div>
+        </template>
+
+        <!-- Modal Component -->
+        <c-coe-manage-fund-modal></c-coe-manage-fund-modal>
+
+    </div>
+</template>

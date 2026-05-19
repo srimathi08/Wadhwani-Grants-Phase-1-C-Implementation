@@ -1,0 +1,3868 @@
+<template> 
+    <lightning-card>
+        
+          <div class="form-logo-title">
+        <img src={winLogoUrl} alt="WIN Logo" class="win-logo" />
+         <h1 class="form-title">{labels.CL_WCF_Form_Title}</h1>
+</div>
+  <template if:false={isPage0}>
+  <div class="wcf-tracker">
+    <template for:each={progressSteps} for:item="step">
+      <div key={step.number} class="tracker-step">
+        <div class={step.bubbleClass}>
+          <template if:true={step.isCompleted}>✓</template>
+          <template if:false={step.isCompleted}>{step.number}</template>
+        </div>
+        <div class={step.labelClass}>{step.label}</div>
+        <template if:true={step.connectorClass}>
+          <div class={step.connectorClass}></div>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>
+        <div class="slds-p-around_medium centered-form-container">
+
+
+
+
+
+<!-- ================================================================
+     wcfOrientationPanel.html
+     Add this block BEFORE your existing PAGE 1 template block.
+     In your main template, add: <template if:true={isPage0}> wrapper.
+     ================================================================ -->
+
+<template if:true={isPage0}>
+    <div class="lang-toggle">
+    <span class="lang-toggle-label">Language:</span>
+    <div class={englishClass} data-lang="en_US" onclick={handleLanguageChange}>
+        🇺🇸 EN
+    </div>
+    <div class={spanishClass} data-lang="es" onclick={handleLanguageChange}>
+        🇪🇸 ES
+    </div>
+    <div class={portugueseClass} data-lang="pt_BR" onclick={handleLanguageChange}>
+        🇧🇷 PT
+    </div>
+</div>
+
+    <!-- ORIENTATION CARDS -->
+    <div class="orientation-grid">
+
+        <!-- CARD 1 -->
+        <div class="orientation-card">
+            <div class="orientation-card-header">
+                <div class="orientation-number">1</div>
+                <h3>What you'll need</h3>
+            </div>
+            <ul class="orientation-list">
+                <li>Your organization's legal registration details</li>
+                <li>3 years of historical financials (revenue and expense)</li>
+                <li>3 years of programme outcome numbers (enrolment, placement, jobs)</li>
+                <li>Verification reports if you have them (PDF, optional)</li>
+                <li>1–2 reference contacts (optional)</li>
+            </ul>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="orientation-card">
+            <div class="orientation-card-header">
+                <div class="orientation-number">2</div>
+                <h3>Sections in this form</h3>
+            </div>
+            <ul class="orientation-list">
+                <li>About Your Organisation — who you are</li>
+                <li>What You Do — your programmes and approach</li>
+                <li>What You've Delivered — financials and outcomes</li>
+                <li>Why Wadhwani Charitable Foundation — your direction</li>
+                <li>Review & Submit — final attestation</li>
+            </ul>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="orientation-card">
+            <div class="orientation-card-header">
+                <div class="orientation-number">3</div>
+                <h3>Quick tips</h3>
+            </div>
+            <ul class="orientation-list">
+                <li>All amounts in US dollars; rounded to nearest million is fine</li>
+                <li>Required fields are marked with a red asterisk *</li>
+                <li>Optional fields show a lavender tint with an "(Optional)" label</li>
+                <li>Use the AI Feedback button under long-text answers</li>
+                <li>You can switch between English, Spanish, and Portuguese anytime</li>
+            </ul>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="orientation-card">
+            <div class="orientation-card-header">
+                <div class="orientation-number">?</div>
+                <h3>Need help?</h3>
+            </div>
+            <div class="help-content">
+                <p>
+                    <strong>Email:</strong>
+                    grants-portal@wadhwani-charitable.org
+                </p>
+                <p>
+                    <strong>Response time:</strong>
+                    Within 2 business days
+                </p>
+                <p>
+                    <strong>Languages:</strong>
+                    English, Spanish, Portuguese
+                </p>
+            </div>
+        </div>
+
+   </div><!-- end orientation-grid -->
+
+<div class="start-form-footer">
+    <div class="lang-hint">
+        <lightning-icon icon-name="utility:world" size="x-small"></lightning-icon>
+        <span>Select your preferred language above before starting</span>
+    </div>
+    <lightning-button
+        variant="brand"
+        label="Start Form →"
+        onclick={handleStartForm}
+        class="start-btn-lwc">
+    </lightning-button>
+</div>
+
+</template>
+
+
+<!--*************************************  PAGE 1 ****************************************************************  -->
+            <template if:true={isPage1}>
+               <!-- <lightning-formatted-rich-text value={labels.WCF_Paragraph_1}></lightning-formatted-rich-text>
+                 <lightning-formatted-rich-text value={labels.WCF_Paragraph_2}></lightning-formatted-rich-text>
+               <lightning-formatted-rich-text value={labels.WCF_Paragraph_3}></lightning-formatted-rich-text>-->
+                <lightning-layout class="slds-m-top_medium">
+                    <lightning-layout-item size="12">
+                        <div class="modern-section-wrapper">
+
+    <div class="section-step">
+        SECTION 1 OF 5
+    </div>
+
+    <h1 class="modern-section-title">
+        About Your Organisation
+    </h1>
+
+    <p class="modern-section-description">
+        Tell us who you are. We use this section to understand your organisation’s structure,
+        leadership, and the most prominent funders backing your work.
+    </p>
+
+    <div class="question-block">
+
+        <div class="question-header">
+
+            <div class="question-number">
+                1
+            </div>
+
+            <div>
+                <div class="question-title">
+                    {labels.CL_Organizational_Area_s_for_Funding_Investment}
+                    <span class="required">*</span>
+                </div>
+
+                <div class="question-subtext">
+                    Select the option that best describes your organisation focus.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="option-grid">
+
+            <template for:each={formattedFundingOptions} for:item="option">
+
+                <div
+                    key={option.value}
+                    class={option.className}
+                    data-value={option.value}
+                    onclick={handleFundingSelection}>
+
+                    <div class="option-title">
+                        {option.label}
+                    </div>
+
+                    <div class="option-description">
+                        {option.description}
+                    </div>
+
+                    <template if:true={option.isSelected}>
+                        <div class="selected-check">
+                            ✓
+                        </div>
+                    </template>
+
+                </div>
+
+            </template>
+
+        </div>
+
+    </div>
+
+</div>
+                    </lightning-layout-item>
+                </lightning-layout>
+                <!-- =========================================================
+     SECTION 2 — ORGANISATIONAL IDENTIFYING INFORMATION
+========================================================= -->
+
+<div class="modern-subsection-card">
+
+    <div class="modern-subsection-header">
+
+        <div class="modern-subsection-number">
+            2
+        </div>
+
+        <div>
+            <div class="modern-subsection-title">
+                {labels.CLS_Organizational_Identifying}
+                <span class="required">*</span>
+            </div>
+
+            <div class="modern-subsection-description">
+                A few details so we know who we're talking to.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-form-grid">
+
+        <!-- Organisation Name -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Organizational_Name}
+                value={organizationData.Organization_Name__c}
+                data-id="Organization_Name__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- HQ -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Headquarters_City_and_Country}
+                value={organizationData.Headquarters_City_and_Country__c}
+                data-id="Headquarters_City_and_Country__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Regions -->
+        <div class="modern-field full-width">
+
+            <div class="field-helper">
+                Where do you operate? List all states / provinces / regions.
+            </div>
+
+            <lightning-input
+                label={labels.CL_Primary_Service_Regions}
+                value={organizationData.Primary_Service_Regions__c}
+                data-id="Primary_Service_Regions__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Leader Name -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Leader_Name}
+                value={organizationData.Leader_Name__c}
+                data-id="Leader_Name__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Leader Title -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Leader_Title}
+                value={organizationData.Leader_Title__c}
+                data-id="Leader_Title__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     SECTION 3 — SUBMITTER CONTACT INFORMATION
+========================================================= -->
+
+<div class="modern-subsection-card">
+
+    <div class="modern-subsection-header">
+
+        <div class="modern-subsection-number">
+            3
+        </div>
+
+        <div>
+            <div class="modern-subsection-title">
+                {labels.CLS_Submitter_Contact_Info}
+                <span class="required">*</span>
+            </div>
+
+            <div class="modern-subsection-description">
+                Who is filling out this form? You'll be the initial point of contact for your organisation.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-form-grid">
+
+        <!-- Name -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Submitter_Name}
+                value={organizationData.Submitter_Name__c}
+                data-id="Submitter_Name__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Job Title -->
+        <div class="modern-field">
+            <lightning-input
+                label={labels.CL_Title}
+                value={organizationData.Job_Title__c}
+                data-id="Job_Title__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Phone -->
+        <div class="modern-field">
+            <lightning-input
+                type="tel"
+                label={labels.CL_Phone_number}
+                value={organizationData.Phone__c}
+                data-id="Phone__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+
+        <!-- Email -->
+        <div class="modern-field">
+            <lightning-input
+                type="email"
+                label={labels.CL_Email_Address}
+                value={organizationData.Work_Email_ID__c}
+                data-id="Work_Email_ID__c"
+                required
+                onchange={handleInput}>
+            </lightning-input>
+        </div>
+</div>
+    </div>
+<!-- =========================================================
+     SECTION 4 — LEGAL STRUCTURE
+========================================================= -->
+
+<div class="modern-subsection-card">
+
+    <div class="modern-subsection-header">
+
+        <div class="modern-subsection-number">
+            4
+        </div>
+
+        <div>
+            <div class="modern-subsection-title">
+                Legal Structure
+                <span class="required">*</span>
+            </div>
+
+            <div class="modern-subsection-description">
+                Tell us how your organisation is legally constituted and where it's registered.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-form-grid legal-grid">
+
+        <!-- Type -->
+        <div class="modern-field">
+
+            <lightning-combobox
+                label="Type"
+                value={organizationData.Legal_Type__c}
+                options={legalTypeOptions}
+                data-id="Legal_Type__c"
+                onchange={handleInput}
+                required>
+            </lightning-combobox>
+
+        </div>
+
+        <!-- Jurisdiction -->
+        <div class="modern-field">
+
+            <lightning-combobox
+                label="Registration Jurisdiction"
+                value={organizationData.Registration_Jurisdiction__c}
+                options={countryOptions}
+                data-id="Registration_Jurisdiction__c"
+                onchange={handleInput}
+                required>
+            </lightning-combobox>
+
+        </div>
+
+        <!-- Date -->
+        <div class="modern-field">
+
+            <lightning-input
+                type="date"
+                label="Incorporation Date"
+                value={organizationData.Incorporation_Date__c}
+                data-id="Incorporation_Date__c"
+                onchange={handleInput}
+                required>
+            </lightning-input>
+
+        </div>
+
+    </div>
+
+    <!-- Rich Text Area -->
+
+    <div class="modern-richtext-wrapper">
+
+        <div class="modern-richtext-label">
+            Brief Description
+            <span class="required">*</span>
+        </div>
+
+        <div class="modern-richtext-helper">
+            Briefly describe your governance and operational structure —
+            board, leadership, key affiliations.
+        </div>
+
+        <!-- Toolbar -->
+        <div class="modern-toolbar">
+
+            <button class="toolbar-min-btn" onclick={boldText}>
+                B
+            </button>
+
+            <button class="toolbar-min-btn" onclick={italicText}>
+                I
+            </button>
+
+            <button class="toolbar-min-btn" onclick={underlineText}>
+                U
+            </button>
+
+            <button class="toolbar-min-btn" onclick={insertBulletPoints}>
+                •
+            </button>
+
+        </div>
+
+        <!-- Editable Area -->
+        <div
+            class="modern-richtext-area"
+            contenteditable="true"
+            data-field="Legal_Structure__c"
+            onclick={setActiveField}
+            oninput={handleInput}
+            onpaste={handlePaste}
+            onkeydown={handleKeyDown}>
+        </div>
+
+        <!-- Footer -->
+        <div class="modern-richtext-footer">
+
+            <button
+                class="modern-ai-btn"
+                onclick={handleAIClick}
+                data-id="Legal_Structure__c">
+
+                ✦ Get AI feedback
+
+            </button>
+
+            <div class="word-counter">
+    {legalStructureWordCount} / 100 words
+</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     SECTION 5 — FISCAL YEAR END DATE
+========================================================= -->
+
+<div class="modern-subsection-card">
+
+    <div class="modern-subsection-header">
+
+        <div class="modern-subsection-number">
+            5
+        </div>
+
+        <div>
+            <div class="modern-subsection-title">
+                Fiscal Year End Date
+                <span class="required">*</span>
+            </div>
+
+            <div class="modern-subsection-description">
+                When does your fiscal year close? This helps us align all financial and outcome data to reporting periods.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modern-field fiscal-date-field">
+
+        <lightning-input
+            type="date"
+            value={organizationData.Current_fiscal_year_s_end_date__c}
+            data-id="Current_fiscal_year_s_end_date__c"
+            onchange={handleInput}
+            required>
+        </lightning-input>
+
+    </div>
+
+
+</div>
+<!-- =========================================================
+     SECTION 6 — TOP FUNDERS
+========================================================= -->
+
+<div class="mockup-optional-card">
+
+    <!-- HEADER -->
+    <div class="mockup-optional-header">
+
+        <div class="mockup-optional-number">
+            6
+        </div>
+
+        <div class="mockup-optional-header-content">
+
+            <div class="mockup-optional-title-row">
+
+                <div class="mockup-optional-title">
+                    Top 3 Most Prominent Funders
+                </div>
+
+                <div class="mockup-optional-pill">
+                    Optional
+                </div>
+
+            </div>
+
+            <div class="mockup-optional-description">
+                Optionally, share up to three of your most prominent funders — the backers whose support is most material or most recognisable.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- INNER CARD -->
+    <div class="mockup-inner-card">
+
+        <!-- TOP -->
+        <div class="mockup-inner-top">
+
+            <div class="mockup-inner-label">
+                FUNDER 1
+            </div>
+
+            <div class="mockup-remove">
+                ✕ Remove
+            </div>
+
+        </div>
+
+        <!-- ROW 1 -->
+        <div class="mockup-grid-two">
+
+            <lightning-input
+                label="Funder Name"
+                placeholder="e.g., Open Society Foundations"
+                value={organizationData.Funder_1_Name__c}
+                data-id="Funder_1_Name__c"
+                onchange={handleInput}>
+            </lightning-input>
+
+            <lightning-input
+                type="number"
+                label="Approx Annual Amount (USD)"
+                value={organizationData.Funder_1_Amount__c}
+                data-id="Funder_1_Amount__c"
+                onchange={handleInput}>
+            </lightning-input>
+
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="mockup-grid-three">
+
+            <lightning-input
+                type="date"
+                label="Funding Period Start"
+                value={organizationData.Funder_1_Period_Start__c}
+                data-id="Funder_1_Period_Start__c"
+                onchange={handleInput}>
+            </lightning-input>
+
+            <lightning-input
+                type="date"
+                label="Funding Period End"
+                value={organizationData.Funder_1_Period_End__c}
+                data-id="Funder_1_Period_End__c"
+                onchange={handleInput}>
+            </lightning-input>
+
+            <lightning-combobox
+                label="Funding Type"
+                value={organizationData.Funder_1_Type__c}
+                options={funderTypeOptions}
+                data-id="Funder_1_Type__c"
+                onchange={handleInput}>
+            </lightning-combobox>
+
+        </div>
+
+    </div>
+    <template if:true={showFunder2}>
+
+<div class="mockup-inner-card">
+
+    <div class="mockup-inner-top">
+
+        <div class="mockup-inner-label">
+            FUNDER 2
+        </div>
+
+        <div
+            class="mockup-remove"
+            onclick={handleRemoveFunder2}>
+
+            ✕ Remove
+        </div>
+
+    </div>
+
+    <div class="mockup-grid-two">
+
+        <lightning-input
+            label="Funder Name"
+            value={organizationData.Funder_2_Name__c}
+            data-id="Funder_2_Name__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-input
+            type="number"
+            label="Approx Annual Amount (USD)"
+            value={organizationData.Funder_2_Amount__c}
+            data-id="Funder_2_Amount__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+    </div>
+
+    <div class="mockup-grid-three">
+
+        <lightning-input
+            type="date"
+            label="Funding Period Start"
+            value={organizationData.Funder_2_Period_Start__c}
+            data-id="Funder_2_Period_Start__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-input
+            type="date"
+            label="Funding Period End"
+            value={organizationData.Funder_2_Period_End__c}
+            data-id="Funder_2_Period_End__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-combobox
+            label="Funding Type"
+            value={organizationData.Funder_2_Type__c}
+            options={funderTypeOptions}
+            data-id="Funder_2_Type__c"
+            onchange={handleInput}>
+        </lightning-combobox>
+
+    </div>
+
+</div>
+
+</template>
+<template if:true={showFunder3}>
+
+<div class="mockup-inner-card">
+
+    <div class="mockup-inner-top">
+
+        <div class="mockup-inner-label">
+            FUNDER 3
+        </div>
+
+        <div
+            class="mockup-remove"
+            onclick={handleRemoveFunder3}>
+
+            ✕ Remove
+        </div>
+
+    </div>
+
+    <div class="mockup-grid-two">
+
+        <lightning-input
+            label="Funder Name"
+            value={organizationData.Funder_3_Name__c}
+            data-id="Funder_3_Name__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-input
+            type="number"
+            label="Approx Annual Amount (USD)"
+            value={organizationData.Funder_3_Amount__c}
+            data-id="Funder_3_Amount__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+    </div>
+
+    <div class="mockup-grid-three">
+
+        <lightning-input
+            type="date"
+            label="Funding Period Start"
+            value={organizationData.Funder_3_Period_Start__c}
+            data-id="Funder_3_Period_Start__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-input
+            type="date"
+            label="Funding Period End"
+            value={organizationData.Funder_3_Period_End__c}
+            data-id="Funder_3_Period_End__c"
+            onchange={handleInput}>
+        </lightning-input>
+
+        <lightning-combobox
+            label="Funding Type"
+            value={organizationData.Funder_3_Type__c}
+            options={funderTypeOptions}
+            data-id="Funder_3_Type__c"
+            onchange={handleInput}>
+        </lightning-combobox>
+
+    </div>
+    
+
+</div>
+
+</template>
+
+    <!-- ADD BUTTON -->
+    <div class="mockup-add-row">
+
+        <button
+    class="mockup-add-btn"
+    onclick={handleAddFunder}>
+    + Add funder
+</button>
+
+        <div class="mockup-add-note">
+            You may add up to 3 funders.
+        </div>
+
+    </div>
+
+</div>
+<!-- =========================================================
+     SECTION 7 — REFERENCES
+========================================================= -->
+
+<div class="mockup-optional-card">
+
+    <!-- HEADER -->
+    <div class="mockup-optional-header">
+
+        <div class="mockup-optional-number">
+            7
+        </div>
+
+        <div class="mockup-optional-header-content">
+
+            <div class="mockup-optional-title-row">
+
+                <div class="mockup-optional-title">
+                    References for Outreach
+                </div>
+
+                <div class="mockup-optional-pill">
+                    Optional
+                </div>
+
+            </div>
+
+            <div class="mockup-optional-description">
+                Optionally, share 1–2 contacts who can speak to your organisation's work.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="mockup-info-box">
+
+        <div class="mockup-info-icon">
+            i
+        </div>
+
+        <div>
+            These contacts may be approached by Wadhwani Charitable Foundation during evaluation.
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         REFERENCE 1
+    ====================================================== -->
+
+    <div class="mockup-inner-card">
+
+        <div class="mockup-inner-top">
+
+            <div class="mockup-inner-label">
+                REFERENCE 1
+            </div>
+
+            <div class="mockup-remove">
+                ✕ Remove
+            </div>
+
+        </div>
+
+        <div class="mockup-grid-three">
+
+            <lightning-input
+                label="Name"
+                placeholder="Full name">
+            </lightning-input>
+
+            <lightning-input
+                label="Organisation / Role"
+                placeholder="e.g., Programme Director">
+            </lightning-input>
+
+            <lightning-input
+                type="email"
+                label="Email"
+                placeholder="name@organization.org">
+            </lightning-input>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         REFERENCE 2
+    ====================================================== -->
+
+    <template if:true={showReference2}>
+
+        <div class="mockup-inner-card">
+
+            <div class="mockup-inner-top">
+
+                <div class="mockup-inner-label">
+                    REFERENCE 2
+                </div>
+
+                <div
+                    class="mockup-remove"
+                    onclick={handleRemoveReference2}>
+
+                    ✕ Remove
+                </div>
+
+            </div>
+
+            <div class="mockup-grid-three">
+
+                <lightning-input
+                    label="Name"
+                    placeholder="Full name">
+                </lightning-input>
+
+                <lightning-input
+                    label="Organisation / Role"
+                    placeholder="e.g., Programme Director">
+                </lightning-input>
+
+                <lightning-input
+                    type="email"
+                    label="Email"
+                    placeholder="name@organization.org">
+                </lightning-input>
+
+            </div>
+
+        </div>
+
+    </template>
+
+    <!-- =====================================================
+         ADD BUTTON
+    ====================================================== -->
+
+    <div class="mockup-add-row">
+
+        <button
+            class="mockup-add-btn"
+            onclick={handleAddReference}>
+
+            + Add reference
+
+        </button>
+
+        <div class="mockup-add-note">
+            You may add up to 2 references.
+        </div>
+
+    </div>
+
+</div>
+<!-- AI FEEDBACK MODAL -->
+
+<template if:true={isAIModalOpen}>
+
+    <section
+        role="dialog"
+        tabindex="-1"
+        class="ai-modal">
+
+        <div class="slds-modal__container ai-modal-container">
+
+            <!-- HEADER -->
+
+            <div class="ai-modal-header">
+
+                <h2 class="ai-modal-title">
+                    ✨ {aiModalTitle}
+                </h2>
+
+                <button
+                    class="ai-close-btn"
+                    onclick={closeAIModal}>
+
+                    ✕
+                </button>
+
+            </div>
+
+            <!-- BODY -->
+
+            <div class="ai-modal-body">
+
+                <template if:true={isAiLoading}>
+
+                    <div class="ai-loading-container">
+
+                        <lightning-spinner
+                            alternative-text="Generating AI Feedback"
+                            size="medium">
+                        </lightning-spinner>
+
+                        <p class="ai-loading-text">
+                            Generating AI feedback...
+                        </p>
+
+                    </div>
+
+                </template>
+
+                <template if:false={isAiLoading}>
+
+                    <div class="ai-response-box">
+    <template if:true={formattedAiSections}>
+        <template for:each={formattedAiSections} for:item="section">
+            
+            <div key={section.title} class="ai-section">
+                <div class="ai-section-title">
+                    {section.title}
+                </div>
+
+                <ul class="ai-points">
+    <template for:each={section.points} for:item="point">
+        <li key={point}>
+            <lightning-formatted-rich-text value={point}>
+            </lightning-formatted-rich-text>
+        </li>
+    </template>
+</ul>
+            </div>
+
+        </template>
+    </template>
+</div>
+
+                </template>
+
+            </div>
+
+            <!-- FOOTER -->
+
+            <div class="ai-modal-footer">
+
+                <button
+                    class="modern-secondary-btn"
+                    onclick={closeAIModal}>
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+
+</template>
+
+            </template>
+<template if:true={isPage3}>
+
+  <!-- SECTION HEADER -->
+  <div class="modern-section-wrapper">
+    <div class="section-step">SECTION 2 OF 5</div>
+    <h1 class="modern-section-title">What You Do</h1>
+    <p class="modern-section-description">
+      Tell us about your skilling work — your top programmes, your theory of change,
+      and what makes your approach distinctive.
+    </p>
+  </div>
+
+  <!-- QUESTION 8: YOUR SKILLING APPROACH -->
+  <div class="modern-subsection-card">
+    <div class="modern-subsection-header">
+      <div class="modern-subsection-number">8</div>
+      <div>
+        <div class="modern-subsection-title">
+          Your Skilling Approach
+          <span class="required">*</span>
+          <span class="question-tag">JOB FULFILMENT</span>
+        </div>
+        <div class="modern-subsection-description">
+          Tell us about your skilling work in roughly 500 words. If you run named
+          programmes, walk us through your top three (names, what they teach, who
+          they serve). Cover your theory of change — the journey from learner
+          enrolment to placement — and what's distinctive about your approach
+          relative to peers. Use the AI Feedback button below the field for a
+          quality nudge before submitting.
+        </div>
+      </div>
+    </div>
+
+    <!-- Rich Text Area -->
+    <div class="modern-richtext-wrapper">
+      <div class="modern-toolbar">
+        <button class="toolbar-min-btn" onclick={boldText}>B</button>
+        <button class="toolbar-min-btn" onclick={italicText}>I</button>
+        <button class="toolbar-min-btn" onclick={underlineText}>U</button>
+        <button class="toolbar-min-btn" onclick={insertBulletPoints}>•</button>
+      </div>
+      <div
+        class="modern-richtext-area"
+        contenteditable="true"
+        data-field="Skilling_Approach__c"
+        onclick={setActiveField}
+        oninput={handleInput}
+        onpaste={handlePaste}
+        onkeydown={handleKeyDown}>
+      </div>
+      <div class="modern-richtext-footer">
+        <button
+          class="modern-ai-btn"
+          onclick={handleAIClick}
+          data-id="Skilling_Approach__c">
+          ✦ Get AI feedback
+        </button>
+        <div class="word-counter">{skillingApproachWordCount} / 500 words</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION 9: SKILLING DOMAINS OFFERED -->
+  <div class="modern-subsection-card">
+    <div class="modern-subsection-header">
+      <div class="modern-subsection-number">9</div>
+      <div>
+        <div class="modern-subsection-title">
+          Skilling Domains Offered
+          <span class="required">*</span>
+          <span class="question-tag">JOB FULFILMENT</span>
+        </div>
+        <div class="modern-subsection-description">
+          List the skilling domains your organisation offers. For each, give us
+          the typical training duration, when you started running it, and your
+          annual enrolment number. This is your delivery footprint at a glance.
+        </div>
+      </div>
+    </div>
+
+    <!-- Domain Cards -->
+    <template for:each={unifiedSkillDomainsIndexed} for:item="row">
+      <div key={row.idx} class="domain-card">
+
+        <div class="domain-card-header">
+          <span class="domain-card-label">DOMAIN {row.displayIdx}</span>
+          <button
+            class="domain-remove-btn"
+            data-index={row.idx}
+            onclick={deleteUnifiedSkillRow}>
+            ✕ Remove
+          </button>
+        </div>
+
+        <!-- Domain / Programme Name -->
+        <div class="domain-name-field">
+          <label class="domain-field-label">
+            Domain / Programme Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            class="domain-text-input"
+            placeholder="e.g., Retail &amp; Customer Service"
+            value={row.domain}
+            data-index={row.idx}
+            data-field="domain"
+            onchange={handleUnifiedSkillInput} />
+        </div>
+
+        <!-- 4-column row -->
+        <div class="domain-fields-grid">
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Hours of Training <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.hours}
+              data-index={row.idx}
+              data-field="hours"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Duration (Months) <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.duration}
+              data-index={row.idx}
+              data-field="duration"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              When Programme Started <span class="required">*</span>
+            </label>
+            <input
+              type="date"
+              class="domain-date-input"
+              value={row.startDate}
+              data-index={row.idx}
+              data-field="startDate"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Yearly Enrolment <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.yearlyEnrolment}
+              data-index={row.idx}
+              data-field="yearlyEnrolment"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+        </div>
+
+      </div>
+    </template>
+
+    <!-- Add Domain Button -->
+    <button class="domain-add-btn" onclick={addUnifiedSkillRow}>
+      + Add domain
+    </button>
+
+  </div>
+  <!-- Q10 + Q11 for Both pathway -->
+  <template if:true={showBothJCQuestions}>
+    <!-- ── JC pathway ── -->
+  <template if:true={showBothJCQuestions}>
+
+    <div class="modern-section-wrapper">
+      <div class="section-step">SECTION 2 OF 5</div>
+      <h1 class="modern-section-title">What You Do</h1>
+      <p class="modern-section-description">
+        Tell us about your job creation work — your support model, your theory of change,
+        and what makes your approach distinctive.
+      </p>
+    </div>
+
+    <!-- QUESTION 10: YOUR JOB CREATION APPROACH -->
+    <div class="modern-subsection-card">
+      <div class="modern-subsection-header">
+        <div class="modern-subsection-number">10</div>
+        <div>
+          <div class="modern-subsection-title">
+            Your Job Creation Approach
+            <span class="required">*</span>
+          </div>
+          <div class="modern-subsection-description">
+            Tell us about your job creation work in roughly 500 words. Cover
+            (i) your support model — the kinds of support you provide (capital,
+            mentorship, business advisory, sector-specific technical assistance,
+            market linkages, etc.); (ii) your theory of change — the journey from
+            engagement through to jobs created and sustained; (iii) what's distinctive
+            about your approach relative to peers. Use the AI Feedback button below
+            the field for a quality nudge before submitting.
+          </div>
+        </div>
+      </div>
+
+      <div class="modern-richtext-wrapper">
+        <div class="modern-toolbar">
+          <button class="toolbar-min-btn" onclick={boldText}>B</button>
+          <button class="toolbar-min-btn" onclick={italicText}>I</button>
+          <button class="toolbar-min-btn" onclick={underlineText}>U</button>
+          <button class="toolbar-min-btn" onclick={insertBulletPoints}>•</button>
+        </div>
+        <div
+          class="modern-richtext-area"
+          contenteditable="true"
+          data-field="Job_Creation_Approach__c"
+          onclick={setActiveField}
+          oninput={handleInput}
+          onpaste={handlePaste}
+          onkeydown={handleKeyDown}>
+        </div>
+        <div class="modern-richtext-footer">
+          <button class="modern-ai-btn" onclick={handleAIClick} data-id="Job_Creation_Approach__c">
+            ✦ Get AI feedback
+          </button>
+          <div class="word-counter">{jcApproachWordCount} / 500 words</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 11: BUSINESS SECTORS SERVED -->
+    <div class="modern-subsection-card">
+      <div class="modern-subsection-header">
+        <div class="modern-subsection-number">11</div>
+        <div>
+          <div class="modern-subsection-title">
+            Business Sectors Served
+            <span class="required">*</span>
+          </div>
+          <div class="modern-subsection-description">
+            List the business sectors in which you support entrepreneurs / MSMEs.
+            For each, tell us what type of support you provide, when you started
+            supporting that sector, and your annual enrolment number.
+          </div>
+        </div>
+      </div>
+
+      <template for:each={businessSectorsIndexed} for:item="sec">
+        <div key={sec.idx} class="domain-card">
+
+          <div class="domain-card-header">
+            <span class="domain-card-label">SECTOR {sec.displayIdx}</span>
+            <button class="domain-remove-btn" data-index={sec.idx} onclick={deleteBusinessSector}>
+              ✕ Remove
+            </button>
+          </div>
+
+          <div class="domain-fields-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="domain-field-item">
+              <label class="domain-field-label">Business Sector <span class="required">*</span></label>
+              <select class="domain-select-input" data-index={sec.idx} data-field="sector"
+                onchange={handleBusinessSectorInput}>
+                <option value="">— Select —</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Retail">Retail</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Services">Services</option>
+                <option value="Technology">Technology</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="domain-field-item">
+              <label class="domain-field-label">When Did Support Begin <span class="required">*</span></label>
+              <input type="date" class="domain-date-input"
+                value={sec.supportBegin} data-index={sec.idx} data-field="supportBegin"
+                onchange={handleBusinessSectorInput} />
+            </div>
+          </div>
+
+          <div class="domain-field-item" style="margin-top:12px;">
+            <label class="domain-field-label">Type of Support Provided <span class="required">*</span></label>
+            <div class="sector-chip-hint">Select all that apply.</div>
+            <div class="sector-chips-row">
+              <template for:each={sec.supportTypeChips} for:item="chip">
+                <button key={chip.label} class={chip.chipClass}
+                  data-index={sec.idx} data-chip={chip.label}
+                  onclick={handleSupportTypeChip}>
+                  {chip.label}
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <div class="domain-field-item" style="margin-top:12px; max-width:220px;">
+            <label class="domain-field-label">Yearly Enrolment <span class="required">*</span></label>
+            <input type="number" class="domain-number-input" placeholder="0"
+              value={sec.yearlyEnrolment} data-index={sec.idx} data-field="yearlyEnrolment"
+              onchange={handleBusinessSectorInput} />
+          </div>
+
+        </div>
+      </template>
+
+      <button class="domain-add-btn" onclick={addBusinessSector}>
+        + Add sector
+      </button>
+    </div>
+
+  </template><!-- end showJCWhatYouDo -->
+  </template>
+
+
+</template>
+
+<!--********************************************  PAGE 2 ****************************************************************  -->
+         <template if:true={isPage2}>
+             <template if:true={showJFWhatYouDo}>
+
+  <!-- SECTION HEADER -->
+  <div class="modern-section-wrapper">
+    <div class="section-step">SECTION 2 OF 5</div>
+    <h1 class="modern-section-title">What You Do</h1>
+    <p class="modern-section-description">
+      Tell us about your skilling work — your top programmes, your theory of change,
+      and what makes your approach distinctive.
+    </p>
+  </div>
+
+  <!-- QUESTION 8: YOUR SKILLING APPROACH -->
+  <div class="modern-subsection-card">
+    <div class="modern-subsection-header">
+      <div class="modern-subsection-number">8</div>
+      <div>
+        <div class="modern-subsection-title">
+          Your Skilling Approach
+          <span class="required">*</span>
+          <!--<span class="question-tag">JOB FULFILMENT</span>-->
+        </div>
+        <div class="modern-subsection-description">
+          Tell us about your skilling work in roughly 500 words. If you run named
+          programmes, walk us through your top three (names, what they teach, who
+          they serve). Cover your theory of change — the journey from learner
+          enrolment to placement — and what's distinctive about your approach
+          relative to peers. Use the AI Feedback button below the field for a
+          quality nudge before submitting.
+        </div>
+      </div>
+    </div>
+
+    <!-- Rich Text Area -->
+    <div class="modern-richtext-wrapper">
+      <div class="modern-toolbar">
+        <button class="toolbar-min-btn" onclick={boldText}>B</button>
+        <button class="toolbar-min-btn" onclick={italicText}>I</button>
+        <button class="toolbar-min-btn" onclick={underlineText}>U</button>
+        <button class="toolbar-min-btn" onclick={insertBulletPoints}>•</button>
+      </div>
+      <div
+        class="modern-richtext-area"
+        contenteditable="true"
+        data-field="Skilling_Approach__c"
+        onclick={setActiveField}
+        oninput={handleInput}
+        onpaste={handlePaste}
+        onkeydown={handleKeyDown}>
+      </div>
+      <div class="modern-richtext-footer">
+        <button
+          class="modern-ai-btn"
+          onclick={handleAIClick}
+          data-id="Skilling_Approach__c">
+          ✦ Get AI feedback
+        </button>
+        <div class="word-counter">{skillingApproachWordCount} / 500 words</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION 9: SKILLING DOMAINS OFFERED -->
+  <div class="modern-subsection-card">
+    <div class="modern-subsection-header">
+      <div class="modern-subsection-number">9</div>
+      <div>
+        <div class="modern-subsection-title">
+          Skilling Domains Offered
+          <span class="required">*</span>
+          <!--<span class="question-tag">JOB FULFILMENT</span>-->
+        </div>
+        <div class="modern-subsection-description">
+          List the skilling domains your organisation offers. For each, give us
+          the typical training duration, when you started running it, and your
+          annual enrolment number. This is your delivery footprint at a glance.
+        </div>
+      </div>
+    </div>
+
+    <!-- Domain Cards -->
+    <template for:each={unifiedSkillDomainsIndexed} for:item="row">
+      <div key={row.idx} class="domain-card">
+
+        <div class="domain-card-header">
+          <span class="domain-card-label">DOMAIN {row.displayIdx}</span>
+          <button
+            class="domain-remove-btn"
+            data-index={row.idx}
+            onclick={deleteUnifiedSkillRow}>
+            ✕ Remove
+          </button>
+        </div>
+
+        <!-- Domain / Programme Name -->
+        <div class="domain-name-field">
+          <label class="domain-field-label">
+            Domain / Programme Name <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            class="domain-text-input"
+            placeholder="e.g., Retail &amp; Customer Service"
+            value={row.domain}
+            data-index={row.idx}
+            data-field="domain"
+            onchange={handleUnifiedSkillInput} />
+        </div>
+
+        <!-- 4-column row -->
+        <div class="domain-fields-grid">
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Hours of Training <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.hours}
+              data-index={row.idx}
+              data-field="hours"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Duration (Months) <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.duration}
+              data-index={row.idx}
+              data-field="duration"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              When Programme Started <span class="required">*</span>
+            </label>
+            <input
+              type="date"
+              class="domain-date-input"
+              value={row.startDate}
+              data-index={row.idx}
+              data-field="startDate"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+
+          <div class="domain-field-item">
+            <label class="domain-field-label">
+              Yearly Enrolment <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              class="domain-number-input"
+              placeholder="0"
+              value={row.yearlyEnrolment}
+              data-index={row.idx}
+              data-field="yearlyEnrolment"
+              onchange={handleUnifiedSkillInput} />
+          </div>
+        </div>
+
+      </div>
+    </template>
+
+    <button class="domain-add-btn" onclick={addUnifiedSkillRow}>
+      + Add domain
+    </button>
+
+  </div>
+
+  </template><!-- end showJFWhatYouDo -->
+
+
+  <!-- ── JC pathway ── -->
+  <template if:true={showJCOrBothWhatYouDo}>
+
+    
+
+    <!-- QUESTION 10: YOUR JOB CREATION APPROACH -->
+    <div class="modern-subsection-card">
+      <div class="modern-subsection-header">
+        <div class="modern-subsection-number">10</div>
+        <div>
+          <div class="modern-subsection-title">
+            Your Job Creation Approach
+            <span class="required">*</span>
+          </div>
+          <div class="modern-subsection-description">
+            Tell us about your job creation work in roughly 500 words. Cover
+            (i) your support model — the kinds of support you provide (capital,
+            mentorship, business advisory, sector-specific technical assistance,
+            market linkages, etc.); (ii) your theory of change — the journey from
+            engagement through to jobs created and sustained; (iii) what's distinctive
+            about your approach relative to peers. Use the AI Feedback button below
+            the field for a quality nudge before submitting.
+          </div>
+        </div>
+      </div>
+
+      <div class="modern-richtext-wrapper">
+        <div class="modern-toolbar">
+          <button class="toolbar-min-btn" onclick={boldText}>B</button>
+          <button class="toolbar-min-btn" onclick={italicText}>I</button>
+          <button class="toolbar-min-btn" onclick={underlineText}>U</button>
+          <button class="toolbar-min-btn" onclick={insertBulletPoints}>•</button>
+        </div>
+        <div
+          class="modern-richtext-area"
+          contenteditable="true"
+          data-field="Job_Creation_Approach__c"
+          onclick={setActiveField}
+          oninput={handleInput}
+          onpaste={handlePaste}
+          onkeydown={handleKeyDown}>
+        </div>
+        <div class="modern-richtext-footer">
+          <button class="modern-ai-btn" onclick={handleAIClick} data-id="Job_Creation_Approach__c">
+            ✦ Get AI feedback
+          </button>
+          <div class="word-counter">{jcApproachWordCount} / 500 words</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 11: BUSINESS SECTORS SERVED -->
+    <div class="modern-subsection-card">
+      <div class="modern-subsection-header">
+        <div class="modern-subsection-number">11</div>
+        <div>
+          <div class="modern-subsection-title">
+            Business Sectors Served
+            <span class="required">*</span>
+          </div>
+          <div class="modern-subsection-description">
+            List the business sectors in which you support entrepreneurs / MSMEs.
+            For each, tell us what type of support you provide, when you started
+            supporting that sector, and your annual enrolment number.
+          </div>
+        </div>
+      </div>
+
+      <template for:each={businessSectorsIndexed} for:item="sec">
+        <div key={sec.idx} class="domain-card">
+
+          <div class="domain-card-header">
+            <span class="domain-card-label">SECTOR {sec.displayIdx}</span>
+            <button class="domain-remove-btn" data-index={sec.idx} onclick={deleteBusinessSector}>
+              ✕ Remove
+            </button>
+          </div>
+
+          <div class="domain-fields-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="domain-field-item">
+              <label class="domain-field-label">Business Sector <span class="required">*</span></label>
+              <select class="domain-select-input" data-index={sec.idx} data-field="sector"
+                onchange={handleBusinessSectorInput}>
+                <option value="">— Select —</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Retail">Retail</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Services">Services</option>
+                <option value="Technology">Technology</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="domain-field-item">
+              <label class="domain-field-label">When Did Support Begin <span class="required">*</span></label>
+              <input type="date" class="domain-date-input"
+                value={sec.supportBegin} data-index={sec.idx} data-field="supportBegin"
+                onchange={handleBusinessSectorInput} />
+            </div>
+          </div>
+
+          <div class="domain-field-item" style="margin-top:12px;">
+            <label class="domain-field-label">Type of Support Provided <span class="required">*</span></label>
+            <div class="sector-chip-hint">Select all that apply.</div>
+            <div class="sector-chips-row">
+              <template for:each={sec.supportTypeChips} for:item="chip">
+                <button key={chip.label} class={chip.chipClass}
+                  data-index={sec.idx} data-chip={chip.label}
+                  onclick={handleSupportTypeChip}>
+                  {chip.label}
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <div class="domain-field-item" style="margin-top:12px; max-width:220px;">
+            <label class="domain-field-label">Yearly Enrolment <span class="required">*</span></label>
+            <input type="number" class="domain-number-input" placeholder="0"
+              value={sec.yearlyEnrolment} data-index={sec.idx} data-field="yearlyEnrolment"
+              onchange={handleBusinessSectorInput} />
+          </div>
+
+        </div>
+      </template>
+
+      <button class="domain-add-btn" onclick={addBusinessSector}>
+        + Add sector
+      </button>
+    </div>
+
+  </template><!-- end showJCWhatYouDo -->
+  </template>
+<!-- end isPage2 -->
+           
+
+
+<!--*************************************** PAGE 4 - Job Fulfilment Questions ***************************************-->
+<template if:true={isPage4}>
+    <div class="section-header slds-m-top_large">9. {labels.CLH_Job_Fulfilment_Questions}</div>
+    <p class="slds-text-title_bold slds-m-bottom_small">{labels.CLH_Outcome_Data}</p>
+    <!-- ── Skilling Domains Sub-Tables ── -->
+<!-- ── Unified Skilling Domains Table ── -->
+<p class="skill-section-label slds-m-top_medium">
+    {labels.CL_List_of_Organization_Skilling_Domain}
+</p>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+    <thead>
+        <tr style="background-color:#FC7666;">
+          <!--  <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Fiscal Year</th> -->
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Domain / Program Name</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Hours of Training</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Duration (Months)</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">When was Program Started</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Yearly Enrolment Nos.</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={unifiedSkillDomainsIndexed} for:item="row">
+            <tr key={row.idx} style="border-bottom:1px solid #f0f0f0;">
+               <!--<td style="padding:4px 6px; min-width:120px;">
+                    <lightning-combobox
+                        variant="label-hidden"
+                        value={row.period}
+                        options={fiscalYearOptions}
+                        data-index={row.idx}
+                        data-field="period"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-combobox>
+                </td> -->
+                <td style="padding:4px 6px;">
+                    <lightning-input variant="label-hidden"
+                        value={row.domain}
+                        data-index={row.idx}
+                        data-field="domain"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-input>
+                </td>
+                <td style="padding:4px 6px;">
+                    <lightning-input type="number" variant="label-hidden"
+                        value={row.hours}
+                        data-index={row.idx}
+                        data-field="hours"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-input>
+                </td>
+                <td style="padding:4px 6px;">
+                    <lightning-input type="number" variant="label-hidden"
+                        value={row.duration}
+                        data-index={row.idx}
+                        data-field="duration"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-input>
+                </td>
+                <td style="padding:4px 6px;">
+                    <lightning-input type="date" variant="label-hidden"
+                        value={row.startDate}
+                        data-index={row.idx}
+                        data-field="startDate"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-input>
+                </td>
+                <td style="padding:4px 6px;">
+                    <lightning-input type="number" variant="label-hidden"
+                        value={row.yearlyEnrolment}
+                        data-index={row.idx}
+                        data-field="yearlyEnrolment"
+                        onchange={handleUnifiedSkillInput}>
+                    </lightning-input>
+                </td>
+                <td style="padding:4px 6px; text-align:center; width:40px;">
+                    <lightning-button-icon
+                        icon-name="utility:delete"
+                        variant="bare"
+                        alternative-text="Delete"
+                        data-index={row.idx}
+                        onclick={deleteUnifiedSkillRow}>
+                    </lightning-button-icon>
+                </td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+<button class="add-row-btn" onclick={addUnifiedSkillRow}>+ Add Row</button>
+<!-- < < ── FY1 Sub-Table ── >
+<p class="skill-period-label slds-m-top_small"><strong>Prior Fiscal Year (FY-1)</strong></p>
+<table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+    <thead>
+        <tr style="background-color:#e8523a;">
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Domain / Program Name</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Hours of Training</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Duration (Months)</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">When was Program Started</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Yearly Enrolment Nos.</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY1Indexed} for:item="row">
+            <tr key={row.idx} style="border-bottom:1px solid #f0f0f0;">
+    <td style="padding:4px 6px;">
+        <lightning-input variant="label-hidden"
+            value={row.domain}
+            data-period="FY1"
+            data-index={row.idx}
+            data-field="domain"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.hours}
+            data-period="FY1"
+            data-index={row.idx}
+            data-field="hours"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.duration}
+            data-period="FY1"
+            data-index={row.idx}
+            data-field="duration"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="date" variant="label-hidden"
+            value={row.startDate}
+            data-period="FY1"
+            data-index={row.idx}
+            data-field="startDate"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.yearlyEnrolment}
+            data-period="FY1"
+            data-index={row.idx}
+            data-field="yearlyEnrolment"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px; text-align:center; width:40px;">
+        <lightning-button-icon
+            icon-name="utility:delete"
+            variant="bare"
+            alternative-text="Delete"
+            data-period="FY1"
+            data-index={row.idx}
+            onclick={deleteSkillDomainRow}>
+        </lightning-button-icon>
+    </td>
+</tr>
+        </template>
+    </tbody>
+</table>
+<button class="add-row-btn" data-period="FY1" onclick={addSkillDomainRow}>+ Add Row</button>
+
+< ── FY2 Sub-Table ── >
+<p class="skill-period-label slds-m-top_small"><strong>Two Years Prior (FY-2)</strong></p>
+<table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+    <thead>
+        <tr style="background-color:#e8523a;">
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Domain / Program Name</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Hours of Training</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Duration (Months)</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">When was Program Started</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Yearly Enrolment Nos.</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY2Indexed} for:item="row">
+            <tr key={row.idx} style="border-bottom:1px solid #f0f0f0;">
+    <td style="padding:4px 6px;">
+        <lightning-input variant="label-hidden"
+            value={row.domain}
+            data-period="FY2"
+            data-index={row.idx}
+            data-field="domain"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.hours}
+            data-period="FY2"
+            data-index={row.idx}
+            data-field="hours"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.duration}
+            data-period="FY2"
+            data-index={row.idx}
+            data-field="duration"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="date" variant="label-hidden"
+            value={row.startDate}
+            data-period="FY2"
+            data-index={row.idx}
+            data-field="startDate"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.yearlyEnrolment}
+            data-period="FY2"
+            data-index={row.idx}
+            data-field="yearlyEnrolment"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px; text-align:center; width:40px;">
+        <lightning-button-icon
+            icon-name="utility:delete"
+            variant="bare"
+            alternative-text="Delete"
+            data-period="FY2"
+            data-index={row.idx}
+            onclick={deleteSkillDomainRow}>
+        </lightning-button-icon>
+    </td>
+</tr>
+        </template>
+    </tbody>
+</table>
+<button class="add-row-btn" data-period="FY2" onclick={addSkillDomainRow}>+ Add Row</button>
+
+<── FY3 Sub-Table ── >
+<p class="skill-period-label slds-m-top_small"><strong>Three Years Prior (FY-3)</strong></p>
+<table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+    <thead>
+        <tr style="background-color:#e8523a;">
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Domain / Program Name</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Hours of Training</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Duration (Months)</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">When was Program Started</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Yearly Enrolment Nos.</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left; white-space:nowrap;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY3Indexed} for:item="row">
+            <tr key={row.idx} style="border-bottom:1px solid #f0f0f0;">
+    <td style="padding:4px 6px;">
+        <lightning-input variant="label-hidden"
+            value={row.domain}
+            data-period="FY3"
+            data-index={row.idx}
+            data-field="domain"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.hours}
+            data-period="FY3"
+            data-index={row.idx}
+            data-field="hours"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.duration}
+            data-period="FY3"
+            data-index={row.idx}
+            data-field="duration"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="date" variant="label-hidden"
+            value={row.startDate}
+            data-period="FY3"
+            data-index={row.idx}
+            data-field="startDate"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px;">
+        <lightning-input type="number" variant="label-hidden"
+            value={row.yearlyEnrolment}
+            data-period="FY3"
+            data-index={row.idx}
+            data-field="yearlyEnrolment"
+            onchange={handleSkillDomainInput}>
+        </lightning-input>
+    </td>
+    <td style="padding:4px 6px; text-align:center; width:40px;">
+        <lightning-button-icon
+            icon-name="utility:delete"
+            variant="bare"
+            alternative-text="Delete"
+            data-period="FY3"
+            data-index={row.idx}
+            onclick={deleteSkillDomainRow}>
+        </lightning-button-icon>
+    </td>
+</tr>
+        </template>
+    </tbody>
+</table>
+<button class="add-row-btn" data-period="FY3" onclick={addSkillDomainRow}>+ Add Row</button>-->
+    <table class="financial-table slds-m-top_medium">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{labels.CL_Current_Fiscal_Year}</th>
+                <th>{labels.CL_Prior_Fiscal_Year}</th>
+                <th>{labels.CL_Two_Years_Prior}</th>
+                <th>{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Row 1: Skilling Domains 
+            <tr>
+                <td>{labels.CL_List_of_Organization_Skilling_Domain}</td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsCFYPreview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Skills_Duration_CFY__c" data-target="outcome" required></lightning-input></td>                
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY1Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Skills_Duration_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY2Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Skills_Duration_FY_2__c" data-target="outcome" required></lightning-input></td>              
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY3Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Skills_Duration_FY_3__c" data-target="outcome" required></lightning-input></td>
+                
+            </tr>-->
+
+            <!-- Row 2: Learner Enrollments -->
+            <tr>
+                <td>{labels.CL_Learner_Enrollment}</td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Enrollments_CFY__c} data-id="Projected_Learner_Enrollments_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Enrollments_FY_1__c} data-id="Projected_Learner_Enrollments_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Enrollments_FY_2__c} data-id="Projected_Learner_Enrollments_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Enrollments_FY_3__c} data-id="Projected_Learner_Enrollments_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 3: Learner Placements -->
+            <tr>
+                <td>{labels.CL_Learner_Placements}</td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Placements_CFY__c} data-id="Projected_Learner_Placements_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Placements_FY_1__c} data-id="Projected_Learner_Placements_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Placements_FY_2__c} data-id="Projected_Learner_Placements_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_Placements_FY_3__c} data-id="Projected_Learner_Placements_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 4: Placement Percentage -->
+            <tr>
+                <td>{labels.CL_Learner_Placement_Percentage}</td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_placement_CFY__c} data-id="Projected_Learner_placement_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_placement_FY_1__c} data-id="Projected_Learner_placement_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_placement_FY_2__c} data-id="Projected_Learner_placement_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Learner_placement_FY_3__c} data-id="Projected_Learner_placement_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 5: Family of Four Explanation 
+            <tr>
+                <td>{labels.CL_Placement_Provided}</td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportCFYPreview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY1Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY1__c" data-target="outcome" required></lightning-input></td>            
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY2Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY2__c" data-target="outcome" required></lightning-input></td>                          
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY3Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY3__c" data-target="outcome" required></lightning-input></td>           
+            </tr>-->
+
+            <!-- Row 6: Avg Cost per Placement -->
+            <!-- <tr>
+                <td>{labels.CL_Projected_Cost_Per_Placement}</td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_CFY__c} data-id="Avg_Cost_per_Placement_CFY__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_1__c} data-id="Avg_Cost_per_Placement_FY_1__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_2__c} data-id="Avg_Cost_per_Placement_FY_2__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_3__c} data-id="Avg_Cost_per_Placement_FY_3__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+            </tr> -->
+
+            <tr>
+    <td class="row-label">
+        {labels.CL_Projected_Cost_Per_Placement}
+    </td>
+    <td class="input-cell">
+        <div class="currency-cell">
+            <span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={outcomeData.Avg_Cost_per_Placement_CFY__c}
+                data-id="Avg_Cost_per_Placement_CFY__c"
+                onchange={handleOutcomeCurrencyInput} required>
+            </lightning-input>
+        </div>
+        <lightning-input type="text" variant="label-hidden" class="sub-text-input"
+            value={outcomeData.Avg_Cost_per_Placement_CFY_Note__c}
+            data-id="Avg_Cost_per_Placement_CFY_Note__c"
+            onchange={handleOutcomeInput} placeholder="Notes...">
+        </lightning-input>
+    </td>
+    <td class="input-cell">
+        <div class="currency-cell">
+            <span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={outcomeData.Avg_Cost_per_Placement_FY_1__c}
+                data-id="Avg_Cost_per_Placement_FY_1__c"
+                onchange={handleOutcomeCurrencyInput} required>
+            </lightning-input>
+        </div>
+        <lightning-input type="text" variant="label-hidden" class="sub-text-input"
+            value={outcomeData.Avg_Cost_per_Placement_FY_1_Note__c}
+            data-id="Avg_Cost_per_Placement_FY_1_Note__c"
+            onchange={handleOutcomeInput} placeholder="Notes...">
+        </lightning-input>
+    </td>
+    <td class="input-cell">
+        <div class="currency-cell">
+            <span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={outcomeData.Avg_Cost_per_Placement_FY_2__c}
+                data-id="Avg_Cost_per_Placement_FY_2__c"
+                onchange={handleOutcomeCurrencyInput} required>
+            </lightning-input>
+        </div>
+        <lightning-input type="text" variant="label-hidden" class="sub-text-input"
+            value={outcomeData.Avg_Cost_per_Placement_FY_2_Note__c}
+            data-id="Avg_Cost_per_Placement_FY_2_Note__c"
+            onchange={handleOutcomeInput} placeholder="Notes...">
+        </lightning-input>
+    </td>
+    <td class="input-cell">
+        <div class="currency-cell">
+            <span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={outcomeData.Avg_Cost_per_Placement_FY_3__c}
+                data-id="Avg_Cost_per_Placement_FY_3__c"
+                onchange={handleOutcomeCurrencyInput} required>
+            </lightning-input>
+        </div>
+        <lightning-input type="text" variant="label-hidden" class="sub-text-input"
+            value={outcomeData.Avg_Cost_per_Placement_FY_3_Note__c}
+            data-id="Avg_Cost_per_Placement_FY_3_Note__c"
+            onchange={handleOutcomeInput} placeholder="Notes...">
+        </lightning-input>
+    </td>
+</tr>
+
+            <!-- Row 7: 3rd Party Verification -->
+            <tr>
+                <td>{labels.CL_Placement_Verification}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.X3rd_Party_Placement_Verification_CFY__c} data-id="X3rd_Party_Placement_Verification_CFY__c" options={picklist3rdPartyCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isPlacementVerifiedCFY}>
+     <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_Party_Verification_Description_CFY__c} data-id="X3rd_Party_Verification_Description_CFY__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>                   
+                        <div class={p4CFYPVClass}>
+                             <abbr class="slds-required" title="required">*</abbr>
+                        <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_CFY_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <template if:true={isP4CFYPVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+                         <!-- File List -->
+            <template if:true={uploadedFilesByCell.P4_CFY_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_CFY_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_CFY_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                    </div>
+                  </template>
+                </td>
+                <!-- FY1 -->
+                  <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_1__c}
+            data-id="X3rd_Party_Placement_Verification_FY_1__c"
+            options={picklist3rdPartyFY1}
+            onchange={handleOutcomeInput}  required>
+        </lightning-combobox>   
+        <template if:true={isPlacementVerifiedFY1}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_1__c}
+            data-id="X3rd_Party_Verification_Description_FY_1__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+
+            <div class={p4FY1PVClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY1_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+             <template if:true={isP4FY1PVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+         <!--FY1-->
+            <template if:true={uploadedFilesByCell.P4_FY1_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY1_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY1_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY2 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_2__c}
+            data-id="X3rd_Party_Placement_Verification_FY_2__c"
+            options={picklist3rdPartyFY2}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+      
+        <template if:true={isPlacementVerifiedFY2}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_2__c}
+            data-id="X3rd_Party_Verification_Description_FY_2__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class={p4FY2PVClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY2_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+            <template if:true={isP4FY2PVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+        <!--FY2 FileName-->
+        <template if:true={uploadedFilesByCell.P4_FY2_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY2_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY2_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+ <!-- FY3 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_3__c}
+            data-id="X3rd_Party_Placement_Verification_FY_3__c"
+            options={picklist3rdPartyFY3}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isPlacementVerifiedFY3}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_3__c}
+            data-id="X3rd_Party_Verification_Description_FY_3__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+               <div class={p4FY3PVClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY3_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+            <template if:true={isP4FY3PVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+        <!--FY3 FileName-->
+          <template if:true={uploadedFilesByCell.P4_FY3_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY3_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY3_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+            </tr>
+
+            <!-- Row 8: Long-Term Outcome Research -->
+            <tr>
+                <td>{labels.CL_Long_term_Outcomes_Research}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Long_Term_Outcomes_CFY__c} data-id="Long_Term_Outcomes_CFY__c" options={picklistLongTermCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isLongTermYesCFY}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.Outcome_Tracking_Details_CFY__c} data-id="Outcome_Tracking_Details_CFY__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                         <div class={p4CFYLTClass}>
+                             <abbr class="slds-required" title="required">*</abbr>
+                        <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_CFY_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <template if:true={isP4CFYLTInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+                        <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_CFY_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_CFY_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_CFY_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                    </div>
+                    </template>
+                </td>
+                 <!-- FY1 --> 
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_1__c}
+            data-id="Long_Term_Outcomes_FY_1__c"
+            options={picklistLongTermFY1}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isLongTermYesFY1}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_1__c}
+            data-id="Outcome_Tracking_Details_FY_1__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+             <div class={p4FY1LTClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY1_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+   <template if:true={isP4FY1LTInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+ 
+            <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY1_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY1_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY1_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY2 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_2__c}
+            data-id="Long_Term_Outcomes_FY_2__c"
+            options={picklistLongTermFY2}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isLongTermYesFY2}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_2__c}
+            data-id="Outcome_Tracking_Details_FY_2__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class={p4FY2LTClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY2_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                <template if:true={isP4FY2LTInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+
+            <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY2_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY2_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY2_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY3 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_3__c}
+            data-id="Long_Term_Outcomes_FY_3__c"
+            options={picklistLongTermFY3}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isLongTermYesFY3}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_3__c}
+            data-id="Outcome_Tracking_Details_FY_3__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+
+            <div class={p4FY3LTClass}>
+                 <abbr class="slds-required" title="required">*</abbr>
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY3_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                  <template if:true={isP4FY3LTInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>  
+
+
+            <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY3_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY3_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY3_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+ 
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Rich Text Modal -->
+   <template if:true={isModalOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open custom-modal">
+        <div class="custom-modal__container">
+            <!-- Modal Header -->
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon 
+                    icon-name="utility:close" 
+                    variant="bare" 
+                    alternative-text="Close"
+                    onclick={closeModal}>
+                </lightning-button-icon>
+            </header>
+            <!-- Modal Content -->
+            <div class="custom-modal__content">
+                <div class="editor-container">
+                    <!-- Toolbar -->
+                    <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFont}>
+                                <option value="">Font</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFontSize}>
+                                <option value="">Size</option>
+                                <option value="1">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Editable Text Area -->
+                    <div class="text-area" 
+                         contenteditable="true" 
+                         data-field={modalField}
+                         onclick={setActiveField} 
+                         oninput={handleInput} 
+                         onpaste={handlePaste} 
+                         onkeydown={handleKeyDown}>
+                        <!-- Optionally insert {modalValue} as innerHTML on modal open -->
+                    </div>
+                    <p class="error-msg" data-error={modalField}></p>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <!-- Modern Backdrop, not old custom one -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+</template>
+
+
+<!--********************************* PAGE 5 - Job Creation Questions ********************************************-->
+<!-- PAGE 5 - Job Creation Questions -->
+<template if:true={isPage5}>
+    <div class="section-header slds-m-top_large">9.{labels.CLH_Job_Creation_Questions}</div>
+    <p class="slds-text-title_bold slds-m-bottom_small">{labels.CLH_Outcome_Data}</p>
+
+    <table class="financial-table slds-m-top_medium">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{labels.CL_Current_Fiscal_Year}</th>
+                <th>{labels.CL_Prior_Fiscal_Year}</th>
+                <th>{labels.CL_Two_Years_Prior}</th>
+                <th>{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Row 1 -->
+            <tr>
+                <td>{labels.CL_List_of_projected_target_business}</td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessCFYPreview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Target_Business_Sectors_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY1Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Target_Business_Sectors_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY2Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Target_Business_Sectors_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY3Preview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Target_Business_Sectors_FY_3__c" data-target="outcome" required></lightning-input></td>
+            </tr>
+
+            <!-- Row 2: # new businesses -->
+            <tr>
+                <td>{labels.CL_Projected_Total_New_Businesses}</td>
+                <td><lightning-input type="number" value={outcomeData.Projected_New_Businesses_CFY__c} data-id="Projected_New_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_New_Businesses_FY_1__c} data-id="Projected_New_Businesses_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_New_Businesses_FY_2__c} data-id="Projected_New_Businesses_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_New_Businesses_FY_3__c} data-id="Projected_New_Businesses_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 3: # jobs from new -->
+            <tr>
+                <td>{labels.CL_Projected_Total_Jobs}</td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Jobs_from_New_Businesses_CFY__c} data-id="Projected_Jobs_from_New_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Jobs_from_New_Businesses_FY1__c} data-id="Projected_Jobs_from_New_Businesses_FY1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Jobs_from_New_Businesses_FY2__c} data-id="Projected_Jobs_from_New_Businesses_FY2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Projected_Jobs_from_New_Businesses_FY3__c} data-id="Projected_Jobs_from_New_Businesses_FY3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 4: % jobs support family 
+            <tr>
+                <td>{labels.CL_Estimated_Jobs_Provide}</td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4CFYPreview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY1Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY2Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY3Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_4__c" data-target="outcome" required></lightning-input></td>
+            </tr>-->
+
+            <!-- Row 5: Existing business helped -->
+            <tr>
+                <td>{labels.CL_Projected_Existing_Businesses}</td>
+                <td><lightning-input type="number" value={outcomeData.Growing_Businesses_Supported_CFY__c} data-id="Growing_Businesses_Supported_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Growing_Businesses_Supported_FY_1__c} data-id="Growing_Businesses_Supported_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Growing_Businesses_Supported_FY_2__c} data-id="Growing_Businesses_Supported_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Growing_Businesses_Supported_FY_3__c} data-id="Growing_Businesses_Supported_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 6: Jobs from existing -->
+            <tr>
+                <td>{labels.CL_Total_Jobs_Created}</td>
+                <td><lightning-input type="number" value={outcomeData.Jobs_from_Growing_Businesses_CFY__c} data-id="Jobs_from_Growing_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Jobs_from_Growing_Businesses_FY_1__c} data-id="Jobs_from_Growing_Businesses_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Jobs_from_Growing_Businesses_FY_2__c} data-id="Jobs_from_Growing_Businesses_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="number" value={outcomeData.Jobs_from_Growing_Businesses_FY_3__c} data-id="Jobs_from_Growing_Businesses_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 7: % jobs support family 
+            <tr>
+                <td>{labels.CL_Estimated_Percentage_Total}</td>
+                <td><lightning-input variant="label-hidden" value={jobSupportCFYPreview} onclick={openModal} data-row="Jobs_Supporting_Family_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY1Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY2Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY3Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_3__c" data-target="outcome" required></lightning-input></td>
+            </tr>-->
+
+            <!-- Row 8: Avg Cost -->
+            <tr>
+                <td>{labels.CL_Total_Projected_Average_Cost}</td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_CFY__c} data-id="Avg_Cost_per_Job_CFY__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_1__c} data-id="Avg_Cost_per_Job_FY_1__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_2__c} data-id="Avg_Cost_per_Job_FY_2__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_3__c} data-id="Avg_Cost_per_Job_FY_3__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+            </tr>
+
+            <!-- Row 9: 3rd Party Verification -->
+            <tr>
+                <td>{labels.CL_Job_Creation_Verification}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_CFY__c} data-id="Job_Verification_3rd_Party_CFY__c" options={picklistJob3rdPartyCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                    
+                    <template if:true={isJobCreationVerifiedCFY}>
+                        <lightning-input label={labels.CL_Describe_Briefly} placeholder={labels.clickToAddExplanation} class="explanation-input" value={jobVerifyDescCFYPreview} onclick={openModal} data-row="X3rd_party_verification_details_CFY__c" data-target="outcome" required></lightning-input>
+                        <div class={p5CFYJVClass}>  
+                             <abbr class="slds-required" title="required">*</abbr>
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_CFY_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                            <template if:true={isP5CFYJVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+
+
+                            <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_CFY_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_CFY_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_CFY_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+                <!-- FY1-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY1__c} data-id="Job_Verification_3rd_Party_FY1__c" options={picklistJob3rdPartyFY1} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY1}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} placeholder={labels.clickToAddExplanation} class="explanation-input" value={outcomeData.X3rd_party_verification_details_FY1__c} data-id="X3rd_party_verification_details_FY1__c" onchange={handleOutcomeInput} required></lightning-textarea>
+                        <div class={p5FY1JVClass}>
+                             <abbr class="slds-required" title="required">*</abbr>
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY1_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <template if:true={isP5FY1JVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+                        
+                            <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY1_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY1_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY1_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+                 <!-- FY2-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY2__c} data-id="Job_Verification_3rd_Party_FY2__c" options={picklistJob3rdPartyFY2} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY2}>
+                         <lightning-input label={labels.CL_Describe_Briefly} placeholder={labels.clickToAddExplanation} class="explanation-input" value={jobVerifyDescFY2Preview} onclick={openModal} data-row="X3rd_party_verification_details_FY2__c" data-target="outcome" required></lightning-input>
+                        <div class={p5FY2JVClass}>
+                             <abbr class="slds-required" title="required">*</abbr>
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY2_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <template if:true={isP5FY2JVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+                        
+                            <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY2_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY2_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY2_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td> 
+                <!-- FY3-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY3__c} data-id="Job_Verification_3rd_Party_FY3__c" options={picklistJob3rdPartyFY3} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY3}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} placeholder={labels.clickToAddExplanation} class="explanation-input" value={outcomeData.X3rd_party_verification_details_FY3__c} data-id="X3rd_party_verification_details_FY3__c" onchange={handleOutcomeInput} required></lightning-textarea>
+                        <div class={p5FY3JVClass}>
+                             <abbr class="slds-required" title="required">*</abbr>
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY3_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                         <template if:true={isP5FY3JVInvalid}>
+        <p class="file-error-msg">{labels.CL_File_Required_Message}</p>
+    </template>
+                        
+                            <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY3_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY3_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY3_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+
+
+            </tr>
+        </tbody>
+    </table>
+
+ <template if:true={isModalOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open custom-modal">
+        <div class="custom-modal__container">
+            <!-- Modal Header -->
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon 
+                    icon-name="utility:close" 
+                    variant="bare" 
+                    alternative-text="Close"
+                    onclick={closeModal}>
+                </lightning-button-icon>
+            </header>
+            <!-- Modal Content -->
+            <div class="custom-modal__content">
+                <div class="editor-container">
+                    <!-- Toolbar -->
+                    <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFont}>
+                                <option value="">Font</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFontSize}>
+                                <option value="">Size</option>
+                                <option value="1">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Editable Text Area -->
+                    <div class="text-area" 
+                         contenteditable="true" 
+                         data-field={modalField}
+                         onclick={setActiveField} 
+                         oninput={handleInput} 
+                         onpaste={handlePaste} 
+                         onkeydown={handleKeyDown}>
+                        <!-- Optionally insert {modalValue} as innerHTML on modal open -->
+                    </div>
+                    <p class="error-msg" data-error={modalField}></p>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <!-- Modern Backdrop, not old custom one -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+</template>
+
+<!--********************************* PAGE 6 - AI Commom Fields ********************************************-->
+<template if:true={isPage6}>
+<div class="section-header slds-m-top_large">10. {labels.CL_Desired_Use_of_Additional_Funding_Investment}</div>
+ <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for="Use_of_Additional_Funding__c">
+        <abbr class="slds-required" title="required">*</abbr>
+        {labels.CL_Additional_Funding_Question}</label>
+      <!--<lightning-helptext content={labels.CL_Legal_Help}></lightning-helptext>-->
+    </div>
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field="Use_of_Additional_Funding__c" aria-label={labels.CL_Additional_Funding_Question}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error="Use_of_Additional_Funding__c"></p>
+  </div>
+  <div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id="Use_of_Additional_Funding__c">
+        ✦ Get AI Feedback
+    </button>
+</div>
+</div>
+
+
+<!-- Operational Synergies Section (dynamic for Funding Area) -->
+<template if:true={operationalSynergiesFieldApi}>
+<div class="section-header slds-m-top_large">11. {labels.CL_Operational_Synergies}</div>
+ <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for={operationalSynergiesFieldApi}>
+         <abbr class="slds-required" title="required">*</abbr>
+            {operationalSynergiesLabel}</label>
+    </div>
+     
+<!-- ✅ Links now outside label and will appear on a new line -->
+<div class="slds-m-top_x-small slds-text-body_small">
+    <ul class="slds-list_dotted">
+        <li>
+            <a href="https://www.youtube.com/watch?v=B8Glesyhvgw" target="_blank" rel="noopener noreferrer">
+                GenieAI for Entrepreneurship – Overview Video
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/watch?v=RwePgeR98oc" target="_blank" rel="noopener noreferrer">
+                GenieAI Skilling Platform – Product Demo
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field={operationalSynergiesFieldApi} aria-label={operationalSynergiesLabel}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error={operationalSynergiesFieldApi}></p>
+  </div>
+<div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id={operationalSynergiesFieldApi}>
+        ✦ Get AI Feedback
+    </button>
+</div>
+  </div>
+  </template>
+</template>
+
+
+<!-- ✅ Always-visible AI Feedback Panel (docked at bottom right) -->
+ <!-- Bottom Row: Navigation + AI Feedback Panel -->
+<!--<div class="form-footer">
+    <div class="navigation-buttons">
+        <lightning-button label={labels.CL_Previous} onclick={handlePrevious} class="slds-m-right_small"  disabled={isFirstPage}></lightning-button>--> <!--disabled={isFirstPage}-->
+        
+         <!--<template if:false={isPage1}>
+        <lightning-button variant="brand" label={labels.CL_Save_Draft} onclick={handleSaveDraft} class="slds-m-right_small"></lightning-button>
+        </template>
+
+        <lightning-button variant="brand" label={labels.CL_Next} onclick={handleNext} disabled={isLastPage}></lightning-button>-->
+
+        <div class="form-footer-wrapper" style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e8e8e8;">
+    <div class="navigation-buttons">
+        <template if:false={isPage0}>
+            <lightning-button label={labels.CL_Previous} onclick={handlePrevious} class="slds-m-right_small" disabled={isFirstPage}></lightning-button>
+
+            <template if:false={isPage1}>
+                <lightning-button variant="brand" label={labels.CL_Save_Draft} onclick={handleSaveDraft} class="slds-m-right_small"></lightning-button>
+            </template>
+
+            <lightning-button variant="brand" label={labels.CL_Next} onclick={handleNext} disabled={isLastPage}></lightning-button>
+        </template>
+
+        <template if:true={showPreviewButton}> 
+            <lightning-button label={labels.CLH_Preview} variant="brand" onclick={openPreviewModal}></lightning-button>
+        </template>
+    </div>
+
+     
+        <!-- ✅ Place Submit and Preview button
+        <template if:true={isPage6}>
+             <lightning-button variant="brand" label={labels.CL_Submit} onclick={handleSubmitClick} class="slds-m-left_small"></lightning-button>
+        </template>-->
+    
+<!--template if:true={showPreviewButton}> 
+    <lightning-button label={labels.CLH_Preview} variant="brand" onclick={openPreviewModal}></lightning-button>
+</template>-->
+        </div>
+
+<!-- AI Feedback Panel Floating at Bottom Right, Expanding Upwards -->
+ <template if:true={showAIFeedbackPanel}>
+<div class="ai-feedback-floating-panel">
+    <div class={panelClasses}>
+        <!-- Header (click to minimize/expand) -->
+        <div class="panel-header" onclick={minimizeFeedbackPanel}>
+            <span>{labels.CLH_AI_Feedback}</span> <!--AI Feedback-->
+            <div class="header-icons">
+                <button class="slds-button slds-button_icon" onclick={minimizeFeedbackPanel} title="Minimize" tabindex="-1">−</button>
+                <button class="slds-button slds-button_icon" onclick={closeFeedbackPanel} title="Close" tabindex="-1">×</button>
+            </div>
+        </div>
+        <!-- Content (only visible if expanded) -->
+        <template if:false={isFeedbackMinimized}>
+            <div class="panel-content">
+                <template if:true={showAiFeedback}>
+                    <template if:true={isAiLoading}>
+                        <div class="slds-p-around_medium slds-text-align_center">
+                            <lightning-spinner alternative-text="Loading AI Feedback..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+                    <template if:false={isAiLoading}>
+                        <div class="ai-response-content">
+                            <lightning-formatted-rich-text value={aiResponse}></lightning-formatted-rich-text>
+                            </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+    </div>
+</div>
+</template>
+
+</div> 
+
+ <!-- PREVIEW MODAL -->
+<!-- PREVIEW MODAL (Fullscreen) -->
+<template if:true={isPreviewVisible}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open wcf-preview-modal">
+        <div class="slds-modal__container wcf-preview-modal__container">
+            <header class="slds-modal__header wcf-preview-modal__header">
+                <h2 class="slds-text-heading_medium">{labels.CL_WCF_Form_Title} Preview</h2>
+            </header>
+           <div class="slds-modal__content slds-p-around_medium">
+
+                <!-- PAGE 1: Org/Submitter/Legal -->
+                <template if:true={isPreviewPage1}>
+                    <h2 class="section-headings">1. {labels.CLS_Organizational_Identifying}</h2>
+                    <div class="preview-table no-lines">                
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Area_s_for_Funding_Investment}</div>
+                            <div class="value-column">{organizationData.Organizational_Area_s_for_Funding_Inves__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Name}</div>
+                            <div class="value-column">{organizationData.Organization_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Headquarters_City_and_Country}</div>
+                            <div class="value-column">{organizationData.Headquarters_City_and_Country__c}</div>
+                        </div>
+                         <div class="preview-row">
+                            <div class="label-column">{labels.CL_Primary_Service_Regions}</div>
+                            <div class="value-column">{organizationData.Primary_Service_Regions__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Leader_Name}</div>
+                            <div class="value-column">{organizationData.Leader_Name__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Leader_Title}</div>
+                            <div class="value-column">{organizationData.Leader_Title__c}</div>
+                        </div>
+                         </div>
+                        <!-- ... Submitter fields ... -->
+                     <h2 class="section-headings">2. {labels.CLS_Submitter_Contact_Info}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Submitter_Name}</div>
+                            <div class="value-column">{organizationData.Submitter_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Title}</div>
+                            <div class="value-column">{organizationData.Job_Title__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Email_Address}</div>
+                            <div class="value-column">{organizationData.Work_Email_ID__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Phone_number}</div>
+                            <div class="value-column">{organizationData.Phone__c}</div>
+                        </div>
+                         </div>     
+                   
+                    <h2 class="section-headings slds-m-top_large">3. {labels.CL_Legal_Structure}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Legal_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Legal_Structure__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 2: Dates, Historical, Fiscal, Sustainability -->
+                <template if:true={isPreviewPage2}>
+                    <h2 class="section-headings">4.{labels.CLH_Financial_Data} </h2> <!--{labels.CL_Current_Fiscal_Year_End_Date}-->
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Current_Fiscal_Year_End_Date}</div>
+                            <div class="value-column">{organizationData.Current_fiscal_year_s_end_date__c}</div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-headings slds-m-top_large">5.{labels.CLH_Historical_Data}</h2>
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th class="wrapped-text"></th>
+                                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="wrapped-text">{labels.CL_Balance_At_Start_of_the_Year}</td>
+                                <td>{historicalData.CY1_Balance_Start_CFY_1__c}</td>
+                                <td>{historicalData.CY2_Balance_Start_CFY_2__c}</td>
+                                <td>{historicalData.CY3_Balance_Start_CFY_3__c}</td>
+                            </tr>
+                            <!-- Revenue(all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue}</td>
+                                <td>{historicalData.CY1_Revenue__c}</td>
+                                <td>{historicalData.CY2_Revenue__c}</td>
+                                <td>{historicalData.CY3_Revenue__c}</td>
+                            </tr>
+                              <!--Expense (all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Expense}</td>
+                                <td>{historicalData.CY1_Expense__c}</td>
+                                <td>{historicalData.CY2_Expense__c}</td>
+                                <td>{historicalData.CY3_Expense__c}</td>
+                            </tr>
+                             <!--Balance At end of the Year (all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Balance_At_End_of_the_Year}</td>
+                                <td>{historicalData.CY1_Balance_End__c}</td>
+                                <td>{historicalData.CY2_Balance_End__c}</td>
+                                <td>{historicalData.CY3_Balance_End__c}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 class="section-headings slds-m-top_large">6. {labels.CLH_Current_Fiscal_Year_Data}</h2>
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th class="wrapped-text"></th>
+                                <th class="wrapped-text">{labels.CL_Budget}</th>
+                                <th class="wrapped-text">{labels.CL_Current_Projection}</th>
+                                <th class="wrapped-text">{labels.CL_Variance}</th>
+                                <th class="wrapped-text">{labels.CL_Explanation}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue}</td>
+                                <td>{fiscalData.Revenue_Budget__c}</td>
+                                <td>{fiscalData.Revenue_Projection__c}</td>
+                                <td>{fiscalData.Revenue_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Revenue_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                            <!-- Expense (all wrap text) -->
+                             <tr>
+                                <td class="wrapped-text">{labels.CL_Expense}</td>
+                                <td>{fiscalData.Expense_Budget__c}</td>
+                                <td>{fiscalData.Expense_Projection__c}</td>
+                                <td>{fiscalData.Expense_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Expense_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                              <!-- Net = Revenue - Expense (all wrap text) -->
+                             <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue_Expense}</td>
+                                <td>{fiscalData.Net_Budget__c}</td>
+                                <td>{fiscalData.Net_Projection__c}</td>
+                                <td>{fiscalData.Net_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Net_Position_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 class="section-headings slds-m-top_large">7. {labels.CL_Organizational_Sustainability}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Sustainability_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Organizational_Sustainability__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 3: Outcome Data Table (Job Fulfillment) -->
+              <template if:true={isPreviewPage3}>
+    <h2 class="section-headings">8. {labels.CLH_Job_Fulfilment_Questions}</h2>
+    <!-- ── Skilling Domains Preview ── -->
+<p class="skill-section-label slds-m-top_medium">
+    {labels.CL_List_of_Organization_Skilling_Domain}
+</p>
+
+<!-- CFY Preview -->
+<p class="skill-period-label"><strong>Current Fiscal Year (Projections)</strong></p>
+<table class="skill-domain-table">
+    <thead>
+        <tr>
+            <th>Domain / Program Name</th>
+            <th>Hours of Training</th>
+            <th>Duration (Months)</th>
+            <th>When was Program Started</th>
+            <th>Yearly Enrolment Nos.</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsCFYIndexed} for:item="row">
+            <tr key={row.idx}>
+                <td>{row.domain}</td>
+                <td>{row.hours}</td>
+                <td>{row.duration}</td>
+                <td>{row.startDate}</td>
+                <td>{row.yearlyEnrolment}</td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+
+<!-- FY1 Preview -->
+<p class="skill-period-label slds-m-top_small"><strong>Prior Fiscal Year (FY-1)</strong></p>
+<table class="skill-domain-table">
+    <thead>
+        <tr>
+            <th>Domain / Program Name</th>
+            <th>Hours of Training</th>
+            <th>Duration (Months)</th>
+            <th>When was Program Started</th>
+            <th>Yearly Enrolment Nos.</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY1Indexed} for:item="row">
+            <tr key={row.idx}>
+                <td>{row.domain}</td>
+                <td>{row.hours}</td>
+                <td>{row.duration}</td>
+                <td>{row.startDate}</td>
+                <td>{row.yearlyEnrolment}</td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+
+<!-- FY2 Preview -->
+<p class="skill-period-label slds-m-top_small"><strong>Two Years Prior (FY-2)</strong></p>
+<table class="skill-domain-table">
+    <thead>
+        <tr>
+            <th>Domain / Program Name</th>
+            <th>Hours of Training</th>
+            <th>Duration (Months)</th>
+            <th>When was Program Started</th>
+            <th>Yearly Enrolment Nos.</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY2Indexed} for:item="row">
+            <tr key={row.idx}>
+                <td>{row.domain}</td>
+                <td>{row.hours}</td>
+                <td>{row.duration}</td>
+                <td>{row.startDate}</td>
+                <td>{row.yearlyEnrolment}</td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+
+<!-- FY3 Preview -->
+<p class="skill-period-label slds-m-top_small"><strong>Three Years Prior (FY-3)</strong></p>
+<table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+    <thead>
+        <tr style="background-color:#e8523a;">
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left;">Domain / Program Name</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left;">Hours of Training</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left;">Duration (Months)</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left;">When was Program Started</th>
+            <th style="color:#fff; padding:10px 12px; font-size:0.78rem; font-weight:600; text-align:left;">Yearly Enrolment Nos.</th>
+        </tr>
+    </thead>
+    <tbody>
+        <template for:each={skillDomainsFY3Indexed} for:item="row">
+            <tr key={row.idx} style="border-bottom:1px solid #f0f0f0;">
+    <td style="padding:8px 12px; font-size:0.82rem;">{row.domain}</td>
+    <td style="padding:8px 12px; font-size:0.82rem;">{row.hours}</td>
+    <td style="padding:8px 12px; font-size:0.82rem;">{row.duration}</td>
+    <td style="padding:8px 12px; font-size:0.82rem;">{row.startDate}</td>
+    <td style="padding:8px 12px; font-size:0.82rem;">{row.yearlyEnrolment}</td>
+</tr>
+        </template>
+    </tbody>
+</table>
+    <table class="financial-table preview-outcome-table">
+        <thead>
+            <tr>
+                <th class="wrapped-text"></th>
+                <th class="wrapped-text">{labels.CL_Current_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+          <!--  <tr>
+                <td class="wrapped-text">{labels.CL_List_of_Organization_Skilling_Domain}</td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_CFY__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_1__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_2__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr> -->
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Enrollment}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Placements}</td>
+                <td>{outcomeData.Projected_Learner_Placements_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Placement_Percentage}</td>
+                <td>{outcomeData.Projected_Learner_placement_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Placement_Provided}</td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_CFY__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY1__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY2__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY3__c}></lightning-formatted-rich-text></td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Projected_Cost_Per_Placement}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_CFY__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_1__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_2__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_3__c}</td>
+            </tr>
+            <!-- 3rd Party Verification (Yes/No, Explanation, Files) -->
+            <tr>
+                <td class="wrapped-text">{labels.CL_Placement_Verification}</td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_CFY__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_CFY__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_CFY__c}></lightning-formatted-rich-text>
+                    </template>
+                         <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_CFY_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_CFY_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <!-- Repeat for FY1, FY2, FY3 -->
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_1__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_1__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_1__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY1_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY1_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_2__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_2__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_2__c}></lightning-formatted-rich-text>
+                    </template>
+                    <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY2_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY2_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_3__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_3__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_3__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY3_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY3_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+            <!-- Long-term outcomes, Yes/No, explanation, files -->
+            <tr>
+                <td class="wrapped-text">{labels.CL_Long_term_Outcomes_Research}</td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_CFY__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_CFY__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_CFY__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_CFY_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_CFY_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_1__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_1__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_1__c}></lightning-formatted-rich-text>
+                    </template>
+                    <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY1_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY1_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_2__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_2__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_2__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY2_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY2_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_3__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_3__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}:</span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_3__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY3_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY3_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+            
+</template>
+
+                <!-- PAGE 4: Outcome Data Table (Job Creation) -->
+               <template if:true={isPreviewPage4}>
+    <h2 class="section-headings">8. {labels.CLH_Job_Creation_Questions}</h2>
+    <table class="financial-table preview-outcome-table">
+        <thead>
+            <tr>
+                <th class="wrapped-text"></th>
+                <th class="wrapped-text">{labels.CL_Current_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Projected Target Business -->
+            <tr>
+                <td>{labels.CL_List_of_projected_target_business}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr>
+            <!-- # new businesses -->
+            <tr>
+                <td>{labels.CL_Projected_Total_New_Businesses}</td>
+                <td>{outcomeData.Projected_New_Businesses_CFY__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_1__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_2__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_3__c}</td>
+            </tr>
+            <!-- # jobs from new -->
+            <tr>
+                <td>{labels.CL_Projected_Total_Jobs}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_CFY__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY1__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY2__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY3__c}</td>
+            </tr>
+            <!-- % jobs support family of 4 (Rich Text)
+            <tr>
+                <td>{labels.CL_Estimated_Jobs_Provide}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_4__c}></lightning-formatted-rich-text></td>
+            </tr> -->
+            <!-- Existing businesses helped -->
+            <tr>
+                <td>{labels.CL_Projected_Existing_Businesses}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_CFY__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_1__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_2__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_3__c}</td>
+            </tr>
+            <!-- Jobs from existing -->
+            <tr>
+                <td>{labels.CL_Total_Jobs_Created}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_CFY__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_1__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_2__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_3__c}</td>
+            </tr>
+            <!-- % jobs support family (Rich Text) -->
+         <!--  <tr>
+                <td>{labels.CL_Estimated_Percentage_Total}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr>--> 
+            <!-- Avg Cost -->
+            <tr>
+                <td>{labels.CL_Total_Projected_Average_Cost}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_CFY__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_1__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_2__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_3__c}</td>
+            </tr>
+            <!-- 3rd Party Verification (Show Yes/No and Description as rich text) -->
+            <tr>
+                <td>{labels.CL_Job_Creation_Verification}</td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_CFY__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_CFY__c}></lightning-formatted-rich-text>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_CFY_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_CFY_JV} for:item="file">
+                      <li key={file.documentId}>{file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY1__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY1__c}></lightning-formatted-rich-text>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_FY1_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_FY1_JV} for:item="file">
+                      <li key={file.documentId}>{file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY2__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY2__c}></lightning-formatted-rich-text>
+                      <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_FY2_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_FY2_JV} for:item="file">
+                      <li key={file.documentId}>{file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY3__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY3__c}></lightning-formatted-rich-text>
+                      <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_FY3_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_FY3_JV} for:item="file">
+                      <li key={file.documentId}>{file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>
+
+               <!-- PAGE 5: Rich text fields - AI (Common) -->
+                <template if:true={isPreviewPage5}>
+                     <h2 class="section-headings slds-m-top_large">9. {labels.CL_Desired_Use_of_Additional_Funding_Investment}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Additional_Funding_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Use_of_Additional_Funding__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+      <h2 class="section-headings slds-m-top_large">10. {labels.CL_Operational_Synergies}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{operationalSynergiesLabel}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={operationalSynergiesPreviewValue}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>       
+
+                </template>
+
+            </div>
+            <!-- AFTER -->
+<footer class="slds-modal__footer">
+    <lightning-button label={labels.CL_Previous} onclick={handlePreviewPrevious} disabled={isFirstPreviewPage}></lightning-button>
+    <lightning-button label={labels.CL_Next} onclick={handlePreviewNext} class="slds-m-left_small" disabled={isLastPreviewPage}></lightning-button>
+    <lightning-button label={labels.CL_Close} onclick={handleClosePreview} class="slds-m-left_small"></lightning-button>
+
+    <!-- Attestation — only shown on last preview page -->
+    <template if:true={isLastPreviewPage}>
+        <div class="attestation-container">
+            <lightning-input
+                type="checkbox"
+                label={labels.CL_Attestation_Label}
+                checked={isAttested}
+                onchange={handleAttestationChange}>
+            </lightning-input>
+            <lightning-button
+                variant="brand"
+                label={labels.CL_Submit}
+                onclick={handleSubmit}
+                disabled={isSubmitDisabled}
+                class="slds-m-left_small attestation-submit-btn">
+            </lightning-button>
+        </div>
+    </template>
+</footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+
+
+    </lightning-card>
+
+</template>

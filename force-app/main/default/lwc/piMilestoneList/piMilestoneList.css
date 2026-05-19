@@ -1,0 +1,437 @@
+.page {
+    padding: 18px 18px 40px 18px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.subtitle {
+    margin-top: 4px;
+    color: #5f6b7a;
+    font-size: 13px;
+}
+
+.loader {
+    padding: 18px;
+    border: 1px dashed #d7dde5;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.error {
+    padding: 14px;
+    border-radius: 14px;
+    background: #fff2f2;
+    border: 1px solid #ffd0d0;
+    color: #8b0000;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #eef1f5;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0px 10px 35px rgba(16, 24, 40, 0.05);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 10px;
+}
+
+.name {
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.appName {
+    font-size: 12px;
+    color: #7a8796;
+    margin-top: 4px;
+}
+
+.dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 10px 0 8px 0;
+}
+
+.metaItem .label {
+    display: block;
+    font-size: 11px;
+    color: #7a8796;
+}
+
+.metaItem .value {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.block {
+    background: #fafbfc;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.blockTitle {
+    font-weight: 800;
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: #2c3642;
+}
+
+.blockText {
+    font-size: 12px;
+    color: #4e5a6a;
+    line-height: 1.5;
+}
+
+.funding {
+    border-left: 4px solid #b31217;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    justify-content: flex-end;
+}
+
+.btnPrimary {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    color: white;
+    background: #b31217;
+    font-weight: 800;
+}
+
+.btnOutline {
+    border: 1px solid #d8dee7;
+    background: white;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+/* ✅ BADGES (Keep single definition only) */
+.badge {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+/* ✅ GREEN */
+.badgeGreen {
+    background: #e8fff0;
+    color: #167a3b;
+    border-color: #baf3cf;
+}
+
+/* ✅ BLUE */
+.badgeBlue {
+    background: #e9f2ff;
+    color: #0b5cab;
+    border-color: #bfdcff;
+}
+
+/* ⚠️ ORANGE */
+.badgeWarn {
+    background: #fff4e5;
+    color: #8a4b00;
+    border-color: #ffd6a0;
+}
+
+/* ❌ RED */
+.badgeDanger {
+    background: #ffecec;
+    color: #ffc1c1;
+    border-color: #ffc1c1;
+}
+
+/* Default grey */
+.badgeNeutral {
+    background: #f2f4f7;
+    color: #344054;
+    border-color: #e4e7ec;
+}
+
+.empty {
+    background: white;
+    border: 1px dashed #d7dde5;
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+}
+
+.emptyTitle {
+    font-weight: 900;
+    font-size: 16px;
+}
+
+.emptySub {
+    margin-top: 8px;
+    color: #6c7889;
+}
+
+/* ✅ MODAL BACKDROP */
+.modalBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    padding: 18px;
+}
+
+/* ✅ MODAL CARD - SCROLL FIX + COMPACT BANNER */
+.modalCard {
+    width: min(980px, 95vw);
+    max-height: 85vh;
+
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+
+    box-shadow: 0px 25px 60px rgba(0, 0, 0, 0.25);
+    border: 1px solid #e9edf3;
+
+    /* ✅ IMPORTANT for scroll layout */
+    display: flex;
+    flex-direction: column;
+}
+
+/* ✅ compact header */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eef1f5;
+}
+
+/* ✅ header fonts reduced */
+.modalTitle {
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.modalSub {
+    font-size: 12px;
+    color: #6c7889;
+    margin-top: 2px;
+}
+
+/* ✅ scroll only inside modal body */
+.modalBody {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* ✅ footer always visible */
+.modalFooter {
+    padding: 12px 16px;
+    border-top: 1px solid #eef1f5;
+    display: flex;
+    justify-content: flex-end;
+    background: #fff;
+}
+
+/* ✅ Document Upload Grid */
+.docGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.docCard {
+    border: 1px solid #eef1f5;
+    background: #fafbfc;
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.docTitle {
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    color: #2c3642;
+}
+
+.docHint {
+    font-size: 12px;
+    color: #6c7889;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+/* ✅ Upload badge row */
+.docTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+/* ✅ Uploaded / Not Uploaded badges */
+.uploadBadge {
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.uploaded {
+    background: #e8fff0;
+    color: #167a3b;
+    border-color: #baf3cf;
+}
+
+.notUploaded {
+    background: #fff4e5;
+    color: #8a4b00;
+    border-color: #ffd6a0;
+}
+
+/* ✅ Uploaded files list */
+.fileList {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: #4e5a6a;
+}
+
+.fileItem {
+    margin-bottom: 4px;
+}
+
+/* ✅ Mobile responsive */
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .docGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+/* ============================
+   ✅ Mentor requested UX styles
+   ============================ */
+
+/* Requested documents text box (COE textbox display) */
+.requestedBox {
+    background: #f7f9fc;
+    border: 1px solid #e3e7ef;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 6px;
+
+    /* ✅ Keep formatting/line breaks entered by COE */
+    white-space: pre-wrap;
+}
+
+/* muted fallback text */
+.muted {
+    color: #6b7280;
+}
+
+/* hint box for naming convention */
+.hintBox {
+    background: #fff7e6;
+    border: 1px solid #ffe0b2;
+    padding: 12px;
+    border-radius: 14px;
+    margin-top: 12px;
+}
+
+.hintTitle {
+    font-weight: 900;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #2c3642;
+}
+
+.hintText {
+    font-size: 12px;
+    color: #4e5a6a;
+    line-height: 1.5;
+}
+
+.hintExample {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #2c3642;
+}
+
+/* upload card full width */
+.fullWidth {
+    width: 100%;
+}
+
+/* uploaded file list title */
+.uploadedTitle {
+    margin-top: 12px;
+    font-weight: 900;
+    font-size: 13px;
+    color: #2c3642;
+}
+.requiredChip {
+    display: inline-block;
+    margin: 6px 6px 0 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e9f2ff;
+    border: 1px solid #bfdcff;
+    color: #0b5cab;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.namingError {
+    margin-top: 12px;
+}

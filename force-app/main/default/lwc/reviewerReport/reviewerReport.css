@@ -1,0 +1,51 @@
+/* =====================================================
+   Action buttons area
+===================================================== */
+.action-bar {
+    background-color: #f4f6f9;
+    border-radius: 6px;
+}
+
+/* =====================================================
+   Table spacing
+===================================================== */
+.table-wrapper {
+    margin-top: 0.75rem;
+}
+
+/* =====================================================
+   Modal polish
+===================================================== */
+.slds-modal__container {
+    max-width: 32rem;
+}
+
+.slds-modal__header,
+.slds-modal__footer {
+    background-color: #f4f6f9;
+}
+/* Allow date picker to overflow outside modal */
+.slds-modal__content {
+    overflow: visible !important;
+}
+
+/* Optional: ensure modal container doesn't clip children */
+.slds-modal__container {
+    overflow: visible !important;
+}
+/* Allow popup elements to escape modal */
+:host .slds-modal,
+:host .slds-modal__container,
+:host .slds-modal__content {
+    overflow: visible !important;
+}
+
+/* 🔥 THIS IS THE KEY FIX 🔥 */
+:host .slds-modal__container {
+    transform: none !important;
+}
+
+/* Ensure calendar is on top */
+:host .slds-datepicker {
+    z-index: 10000;
+}

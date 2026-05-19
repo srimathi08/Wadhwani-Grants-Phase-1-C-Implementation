@@ -1,0 +1,126 @@
+:host {
+    display: block;
+    background: #ffffff;
+}
+
+.table-container {
+    padding: 10px 15px 20px 15px;
+}
+
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.review-table thead th {
+    background: linear-gradient(to right, #f4f6f9, #eef1f6);
+    font-weight: 600;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #d8dde6;
+    letter-spacing: 0.3px;
+}
+
+.review-table tbody td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #e3e6ea;
+    vertical-align: middle;
+}
+
+.review-table tbody tr:hover {
+    background-color: #f9fbfd;
+    transition: 0.2s ease;
+}
+
+.proposal-cell {
+    font-weight: 600;
+    background-color: #f8f9fb;
+}
+
+.reviewer-cell {
+    text-align: left;
+    font-weight: 500;
+}
+
+.action-cell {
+    min-width: 180px;
+}
+
+/* Status Colors */
+.status-recommended {
+    color: #2e844a;
+    font-weight: 700;
+}
+
+.status-not-recommended {
+    color: #c23934;
+    font-weight: 700;
+}
+
+.status-neutral {
+    color: #5c5c5c;
+    font-weight: 600;
+}
+.table-container {
+    overflow-x: auto;
+}
+
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.review-table th {
+    background-color: #f3f3f3;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.review-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+}
+
+.proposal-cell {
+    font-weight: 600;
+}
+
+.action-cell {
+    white-space: nowrap;
+}
+
+.record-link {
+    color: #0176d3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.record-link:hover {
+    text-decoration: underline;
+}
+.focus-area-cell {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 200px;
+}
+.focus-area-cell {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 200px;
+}
+
+.decision-approved {
+    color: #2e844a;
+    font-weight: 600;
+}
+
+.decision-rejected {
+    color: #ba0517;
+    font-weight: 600;
+}

@@ -1,0 +1,78 @@
+/* Card Styling */
+lightning-card {
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+}
+
+/* Header Styling */
+.slds-card__header {
+    background: linear-gradient(90deg, #c62828, #ef5350);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 12px 16px;
+}
+
+/* Title */
+.slds-card__header-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+/* Table container */
+.slds-p-around_medium {
+    background: #f9fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Datatable row hover */
+lightning-datatable {
+    --lwc-colorBackgroundAlt: #f4f6f9;
+}
+
+/* Add hover effect */
+:host ::ng-deep tr:hover {
+    background-color: #ffeaea !important;
+    transition: 0.3s;
+}
+
+/* Button styling (future use) */
+.custom-btn {
+    background: #c62828;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 14px;
+}
+
+.custom-btn:hover {
+    background: #b71c1c;
+}
+
+/* Scrollbar (optional clean look) */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d32f2f;
+    border-radius: 10px;
+}
+.header {
+    background: linear-gradient(90deg, #c62828, #ef5350);
+    color: white;
+    padding: 14px;
+    border-radius: 12px 12px 0 0;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.header p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+}

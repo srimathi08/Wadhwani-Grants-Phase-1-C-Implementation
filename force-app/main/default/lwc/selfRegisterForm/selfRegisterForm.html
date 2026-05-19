@@ -1,0 +1,11 @@
+<template>
+    <lightning-card title="Self Registration">
+        <div class="slds-m-around_medium">
+            <lightning-input label="First Name" name="firstName" onchange={handleChange}></lightning-input>
+            <lightning-input label="Last Name" name="lastName" onchange={handleChange}></lightning-input>
+            <lightning-input label="Email" name="email" type="email" onchange={handleChange}></lightning-input>
+            <lightning-input label="Password" name="password" type="password" onchange={handleChange}></lightning-input>
+            <lightning-button label="Register" onclick={handleRegister} variant="brand"></lightning-button>
+        </div>
+    </lightning-card>
+</template>

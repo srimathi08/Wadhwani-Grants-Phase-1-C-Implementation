@@ -1,0 +1,169 @@
+<template>
+    <div class="container">
+
+        <h2 class="title">Fund Management Overview</h2>
+        <p class="subtitle">
+            Track and distribute funds to approved projects based on milestone completion
+        </p>
+
+        <!-- ================= SUMMARY CARDS ================= -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <p class="label">Total Funds Received</p>
+                <p class="amount">$ {summary.total}</p>
+            </div>
+
+            <div class="stat-card">
+                <p class="label">Total Project Grant Received</p>
+                <p class="amount">$ {summary.projectGrantReceived}</p>
+            </div>
+
+            <div class="stat-card">
+                <p class="label">Total Operational Grant Received</p>
+                <p class="amount">$ {summary.operationalGrantReceived}</p>
+            </div>
+
+            <div class="stat-card disbursed-card">
+                <p class="label">Disbursed to PIs</p>
+                <p class="amount green">$ {summary.disbursed}</p>
+                <div class="bar">
+                    <div class="fill summary-fill"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <p class="label">Available Project Grant</p>
+                <p class="amount blue">$ {summary.availableProjectGrant}</p>
+            </div>
+
+            <div class="stat-card">
+                <p class="label">Available Operational Grant</p>
+                <p class="amount blue">$ {summary.availableOperationalGrant}</p>
+            </div>
+
+            <div class="stat-card get-fund">
+                <button class="request-btn" onclick={openFundModal}>
+                    Request Fund
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ================= PROJECT LIST ================= -->
+        <div class="project-section">
+            <h3>Projects with Funding Awards</h3>
+
+            <template for:each={projects} for:item="p">
+                <div key={p.proposalId} class="project-card">
+
+                    <div class="card-header">
+                        <div class="left-details">
+                            <p class="project-name">{p.name}</p>
+                            <p class="pi">PI: {p.piName}</p>
+
+                            <template if:true={p.projectTitle}>
+                                <p class="project-title">
+                                    <span class="pt-label">Project Title: </span>
+                                    <span class="pt-value">{p.projectTitle}</span>
+                                </p>
+                            </template>
+                        </div>
+
+                        <div class="right-box">
+                            <a
+                                class="manage-link"
+                                data-id={p.proposalId}
+                                onclick={manage}>
+                                Manage
+                            </a>
+
+                            <template if:true={p.totalMilestones}>
+                                <span class="milestone-pill">
+                                    {p.submittedMilestones}/{p.totalMilestones}
+                                    Milestones Submitted
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="budget-grid">
+                        <div class="budget-item">
+                            <p class="budget-label">Total Budget</p>
+                            <p class="budget-value">$ {p.totalBudget}</p>
+                        </div>
+
+                        <div class="budget-item">
+                            <p class="budget-label">Disbursed</p>
+                            <p class="budget-value green">$ {p.disbursed}</p>
+                        </div>
+
+                        <div class="budget-item">
+                            <p class="budget-label">Remaining</p>
+                            <p class="budget-value blue">$ {p.remaining}</p>
+                        </div>
+                    </div>
+
+                    <div class="bar project-bar">
+                        <div class="fill project-fill" data-id={p.proposalId}></div>
+                    </div>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- ================= CUSTOM FUND MODAL ================= -->
+        <template if:true={isFundModalOpen}>
+            <div class="custom-backdrop" onclick={closeFundModal}></div>
+
+            <div class="custom-modal">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h2>Request Fund</h2>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <lightning-input
+                        label="Amount"
+                        type="number"
+                        value={fundAmount}
+                        onchange={handleAmountChange}>
+                    </lightning-input>
+
+                    <lightning-input
+                        label="Date of Request"
+                        type="date"
+                        remember-me
+                        value={fundDate}
+                        onchange={handleDateChange}>
+                    </lightning-input>
+
+                    <!-- ONLY CHANGE IS HERE -->
+                    <div class="comments-box">
+                        <label class="comment-label">Comments</label>
+                        <lightning-input-rich-text
+                            value={fundComment}
+                            formats="bold italic underline bullet list"
+                            onchange={handleCommentChange}>
+                        </lightning-input-rich-text>
+                    </div>
+                    <!-- ONLY CHANGE IS HERE -->
+
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button class="cancel-btn" onclick={closeFundModal}>
+                        Cancel
+                    </button>
+
+                    <button class="submit-btn" onclick={submitFundRequest}>
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </template>
+
+    </div>
+</template>

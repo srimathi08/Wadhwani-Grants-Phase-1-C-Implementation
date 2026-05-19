@@ -1,0 +1,44 @@
+<template>
+    <!-- Custom header instead of lightning-card -->
+    <div class="custom-card-header">
+        <lightning-icon icon-name="standard:metrics" size="small" class="header-icon"></lightning-icon>
+        <span class="custom-title">My Review Summary</span>
+    </div>
+
+    <div class="slds-grid slds-wrap slds-p-around_large slds-text-align_center">
+
+        <!-- Total Assigned -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="metric-box" onclick={handleTotalClick}>
+                <lightning-icon icon-name="standard:task2" size="medium" class="metric-icon"></lightning-icon>
+                <p class="metric-label">Total Assigned</p>
+                <p class="metric-value">{totalAssigned}</p>
+            </div>
+        </div>
+
+        <!-- Reviewed -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="metric-box" onclick={handleReviewedClick}>
+                <lightning-icon icon-name="utility:check" size="medium" class="metric-icon"></lightning-icon>
+                <p class="metric-label">Reviewed</p>
+                <p class="metric-value slds-text-color_success">{submitted}</p>
+            </div>
+        </div>
+
+        <!-- Yet to Start -->
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="metric-box" onclick={handleYetToStartClick}>
+                <lightning-icon icon-name="utility:pause" size="medium" class="metric-icon"></lightning-icon>
+                <p class="metric-label">Yet to Start</p>
+                <p class="metric-value slds-text-color_error">{yetToStart}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error message -->
+    <template if:true={error}>
+        <div class="slds-text-color_error slds-p-horizontal_medium slds-text-align_center">
+            Error loading data. Please try again later.
+        </div>
+    </template>
+</template>

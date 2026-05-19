@@ -1,0 +1,132 @@
+<template>
+     <template if:true={showForm}>
+    <lightning-card>
+        <div class="slds-p-around_medium">
+
+            <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 1.2rem; color: #c02328;">
+                PROPOSAL EVALUATION
+            </div>
+
+             <!-- Display the Account Name and the Contact Name  -->
+            <lightning-layout>
+          <!--  <lightning-layout-item size="6" padding="around-small">
+                <lightning-input label="Institution Name" value={accountName} disabled></lightning-input>
+            </lightning-layout-item>  -->
+
+            <lightning-layout-item size="6" padding="around-small">
+                <lightning-input label="Reviewed By" value={contactName} disabled></lightning-input>
+            </lightning-layout-item> 
+        </lightning-layout>
+
+            <!-- Subheadings & Fields  <div class="subheading">-->
+            
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;">
+                Demonstration of overall research, translation and commercialization Capability</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox name="ResearchRating" label="Research & Commercialization Rating"
+                                        value={formData.ResearchRating}
+                                        options={researchOptions}
+                                        onchange={handleChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-textarea name="ResearchRemarks" label="Research & Commercialization Remarks"
+                                        value={formData.ResearchRemarks}
+                                        onchange={handleChange}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+           <!-- <div class="subheading"> -->
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;">
+                Demonstration for sub-areas selected</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox name="SubAreaRating" label="Sub Area Rating"
+                                        value={formData.SubAreaRating}
+                                        options={subAreaOptions}
+                                        onchange={handleChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-textarea name="SubAreaRemarks" label="Sub Area Remarks"
+                                        value={formData.SubAreaRemarks}
+                                        onchange={handleChange}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+           <!-- <div class="subheading"> -->
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;"> 
+                Availability of ecosystem and infrastructure</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox name="EcosystemRating" label="Ecosystem & Infra Rating"
+                                        value={formData.EcosystemRating}
+                                        options={ecosystemOptions}
+                                        onchange={handleChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-textarea name="EcosystemRemarks" label="Ecosystem & Infra Remarks"
+                                        value={formData.EcosystemRemarks}
+                                        onchange={handleChange}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+           <!-- <div class="subheading"> -->
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;">
+                Quality of indicative list of projects</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox name="ProjectRating" label="Project List Quality Rating"
+                                        value={formData.ProjectRating}
+                                        options={projectOptions}
+                                        onchange={handleChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-textarea name="ProjectRemarks" label="Project List Quality Remarks"
+                                        value={formData.ProjectRemarks}
+                                        onchange={handleChange}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+          <!--  <div class="subheading"> -->
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;">
+                Availability of physical space, and expert faculty</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox name="FacilitiesRating" label="Facilities & Faculty Rating"
+                                        value={formData.FacilitiesRating}
+                                        options={facilitiesOptions}
+                                        onchange={handleChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-textarea name="FacilitiesRemarks" label="Facilities & Faculty Remarks"
+                                        value={formData.FacilitiesRemarks}
+                                        onchange={handleChange}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-textarea name="OtherWeakness" label="Any other weaknesses in the proposal"
+                                value={formData.OtherWeakness}
+                                class="slds-m-top_medium"
+                                onchange={handleChange}></lightning-textarea>
+
+           <!-- <div class="subheading slds-m-top_medium"> -->
+                <div style="text-align: left; font-family: 'Open Sans', sans-serif; color: #f2682b; font-size: 17px; font-weight: bold; margin-top: 25px; margin-bottom: 25px; padding-left: 20px;">
+                Overall Rating</div>
+            <lightning-textarea name="OverallRemarks" label="Overall Remarks"
+                                value={formData.OverallRemarks}
+                                onchange={handleChange}></lightning-textarea>
+
+            <div class="slds-align_absolute-center slds-m-top_large">
+                <lightning-button label="Submit" onclick={handleSubmit} variant="brand"></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+    </template>
+
+     <!-- Show Already Reviewed Message -->
+    <template if:true={alreadyReviewed}>
+        <div class="slds-box slds-theme_alert-texture slds-theme_error slds-align_absolute-center slds-text-heading_medium slds-m-around_large">
+            A review has already been submitted for this proposal.
+        </div>
+    </template>
+</template>

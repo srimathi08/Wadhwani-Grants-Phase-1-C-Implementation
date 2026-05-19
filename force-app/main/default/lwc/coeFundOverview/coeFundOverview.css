@@ -1,0 +1,504 @@
+/* ======================================================
+   BASE CONTAINER
+====================================================== */
+
+.container {
+    padding: 24px;
+    background: #f8fafc;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 22px;
+    font-size: 14px;
+}
+
+/* ======================================================
+   SUMMARY GRID – SINGLE SOURCE OF TRUTH
+====================================================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    align-items: stretch;
+}
+
+/* ======================================================
+   STAT CARDS – BASE
+====================================================== */
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.05);
+    transition: all .25s ease;
+    min-height: 120px;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.10);
+}
+
+.label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.amount {
+    font-size: 22px;
+    font-weight: 900;
+    margin-top: 4px;
+}
+
+.green { color: #16a34a; }
+.blue  { color: #8f1d1d; }
+
+/* ======================================================
+   DISBURSED CARD
+====================================================== */
+
+.disbursed-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.disbursed-card .amount {
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.disbursed-card .bar {
+    height: 6px;
+    margin-top: 10px;
+}
+
+/* ======================================================
+   AVAILABLE GRANT CARD
+====================================================== */
+
+.available-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.available-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.available-btn {
+    width: 100%;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    background: #f9fafb;
+    color: #111827;
+    cursor: default;
+}
+
+.available-btn.project {
+    background: #eefcf5;
+    color: #065f46;
+}
+
+.available-btn.operational {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* ======================================================
+   REQUEST FUND – CTA (OWN ROW)
+====================================================== */
+
+.stat-card.get-fund {
+    grid-column: 1 / -1;
+    background: transparent;
+    box-shadow: none;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.request-btn {
+    margin-top: 14px;
+    background: linear-gradient(135deg,#8f1d1d,#741414);
+    color: #ffffff;
+    border: none;
+    padding: 12px 48px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: .4px;
+    transition: all .25s ease;
+}
+
+.request-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(143,29,29,.45);
+}
+
+/* ======================================================
+   PROGRESS BAR
+====================================================== */
+
+.bar {
+    height: 7px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.project-bar {
+    height: 8px;
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#8f1d1d,#741414);
+    border-radius: 999px;
+    transition: width .6s ease;
+}
+
+/* ======================================================
+   PROJECT SECTION
+====================================================== */
+
+.project-section {
+    margin-top: 36px;
+}
+
+.project-section h3 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 14px;
+}
+
+/* ======================================================
+   PROJECT CARD
+====================================================== */
+
+.project-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+    border: 1px solid #f1f1f1;
+    border-left: 5px solid #8f1d1d;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+    transition: all .25s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(0,0,0,0.1);
+}
+
+/* ======================================================
+   PROJECT HEADER
+====================================================== */
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.left-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.project-name {
+    font-weight: 800;
+    font-size: 16px;
+    color: #111827;
+    margin: 0;
+}
+
+.pi {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 2px 0;
+}
+
+.project-title {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 600;
+    margin: 0;
+}
+
+.pt-label {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.pt-value {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* ======================================================
+   RIGHT SIDE
+====================================================== */
+
+.right-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.manage-link {
+    color: #8f1d1d;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.manage-link:hover {
+    text-decoration: underline;
+}
+
+/* ======================================================
+   MILESTONE PILL
+====================================================== */
+
+.milestone-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    background: #fef2f2;
+    color: #8f1d1d;
+}
+
+/* ======================================================
+   BUDGET GRID
+====================================================== */
+
+.budget-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+    margin-bottom: 14px;
+}
+
+.budget-item {
+    background: #fafafa;
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid #f1f1f1;
+}
+
+.budget-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.budget-value {
+    font-size: 15px;
+    font-weight: 900;
+    color: #111827;
+}
+
+.budget-value.green { color: #16a34a; }
+.budget-value.blue  { color: #8f1d1d; }
+
+/* ======================================================
+   MODAL
+====================================================== */
+
+.slds-modal__container {
+    width: 680px !important;
+    max-width: 95% !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45) !important;
+}
+
+.slds-modal__header {
+    background: linear-gradient(135deg,#8f1d1d,#741414) !important;
+    padding: 20px 24px !important;
+    border-bottom: none !important;
+}
+
+.slds-modal__title {
+    color: #ffffff !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    letter-spacing: .3px;
+}
+
+.slds-modal__content {
+    padding: 26px 26px 22px !important;
+    background: #ffffff !important;
+}
+
+.slds-form-element__label {
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    font-weight: 700 !important;
+    color: #6b7280 !important;
+}
+
+.slds-input,
+textarea {
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+    font-size: 14px !important;
+}
+
+.slds-input:focus,
+textarea:focus {
+    background: #ffffff !important;
+    border-color: #8f1d1d !important;
+    box-shadow: 0 0 0 3px rgba(143,29,29,.18) !important;
+}
+
+.slds-modal__footer {
+    background: #fafafa !important;
+    padding: 18px 26px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    border-top: 1px solid #e5e7eb !important;
+}
+
+.slds-backdrop {
+    background: rgba(15,15,15,0.65) !important;
+}
+/* ================= MODAL BACKDROP ================= */
+.custom-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+}
+
+/* ================= MODAL CONTAINER ================= */
+.custom-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 620px;
+    max-width: 92%;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    animation: popIn 0.25s ease;
+}
+
+/* ================= HEADER ================= */
+.modal-header {
+    background: linear-gradient(135deg, #8f1d1d, #741414);
+    color: #ffffff;
+    padding: 18px 22px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 14px 14px 0 0;
+}
+
+/* ================= BODY ================= */
+.modal-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comments-box {
+    margin-top: 6px;
+}
+
+.comment-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* ================= FOOTER ================= */
+.modal-footer {
+    padding: 16px 22px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #e6e6e6;
+}
+
+/* ================= BUTTONS ================= */
+.cancel-btn {
+    background: #ffffff;
+    border: 1px solid #ccc;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancel-btn:hover {
+    background: #f4f4f4;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #8f1d1d, #741414);
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    opacity: 0.92;
+}
+
+/* ================= ANIMATION ================= */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

@@ -1,0 +1,106 @@
+/* Outer container with embossed effect */
+.table-container {
+    background: #ffffe5;
+    padding: 20px;
+    border-radius: 14px;
+
+    /* Embossed look */
+    box-shadow:
+        6px 6px 16px rgba(0, 0, 0, 0.15),
+        -6px -6px 16px rgba(255, 255, 255, 0.6);
+}
+.share-btn.shared {
+    background: #dcdcdc;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Full table styling */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffe5;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* HEADER GRADIENT */
+.custom-table thead tr {
+    background: linear-gradient(to right, #ff7a3d, #ffa33a);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.custom-table th {
+    padding: 12px 14px;
+    font-size: 14px;
+    text-align: center !important;   /* CENTER HEADINGS */
+}
+
+.custom-table th {
+    padding: 12px 14px;
+    font-size: 14px;
+}
+
+/* Body styles */
+.custom-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0eacb;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Row hover */
+.custom-table tbody tr:hover {
+    background: #fff8c2;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.status-badge.approved { background: #2e7d32; }
+.status-badge.rejected { background: #c62828; }
+.status-badge.resubmit { background: #ff9800; }
+.status-badge.submitted { background: #0277bd; }
+.status-badge.question {
+    background: #4663c4;   /* clean blue shade */
+    color: #fff;
+}
+
+
+/* SHARE BUTTON */
+.share-btn {
+    background: #ffcf4d;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    color: #333;
+    font-weight: 600;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.wrap-text {
+    white-space: normal !important;
+    word-wrap: break-word;
+    max-width: 250px; /* optional limit */
+}
+
+
+.share-btn:hover {
+    background: #f0b933;
+    transform: translateY(-2px);
+}
+
+/* Optional: make last column centered */
+td:last-child {
+    text-align: center;
+}

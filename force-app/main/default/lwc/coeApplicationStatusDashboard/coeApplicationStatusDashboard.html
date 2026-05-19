@@ -1,0 +1,242 @@
+<template>
+    <div class="dashboard">
+
+        <!-- Loader -->
+        <template if:true={isLoading}>
+            <div class="loader-overlay">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">📊</div>
+                <div>
+                    <h1 class="title">Application Status Dashboard</h1>
+                    <p class="subtitle">COE Portal &mdash; Year-wise Segregation</p>
+                </div>
+            </div>
+
+           <!-- Year + Month + Date filter bar -->
+<div class="filter-bar">
+
+    <div class="filter-segment">
+        <lightning-icon icon-name="utility:event" size="x-small" class="filter-icon"></lightning-icon>
+        <div class="filter-inner">
+            <span class="filter-label">Year</span>
+            <lightning-combobox
+                value={selectedYear}
+                options={yearOptions}
+                onchange={handleYearChange}
+                variant="label-hidden"
+                class="filter-combo">
+            </lightning-combobox>
+        </div>
+    </div>
+
+    <div class="filter-divider"></div>
+
+    <div class="filter-segment">
+        <lightning-icon icon-name="utility:date_input" size="x-small" class="filter-icon"></lightning-icon>
+        <div class="filter-inner">
+            <span class="filter-label">Month</span>
+            <lightning-combobox
+                value={selectedMonth}
+                options={monthOptions}
+                onchange={handleMonthChange}
+                variant="label-hidden"
+                class="filter-combo">
+            </lightning-combobox>
+        </div>
+    </div>
+
+    <div class="filter-divider"></div>
+
+    <div class="filter-segment">
+        <lightning-icon icon-name="utility:search" size="x-small" class="filter-icon"></lightning-icon>
+        <div class="filter-inner">
+            <span class="filter-label">Date</span>
+            <lightning-input
+                type="date"
+                value={selectedDate}
+                onchange={handleDateChange}
+                variant="label-hidden"
+                class="filter-date">
+            </lightning-input>
+        </div>
+    </div>
+
+    <template if:true={hasSelectedDate}>
+        <button class="filter-clear-btn" onclick={handleClearDate}>
+            ✕ Clear
+        </button>
+    </template>
+
+</div>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="section-label">Overview</div>
+        <div class="summary-strip">
+
+            <div class={tileAllClass} data-key="all" onclick={handleTileClick}>
+                <div class="tile-badge">📥</div>
+                <div class="tile-count">{totalCount}</div>
+                <div class="tile-label">Total Received</div>
+            </div>
+
+            <div class={tileDraftClass} data-key="draft" onclick={handleTileClick}>
+                <div class="tile-badge">📝</div>
+                <div class="tile-count">{draftCount}</div>
+                <div class="tile-label">Draft</div>
+            </div>
+
+            <div class={tileSubmittedClass} data-key="submitted" onclick={handleTileClick}>
+                <div class="tile-badge">📄</div>
+                <div class="tile-count">{submittedCount}</div>
+                <div class="tile-label">Submitted</div>
+            </div>
+
+            <div class={tileRejectedClass} data-key="rejected" onclick={handleTileClick}>
+                <div class="tile-badge">🚫</div>
+                <div class="tile-count tile-count--rejected">{rejectedCount}</div>
+                <div class="tile-label">Rejected</div>
+            </div>
+
+            <div class={tileResubClass} data-key="resubmission" onclick={handleTileClick}>
+                <div class="tile-badge">🔁</div>
+                <div class="tile-count">{resubCount}</div>
+                <div class="tile-label">Resubmissions</div>
+            </div>
+
+            <div class={tileShortlistedClass} data-key="shortlisted" onclick={handleTileClick}>
+                <div class="tile-badge">✅</div>
+                <div class="tile-count">{shortlistedCount}</div>
+                <div class="tile-label">Shortlisted</div>
+            </div>
+
+            <div class={tileFundedClass} data-key="funded" onclick={handleTileClick}>
+                <div class="tile-badge">🏆</div>
+                <div class="tile-count">{fundedCount}</div>
+                <div class="tile-label">Funded</div>
+            </div>
+
+        </div>
+
+        <!-- Pipeline -->
+        <div class="pipeline-wrapper">
+            <div class="pipeline-header">
+                <div class="live-dot"></div>
+                <div class="pipeline-title">Live Application Pipeline</div>
+            </div>
+
+            <div class="pipeline">
+
+                <div class="pipe-stage received">
+                    <div class="pipe-icon">📨</div>
+                    <div class="pipe-name">Applications Received</div>
+                    <div class="pipe-count">{totalCount}</div>
+                </div>
+
+                <div class="pipe-arrow">
+                    <div class="pipe-arrow-line"></div>
+                    <div class="pipe-arrow-pct">{p1}%</div>
+                </div>
+
+                <div class="pipe-stage submitted">
+                    <div class="pipe-icon">📄</div>
+                    <div class="pipe-name">Submitted to WIN</div>
+                    <div class="pipe-count">{submittedCount}</div>
+                </div>
+
+                <div class="pipe-arrow reject">
+                    <div class="pipe-arrow-line"></div>
+                    <div class="pipe-arrow-pct">↘ {rejectedPercent}% Rej.</div>
+                </div>
+
+                <div class="pipe-stage rejected">
+                    <div class="pipe-icon">❌</div>
+                    <div class="pipe-name">Rejected (WIN &amp; COE)</div>
+                    <div class="pipe-count pipe-count--rejected">{rejectedCount}</div>
+                </div>
+
+                <div class="pipe-arrow">
+                    <div class="pipe-arrow-line"></div>
+                    <div class="pipe-arrow-pct">{p2}%</div>
+                </div>
+
+                <div class="pipe-stage resub">
+                    <div class="pipe-icon">🔁</div>
+                    <div class="pipe-name">Resubmission (WIN &amp; COE)</div>
+                    <div class="pipe-count">{resubCount}</div>
+                </div>
+
+                <div class="pipe-arrow">
+                    <div class="pipe-arrow-line"></div>
+                    <div class="pipe-arrow-pct">{p3}%</div>
+                </div>
+
+                <div class="pipe-stage shortlisted">
+                    <div class="pipe-icon">✅</div>
+                    <div class="pipe-name">Shortlisted for Presentation</div>
+                    <div class="pipe-count">{shortlistedCount}</div>
+                </div>
+
+                <div class="pipe-arrow">
+                    <div class="pipe-arrow-line"></div>
+                    <div class="pipe-arrow-pct">{p4}%</div>
+                </div>
+
+                <div class="pipe-stage funded">
+                    <div class="pipe-icon">🏆</div>
+                    <div class="pipe-name">Recommended / Funded</div>
+                    <div class="pipe-count">{fundedCount}</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Status Breakdown -->
+        <div class="section-header">
+            <div class="section-top">
+                <h2 class="section-title">Status Breakdown</h2>
+                <div class="filter-row">
+                    <button data-f="all"          class={filterAllClass}       onclick={handleFilterClick}>All</button>
+                    <button data-f="draft"        class={filterDraftClass}     onclick={handleFilterClick}>Draft</button>
+                    <button data-f="approved"     class={filterApprovedClass}  onclick={handleFilterClick}>Approved</button>
+                    <button data-f="rejected"     class={filterRejectedClass}  onclick={handleFilterClick}>Rejected</button>
+                    <button data-f="resubmission" class={filterResubClass}     onclick={handleFilterClick}>Resubmission</button>
+                    <button data-f="submitted"    class={filterSubmittedClass} onclick={handleFilterClick}>Submitted</button>
+                    <button data-f="funded"       class={filterFundedClass}    onclick={handleFilterClick}>Funded</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <template if:true={hasCards}>
+            <div class="card-grid">
+                <template for:each={filteredCards} for:item="card">
+                    <div key={card.id}
+                         class={card.cssClass}
+                         data-id={card.id}
+                         onclick={handleCardClick}>
+                        <div class="card-inner">
+                            <div class="card-count">{card.count}</div>
+                            <div class="card-label">{card.label}</div>
+                        </div>
+                        <div class="card-arrow">↗</div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template if:false={hasCards}>
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>No records found for {selectedYear}.</p>
+            </div>
+        </template>
+
+    </div>
+</template>

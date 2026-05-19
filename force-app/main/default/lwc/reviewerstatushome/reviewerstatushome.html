@@ -1,0 +1,57 @@
+<template>
+    <div class="steps-container">
+        <div class="step-with-line">
+            <div class="step-container">
+                <div class="icon-container">
+                    <span class="step-icon">{reviewerOnboardingIcon}</span>
+                </div>
+                <div class="step-content">
+                    <div class="heading">Reviewer Onboarding</div>
+                    <div class="status-line">
+                        <strong>Status:</strong>
+                        <span class="status-text">{reviewerOnboardingStatusText}</span>
+                        <template if:false={reviewerRegistered}>
+                            <a href={registrationUrl}
+                                class="register-link">
+                                Click here to register
+                            </a>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-with-line">
+            <div class="step-container">
+                <div class="icon-container">
+                    <span class="step-icon">{ndaStatusIcon}</span>
+                </div>
+                <div class="step-content">
+                    <div class="heading">NDA Status</div>
+                    <div class="status-line">
+                        <strong>Status:</strong>
+                        <span class="status-text">{ndaStatusText}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-with-line">
+            <div class="step-container">
+                <div class="icon-container">
+                    <span class="step-icon">👉</span>
+                </div>
+                <div class="step-content">
+                    <div class="heading">Start Review</div>
+                    <div class="status-line">
+                        <span class="review-icon">▶️</span>
+                        <a href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/ProposallReviewerPortal/s/individualapplication/IndividualApplication/Default"
+                            class="review-link">
+                            Click here to start review
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,351 @@
+/* ── Wrapper ─────────────────────────────────── */
+.rq-wrapper {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f6fa;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    margin: 16px;
+}
+
+/* ── Header ──────────────────────────────────── */
+.rq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px 18px;
+    background: linear-gradient(135deg, #0f1f3d 0%, #1a3566 100%);
+    border-bottom: 3px solid #e8a000;
+}
+
+.rq-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.rq-icon-wrap {
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rq-icon-wrap lightning-icon {
+    --slds-c-icon-color-foreground-default: #ffffff;
+}
+
+.rq-eyebrow {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #e8a000;
+}
+
+.rq-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.rq-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 8px 18px;
+    min-width: 60px;
+}
+
+.rq-count {
+    font-size: 22px;
+    font-weight: 800;
+    color: #e8a000;
+    line-height: 1;
+}
+
+.rq-count-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* ── Loading ─────────────────────────────────── */
+.rq-loading {
+    padding: 48px;
+    display: flex;
+    justify-content: center;
+    background: #fff;
+}
+
+/* ── Table Wrapper ───────────────────────────── */
+.rq-table-wrap {
+    overflow-x: auto;
+    background: #fff;
+}
+
+/* ── Table ───────────────────────────────────── */
+.rq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+/* ── Table Head ──────────────────────────────── */
+.rq-table thead tr {
+    background: #f0f2f8;
+    border-bottom: 2px solid #dde2f0;
+}
+
+.rq-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.rq-table thead th.col-num {
+    width: 36px;
+    text-align: center;
+    padding-left: 20px;
+}
+
+.rq-table thead th.col-actions {
+    text-align: center;
+}
+
+/* ── Table Body ──────────────────────────────── */
+.rq-row {
+    border-bottom: 1px solid #eef0f6;
+    transition: background 0.15s ease;
+}
+
+.rq-row:hover {
+    background: #f7f9ff;
+}
+
+.rq-row:last-child {
+    border-bottom: none;
+}
+
+.rq-table tbody td {
+    padding: 14px 16px;
+    vertical-align: top;
+    color: #1f2937;
+}
+
+.col-num {
+    text-align: center;
+    width: 36px;
+    padding-left: 20px !important;
+}
+
+/* ── Cell types ──────────────────────────────── */
+.cell-muted {
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.cell-wrap {
+    max-width: 200px;
+}
+
+.cell-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+    color: #374151;
+}
+
+/* ── Links ───────────────────────────────────── */
+.rq-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #1a3566;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1.5px solid transparent;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    font-size: 13px;
+}
+
+.rq-link:hover {
+    color: #e8a000;
+    border-bottom-color: #e8a000;
+}
+
+.proposal-link {
+    color: #374151;
+    font-weight: 500;
+}
+
+.proposal-link:hover {
+    color: #1a3566;
+    border-bottom-color: #1a3566;
+}
+
+.link-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* ── Status Badges ───────────────────────────── */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-new {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.status-coe {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.status-reviewer {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.status-closed {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.status-default {
+    background: #faf5ff;
+    color: #7c3aed;
+    border: 1px solid #ddd6fe;
+}
+
+/* ── Action Buttons ──────────────────────────── */
+.col-actions {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.action-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    transition: all 0.15s ease;
+    letter-spacing: 0.3px;
+}
+
+.btn-view {
+    background: #f0f2f8;
+    color: #374151;
+    padding: 6px;
+}
+
+.btn-view:hover {
+    background: #1a3566;
+    color: #fff;
+}
+
+.btn-view lightning-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+}
+
+.btn-coe {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.btn-coe:hover {
+    background: #c2410c;
+    color: #fff;
+    border-color: #c2410c;
+}
+
+.btn-coe lightning-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+}
+
+.btn-reviewer {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.btn-reviewer:hover {
+    background: #15803d;
+    color: #fff;
+    border-color: #15803d;
+}
+
+.btn-reviewer lightning-icon {
+    --slds-c-icon-color-foreground-default: currentColor;
+}
+
+/* ── Empty State ─────────────────────────────── */
+.rq-empty {
+    padding: 64px 24px;
+    text-align: center;
+    background: #fff;
+}
+
+.empty-icon {
+    --slds-c-icon-color-foreground-default: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #374151;
+    margin: 0 0 6px;
+}
+
+.empty-sub {
+    font-size: 13px;
+    color: #9ca3af;
+    margin: 0;
+}

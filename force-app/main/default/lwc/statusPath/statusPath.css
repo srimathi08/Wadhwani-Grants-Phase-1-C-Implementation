@@ -1,0 +1,83 @@
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Keep spacing */
+    padding: 1rem;
+    background-color: #f4f6f9;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start; /* Aligns content to the left */
+    padding-left: 80px; /* Push everything to the right */
+}
+
+
+/* Status Segment: Ensures proper alignment of title, box, and arrow */
+.status-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #131212;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+    margin-left: 20px; /* Adjust this value to move right */
+}
+
+/* Status Box */
+.status-box {
+    padding: 1rem;
+    border-radius: 12px;
+    width: 200px;
+    height: 50px;
+    text-align: center;
+    color: #131212;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+    background-color: #6c757d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Arrow Container */
+.arrow-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px; /* Adjust this value to move it down */
+}
+
+
+/* Arrow Styling */
+.arrow {
+    font-size: 20px; /* Adjust size if needed */
+    font-weight: bold;
+    margin: 0 8px; /* Space between box and arrow */
+    position: relative;
+    top: 5px; /* Move arrow down */
+}
+
+
+/* Color Variations */
+.green  { background-color: #3edb63; }
+.yellow { background-color: #ecbe34; color: #212529; }
+.blue   { background-color: #348be7; }
+.gray   { background-color: #af9aaf; }
+.orange { background-color: orange; }
+.red    { background-color: #c02434; }
+
+.heading {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    text-align: center; /* Ensure the heading is centered above the box */
+    margin-top: 0; /* Remove any top margin to make it aligned with the box */
+}
+
+.content {
+    font-size: 0.9rem;
+    white-space: pre-line;
+}

@@ -1,0 +1,2091 @@
+<template> 
+    <lightning-card>
+          <div class="form-logo-title">
+        <img src={winLogoUrl} alt="WIN Logo" class="win-logo" />
+         <h1 class="form-title">{labels.CL_WCF_Form_Title}</h1>
+</div>
+        <div class="slds-p-around_medium centered-form-container">
+<!--*************************************  PAGE 1 ****************************************************************  -->
+            <template if:true={isPage1}>
+                <lightning-formatted-rich-text value={labels.WCF_Paragraph_1}></lightning-formatted-rich-text>
+                 <lightning-formatted-rich-text value={labels.WCF_Paragraph_2}></lightning-formatted-rich-text>
+               <lightning-formatted-rich-text value={labels.WCF_Paragraph_3}></lightning-formatted-rich-text>
+                <lightning-layout class="slds-m-top_medium">
+                    <lightning-layout-item size="12">
+                        <lightning-combobox
+                            name="fundingArea"
+                            label={labels.CL_Organizational_Area_s_for_Funding_Investment}
+                            value={selectedFundingArea}
+                            options={organizationalAreaValues}
+                            onchange={handlePicklistChange} required>
+                    </lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+
+<!--********************************************  PAGE 2 ****************************************************************  -->
+            <template if:true={isPage2}>
+
+            <!-- Section Header -->
+          <div class="section-header slds-m-top_large">2. {labels.CLS_Organizational_Identifying}</div>
+
+                <div class="form-section">
+                    <lightning-input label={labels.CL_Organizational_Name} value={organizationData.Organization_Name__c} data-id="Organization_Name__c" required onchange={handleInput}></lightning-input>
+                    <lightning-textarea label={labels.CL_Headquarters_City_and_Country} value={organizationData.Headquarters_City_and_Country__c} data-id="Headquarters_City_and_Country__c" onchange={handleInput} required></lightning-textarea>
+                    <lightning-textarea label={labels.CL_Primary_Service_Regions} value={organizationData.Primary_Service_Regions__c} data-id="Primary_Service_Regions__c" onchange={handleInput} required></lightning-textarea>
+                    <lightning-input label={labels.CL_Leader_Name} value={organizationData.Leader_Name__c} data-id="Leader_Name__c" onchange={handleInput} required></lightning-input>
+                    <lightning-input label={labels.CL_Leader_Title} value={organizationData.Leader_Title__c} data-id="Leader_Title__c" onchange={handleInput} required></lightning-input>
+                </div>
+
+                <div class="section-header slds-m-top_large">3. {labels.CLS_Submitter_Contact_Info}</div>
+                <div class="form-section">
+                    <lightning-input label={labels.CL_Submitter_Name} value={organizationData.Submitter_Name__c} data-id="Submitter_Name__c" onchange={handleInput} required></lightning-input>
+                    <lightning-input label={labels.CL_Title} value={organizationData.Job_Title__c} data-id="Job_Title__c" onchange={handleInput} required></lightning-input>
+                    <lightning-input type="email" label={labels.CL_Email_Address} value={organizationData.Work_Email_ID__c} data-id="Work_Email_ID__c" onchange={handleInput} required></lightning-input>
+                    <lightning-input type="tel" label={labels.CL_Phone_number} value={organizationData.Phone__c} data-id="Phone__c" onchange={handleInput} required></lightning-input>
+                </div>
+
+                <!-- Legal Structure -->
+    <div class="section-header slds-m-top_large">4. {labels.CL_Legal_Structure}</div>
+  <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for="Legal_Structure__c">
+        <abbr class="slds-required" title="required">*</abbr>
+        {labels.CL_Legal_Question}</label>
+      <!--<lightning-helptext content={labels.CL_Legal_Help}></lightning-helptext>-->
+    </div>
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field="Legal_Structure__c" aria-label={labels.CL_Legal_Question}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error="Legal_Structure__c"></p>
+  </div>
+  <div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id="Legal_Structure__c">
+        ✦ Get AI Feedback
+    </button>
+</div>
+
+</div>
+
+ </template>
+            
+<!-- ***********************************  PAGE 3 ********************************************************************* -->
+            <template if:true={isPage3}>
+                <div class="section-header slds-m-top_large">5. {labels.CLH_Financial_Data} </div> 
+                <lightning-input type="date" label={labels.CL_Current_Fiscal_Year_End_Date} value={organizationData.Current_fiscal_year_s_end_date__c} data-id="Current_fiscal_year_s_end_date__c" onchange={handleInput} required></lightning-input>
+               
+                <!-- Section Header -->
+     <div class="section-header slds-m-top_large">6. {labels.CLH_Historical_Data}</div> 
+
+             <table class="financial-table slds-m-top_medium">
+    <thead>
+        <tr>
+            <th></th>
+            <th>{labels.CL_Prior_Fiscal_Year}</th>
+            <th>{labels.CL_Two_Years_Prior}</th>
+            <th>{labels.CL_Three_Years_Prior}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{labels.CL_Balance_At_Start_of_the_Year}</td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY1_Balance_Start_CFY_1__c} data-id="CY1_Balance_Start_CFY_1__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY2_Balance_Start_CFY_2__c} data-id="CY2_Balance_Start_CFY_2__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY3_Balance_Start_CFY_3__c} data-id="CY3_Balance_Start_CFY_3__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+        </tr>
+        <tr>
+            <td>{labels.CL_Revenue}</td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY1_Revenue__c} data-id="CY1_Revenue__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY2_Revenue__c} data-id="CY2_Revenue__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY3_Revenue__c} data-id="CY3_Revenue__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+        </tr>
+        <tr>
+            <td>{labels.CL_Expense}</td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY1_Expense__c} data-id="CY1_Expense__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY2_Expense__c} data-id="CY2_Expense__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY3_Expense__c} data-id="CY3_Expense__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+        </tr>
+        <tr>
+            <td>{labels.CL_Balance_At_End_of_the_Year}</td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY1_Balance_End__c} data-id="CY1_Balance_End__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY2_Balance_End__c} data-id="CY2_Balance_End__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+            <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={historicalData.CY3_Balance_End__c} data-id="CY3_Balance_End__c" onchange={handleHistoricalInput} required></lightning-input></div></td>
+        </tr>
+    </tbody>
+</table>
+
+
+<!--  *************************** TABLE 2 - CURRENT FISCAL YEAR DATA ****************************************-->
+<!-- Section Header -->
+<div class="section-header slds-m-top_large">7. {labels.CLH_Current_Fiscal_Year_Data}</div>
+
+<table class="financial-table slds-m-top_medium">
+    <thead>
+        <tr>
+            <th></th>
+            <th>{labels.CL_Budget}</th>
+            <th>{labels.CL_Current_Projection}</th>
+            <th>{labels.CL_Variance}</th>
+            <th>{labels.CL_Explanation}</th>
+        </tr>
+    </thead>
+    <tbody>
+    <!-- Revenue Row -->
+    <tr>
+        <td>{labels.CL_Revenue}</td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Revenue_Budget__c}
+                data-id="Revenue_Budget__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Revenue_Projection__c}
+                data-id="Revenue_Projection__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Revenue_Variance__c}
+                data-id="Revenue_Variance__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+  <td>
+    <lightning-input variant="label-hidden"  class="explanation-input" value={revenueExplanationPreview} placeholder={labels.clickToAddExplanation}  onclick={openModal}  data-row="Revenue_Explanation__c" data-target="fiscal" required></lightning-input> <!--data-row="Revenue"-->
+</td>
+    </tr>
+
+    <!-- Expense Row -->
+    <tr>
+        <td>{labels.CL_Expense}</td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Expense_Budget__c}
+                data-id="Expense_Budget__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Expense_Projection__c}
+                data-id="Expense_Projection__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Expense_Variance__c}
+                data-id="Expense_Variance__c" onchange={handleCurrencyInput} required></lightning-input></div>
+        </td>
+        <td>
+    <lightning-input variant="label-hidden" class="explanation-input" value={expenseExplanationPreview} placeholder={labels.clickToAddExplanation} onclick={openModal} data-row="Expense_Explanation__c" data-target="fiscal" required></lightning-input> <!--data-row="Expense"-->
+</td>
+        
+    </tr>
+
+    <!-- Net Row (Auto Calculated) -->
+    <tr>
+        <td>{labels.CL_Revenue_Expense}</td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Net_Budget__c}
+                data-id="Net_Budget__c" ></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Net_Projection__c}
+                data-id="Net_Projection__c"></lightning-input></div>
+        </td>
+        <td><div class="currency-cell"><span class="currency-symbol">$</span>
+            <lightning-input type="number" variant="label-hidden" class="currency-input"
+                value={fiscalData.Net_Variance__c}
+                data-id="Net_Variance__c"></lightning-input></div>
+        </td>
+        <td> 
+    <lightning-input ariant="label-hidden"  class="explanation-input"  value={netExplanationPreview} placeholder={labels.clickToAddExplanation} onclick={openModal}  data-row="Net_Position_Explanation__c" data-target="fiscal"></lightning-input> <!--data-row="Net"-->
+</td>
+    </tr>
+</tbody>
+
+</table>
+
+<!-- Modal -->
+<!-- Rich Text Modal for Explanation -->
+ <template if:true={isModalOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open custom-modal">
+        <div class="custom-modal__container">
+            <!-- Modal Header -->
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon 
+                    icon-name="utility:close" 
+                    variant="bare" 
+                    alternative-text="Close"
+                    onclick={closeModal}>
+                </lightning-button-icon>
+            </header>
+            <!-- Modal Content -->
+            <div class="custom-modal__content">
+                <div class="editor-container">
+                    <!-- Toolbar -->
+                    <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFont}>
+                                <option value="">Font</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFontSize}>
+                                <option value="">Size</option>
+                                <option value="1">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Editable Text Area -->
+                    <div class="text-area" 
+                         contenteditable="true" 
+                         data-field={modalField}
+                         onclick={setActiveField} 
+                         oninput={handleInput} 
+                         onpaste={handlePaste} 
+                         onkeydown={handleKeyDown}>
+                        <!-- Optionally insert {modalValue} as innerHTML on modal open -->
+                    </div>
+                    <p class="error-msg" data-error={modalField}></p>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <!-- Modern Backdrop, not old custom one -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+
+<!-- Organizational Sustainability Section -->
+    <div class="section-header slds-m-top_large">8.{labels.CL_Organizational_Sustainability}</div>
+     <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for="Organizational_Sustainability__c">
+        <abbr class="slds-required" title="required">*</abbr>
+        {labels.CL_Organizational_Sustainability_Question}</label>
+      <!--<lightning-helptext content={labels.CL_Legal_Help}></lightning-helptext>-->
+    </div>
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field="Organizational_Sustainability__c" aria-label={labels.CL_Organizational_Sustainability_Question}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error="Organizational_Sustainability__c"></p>
+  </div>
+  <div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id="Organizational_Sustainability__c">
+        ✦ Get AI Feedback
+    </button>
+</div>
+</div>
+</template>
+
+
+<!--*************************************** PAGE 4 - Job Fulfilment Questions ***************************************-->
+<template if:true={isPage4}>
+    <div class="section-header slds-m-top_large">9. {labels.CLH_Job_Fulfilment_Questions}</div>
+    <p class="slds-text-title_bold slds-m-bottom_small">{labels.CLH_Outcome_Data}</p>
+
+    <table class="financial-table slds-m-top_medium">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{labels.CL_Current_Fiscal_Year}</th>
+                <th>{labels.CL_Prior_Fiscal_Year}</th>
+                <th>{labels.CL_Two_Years_Prior}</th>
+                <th>{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Row 1: Skilling Domains -->
+            <tr>
+                <td>{labels.CL_List_of_Organization_Skilling_Domain}</td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsCFYPreview} onclick={openModal} placeholder={labels.clickToAddExplanation} data-row="Skills_Duration_CFY__c" data-target="outcome" required></lightning-input></td>                
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY1Preview} onclick={openModal} placeholder={labels.clickToAddExplanation} data-row="Skills_Duration_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY2Preview} onclick={openModal} placeholder={labels.clickToAddExplanation} data-row="Skills_Duration_FY_2__c" data-target="outcome" required></lightning-input></td>              
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={skillDomainsFY3Preview} onclick={openModal} placeholder={labels.clickToAddExplanation} data-row="Skills_Duration_FY_3__c" data-target="outcome" required></lightning-input></td>
+                
+            </tr>
+
+            <!-- Row 2: Learner Enrollments -->
+            <tr>
+                <td>{labels.CL_Learner_Enrollment}</td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Enrollments_CFY__c} data-id="Projected_Learner_Enrollments_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Enrollments_FY_1__c} data-id="Projected_Learner_Enrollments_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Enrollments_FY_2__c} data-id="Projected_Learner_Enrollments_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Enrollments_FY_3__c} data-id="Projected_Learner_Enrollments_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 3: Learner Placements -->
+            <tr>
+                <td>{labels.CL_Learner_Placements}</td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Placements_CFY__c} data-id="Projected_Learner_Placements_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Placements_FY_1__c} data-id="Projected_Learner_Placements_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Placements_FY_2__c} data-id="Projected_Learner_Placements_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_Placements_FY_3__c} data-id="Projected_Learner_Placements_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 4: Placement Percentage -->
+            <tr>
+                <td>{labels.CL_Learner_Placement_Percentage}</td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_placement_CFY__c} data-id="Projected_Learner_placement_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_placement_FY_1__c} data-id="Projected_Learner_placement_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_placement_FY_2__c} data-id="Projected_Learner_placement_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Learner_placement_FY_3__c} data-id="Projected_Learner_placement_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 5: Family of Four Explanation 
+            <tr>
+                <td>{labels.CL_Placement_Provided}</td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportCFYPreview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY1Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY1__c" data-target="outcome" required></lightning-input></td>            
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY2Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY2__c" data-target="outcome" required></lightning-input></td>                          
+                <td><lightning-input variant="label-hidden" class="explanation-input" value={placementSupportFY3Preview} onclick={openModal} data-row="Placements_Supporting_Family_of_4_FY3__c" data-target="outcome" required></lightning-input></td>           
+            </tr>-->
+
+            <!-- Row 6: Avg Cost per Placement -->
+            <tr>
+                <td>{labels.CL_Projected_Cost_Per_Placement}</td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_CFY__c} data-id="Avg_Cost_per_Placement_CFY__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_1__c} data-id="Avg_Cost_per_Placement_FY_1__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_2__c} data-id="Avg_Cost_per_Placement_FY_2__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" variant="label-hidden" class="currency-input" value={outcomeData.Avg_Cost_per_Placement_FY_3__c} data-id="Avg_Cost_per_Placement_FY_3__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+            </tr>
+
+            <!-- Row 7: 3rd Party Verification -->
+            <tr>
+                <td>{labels.CL_Placement_Verification}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.X3rd_Party_Placement_Verification_CFY__c} data-id="X3rd_Party_Placement_Verification_CFY__c" options={picklist3rdPartyCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isPlacementVerifiedCFY}>
+                     <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_Party_Verification_Description_CFY__c} data-id="X3rd_Party_Verification_Description_CFY__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                         <div class="file-upload-wrapper">
+                        <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_CFY_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                         <!-- File List -->
+            <template if:true={uploadedFilesByCell.P4_CFY_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_CFY_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_CFY_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                    </div>
+                  </template>
+                </td>
+                <!-- FY1 -->
+                  <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_1__c}
+            data-id="X3rd_Party_Placement_Verification_FY_1__c"
+            options={picklist3rdPartyFY1}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>   
+        <template if:true={isPlacementVerifiedFY1}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_1__c}
+            data-id="X3rd_Party_Verification_Description_FY_1__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY1_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+         <!--FY1-->
+            <template if:true={uploadedFilesByCell.P4_FY1_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY1_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY1_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY2 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_2__c}
+            data-id="X3rd_Party_Placement_Verification_FY_2__c"
+            options={picklist3rdPartyFY2}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+      
+        <template if:true={isPlacementVerifiedFY2}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_2__c}
+            data-id="X3rd_Party_Verification_Description_FY_2__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY2_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        <!--FY2 FileName-->
+        <template if:true={uploadedFilesByCell.P4_FY2_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY2_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY2_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+ <!-- FY3 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.X3rd_Party_Placement_Verification_FY_3__c}
+            data-id="X3rd_Party_Placement_Verification_FY_3__c"
+            options={picklist3rdPartyFY3}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isPlacementVerifiedFY3}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.X3rd_Party_Verification_Description_FY_3__c}
+            data-id="X3rd_Party_Verification_Description_FY_3__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+               <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY3_PV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        <!--FY3 FileName-->
+          <template if:true={uploadedFilesByCell.P4_FY3_PV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY3_PV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY3_PV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+            </tr>
+
+            <!-- Row 8: Long-Term Outcome Research -->
+            <tr>
+                <td>{labels.CL_Long_term_Outcomes_Research}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Long_Term_Outcomes_CFY__c} data-id="Long_Term_Outcomes_CFY__c" options={picklistLongTermCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isLongTermYesCFY}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.Outcome_Tracking_Details_CFY__c} data-id="Outcome_Tracking_Details_CFY__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                         <div class="file-upload-wrapper">
+                        <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_CFY_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                    <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_CFY_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_CFY_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_CFY_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                    </div>
+                    </template>
+                </td>
+                 <!-- FY1 --> 
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_1__c}
+            data-id="Long_Term_Outcomes_FY_1__c"
+            options={picklistLongTermFY1}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+       <template if:true={isLongTermYesFY1}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_1__c}
+            data-id="Outcome_Tracking_Details_FY_1__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+             <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY1_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY1_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY1_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY1_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY2 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_2__c}
+            data-id="Long_Term_Outcomes_FY_2__c"
+            options={picklistLongTermFY2}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isLongTermYesFY2}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_2__c}
+            data-id="Outcome_Tracking_Details_FY_2__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY2_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY2_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY2_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY2_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+
+    <!-- FY3 -->
+    <td>
+        <lightning-combobox
+            label={labels.CL_Yes_No}
+            value={outcomeData.Long_Term_Outcomes_FY_3__c}
+            data-id="Long_Term_Outcomes_FY_3__c"
+            options={picklistLongTermFY3}
+            onchange={handleOutcomeInput} required>
+        </lightning-combobox>
+       
+        <template if:true={isLongTermYesFY3}>
+            <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input"
+            value={outcomeData.Outcome_Tracking_Details_FY_3__c}
+            data-id="Outcome_Tracking_Details_FY_3__c"
+            onchange={handleOutcomeInput}
+            placeholder={labels.clickToAddExplanation} required>
+        </lightning-textarea>
+            <div class="file-upload-wrapper">
+            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P4_FY3_LT" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        <!--FileName-->
+                     <template if:true={uploadedFilesByCell.P4_FY3_LT}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P4_FY3_LT} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P4_FY3_LT" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+        </template>
+    </td>
+ 
+            </tr>
+        </tbody>
+    </table>
+    <!--Filenames-->
+    <template if:true={allOutcomeFilesList}>
+    <div class="slds-m-top_small">
+        <span class="slds-text-title_bold">List of files uploaded:</span>
+        <span>{allOutcomeFilesList}</span>
+    </div>
+</template>
+
+
+    <!-- Rich Text Modal -->
+   <template if:true={isModalOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open custom-modal">
+        <div class="custom-modal__container">
+            <!-- Modal Header -->
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon 
+                    icon-name="utility:close" 
+                    variant="bare" 
+                    alternative-text="Close"
+                    onclick={closeModal}>
+                </lightning-button-icon>
+            </header>
+            <!-- Modal Content -->
+            <div class="custom-modal__content">
+                <div class="editor-container">
+                    <!-- Toolbar -->
+                    <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFont}>
+                                <option value="">Font</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFontSize}>
+                                <option value="">Size</option>
+                                <option value="1">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Editable Text Area -->
+                    <div class="text-area" 
+                         contenteditable="true" 
+                         data-field={modalField}
+                         onclick={setActiveField} 
+                         oninput={handleInput} 
+                         onpaste={handlePaste} 
+                         onkeydown={handleKeyDown}>
+                        <!-- Optionally insert {modalValue} as innerHTML on modal open -->
+                    </div>
+                    <p class="error-msg" data-error={modalField}></p>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <!-- Modern Backdrop, not old custom one -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+</template>
+
+
+<!--********************************* PAGE 5 - Job Creation Questions ********************************************-->
+<!-- PAGE 5 - Job Creation Questions -->
+<template if:true={isPage5}>
+    <div class="section-header slds-m-top_large">9.{labels.CLH_Job_Creation_Questions}</div>
+    <p class="slds-text-title_bold slds-m-bottom_small">{labels.CLH_Outcome_Data}</p>
+
+    <table class="financial-table slds-m-top_medium">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{labels.CL_Current_Fiscal_Year}</th>
+                <th>{labels.CL_Prior_Fiscal_Year}</th>
+                <th>{labels.CL_Two_Years_Prior}</th>
+                <th>{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Row 1 -->
+            <tr>
+                <td>{labels.CL_List_of_projected_target_business}</td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessCFYPreview} onclick={openModal} data-row="Target_Business_Sectors_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY1Preview} onclick={openModal} data-row="Target_Business_Sectors_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY2Preview} onclick={openModal} data-row="Target_Business_Sectors_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={targetBusinessFY3Preview} onclick={openModal} data-row="Target_Business_Sectors_FY_3__c" data-target="outcome" required></lightning-input></td>
+            </tr>
+
+            <!-- Row 2: # new businesses -->
+            <tr>
+                <td>{labels.CL_Projected_Total_New_Businesses}</td>
+                <td><lightning-input type="text" value={outcomeData.Projected_New_Businesses_CFY__c} data-id="Projected_New_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_New_Businesses_FY_1__c} data-id="Projected_New_Businesses_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_New_Businesses_FY_2__c} data-id="Projected_New_Businesses_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_New_Businesses_FY_3__c} data-id="Projected_New_Businesses_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 3: # jobs from new -->
+            <tr>
+                <td>{labels.CL_Projected_Total_Jobs}</td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Jobs_from_New_Businesses_CFY__c} data-id="Projected_Jobs_from_New_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Jobs_from_New_Businesses_FY1__c} data-id="Projected_Jobs_from_New_Businesses_FY1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Jobs_from_New_Businesses_FY2__c} data-id="Projected_Jobs_from_New_Businesses_FY2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Projected_Jobs_from_New_Businesses_FY3__c} data-id="Projected_Jobs_from_New_Businesses_FY3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 4: % jobs support family 
+            <tr>
+                <td>{labels.CL_Estimated_Jobs_Provide}</td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4CFYPreview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY1Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY2Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupport4FY3Preview} onclick={openModal} data-row="Jobs_Supporting_Family_of_4_FY_4__c" data-target="outcome" required></lightning-input></td>
+            </tr>-->
+
+            <!-- Row 5: Existing business helped -->
+            <tr>
+                <td>{labels.CL_Projected_Existing_Businesses}</td>
+                <td><lightning-input type="text" value={outcomeData.Growing_Businesses_Supported_CFY__c} data-id="Growing_Businesses_Supported_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Growing_Businesses_Supported_FY_1__c} data-id="Growing_Businesses_Supported_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Growing_Businesses_Supported_FY_2__c} data-id="Growing_Businesses_Supported_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Growing_Businesses_Supported_FY_3__c} data-id="Growing_Businesses_Supported_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 6: Jobs from existing -->
+            <tr>
+                <td>{labels.CL_Total_Jobs_Created}</td>
+                <td><lightning-input type="text" value={outcomeData.Jobs_from_Growing_Businesses_CFY__c} data-id="Jobs_from_Growing_Businesses_CFY__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Jobs_from_Growing_Businesses_FY_1__c} data-id="Jobs_from_Growing_Businesses_FY_1__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Jobs_from_Growing_Businesses_FY_2__c} data-id="Jobs_from_Growing_Businesses_FY_2__c" onchange={handleOutcomeInput} required></lightning-input></td>
+                <td><lightning-input type="text" value={outcomeData.Jobs_from_Growing_Businesses_FY_3__c} data-id="Jobs_from_Growing_Businesses_FY_3__c" onchange={handleOutcomeInput} required></lightning-input></td>
+            </tr>
+
+            <!-- Row 7: % jobs support family 
+            <tr>
+                <td>{labels.CL_Estimated_Percentage_Total}</td>
+                <td><lightning-input variant="label-hidden" value={jobSupportCFYPreview} onclick={openModal} data-row="Jobs_Supporting_Family_CFY__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY1Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_1__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY2Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_2__c" data-target="outcome" required></lightning-input></td>
+                <td><lightning-input variant="label-hidden" value={jobSupportFY3Preview} onclick={openModal} data-row="Jobs_Supporting_Family_FY_3__c" data-target="outcome" required></lightning-input></td>
+            </tr>-->
+
+            <!-- Row 8: Avg Cost -->
+            <tr>
+                <td>{labels.CL_Total_Projected_Average_Cost}</td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_CFY__c} data-id="Avg_Cost_per_Job_CFY__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_1__c} data-id="Avg_Cost_per_Job_FY_1__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_2__c} data-id="Avg_Cost_per_Job_FY_2__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+                <td><div class="currency-cell"><span class="currency-symbol">$</span><lightning-input type="number" class="currency-input" variant="label-hidden" value={outcomeData.Avg_Cost_per_Job_FY_3__c} data-id="Avg_Cost_per_Job_FY_3__c" onchange={handleOutcomeCurrencyInput} required></lightning-input></div></td>
+            </tr>
+
+            <!-- Row 9: 3rd Party Verification -->
+            <tr>
+                <td>{labels.CL_Job_Creation_Verification}</td>
+                <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_CFY__c} data-id="Job_Verification_3rd_Party_CFY__c" options={picklistJob3rdPartyCFY} onchange={handleOutcomeInput} required></lightning-combobox>
+                    
+                    <template if:true={isJobCreationVerifiedCFY}>
+                        <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_party_verification_details_CFY__c} data-id="X3rd_party_verification_details_CFY__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                        <div class="file-upload-wrapper">
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_CFY_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_CFY_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_CFY_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_CFY_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+                <!-- FY1-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY1__c} data-id="Job_Verification_3rd_Party_FY1__c" options={picklistJob3rdPartyFY1} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY1}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_party_verification_details_FY1__c} data-id="X3rd_party_verification_details_FY1__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                        <div class="file-upload-wrapper">
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY1_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                         <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY1_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY1_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY1_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+                 <!-- FY2-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY2__c} data-id="Job_Verification_3rd_Party_FY2__c" options={picklistJob3rdPartyFY2} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY2}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_party_verification_details_FY2__c} data-id="X3rd_party_verification_details_FY2__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                        <div class="file-upload-wrapper">
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY2_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY2_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY2_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY2_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td> 
+                <!-- FY3-->
+                 <td>
+                    <lightning-combobox label={labels.CL_Yes_No} value={outcomeData.Job_Verification_3rd_Party_FY3__c} data-id="Job_Verification_3rd_Party_FY3__c" options={picklistJob3rdPartyFY3} onchange={handleOutcomeInput} required></lightning-combobox>
+                   
+                    <template if:true={isJobCreationVerifiedFY3}>
+                         <lightning-textarea label={labels.CL_Describe_Briefly} class="explanation-input" value={outcomeData.X3rd_party_verification_details_FY3__c} data-id="X3rd_party_verification_details_FY3__c" onchange={handleOutcomeInput} placeholder={labels.clickToAddExplanation} required></lightning-textarea>
+                        <div class="file-upload-wrapper">
+                            <lightning-file-upload label={labels.CL_File_Attachments} record-id={outcomeData.Id} multiple data-cell-key="P5_FY3_JV" onuploadfinished={handleUploadFinished}></lightning-file-upload>
+                        <!--FileName-->
+                            <template if:true={uploadedFilesByCell.P5_FY3_JV}>
+                <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY3_JV} for:item="file">
+                        <li key={file.documentId} class="file-item">
+                            <span>{file.name}</span>
+                            <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Delete"
+                                onclick={handleDeleteFile} data-doc-id={file.documentId} data-cell-key="P5_FY3_JV" class="delete-icon">
+                            </lightning-button-icon>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+                        </div>
+                    </template>
+                </td>
+
+
+            </tr>
+        </tbody>
+    </table>
+        <!--Filenames-->
+    <template if:true={allOutcomeFilesList}>
+    <div class="slds-m-top_small">
+        <span class="slds-text-title_bold">List of files uploaded:</span>
+        <span>{allOutcomeFilesList}</span>
+    </div>
+</template>
+
+ <template if:true={isModalOpen}>
+    <section role="dialog" class="slds-modal slds-fade-in-open custom-modal">
+        <div class="custom-modal__container">
+            <!-- Modal Header -->
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon 
+                    icon-name="utility:close" 
+                    variant="bare" 
+                    alternative-text="Close"
+                    onclick={closeModal}>
+                </lightning-button-icon>
+            </header>
+            <!-- Modal Content -->
+            <div class="custom-modal__content">
+                <div class="editor-container">
+                    <!-- Toolbar -->
+                    <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFont}>
+                                <option value="">Font</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <select class="slds-select" onchange={changeFontSize}>
+                                <option value="">Size</option>
+                                <option value="1">Small</option>
+                                <option value="3">Normal</option>
+                                <option value="5">Large</option>
+                                <option value="7">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-col">
+                            <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Editable Text Area -->
+                    <div class="text-area" 
+                         contenteditable="true" 
+                         data-field={modalField}
+                         onclick={setActiveField} 
+                         oninput={handleInput} 
+                         onpaste={handlePaste} 
+                         onkeydown={handleKeyDown}>
+                        <!-- Optionally insert {modalValue} as innerHTML on modal open -->
+                    </div>
+                    <p class="error-msg" data-error={modalField}></p>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <!-- Modern Backdrop, not old custom one -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+</template>
+<!--********************************* PAGE 6 - AI Commom Fields ********************************************-->
+<template if:true={isPage6}>
+<div class="section-header slds-m-top_large">10. {labels.CL_Desired_Use_of_Additional_Funding_Investment}</div>
+ <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for="Use_of_Additional_Funding__c">
+        <abbr class="slds-required" title="required">*</abbr>
+        {labels.CL_Additional_Funding_Question}</label>
+      <!--<lightning-helptext content={labels.CL_Legal_Help}></lightning-helptext>-->
+    </div>
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field="Use_of_Additional_Funding__c" aria-label={labels.CL_Additional_Funding_Question}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error="Use_of_Additional_Funding__c"></p>
+  </div>
+  <div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id="Use_of_Additional_Funding__c">
+        ✦ Get AI Feedback
+    </button>
+</div>
+</div>
+
+
+
+<!-- Operational Synergies Section (dynamic for Funding Area) -->
+<template if:true={operationalSynergiesFieldApi}>
+<div class="section-header slds-m-top_large">11. {labels.CL_Operational_Synergies}</div>
+ <div class="slds-grid slds-wrap">
+  <div class="slds-col slds-size_12-of-12">
+    <div class="label-container">
+      <label class="slds-form-element__label" for={operationalSynergiesFieldApi}>
+         <abbr class="slds-required" title="required">*</abbr>
+            {operationalSynergiesLabel}</label>
+    </div>
+     
+<!-- ✅ Links now outside label and will appear on a new line -->
+<div class="slds-m-top_x-small slds-text-body_small">
+    <ul class="slds-list_dotted">
+        <li>
+            <a href="https://www.youtube.com/watch?v=B8Glesyhvgw" target="_blank" rel="noopener noreferrer">
+                GenieAI for Entrepreneurship – Overview Video
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/watch?v=RwePgeR98oc" target="_blank" rel="noopener noreferrer">
+                GenieAI Skilling Platform – Product Demo
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+    <div class="editor-container">
+      <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+        <!-- ...toolbar buttons... -->
+                  <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                   <!-- Number List -->
+                               <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertNumberList} title="Numbered List">
+                                      <lightning-icon icon-name="utility:number_input" size="x-small"></lightning-icon>
+                                   </button>
+                               </div>
+                        
+                                <!-- Bullet List -->
+                              <div class="slds-col">
+                                   <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet List">
+                                      <lightning-icon icon-name="utility:list" size="x-small"></lightning-icon>
+                                   </button>
+                              </div>     
+
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+      </div>
+      <div class="text-area" contenteditable="true" data-field={operationalSynergiesFieldApi} aria-label={operationalSynergiesLabel}
+        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+    </div>
+    <p class="error-msg" data-error={operationalSynergiesFieldApi}></p>
+  </div>
+  <div class="slds-col slds-size_12-of-12 slds-m-top_x-small">
+    <button class="ai-feedback-btn" onclick={handleAIClick} data-id={operationalSynergiesFieldApi}>
+        ✦ Get AI Feedback
+    </button>
+</div>
+  </div>
+  </template>
+</template>
+
+
+
+
+
+<!-- ✅ Always-visible AI Feedback Panel (docked at bottom right) -->
+ <!-- Bottom Row: Navigation + AI Feedback Panel -->
+<div class="form-footer">
+    <div class="navigation-buttons">
+        <lightning-button label={labels.CL_Previous} onclick={handlePrevious} class="slds-m-right_small"  disabled={isFirstPage}></lightning-button> <!--disabled={isFirstPage}-->
+        
+         <template if:false={isPage1}>
+        <lightning-button variant="brand" label={labels.CL_Save_Draft} onclick={handleSaveDraft} class="slds-m-right_small"></lightning-button>
+        </template>
+
+        <lightning-button variant="brand" label={labels.CL_Next} onclick={handleNext} disabled={isLastPage}></lightning-button>
+     
+        <!-- ✅ Place Submit and Preview button-->
+        <template if:true={isPage6}>
+             <lightning-button variant="brand" label={labels.CL_Submit} onclick={handleSubmit} class="slds-m-left_small"></lightning-button>
+        </template>
+    
+   <template if:true={showPreviewButton}>
+    <lightning-button label={labels.CLH_Preview} variant="brand" onclick={openPreviewModal}></lightning-button>
+</template>
+
+    </div>
+
+<!-- AI Feedback Panel Floating at Bottom Right, Expanding Upwards -->
+ <template if:true={showAIFeedbackPanel}>
+<div class="ai-feedback-floating-panel">
+    <div class={panelClasses}>
+        <!-- Header (click to minimize/expand) -->
+        <div class="panel-header" onclick={minimizeFeedbackPanel}>
+            <span>{labels.CLH_AI_Feedback}</span>
+            <div class="header-icons">
+                <button class="slds-button slds-button_icon" onclick={minimizeFeedbackPanel} title="Minimize" tabindex="-1">−</button>
+                <button class="slds-button slds-button_icon" onclick={closeFeedbackPanel} title="Close" tabindex="-1">×</button>
+            </div>
+        </div>
+        <!-- Content (only visible if expanded) -->
+        <template if:false={isFeedbackMinimized}>
+            <div class="panel-content">
+                <template if:true={showAiFeedback}>
+                    <template if:true={isAiLoading}>
+                        <div class="slds-p-around_medium slds-text-align_center">
+                            <lightning-spinner alternative-text="Loading AI Feedback..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+                    <template if:false={isAiLoading}>
+                        <div class="ai-response-content">
+                            <lightning-formatted-rich-text value={aiResponse}></lightning-formatted-rich-text>
+                            </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+    </div>
+</div>
+</template>
+
+</div> 
+
+ <!-- PREVIEW MODAL -->
+<!-- PREVIEW MODAL (Fullscreen) -->
+<template if:true={isPreviewVisible}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open wcf-preview-modal">
+        <div class="slds-modal__container wcf-preview-modal__container">
+            <header class="slds-modal__header wcf-preview-modal__header">
+                <h2 class="slds-text-heading_medium">{labels.CL_WCF_Form_Title} Preview</h2>
+            </header>
+           <div class="slds-modal__content slds-p-around_medium">
+
+                <!-- PAGE 1: Org/Submitter/Legal -->
+                <template if:true={isPreviewPage1}>
+                    <h2 class="section-headings">1. {labels.CLS_Organizational_Identifying}</h2>
+                    <div class="preview-table no-lines">                
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Area_s_for_Funding_Investment}</div>
+                            <div class="value-column">{organizationData.Organizational_Area_s_for_Funding_Inves__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Name}</div>
+                            <div class="value-column">{organizationData.Organization_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Headquarters_City_and_Country}</div>
+                            <div class="value-column">{organizationData.Headquarters_City_and_Country__c}</div>
+                        </div>
+                         <div class="preview-row">
+                            <div class="label-column">{labels.CL_Primary_Service_Regions}</div>
+                            <div class="value-column">{organizationData.Primary_Service_Regions__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Leader_Name}</div>
+                            <div class="value-column">{organizationData.Leader_Name__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Leader_Title}</div>
+                            <div class="value-column">{organizationData.Leader_Title__c}</div>
+                        </div>
+                         </div>
+                        <!-- ... Submitter fields ... -->
+                     <h2 class="section-headings">2. {labels.CLS_Submitter_Contact_Info}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Submitter_Name}</div>
+                            <div class="value-column">{organizationData.Submitter_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Title}</div>
+                            <div class="value-column">{organizationData.Job_Title__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Email_Address}</div>
+                            <div class="value-column">{organizationData.Work_Email_ID__c}</div>
+                        </div>
+                          <div class="preview-row">
+                            <div class="label-column">{labels.CL_Phone_number}</div>
+                            <div class="value-column">{organizationData.Phone__c}</div>
+                        </div>
+                         </div>     
+                   
+                    <h2 class="section-headings slds-m-top_large">3. {labels.CL_Legal_Structure}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Legal_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Legal_Structure__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 2: Dates, Historical, Fiscal, Sustainability -->
+                <template if:true={isPreviewPage2}>
+                    <h2 class="section-headings">4.{labels.CLH_Financial_Data} </h2> <!--{labels.CL_Current_Fiscal_Year_End_Date}-->
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Current_Fiscal_Year_End_Date}</div>
+                            <div class="value-column">{organizationData.Current_fiscal_year_s_end_date__c}</div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-headings slds-m-top_large">5.{labels.CLH_Historical_Data}</h2>
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th class="wrapped-text"></th>
+                                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="wrapped-text">{labels.CL_Balance_At_Start_of_the_Year}</td>
+                                <td>{historicalData.CY1_Balance_Start_CFY_1__c}</td>
+                                <td>{historicalData.CY2_Balance_Start_CFY_2__c}</td>
+                                <td>{historicalData.CY3_Balance_Start_CFY_3__c}</td>
+                            </tr>
+                            <!-- Revenue(all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue}</td>
+                                <td>{historicalData.CY1_Revenue__c}</td>
+                                <td>{historicalData.CY2_Revenue__c}</td>
+                                <td>{historicalData.CY3_Revenue__c}</td>
+                            </tr>
+                              <!--Expense (all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Expense}</td>
+                                <td>{historicalData.CY1_Expense__c}</td>
+                                <td>{historicalData.CY2_Expense__c}</td>
+                                <td>{historicalData.CY3_Expense__c}</td>
+                            </tr>
+                             <!--Balance At end of the Year (all labels wrapped) -->
+                              <tr>
+                                <td class="wrapped-text">{labels.CL_Balance_At_End_of_the_Year}</td>
+                                <td>{historicalData.CY1_Balance_End__c}</td>
+                                <td>{historicalData.CY2_Balance_End__c}</td>
+                                <td>{historicalData.CY3_Balance_End__c}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 class="section-headings slds-m-top_large">6. {labels.CLH_Current_Fiscal_Year_Data}</h2>
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th class="wrapped-text"></th>
+                                <th class="wrapped-text">{labels.CL_Budget}</th>
+                                <th class="wrapped-text">{labels.CL_Current_Projection}</th>
+                                <th class="wrapped-text">{labels.CL_Variance}</th>
+                                <th class="wrapped-text">{labels.CL_Explanation}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue}</td>
+                                <td>{fiscalData.Revenue_Budget__c}</td>
+                                <td>{fiscalData.Revenue_Projection__c}</td>
+                                <td>{fiscalData.Revenue_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Revenue_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                            <!-- Expense (all wrap text) -->
+                             <tr>
+                                <td class="wrapped-text">{labels.CL_Expense}</td>
+                                <td>{fiscalData.Expense_Budget__c}</td>
+                                <td>{fiscalData.Expense_Projection__c}</td>
+                                <td>{fiscalData.Expense_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Expense_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                              <!-- Net = Revenue - Expense (all wrap text) -->
+                             <tr>
+                                <td class="wrapped-text">{labels.CL_Revenue_Expense}</td>
+                                <td>{fiscalData.Net_Budget__c}</td>
+                                <td>{fiscalData.Net_Projection__c}</td>
+                                <td>{fiscalData.Net_Variance__c}</td>
+                                <td>
+                                    <lightning-formatted-rich-text value={fiscalData.Net_Position_Explanation__c}></lightning-formatted-rich-text>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 class="section-headings slds-m-top_large">7. {labels.CL_Organizational_Sustainability}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Organizational_Sustainability_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Organizational_Sustainability__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 3: Outcome Data Table (Job Fulfillment) -->
+              <template if:true={isPreviewPage3}>
+    <h2 class="section-headings">8. {labels.CLH_Job_Fulfilment_Questions}</h2>
+    <table class="financial-table preview-outcome-table">
+        <thead>
+            <tr>
+                <th class="wrapped-text"></th>
+                <th class="wrapped-text">{labels.CL_Current_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="wrapped-text">{labels.CL_List_of_Organization_Skilling_Domain}</td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_CFY__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_1__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_2__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Skills_Duration_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Enrollment}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_Enrollments_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Placements}</td>
+                <td>{outcomeData.Projected_Learner_Placements_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_Placements_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Learner_Placement_Percentage}</td>
+                <td>{outcomeData.Projected_Learner_placement_CFY__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_1__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_2__c}</td>
+                <td>{outcomeData.Projected_Learner_placement_FY_3__c}</td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Placement_Provided}</td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_CFY__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY1__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY2__c}></lightning-formatted-rich-text></td>
+                <td class="wrapped-text"><lightning-formatted-rich-text value={outcomeData.Placements_Supporting_Family_of_4_FY3__c}></lightning-formatted-rich-text></td>
+            </tr>
+            <tr>
+                <td class="wrapped-text">{labels.CL_Projected_Cost_Per_Placement}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_CFY__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_1__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_2__c}</td>
+                <td>${outcomeData.Avg_Cost_per_Placement_FY_3__c}</td>
+            </tr>
+            <!-- 3rd Party Verification (Yes/No, Explanation, Files) -->
+            <tr>
+                <td class="wrapped-text">{labels.CL_Placement_Verification}</td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_CFY__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_CFY__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_CFY__c}></lightning-formatted-rich-text>
+                    </template>
+                    <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_CFY_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_CFY_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <!-- Repeat for FY1, FY2, FY3 -->
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_1__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_1__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_1__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY1_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY1_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_2__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_2__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_2__c}></lightning-formatted-rich-text>
+                    </template>
+                        <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY2_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY2_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.X3rd_Party_Placement_Verification_FY_3__c}
+                    <template if:true={outcomeData.X3rd_Party_Verification_Description_FY_3__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.X3rd_Party_Verification_Description_FY_3__c}></lightning-formatted-rich-text>
+                    </template>
+                        <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY3_PV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY3_PV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+            <!-- Long-term outcomes, Yes/No, explanation, files -->
+            <tr>
+                <td class="wrapped-text">{labels.CL_Long_term_Outcomes_Research}</td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_CFY__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_CFY__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_CFY__c}></lightning-formatted-rich-text>
+                    </template>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_CFY_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_CFY_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_1__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_1__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_1__c}></lightning-formatted-rich-text>
+                    </template>
+                       <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY1_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY1_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_2__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_2__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_2__c}></lightning-formatted-rich-text>
+                    </template>
+                   <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY2_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY2_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td class="wrapped-text">
+                    {outcomeData.Long_Term_Outcomes_FY_3__c}
+                    <template if:true={outcomeData.Outcome_Tracking_Details_FY_3__c}>
+                        <br/>
+                        <span class="label-small">{labels.CL_Describe_Briefly}: </span>
+                        <lightning-formatted-rich-text value={outcomeData.Outcome_Tracking_Details_FY_3__c}></lightning-formatted-rich-text>
+                    </template>
+                        <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P4_FY3_LT}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P4_FY3_LT} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+            
+</template>
+
+                <!-- PAGE 4: Outcome Data Table (Job Creation) -->
+               <template if:true={isPreviewPage4}>
+    <h2 class="section-headings">8. {labels.CLH_Job_Creation_Questions}</h2>
+    <table class="financial-table preview-outcome-table">
+        <thead>
+            <tr>
+                <th class="wrapped-text"></th>
+                <th class="wrapped-text">{labels.CL_Current_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Prior_Fiscal_Year}</th>
+                <th class="wrapped-text">{labels.CL_Two_Years_Prior}</th>
+                <th class="wrapped-text">{labels.CL_Three_Years_Prior}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Projected Target Business -->
+            <tr>
+                <td>{labels.CL_List_of_projected_target_business}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Target_Business_Sectors_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr>
+            <!-- # new businesses -->
+            <tr>
+                <td>{labels.CL_Projected_Total_New_Businesses}</td>
+                <td>{outcomeData.Projected_New_Businesses_CFY__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_1__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_2__c}</td>
+                <td>{outcomeData.Projected_New_Businesses_FY_3__c}</td>
+            </tr>
+            <!-- # jobs from new -->
+            <tr>
+                <td>{labels.CL_Projected_Total_Jobs}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_CFY__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY1__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY2__c}</td>
+                <td>{outcomeData.Projected_Jobs_from_New_Businesses_FY3__c}</td>
+            </tr>
+            <!-- % jobs support family of 4 (Rich Text)
+            <tr>
+                <td>{labels.CL_Estimated_Jobs_Provide}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_of_4_FY_4__c}></lightning-formatted-rich-text></td>
+            </tr> -->
+            <!-- Existing businesses helped -->
+            <tr>
+                <td>{labels.CL_Projected_Existing_Businesses}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_CFY__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_1__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_2__c}</td>
+                <td>{outcomeData.Growing_Businesses_Supported_FY_3__c}</td>
+            </tr>
+            <!-- Jobs from existing -->
+            <tr>
+                <td>{labels.CL_Total_Jobs_Created}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_CFY__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_1__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_2__c}</td>
+                <td>{outcomeData.Jobs_from_Growing_Businesses_FY_3__c}</td>
+            </tr>
+            <!-- % jobs support family (Rich Text) -->
+           <!-- <tr>
+                <td>{labels.CL_Estimated_Percentage_Total}</td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_CFY__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_1__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_2__c}></lightning-formatted-rich-text></td>
+                <td><lightning-formatted-rich-text value={outcomeData.Jobs_Supporting_Family_FY_3__c}></lightning-formatted-rich-text></td>
+            </tr>-->
+            <!-- Avg Cost -->
+            <tr>
+                <td>{labels.CL_Total_Projected_Average_Cost}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_CFY__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_1__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_2__c}</td>
+                <td><span class="currency-symbol">$</span> {outcomeData.Avg_Cost_per_Job_FY_3__c}</td>
+            </tr>
+            <!-- 3rd Party Verification (Show Yes/No and Description as rich text) -->
+            <tr>
+                <td>{labels.CL_Job_Creation_Verification}</td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_CFY__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_CFY__c}></lightning-formatted-rich-text>
+                    <!-- Show uploaded file names -->
+                     <template if:true={uploadedFilesByCell.P5_CFY_JV}>
+                    <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_CFY_JV} for:item="file">
+                   <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+            </template>
+        </ul>
+    </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY1__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY1__c}></lightning-formatted-rich-text>
+                        <!-- Show uploaded file names -->
+                     <template if:true={uploadedFilesByCell.P5_FY1_JV}>
+                    <ul class="file-list">
+                    <template for:each={uploadedFilesByCell.P5_FY1_JV} for:item="file">
+                   <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+            </template>
+        </ul>
+    </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY2__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY2__c}></lightning-formatted-rich-text>
+                       <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_FY2_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_FY2_JV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+                <td>
+                    {outcomeData.Job_Verification_3rd_Party_FY3__c}
+                    <br/>
+                    <lightning-formatted-rich-text value={outcomeData.X3rd_party_verification_details_FY3__c}></lightning-formatted-rich-text>
+                     <!-- Show uploaded file names -->
+                <template if:true={uploadedFilesByCell.P5_FY3_JV}>
+                    <ul class="file-list">
+                        <template for:each={uploadedFilesByCell.P5_FY3_JV} for:item="file">
+                      <li key={file.documentId}>Uploaded Filename: {file.name}</li>
+                    </template>
+                   </ul>
+                </template>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>
+
+               <!-- PAGE 5: Rich text fields - AI (Common) -->
+                <template if:true={isPreviewPage5}>
+                     <h2 class="section-headings slds-m-top_large">9. {labels.CL_Desired_Use_of_Additional_Funding_Investment}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{labels.CL_Additional_Funding_Question}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={organizationData.Use_of_Additional_Funding__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+      <h2 class="section-headings slds-m-top_large">10. {labels.CL_Operational_Synergies}</h2>
+                    <div class="preview-table no-lines">
+                        <div class="preview-row">
+                            <div class="label-column">{operationalSynergiesLabel}</div>
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={operationalSynergiesPreviewValue}></lightning-formatted-rich-text> <!--{organizationData.Operational_Synergies_with_WOF__c}-->
+                            </div>
+                        </div>
+                    </div>       
+
+                </template>
+
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning-button label={labels.CL_Previous} onclick={handlePreviewPrevious} disabled={isFirstPreviewPage}></lightning-button>
+                <lightning-button label={labels.CL_Next}  onclick={handlePreviewNext} class="slds-m-left_small" disabled={isLastPreviewPage}></lightning-button>
+                <lightning-button label={labels.CL_Close} onclick={handleClosePreview} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+
+
+        </div>
+    </lightning-card>
+
+</template>

@@ -1,0 +1,102 @@
+<template>
+    <lightning-card title="WIN Admin Decision" icon-name="standard:approval">
+
+        <div class="container">
+
+            <!-- Status Section -->
+            <div class={statusCardClass}>
+                <div class="status-left">
+                    <span class={statusDotClass}></span>
+                    <div>
+                        <p class="status-label">Current Decision</p>
+                        <p class="status-value">{status}</p>
+                    </div>
+                </div>
+                <div class={badgeClass}>
+                    <lightning-icon icon-name={badgeIcon} size="xx-small"></lightning-icon>
+                    <span>{badgeLabel}</span>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="divider"></div>
+
+            <!-- Action Row — hidden after escalation -->
+            <template if:true={showButton}>
+                <div class="action-row">
+                    <div class="action-hint-wrap">
+                        <lightning-icon icon-name="utility:notification" size="xx-small"></lightning-icon>
+                        <p class="action-hint">{actionHint}</p>
+                    </div>
+                    <lightning-button
+                        label="Escalate to PI"
+                        variant="destructive"
+                        icon-name="utility:send"
+                        icon-position="left"
+                        onclick={handleEscalateClick}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <!-- Success Panel — shown after escalation -->
+            <template if:true={isEscalated}>
+                <div class="success-panel">
+                    <div class="success-icon">
+                        <lightning-icon icon-name="utility:send" size="small" variant="inverse"></lightning-icon>
+                    </div>
+                    <div>
+                        <p class="success-title">Email sent to Principal Investigator</p>
+                        <p class="success-meta">The PI has been notified to review and take action on this proposal.</p>
+                        <p class="success-time">{escalatedAt}</p>
+                    </div>
+                </div>
+            </template>
+
+        </div>
+
+        <!-- Confirmation Modal -->
+<template if:true={showConfirmModal}>
+    <section class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box">
+
+            <div class="modal-icon-wrap">
+                <lightning-icon icon-name="utility:send" size="small"></lightning-icon>
+            </div>
+
+            <h2 class="modal-title">Escalate to Principal Investigator?</h2>
+            <p class="modal-body">
+                An email notification will be sent to the PI regarding this proposal.
+                Please add your comments below before sending.
+            </p>
+
+            <!-- ← NEW: COE Comments textarea -->
+            <div class="comments-wrap">
+                <label class="comments-label" for="coeComments">
+                    COE Comments <span class="required">*</span>
+                </label>
+                <textarea
+                    id="coeComments"
+                    class="comments-textarea"
+                    placeholder="Enter your comments for the PI..."
+                    rows="4"
+                    value={coeComments}
+                    onchange={handleCommentsChange}>
+                </textarea>
+            </div>
+
+            <div class="modal-actions">
+                <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+                <lightning-button
+                    label="Send Email to PI"
+                    variant="destructive"
+                    icon-name="utility:send"
+                    icon-position="left"
+                    onclick={handleEscalate}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </section>
+</template>
+    </lightning-card>
+</template>

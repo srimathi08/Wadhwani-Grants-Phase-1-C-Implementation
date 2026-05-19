@@ -1,0 +1,38 @@
+<template>
+    <div class="center-title">
+        <lightning-card title="Proposal Review Status">
+            <template if:true={reviewers}>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Reviewer</th>
+                            <th>Total Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={reviewers} for:item="rev">
+                            <tr key={rev.name}>
+                                <td>{rev.name}</td>
+                                <td>{rev.displayScore}</td>
+                                <td>
+                                    <span class={rev.statusClass}>
+                                        {rev.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr class="avg-row">
+                            <td>Average Score</td>
+                            <td>{averageScore}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </template>
+            <template if:true={error}>
+                <div class="slds-text-color_error">Error loading reviewers.</div>
+            </template>
+        </lightning-card>
+    </div>
+</template>

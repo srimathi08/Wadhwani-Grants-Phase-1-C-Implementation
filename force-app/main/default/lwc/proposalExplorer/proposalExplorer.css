@@ -1,0 +1,207 @@
+/* MAIN CONTAINER */
+
+.container {
+    padding: 20px;
+}
+
+
+/* FILTER PANEL */
+
+.filter-container {
+    background: #f7f9fb;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    border: 1px solid #e5e7eb;
+}
+
+
+/* FILTER ROW */
+
+.filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+
+/* COE DROPDOWN */
+
+.filter-coe {
+    flex: 1.5;
+}
+
+
+/* DATE FIELDS */
+
+.filter-date {
+    width: 150px;
+}
+
+
+/* SEARCH FIELD */
+
+.filter-search {
+    flex: 2;
+}
+
+
+/* COUNT BAR */
+
+.count-bar {
+    background: white;
+    border-left: 4px solid #0176d3;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* TABLE WRAPPER */
+
+.table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+
+/* TABLE */
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+
+/* HEADER */
+
+.custom-table thead {
+    background: #f3f4f6;
+}
+
+.custom-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+/* BODY */
+
+.custom-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #1f2937;
+
+    /* Wrap text nicely */
+    white-space: normal;
+    word-break: break-word;
+}
+
+
+/* PROPOSAL ID COLUMN */
+
+.custom-table td:first-child,
+.custom-table th:first-child {
+    width: 170px;
+}
+
+
+/* PROJECT TITLE */
+
+.custom-table td:nth-child(2),
+.custom-table th:nth-child(2) {
+    width: 260px;
+}
+
+
+/* COE */
+
+.custom-table td:nth-child(3),
+.custom-table th:nth-child(3) {
+    width: 220px;
+}
+
+
+/* FOCUS AREA */
+
+.custom-table td:nth-child(4),
+.custom-table th:nth-child(4) {
+    width: 260px;
+}
+
+
+/* DATE */
+
+.custom-table td:nth-child(5),
+.custom-table th:nth-child(5) {
+    width: 150px;
+}
+
+
+/* ROW HOVER */
+
+.custom-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+
+/* PROPOSAL LINK */
+
+.proposal-link {
+    color: #0176d3;
+    text-decoration: none;
+    font-weight: 500;
+
+    /* Prevent ID from breaking */
+    white-space: nowrap;
+}
+
+.proposal-link:hover {
+    text-decoration: underline;
+}
+
+
+/* EMPTY STATE */
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* SPINNER */
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-date {
+        width: 100%;
+    }
+
+}

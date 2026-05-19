@@ -1,0 +1,45 @@
+<template>
+    <template if:true={historicalData}>
+        <div class="table-container">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr>
+                        <th>Historical Data</th>
+                        <th>Prior Fiscal Year (Current Fiscal Year-1)</th>
+                        <th>Two Years Prior (Current Fiscal Year-2)</th>
+                        <th>Three Years Prior (Current Fiscal Year-3)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Balance At start of the Year</td>
+                        <td>${historicalData.CY1_Balance_Start_CFY_1__c}</td>
+                        <td>${historicalData.CY2_Balance_Start_CFY_2__c}</td>
+                        <td>${historicalData.CY3_Balance_Start_CFY_3__c}</td>
+                    </tr>
+                    <tr>
+                        <td>Revenue</td>
+                        <td>${historicalData.CY1_Revenue__c}</td>
+                        <td>${historicalData.CY2_Revenue__c}</td>
+                        <td>${historicalData.CY3_Revenue__c}</td>
+                    </tr>
+                    <tr>
+                        <td>Expense</td>
+                        <td>${historicalData.CY1_Expense__c}</td>
+                        <td>${historicalData.CY2_Expense__c}</td>
+                        <td>${historicalData.CY3_Expense__c}</td>
+                    </tr>
+                    <tr>
+                        <td>Balance At end of the Year</td>
+                        <td>${historicalData.CY1_Balance_End__c}</td>
+                        <td>${historicalData.CY2_Balance_End__c}</td>
+                        <td>${historicalData.CY3_Balance_End__c}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+    <template if:false={historicalData}>
+        <p>No historical data available.</p>
+    </template>
+</template>

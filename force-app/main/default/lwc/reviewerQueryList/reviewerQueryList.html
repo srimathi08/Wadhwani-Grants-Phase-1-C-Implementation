@@ -1,0 +1,136 @@
+<template>
+    <div class="rql-wrapper">
+
+        <!-- Header -->
+        <div class="rql-header">
+            <div class="rql-header-left">
+                <div class="rql-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="rql-title">My Queries</h1>
+                    <p class="rql-subtitle">Track your raised queries and responses</p>
+                </div>
+            </div>
+            <div class="rql-badge">
+                <span class="rql-count">{totalCount}</span>
+                <span class="rql-count-label">Total</span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="rql-loading">
+                <div class="rql-spinner"></div>
+                <p>Loading your queries...</p>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={hasError}>
+            <div class="rql-error">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p>{errorMessage}</p>
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template if:true={isEmpty}>
+            <div class="rql-empty">
+                <div class="rql-empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <h3>No Queries Raised</h3>
+                <p>You haven't raised any queries yet. Queries you raise on proposals will appear here.</p>
+            </div>
+        </template>
+
+        <!-- Table -->
+        <template if:true={hasData}>
+            <div class="rql-table-container">
+                <table class="rql-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Query Number</th>
+                            <th>Proposal</th>
+                            <th>Your Query</th>
+                            <th>Reply from COE</th>
+                            <th>Reply from PI</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={queries} for:item="q" for:index="idx">
+                            <tr key={q.Id} class="rql-row">
+                                <td class="rql-serial">{q.serialNumber}</td>
+                                <td class="rql-query-number">
+                                    <a class="rql-link"
+                                       href={q.queryUrl}
+                                       onclick={handleQueryClick}
+                                       data-id={q.Id}
+                                       data-name={q.Name}>
+                                        {q.Name}
+                                    </a>
+                                </td>
+                                <td class="rql-proposal-cell">
+                                    <a class="rql-proposal-link"
+                                       href={q.proposalUrl}
+                                       onclick={handleProposalClick}
+                                       data-id={q.Proposal__c}>
+                                        {q.Proposal__r.Name}
+                                        <svg class="rql-ext-icon" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2.5">
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                            <polyline points="15 3 21 3 21 9"/>
+                                            <line x1="10" y1="14" x2="21" y2="3"/>
+                                        </svg>
+                                    </a>
+                                </td>
+                                <td class="rql-query-text">
+                                    <lightning-formatted-rich-text
+                                        value={q.Query__c}>
+                                    </lightning-formatted-rich-text>
+                                </td>
+                                <td class="rql-reply">
+                                    <template if:true={q.Reply_from_COE__c}>
+                                        <lightning-formatted-rich-text
+                                            value={q.Reply_from_COE__c}
+                                            class="rql-reply-text">
+                                        </lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:false={q.Reply_from_COE__c}>
+                                        <span class="rql-awaiting">Awaiting reply</span>
+                                    </template>
+                                </td>
+                                <td class="rql-reply">
+                                    <template if:true={q.Reply_from_PI__c}>
+                                        <lightning-formatted-rich-text
+                                            value={q.Reply_from_PI__c}
+                                            class="rql-reply-text">
+                                        </lightning-formatted-rich-text>
+                                    </template>
+                                    <template if:false={q.Reply_from_PI__c}>
+                                        <span class="rql-awaiting">Awaiting reply</span>
+                                    </template>
+                                </td>
+                                <td>
+                                    <span class={q.statusClass}>{q.Status__c}</span>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
+    </div>
+</template>

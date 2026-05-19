@@ -1,0 +1,39 @@
+<template>
+    <div class="table-wrapper">
+        <h2 class="table-title">Proposals Assigned</h2>
+        <template if:true={proposals.length}>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>COE Name</th>
+                        <th>Project Title</th>
+                        <th>Application Name</th>
+                        <th>Assigned Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={proposals} for:item="row">
+                        <tr key={row.ApplicationId}>
+                            <td>{row.COEName}</td>
+                            <td>{row.ProjectTitle}</td>
+                            <td>{row.ApplicationName}</td>
+                            <td>
+                                <lightning-formatted-date-time
+                                    value={row.AssignedDate}
+                                    year="numeric"
+                                    month="short"
+                                    day="2-digit"
+                                ></lightning-formatted-date-time>
+                            </td>
+                            <td><span class={row.statusClass}>{row.ReviewStatus}</span></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <template if:true={error}>
+            <p class="slds-text-color_error">{error}</p>
+        </template>
+    </div>
+</template>

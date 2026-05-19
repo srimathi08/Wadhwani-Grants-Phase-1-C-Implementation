@@ -1,0 +1,480 @@
+/* ===== Main Dashboard Container ===== */
+.dashboard-container {
+    padding: 1.5rem;
+    background-color: #f7f9fb;
+    min-height: 100vh;
+}
+
+/* ===== Section Titles ===== */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.dashboard-title {
+    margin: 2rem 0 1rem 0;
+}
+
+/* ===== Onboarding Section ===== */
+.onboarding-section {
+    margin-bottom: 2rem;
+}
+
+.onboarding-section lightning-card {
+    --slds-c-card-radius-border: 0.5rem;
+    --slds-c-card-color-border: transparent;
+    --slds-c-card-sizing-border: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 1px 3px rgba(255, 255, 255, 0.5);
+}
+
+.progress-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* ===== Stepper Container ===== */
+.stepper-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 2rem 1.5rem;
+    position: relative;
+}
+
+.step-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Step Circle */
+.step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.step-completed {
+    background-color: #10b981;
+    color: white;
+    border: 3px solid #10b981;
+}
+
+.step-current {
+    background-color: rgb(192, 32, 38);
+    color: white;
+    border: 3px solid rgb(192, 32, 38);
+}
+
+.step-pending {
+    background-color: white;
+    color: #9ca3af;
+    border: 3px solid #e5e7eb;
+}
+
+.step-number {
+    color: inherit;
+}
+
+.step-icon-check {
+    --slds-c-icon-color-foreground: white;
+}
+
+/* Step Labels */
+.step-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 150px;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.step-status {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Connecting Lines */
+.step-line {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.line-completed {
+    background-color: #10b981;
+}
+
+.line-pending {
+    background: repeating-linear-gradient(
+        to right,
+        #e5e7eb 0px,
+        #e5e7eb 8px,
+        transparent 8px,
+        transparent 16px
+    );
+}
+
+/* ===== Status Banners ===== */
+.status-banner {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 1.5rem 0.5rem 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.banner-warning {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+}
+
+.banner-info {
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.banner-success {
+    background-color: #d1fae5;
+    border-color: #10b981;
+}
+
+.banner-icon {
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.banner-content {
+    flex: 1;
+}
+
+.banner-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.25rem 0;
+}
+
+.banner-text {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin: 0 0 0.75rem 0;
+}
+
+.banner-button {
+    margin-top: 0.5rem;
+}
+
+/* ===== Metrics Grid ===== */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* ===== Metric Cards ===== */
+.metric-card {
+    --slds-c-card-radius-border: 0.5rem;
+    --slds-c-card-color-border: transparent;
+    --slds-c-card-sizing-border: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    height: 100%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 3px rgba(255, 255, 255, 0.5);
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.metric-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.icon-blue {
+    background-color: #dbeafe;
+}
+
+.icon-blue lightning-icon {
+    --slds-c-icon-color-foreground: #2563eb;
+}
+
+.icon-orange {
+    background-color: #ffedd5;
+}
+
+.icon-orange lightning-icon {
+    --slds-c-icon-color-foreground: rgb(192, 32, 38);
+}
+
+.icon-green {
+    background-color: #d1fae5;
+}
+
+.icon-green lightning-icon {
+    --slds-c-icon-color-foreground: #10b981;
+}
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.metric-warning {
+    color: rgb(192, 32, 38);
+}
+
+.metric-success {
+    color: #10b981;
+}
+
+.metric-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.footer-link {
+    font-size: 0.875rem;
+    color: rgb(192, 32, 38);
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.metric-card:hover .footer-link {
+    color: rgb(152, 25, 30);
+}
+
+/* ===== Recent Activity Section ===== */
+.activity-section {
+    margin-top: 2rem;
+}
+
+.activity-section lightning-card {
+    --slds-c-card-radius-border: 0.5rem;
+    --slds-c-card-color-border: transparent;
+    --slds-c-card-sizing-border: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.title-icon {
+    margin-right: 0.5rem;
+}
+
+.activity-container {
+    padding: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item:hover {
+    background-color: #f9fafb;
+}
+
+.activity-status {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.status-success {
+    background-color: #d1fae5;
+}
+
+.status-success lightning-icon {
+    --slds-c-icon-color-foreground: #10b981;
+}
+
+.status-draft {
+    background-color: #dbeafe;
+}
+
+.status-draft lightning-icon {
+    --slds-c-icon-color-foreground: #3b82f6;
+}
+
+.status-info {
+    background-color: #fef3c7;
+}
+
+.status-info lightning-icon {
+    --slds-c-icon-color-foreground: #f59e0b;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 0.875rem;
+    color: #1f2937;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+.empty-state lightning-icon {
+    --slds-c-icon-color-foreground: #d1d5db;
+    margin-bottom: 0.5rem;
+}
+
+.empty-text {
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0 0;
+}
+
+/* ===== Error Banner ===== */
+.error-banner {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    margin-top: 1rem;
+}
+
+.error-banner lightning-icon {
+    --slds-c-icon-color-foreground: #dc2626;
+    margin-right: 0.75rem;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .stepper-container {
+        flex-direction: column;
+        padding: 1.5rem 1rem;
+    }
+    
+    .step-wrapper {
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    
+    .step-line {
+        display: none;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem;
+    }
+}

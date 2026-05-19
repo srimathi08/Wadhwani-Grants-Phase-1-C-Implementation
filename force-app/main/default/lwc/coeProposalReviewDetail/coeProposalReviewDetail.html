@@ -1,0 +1,109 @@
+<template>
+    <div class="related-list-container">
+
+        <!-- Header -->
+        <div class="related-list-header">
+            <div class="header-left">
+                <lightning-icon
+                    icon-name="standard:task2"
+                    size="small"
+                    class="header-icon">
+                </lightning-icon>
+                <span class="header-title">
+                    Proposal Reviews
+                    <template if:true={hasReviews}>
+                        ({reviewCount})
+                    </template>
+                </span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-align_absolute-center">
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="small">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={hasError}>
+            <div class="empty-container">
+                <p class="empty-text">
+                    Unable to load reviews. Please try again.
+                </p>
+            </div>
+        </template>
+
+        <!-- No Reviews -->
+        <template if:true={isEmpty}>
+            <div class="empty-container">
+                <p class="empty-text">
+                    No external reviews have been shared for this proposal yet.
+                </p>
+            </div>
+        </template>
+
+        <!-- Reviews Table -->
+        <template if:true={hasReviews}>
+            <div class="table-wrapper">
+                <table class="review-table">
+
+                    <thead>
+                        <tr>
+                            <th class="col-checkbox">
+                                <input type="checkbox" disabled />
+                            </th>
+                            <th>Name</th>
+                            <th>Reviewed By</th>
+                            <th>Funding Recommendation</th>
+                            <th>Total Score</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={reviews} for:item="review">
+                            <tr key={review.reviewId}>
+
+                                <td class="col-checkbox">
+                                    <input type="checkbox" disabled />
+                                </td>
+
+                                <!-- Review Name — clickable link -->
+                                <td>
+                                    <button
+                                        class="record-link"
+                                        data-id={review.reviewId}
+                                        onclick={navigateToReview}>
+                                        {review.reviewName}
+                                    </button>
+                                </td>
+
+                                <td>{review.reviewerName}</td>
+
+                                <td>
+                                    <span class={review.recommendationClass}>
+                                        {review.recommendation}
+                                    </span>
+                                </td>
+
+                                <td>{review.totalScore}</td>
+
+                            </tr>
+                        </template>
+                    </tbody>
+
+                </table>
+
+                <!-- View All -->
+                <div class="view-all-row">
+                    <span class="view-all-text">View All</span>
+                </div>
+
+            </div>
+        </template>
+
+    </div>
+</template>

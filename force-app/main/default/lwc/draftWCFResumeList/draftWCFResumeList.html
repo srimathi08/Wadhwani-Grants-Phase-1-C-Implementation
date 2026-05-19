@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title="Draft Project Proposals">
+        <template if:true={draftRecords.length}>
+            <lightning-datatable
+                key-field="Id"
+                data={draftRecords}
+                columns={columns}
+                onrowaction={handleRowAction}
+                hide-checkbox-column="true">
+            </lightning-datatable>
+        </template>
+        <template if:true={isLoading}>
+            <div class="slds-p-around_medium slds-align_absolute-center">
+                <lightning-spinner alternative-text="Loading drafts..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={hasError}>
+            <div class="slds-text-color_error slds-p-around_medium">
+                Failed to load draft records. Please try again later.
+            </div>
+        </template>
+    </lightning-card>
+</template>

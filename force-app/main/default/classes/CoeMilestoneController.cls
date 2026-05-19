@@ -1,0 +1,155 @@
+public without sharing class CoeMilestoneController {
+
+    public class MilestoneWrap {
+        @AuraEnabled public Id milestoneId;
+        @AuraEnabled public String name;
+        @AuraEnabled public String status;
+
+        @AuraEnabled public Date targetDate;
+
+        // ✅ FIX: Send as String for portal/LWC stability
+        @AuraEnabled public String projectStartDate;
+        @AuraEnabled public String projectEndDate;
+
+        @AuraEnabled public Decimal budgetRequired;
+        @AuraEnabled public Decimal amount;
+        @AuraEnabled public Decimal disbursedAmount;
+        @AuraEnabled public Id fundingDisbursementId;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<MilestoneWrap> getMilestones(Id appId) {
+        if (appId == null) return new List<MilestoneWrap>();
+
+        List<Milestone__c> ms = [
+            SELECT Id, Name, Status__c, Milestone_Target_Date__c,
+                   Budget_Required_INR__c, Amount__c, Disbursed_Amount__c,
+                   Funding_Disbursement__c,
+                   Project_Start_Date__c,
+                   Project_End_Date__c
+            FROM Milestone__c
+            WHERE Individual_Application__c = :appId
+            ORDER BY CreatedDate ASC
+        ];
+
+        List<MilestoneWrap> wraps = new List<MilestoneWrap>();
+
+        for (Milestone__c m : ms) {
+            MilestoneWrap w = new MilestoneWrap();
+            w.milestoneId = m.Id;
+            w.name = m.Name;
+            w.status = m.Status__c;
+
+            w.targetDate = m.Milestone_Target_Date__c;
+
+            // ✅ FIX: return as string instead of Date
+            w.projectStartDate =
+                (m.Project_Start_Date__c == null)
+                ? null
+                : String.valueOf(m.Project_Start_Date__c);
+
+            w.projectEndDate =
+                (m.Project_End_Date__c == null)
+                ? null
+                : String.valueOf(m.Project_End_Date__c);
+
+            w.budgetRequired = m.Budget_Required_INR__c;
+            w.amount = m.Amount__c;
+            w.disbursedAmount = m.Disbursed_Amount__c;
+            w.fundingDisbursementId = m.Funding_Disbursement__c;
+
+            wraps.add(w);
+        }
+
+        return wraps;
+    }
+
+    @AuraEnabled
+    public static Id createFundingDisbursement(
+        Id appId,
+        Id milestoneId,
+        String requestedDocs,
+        String comments,
+        Datetime disbursementDate,
+        Decimal approvedAmount
+    ) {
+        if (appId == null || milestoneId == null) {
+            throw new AuraHandledException('Missing Proposal or Milestone Id.');
+        }
+        if (approvedAmount == null || approvedAmount <= 0) {
+            throw new AuraHandledException('Approved Amount is required and must be greater than 0.');
+        }
+        if (disbursementDate == null) {
+            throw new AuraHandledException('Date of Funds Disbursed is required.');
+        }
+
+        // ✅ FIX: Force rounding to 0 decimals to avoid ₹1 reduction problem
+        Decimal finalApprovedAmount =
+            approvedAmount.setScale(0, System.RoundingMode.HALF_UP);
+
+        User u = [
+            SELECT Contact.AccountId
+            FROM User
+            WHERE Id = :UserInfo.getUserId()
+            LIMIT 1
+        ];
+
+        Id loggedInAccountId =
+            (u.Contact != null) ? u.Contact.AccountId : null;
+
+        if (loggedInAccountId == null) {
+            throw new AuraHandledException(
+                'Logged in user is not mapped to Contact/Account.'
+            );
+        }
+
+        /* -------------------------------------------------
+           Funding Award (COE wallet)
+           ✅ ONLY CHANGE: include Type_of_Fund__c
+        ------------------------------------------------- */
+        List<FundingAward> faList = [
+            SELECT Id, Status, Type_of_Fund__c
+            FROM FundingAward
+            WHERE AwardeeId = :loggedInAccountId
+            AND Status = 'New Fund'
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
+
+        if (faList.isEmpty()) {
+            throw new AuraHandledException(
+                'No Funding Award found with status "New Fund" for your COE Account.'
+            );
+        }
+
+        FundingAward fa = faList[0];
+
+        /* -------------------------------------------------
+           Create Funding Disbursement
+        ------------------------------------------------- */
+        FundingDisbursement fd = new FundingDisbursement();
+        fd.FundingAwardId = fa.Id;
+        fd.Proposal__c = appId;
+        fd.Milestone__c = milestoneId;
+        fd.Requested_Support_Documents__c = requestedDocs;
+        fd.Comments__c = comments;
+        fd.DisbursementDate = disbursementDate;
+        fd.Amount = finalApprovedAmount;
+
+        insert fd;
+
+        /* -------------------------------------------------
+           Update Milestone (ACTUAL SPEND)
+           ✅ ONLY CHANGE: populate Funding_Type__c
+        ------------------------------------------------- */
+        update new Milestone__c(
+            Id = milestoneId,
+            Funding_Disbursement__c = fd.Id,
+            Status__c = 'Fund Disbursed',
+            Disbursed_Amount__c = finalApprovedAmount,
+            Funding_Type__c = fa.Type_of_Fund__c
+        );
+
+        return fd.Id;
+    }
+}

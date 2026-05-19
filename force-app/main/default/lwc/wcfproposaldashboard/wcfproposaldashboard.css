@@ -1,0 +1,123 @@
+/* ── Wrapper ─────────────────────────────────────────────── */
+.emboss-wrapper {
+    background: #f0f4ff;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem 1.5rem;
+    box-shadow:
+        4px 4px 10px rgba(0, 0, 0, 0.18),
+        -3px -3px 6px rgba(255, 255, 255, 0.75);
+}
+
+/* ── Title ───────────────────────────────────────────────── */
+.dashboard-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+/* ── Grid: 3 columns for 6 cards ─────────────────────────── */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 0.25rem;
+}
+
+@media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+}
+
+/* ── Card Base ────────────────────────────────────────────── */
+.card {
+    border-radius: 16px;
+    padding: 1.25rem 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Per-status Colors ────────────────────────────────────── */
+
+/* Draft — warm dark brown-grey */
+.card:nth-child(1) {
+    background: linear-gradient(135deg, #6b5c52, #4a3d35);
+    color: #ffffff;
+}
+
+/* Submitted — Wadhwani brand orange-red */
+.card:nth-child(2) {
+    background: linear-gradient(135deg, #e05a28, #c04018);
+    color: #ffffff;
+}
+
+/* Revision Requested — muted warm amber */
+.card:nth-child(3) {
+    background: linear-gradient(135deg, #c47a30, #a05e18);
+    color: #ffffff;
+}
+
+/* In Review — dark slate */
+.card:nth-child(4) {
+    background: linear-gradient(135deg, #4a5568, #2d3748);
+    color: #ffffff;
+}
+
+/* Approved — muted olive green */
+.card:nth-child(5) {
+    background: linear-gradient(135deg, #4a7c59, #2e5c3a);
+    color: #ffffff;
+}
+
+/* Rejected — deep dark red */
+.card:nth-child(6) {
+    background: linear-gradient(135deg, #8b2500, #5c1800);
+    color: #ffffff;
+}
+
+/* ── Card Internals ───────────────────────────────────────── */
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+
+.corner-icon {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.card-count {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-align: right;
+}

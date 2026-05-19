@@ -1,0 +1,39 @@
+.table-container {
+    max-width: 100%;
+    overflow-x: auto;
+}
+.slds-table {
+    width: 100%;
+    table-layout: fixed;
+    border: 2px solid #d8dde6;
+    border-collapse: collapse !important;
+}
+.slds-table th,
+.slds-table td {
+    border: 1px solid #d8dde6 !important;
+}
+
+.slds-table th {
+    background-color: #FC7666 !important;
+    color: #fff !important;
+    white-space: normal !important;
+    word-break: break-word;
+    max-width: 180px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.5rem 0.7rem;
+    font-weight: 600;
+    border-top: 2px solid #FC7666 !important;
+    border-bottom: 2px solid #FC7666 !important;
+}
+.slds-table td {
+    padding: 0.5rem 1rem;
+    text-align: center;
+}
+.slds-table td:last-child {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    max-width: 340px;
+    text-align: left;
+    overflow-wrap: break-word !important;
+}

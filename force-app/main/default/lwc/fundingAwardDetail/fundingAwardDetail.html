@@ -1,0 +1,59 @@
+<template>
+    <div class="slds-card slds-p-around_medium milestone-card">
+
+        <h2 class="slds-text-heading_small slds-m-bottom_small">Milestones</h2>
+
+<table class="milestone-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Budget</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Amount</th>
+            <th>Funds Disbursed</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <template for:each={milestones} for:item="m">
+            <tr key={m.Id}>
+                <td><a href={m.link} target="_blank" class="record-link">{m.Name}</a></td>
+                <td class="wrap-text">
+                <lightning-formatted-rich-text value={m.Milestone_Description__c}></lightning-formatted-rich-text>
+                </td>
+
+                <td>₹ {m.Budget_Required_INR__c}</td>
+                <td>{m.Project_Start_Date__c}</td>
+                <td>{m.Project_End_Date__c}</td>
+                <td>₹ {m.Amount__c}</td>
+                <td>{m.Funds_Released__c}</td>
+
+                <td>
+                    <lightning-button 
+                        label="Disburse to Milestone"
+                        variant="brand"
+                        class="action-btn"
+                        data-id={m.Id}
+                        onclick={openModal}>
+                    </lightning-button>
+                </td>
+            </tr>
+        </template>
+    </tbody>
+</table>
+
+
+    </div>
+
+    <template if:true={showModal}>
+        <c-disbursement-modal 
+            milestone-id={selectedMilestoneId}
+            funding-award-id={recordId}
+            onclosemodal={closeModal}
+            onrefresh={refreshData}>
+        </c-disbursement-modal>
+    </template>
+</template>

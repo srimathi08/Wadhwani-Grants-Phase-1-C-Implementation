@@ -1,0 +1,69 @@
+<apex:page standardController="Account" extensions="recTypeClass">
+    <apex:slds />
+
+    <style>
+        /* Rounded corners for modal */
+        .slds-modal__container {
+            border-radius: 1rem !important;
+            overflow: hidden !important;
+        }
+
+        .slds-modal {
+            border-radius: 1rem !important;
+        }
+
+        /* Left align the heading text */
+        .left-text {
+            text-align: left;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Center the radio buttons */
+        .radio-center {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        /* Add spacing between radio options */
+        .radio-center td {
+            padding: 0.5rem 1.5rem;
+        }
+    </style>
+
+    <apex:form >
+        <!-- Modal -->
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+                 class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+
+                <!-- Header -->
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate" tabindex="-1">New Account</h1>
+                </div>
+
+                <!-- Body -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p class="left-text">Select record type</p>
+                    <div class="radio-center">
+                        <apex:selectRadio value="{!recId}" layout="pageDirection">
+                            <apex:selectOptions value="{!reco}"/>
+                            <apex:actionSupport event="onchange"
+                                action="{!URLFOR($Action.Account.New, null, [RecordType=recId, save=1], true)}"/>
+                        </apex:selectRadio>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close">Cancel</button>
+                    <button class="slds-button slds-button_brand">Next</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal backdrop -->
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </apex:form>
+</apex:page>

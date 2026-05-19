@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Proposals Dashboard" class="slds-p-around_small">
+        
+        <div class="section-wrapper">
+            <div class="section-title">COE Admin Actions</div>
+            <div class="grid">
+                <template for:each={coeCards} for:item="c">
+                    <article key={c.id} class={c.combinedClass} data-filter={c.listViewApiName}
+                             onclick={handleNavigate} title={c.label}>
+                        <div class="card-header">
+                            <span class="card-title">{c.label}</span>
+                            <span class="corner-icon" aria-hidden="true">↗</span>
+                        </div>
+                        <div class="card-count">{c.count}</div>
+                    </article>
+                </template>
+            </div>
+        </div>
+
+        <div class="section-wrapper">
+            <div class="section-title">WIN Admin Actions</div>
+            <div class="grid">
+                <template for:each={winCards} for:item="c">
+                    <article key={c.id} class={c.combinedClass} data-filter={c.listViewApiName}
+                             onclick={handleNavigate} title={c.label}>
+                        <div class="card-header">
+                            <span class="card-title">{c.label}</span>
+                            <span class="corner-icon" aria-hidden="true">↗</span>
+                        </div>
+                        <div class="card-count">{c.count}</div>
+                    </article>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

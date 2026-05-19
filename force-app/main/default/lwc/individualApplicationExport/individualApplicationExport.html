@@ -1,0 +1,18 @@
+<template>
+    <lightning-card title="Individual Applications">
+        <div class="slds-m-around_medium">
+            <lightning-button
+                label="Download as Excel"
+                variant="brand"
+                onclick={downloadExcel}>
+            </lightning-button>
+        </div>
+
+        <lightning-datatable
+            key-field="recordId"
+            data={data}
+            columns={columns}
+            hide-checkbox-column>
+        </lightning-datatable>
+    </lightning-card>
+</template>

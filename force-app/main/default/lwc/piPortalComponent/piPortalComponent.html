@@ -1,0 +1,182 @@
+<template>
+    <div class="wf-page">
+
+        <!-- =========================
+             HERO / PROFILE CARD
+        ========================== -->
+        <section class="wf-hero">
+            <div class="wf-hero-top">
+                <div class="wf-hero-left">
+                    <div class="wf-hero-title">Principal Investigator Dashboard</div>
+                    <div class="wf-hero-sub">
+                        Manage proposals, track review progress, and access milestone submissions in one place.
+                    </div>
+                </div>
+
+                <div class="wf-hero-right">
+                    <button class="wf-btn wf-btn-primary" onclick={handleRegister}>
+                        Register
+                    </button>
+                </div>
+            </div>
+
+            <div class="wf-hero-profile">
+                <div class="wf-profile-avatar">{initials}</div>
+
+                <div class="wf-profile-info">
+                    <div class="wf-profile-name">{contactName}</div>
+
+                    <div class="wf-profile-meta">
+                        <template if:true={accountName}>
+                            <span class="wf-profile-pill">{accountName}</span>
+                        </template>
+
+                        <template if:true={contactEmail}>
+                            <span class="wf-profile-muted">{contactEmail}</span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================
+             4 NAVIGATION ACTION CARDS
+        ========================== -->
+        <section class="wf-navgrid">
+
+            <!-- Submit Proposal -->
+            <div class="wf-navcard active" onclick={handleSubmitProposal}>
+                <div class="wf-navtitle">Submit Project Proposal</div>
+                <div class="wf-navdesc">Start a new application</div>
+            </div>
+
+            <!-- Proposals in Draft -->
+            <div class="wf-navcard" onclick={handleViewDrafts}>
+                <div class="wf-navtitle">
+                    Proposals In Draft
+                    <span class="wf-count-badge">{draftProposalCount}</span>
+                </div>
+                <div class="wf-navdesc">
+                    Continue unfinished applications
+                </div>
+            </div>
+
+            <!-- All Proposals -->
+            <div class="wf-navcard" onclick={handleViewAllProposals}>
+                <div class="wf-navtitle">
+                    View all proposals
+                    <span class="wf-count-badge">{totalProposalCount}</span>
+                </div>
+                <div class="wf-navdesc">
+                    All proposals submitted by you
+                </div>
+            </div>
+
+            <!-- NEW CARD : PROPOSAL REVIEWS -->
+            <div class="wf-navcard" onclick={handleViewProposalReviews}>
+                <div class="wf-navtitle">
+                    Proposal Reviews
+                </div>
+                <div class="wf-navdesc">
+                    View reviews shared by COE Admin
+                </div>
+            </div>
+            <!-- REVIEWER QUERIES TILE -->
+<div class="wf-navcard wf-navcard-icon" onclick={handleViewReviewerQueries}>
+    <div class="wf-tile-icon wf-tile-icon-blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+             viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+    </div>
+    <div class="wf-navtitle" style="margin-top:14px;">
+        Reviewer Queries
+        <span class="wf-count-badge">{reviewerQueryCount}</span>
+    </div>
+    <div class="wf-navdesc">
+        View and respond to queries shared with you
+    </div>
+</div>
+        </section>
+
+        <!-- =========================
+             APPROVED FUNDING BANNER
+        ========================== -->
+        <section class="wf-card wf-action-card wf-accent">
+            <div>
+                <div class="wf-card-title">Proposal Approved for Funding</div>
+                <div class="wf-card-desc">
+                    View proposals that are approved for funding and proceed with milestone submission.
+                </div>
+            </div>
+
+            <button class="wf-btn wf-btn-primary" onclick={handleViewApprovedFunding}>
+                View Proposals
+            </button>
+        </section>
+
+        <!-- =========================
+             FILTER SECTION
+        ========================== -->
+        <section class="wf-card">
+            <div class="wf-section-head">
+                <div>
+                    <div class="wf-card-title">Proposal Filter</div>
+                    <div class="wf-card-desc">
+                        Choose a proposal to view progress
+                    </div>
+                </div>
+            </div>
+
+            <div class="wf-filter-label">Select Proposal</div>
+
+            <div style="margin-top:10px;">
+                <select class="wf-select" onchange={handleProposalChange}>
+                    <option value="">-- Select Proposal --</option>
+                    <template for:each={proposalOptions} for:item="opt">
+                        <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </option>
+                    </template>
+                </select>
+            </div>
+        </section>
+
+        <!-- =========================
+             PROPOSAL PROGRESS
+        ========================== -->
+        <section class="wf-card">
+            <div class="wf-section-head">
+                <div>
+                    <div class="wf-card-title">Proposal Progress</div>
+                    <div class="wf-card-desc">
+                        Governance flow based on selected proposal status
+                    </div>
+                </div>
+
+                <button class="wf-btn wf-btn-secondary"
+                        onclick={handleViewSelectedProposal}
+                        disabled={isViewProposalDisabled}>
+                    View Proposal
+                </button>
+            </div>
+
+            <div class={stepperWrapperClass}>
+                <div class={stepClassDraft}>Draft</div>
+                <div class={stepClassCOE}>COE Review</div>
+                <div class={stepClassWIN}>WIN Review</div>
+                <div class={stepClassDecision}>Decision</div>
+                <div class={stepClassApproved}>Approved</div>
+            </div>
+
+            <template if:true={isViewProposalDisabled}>
+                <div class="wf-lock-note" style="margin-top:14px;">
+                    Select a proposal to view progress.
+                </div>
+            </template>
+        </section>
+
+    </div>
+</template>

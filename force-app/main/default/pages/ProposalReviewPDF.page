@@ -1,0 +1,1056 @@
+<apex:page standardController="ApplicationReview"
+           extensions="ProposalReviewPDFController"
+           renderAs="pdf"
+           showHeader="false"
+           sidebar="false"
+           applyBodyTag="false">
+<style>
+    @page {
+        margin: 55px 55px 55px 55px;
+        size: A4;
+    }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        color: #2c2c2c;
+    }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LAYOUT A — Project_Proposal_Review                         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<apex:outputPanel rendered="{!recordTypeName == 'Project_Proposal_Review'}">
+<table width="100%" cellpadding="0" cellspacing="0">
+
+    <!-- LOGO -->
+    <tr>
+        <td align="left" style="padding-bottom:14px;">
+            <img src="{!URLFOR($Resource.WIN_Logo)}" width="150"/>
+        </td>
+    </tr>
+    <tr>
+        <td style="border-bottom:3px solid #C0392B; padding-bottom:14px;"></td>
+    </tr>
+    <tr>
+        <td style="padding-top:14px; padding-bottom:4px;
+                   font-size:17px; font-weight:bold;
+                   color:#C0392B; letter-spacing:1px;">
+            PROJECT PROPOSAL REVIEW
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size:10px; color:#555555; padding-bottom:28px;">
+            Confidential — For Internal Review Purposes Only
+        </td>
+    </tr>
+
+    <!-- SECTION 1: Project Overview -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Project Overview
+        </td>
+    </tr>
+
+    <!-- Institution Name — lookup name -->
+    <tr>
+        <td style="padding-top:16px; padding-left:10px; padding-bottom:2px;
+                   font-size:9px; font-weight:bold; color:#555555;
+                   text-transform:uppercase; letter-spacing:0.8px;">
+            Institution Name
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Institution_Name__r.Name}&#160;
+        </td>
+    </tr>
+
+    <!-- Project Title -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                   font-weight:bold; color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Project Title
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Title}&#160;
+        </td>
+    </tr>
+
+    <!-- PI + Co-PI -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Principal Investigator (PI)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.PI_NAME__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Co-Principal Investigator</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Co_Principal_Investigators_PI__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Focus + Sub Focus -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Focus Area</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Focus_Area__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Sub Focus Area</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Sub_Focus_Area__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Reviewed By — full width -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Reviewed By
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.ReviewedBy.Name}&#160;
+        </td>
+    </tr>
+
+    <!-- Submission Date + Status -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Submission Date</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.SubmissionDate}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Status</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Status}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Comment -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Comment
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:28px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B; word-wrap:break-word;">
+            {!review.Comment}&#160;
+        </td>
+    </tr>
+
+    <!-- SECTION 2: Evaluation Criteria -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Evaluation Criteria
+        </td>
+    </tr>
+
+    <!-- Innovation / Novelty -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Innovation &amp; Novelty
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Innovation_Novelty__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Rationale_for_Scoring__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Commercial Viability -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Commercial Viability
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Commercial_Viability__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Commercial_viability_Rationale__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Market Potential -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Market Potential
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Market_Potential__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Market_Potential_Rationale__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Social Impact -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Social Impact
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Social_Impact__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Social_Impact_Rationale__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- External Funding Potential -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;External Funding Potential
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.External_Funding_Potential__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.External_Funding_Potential_Rationale__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Team Strength and Expertise -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Team Strength &amp; Expertise
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Team_Strength_and_Expertise__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Reviewer's Rationale</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Team_Strength_and_Expertise_Rationale__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Milestone Planning -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:16px; border-bottom:1px solid #eeeeee;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Milestone Planning
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Milestone_Planning__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Justification</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Milestone_Planning_Justification__c}&#160;
+                                </td>
+                            </tr>
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px; padding-top:10px;">
+                                Justification (NWP)</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Milestone_Planning_Justification_NWP__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Budget Requisite -->
+    <tr>
+        <td style="padding-top:16px; padding-bottom:28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td colspan="2" style="padding-left:10px; padding-bottom:8px; font-size:11px;
+                                           font-weight:bold; color:#333333; text-transform:uppercase;
+                                           letter-spacing:0.5px; border-left:4px solid #C0392B;">
+                        &#160;Budget Requisite
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80px" style="vertical-align:top; padding-left:14px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Score</td></tr>
+                            <tr>
+                                <td style="font-size:22px; font-weight:bold; color:#C0392B;
+                                           background-color:#f9f9f9; border:1px solid #dddddd;
+                                           padding:6px 16px; text-align:center;">
+                                    {!review.Budget_Requisite__c}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top; padding-left:16px; padding-top:4px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px;">Justification</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Budget_Requisite_Justification__c}&#160;
+                                </td>
+                            </tr>
+                            <tr><td style="font-size:9px; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.5px; padding-bottom:4px; padding-top:10px;">
+                                Justification (UB)</td></tr>
+                            <tr>
+                                <td style="font-size:11px; color:#444444; font-style:italic; word-wrap:break-word;">
+                                    {!review.Budget_Requisite_Justification_UB__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- SECTION 3: Score Summary -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Score Summary
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top:16px; padding-bottom:28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td width="110px" style="vertical-align:middle; padding-left:10px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="background-color:#C0392B; color:#ffffff; font-size:26px;
+                                           font-weight:bold; text-align:center; padding:10px 16px;">
+                                    {!review.Total_Score__c}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background-color:#a93226; color:#ffffff; font-size:10px;
+                                           text-align:center; padding:3px 8px;">
+                                    out of 60
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="vertical-align:middle; padding-left:20px;">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="font-size:9px; font-weight:bold; color:#555555;
+                                           text-transform:uppercase; letter-spacing:0.8px;
+                                           padding-bottom:6px;">Funding Recommendation</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size:14px; font-weight:bold; color:#1a7a3a;">
+                                    {!review.Final_recommendation_ExternalReviewer__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- SECTION 4: Final Remarks -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Final Remarks
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top:16px; padding-left:10px; padding-bottom:2px; font-size:9px;
+                   font-weight:bold; color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Reason if Not Recommended
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:18px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B; word-wrap:break-word;">
+            {!review.Final_recommendation_Not_recommended__c}&#160;
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Notes for WIN Team
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:18px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B; word-wrap:break-word;">
+            {!review.ForWINTeam__c}&#160;
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Message to Communicate to PI
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:28px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B; word-wrap:break-word;">
+            {!review.CommunicateToPI__c}&#160;
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border-top:2px solid #C0392B; padding-top:10px;
+                   font-size:9px; color:#555555; text-align:center;">
+            Wadhwani Foundation — Confidential Project Proposal Review Document
+        </td>
+    </tr>
+
+</table>
+</apex:outputPanel>
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LAYOUT B — CEO_Admin_Project_Proposal_Review               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<apex:outputPanel rendered="{!recordTypeName == 'CEO_Admin_Project_Proposal_Review'}">
+<table width="100%" cellpadding="0" cellspacing="0">
+
+    <!-- LOGO -->
+    <tr>
+        <td align="left" style="padding-bottom:14px;">
+            <img src="{!URLFOR($Resource.WIN_Logo)}" width="150"/>
+        </td>
+    </tr>
+    <tr>
+        <td style="border-bottom:3px solid #C0392B; padding-bottom:14px;"></td>
+    </tr>
+    <tr>
+        <td style="padding-top:14px; padding-bottom:4px;
+                   font-size:17px; font-weight:bold;
+                   color:#C0392B; letter-spacing:1px;">
+            CEO ADMIN — PROJECT PROPOSAL REVIEW
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size:10px; color:#555555; padding-bottom:28px;">
+            Confidential — For Internal Review Purposes Only
+        </td>
+    </tr>
+
+    <!-- SECTION 1: Project Overview -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Project Overview
+        </td>
+    </tr>
+
+    <!-- Institution Name — lookup name -->
+    <tr>
+        <td style="padding-top:16px; padding-left:10px; padding-bottom:2px; font-size:9px;
+                   font-weight:bold; color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Institution Name
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Institution_Name__r.Name}&#160;
+        </td>
+    </tr>
+
+    <!-- Project Title -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Project Title
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Title}&#160;
+        </td>
+    </tr>
+
+    <!-- PI + Co-PI -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Principal Investigator (PI)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.PI_NAME__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Co-Principal Investigator</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Co_Principal_Investigators_PI__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Focus + Sub Focus -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Focus Area</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Focus_Area__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Sub Focus Area</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Sub_Focus_Area__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Reviewed By — full width (Reviewer__c removed — was showing raw ID) -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Reviewed By
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.ReviewedBy.Name}&#160;
+        </td>
+    </tr>
+
+    <!-- Submission Date + Status -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="48%" style="vertical-align:top; padding-right:10px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Submission Date</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.SubmissionDate}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Status</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Status}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Comment -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Comment
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:28px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B; word-wrap:break-word;">
+            {!review.Comment}&#160;
+        </td>
+    </tr>
+
+    <!-- SECTION 2: Review Details -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Review Details
+        </td>
+    </tr>
+
+    <!-- Does Focus & Sub-Focus Fall within WIN? -->
+    <tr>
+        <td style="padding-top:16px; padding-left:10px; padding-bottom:2px; font-size:9px;
+                   font-weight:bold; color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Does Focus &amp; Sub-Focus Fall within WIN?
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Does_the_Focus_and_Sub_Focus_area_fall_w__c}&#160;
+        </td>
+    </tr>
+
+    <!-- TRL stacked vertically -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                               font-weight:bold; color:#555555; text-transform:uppercase;
+                               letter-spacing:0.8px;">Technology Readiness Level</td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px; padding-top:4px; padding-bottom:16px; font-size:12px;
+                               color:#1a1a1a; border-left:3px solid #C0392B;">
+                        {!review.Technology_Readiness_Level__c}&#160;
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                               font-weight:bold; color:#555555; text-transform:uppercase;
+                               letter-spacing:0.8px;">Project's TRL — Brief Justification</td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px; padding-top:4px; font-size:12px; color:#1a1a1a;
+                               border-left:3px solid #C0392B; word-wrap:break-word;">
+                        {!review.Project_s_TRL_with_a_brief_justification__c}&#160;
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Milestones + Budgets + Project Proposal -->
+    <tr>
+        <td style="padding-bottom:16px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="page-break-inside:avoid;">
+                <tr>
+                    <td width="30%" style="vertical-align:top; padding-right:8px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Milestones</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Milestones__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="3%"></td>
+                    <td width="30%" style="vertical-align:top; padding-right:8px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Budgets</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Budgets__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="3%"></td>
+                    <td width="34%" style="vertical-align:top;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-left:10px; padding-bottom:2px; font-size:9px;
+                                           font-weight:bold; color:#555555; text-transform:uppercase;
+                                           letter-spacing:0.8px;">Project Proposal</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px; padding-top:4px; padding-bottom:8px;
+                                           font-size:12px; color:#1a1a1a; border-left:3px solid #C0392B;">
+                                    {!review.Project_proposal__c}&#160;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Prior Research Funding Raised -->
+    <tr>
+        <td style="padding-left:10px; padding-bottom:2px; font-size:9px; font-weight:bold;
+                   color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Prior Research Funding Raised
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:28px; font-size:12px;
+                   color:#1a1a1a; border-left:3px solid #C0392B;">
+            {!review.Prior_Research_Funding_raised__c}&#160;
+        </td>
+    </tr>
+
+    <!-- SECTION 3: Final Recommendation -->
+    <tr>
+        <td style="background-color:#C0392B; color:#ffffff; font-size:12px;
+                   font-weight:bold; padding:7px 10px; letter-spacing:0.5px;">
+            Final Recommendation
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top:16px; padding-left:10px; padding-bottom:2px; font-size:9px;
+                   font-weight:bold; color:#555555; text-transform:uppercase; letter-spacing:0.8px;">
+            Recommendation
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-left:10px; padding-top:4px; padding-bottom:28px; font-size:14px;
+                   font-weight:bold; color:#1a7a3a; border-left:3px solid #C0392B;">
+            {!review.Final_recommendation__c}&#160;
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border-top:2px solid #C0392B; padding-top:10px;
+                   font-size:9px; color:#555555; text-align:center;">
+            Wadhwani Foundation — Confidential CEO Admin Project Proposal Review Document
+        </td>
+    </tr>
+
+</table>
+</apex:outputPanel>
+
+</apex:page>

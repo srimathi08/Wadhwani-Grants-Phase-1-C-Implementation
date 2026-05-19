@@ -1,0 +1,209 @@
+<template>
+    <div class="page">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div>
+                <h1 class="title">Milestones</h1>
+                <p class="subtitle">View project milestones and track progress.</p>
+            </div>
+
+            <button class="btnOutline" onclick={handleRefresh}>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Loader -->
+        <template if:true={isLoading}>
+            <div class="loader">Loading milestones...</div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={errorMsg}>
+            <div class="error">{errorMsg}</div>
+        </template>
+
+        <!-- Milestone List -->
+        <template if:true={milestones.length}>
+            <div class="grid">
+                <template for:each={milestones} for:item="m">
+                    <div key={m.milestoneId} class="card">
+
+                        <!-- Card Header -->
+                        <div class="cardHeader">
+                            <div>
+                                <div class="name">{m.milestoneName}</div>
+                                <div class="appName">Application: {m.applicationName}</div>
+                            </div>
+                            <span class={m.statusClass}>{m.statusLabel}</span>
+                        </div>
+
+                        <!-- Month Tiles -->
+                        <div class="dates">
+                            <div class="metaItem">
+                                <span class="label">Start Month</span>
+                                <span class="value">{m.startFormatted}</span>
+                            </div>
+
+                            <div class="metaItem">
+                                <span class="label">End Month</span>
+                                <span class="value">{m.endFormatted}</span>
+                            </div>
+                        </div>
+
+                        <!-- Milestone Description -->
+                        <template if:true={m.milestoneDescription}>
+                            <div class="block">
+                                <div class="blockTitle">Milestone Description</div>
+                                <div class="blockText"
+                                     lwc:dom="manual"
+                                     data-mid={m.milestoneId}
+                                     data-type="desc"></div>
+                            </div>
+                        </template>
+
+                        <!-- Disbursed Amount -->
+                        <template if:true={m.disbursedAmount}>
+                            <div class="block">
+                                <div class="blockTitle">Disbursed Amount</div>
+                                <div class="blockText">
+                                    $ {m.disbursedAmount}
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Budget Required -->
+                        <template if:true={m.budgetRequiredINR}>
+                            <div class="block">
+                                <div class="blockTitle">Budget Required (INR)</div>
+                                <div class="blockText">
+                                    $ {m.budgetRequiredINR}
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Actions -->
+                        <div class="actions">
+                            <button class="btnOutline"
+                                    data-id={m.milestoneId}
+                                    onclick={handleView}>
+                                View Details
+                            </button>
+
+                            <button class="btnPrimary"
+                                    data-id={m.milestoneId}
+                                    onclick={handleUpload}
+                                    disabled={m.isAlreadyUploaded}>
+                                {m.uploadBtnLabel}
+                            </button>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template if:false={milestones.length}>
+            <template if:false={isLoading}>
+                <div class="empty">
+                    <div class="emptyTitle">No milestones found</div>
+                    <div class="emptySub">
+                        If your proposal was approved, milestones will appear here.
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <!-- Upload Modal -->
+        <template if:true={isUploadOpen}>
+            <section class="modalBackdrop">
+                <div class="modalCard">
+
+                    <div class="modalHeader">
+                        <div>
+                            <div class="modalTitle">Upload Milestone Documents</div>
+                            <div class="modalSub">
+                                Upload the requested documents in correct naming.
+                            </div>
+                        </div>
+
+                        <button class="btnOutline" onclick={closeUploadModal}>
+                            Close
+                        </button>
+                    </div>
+
+                    <div class="modalBody">
+
+                        <div class="block">
+                            <div class="blockTitle">Requested Support Documents</div>
+
+                            <template if:true={requestedSupportDocs}>
+                                <div class="blockText requestedBox">
+                                    {requestedSupportDocs}
+                                </div>
+                            </template>
+
+                            <template if:false={requestedSupportDocs}>
+                                <div class="blockText muted">
+                                    No requested support documents mentioned by COE.
+                                </div>
+                            </template>
+                        </div>
+
+                        <template if:true={requiredDocNames.length}>
+                            <div class="hintBox">
+                                <div class="hintTitle">File Naming Rule</div>
+
+                                <div class="hintText">
+                                    Please upload file names matching the required document names.
+                                </div>
+
+                                <div class="hintExample">
+                                    Required Names:
+                                    <template for:each={requiredDocNames} for:item="doc">
+                                        <span key={doc} class="requiredChip">{doc}</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:true={namingErrorMsg}>
+                            <div class="error namingError">{namingErrorMsg}</div>
+                        </template>
+
+                        <div class="docCard fullWidth">
+                            <div class="docTitle">Upload Required Documents</div>
+
+                            <lightning-file-upload
+                                label="Upload Documents"
+                                record-id={selectedMilestoneId}
+                                accept={acceptedFormats}
+                                multiple
+                                onuploadfinished={handleUploadFinished}>
+                            </lightning-file-upload>
+
+                            <template if:true={uploadedFileNames.length}>
+                                <div class="uploadedTitle">Uploaded Files</div>
+                                <ul class="fileList">
+                                    <template for:each={uploadedFileNames} for:item="name">
+                                        <li key={name} class="fileItem">{name}</li>
+                                    </template>
+                                </ul>
+                            </template>
+                        </div>
+
+                    </div>
+
+                    <div class="modalFooter">
+                        <button class="btnPrimary" onclick={closeUploadModal}>
+                            Save & Close
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+        </template>
+
+    </div>
+</template>

@@ -1,0 +1,179 @@
+<template>
+    <!-- Loading Spinner -->
+    <template if:true={isLoading}>
+        <div class="slds-p-around_medium slds-text-align_center">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </template>
+
+    <!-- FORM -->
+    <!--<lightning-card>-->
+        <!-- Logo -->
+        <div class="slds-text-align_center slds-m-bottom_medium">
+            <img src={winLogoUrl} alt="WIN Logo" class="win-logo" />
+        </div>
+
+        <!-- Title -->
+        <h1 class="slds-text-heading_medium slds-text-align_center slds-m-bottom_medium custom-title">
+            COE REVIEW FORM
+        </h1>
+
+        <div class="slds-p-around_medium">
+            <lightning-layout multiple-rows>
+
+                <!-- Institution -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Name of the Institution</label>
+                        <div class="readonly-box">{institutionName}</div>
+                    </div>
+                </lightning-layout-item>
+
+                <!-- Project Name -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Name of the Project</label>
+                        <div class="readonly-box">{level1Data.Title}</div>
+                    </div>
+                </lightning-layout-item>
+
+                <!-- PI -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Principal Investigator (PI)</label>
+                        <div class="readonly-box">{level1Data.PI_Name__c}</div>
+                    </div>
+                </lightning-layout-item>
+
+                <!-- Co PI -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-input
+                        label="Co-Principal Investigators (PI)"
+                        name="Co_Principal_Investigators_PI__c"
+                        value={level1Data.Co_Principal_Investigators_PI__c}
+                        onchange={handleInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+
+                <!-- Focus & Sub Focus within WIN -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Does the Focus and Sub-Focus area fall within WIN priorities?"
+                        name="Does_the_Focus_and_Sub_Focus_area_fall_w__c"
+                        value={level1Data.Does_the_Focus_and_Sub_Focus_area_fall_w__c}
+                        options={FallWithinWinOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- TRL -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Technology Readiness Level"
+                        name="Technology_Readiness_Level__c"
+                        value={level1Data.Technology_Readiness_Level__c}
+                        options={TRLOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- TRL Justification -->
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-textarea
+                        label="TRL justification"
+                        name="Project_s_TRL_with_a_brief_justification__c"
+                        value={level1Data.Project_s_TRL_with_a_brief_justification__c}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-textarea>
+                </lightning-layout-item>
+
+                <!-- Milestones -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Milestones"
+                        name="Milestones__c"
+                        value={level1Data.Milestones__c}
+                        options={MilestoneOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- Budgets -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Budgets"
+                        name="Budgets__c"
+                        value={level1Data.Budgets__c}
+                        options={BudgetOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- Project Proposal -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Project Proposal"
+                        name="Project_proposal__c"
+                        value={level1Data.Project_proposal__c}
+                        options={ProjectProposalOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- Prior Research Funding -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Prior Research Funding raised"
+                        name="Prior_Research_Funding_raised__c"
+                        value={level1Data.Prior_Research_Funding_raised__c}
+                        options={PriorResearchFundingOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- Funding Amount -->
+                <template if:true={showFundingAmountField}>
+                    <lightning-layout-item size="6" padding="around-small">
+                        <lightning-input
+                            type="number"
+                            label="If yes, how much (INR)?"
+                            name="If_yes_how_much_in_USD__c"
+                            value={level1Data.If_yes_how_much_in_USD__c}
+                            required
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                </template>
+
+                <!-- Final Recommendation -->
+                <lightning-layout-item size="6" padding="around-small">
+                    <lightning-combobox
+                        label="Final Recommendation"
+                        name="Final_recommendation__c"
+                        value={level1Data.Final_recommendation__c}
+                        options={FinalRecommendationOptions}
+                        required
+                        onchange={handleInputChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <!-- Submit -->
+                <lightning-layout-item size="12" class="slds-text-align_center">
+                    <lightning-button
+                        variant="brand"
+                        label="Submit Review"
+                        onclick={handleSubmit}>
+                    </lightning-button>
+                </lightning-layout-item>
+
+            </lightning-layout>
+        </div>
+   <!--</lightning-card>-->
+</template>

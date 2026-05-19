@@ -1,0 +1,122 @@
+<template>
+
+    <lightning-card
+        title="Review Sharing Dashboard"
+        icon-name="standard:approval">
+
+        <!-- Search -->
+        <div class="slds-p-around_small">
+
+            <lightning-input
+                type="search"
+                label="Search Proposals"
+                placeholder="Search by Proposal Id, Title or Focus Area"
+                onkeyup={handleSearch}>
+            </lightning-input>
+
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+
+            <table class="review-table">
+
+                <thead>
+                    <tr>
+                        <th>Proposal Id</th>
+                        <th>Project Title</th>
+                        <th>Primary Focus Area</th>
+                        <th>COE Name</th>
+                        <th>Reviewer</th>
+                        <th>Funding Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <template for:each={proposals} for:item="proposal">
+
+                        <template for:each={proposal.reviews} for:item="review">
+
+                            <tr key={review.rowKey}>
+
+                                <template if:true={review.isFirst}>
+
+                                    <!-- Proposal Id as button styled as link -->
+                                    <td rowspan={proposal.rowspan} class="proposal-cell">
+                                        <button
+                                            class="record-link-btn"
+                                            data-id={proposal.proposalId}
+                                            onclick={navigateToRecord}>
+                                            {proposal.proposalName}
+                                        </button>
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan} class="proposal-cell">
+                                        {proposal.projectTitle}
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan} class="proposal-cell focus-area-cell">
+                                        {proposal.primaryFocusArea}
+                                    </td>
+
+                                    <td rowspan={proposal.rowspan} class="proposal-cell">
+                                        {proposal.coeName}
+                                    </td>
+
+                                </template>
+
+                                <td class="reviewer-cell">
+                                    {review.reviewerName}
+                                </td>
+
+                                <td>
+                                    <span class={review.reviewStatusClass}>
+                                        {review.reviewStatus}
+                                    </span>
+                                </td>
+
+                                <template if:true={review.isFirst}>
+
+                                    <td rowspan={proposal.rowspan} class="action-cell">
+
+                                        <!-- Shared badge -->
+                                        <template if:true={proposal.isSharedWithCOE}>
+                                            <div class="shared-badge-wrapper">
+                                                <lightning-icon
+                                                    icon-name="utility:check"
+                                                    size="x-small"
+                                                    class="shared-check-icon">
+                                                </lightning-icon>
+                                                <span class="shared-label">Shared</span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Share button — always active -->
+                                        <lightning-button
+                                            label="Share"
+                                            variant="brand"
+                                            data-id={proposal.proposalId}
+                                            onclick={handleShare}>
+                                        </lightning-button>
+
+                                    </td>
+
+                                </template>
+
+                            </tr>
+
+                        </template>
+
+                    </template>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </lightning-card>
+
+</template>

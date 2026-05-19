@@ -1,0 +1,195 @@
+<template>
+     <!-- Show Form Already Submitted Message -->
+     <template if:true={formAlreadySubmitted}>
+        <lightning-card>
+            <h1 class="form-submitted-class">Form already submitted</h1>
+        </lightning-card>
+    </template>
+
+    <template if:true={showForm}>
+        <lightning-card class="form-container">
+            
+                <h1 class="form-title">INSTITUTE REGISTRATION</h1>
+           
+            
+            <!-- Heading 1: Institution Information -->
+            <h2 class="section-heading">Institution Information</h2>
+
+            <lightning-layout multiple-rows class="form-layout">
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="Institute Name (as per govt. records)" value={account.Name} disabled></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="Phone Number" value={account.Phone} data-field="Phone" data-object="account" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-textarea label="Address" value={account.BillingStreet} data-field="BillingStreet" data-object="account" onchange={handleInputChange}></lightning-textarea>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="State" value={account.BillingState} data-field="BillingState" data-object="account" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="Country" value={account.BillingCountry} data-field="BillingCountry" data-object="account" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <!-- Heading 2: Institution SPOC Details -->
+            <h2 class="section-heading">Institution SPOC details for Wadhwani Innovation Network</h2>
+
+            <lightning-layout multiple-rows class="form-layout">
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="WIN SPOC Name" value={contact.Name} disabled></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="email" label="WIN SPOC Email ID" value={contact.Email} disabled></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-combobox label="Country Code" value={contact.SPOC_Country_Code__c} options={countryCodeValues} onchange={handleCountryCodeChange}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="WIN SPOC Phone number" value={contact.Phone} data-field="Phone" data-object="contact" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="6" class="field-spacing">
+                    <lightning-input type="text" label="WIN SPOC Designation" value={contact.SPOC_Designation__c} data-field="SPOC_Designation__c" data-object="contact" onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+
+          
+         <!-- Heading 3: FCRA and Legal Entity Information -->
+<h2 class="section-heading">FCRA and Legal Entity Information (Required for providing grants)</h2>
+
+<lightning-layout multiple-rows class="form-layout">
+
+    <!-- Are you FCRA Exempted/Compliant? -->
+    <lightning-layout-item size="8" class="field-spacing">
+        <lightning-combobox label="Are you FCRA Exempted/Compliant?" 
+                            value={account.Are_you_FCRA_exempted_compliant__c} 
+                            options={fcraComplianceValues} 
+                            onchange={handleFCRAPicklistChange} 
+                            required>
+        </lightning-combobox>
+    </lightning-layout-item>
+
+    <!-- Upload FCRA Document (Appears only if FCRA Exempted is Yes) -->
+    <template if:true={isFCRAExempted}>
+        <lightning-layout-item size="4" class="field-spacing">
+            <lightning-file-upload label="Upload FCRA Document" 
+                                   data-id="fcra" 
+                                   record-id={accountId} 
+                                   onuploadfinished={handleFileUpload}>
+            </lightning-file-upload>
+            <template if:true={fcraFileNames}>
+                <ul>
+                    <template for:each={fcraFileNames} for:item="fileName">
+                        <li key={fileName}>{fileName}</li>
+                    </template>
+                </ul>
+            </template>
+        </lightning-layout-item>
+    </template>
+
+    <!-- Do you have a US 501(c)3 Organization? (Directly Below FCRA Field) -->
+    <lightning-layout-item size="8" class="field-spacing">
+        <lightning-combobox label="Do you have a US 501(c)3 Organization?" 
+                            value={account.Do_you_have_a_US_501_c_3_organization__c} 
+                            options={us501c3orgValues} 
+                            onchange={handleUS501C3PicklistChange} 
+                            required>
+        </lightning-combobox>
+    </lightning-layout-item>
+
+    <!-- 501(c)(3) Fields (Appears only if "Do you have a US 501(c)3 Organization?" is Yes) -->
+    <template if:true={has501C3Organization}>
+       <!-- NOTE Section -->
+    <lightning-layout-item size="12" class="field-spacing">
+        <p class="note-text"><strong>NOTE:</strong> If yes, please provide the following details of the 501(c)3 organization.</p>
+    </lightning-layout-item>
+
+        <lightning-layout-item size="6" class="field-spacing">
+            <lightning-input type="text" 
+                             label="501(c)(3) Name" 
+                             value={account.X501_c_3_name__c} 
+                             data-field="X501_c_3_name__c" 
+                             data-object="account" 
+                             onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="6" class="field-spacing">
+            <lightning-input type="email" 
+                             label="501(c)(3) Email ID" 
+                             value={account.X501_c_3_Email_ID__c} 
+                             data-field="X501_c_3_Email_ID__c" 
+                             data-object="account" 
+                             onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="6" class="field-spacing">
+            <lightning-input type="text" 
+                             label="501(c)(3) Phone Number" 
+                             value={account.X501_c_3_phone_number__c} 
+                             data-field="X501_c_3_phone_number__c" 
+                             data-object="account" 
+                             onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="6" class="field-spacing">
+            <lightning-textarea label="501(c)(3) Address" 
+                                value={account.X501_c_3_Address__c} 
+                                data-field="X501_c_3_Address__c" 
+                                data-object="account" 
+                                onchange={handleInputChange}>
+            </lightning-textarea>
+        </lightning-layout-item>
+    </template>
+
+    <!-- Have you cleared Equivalency Determination? -->
+    <lightning-layout-item size="8" class="field-spacing">
+        <lightning-combobox label="Have you cleared Equivalency Determination?" 
+                            value={account.Have_you_cleared_Equivalency_Determinat__c} 
+                            options={equivalencyDeterminationValues} 
+                            onchange={handleEquivalencyPicklistChange}>
+        </lightning-combobox>
+    </lightning-layout-item>
+
+    <!-- Upload Equivalency Document (Appears only if Equivalency Cleared is Yes) -->
+    <template if:true={isEquivalencyCleared}>
+        <lightning-layout-item size="4" class="field-spacing">
+            <lightning-file-upload label="Upload Equivalency Document" 
+                                   data-id="equivalency" 
+                                   record-id={accountId} 
+                                   onuploadfinished={handleFileUpload}>
+            </lightning-file-upload>
+            <template if:true={equivalencyFileNames}>
+                <ul>
+                    <template for:each={equivalencyFileNames} for:item="fileName">
+                        <li key={fileName}>{fileName}</li>
+                    </template>
+                </ul>
+            </template>
+        </lightning-layout-item>
+    </template>
+
+</lightning-layout>
+
+
+
+            <!-- Submit Button Centered -->
+            <div class="submit-button-container">
+                <lightning-button label="Submit" onclick={handleSubmit} variant="brand"></lightning-button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <template if:true={showThankYou}>
+    
+            <h1 class="thankyou-class">Registration details submitted successfully!</h1>
+        
+    </template>
+</template>

@@ -1,0 +1,69 @@
+<template>
+
+    <div class="query-container">
+
+        <!-- Header -->
+        <div class="query-header">
+            <h2>Raise Query</h2>
+            <p class="sub-text">
+                Ask a clarification from PI or COE regarding this proposal.
+            </p>
+        </div>
+
+        <!-- Query Input -->
+        <div class="form-section">
+
+            <lightning-textarea
+                label="Enter Your Query"
+                value={queryComment}
+                onchange={handleQueryChange}
+                placeholder="Type your question or clarification here..."
+                maxlength="5000">
+            </lightning-textarea>
+
+        </div>
+
+        <!-- File Upload -->
+        <div class="form-section">
+
+            <lightning-file-upload
+                label="Upload Supporting Documents"
+                name="fileUploader"
+                record-id={queryId}
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                multiple
+                disabled={isUploaderDisabled}
+                onuploadfinished={handleUploadFinished}>
+            </lightning-file-upload>
+
+            <!-- Optional helper text -->
+            <template if:true={isUploaderDisabled}>
+                <p class="upload-help-text">
+                    Submit the query first to enable document upload.
+                </p>
+            </template>
+
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="footer-buttons">
+
+            <lightning-button
+                label="Cancel"
+                variant="neutral"
+                onclick={closeAction}>
+            </lightning-button>
+
+            <lightning-button
+                class="submit-btn"
+                label="Submit Query"
+                variant="brand"
+                onclick={submitQuery}
+                disabled={isSubmitDisabled}>
+            </lightning-button>
+
+        </div>
+
+    </div>
+
+</template>

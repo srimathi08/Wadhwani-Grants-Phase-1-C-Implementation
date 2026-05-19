@@ -1,0 +1,2412 @@
+<template>
+    
+    <!-- <div class="container">
+         Apply Now Button 
+        <lightning-button 
+                    label="Apply Now" 
+                    onclick={handleApplyNow}
+                    variant="success"
+                    disabled={isButtonDisabled}
+                    class="apply-button"></lightning-button>
+          </div> -->
+
+         
+            <!-- Apply Now Button (Hidden when form is shown) -->
+          <!--  <template if:false={showForm}>
+                <div class="slds-text-align_center">
+                    <lightning-button 
+                        label="Apply Now" 
+                        onclick={handleApplyNow}
+                        variant="success"
+                        class="apply-button">
+                    </lightning-button>
+                </div>
+            </template>-->
+       
+  
+        <template if:true={showForm}>
+            
+            <lightning-card>
+                <div class="scrollable-content" onscroll={handleScroll}>
+        <div class="form-container">
+            
+            <div class="logo-container">
+                <img src={winLogoUrl} alt="WIN Logo" class="win-logo" />
+            <h1 class="form-title">PROJECT PROPOSAL FORM</h1>
+        </div>
+
+            
+            <!--**************************************** GENERAL INFORMATION ******************************************  -->
+           <!-- PAGE 1 -->
+            <template if:true={isPage1}>
+                <div class="form-page page1">
+            <h2 class="section-headings">GENERAL INFORMATION</h2>
+            <lightning-layout multiple-rows>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Project Title" name="Project_Title__c" value={applicationData.Project_Title__c}  variant="standard" onchange={handleInputChange} required></lightning-input>
+                </lightning-layout-item>
+
+
+                <!-- Display the Account Name -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Institution Name" value={applicationData.Institution_Name__c} disabled></lightning-input>
+                </lightning-layout-item> 
+
+
+                <!-- COE ADMIN - Display the Contact Name -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="COE Admin" value={applicationData.COE_Admin__c} disabled></lightning-input>
+                </lightning-layout-item> 
+
+                <!-- PI Contact Name as Text -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Principal Investigator (PI)" name="PI_Name__c" value={applicationData.PI_Name__c} variant="standard" onchange={handleInputChange} required></lightning-input>
+                </lightning-layout-item> 
+                
+                <!-- PI DETAILS -->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <div class="slds-text-title_bold slds-m-bottom_x-small"></div>
+                    <lightning-layout>
+                        <lightning-layout-item size="6" class="slds-p-right_small">
+                            <lightning-input  type="Phone" name="PI_Phone__c" label="Principal Investigator Phone" value={applicationData.PI_Phone__c} onchange={handleInputChange} required></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6">
+                            <lightning-input  type="Email" name="PI_Email__c" label="Principal Investigator Email" value={applicationData.PI_Email__c} onchange={handleInputChange} required></lightning-input> 
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+
+                
+                <!-- Account Name as Picklist 
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Institution Name" name="Institution__c" value={applicationData.Institution__c}  options={InstitutionOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item> -->
+            
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input label="Co-Principal Investigator (Co-PI)" name="Co_Principal_Investigator_Co_PI__c" value={applicationData.Co_Principal_Investigator_Co_PI__c} variant="standard" onchange={handleInputChange} required></lightning-input>
+                </lightning-layout-item>
+
+                 <!-- CO-PI DETAILS -->
+                 <lightning-layout-item size="12" class="slds-p-around_small">
+                    <div class="slds-text-title_bold slds-m-bottom_x-small"></div>
+                    <lightning-layout>
+                        <lightning-layout-item size="6" class="slds-p-right_small">
+                            <lightning-input  type="Phone" name="CO_PI_Phone__c" label="Co-Principal Investigator Phone" value={applicationData.CO_PI_Phone__c} onchange={handleInputChange} ></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6">
+                            <lightning-input  type="Email" name="CO_PI_Email__c" label="Co-Principal Investigator Email" value={applicationData.CO_PI_Email__c} onchange={handleInputChange} ></lightning-input> 
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-textarea label="Project Team Members (With Designation)" name="Project_Team_Members__c" value={applicationData.Project_Team_Members__c} field-level-help="List key faculty, researchers, and collaborators" onchange={handleInputChange} ></lightning-textarea>
+                </lightning-layout-item>
+
+             <!--<lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Primary Focus Area" name="Primary_Focus_Area__c" value={applicationData.Primary_Focus_Area__c} options={primaryFocusAreaOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item>  
+
+               <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox label="Sub-Focus Area" name="Sub_Focus_Area__c"  value={applicationData.Sub_Focus_Area__c} options={subFocusAreaOptions} onchange={handleInputChange}></lightning-combobox>
+                </lightning-layout-item> -->
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox 
+                        label="Primary Focus Area" 
+                        options={primaryFocusAreaOptions} 
+                        value={applicationData.Primary_Focus_Area__c}
+                        onchange={handlePrimaryFocusChange}
+                        required>
+                    </lightning-combobox>
+                </lightning-layout-item>
+                
+                <template if:true={subFocusAreaOptions.length}>
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-dual-listbox
+                            label="Sub-Focus Area"
+                            source-label="Available"
+                            selected-label="Selected"
+                            options={subFocusAreaOptions}
+                            value={applicationData.Sub_Focus_Area__c}
+                            onchange={handleSubFocusChange}
+                            required>
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+                </template>
+                   
+
+              <!--  <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input  label="Project Duration" name="Project_Duration__c" value={applicationData.Project_Duration__c} field-level-help="Estimated time required for completion (in months/years)" onchange={handleInputChange} required></lightning-input>
+                </lightning-layout-item> -->
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <div class="slds-text-title_bold slds-m-bottom_x-small">Project Duration</div>
+                    <lightning-layout>
+                        <lightning-layout-item size="6" class="slds-p-right_small">
+                            <lightning-input  type="date" name="Project_Start_Date__c" label="Project Start Date" value={applicationData.Project_Start_Date__c} onchange={handleInputChange} required></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6">
+                            <lightning-input  type="date" name="Project_End_Date__c" label="Project End Date" value={applicationData.Project_End_Date__c} onchange={handleInputChange} required></lightning-input> 
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+                
+
+                
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-input type="url" label="Project Website (if any)" field-level-help="Provide a link (if applicable)" name="Project_Website_if_any__c" value={applicationData.Project_Website_if_any__c} onchange={handleInputChange}></lightning-input>
+                </lightning-layout-item>
+            
+
+            </lightning-layout>
+
+            <!-- PREVIOUS and NEXT Button -->
+
+            <div class="button-container slds-text-align_right">
+                <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+                <!-- SAVE DRAFT Button -->
+    <lightning-button label="Save as Draft" variant="brand" onclick={handleSaveDraft} class="slds-m-left_small"></lightning-button>
+
+                <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>
+                </div>
+                </div>
+                </template>
+
+            <!--**************************************** PROJECT DETAILS ******************************************  -->
+            <!-- PAGE 2 -->
+            <template if:true={isPage2}>
+                <div class="form-page page2">
+            <h2 class="section-headings">PROJECT DETAILS</h2>
+            <lightning-layout multiple-rows>
+              
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="projectSummary">Project Summary</label>
+                        <lightning-helptext content="Briefly describe the project, objectives, and expected impact"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Project_Summary_Max_500_words__c"
+                        onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}>
+                   </div>
+                   <!-- Error message container -->
+                   <p class="error-msg" data-error="Project_Summary_Max_500_words__c"></p>
+                    </div>
+                </lightning-layout-item>
+               
+                
+
+                <!--Current Technology Readiness Level (TRL) as Picklist-->
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <lightning-combobox 
+                        label="Current Technology Readiness Level (TRL)" 
+                        name="Current_Technology_Readiness_Level_TRL__c"
+                        value={applicationData.Current_Technology_Readiness_Level_TRL__c}
+                        field-level-help="Indicate current TRL level (Must be >3)"
+                        options={trlOptions} 
+                        onchange={handleInputChange}
+                        required>
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="keyProblem">Key Problem Being Solved</label>
+                        <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Key_Problem_Being_Solved__c"
+                onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Key_Problem_Being_Solved__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="proposedSoultion">Proposed Solution</label>
+                        <lightning-helptext content="Describe the innovation, uniqueness, and key differentiators"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Proposed_Solution__c"
+                onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Proposed_Solution__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="InterDisNature">Interdisciplinary Nature</label>
+                        <lightning-helptext content="Mention any cross-domain collaborations"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Interdisciplinary_Nature__c"
+                onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Interdisciplinary_Nature__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="potentialComm">Potential for Commercialization</label>
+                        <lightning-helptext content="How will this translate into a viable product/startup?"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Potential_for_Commercialization__c"
+                onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Potential_for_Commercialization__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="targetMarket">Target Market and Industry Application</label>
+                        <lightning-helptext content="Describe the potential industry use cases and market opportunity"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Target_Market_Industry_Application__c"
+                onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Target_Market_Industry_Application__c"></p>
+                    </div>
+                </lightning-layout-item>
+            
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="competitiveLand">Competitive Landscape</label>
+                        <lightning-helptext content="Who are the competitors, and how does this solution compare?"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Competitive_Landscape__c"
+                        onclick={setActiveField}  oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                            <!-- Error message container -->
+                   <p class="error-msg" data-error="Competitive_Landscape__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="existStrategy">Exit Strategy of project</label>
+                        <lightning-helptext content="What are you plans on completing the project? (Startup/IP/License etc.)"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Exit_Strategy_of_project__c"
+                onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Exit_Strategy_of_project__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+
+                <lightning-layout-item size="12" class="slds-p-around_small">
+                    <!-- Label with Help Text -->
+                    <div class="label-container">
+                        <label class="slds-form-element__label" for="proposedWin">Proposed WIN Grant Utilization</label>
+                        <lightning-helptext content="How will the funds be used? (WIN grants cannot be used for salaries/overheads)"></lightning-helptext>
+                    </div>
+        
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+        
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field="Proposed_WIN_Grant_Utilization__c"
+                onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                    <p class="error-msg" data-error="Proposed_WIN_Grant_Utilization__c"></p>
+                    </div>
+                </lightning-layout-item>
+
+                </lightning-layout>
+
+                <!-- NEXT and PREVIOUS BUTTON -->
+
+                <div class="button-container slds-text-align_right">
+                    <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button> 
+                    <!-- SAVE DRAFT Button -->
+    <lightning-button label="Save as Draft" variant="brand" onclick={handleSaveDraft} class="slds-m-left_small"></lightning-button>
+        
+                    <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>    
+                    </div> 
+                    </div>
+                    </template>
+
+<!--**************************************** FUNDING & RESOURCES ******************************************  -->
+                <!-- PAGE 3 -->
+                <template if:true={isPage3}>
+                    <div class="form-page page3">
+               <h2 class="section-headings">FUNDING AND RESOURCES</h2>
+                <lightning-layout multiple-rows>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-combobox label="Prior Research Funding" name="Prio_Research_Funding_Yes_No__c"  value={applicationData.Prio_Research_Funding_Yes_No__c} field-level-help="Has the project received at least $500K in research funding from Govt/other sources?" options={priorResearchFundingOptions} onchange={handleInputChange} required=""></lightning-combobox>
+                    </lightning-layout-item> 
+
+
+                    <template if:true={showFundingSources}>
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="listExisting">List of Existing Funding Sources and Funds raised</label>
+                            <lightning-helptext content="Mention any prior or ongoing funding (along with amounts raised)"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="List_of_Existing_Funding_Sources_and_Fun__c"
+                    onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                        <!-- Error message container -->
+                   <p class="error-msg" data-error="List_of_Existing_Funding_Sources_and_Fun__c"></p>
+                        </div>
+                    </lightning-layout-item>
+                </template>
+                
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="additionalPlans">Additional Funding Plans</label>
+                            <lightning-helptext content="Will you seek additional funding? From which sources?"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="Additional_Funding_Plans__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                        <!-- Error message container -->
+                   <p class="error-msg" data-error="Additional_Funding_Plans__c"></p>
+                        </div>
+                    </lightning-layout-item>    
+
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="instSupport">Institute Support and Facilities</label>
+                            <lightning-helptext content="What infrastructure/resources are available within the institution to support your project?"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="Institute_Support_Facilities__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                        <!-- Error message container -->
+                   <p class="error-msg" data-error="Institute_Support_Facilities__c"></p>
+                        </div>
+                    </lightning-layout-item>    
+
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <lightning-combobox label="Collaboration with Institute Incubator" name="Collaboration_with_Institute_Incubator__c" value={applicationData.Collaboration_with_Institute_Incubator__c} field-level-help="Is this project aligned with the institution's incubator? " options={collaborationOptions} onchange={handleInputChange} required></lightning-combobox>
+                    </lightning-layout-item> 
+                
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="winSupport">WIN Support</label>
+                            <lightning-helptext content="What additional support would you require from Wadhwani Innovation network for this project (apart from funding)?"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="WIN_Support__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                        <!-- Error message container -->
+                   <p class="error-msg" data-error="WIN_Support__c"></p>
+                        </div>
+                    </lightning-layout-item>    
+
+
+                    </lightning-layout>
+
+                    <!-- PREVIOUS AND NEXT BUTTON -->
+                    <div class="button-container slds-text-align_right">
+                        <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button> 
+                        <!-- SAVE DRAFT Button -->
+    <lightning-button label="Save as Draft" variant="brand" onclick={handleSaveDraft} class="slds-m-left_small"></lightning-button>
+                       
+                        <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>                        
+                        </div>
+                        </div>              
+                        </template>
+
+                 <!--**************************************** EXPECTED OUTCOMES ******************************************  -->   
+                  <!-- PAGE 4 --> 
+                  <template if:true={isPage4}>
+
+                 <h2 class="section-headings">EXPECTED OUTCOMES</h2>
+
+                 <lightning-layout multiple-rows>
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="expectedImpact">Expected Impact (Socio-economic/Scientific/Commercial)</label>
+                            <lightning-helptext content="Describe how this project will create impact"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="Expected_Impact_Socio_economic_Scientif__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                   <p class="error-msg" data-error="Expected_Impact_Socio_economic_Scientif__c"></p>
+                        </div>
+                    </lightning-layout-item>   
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="potentialStartup">Potential for Startup Formation</label>
+                            <lightning-helptext content="Do you anticipate forming a startup? If yes, provide details"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="Potential_for_Startup_Formation__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                   <p class="error-msg" data-error="Potential_for_Startup_Formation__c"></p>
+                        </div>
+                    </lightning-layout-item> 
+
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="ipPatent">IP and Patent Potential</label>
+                            <lightning-helptext content="Are there any patents filed or expected to be filed?"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="IP_Patent_Potential__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                    <!-- Error message container -->
+                   <p class="error-msg" data-error="IP_Patent_Potential__c"></p>
+                        </div>
+                    </lightning-layout-item> 
+                    
+                    <lightning-layout-item size="12" class="slds-p-around_small">
+                        <!-- Label with Help Text -->
+                        <div class="label-container">
+                            <label class="slds-form-element__label" for="expectedRevenue">Expected Revenue Model (if applicable)</label>
+                            <lightning-helptext content="How will this project generate revenue post-development?"></lightning-helptext>
+                        </div>
+            
+                        <div class="editor-container">
+                            <!-- Toolbar -->
+                            <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                                <!-- Font selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFont}>
+                                        <option value="">Font</option>
+                                        <option value="Arial">Arial</option>
+                                        <option value="Times New Roman">Times New Roman</option>
+                                        <option value="Courier New">Courier New</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Font Size selection -->
+                                <div class="slds-col">
+                                    <select class="slds-select" onchange={changeFontSize}>
+                                        <option value="">Size</option>
+                                        <option value="1">Small</option>
+                                        <option value="3">Normal</option>
+                                        <option value="5">Large</option>
+                                        <option value="7">Extra Large</option>
+                                    </select>
+                                </div>
+                            
+                                <!-- Bold -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                        <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Italic -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                        <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Underline -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                        <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+    
+                                     <!-- Bullet Points (Newly Added) 
+                                 <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                       <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                    </button>
+                                </div> -->
+                            
+                                <!-- Align Left -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                        <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Center -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                        <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            
+                                <!-- Align Right -->
+                                <div class="slds-col">
+                                    <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                        <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            
+            
+                            <!-- Editable Text Area -->
+                            <div class="text-area" contenteditable="true" data-field="Expected_Revenue_Model_if_applicable__c"
+                    onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}></div>
+                      <!-- Error message container -->
+                   <p class="error-msg" data-error="Expected_Revenue_Model_if_applicable__c"></p>
+                        </div>
+                    </lightning-layout-item> 
+                        
+                </lightning-layout>
+                     <!-- PREVIOUS AND NEXT BUTTON -->
+                     <div class="button-container slds-text-align_right">
+                        <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>   
+                        <!-- SAVE DRAFT Button -->
+    <lightning-button label="Save as Draft" variant="brand" onclick={handleSaveDraft} class="slds-m-left_small"></lightning-button>
+                     
+                        <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>                        
+                        </div>                      
+                        
+                    </template>
+
+  <!--**************************************** Milestones and Deliverables ******************************************  -->   
+               <!--PAGE 5-->
+            <!-- PAGE 5 -->
+<template if:true={isPage5}>
+    <h2 class="section-headings">MILESTONES AND DELIVERABLES</h2>
+    <lightning-layout multiple-rows>
+        <p class="note-text">
+            <strong>NOTE:</strong> Key milestones, with timelines for completion.
+        </p>
+
+        <div class="table-container">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr>
+                        <th>Milestone Description</th>
+                        <th>Deliverables</th>
+                        <th>Budget Required (USD)</th>
+                        <th>Target Date</th>
+                        <th>Justification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={milestones} for:item="milestone">
+                        <tr key={milestone.uniqueId}>
+                            <td>
+                                <lightning-input 
+                                    type="text" 
+                                    value={milestone.Milestone_Description__c} 
+                                    data-id={milestone.uniqueId} 
+                                    data-field="Milestone_Description__c" 
+                                    onclick={openModal}>
+                                </lightning-input>
+                            </td>
+                            <td>
+                                <lightning-input 
+                                    type="text" 
+                                    value={milestone.Deliverables__c} 
+                                    data-id={milestone.uniqueId} 
+                                    data-field="Deliverables__c" 
+                                    onclick={openModal}>
+                                </lightning-input>
+                            </td>
+                            
+                          <!--  <td>
+                                <lightning-input 
+                                    type="number" 
+                                    value={milestone.Budget_Required__c} 
+                                    data-id={milestone.uniqueId} 
+                                    data-field="Budget_Required__c" 
+                                    onchange={handleMilestoneChange}>
+                                </lightning-input>
+                            </td> -->
+                            <td>
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                                        <lightning-icon icon-name="utility:moneybag" size="x-small"
+                                            class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default"></lightning-icon>
+                                        <input type="number" min="0" step="1" 
+                                            class="slds-input budget-input"
+                                            data-id={milestone.uniqueId} 
+                                            data-field="Budget_Required__c"
+                                            onchange={handleMilestoneChange}
+                                            onkeypress={preventDecimal}
+                                            value={milestone.Budget_Required__c}>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <lightning-input 
+                                    type="date" 
+                                    value={milestone.Milestone_Target_Date__c} 
+                                    data-id={milestone.uniqueId} 
+                                    data-field="Milestone_Target_Date__c" 
+                                    onchange={handleMilestoneChange}>
+                                </lightning-input>
+                            </td>
+                            <td>
+                                <lightning-input 
+                                    type="text" 
+                                    value={milestone.Justification__c} 
+                                    data-id={milestone.uniqueId} 
+                                    data-field="Justification__c" 
+                                    onclick={openModal}>
+                                </lightning-input>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <lightning-button label="Add Row" onclick={addRow} variant="destructive-text" class="slds-m-top_small"></lightning-button>
+    </lightning-layout>
+
+  <!-- Modal Window for Rich Text Editing -->
+<template if:true={isModalOpen}>
+    <section role="dialog" tabindex="-1" class="custom-modal">
+        <div class="custom-modal__container">
+            <header class="custom-modal__header">
+                <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Close"
+                    onclick={closeModal}></lightning-button-icon>
+            </header>
+            <div class="custom-modal__content">
+
+                <div class="custom-modal__content">
+                    <div class="editor-container">
+                        <!-- Toolbar -->
+                        <div class="toolbar slds-grid slds-wrap slds-gutters_xx-small slds-align_absolute-center">
+                            <!-- Font selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFont}>
+                                    <option value="">Font</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Font Size selection -->
+                            <div class="slds-col">
+                                <select class="slds-select" onchange={changeFontSize}>
+                                    <option value="">Size</option>
+                                    <option value="1">Small</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Large</option>
+                                    <option value="7">Extra Large</option>
+                                </select>
+                            </div>
+                        
+                            <!-- Bold -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={boldText} title="Bold">
+                                    <lightning-icon icon-name="utility:bold" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Italic -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={italicText} title="Italic">
+                                    <lightning-icon icon-name="utility:italic" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Underline -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={underlineText} title="Underline">
+                                    <lightning-icon icon-name="utility:underline" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+
+                                 <!-- Bullet Points (Newly Added) 
+                             <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={insertBulletPoints} title="Bullet Points">
+                                   <lightning-icon icon-name="utility:richtextbulletedlist" size="x-small"></lightning-icon>
+                                </button>
+                            </div> -->
+                        
+                            <!-- Align Left -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignLeft} title="Align Left">
+                                    <lightning-icon icon-name="utility:left_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Center -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignCenter} title="Align Center">
+                                    <lightning-icon icon-name="utility:center_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        
+                            <!-- Align Right -->
+                            <div class="slds-col">
+                                <button class="toolbar-button slds-button slds-button_icon" onclick={alignRight} title="Align Right">
+                                    <lightning-icon icon-name="utility:right_align_text" size="x-small"></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                        
+    
+                        <!-- Editable Text Area -->
+                        <div class="text-area" contenteditable="true" data-field={modalField}
+                            onclick={setActiveField} oninput={handleInput} onpaste={handlePaste} onkeydown={handleKeyDown}>
+                            <!--{modalValue} -->
+                        </div>
+                        <!-- Error message container -->
+                   <p class="error-msg" data-error={modalField}></p>
+                    </div>
+                </div>
+    
+               <!--<lightning-input-rich-text value={modalValue} onchange={handleModalChange}></lightning-input-rich-text> --> 
+            </div> 
+            <footer class="custom-modal__footer">
+                <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                <lightning-button variant="brand" label="Save" onclick={saveModalData} class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="custom-modal-backdrop"></div>
+</template>
+
+
+    <!-- PREVIOUS AND NEXT BUTTON -->
+    <div class="button-container slds-text-align_right">
+        <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+        <!-- SAVE DRAFT Button -->
+    <lightning-button label="Save as Draft" variant="brand" onclick={handleSaveDraft} class="slds-m-left_small"></lightning-button>
+
+        <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small"></lightning-button>
+    </div>
+</template> 
+
+
+              <!-- **************************************** FILE UPLOAD TABLE WITH HELP TEXT ****************************************** -->
+
+              <!-- PAGE 6-->
+              <template if:true={isPage6}>
+              <h2 class="section-headings">SUPPORTING DOCUMENTS</h2>
+              
+              <!-- Note Section -->
+<p class="note-text">
+    <strong>NOTE:</strong> Document Type: <em>.pdf, .doc, .docx</em> <br>
+                           File Size - Maximum: 25 MB (for Attachments).
+</p>
+              
+
+
+<div class="file-upload-container">
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+            <tr>
+                <th>Document Type</th>
+                <th>Upload File</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={fileUploadFields} for:item="file">
+                <tr key={file.name}>
+                    <td class="file-label">
+                        {file.label}
+                        <template if:true={file.helpText}>
+                            <lightning-helptext content={file.helpText}></lightning-helptext>
+                        </template>
+                    </td>
+                    <td>
+                        <lightning-file-upload 
+                            label="Upload File"
+                            name={file.name}
+                            record-id={applicationRecordId}
+                            accept=".pdf,.doc,.docx"
+                            onuploadfinished={handleFileUpload}
+                            multiple="false">
+                        </lightning-file-upload>
+                        <template if:true={file.uploadedFileName}>
+                            <p class="file-name">Uploaded: {file.uploadedFileName}</p>
+                        </template>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+
+<!-- PREVIOUS AND NEXT BUTTONS -->
+
+<div class="button-container slds-text-align_right">
+    <lightning-button label="Previous" variant="destructive-text" onclick={handlePrevious}></lightning-button>
+    <lightning-button label="Next" variant="destructive-text" onclick={handleNext} class="slds-m-left_small" disabled={isLastPage}></lightning-button>
+    </div>
+
+        <!-- Action Buttons -->
+        <div class="button-container">
+            <lightning-button label="Preview" variant="destructive-text" onclick={handlePreview}></lightning-button>
+            <lightning-button label="Submit" variant="success" onclick={handleSubmit}></lightning-button>
+        </div>
+    </template>
+
+<!-- PREVIEW MODAL -->
+<template if:true={isPreviewVisible}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium">Application Form Preview</h2>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                
+                <!-- PAGE 1: GENERAL INFORMATION -->
+                <template if:true={isPreviewPage1}>
+                    <h2 class="section-headings">GENERAL INFORMATION</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Project Title</div>
+                            <div class="value-column">{applicationData.Project_Title__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Institution Name</div>
+                            <div class="value-column">{applicationData.Institution_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">COE Admin</div>
+                            <div class="value-column">{applicationData.	COE_Admin__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Principal Investigator</div>
+                            <div class="value-column">{applicationData.PI_Name__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Principal Investigator Phone</div>
+                            <div class="value-column">{applicationData.PI_Phone__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Principal Investigator Email</div>
+                            <div class="value-column">{applicationData.PI_Email__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Co-Principal Investigator</div>
+                            <div class="value-column">{applicationData.Co_Principal_Investigator_Co_PI__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Co-Principal Investigator Phone</div>
+                            <div class="value-column">{applicationData.CO_PI_Phone__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Co-Principal Investigator Email</div>
+                            <div class="value-column">{applicationData.CO_PI_Email__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Project Team Members</div>
+                            <div class="value-column">{applicationData.Project_Team_Members__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Primary Focus Area</div>
+                            <div class="value-column">{applicationData.Primary_Focus_Area__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Sub-Focus Area</div>
+                            <div class="value-column">{applicationData.Sub_Focus_Area__c}</div>
+                        </div>
+                       <!-- <div class="preview-row">
+                            <div class="label-column">Project Duration</div>
+                            <div class="value-column">{applicationData.Project_Duration__c}</div>
+                        </div> -->
+
+                         <div class="preview-row">
+                            <div class="label-column">Project Start Date</div>
+                            <div class="value-column">{applicationData.Project_Start_Date__c}</div>
+                        </div> 
+                        <div class="preview-row">
+                            <div class="label-column">Project End Date</div>
+                            <div class="value-column">{applicationData.Project_End_Date__c}</div>
+                        </div> 
+                                            
+                       <div class="preview-row">
+                            <div class="label-column">Project Website</div>
+                            <div class="value-column">{applicationData.Project_Website_if_any__c}</div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 2: PROJECT DETAILS -->
+                <template if:true={isPreviewPage2}>
+                    <h2 class="section-headings">PROJECT DETAILS</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Project Summary</div>
+                           <!--  <div class="value-column">{applicationData.Project_Summary_Max_500_words__c}</div> -->
+                          <!-- <div class="value-column">{cleanedProjectSummary}</div> --> 
+                            <!-- <div class="value-column" lwc:dom="manual"></div> -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Project_Summary_Max_500_words__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                        <div class="label-column">Current Technology Readiness Level</div>
+                            <div class="value-column">{applicationData.Current_Technology_Readiness_Level_TRL__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Key Problem Being Solved</div>
+                           <!--  <div class="value-column">{applicationData.Key_Problem_Being_Solved__c}</div> -->
+                             <!--<div class="value-column">{cleanedKeyProblem}</div> -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Key_Problem_Being_Solved__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Proposed Solution</div>
+                           <!--  <div class="value-column">{applicationData.Proposed_Solution__c}</div> -->
+                           <!--  <div class="value-column">{cleanedProposedSolution}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Proposed_Solution__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Interdisciplinary Nature</div>
+                           <!--  <div class="value-column">{applicationData.Interdisciplinary_Nature__c}</div> -->
+                           <!-- <div class="value-column">{cleanedInterdisciplinaryNature}</div> -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Interdisciplinary_Nature__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Commercialization</div>
+                           <!--  <div class="value-column">{applicationData.Interdisciplinary_Nature__c}</div> -->
+                           <!-- <div class="value-column">{cleanedInterdisciplinaryNature}</div> -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Potential_for_Commercialization__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+
+                        <div class="preview-row">
+                            <div class="label-column">Target Market and Industry Application</div>
+                           <!--  <div class="value-column">{applicationData.Target_Market_Industry_Application__c}</div> -->
+                           <!-- <div class="value-column">{cleanedTargetMarketIndustryApplication}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Target_Market_Industry_Application__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Competitive Landscape</div>
+                            <!-- <div class="value-column">{applicationData.Competitive_Landscape__c}</div> -->
+                           <!-- <div class="value-column">{cleanedCompetitiveLandscape}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Competitive_Landscape__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Exit Strategy of project</div>
+                           <!--  <div class="value-column">{applicationData.Exit_Strategy_of_project__c}</div> -->
+                            <!-- <div class="value-column">{cleanedExitStrategyofproject}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Exit_Strategy_of_project__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Proposed WIN Grant Utilization</div>
+                           <!--  <div class="value-column">{applicationData.Proposed_WIN_Grant_Utilization__c}</div> -->
+                           <!-- <div class="value-column">{cleanedProposedWINGrantUtilization}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Proposed_WIN_Grant_Utilization__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 3: FUNDING AND RESOURCES -->
+                <template if:true={isPreviewPage3}>
+                    <h2 class="section-headings">FUNDING AND RESOURCES</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Prior Research Funding</div>
+                            <div class="value-column">{applicationData.Prio_Research_Funding_Yes_No__c}</div>
+                            
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Existing Funding Sources</div>
+                           <!--  <div class="value-column">{applicationData.List_of_Existing_Funding_Sources_and_Fun__c}</div> -->
+                            <!--  <div class="value-column">{cleanedExistingFundingSources}</div> -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.List_of_Existing_Funding_Sources_and_Fun__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Additional Funding Plans</div>
+                           <!--  <div class="value-column">{applicationData.Additional_Funding_Plans__c}</div> -->
+                           <!-- <div class="value-column">{cleanedAdditionalFundingPlans}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Additional_Funding_Plans__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Institute Support and Facilities</div>
+                          <!--   <div class="value-column">{applicationData.Institute_Support_Facilities__c}</div> -->
+                           <!-- <div class="value-column">{cleanedInstituteSupportandFacilities}</div>  -->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Institute_Support_Facilities__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Collaboration with Institute Incubator</div>
+                            <div class="value-column">{applicationData.Collaboration_with_Institute_Incubator__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Commercialization</div>
+                            <div class="value-column">{applicationData.Potential_for_Commercialization__c}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">WIN Support</div>
+                           <!--  <div class="value-column">{applicationData.WIN_Support__c}</div> -->
+                           <!--<div class="value-column">{cleanedWINSupport}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.WIN_Support__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+
+                <!-- PAGE 4: EXPECTED OUTCOMES -->
+                <template if:true={isPreviewPage4}>
+                    <h2 class="section-headings">EXPECTED OUTCOMES</h2>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <div class="label-column">Expected Impact (Socio-economic/Scientific/Commercial)</div>
+                          <!--   <div class="value-column">{applicationData.Expected_Impact_Socio_economic_Scientif__c}</div> -->
+                           <!-- <div class="value-column">{cleanedExpectedImpact}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Expected_Impact_Socio_economic_Scientif__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Potential for Startup Formation</div>
+                          <!--   <div class="value-column">{applicationData.Potential_for_Startup_Formation__c}</div> -->
+                           <!--   <div class="value-column">{cleanedPotentialforStartupFormation}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Potential_for_Startup_Formation__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">IP and Patent Potential</div>
+                          <!--   <div class="value-column">{applicationData.IP_Patent_Potential__c}</div> -->
+                            <!-- <div class="value-column">{cleanedIPandPatentPotential}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.IP_Patent_Potential__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="label-column">Expected Revenue Model</div>
+                          <!--   <div class="value-column">{applicationData.Expected_Revenue_Model_if_applicable__c}</div> -->
+                          <!--  <div class="value-column">{cleanedExpectedRevenueModel}</div>-->
+                            <div class="value-column">
+                                <lightning-formatted-rich-text value={applicationData.Expected_Revenue_Model_if_applicable__c}></lightning-formatted-rich-text>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- PAGE 5: MILESTONES AND DELIVERABLES -->
+                <template if:true={isPreviewPage5}>
+                    <h2 class="section-headings">MILESTONES AND DELIVERABLES</h2>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr>
+                                <th>Milestone Description</th>
+                                <th>Deliverables</th>
+                                <th>Budget Required (USD)</th>
+                                <th>Target Date</th>
+                                <th>Justification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={filledMilestones} for:item="milestone"> <!--for:each={filledMilestones}-->
+                                <tr key={milestone.uniqueId}>
+                                    <td class="wrapped-text">{milestone.Milestone_Description__c}</td>
+                                    <td class="wrapped-text">{milestone.Deliverables__c}</td>
+                                    <td>{milestone.Budget_Required__c}</td>
+                                    <td>{milestone.Milestone_Target_Date__c}</td>
+                                    <td class="wrapped-text">{milestone.Justification__c}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+
+                <!-- PAGE 6: SUPPORTING DOCUMENTS -->
+                <template if:true={isPreviewPage6}>
+                    <h2 class="section-headings">SUPPORTING DOCUMENTS</h2>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th>Uploaded File</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={fileUploadFields} for:item="file">
+                                <tr key={file.name}>
+                                    <td class="file-label">{file.label}</td>
+                                    <td>
+                                        <template if:true={file.uploadedFileName}>
+                                            {file.uploadedFileName}
+                                        </template>
+                                        <template if:false={file.uploadedFileName}>
+                                            No file uploaded
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                
+
+            </div>
+
+            <!-- Preview Modal Footer -->
+            <footer class="slds-modal__footer">
+                <lightning-button label="Previous" onclick={handlePreviewPrevious} variant="destructive-text" disabled={isFirstPreviewPage}></lightning-button>
+                <lightning-button label="Next" onclick={handlePreviewNext} variant="destructive-text" class="slds-m-left_small" disabled={isLastPreviewPage}></lightning-button>
+                <lightning-button label="Close" onclick={handleClosePreview} variant="destructive-text" class="slds-m-left_small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+</div>
+</div>
+</lightning-card>  
+</template>  
+</template>

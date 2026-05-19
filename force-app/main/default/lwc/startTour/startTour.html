@@ -1,0 +1,85 @@
+<!--<template>
+    <template if:true={isTourModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open tour-modal">
+            <div class="tour-modal__container">
+                <header class="tour-modal__header">
+                    <h2 class="slds-text-heading_medium">Form Video Tour</h2>
+                    <lightning-button-icon 
+                        icon-name="utility:close" 
+                        variant="bare" 
+                        alternative-text="Close"
+                        onclick={closeTourModal}>
+                    </lightning-button-icon>
+                </header>
+                <div class="tour-modal__content">
+                    <div class="video-responsive">
+                        <video 
+                            width="100%" 
+                            height="315" 
+                            controls 
+                            autoplay 
+                            style="background: #000; border-radius: 8px;">
+                            <source src="https://www.youtube.com/watch?v=Be-4N5mLtQw" type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" onclick={closeTourModal}></div>
+    </template>
+
+    <div class="tour-btn-wrapper" style="text-align:right;">
+        <lightning-button 
+            label="Start a Tour" 
+            variant="brand" 
+            onclick={openTourModal} 
+            class="start-tour-btn">
+        </lightning-button>
+    </div>
+</template>-->
+
+
+
+
+<template>
+    <template if:true={isTourModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open tour-modal">
+            <div class="tour-modal__container">
+                <header class="tour-modal__header">
+                  <!--  <h2 class="slds-text-heading_medium">Form Video Tour</h2>-->
+                    <h2 class="tour-modal__title">Form Video Tour</h2>
+                    <lightning-button-icon 
+                        icon-name="utility:close" 
+                        variant="bare" 
+                        alternative-text="Close"
+                        onclick={closeTourModal}>
+                    </lightning-button-icon>
+                </header>
+                <div class="tour-modal__content">
+                    <div class="video-responsive">
+                        <iframe 
+                            width="560" 
+                            height="315" 
+                            src="https://www.youtube.com/embed/Be-4N5mLtQw?autoplay=1"  
+                            title="YouTube video player"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" onclick={closeTourModal}></div>
+    </template>
+
+    <div class="tour-btn-wrapper" style="text-align:right;">
+        <lightning-button 
+            label="Start a Tour" 
+            variant="brand" 
+            onclick={openTourModal} 
+            class="start-tour-btn">
+        </lightning-button>
+    </div>
+</template>

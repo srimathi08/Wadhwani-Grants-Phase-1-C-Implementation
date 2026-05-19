@@ -1,0 +1,105 @@
+/* Entire component background */
+.component-background {
+    background: #ffffe5;
+    padding: 20px;
+    border-radius: 18px;
+}
+
+/* Outer embossed container */
+.embossed-container {
+    border-radius: 18px;
+    padding: 20px;
+    background: #ffffe5;
+    box-shadow:
+        6px 6px 12px rgba(0, 0, 0, 0.15),
+        -6px -6px 12px rgba(255, 255, 229, 1);
+}
+
+/* Center Title */
+.header-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #333;
+    text-align: center;   /* 🔥 centered */
+}
+
+/* Scroll wrapper */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+/* Custom table */
+.custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+/* 🔥 Orange Column Header — CENTERED */
+.custom-table thead tr {
+    background: linear-gradient(90deg, #ff7a3d, #ffa33a);
+    color: #ffffe5;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+}
+
+.custom-table th {
+    padding: 12px;
+    text-align: center;  /* 🔥 center header text */
+}
+
+/* FORCE TABLE ROW BACKGROUND = #ffffe5 */
+.embossed-container .custom-table tbody tr,
+.embossed-container .custom-table tbody tr td {
+    background-color: #ffffe5 !important;
+}
+
+/* Row styling */
+.custom-table tbody tr {
+    border-radius: 12px;
+    box-shadow:
+        3px 3px 8px rgba(0,0,0,0.1),
+        -3px -3px 8px rgba(255, 255, 229, 1);
+    transition: 0.2s ease;
+}
+
+.custom-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        5px 5px 12px rgba(0,0,0,0.15),
+        -5px -5px 12px rgba(255, 255, 229, 1);
+}
+
+/* Table cell text alignment */
+.custom-table td {
+    padding: 14px 12px;
+    font-size: 14px;
+    text-align: center;   /* 🔥 center row values */
+}
+
+/* Yellow Resume Button */
+.resume-btn {
+    background: #ffcf4d;
+    color: #000;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.resume-btn:hover {
+    background: #f5c53f;
+}
+
+/* Loader + error */
+.loader-wrapper,
+.error-msg {
+    padding: 20px;
+    text-align: center;
+}

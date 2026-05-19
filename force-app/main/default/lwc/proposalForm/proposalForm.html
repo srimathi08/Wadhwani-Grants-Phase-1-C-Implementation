@@ -1,0 +1,215 @@
+<template>
+    <template if:true={showform}>
+        <lightning-card>
+            <div class="slds-p-around_medium">
+
+                <!-- Logo inside the card and above the title -->
+                <div class="slds-text-align_center slds-m-bottom_medium">
+                    <img src={winLogoUrl} alt="WIN Logo" class="win-logo" style="max-height: 80px;" />
+                </div>
+
+                <!-- Custom title below the logo -->
+                <h1 class="slds-text-heading_medium slds-text-align_center slds-m-bottom_medium custom-title">
+                    PROPOSAL SUBMISSION 
+                </h1>
+
+            <div class="Intro">
+                <p>Hello {institutionName},</p>
+                <br>
+                <p>We are pleased to invite you to submit a proposal to establish a Centre of Excellence (COE) under the Wadhwani Innovation Network program.<br>
+                To ensure clarity and uniformity, please follow the submission format mentioned below. We request you to select up to 3 Focus Areas and then select specific sub-areas (within these Focus Areas) in alignment with your strengths and our program's goals, for the final proposal submission.</p>
+                <br>
+                <p>We're keen to see your innovative contributions and further our collaborative impact.</p>
+                <br>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                    <th>S No</th>
+                    <th>Topic</th>
+                    <th>Remarks</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                    <td>1</td>
+                    <td>Overview of research, translation and commercialization efforts</td>
+                  <!--<td>Summary of past and ongoing research projects, translation activities, and any commercialization outcomes like patents or startups</td> -->
+                    </tr>
+                    <tr>
+                    <td rowspan="5">2</td> <!-- Merging "S No" for (i), (ii), (iii), and (iv) -->
+                    <td>For each area selected, provide the following:</td>
+                    <td></td>
+                    </tr>
+                    <tr>
+                    <td>(i) List of sub-areas</td>
+                    <td>Against each selected area (HealthTech, Advanced Computing and AI, Bio-tech and Bio-engineering ,SpaceTech, Quantum, Critical Minerals and Mining)</td>
+                    </tr>
+                    <tr>
+                    <td>(ii) Research, translation and commercialization success in these areas</td>
+                    <td>Provide nos such as amount of research done (with TRL progress), IPs created, startups created, cumulative funding/grants raised</td>
+                    </tr>
+                    <tr>
+                    <td>(iii) Ecosystem resources available at university</td>
+                    <td>Physical facilities, Industry network, Academia network, etc.</td>
+                    </tr>
+                    <tr>
+                    <td>(iv) Indicative list of research projects (between TRL 3-7) proposed that would be worked upon in 2024 within WIN</td>
+                    <td>Project title, aims & objectives, research, translation & commercialization components (including current TRL level), expected funding required for translation and commercialization, expected outcome & impact, timelines</td>
+                    </tr>
+                    <tr>
+                    <td>3</td>
+                    <td>Proposal for physical space and human resource for Wadhwani Centre of Innovation</td>
+                    <td>Indicate sq.ft that can be allotted towards WIN, manpower to be engaged, other experts from the institute network that will partner with the Wadhwani Centre of Innovation</td>
+                    </tr>
+                    </tbody>
+                    </table>
+            </div>
+
+        </div>
+<div>
+
+
+    <div class="slds-p-around_small slds-m-top_medium">   
+        <div class="fields">
+            <lightning-layout multiple-rows class="form-layout" vertical-align="start">
+    
+                <!-- Focus Area 1 and its Sub Focus -->
+                <lightning-layout-item size="10" class="field-spacing">
+                    <lightning-combobox 
+                        label="Focus Area 1" 
+                         label-class="bold-label"
+                        name="Primary_Focus_Area__c" 
+                        value={ProposalData.Primary_Focus_Area__c} 
+                        options={FocusArea1Options} 
+                        onchange={handleInputChange}
+                        required>
+                    </lightning-combobox>
+                </lightning-layout-item>
+                <template if:true={showSubFocus1}>
+                    <lightning-layout-item size="8" class="field-spacing">
+                        <lightning-dual-listbox
+                            name="Sub_Focus_Area__c"
+                            label="Sub-Focus Area 1 (Multi-Select)"
+                             label-class="bold-label"
+                            source-label="Available"
+                            selected-label="Selected"
+                            value={ProposalData.Sub_Focus_Area__c}
+                            options={subFocusArea1Options}
+                            onchange={handleInputChange} 
+                            required={showSubFocus1}>
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+                </template>
+    
+                <!-- Focus Area 2 and its Sub Focus -->
+                <lightning-layout-item size="10" class="field-spacing">
+                    <lightning-combobox 
+                        label="Focus Area 2" 
+                         label-class="bold-label"
+                        name="Focus_Area_2__c" 
+                        value={ProposalData.Focus_Area_2__c} 
+                        options={FocusArea2Options} 
+                        onchange={handleInputChange}
+                        >
+                    </lightning-combobox>
+                </lightning-layout-item>
+                <template if:true={showSubFocus2}>
+                    <lightning-layout-item size="8" class="field-spacing">
+                        <lightning-dual-listbox
+                            name="Sub_Focus_Area_Focus_area_2__c"
+                            label="Sub-Focus Area 2 (Multi-Select)"
+                             label-class="bold-label"
+                            source-label="Available"
+                            selected-label="Selected"
+                            value={ProposalData.Sub_Focus_Area_Focus_area_2__c}
+                            options={subFocusArea2Options}
+                            onchange={handleInputChange} >
+                          <!--required={showSubFocus2}> -->  
+                            
+    
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+                </template>
+    
+                <!-- Focus Area 3 and its Sub Focus -->
+                <lightning-layout-item size="10" class="field-spacing">
+                    <lightning-combobox 
+                        label="Focus Area 3" 
+                         label-class="bold-label"
+                        name="Focus_Area_3__c" 
+                        value={ProposalData.Focus_Area_3__c} 
+                        options={FocusArea3Options} 
+                        onchange={handleInputChange}
+                        >
+                    </lightning-combobox>
+                </lightning-layout-item>
+                <template if:true={showSubFocus3}>
+                    <lightning-layout-item size="8" class="field-spacing">
+                        <lightning-dual-listbox
+                            name="Sub_Focus_Area_Focus_area_3__c"
+                            label="Sub-Focus Area 3 (Multi-Select)"
+                             label-class="bold-label"
+                            source-label="Available"
+                            selected-label="Selected"
+                            value={ProposalData.Sub_Focus_Area_Focus_area_3__c}
+                            options={subFocusArea3Options}
+                            onchange={handleInputChange} >
+                            <!--  required={showSubFocus3} -->
+                          
+                        </lightning-dual-listbox>
+                    </lightning-layout-item>
+                </template>
+    
+            </lightning-layout>
+        </div>
+    </div>
+    
+
+<div class="slds-p-around_small sslds-m-top_small">
+<p class="note-text">
+    <strong>NOTE:</strong> Document Type: <em>.pdf, .doc, .docx </em> <br>
+                           File Size - Maximum: 25 MB (for Attachments).
+</p>
+
+<!-- Upload Proposal Document -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-file-upload
+        label="Upload Proposal Document"
+         label-class="bold-label"
+        name="fileUploader"
+        record-id={proposalId}    
+        accept=".pdf,.doc,.docx"
+        max-file-size="26214400"
+        onuploadfinished={handleFileUpload}
+        required>
+    </lightning-file-upload>
+
+    <!-- Display selected file name -->
+    <template if:true={uploadedFileName}>
+        <p class="slds-m-top_small">Uploaded File: {uploadedFileName}</p>
+    </template>
+</lightning-layout-item>
+</div>
+
+<div class="button-container slds-text-align_center">
+    <lightning-button 
+    variant="destructive-text" 
+        label="Submit Proposal" 
+        onclick={handleSubmit}>
+    </lightning-button>
+</div>
+
+</div>
+    </lightning-card>
+
+</template>
+
+<template if:true={showThankYou}>
+    
+        <h1 class="thank-you slds-text-align_center">For any questions or clarifications, please contact us. Thank you for your dedication to innovation and our partnership.</h1>
+   
+</template>
+</template>

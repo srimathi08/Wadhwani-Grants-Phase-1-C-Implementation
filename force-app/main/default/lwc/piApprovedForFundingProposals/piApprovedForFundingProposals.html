@@ -1,0 +1,94 @@
+<template>
+    <div class="wf-page">
+
+        <!-- Header -->
+        <section class="wf-card wf-head">
+            <div>
+                <div class="wf-title">Approved for Funding Proposals</div>
+                <div class="wf-sub">Only proposals approved for funding are shown here.</div>
+            </div>
+
+            <button class="wf-btn wf-btn-secondary" onclick={handleBack}>
+                Back
+            </button>
+        </section>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <section class="wf-card">
+                <div class="wf-skeleton">Loading proposals...</div>
+            </section>
+        </template>
+
+        <!-- Error -->
+        <template if:true={errorMsg}>
+            <section class="wf-card">
+                <div class="wf-empty">Error: {errorMsg}</div>
+            </section>
+        </template>
+
+        <!-- Data -->
+        <template if:false={isLoading}>
+            <template if:true={proposals.length}>
+                <section class="wf-grid">
+                    <template for:each={proposals} for:item="p">
+                        <article key={p.id} class="wf-tile">
+
+                            <!-- Top Row -->
+                            <div class="wf-top">
+                                <div class="wf-no">{p.name}</div>
+                            </div>
+
+                            <!-- Project title -->
+                            <div class="wf-ptitle">{p.projectTitle}</div>
+
+                            <!-- ✅ Milestones -->
+                            <template if:true={p.milestones}>
+                                <template if:true={p.milestones.length}>
+                                    <div class="wf-mile">
+                                        <div class="wf-mile-label">Milestones</div>
+
+                                        <div class="wf-mile-list">
+                                            <template for:each={p.milestones} for:item="m">
+                                                <div key={m.id} class="wf-mile-row">
+                                                    <div class="wf-mile-name">{m.name}</div>
+                                                    <span class={m.badgeClass}>{m.status}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template if:false={p.milestones.length}>
+                                    <div class="wf-mile wf-mile-empty">
+                                        No milestone created yet
+                                    </div>
+                                </template>
+                            </template>
+
+                            <!-- Buttons -->
+                            <div class="wf-actions">
+                                <button class="wf-btn wf-btn-secondary" data-id={p.id} onclick={handleViewDetails}>
+                                    View Details
+                                </button>
+
+                                <button class="wf-btn wf-btn-primary" data-id={p.id} onclick={handleViewMilestone}>
+                                    View Milestone
+                                </button>
+                            </div>
+
+                        </article>
+                    </template>
+                </section>
+            </template>
+
+            <!-- No results -->
+            <template if:false={proposals.length}>
+                <section class="wf-card">
+                    <div class="wf-empty">No proposals approved for funding found.</div>
+                </section>
+            </template>
+        </template>
+
+    </div>
+</template>

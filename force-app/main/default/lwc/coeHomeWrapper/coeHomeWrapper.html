@@ -1,0 +1,46 @@
+<template>
+    <div class="home-container">
+
+        <!-- Header -->
+        <div class="header-section">
+            <c-coe-welcome-header></c-coe-welcome-header>
+        </div>
+
+        <!-- KPI 
+        <div class="kpi-row">
+            <c-coe-stats-cards></c-coe-stats-cards>
+        </div> -->
+
+        <!-- Journey -->
+        <div class="journey-section">
+            <c-coepath></c-coepath>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <c-coe-proposal-review-tile></c-coe-proposal-review-tile>
+            <c-coe-reviewer-query-tile></c-coe-reviewer-query-tile>
+            <c-coe-application-status-tile></c-coe-application-status-tile>
+        </div>
+
+        
+
+        <!-- 🔥 TABS -->
+        <lightning-tabset variant="scoped" class="main-tabs">
+
+            <lightning-tab label="PI Management">
+                <div class="tab-content">
+                    <c-coe-pi-project-setup></c-coe-pi-project-setup>
+                </div>
+            </lightning-tab>
+
+            <lightning-tab label="Fund Management">
+                <div class="tab-content">
+                    <c-coe-fund-summary-home></c-coe-fund-summary-home>
+                </div>
+            </lightning-tab>
+
+        </lightning-tabset>
+
+    </div>
+</template>

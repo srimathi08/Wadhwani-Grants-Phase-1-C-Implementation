@@ -1,0 +1,213 @@
+<template>
+
+    <template if:true={isLoading}>
+        <div class="spinner-container">
+            <lightning-spinner alternative-text="Loading profile"></lightning-spinner>
+        </div>
+    </template>
+
+    <template if:true={error}>
+        <div class="error-message">
+            <lightning-icon icon-name="utility:error" size="small" class="error-icon"></lightning-icon>
+            <span>{error}</span>
+        </div>
+    </template>
+
+    <template if:true={profileData}>
+        <div class="profile-container">
+
+            <!-- Header -->
+            <div class="profile-header">
+                <div class="header-content">
+                    <h1 class="header-title">My Profile</h1>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+
+                <!-- Left Sidebar - Profile Card -->
+                <div class="sidebar">
+                    <div class="profile-card">
+                        
+                        <!-- Gradient Header -->
+                        <div class="profile-card-header"></div>
+                        
+                        <!-- Avatar Circle -->
+                        <div class="avatar-container">
+                            <div class="avatar">
+                                <span class="avatar-initials">{initials}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Name and Title -->
+                        <div class="profile-info">
+                            <h2 class="profile-name">{profileData.Name}</h2>
+                            <p class="profile-role">{profileData.Current_Role__pc}</p>
+                            <p class="profile-org">{profileData.Current_Organization__pc}</p>
+                        </div>
+
+                        <!-- Quick Info -->
+                        <div class="quick-info">
+                            <div class="info-item">
+                                <div class="icon-wrapper">
+                                    <lightning-icon icon-name="utility:email" size="x-small"></lightning-icon>
+                                </div>
+                                <div class="info-text">
+                                    <p class="info-label">EMAIL</p>
+                                    <p class="info-value">{profileData.PersonEmail}</p>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="icon-wrapper">
+                                    <lightning-icon icon-name="utility:phone_portrait" size="x-small"></lightning-icon>
+                                </div>
+                                <div class="info-text">
+                                    <p class="info-label">PHONE</p>
+                                    <p class="info-value">{profileData.Phone}</p>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="icon-wrapper">
+                                    <lightning-icon icon-name="utility:location" size="x-small"></lightning-icon>
+                                </div>
+                                <div class="info-text">
+                                    <p class="info-label">LOCATION</p>
+                                    <p class="info-value">{location}</p>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="icon-wrapper">
+                                    <lightning-icon icon-name="utility:identity" size="x-small"></lightning-icon>
+                                </div>
+                                <div class="info-text">
+                                    <p class="info-label">SPECIALIZATION</p>
+                                    <p class="info-value">{profileData.Field_of_specialization__pc}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content Area -->
+                <div class="content-area">
+
+                    <!-- Basic Information -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon-wrapper">
+                                <lightning-icon icon-name="utility:user" size="small"></lightning-icon>
+                            </div>
+                            <h3 class="section-title">Basic Information</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="field-box">
+                                <span class="field-label">Full Name</span>
+                                <span class="field-value">{profileData.Name}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon-wrapper">
+                                <lightning-icon icon-name="utility:phone_portrait" size="small"></lightning-icon>
+                            </div>
+                            <h3 class="section-title">Contact Information</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="two-column">
+                                <div class="field-box">
+                                    <span class="field-label">Phone</span>
+                                    <span class="field-value">{profileData.Phone}</span>
+                                </div>
+                                <div class="field-box">
+                                    <span class="field-label">Primary Email</span>
+                                    <span class="field-value">{profileData.PersonEmail}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Professional Information -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon-wrapper">
+                                <lightning-icon icon-name="utility:work" size="small"></lightning-icon>
+                            </div>
+                            <h3 class="section-title">Professional Information</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="two-column">
+                                <div class="field-box">
+                                    <span class="field-label">Current Organization</span>
+                                    <span class="field-value">{profileData.Current_Organization__pc}</span>
+                                </div>
+                                <div class="field-box">
+                                    <span class="field-label">Current Role</span>
+                                    <span class="field-value">{profileData.Current_Role__pc}</span>
+                                </div>
+                            </div>
+                            <div class="field-box">
+                                <span class="field-label">Field of Specialization</span>
+                                <span class="field-value">{profileData.Field_of_specialization__pc}</span>
+                            </div>
+                            <div class="summary-box">
+                                <span class="field-label">Profile Executive Summary</span>
+                                <p class="summary-text">{profileData.Profile_Executive_Summary__pc}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon-wrapper">
+                                <lightning-icon icon-name="utility:home" size="small"></lightning-icon>
+                            </div>
+                            <h3 class="section-title">Address</h3>
+                        </div>
+                        <div class="section-content">
+                            <div class="field-box">
+                                <span class="field-label">Street Address</span>
+                                <span class="field-value">{profileData.BillingStreet}</span>
+                            </div>
+                            <div class="two-column">
+                                <div class="field-box">
+                                    <span class="field-label">City</span>
+                                    <span class="field-value">{profileData.BillingCity}</span>
+                                </div>
+                                <div class="field-box">
+                                    <span class="field-label">State/Province</span>
+                                    <span class="field-value">{profileData.BillingState}</span>
+                                </div>
+                            </div>
+                            <div class="two-column">
+                                <div class="field-box">
+                                    <span class="field-label">Postal Code</span>
+                                    <span class="field-value">{profileData.BillingPostalCode}</span>
+                                </div>
+                                <div class="field-box">
+                                    <span class="field-label">Country</span>
+                                    <span class="field-value">{profileData.BillingCountry}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Note -->
+                    <div class="profile-note">
+                        If there are any changes in profile information, please reach out to
+                        <a href="mailto:win@wadhwanifoundation.com">win@wadhwanifoundation.com</a>.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </template>
+
+</template>

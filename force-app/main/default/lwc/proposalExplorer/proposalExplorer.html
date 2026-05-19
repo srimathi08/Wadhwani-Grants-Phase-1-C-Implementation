@@ -1,0 +1,148 @@
+<template>
+
+<lightning-card title="Proposal Explorer">
+
+<div class="container">
+
+<!-- FILTER PANEL -->
+
+<div class="filter-container">
+
+<div class="filter-row">
+
+<div class="filter-coe">
+<lightning-combobox
+label="COE"
+value={selectedCOE}
+options={coeOptions}
+onchange={handleCOEChange}>
+</lightning-combobox>
+</div>
+
+<div class="filter-date">
+<lightning-input
+type="date"
+label="From"
+value={fromDate}
+onchange={handleFromDate}>
+</lightning-input>
+</div>
+
+<div class="filter-date">
+<lightning-input
+type="date"
+label="To"
+value={toDate}
+onchange={handleToDate}>
+</lightning-input>
+</div>
+
+<div class="filter-search">
+<lightning-input
+type="search"
+label="Search"
+placeholder="Search proposal ID or title"
+onchange={handleSearch}>
+</lightning-input>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TOTAL COUNT -->
+
+<div class="count-bar">
+Total Proposals: {proposalCount}
+</div>
+
+
+<!-- LOADING -->
+
+<template if:true={isLoading}>
+<div class="spinner-container">
+<lightning-spinner alternative-text="Loading"></lightning-spinner>
+</div>
+</template>
+
+
+<!-- TABLE -->
+
+<template if:false={isLoading}>
+
+<template if:true={proposals.length}>
+
+<div class="table-wrapper">
+
+<table class="custom-table">
+
+<thead>
+
+<tr>
+<th>Proposal ID</th>
+<th>Project Title</th>
+<th>COE</th>
+<th>Focus Area</th>
+<th>Applied Date</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<template for:each={proposals} for:item="proposal">
+
+<tr key={proposal.recordId}>
+
+<td>
+<a href={proposal.recordUrl} class="proposal-link">
+{proposal.proposalId}
+</a>
+</td>
+
+<td>{proposal.projectTitle}</td>
+
+<td>{proposal.coeName}</td>
+
+<td>{proposal.focusArea}</td>
+
+<td>
+<lightning-formatted-date-time
+value={proposal.appliedDate}
+year="numeric"
+month="short"
+day="2-digit">
+</lightning-formatted-date-time>
+</td>
+
+</tr>
+
+</template>
+
+</tbody>
+
+</table>
+
+</div>
+
+</template>
+
+
+<!-- EMPTY STATE -->
+
+<template if:false={proposals.length}>
+
+<div class="empty-state">
+No proposals found for the selected filters.
+</div>
+
+</template>
+
+</template>
+
+</div>
+
+</lightning-card>
+
+</template>

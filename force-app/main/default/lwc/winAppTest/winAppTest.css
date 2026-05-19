@@ -1,0 +1,144 @@
+/* Apply Wadhwani Base Colors & Fonts */
+.form-container {
+    padding: 1.5rem;
+    max-width: 900px;
+    margin: auto;
+    font-family: 'Arial', sans-serif; /* Use Wadhwani website font */
+    --slds-c-tooltip-text-color: red; /* Change the help text color */
+}
+
+
+
+.form-title {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1.2rem;
+    color: #8A1C1C; /* Wadhwani Base Color */
+}
+
+.section-headings {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 1.5rem 0;
+    color: #FC7666; /* Wadhwani Highlight Color */
+    border-bottom: 2px solid #FC7666;
+    padding-bottom: 5px;
+}
+
+.slds-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+}
+
+.slds-table th {
+    background: #8A1C1C; /* Wadhwani Base Color */
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.slds-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+/* Milestones Table */
+.table-container {
+    overflow-x: auto;
+}
+
+.milestone-table th {
+    background-color: #8A1C1C;
+    color: #fff;
+    text-align: center;
+    padding: 12px;
+}
+
+/* Upload Table Styling */
+.file-upload-container {
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.file-label {
+    font-weight: bold;
+    text-align: left;
+}
+
+/* Preview Modal Styling */
+.slds-modal {
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slds-modal__container {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.slds-modal__content {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}
+
+.slds-modal__header {
+    background-color: #f3f3f3;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+    color: #8A1C1C;
+}
+
+/* Styling for preview table */
+.preview-table {
+    display: table;
+    width: 100%;
+}
+
+.preview-row {
+    display: table-row;
+}
+
+.label-column {
+    display: table-cell;
+    width: 40%;
+    font-weight: bold;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.value-column {
+    display: table-cell;
+    width: 60%;
+    padding: 10px;
+    vertical-align: top;
+}
+
+
+/* Backdrop */
+.slds-backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+
+.apply-button {
+    display: block;
+    margin: auto; /* Centers horizontally */
+}
+.hidden {
+    display: none;
+}

@@ -1,0 +1,302 @@
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.card {
+    border-radius: 16px;
+    padding: 1.2rem;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 6px 14px rgba(0,0,0,.12);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0,0,0,.16);
+}
+
+.card p {
+    font-size: .85rem;
+    opacity: .9;
+}
+
+.card h1 {
+    font-size: 1.9rem;
+    margin: 0;
+}
+
+.card1 { background: linear-gradient(135deg,#43a047,#66bb6a); }
+.card2 { background: linear-gradient(135deg,#e53935,#ef5350); }
+.card3 { background: linear-gradient(135deg,#fb8c00,#ffb74d); }
+.card4 { background: linear-gradient(135deg,#1e88e5,#64b5f6); }
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+.table-container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    overflow: visible;
+}
+
+/* =========================================================
+   TABLE RESET
+========================================================= */
+
+.slds-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background: transparent;
+    table-layout: fixed;
+}
+
+.slds-table thead th {
+    background: transparent;
+    font-weight: 700;
+    font-size: .8rem;
+    color: #64748b;
+    padding: .75rem .75rem;
+    border: none;
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   ROW AS CARD
+========================================================= */
+
+.slds-table tbody tr {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+    transition: transform .15s ease, box-shadow .15s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.slds-table tbody tr:hover,
+.slds-table tbody tr:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0,0,0,.08);
+    z-index: 10;
+}
+
+/* =========================================================
+   CELLS
+========================================================= */
+
+.slds-table tbody td {
+    padding: .9rem .9rem;
+    font-size: .85rem;
+    border: none;
+    white-space: nowrap;
+    overflow: visible;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* Rounded row corners */
+
+.slds-table tbody td:first-child {
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+
+.slds-table tbody td:last-child {
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+========================================================= */
+
+.slds-table th:nth-child(1),
+.slds-table td:nth-child(1){width:14%;}
+
+.slds-table th:nth-child(2),
+.slds-table td:nth-child(2){width:22%;}
+
+.slds-table th:nth-child(3),
+.slds-table td:nth-child(3){width:28%;}
+
+.slds-table th:nth-child(4),
+.slds-table td:nth-child(4){width:18%;}
+
+.slds-table th:nth-child(5),
+.slds-table td:nth-child(5){
+    width:18%;
+    text-align:center;
+}
+
+/* =========================================================
+   APPLICATION LINK
+========================================================= */
+
+.app-link {
+    color: #1d4ed8;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.app-link:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.status-pill {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+/* =========================================================
+   ACTION COLUMN (AUTO-FIT CONTENT)
+========================================================= */
+
+.action-col {
+    min-width: 320px;
+    width: 320px;
+    text-align: center;
+}
+
+.action-col lightning-combobox {
+    width: 100%;
+}
+
+lightning-combobox {
+    --slds-c-input-radius-border: 18px;
+    position: relative;
+    z-index: 1000;
+}
+
+/* =========================================================
+   DROPDOWN EXPANSION FIX
+========================================================= */
+
+.slds-dropdown {
+    min-width: max-content !important;
+    width: max-content !important;
+    overflow-x: hidden !important;
+}
+
+.slds-dropdown__item span {
+    white-space: nowrap;
+}
+
+/* Prevent parents from clipping dropdown */
+
+lightning-card,
+lightning-card * {
+    overflow: visible !important;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1rem;
+}
+
+.page-info {
+    font-weight: 600;
+    color: #475569;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.slds-modal__container {
+    max-width: 40rem !important;
+    border-radius: 14px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1024px) {
+    .summary-cards {
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .slds-table {
+        border-spacing: 0 10px;
+    }
+
+    .slds-table tbody td {
+        font-size: .75rem;
+        padding: .6rem;
+    }
+
+    .action-col {
+        min-width: 260px;
+        width: 260px;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+/* =========================================
+   WRAP PROJECT TITLE (COLUMN 2)
+========================================= */
+
+.slds-table tbody td:nth-child(2) {
+    white-space: normal;      /* allow wrapping */
+    line-height: 1.4;
+}
+/* =========================================
+   FORCE WRAP PROJECT TITLE
+========================================= */
+
+.slds-table tbody td:nth-child(2) {
+    white-space: normal !important;
+    word-break: break-word;
+    line-height: 1.4;
+}
+/* =========================================
+   SHIFT STATUS HEADER SLIGHTLY RIGHT
+========================================= */
+
+.slds-table thead th:nth-child(3) {
+    padding-left: 2.5rem;
+}

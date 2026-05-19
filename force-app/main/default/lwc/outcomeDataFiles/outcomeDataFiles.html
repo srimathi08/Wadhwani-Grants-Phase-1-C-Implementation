@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Attached Documents">
+        
+        <!-- Show datatable if files exist -->
+        <template if:true={files}>
+            <lightning-datatable 
+                key-field="id"
+                data={files}
+                columns={columns}>
+            </lightning-datatable>
+        </template>
+
+        <!-- Show message if no files -->
+        <template if:true={noFiles}>
+            <p class="slds-p-around_small">No documents uploaded.</p>
+        </template>
+
+    </lightning-card>
+</template>

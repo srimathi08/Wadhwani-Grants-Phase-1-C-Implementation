@@ -1,0 +1,22 @@
+.register-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Allows centering within tall regions; adjust as needed by page layout */
+  padding: 1rem 0;
+  width: 100%;
+}
+
+.register-button {
+  /* Make button larger */
+  font-size: 1.125rem; /* ~18px */
+  line-height: 1.5rem;
+  padding: 0.875rem 1.5rem; /* taller and wider */
+  border-radius: 0.375rem; /* slightly more rounded */
+}
+
+/* Respect SLDS focus ring but ensure visible contrast */
+.register-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(21, 137, 238, 0.4); /* SLDS brand focus glow */
+}

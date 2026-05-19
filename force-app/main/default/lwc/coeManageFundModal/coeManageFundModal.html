@@ -1,0 +1,100 @@
+<template>
+    <template if:true={isOpen}>
+        <section class="backdrop">
+            <div class="modal">
+
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <div>
+                        <div class="modal-title">Manage Fund</div>
+                        <div class="modal-subtitle">{milestoneName}</div>
+                    </div>
+                    <button class="icon-btn" onclick={close}>✕</button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                    <!-- Funding Details -->
+                    <div class="block">
+                        <div class="block-title">Funding Details</div>
+
+                        <label class="field-label">Budget Required</label>
+                        <input
+                            class="text-input"
+                            type="number"
+                            value={budgetRequired}
+                            readonly
+                        />
+
+                        <label class="field-label">Approved Amount</label>
+                        <input
+                            class="text-input"
+                            type="number"
+                            value={approvedAmount}
+                            onchange={handleApprovedAmount}
+                        />
+                    </div>
+
+                    <!-- Support Documents Required (TEXT ONLY) -->
+                    <div class="block">
+                        <div class="block-title">Support Documents Required from PI</div>
+                        <ul class="doc-list">
+                            <li>Milestone Report</li>
+                            <li>Deliverables</li>
+                            <li>UC</li>
+                            <li>SoE</li>
+                        </ul>
+                    </div>
+
+                    <!-- Additional Documents -->
+                    <div class="block">
+                        <div class="block-title">Additional Documents</div>
+
+                        <template for:each={extraDocs} for:item="row">
+                            <input
+                                key={row.id}
+                                class="text-input"
+                                type="text"
+                                placeholder="Enter additional document name"
+                                data-id={row.id}
+                                value={row.value}
+                                onchange={handleExtraDocChange}
+                            />
+                        </template>
+
+                        <button class="btn-add" onclick={handleAddMore}>+ Add More</button>
+                    </div>
+
+                    <!-- Disbursement Date -->
+                    <div class="block">
+                        <div class="block-title">Date of Funds Disbursed</div>
+                        <input
+                            class="text-input"
+                            type="datetime-local"
+                            onchange={handleDate}
+                        />
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="block">
+                        <div class="block-title">Comments / Instructions to PI</div>
+                        <textarea
+                            class="textarea"
+                            rows="4"
+                            onchange={handleComments}
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                <button class="btn secondary" onclick={close}>Cancel</button>
+                <button class="btn primary" onclick={handleSubmit}>Submit</button>
+                </div>
+
+            </div>
+        </section>
+    </template>
+</template>

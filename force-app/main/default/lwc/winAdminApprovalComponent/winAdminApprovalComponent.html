@@ -1,0 +1,73 @@
+<template>
+    <lightning-card title="Win Admin Actions" class="slds-p-around_medium">
+
+        <div class="action-bar">
+            <!-- Approve Button
+            <button type="button"
+                    class="slds-button slds-button_neutral action-btn approve-btn"
+                    data-action="Approve"
+                    onclick={handleAction}
+                    aria-label="Approve"
+                    disabled={isButtonDisabled}>
+                <lightning-icon icon-name="utility:check" size="x-small" class="btn-icn"></lightning-icon>
+                <span>Approve</span>
+            </button>
+        -->
+            <!-- Reject Button
+            <button type="button"
+                    class="slds-button slds-button_neutral action-btn reject-btn"
+                    data-action="Reject"
+                    onclick={handleAction}
+                    aria-label="Reject"
+                    disabled={isButtonDisabled}>
+                <lightning-icon icon-name="utility:close" size="x-small" class="btn-icn"></lightning-icon>
+                <span>Reject</span>
+            </button>
+        -->
+            <button type="button"
+                    class="slds-button slds-button_neutral action-btn resubmit-btn"
+                    data-action="Resubmit"
+                    onclick={handleAction}
+                    aria-label="Resubmit"
+                    disabled={isButtonDisabled}>
+                <lightning-icon icon-name="utility:refresh" size="x-small" class="btn-icn"></lightning-icon>
+                <span>Ask For Resubmission</span>
+            </button>
+        </div>
+
+        <template if:true={showModal}>
+            <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium">{actionType} Proposal</h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-textarea
+                            label="Enter your comments"
+                            value={comments}
+                            onchange={handleCommentsChange}
+                            placeholder="Provide your reason or feedback here">
+                        </lightning-textarea>
+
+                        <template if:true={isResubmit}>
+                            <lightning-input
+                                type="date"
+                                label="Due Date for Resubmission"
+                                value={dueDate}
+                                onchange={handleDueDateChange}>
+                            </lightning-input>
+                        </template>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                        <lightning-button variant="brand" label="Submit" onclick={updateStatus}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </lightning-card>
+</template>

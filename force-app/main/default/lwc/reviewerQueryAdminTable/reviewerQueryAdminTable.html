@@ -1,0 +1,141 @@
+<template>
+    <div class="rq-wrapper">
+
+        <!-- Header -->
+        <div class="rq-header">
+            <div class="rq-header-left">
+                <div class="rq-icon-wrap">
+                    <lightning-icon icon-name="standard:feedback" size="small"></lightning-icon>
+                </div>
+                <div>
+                    <p class="rq-eyebrow">Grant Management</p>
+                    <h1 class="rq-title">Reviewer Queries</h1>
+                </div>
+            </div>
+            <div class="rq-badge">
+                <span class="rq-count">{queryCount}</span>
+                <span class="rq-count-label">Total</span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="rq-loading">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Table -->
+        <template if:false={isLoading}>
+            <template if:false={noRecords}>
+                <div class="rq-table-wrap">
+                    <table class="rq-table">
+                        <thead>
+                            <tr>
+                                <th class="col-num">#</th>
+                                <th>Query Number</th>
+                                <th>Proposal</th>
+                                <th>Reviewer Query</th>
+                                <th>Reply from COE</th>
+                                <th>Reply from PI</th>
+                                <th>Status</th>
+                                <th class="col-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={queries} for:item="row" for:index="idx">
+                                <tr key={row.Id} class="rq-row">
+                                    <td class="col-num cell-muted">{row.rowIndex}</td>
+                                    <td>
+                                        <a href={row.queryUrl} target="_blank" class="rq-link">
+                                            <lightning-icon icon-name="utility:new_window" size="xx-small" class="link-icon"></lightning-icon>
+                                            {row.Name}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <template if:true={row.proposalName}>
+                                            <a href={row.proposalUrl} target="_blank" class="rq-link proposal-link">
+                                                {row.proposalName}
+                                            </a>
+                                        </template>
+                                        <template if:false={row.proposalName}>
+                                            <span class="cell-muted">—</span>
+                                        </template>
+                                    </td>
+                                    <td class="cell-wrap">
+                                        <lightning-formatted-rich-text
+                                            value={row.Query__c}
+                                            class="cell-text">
+                                        </lightning-formatted-rich-text>
+                                    </td>
+                                    <td class="cell-wrap">
+                                        <template if:true={row.Reply_from_COE__c}>
+                                            <lightning-formatted-rich-text
+                                                value={row.Reply_from_COE__c}
+                                                class="cell-text">
+                                            </lightning-formatted-rich-text>
+                                        </template>
+                                        <template if:false={row.Reply_from_COE__c}>
+                                            <span class="cell-muted">Awaiting reply</span>
+                                        </template>
+                                    </td>
+                                    <td class="cell-wrap">
+                                        <template if:true={row.Reply_from_PI__c}>
+                                            <lightning-formatted-rich-text
+                                                value={row.Reply_from_PI__c}
+                                                class="cell-text">
+                                            </lightning-formatted-rich-text>
+                                        </template>
+                                        <template if:false={row.Reply_from_PI__c}>
+                                            <span class="cell-muted">Awaiting reply</span>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <span class={row.statusClass}>{row.Status__c}</span>
+                                    </td>
+                                    <td class="col-actions">
+                                        <div class="action-group">
+                                            <button class="btn-action btn-view"
+                                                data-id={row.Id}
+                                                data-action="view"
+                                                onclick={handleRowAction}
+                                                title="View record">
+                                                <lightning-icon icon-name="utility:preview" size="xx-small"></lightning-icon>
+                                            </button>
+                                            <button class="btn-action btn-coe"
+                                                data-id={row.Id}
+                                                data-action="coe"
+                                                onclick={handleRowAction}
+                                                title="Share with COE">
+                                                <lightning-icon icon-name="utility:share" size="xx-small"></lightning-icon>
+                                                <span>COE</span>
+                                            </button>
+                                            <button class="btn-action btn-reviewer"
+                                                data-id={row.Id}
+                                                data-action="reviewer"
+                                                onclick={handleRowAction}
+                                                title="Share with Reviewer">
+                                                <lightning-icon icon-name="utility:share" size="xx-small"></lightning-icon>
+                                                <span>Reviewer</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:true={noRecords}>
+                <div class="rq-empty">
+                    <lightning-icon icon-name="utility:inbox" size="large" class="empty-icon"></lightning-icon>
+                    <p class="empty-title">No Queries Found</p>
+                    <p class="empty-sub">Reviewer queries will appear here once submitted.</p>
+                </div>
+            </template>
+        </template>
+
+    </div>
+</template>

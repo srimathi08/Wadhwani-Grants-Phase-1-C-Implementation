@@ -1,0 +1,98 @@
+<template>
+
+    <div class="container">
+
+        <div class="header">
+            <h2>Queries Shared by COE</h2>
+        </div>
+
+        <!-- TABLE -->
+        <template if:true={data}>
+            <div class="table">
+
+                <!-- HEADER -->
+                <div class="row header-row">
+                    <div class="col-query-number">Query Number</div>
+                    <div class="col-proposal">Proposal</div>
+                    <div class="col-query">Query</div>
+                    <div class="col-actions">Actions</div>
+                </div>
+
+                <!-- ROWS -->
+                <template for:each={data} for:item="row">
+                    <div key={row.Id} class="row">
+
+                        <!-- Query Number (Clickable ✅) -->
+                        <div class="col-query-number query-link"
+                             data-id={row.Id}
+                             data-name={row.queryName}
+                             onclick={handleView}>
+                            {row.queryName}
+                        </div>
+
+                        <!-- Proposal -->
+                        <div class="col-proposal link"
+                             data-id={row.proposalId}
+                             onclick={handleProposalView}>
+                            {row.proposalName}
+                        </div>
+
+                        <!-- Query -->
+                        <div class="col-query query-text">
+                            <lightning-formatted-rich-text value={row.queryText}></lightning-formatted-rich-text>
+                        </div>
+
+                        <!-- ACTION -->
+                        <div class="col-actions actions">
+                            <lightning-button 
+                                label="Reply"
+                                variant="brand"
+                                data-id={row.Id}
+                                onclick={handleReply}
+                                disabled={row.isReplied}>
+                            </lightning-button>
+                        </div>
+
+                    </div>
+                </template>
+
+            </div>
+        </template>
+
+        <!-- EMPTY -->
+        <template if:true={isEmpty}>
+            <div class="empty">
+                No queries shared by COE yet.
+            </div>
+        </template>
+
+    </div>
+
+    <!-- REPLY MODAL -->
+    <template if:true={showModal}>
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <h2>Reply to Query</h2>
+                </header>
+
+                <div class="slds-modal__content">
+                    <lightning-textarea 
+                        label="Reply"
+                        value={replyText}
+                        onchange={handleReplyChange}>
+                    </lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeModal}></lightning-button>
+                    <lightning-button variant="brand" label="Submit" onclick={submitReply}></lightning-button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

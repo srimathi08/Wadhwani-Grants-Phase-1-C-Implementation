@@ -1,0 +1,20 @@
+<apex:page controller="SelfRegistrationController" showHeader="false" sidebar="false">
+    <apex:form >
+        <apex:pageBlock title="Partner Community Self-Registration">
+            <apex:pageMessages />
+
+            <apex:pageBlockSection columns="2">
+                <apex:inputText value="{!FirstName}" label="First Name"/>
+                <apex:inputText value="{!LastName}" label="Last Name"/>
+                 <apex:inputText value="{!InstitutionName}" label="Institution Name"/>
+                <apex:inputText value="{!Email}" label="Email"/>
+                <apex:inputText value="{!Username}" label="Username"/>
+                <apex:inputSecret value="{!Password}" label="Password"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Register" action="{!registerUser}" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

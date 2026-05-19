@@ -1,0 +1,107 @@
+/* Change entire lightning-card background */
+lightning-card {
+    --slds-c-card-background-color: #ffffe5;
+}
+
+/* Also apply to the internal SLDS class as backup */
+.slds-card {
+    background-color: #ffffe5 !important;
+}
+
+/* If needed, target the body area only */
+.slds-card__body {
+    background-color: #ffffe5 !important;
+}
+
+
+
+
+
+/* 🧭 Dashboard Title */
+.lightning-card .slds-card__header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+}
+
+.lightning-card .slds-card__header-title h2 {
+    color: #c2252b;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 📊 Section Titles */
+.section-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 1.2rem 0 0.8rem 0;
+    color: #c2252b;
+}
+
+/* Grid Layout */
+.section-wrapper {
+    padding: 0 0.5rem 1.5rem 0.5rem;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0.5rem;
+}
+@media (max-width: 1200px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; }
+}
+
+/* 📇 Card Base */
+.card {
+    border-radius: 1rem;
+    padding: 1rem;
+    min-height: 130px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 🎨 Alternating Colors */
+.card:nth-child(odd) {
+    background-color: #f2672a; /* Red  939598   bf2026*/
+    color: #ffffff; /* White text */
+}
+
+.card:nth-child(even) {
+    background-color: #f68721; /* Orange f68721 ffffe5 939598 f68721*/
+    color: #000000; /* Black text */
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-title {
+    font-size: 1.0rem;
+    font-weight: 600;
+}
+.corner-icon {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+.card-count {
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-align: right;
+}

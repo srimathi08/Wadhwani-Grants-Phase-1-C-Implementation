@@ -1,0 +1,107 @@
+<template>
+    <lightning-card title="Proposals Approved by WIN Admin">
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card card1">
+                <p>Total Approved by WIN Admin</p>
+                <h1>{approvedCount}</h1>
+            </div>
+            <div class="card card2">
+                <p>Approved for Funding</p>
+                <h1>{fundingCount}</h1>
+            </div>
+            <div class="card card3">
+                <p>Not Recommended for Funding</p>
+                <h1>{notRecommendedCount}</h1>
+            </div>
+            <div class="card card4">
+                <p>Approved with Resubmission</p>
+                <h1>{resubmissionCount}</h1>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+                <thead>
+                    <tr>
+                        <th>Application ID</th>
+                        <th>Project Title</th>
+                        <th>Status</th>
+                        <th>Account</th>
+                        <th class="center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={proposals} for:item="row">
+                        <tr key={row.Id}>
+
+                            <!-- Clickable Application -->
+                            <td>
+                                <a href={row.recordUrl}
+                                   target="_blank"
+                                   class="app-link">
+                                    {row.Name}
+                                </a>
+                            </td>
+
+                            <td>{row.Project_Title__c}</td>
+
+                            <td>
+                                <span class="status-pill">{row.Status}</span>
+                            </td>
+
+                            <td>{row.AccountName}</td>
+
+                            <td class="center">
+                                <lightning-combobox
+                                    data-id={row.Id}
+                                    placeholder="Select Action"
+                                    value={row.selectedAction}
+                                    options={actionOptions}
+                                    onchange={handleActionChange}>
+                                </lightning-combobox>
+                            </td>
+
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <lightning-button label="Previous" onclick={handlePrev}></lightning-button>
+            <span class="page-info">Page {currentPage} of {totalPages}</span>
+            <lightning-button label="Next" onclick={handleNext}></lightning-button>
+        </div>
+
+    </lightning-card>
+
+    <!-- Modal -->
+    <template if:true={showModal}>
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Add Comments</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-textarea
+                        label="Comments"
+                        value={comments}
+                        onchange={handleCommentChange}>
+                    </lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer modal-footer">
+                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                    <lightning-button variant="brand" label="Submit" onclick={submitAction}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

@@ -1,0 +1,188 @@
+<template>
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Funded Project Status</h1>
+        <p>Overview of funded projects, budget distribution and key metrics</p>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+        <div class="kpi-card primary">
+            <div class="icon">📊</div>
+            <div>
+                <span>Total Projects Funded</span>
+                <h2>{totalProjectsFunded}</h2>
+            </div>
+        </div>
+        <div class="kpi-card gradient">
+            <div class="icon">💰</div>
+            <div>
+                <span>Total Budget (USD)</span>
+                <h2>$ {totalReceived}</h2>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="icon">📦</div>
+            <div>
+                <span>Grant Money Available</span>
+                <h2>$ {grantAvailable}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="grid">
+
+        <!-- LEFT PANEL -->
+        <div class="panel">
+            <h3>Budget Split (Project / Operational Grants)</h3>
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <span>Project Grant (Budget)</span>
+                    <h3>$ {projectGrantReceived}</h3>
+                </div>
+                <div class="mini-card">
+                    <span>Operational Grant (Budget)</span>
+                    <h3>$ {operationalGrantReceived}</h3>
+                </div>
+                <div class="mini-card success">
+                    <span>Funds Disbursed</span>
+                    <h3>$ {disbursed}</h3>
+                </div>
+                <div class="mini-card info">
+                    <span>Total Balance</span>
+                    <h3>$ {available}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="panel">
+            <h3>Metrics (Avg TRL, Expected TRL, Duration)</h3>
+
+            <!-- AVG TRL — CLICKABLE -->
+            <div class="metric-card clickable" onclick={openTRLModal}>
+                <div class="metric-header">
+                    <span>Average TRL <span class="click-hint">↗ View Details</span></span>
+                    <!-- <strong>{avgTRL} / 9</strong> -->
+                     <strong>{avgTRL} / {expectedTRL}</strong>
+                </div>
+                <div class="progress">
+                    <div class="progress-fill" style={avgTRLStyle}></div>
+                </div>
+            </div>
+
+            <!-- EXPECTED TRL — CLICKABLE -->
+            <div class="metric-card clickable" onclick={openTRLModal}>
+                <div class="metric-header">
+                    <span>Expected TRL <span class="click-hint">↗ View Details</span></span>
+                    <strong>{expectedTRL} / 9</strong>
+                </div>
+                <div class="progress purple">
+                    <div class="progress-fill" style={expectedTRLStyle}></div>
+                </div>
+            </div>
+
+            <!-- DURATION -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Duration</span>
+                    <strong>{duration} months</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA -->
+    <button class="cta" onclick={navigateToFund}>
+        Manage Fund Distribution →
+    </button>
+
+    <!-- ============ TRL MODAL ============ -->
+    <template if:true={isTRLModalOpen}>
+        <div class="modal-backdrop" onclick={closeTRLModal}></div>
+
+        <div class="trl-modal">
+
+            <div class="trl-modal-header">
+                <h2>TRL Breakdown by Project</h2>
+                <button class="close-btn" onclick={closeTRLModal}>✕</button>
+            </div>
+
+            <div class="trl-modal-body">
+
+                <!-- TRL LEGEND -->
+                <div class="trl-legend">
+                    <div class="legend-row">
+                        <!-- ✅ Correct class names matching the CSS -->
+<span class="legend-dot current"></span>
+<span>Current TRL</span>
+<span class="legend-dot expected"></span>
+<span>Expected TRL</span>
+                    </div>
+                </div>
+
+                <!-- TRL SCALE HEADER 
+                <div class="trl-scale-header">
+                    <template for:each={trlScaleLabels} for:item="n">
+                        <span key={n}>{n}</span>
+                    </template>
+                </div> -->
+
+                <!-- PER PROJECT ROWS -->
+                <template if:true={isTRLLoaded}>
+                    <template for:each={trlProjects} for:item="p">
+                        <div key={p.proposalId} class="trl-project-row">
+
+                            <div class="trl-project-name">
+                                <p class="proj-name">{p.name}</p>
+                                <template if:true={p.projectTitle}>
+                                    <p class="proj-title">{p.projectTitle}</p>
+                                </template>
+                            </div>
+
+                            <!-- TRL SCALE: number + block per column -->
+                            <div class="trl-scale-wrapper">
+    <template for:each={p.steps} for:item="s">
+        <div key={s.n} class={s.colClass}>
+            <span class="trl-step-number">{s.n}</span>
+            <div class={s.stepClass}></div>
+        </div>
+    </template>
+</div>
+
+                            <!-- NUMBERS -->
+                            <div class="trl-numbers">
+                                <span class="current-trl">Current: <strong>{p.currentTRL}</strong></span>
+                                <span class="expected-trl">Expected: <strong>{p.expectedTRL}</strong></span>
+                            </div>
+
+                            <!-- WORK DONE -->
+                            <template if:true={p.workDone}>
+                                <div class="work-done">
+                                    <p class="work-label">Work Supporting Current TRL:</p>
+                                    <lightning-formatted-rich-text
+                                        value={p.workDone}>
+                                    </lightning-formatted-rich-text>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+                </template>
+
+                <template if:false={isTRLLoaded}>
+                    <div class="trl-loading">
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </template>
+
+</div>
+</template>

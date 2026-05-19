@@ -1,0 +1,22 @@
+<template>
+    <h2>Project Proposals</h2>
+
+    <div class="stats-grid">
+        <div>Total: {summary.total}</div>
+        <div>Pending: {summary.pending}</div>
+        <div>With WIN: {summary.win}</div>
+        <div>Approved: {summary.approved}</div>
+    </div>
+
+      <template for:each={projects} for:item="p">
+        <div key={p.Id} class="card">
+            <b>{p.Name}</b>
+            <br/>
+            Status: {p.Status}
+            <br/>
+            <button data-id={p.Id} onclick={viewDetails}>
+                View Details →
+            </button>
+        </div>
+    </template>
+</template>

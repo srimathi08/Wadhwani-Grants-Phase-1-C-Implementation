@@ -1,0 +1,336 @@
+<template>
+
+```
+<!-- Loading -->
+<template if:true={isLoading}>
+    <div class="slds-p-around_large slds-align_absolute-center">
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+</template>
+
+<!-- Access Denied -->
+<template if:true={isAccessDenied}>
+    <div class="access-denied">
+        <lightning-icon icon-name="utility:lock" size="medium" class="lock-icon"></lightning-icon>
+        <p class="denied-title">Access Restricted</p>
+        <p class="denied-text">
+            You do not have permission to view this review.
+        </p>
+    </div>
+</template>
+
+<!-- Review Detail -->
+<template if:true={hasData}>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-eyebrow">Proposal Review</div>
+        <div class="header-title">{review.reviewName}</div>
+
+        <div class="header-highlights">
+
+            <div class="highlight-item">
+                <div class="highlight-label">Application</div>
+                <button class="highlight-link" onclick={navigateToProposal}>
+                    {review.applicationName}
+                </button>
+            </div>
+
+            <div class="highlight-item">
+                <div class="highlight-label">Status</div>
+                <div class="highlight-value">{review.status}</div>
+            </div>
+
+            <div class="highlight-item">
+                <div class="highlight-label">Reviewed By</div>
+                <div class="highlight-value">{review.reviewerName}</div>
+            </div>
+
+            <div class="highlight-item">
+                <div class="highlight-label">Total Score</div>
+                <div class="highlight-value">{review.totalScore}</div>
+            </div>
+
+            <div class="highlight-item">
+                <div class="highlight-label">Funding Recommendation</div>
+                <div class={review.fundingRecommendationClass}>
+                    {review.fundingRecommendation}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-btn-wrapper">
+        <button class="back-btn" onclick={goBack}>
+            ← Back to Proposal
+        </button>
+    </div>
+
+    <!-- Review Section -->
+    <div class="detail-card">
+
+        <div class="section-header">
+            <span class="section-toggle">▾</span>
+            <span class="section-title">Review</span>
+        </div>
+
+        <div class="fields-grid">
+
+            <!-- NOTE -->
+            <div class="review-note">
+                <b>NOTE:</b> On the scale of 1 to 10, 1 being the lowest and 10 being the highest
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Innovation / Novelty
+                    <template if:true={review.innovationNoveltyHelp}>
+                        <lightning-helptext content={review.innovationNoveltyHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.innovationNovelty}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Rationale for Scoring
+                    <template if:true={review.rationaleForScoringHelp}>
+                        <lightning-helptext content={review.rationaleForScoringHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.rationaleForScoring}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Commercial Viability
+                    <template if:true={review.commercialViabilityHelp}>
+                        <lightning-helptext content={review.commercialViabilityHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.commercialViability}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Commercial Viability Rationale
+                    <template if:true={review.commercialViabilityRationaleHelp}>
+                        <lightning-helptext content={review.commercialViabilityRationaleHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.commercialViabilityRationale}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Market Potential
+                    <template if:true={review.marketPotentialHelp}>
+                        <lightning-helptext content={review.marketPotentialHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.marketPotential}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Market Potential Rationale
+                    <template if:true={review.marketPotentialRationaleHelp}>
+                        <lightning-helptext content={review.marketPotentialRationaleHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.marketPotentialRationale}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Social Impact
+                    <template if:true={review.socialImpactHelp}>
+                        <lightning-helptext content={review.socialImpactHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.socialImpact}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Social Impact Rationale
+                    <template if:true={review.socialImpactRationaleHelp}>
+                        <lightning-helptext content={review.socialImpactRationaleHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.socialImpactRationale}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    External Funding Potential
+                    <template if:true={review.externalFundingPotentialHelp}>
+                        <lightning-helptext content={review.externalFundingPotentialHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.externalFundingPotential}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    External Funding Potential Rationale
+                    <template if:true={review.externalFundingPotentialRationaleHelp}>
+                        <lightning-helptext content={review.externalFundingPotentialRationaleHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.externalFundingPotentialRationale}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Team Strength and Expertise
+                    <template if:true={review.teamStrengthHelp}>
+                        <lightning-helptext content={review.teamStrengthHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.teamStrength}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Team Strength and Expertise Rationale
+                    <template if:true={review.teamStrengthRationaleHelp}>
+                        <lightning-helptext content={review.teamStrengthRationaleHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.teamStrengthRationale}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Milestone Planning
+                    <template if:true={review.milestonePlanningHelp}>
+                        <lightning-helptext content={review.milestonePlanningHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.milestonePlanning}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Milestone Planning Justification
+                    <template if:true={review.milestonePlanningJustificationHelp}>
+                        <lightning-helptext content={review.milestonePlanningJustificationHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.milestonePlanningJustification}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Milestone Planning Justification (NWP)
+                    <template if:true={review.milestonePlanningJustificationNWPHelp}>
+                        <lightning-helptext content={review.milestonePlanningJustificationNWPHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.milestonePlanningJustificationNWP}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Budget Adequacy
+                    <template if:true={review.budgetAdequacyHelp}>
+                        <lightning-helptext content={review.budgetAdequacyHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.budgetAdequacy}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Budget Requisite Justification
+                    <template if:true={review.budgetRequisiteJustificationHelp}>
+                        <lightning-helptext content={review.budgetRequisiteJustificationHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.budgetRequisiteJustification}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Budget Requisite Justification (UB)
+                    <template if:true={review.budgetRequisiteJustificationUBHelp}>
+                        <lightning-helptext content={review.budgetRequisiteJustificationUBHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.budgetRequisiteJustificationUB}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    Comment
+                    <template if:true={review.commentHelp}>
+                        <lightning-helptext content={review.commentHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.comment}</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Final Remarks Section -->
+    <div class="detail-card">
+
+        <div class="section-header">
+            <span class="section-toggle">▾</span>
+            <span class="section-title">Final Remarks</span>
+        </div>
+
+        <div class="fields-grid">
+
+            <div class="field-row">
+                <div class="field-label">Funding Recommendation</div>
+                <div class="field-value">
+                    <span class={review.finalRecommendationClass}>
+                        {review.finalRecommendation}
+                    </span>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    For WIN Team (Not Recommended)
+                    <template if:true={review.finalRecommendationNotRecommendedHelp}>
+                        <lightning-helptext content={review.finalRecommendationNotRecommendedHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">
+                    {review.finalRecommendationNotRecommended}
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    For WIN Team
+                    <template if:true={review.forWINTeamHelp}>
+                        <lightning-helptext content={review.forWINTeamHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.forWINTeam}</div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">
+                    To be Communicated to the PI
+                    <template if:true={review.communicateToPIHelp}>
+                        <lightning-helptext content={review.communicateToPIHelp}></lightning-helptext>
+                    </template>
+                </div>
+                <div class="field-value">{review.communicateToPI}</div>
+            </div>
+
+        </div>
+    </div>
+
+</template>
+```
+
+</template>

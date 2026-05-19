@@ -1,0 +1,81 @@
+<template>
+    <div class="rd-container">
+
+        <!-- HEADER: Logo + Profile -->
+        <div class="rd-header">
+            <img src={logoUrl} class="rd-logo" alt="Wadhwani Logo" />
+
+            <div class="rd-profile">
+                <div class="rd-avatar">{initials}</div>
+                <div class="rd-profile-name">{profile.name}</div>
+                <div class="rd-profile-email">{profile.email}</div>
+            </div>
+        </div>
+
+        <!-- WELCOME -->
+        <section class="rd-welcome">
+            <h2>Welcome – {profile.name}</h2>
+            <p>Your onboarding progress and review summary</p>
+        </section>
+
+        <!-- ONBOARDING STATUS -->
+        <section class="rd-onboarding">
+            <h3>Reviewer Onboarding</h3>
+
+            <div class="rd-item">
+                <span>Registration</span>
+                <span class="rd-status">{onboarding.registration}</span>
+            </div>
+
+            <div class="rd-item">
+                <span>NDA Status</span>
+                <span class="rd-status">{onboarding.nda}</span>
+            </div>
+
+            <div class="rd-item">
+                <span>Active Reviewer</span>
+                <span class="rd-status">{onboarding.active}</span>
+            </div>
+
+            <button class="rd-btn">Start Review</button>
+        </section>
+
+        <!-- REVIEW SUMMARY -->
+        <section class="rd-summary">
+            <h3>My Review Summary</h3>
+
+            <div class="rd-summary-grid">
+                <div class="rd-summary-box">
+                    <div class="rd-value">{summary.totalAssigned}</div>
+                    <div class="rd-label">Total Assigned</div>
+                </div>
+
+                <div class="rd-summary-box">
+                    <div class="rd-value">{summary.reviewed}</div>
+                    <div class="rd-label">Reviewed</div>
+                </div>
+
+                <div class="rd-summary-box">
+                    <div class="rd-value">{summary.yetToStart}</div>
+                    <div class="rd-label">Yet to Start</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONBOARDING JOURNEY PROGRESS -->
+        <section class="rd-journey">
+            <h3>Your Onboarding Journey</h3>
+
+            <div class="rd-journey-line">
+                <template for:each={journey} for:item="step">
+                    <div key={step.id} class={step.class}>
+                        <div class="dot"></div>
+                        <div class="j-label">{step.title}</div>
+                        <div class="j-sub">{step.sub}</div>
+                    </div>
+                </template>
+            </div>
+        </section>
+
+    </div>
+</template>
