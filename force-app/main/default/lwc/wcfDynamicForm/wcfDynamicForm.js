@@ -12,8 +12,14 @@ import submitDynamicApplication from '@salesforce/apex/WCFFormEngineController.s
 import deleteUploadedFile from '@salesforce/apex/WCFFormEngineController.deleteUploadedFile';
 import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedback';
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
-import { calculateEndingBalance } from 'c/wcfFormEvaluator';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+function calculateEndingBalance(startBalance, revenue, expense) {
+    const start = Number(startBalance) || 0;
+    const rev = Number(revenue) || 0;
+    const exp = Number(expense) || 0;
+    return start + rev - exp;
+}
 
 export default class WcfDynamicForm extends LightningElement {
     @api recordId;

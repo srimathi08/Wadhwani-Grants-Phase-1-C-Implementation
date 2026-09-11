@@ -1710,6 +1710,128 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     }
 }
 
+/* ── FAQ Accordion (Block 3) ── */
+.faq-card-box {
+    padding: 12px 20px;
+}
+
+.faq-item {
+    border-bottom: 1px solid #edf2f7;
+    padding: 14px 0;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.faq-symbol {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #8A1C1C;
+    width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+.faq-question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.faq-content-body {
+    padding: 12px 0 6px 32px;
+    font-size: 0.92rem;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.faq-example-box {
+    margin-top: 10px;
+    background: #f7fafc;
+    border-left: 3px solid #8A1C1C;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    color: #4a5568;
+}
+
+/* ── Submit / Processing Overlay ── */
+.wcf-submit-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wcf-submit-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-width: 440px;
+    width: 90%;
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wcf-submit-spinner {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
+    animation: rotateSpinner 1.2s linear infinite;
+}
+
+.wcf-submit-spinner-track {
+    stroke: #f3f3f3;
+}
+
+.wcf-submit-spinner-arc {
+    stroke: #8A1C1C;
+    stroke-linecap: round;
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: 0;
+}
+
+@keyframes rotateSpinner {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.wcf-submit-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.wcf-submit-modal-sub {
+    font-size: 0.9rem;
+    color: #666666;
+    margin: 0;
+    line-height: 1.5;
+}
+
 
 
 

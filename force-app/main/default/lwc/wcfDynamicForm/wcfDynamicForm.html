@@ -91,7 +91,55 @@
                     <!-- BLOCK 3: FAQ, WHAT THE THREE TRACKS MEAN -->
                     <div data-id="faq-section" class="block-divider-label faq-section-target">BLOCK 3 · FAQ, WHAT THE THREE TRACKS MEAN</div>
 
-                    <c-wcf-application-faq-modal standalone category="RFI Track FAQ"></c-wcf-application-faq-modal>
+                    <div class="rfi-card-box faq-card-box">
+                        <!-- FAQ 1: Job Fulfillment -->
+                        <div class="faq-item">
+                            <div class="faq-header clickable" data-faq="jobFulfillment" onclick={toggleFaq}>
+                                <span class="faq-symbol">{faqJobFulfillmentSymbol}</span>
+                                <h3 class="faq-question-text">Job Fulfillment (Skilling and Placement)</h3>
+                            </div>
+                            <template if:true={isFaqJobFulfillmentOpen}>
+                                <div class="faq-content-body">
+                                    <p>Organizations in this track train youth in market-aligned vocational skills and place them into formal, wage-paying employment with verifiable employer records.</p>
+                                    <div class="faq-example-box">
+                                        <strong>Example.</strong> A vocational skilling institute offering 3-month certified technical courses, placing 85% of graduates into formal retail and logistics roles with offer letters.
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- FAQ 2: Job Creation -->
+                        <div class="faq-item">
+                            <div class="faq-header clickable" data-faq="jobCreation" onclick={toggleFaq}>
+                                <span class="faq-symbol">{faqJobCreationSymbol}</span>
+                                <h3 class="faq-question-text">Job Creation (SME / Enterprise Support)</h3>
+                            </div>
+                            <template if:true={isFaqJobCreationOpen}>
+                                <div class="faq-content-body">
+                                    <p>Organizations that accelerate early-stage micro and small enterprises, enabling them to expand operations and create net-new employment opportunities for others.</p>
+                                    <div class="faq-example-box">
+                                        <strong>Example.</strong> An enterprise accelerator providing capital access and mentorship to micro-manufacturers, directly resulting in each hiring 3–5 additional full-time staff.
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- FAQ 3: Livelihood -->
+                        <div class="faq-item">
+                            <div class="faq-header clickable" data-faq="livelihood" onclick={toggleFaq}>
+                                <span class="faq-symbol">{faqLivelihoodSymbol}</span>
+                                <h3 class="faq-question-text">Livelihood Upliftment</h3>
+                            </div>
+                            <template if:true={isFaqLivelihoodOpen}>
+                                <div class="faq-content-body">
+                                    <p>Interventions that systematically lift low-income household earnings to sustainable family-supporting thresholds (e.g., above ₹1,00,000/yr with 30%+ net uplift).</p>
+                                    <div class="faq-example-box">
+                                        <strong>Example.</strong> An agricultural producer company aggregating smallholder farmers, introducing high-value crop cultivation and direct market linkages to double net family incomes.
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
 
                 </div>
             </template>
