@@ -1,6 +1,6 @@
 import { LightningElement, api, track } from 'lwc';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import WIN_LOGO from '@salesforce/resourceUrl/WIN_LOGO';
+import WIN_LOGO from '@salesforce/resourceUrl/WIN_Logo';
 import flagTelpicker from '@salesforce/resourceUrl/flagTelpicker';
 import JSPDF from '@salesforce/resourceUrl/downloadjs';
 import AUTO_TABLE from '@salesforce/resourceUrl/autotable';
@@ -137,14 +137,18 @@ export default class WcfDynamicForm extends LightningElement {
     _beforeUnloadHandler = null;
 
     connectedCallback() {
-        this._beforeUnloadHandler = (event) => {
-            if (this.isDirty) {
-                event.preventDefault();
-                event.returnValue = '';
-                return '';
-            }
-        };
-        window.addEventListener('beforeunload', this._beforeUnloadHandler);
+        try {
+            this._beforeUnloadHandler = (event) => {
+                if (this.isDirty) {
+                    event.preventDefault();
+                    event.returnValue = '';
+                    return '';
+                }
+            };
+            window.addEventListener('beforeunload', this._beforeUnloadHandler);
+        } catch (e) {
+            // Sandboxed iframe safety
+        }
 
         this.loadMetadata();
         this._loadPdfLibraries();
@@ -171,9 +175,11 @@ export default class WcfDynamicForm extends LightningElement {
 
     disconnectedCallback() {
         this._destroyPhoneIti();
-        if (this._beforeUnloadHandler) {
-            window.removeEventListener('beforeunload', this._beforeUnloadHandler);
-        }
+        try {
+            if (this._beforeUnloadHandler) {
+                window.removeEventListener('beforeunload', this._beforeUnloadHandler);
+            }
+        } catch (e) {}
     }
 
     @track metadataQuestions = [];
@@ -511,6 +517,11 @@ export default class WcfDynamicForm extends LightningElement {
             map.Q12 = currentNumber++;
             map.Q13 = currentNumber++;
             map.Q14 = currentNumber++;
+        } else {
+            map.Q11 = '11';
+            map.Q12 = '12';
+            map.Q13 = '13';
+            map.Q14 = '14';
         }
 
         // Section 2: Job Creation (Q15 - Q18)
@@ -519,6 +530,11 @@ export default class WcfDynamicForm extends LightningElement {
             map.Q16 = currentNumber++;
             map.Q17 = currentNumber++;
             map.Q18 = currentNumber++;
+        } else {
+            map.Q15 = '15';
+            map.Q16 = '16';
+            map.Q17 = '17';
+            map.Q18 = '18';
         }
 
         // Section 2: Livelihood (Q19 - Q23)
@@ -528,6 +544,12 @@ export default class WcfDynamicForm extends LightningElement {
             map.Q21 = currentNumber++;
             map.Q22 = currentNumber++;
             map.Q23 = currentNumber++;
+        } else {
+            map.Q19 = '19';
+            map.Q20 = '20';
+            map.Q21 = '21';
+            map.Q22 = '22';
+            map.Q23 = '23';
         }
 
         // Section 3: Why Wadhwani / Deliverables & Synergies (Q24 - Q28)
