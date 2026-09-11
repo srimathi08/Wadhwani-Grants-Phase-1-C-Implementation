@@ -361,6 +361,21 @@
                     </div>
                 </div>
 
+                <!-- Dynamic Custom Questions for About Org -->
+                <template if:true={hasCustomQuestionsAboutOrg}>
+                    <template for:each={customQuestionsAboutOrg} for:item="cq">
+                        <div key={cq.key} class="rv-row">
+                            <div class="rv-lbl">
+                                <span class="rv-q-num">{cq.displayNumber}</span>
+                                <span class="rv-lbl-text">{cq.label}</span>
+                            </div>
+                            <div class="rv-val">
+                                <span>{cq.displayValue}</span>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+
             </div>
 
             <!-- ═══════════════════════════════════════════════════════════
@@ -490,6 +505,21 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Dynamic Custom Questions for Job Fulfillment -->
+                    <template if:true={hasCustomQuestionsJobFulfillment}>
+                        <template for:each={customQuestionsJobFulfillment} for:item="cq">
+                            <div key={cq.key} class="rv-row">
+                                <div class="rv-lbl">
+                                    <span class="rv-q-num">{cq.displayNumber}</span>
+                                    <span class="rv-lbl-text">{cq.label}</span>
+                                </div>
+                                <div class="rv-val">
+                                    <span>{cq.displayValue}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
 
                 </div>
             </template>
@@ -627,6 +657,21 @@
                         </div>
                     </div>
 
+                    <!-- Dynamic Custom Questions for Job Creation -->
+                    <template if:true={hasCustomQuestionsJobCreation}>
+                        <template for:each={customQuestionsJobCreation} for:item="cq">
+                            <div key={cq.key} class="rv-row">
+                                <div class="rv-lbl">
+                                    <span class="rv-q-num">{cq.displayNumber}</span>
+                                    <span class="rv-lbl-text">{cq.label}</span>
+                                </div>
+                                <div class="rv-val">
+                                    <span>{cq.displayValue}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
                 </div>
             </template>
 
@@ -720,6 +765,21 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Dynamic Custom Questions for Livelihood Upliftment -->
+                    <template if:true={hasCustomQuestionsLivelihood}>
+                        <template for:each={customQuestionsLivelihood} for:item="cq">
+                            <div key={cq.key} class="rv-row">
+                                <div class="rv-lbl">
+                                    <span class="rv-q-num">{cq.displayNumber}</span>
+                                    <span class="rv-lbl-text">{cq.label}</span>
+                                </div>
+                                <div class="rv-val">
+                                    <span>{cq.displayValue}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
 
                 </div>
             </template>
@@ -836,6 +896,21 @@
                             </template>
                         </div>
                     </div>
+                </template>
+
+                <!-- Dynamic Custom Questions for Why Wadhwani -->
+                <template if:true={hasCustomQuestionsWhyWadhwani}>
+                    <template for:each={customQuestionsWhyWadhwani} for:item="cq">
+                        <div key={cq.key} class="rv-row">
+                            <div class="rv-lbl">
+                                <span class="rv-q-num">{cq.displayNumber}</span>
+                                <span class="rv-lbl-text">{cq.label}</span>
+                            </div>
+                            <div class="rv-val">
+                                <span>{cq.displayValue}</span>
+                            </div>
+                        </div>
+                    </template>
                 </template>
 
             </div>

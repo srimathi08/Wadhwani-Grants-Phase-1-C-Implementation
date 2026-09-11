@@ -240,29 +240,37 @@ public without sharing class WCFFormEngineController {
                 return wrapper;
             }
 
-            // 1. Query IndividualApplication
-            IndividualApplication app = [
-                SELECT Id, Status, RecordTypeId, AccountId, OwnerId, Category, Last_Page__c,
-                       Organizational_Area_s_for_Funding_Inves__c,
-                       Organization_Name__c, Headquarters_City_and_Country__c, Primary_Service_Regions__c,
-                       Leader_Name__c, Leader_Title__c, Leader_Tenure__c,
-                       Submitter_Name__c, Job_Title__c, Work_Email_ID__c, Phone__c, WG_Phone_Country_Code__c,
-                       Legal_Type__c, Legal_Type_Other__c, Registration_Jurisdiction__c, Registration_Jurisdiction_Other__c,
-                       Legal_Structure__c, Current_fiscal_year_s_end_date__c,
-                       Funder_1_Name__c, Funder_1_Amount__c, Funder_1_Period_Start__c, Funder_1_Period_End__c, Funder_1_Type__c,
-                       Funder_2_Name__c, Funder_2_Amount__c, Funder_2_Period_Start__c, Funder_2_Period_End__c, Funder_2_Type__c,
-                       Funder_3_Name__c, Funder_3_Amount__c, Funder_3_Period_Start__c, Funder_3_Period_End__c, Funder_3_Type__c,
-                       Reference_1_Name__c, Reference_1_Role__c, Reference_1_Email__c,
-                       Reference_2_Name__c, Reference_2_Role__c, Reference_2_Email__c,
-                       Skilling_Approach__c, Job_Creation_Approach__c,
-                       Organizational_Sustainability__c, Use_of_Additional_Funding__c,
-                       GenieAI_Interest_Level__c, Operational_Synergies_with_WOF__c,
-                       Attesting_User_Name__c, Attesting_User_Title__c
-                FROM IndividualApplication 
-                WHERE Id = :appId 
-                WITH SYSTEM_MODE 
-                LIMIT 1
-            ];
+            // 1. Build dynamic SOQL query for IndividualApplication including all fields from RFI_Question__mdt
+            Set<String> fieldNames = new Set<String>{
+                'Id', 'Status', 'RecordTypeId', 'AccountId', 'OwnerId', 'Category', 'Last_Page__c',
+                'Organizational_Area_s_for_Funding_Inves__c', 'ContactId', 'Principal_Investigator_PI__c', 'PI__c',
+                'Organization_Name__c', 'Headquarters_City_and_Country__c', 'Primary_Service_Regions__c',
+                'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c',
+                'Submitter_Name__c', 'Job_Title__c', 'Work_Email_ID__c', 'Phone__c', 'WG_Phone_Country_Code__c',
+                'Legal_Type__c', 'Legal_Type_Other__c', 'Registration_Jurisdiction__c', 'Registration_Jurisdiction_Other__c',
+                'Legal_Structure__c', 'Current_fiscal_year_s_end_date__c',
+                'Funder_1_Name__c', 'Funder_1_Amount__c', 'Funder_1_Period_Start__c', 'Funder_1_Period_End__c', 'Funder_1_Type__c',
+                'Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c', 'Funder_2_Period_End__c', 'Funder_2_Type__c',
+                'Funder_3_Name__c', 'Funder_3_Amount__c', 'Funder_3_Period_Start__c', 'Funder_3_Period_End__c', 'Funder_3_Type__c',
+                'Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c',
+                'Reference_2_Name__c', 'Reference_2_Role__c', 'Reference_2_Email__c',
+                'Skilling_Approach__c', 'Job_Creation_Approach__c',
+                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c',
+                'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
+                'Attesting_User_Name__c', 'Attesting_User_Title__c'
+            };
+
+            Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
+            for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
+                if (String.isNotBlank(q.Field_API_Name__c) && (q.Target_Object__c == 'IndividualApplication' || String.isBlank(q.Target_Object__c))) {
+                    if (appFieldMap.containsKey(q.Field_API_Name__c.toLowerCase())) {
+                        fieldNames.add(appFieldMap.get(q.Field_API_Name__c.toLowerCase()).getDescribe().getName());
+                    }
+                }
+            }
+
+            String soql = 'SELECT ' + String.join(new List<String>(fieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :appId WITH SYSTEM_MODE LIMIT 1';
+            IndividualApplication app = Database.query(soql);
 
             wrapper.recordId = app.Id;
             wrapper.status = app.Status;
@@ -637,6 +645,7 @@ public without sharing class WCFFormEngineController {
             wgRt = rtsByDevName.values()[0];
         }
 
+        Map<String, Schema.SObjectField> appFields = Schema.SObjectType.IndividualApplication.fields.getMap();
         Boolean isNew = (recordId == null);
         IndividualApplication app;
         if (isNew) {
@@ -647,20 +656,23 @@ public without sharing class WCFFormEngineController {
                 Draft_Email_Sent__c = true
             );
         } else {
-            app = [
-                SELECT Id, RecordTypeId, AccountId, Category, Status, OwnerId, Initial_Submission_Date__c, Last_Resubmission_Date__c, Last_Page__c,
-                       Organization_Name__c, ContactId, Principal_Investigator_PI__c, PI__c, Attesting_User_Name__c, Attesting_User_Title__c, Attestation_Date__c,
-                       Draft_Email_Sent__c,
-                       Skilling_Approach__c, Job_Creation_Approach__c,
-                       Organizational_Sustainability__c, Use_of_Additional_Funding__c,
-                       GenieAI_Interest_Level__c, Operational_Synergies_with_WOF__c,
-                       Leader_Tenure__c,
-                       Organizational_Area_s_for_Funding_Inves__c
-                FROM IndividualApplication 
-                WHERE Id = :recordId 
-                WITH SYSTEM_MODE 
-                LIMIT 1
-            ];
+            Set<String> updateFieldNames = new Set<String>{
+                'Id', 'RecordTypeId', 'AccountId', 'Category', 'Status', 'OwnerId', 'Initial_Submission_Date__c', 'Last_Resubmission_Date__c', 'Last_Page__c',
+                'Organization_Name__c', 'ContactId', 'Principal_Investigator_PI__c', 'PI__c', 'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c',
+                'Draft_Email_Sent__c', 'Skilling_Approach__c', 'Job_Creation_Approach__c',
+                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c',
+                'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
+                'Leader_Tenure__c', 'Organizational_Area_s_for_Funding_Inves__c'
+            };
+            for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
+                if (String.isNotBlank(q.Field_API_Name__c) && (q.Target_Object__c == 'IndividualApplication' || String.isBlank(q.Target_Object__c))) {
+                    if (appFields.containsKey(q.Field_API_Name__c.toLowerCase())) {
+                        updateFieldNames.add(appFields.get(q.Field_API_Name__c.toLowerCase()).getDescribe().getName());
+                    }
+                }
+            }
+            String updateSoql = 'SELECT ' + String.join(new List<String>(updateFieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :recordId WITH SYSTEM_MODE LIMIT 1';
+            app = Database.query(updateSoql);
         }
 
         app.Draft_Email_Sent__c = true;
@@ -745,7 +757,6 @@ public without sharing class WCFFormEngineController {
         }
 
         // Map valuesMap into IndividualApplication fields
-        Map<String, Schema.SObjectField> appFields = Schema.SObjectType.IndividualApplication.fields.getMap();
         for (String f : valuesMap.keySet()) {
             if (f == 'Id' || f == 'RecordTypeId' || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves__c') || !appFields.containsKey(f.toLowerCase())) continue;
             Object val = valuesMap.get(f);

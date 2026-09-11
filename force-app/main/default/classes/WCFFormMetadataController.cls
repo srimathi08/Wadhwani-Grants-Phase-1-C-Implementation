@@ -21,6 +21,15 @@ public with sharing class WCFFormMetadataController {
         @AuraEnabled public List<String> applicableTracks;
     }
 
+    public class PicklistOption {
+        @AuraEnabled public String label;
+        @AuraEnabled public String value;
+        public PicklistOption(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
+    }
+
     public class QuestionWrapper {
         @AuraEnabled public String key;
         @AuraEnabled public String sectionCode;
@@ -35,6 +44,8 @@ public with sharing class WCFFormMetadataController {
         @AuraEnabled public List<String> applicableTracks;
         @AuraEnabled public String picklistSource;
         @AuraEnabled public Integer maxWordCount;
+        @AuraEnabled public List<PicklistOption> picklistOptions;
+        @AuraEnabled public Boolean isCustom;
     }
 
     public class RuleWrapper {
@@ -140,7 +151,7 @@ public with sharing class WCFFormMetadataController {
         sections.add(s1);
         
         SectionWrapper s2 = new SectionWrapper();
-        s2.code = 'SEC_WHAT_YOU_DO';
+        s2.code = 'SEC_JOB_FULFILLMENT';
         s2.title = '2. What You Do';
         s2.description = 'Core programmatic operations, skilling domains, and business sectors.';
         s2.sequence = 2;
@@ -156,7 +167,7 @@ public with sharing class WCFFormMetadataController {
         sections.add(s3);
         
         SectionWrapper s4 = new SectionWrapper();
-        s4.code = 'SEC_WHY_WCF';
+        s4.code = 'SEC_WHY_WADHWANI';
         s4.title = '4. Why Wadhwani Grants';
         s4.description = 'Strategic alignment, proposed project budget, and leadership references.';
         s4.sequence = 4;
@@ -176,10 +187,29 @@ public with sharing class WCFFormMetadataController {
 
     private static List<QuestionWrapper> getQuestions(String languageCode) {
         List<QuestionWrapper> questions = new List<QuestionWrapper>();
+        
+        // Built-in question keys for tracking
+        Set<String> builtInKeys = new Set<String>{
+            'Q1_SELECTED_TRACKS', 'Q2_ORG_NAME', 'Q2_HQ_LOCATION', 'Q2_PRIMARY_REGIONS', 'Q2_LEADER_NAME', 'Q2_LEADER_TITLE', 'Q2_LEADER_TENURE',
+            'Q3_SUBMITTER_NAME', 'Q3_JOB_TITLE', 'Q3_WORK_EMAIL', 'Q3_PHONE',
+            'Q4_LEGAL_TYPE', 'Q4_JURISDICTION', 'Q4_INCORP_DATE', 'Q4_GOVERNANCE_DESC',
+            'Q5_US_501C3', 'Q5_ED_STATUS', 'Q5_FCRA_STATUS', 'Q5_WILLING_ED',
+            'Q6_FISCAL_MONTH', 'Q6_FISCAL_DAY', 'Q7_TOP_FUNDERS', 'Q8_REFERENCES',
+            'Q9_HIST_FINANCIALS', 'Q10_CURRENT_FY',
+            'Q11_SKILLING_APPROACH', 'Q12_SKILLING_DOMAINS', 'Q13_JF_HIST_OUTCOMES', 'Q14_JF_PROJ_OUTCOMES',
+            'Q15_JOB_CREATION_APPROACH', 'Q16_BUSINESS_SECTORS', 'Q17_JC_HIST_OUTCOMES', 'Q18_JC_PROJ_OUTCOMES',
+            'Q19_LIVELIHOOD_APPROACH', 'Q20_LIVELIHOOD_PROGRAMS', 'Q21_COMMUNITIES_SERVED', 'Q22_LIVELIHOOD_ACTUALS', 'Q23_LIVELIHOOD_PROJ',
+            'Q24_INDEPENDENT_VERIFICATION', 'Q24_OPERATIONAL_SYNERGIES',
+            'Q25_SUSTAINABILITY_PLAN', 'Q26_ADDITIONAL_FUNDING', 'Q27_GENIE_AI', 'Q28_SUPPORTING_DOCS'
+        };
+
+        Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
+
         List<RFI_Question__mdt> records = [
             SELECT DeveloperName, Question_Code__c, Section_Code__c, Field_API_Name__c,
                    Target_Object__c, Display_Type__c, Label__c
             FROM RFI_Question__mdt
+            ORDER BY DeveloperName ASC
         ];
         
         if (!records.isEmpty()) {
@@ -189,12 +219,52 @@ public with sharing class WCFFormMetadataController {
                 q.key = String.isNotBlank(r.Question_Code__c) ? r.Question_Code__c : r.DeveloperName;
                 q.sectionCode = String.isNotBlank(r.Section_Code__c) ? r.Section_Code__c : 'SEC_ABOUT_ORG';
                 q.sequence = seq++;
-                q.displayType = String.isNotBlank(r.Display_Type__c) ? r.Display_Type__c : 'Text';
                 q.targetObject = String.isNotBlank(r.Target_Object__c) ? r.Target_Object__c : 'IndividualApplication';
                 q.targetField = r.Field_API_Name__c;
                 q.label = r.Label__c;
-                q.isRequired = true;
+                q.isRequired = false;
                 q.applicableTracks = new List<String>();
+                q.picklistOptions = new List<PicklistOption>();
+                q.isCustom = !builtInKeys.contains(q.key);
+
+                // Auto-describe field if on IndividualApplication
+                String fieldNameLower = String.isNotBlank(q.targetField) ? q.targetField.toLowerCase() : '';
+                if (q.targetObject == 'IndividualApplication' && appFieldMap.containsKey(fieldNameLower)) {
+                    Schema.DescribeFieldResult dfr = appFieldMap.get(fieldNameLower).getDescribe();
+                    if (String.isBlank(q.label)) {
+                        q.label = dfr.getLabel();
+                    }
+                    q.helpText = dfr.getInlineHelpText();
+                    q.isRequired = !dfr.isNillable();
+
+                    // Detect Display Type if blank or Auto
+                    if (String.isBlank(r.Display_Type__c) || r.Display_Type__c.equalsIgnoreCase('Auto')) {
+                        Schema.DisplayType dt = dfr.getType();
+                        if (dt == Schema.DisplayType.PICKLIST) q.displayType = 'Picklist';
+                        else if (dt == Schema.DisplayType.TEXTAREA) q.displayType = dfr.isHtmlFormatted() ? 'RichText' : 'TextArea';
+                        else if (dt == Schema.DisplayType.BOOLEAN) q.displayType = 'Checkbox';
+                        else if (dt == Schema.DisplayType.DATE) q.displayType = 'Date';
+                        else if (dt == Schema.DisplayType.DATETIME) q.displayType = 'DateTime';
+                        else if (dt == Schema.DisplayType.INTEGER || dt == Schema.DisplayType.DOUBLE || dt == Schema.DisplayType.CURRENCY || dt == Schema.DisplayType.PERCENT) q.displayType = 'Number';
+                        else if (dt == Schema.DisplayType.EMAIL) q.displayType = 'Email';
+                        else if (dt == Schema.DisplayType.PHONE) q.displayType = 'Phone';
+                        else q.displayType = 'Text';
+                    } else {
+                        q.displayType = r.Display_Type__c;
+                    }
+
+                    // Populate picklist options if applicable
+                    if (dfr.getType() == Schema.DisplayType.PICKLIST) {
+                        for (Schema.PicklistEntry pe : dfr.getPicklistValues()) {
+                            if (pe.isActive()) {
+                                q.picklistOptions.add(new PicklistOption(pe.getLabel(), pe.getValue()));
+                            }
+                        }
+                    }
+                } else {
+                    q.displayType = String.isNotBlank(r.Display_Type__c) ? r.Display_Type__c : 'Text';
+                }
+
                 questions.add(q);
             }
             return questions;
@@ -212,6 +282,7 @@ public with sharing class WCFFormMetadataController {
         qTrack.helpText = 'You may select one or more tracks that apply to your organization.';
         qTrack.isRequired = true;
         qTrack.applicableTracks = new List<String>();
+        qTrack.isCustom = false;
         questions.add(qTrack);
         
         QuestionWrapper qName = new QuestionWrapper();
@@ -225,6 +296,7 @@ public with sharing class WCFFormMetadataController {
         qName.placeholder = 'Enter full registered legal name';
         qName.isRequired = true;
         qName.applicableTracks = new List<String>();
+        qName.isCustom = false;
         questions.add(qName);
         
         QuestionWrapper qHistFin = new QuestionWrapper();
@@ -237,6 +309,7 @@ public with sharing class WCFFormMetadataController {
         qHistFin.helpText = 'Provide audited financial figures across the 3 prior fiscal years.';
         qHistFin.isRequired = true;
         qHistFin.applicableTracks = new List<String>();
+        qHistFin.isCustom = false;
         questions.add(qHistFin);
 
         QuestionWrapper qOutcomes = new QuestionWrapper();
@@ -249,6 +322,7 @@ public with sharing class WCFFormMetadataController {
         qOutcomes.helpText = 'Historical and current projected outcomes for your selected tracks.';
         qOutcomes.isRequired = true;
         qOutcomes.applicableTracks = new List<String>();
+        qOutcomes.isCustom = false;
         questions.add(qOutcomes);
 
         return questions;

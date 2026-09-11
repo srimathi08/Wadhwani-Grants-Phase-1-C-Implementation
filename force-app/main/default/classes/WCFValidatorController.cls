@@ -709,35 +709,49 @@ public without sharing class WCFValidatorController {
     public static WCFPreviewWrapper getWCFFullPreviewData(Id applicationId) {
         WCFPreviewWrapper wrapper = new WCFPreviewWrapper();
 
-        wrapper.application = [
-            SELECT
-                Id, Name, Status, AppliedDate, Funding_Year__c, RecordType.Name,
-                Organizational_Area_s_for_Funding_Inves__c, Organizational_Area_s_for_Funding_Inves1__c, Organization_Name__c,
-                Headquarters_City_and_Country__c, Primary_Service_Regions__c,
-                Leader_Name__c, Leader_Title__c, Leader_Tenure__c, Submitter_Name__c, Job_Title__c,
-                WG_Phone_Country_Code__c, Phone_Country_Code__c,
-                Work_Email_ID__c, Phone__c, Legal_Structure__c,
-                Legal_Type__c, Legal_Type_Other__c,
-                Registration_Jurisdiction__c, Registration_Jurisdiction_Other__c,
-                Incorporation_Date__c, Has_501c3_Status__c, Has_Equivalency_Determination__c,
-                Is_FCRA_Registered__c, Willing_to_Pursue_ED__c,
-                Fiscal_Day__c, Fiscal_Month__c, Current_fiscal_year_s_end_date__c,
-                Funder_1_Name__c, Funder_1_Amount__c, Funder_1_Period_Start__c, Funder_1_Period_End__c, Funder_1_Type__c,
-                Funder_2_Name__c, Funder_2_Amount__c, Funder_2_Period_Start__c, Funder_2_Period_End__c, Funder_2_Type__c,
-                Funder_3_Name__c, Funder_3_Amount__c, Funder_3_Period_Start__c, Funder_3_Period_End__c, Funder_3_Type__c,
-                Reference_1_Name__c, Reference_1_Role__c, Reference_1_Email__c,
-                Reference_2_Name__c, Reference_2_Role__c, Reference_2_Email__c,
-                Skilling_Approach__c, Job_Creation_Approach__c, Livelihood_Approach__c, Business_Sectors_JSON__c,
-                Q24_VERIFIED__c, Q24_REPORT_URL__c, Details_of_Ethical_Received__c,
-                Organizational_Sustainability__c,
-                Use_of_Additional_Funding__c, Use_of_Additional_Funding_JC__c,
-                GenieAI_Interest_Level__c,
-                Operational_Synergies_with_WOF__c, Operational_Synergies_with_WOF_JC__c, Operational_Synergies_with_WOF_Both__c,
-                Attesting_User_Name__c, Attesting_User_Title__c, Initial_Submission_Date__c, Attestation_Date__c,
-                CreatedDate, LastModifiedDate, CreatedBy.Name, CreatedBy.Title
-            FROM IndividualApplication
-            WHERE Id = :applicationId WITH SYSTEM_MODE LIMIT 1
-        ];
+        Set<String> fieldNames = new Set<String>{
+            'Id', 'Name', 'Status', 'AppliedDate', 'Funding_Year__c', 'RecordType.Name',
+            'Organizational_Area_s_for_Funding_Inves__c', 'Organization_Name__c',
+            'Headquarters_City_and_Country__c', 'Primary_Service_Regions__c',
+            'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c', 'Submitter_Name__c', 'Job_Title__c',
+            'WG_Phone_Country_Code__c', 'Phone_Country_Code__c',
+            'Work_Email_ID__c', 'Phone__c', 'Legal_Structure__c',
+            'Legal_Type__c', 'Legal_Type_Other__c',
+            'Registration_Jurisdiction__c', 'Registration_Jurisdiction_Other__c',
+            'Incorporation_Date__c', 'Has_501c3_Status__c', 'Has_Equivalency_Determination__c',
+            'Is_FCRA_Registered__c', 'Willing_to_Pursue_ED__c',
+            'Fiscal_Day__c', 'Fiscal_Month__c', 'Current_fiscal_year_s_end_date__c',
+            'Funder_1_Name__c', 'Funder_1_Amount__c', 'Funder_1_Period_Start__c', 'Funder_1_Period_End__c', 'Funder_1_Type__c',
+            'Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c', 'Funder_2_Period_End__c', 'Funder_2_Type__c',
+            'Funder_3_Name__c', 'Funder_3_Amount__c', 'Funder_3_Period_Start__c', 'Funder_3_Period_End__c', 'Funder_3_Type__c',
+            'Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c',
+            'Reference_2_Name__c', 'Reference_2_Role__c', 'Reference_2_Email__c',
+            'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c', 'Business_Sectors_JSON__c',
+            'Q24_VERIFIED__c', 'Q24_REPORT_URL__c', 'Details_of_Ethical_Received__c',
+            'Organizational_Sustainability__c',
+            'Use_of_Additional_Funding__c', 'Use_of_Additional_Funding_JC__c',
+            'GenieAI_Interest_Level__c',
+            'Operational_Synergies_with_WOF__c', 'Operational_Synergies_with_WOF_JC__c', 'Operational_Synergies_with_WOF_Both__c',
+            'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Initial_Submission_Date__c', 'Attestation_Date__c',
+            'CreatedDate', 'LastModifiedDate', 'CreatedBy.Name', 'CreatedBy.Title'
+        };
+
+        Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
+        try {
+            for (RFI_Question__mdt q : [SELECT Target_Field__c, Target_Object__c, Is_Active__c FROM RFI_Question__mdt WHERE Is_Active__c = true]) {
+                if (String.isNotBlank(q.Target_Field__c) && (String.isBlank(q.Target_Object__c) || q.Target_Object__c.equalsIgnoreCase('IndividualApplication'))) {
+                    String cleanFld = q.Target_Field__c.trim();
+                    if (appFieldMap.containsKey(cleanFld.toLowerCase())) {
+                        fieldNames.add(appFieldMap.get(cleanFld.toLowerCase()).getDescribe().getName());
+                    }
+                }
+            }
+        } catch (Exception qEx) {
+            System.debug(LoggingLevel.WARN, 'Could not query RFI_Question__mdt in getWCFFullPreviewData: ' + qEx.getMessage());
+        }
+
+        String soql = 'SELECT ' + String.join(new List<String>(fieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :applicationId WITH SYSTEM_MODE LIMIT 1';
+        wrapper.application = Database.query(soql);
 
         List<Historical_Data__c> hists = [
             SELECT Id, CY1_Balance_Start_CFY_1__c, CY2_Balance_Start_CFY_2__c,

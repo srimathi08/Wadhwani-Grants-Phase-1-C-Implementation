@@ -1125,6 +1125,43 @@
                                 </template>
                             </div>
 
+                            <!-- Dynamic Custom Questions for About Org -->
+                            <template if:true={hasCustomQuestionsAboutOrg}>
+                                <template for:each={customQuestionsAboutOrg} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+
                         </template>
 
 
@@ -1369,6 +1406,43 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- Dynamic Custom Questions for Job Fulfillment -->
+                            <template if:true={hasCustomQuestionsJobFulfillment}>
+                                <template for:each={customQuestionsJobFulfillment} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
 
                         </template>
 
@@ -1650,6 +1724,43 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- Dynamic Custom Questions for Job Creation -->
+                            <template if:true={hasCustomQuestionsJobCreation}>
+                                <template for:each={customQuestionsJobCreation} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
 
                         </template>
 
@@ -1944,6 +2055,43 @@
                                 </div>
                             </div>
 
+                            <!-- Dynamic Custom Questions for Livelihood Upliftment -->
+                            <template if:true={hasCustomQuestionsLivelihood}>
+                                <template for:each={customQuestionsLivelihood} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+
                         </template>
 
 
@@ -2194,6 +2342,43 @@
                                     </template>
                                 </div>
                             </div>
+
+                            <!-- Dynamic Custom Questions for Why Wadhwani -->
+                            <template if:true={hasCustomQuestionsWhyWadhwani}>
+                                <template for:each={customQuestionsWhyWadhwani} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
 
                                 <!-- Tagline Banner -->
                                 <div class="tagline-footer-banner">

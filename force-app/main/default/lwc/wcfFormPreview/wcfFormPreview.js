@@ -1,6 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import getWCFFullPreviewData       from '@salesforce/apex/WCFValidatorController.getWCFFullPreviewData';
 import getApplicationAttachments   from '@salesforce/apex/WCFValidatorController.getApplicationAttachments';
+import getFormMetadata             from '@salesforce/apex/WCFFormMetadataController.getFormMetadata';
 import WCF_LOGO from '@salesforce/resourceUrl/WIN_Logo';
 import getFileBase64 from '@salesforce/apex/WCFValidatorController.getFileBase64';
 import { loadScript } from 'lightning/platformResourceLoader';
@@ -148,14 +149,90 @@ export default class WcfFormPreview extends LightningElement {
     }
 
     // ── Lifecycle Callbacks ──────────────────────────────────────────────────
+    @track metadataQuestions = [];
+
     connectedCallback() {
         this._loadPdfLibraries();
         this._loadPreviewData();
+        this._loadMetadata();
     }
 
     @api
     refreshPreview() {
+        this._loadMetadata();
         return this._loadPreviewData();
+    }
+
+    async _loadMetadata() {
+        try {
+            const meta = await getFormMetadata({
+                languageCode: 'en_US',
+                fiscalMonth: this._app?.Fiscal_Month__c || '03',
+                fiscalDay: this._app?.Fiscal_Day__c || '31'
+            });
+            if (meta && meta.questions) {
+                this.metadataQuestions = meta.questions;
+            }
+        } catch (err) {
+            console.warn('WcfFormPreview metadata load warning:', err);
+        }
+    }
+
+    _getCustomQuestionsForSection(sectionCode, baseNumberPrefix) {
+        if (!this.metadataQuestions || !this.metadataQuestions.length || !this._app) return [];
+        const custom = this.metadataQuestions.filter(q => q.isCustom && (
+            q.sectionCode === sectionCode ||
+            (sectionCode === 'SEC_JOB_FULFILLMENT' && q.sectionCode === 'SEC_WHAT_YOU_DO') ||
+            (sectionCode === 'SEC_WHY_WADHWANI' && q.sectionCode === 'SEC_WHY_WCF')
+        ));
+        return custom.map((q, idx) => {
+            let val = this._app[q.targetField];
+            if (val === undefined || val === null || val === '') {
+                val = '—';
+            } else if (typeof val === 'boolean') {
+                val = val ? 'Yes' : 'No';
+            }
+            return {
+                ...q,
+                displayNumber: `${baseNumberPrefix}.${idx + 1}`,
+                displayValue: String(val)
+            };
+        });
+    }
+
+    get customQuestionsAboutOrg() {
+        return this._getCustomQuestionsForSection('SEC_ABOUT_ORG', 'Q2');
+    }
+    get hasCustomQuestionsAboutOrg() {
+        return this.customQuestionsAboutOrg && this.customQuestionsAboutOrg.length > 0;
+    }
+
+    get customQuestionsJobFulfillment() {
+        return this._getCustomQuestionsForSection('SEC_JOB_FULFILLMENT', `Q${this.qNum?.Q14 || '14'}`);
+    }
+    get hasCustomQuestionsJobFulfillment() {
+        return this.customQuestionsJobFulfillment && this.customQuestionsJobFulfillment.length > 0;
+    }
+
+    get customQuestionsJobCreation() {
+        return this._getCustomQuestionsForSection('SEC_JOB_CREATION', `Q${this.qNum?.Q18 || '18'}`);
+    }
+    get hasCustomQuestionsJobCreation() {
+        return this.customQuestionsJobCreation && this.customQuestionsJobCreation.length > 0;
+    }
+
+    get customQuestionsLivelihood() {
+        return this._getCustomQuestionsForSection('SEC_LIVELIHOOD', `Q${this.qNum?.Q23 || '23'}`);
+    }
+    get hasCustomQuestionsLivelihood() {
+        return this.customQuestionsLivelihood && this.customQuestionsLivelihood.length > 0;
+    }
+
+    get customQuestionsWhyWadhwani() {
+        return this._getCustomQuestionsForSection('SEC_WHY_WADHWANI', `Q${this.qNum?.Q28 || '28'}`);
+    }
+    get hasCustomQuestionsWhyWadhwani() {
+        return this.customQuestionsWhyWadhwani && this.customQuestionsWhyWadhwani.length > 0;
     }
 
     renderedCallback() {
@@ -1393,6 +1470,12 @@ export default class WcfFormPreview extends LightningElement {
             ]);
             if (this.showCFYExplanation) richBoxUnder('Explanation of Deviation', this.cfyVarianceExplanation);
 
+            if (this.hasCustomQuestionsAboutOrg) {
+                this.customQuestionsAboutOrg.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                });
+            }
+
             // ══ SECTION 2 — Track 1: Job Fulfillment (Q11 - Q14) ══
             if (this.isJobFulfillment) {
                 sectionHeader('Track 1: Job Fulfillment', this.sectionJfStepLabel);
@@ -1446,6 +1529,12 @@ export default class WcfFormPreview extends LightningElement {
                     ['Avg Cost per Placement', o.manualCostPerPlaceCFY]
                 ];
                 table(['Item', 'FY-2026 (CFY) — Projection'], jfProjRows);
+
+                if (this.hasCustomQuestionsJobFulfillment) {
+                    this.customQuestionsJobFulfillment.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                    });
+                }
             }
 
             // ══ SECTION 3 — Track 2: Job Creation (Q15 - Q18) ══
@@ -1503,6 +1592,12 @@ export default class WcfFormPreview extends LightningElement {
                     ['Total Avg Cost per Job Created', o.manualCostPerJobCFY]
                 ];
                 table(['Item', 'CFY (projected)'], jcProjRows);
+
+                if (this.hasCustomQuestionsJobCreation) {
+                    this.customQuestionsJobCreation.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                    });
+                }
             }
 
             // ══ SECTION 4 — Track 3: Livelihood Upliftment (Q19 - Q23) ══
@@ -1549,6 +1644,12 @@ export default class WcfFormPreview extends LightningElement {
                     ['Avg. cost per outcome (USD) - projected', o.livCostManualProj]
                 ];
                 table(['Item', 'CFY (projected)'], livProjRows);
+
+                if (this.hasCustomQuestionsLivelihood) {
+                    this.customQuestionsLivelihood.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                    });
+                }
             }
 
             // ══ SECTION 5 — Why Wadhwani Grants & Organizational Sustainability (Q24 - Q28) ══
@@ -1578,6 +1679,12 @@ export default class WcfFormPreview extends LightningElement {
                 drawQLabel(q.Q28, 'Supporting Documents', docTop);
                 y = docTop + 10;
                 table(['File Name'], this.supportingDocuments.map(f => [f.name]));
+            }
+
+            if (this.hasCustomQuestionsWhyWadhwani) {
+                this.customQuestionsWhyWadhwani.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                });
             }
 
             // ══ Addendum — Reviewer Additional Info ══

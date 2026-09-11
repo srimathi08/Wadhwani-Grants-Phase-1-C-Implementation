@@ -176,6 +176,87 @@ export default class WcfDynamicForm extends LightningElement {
         }
     }
 
+    @track metadataQuestions = [];
+
+    loadMetadata() {
+        getFormMetadata({
+            languageCode: this.selectedLanguage || 'en_US',
+            fiscalMonth: this.formValues.Fiscal_Month__c || '03',
+            fiscalDay: this.formValues.Fiscal_Day__c || '31'
+        })
+        .then(result => {
+            if (result && result.questions) {
+                this.metadataQuestions = result.questions;
+            }
+            if (result && result.fiscalYears) {
+                this.fiscalYears = result.fiscalYears;
+            }
+        })
+        .catch(err => {
+            console.warn('Metadata load warning:', err);
+        });
+    }
+
+    _getCustomQuestionsForSection(sectionCode, baseNumberPrefix) {
+        if (!this.metadataQuestions || !this.metadataQuestions.length) return [];
+        const custom = this.metadataQuestions.filter(q => q.isCustom && (
+            q.sectionCode === sectionCode ||
+            (sectionCode === 'SEC_JOB_FULFILLMENT' && q.sectionCode === 'SEC_WHAT_YOU_DO') ||
+            (sectionCode === 'SEC_WHY_WADHWANI' && q.sectionCode === 'SEC_WHY_WCF')
+        ));
+        return custom.map((q, idx) => {
+            const val = this.formValues[q.targetField] !== undefined ? this.formValues[q.targetField] : '';
+            const dt = (q.displayType || 'Text').toLowerCase();
+            return {
+                ...q,
+                displayNumber: `${baseNumberPrefix}.${idx + 1}`,
+                value: val,
+                isText: dt === 'text' || dt === 'string' || dt === 'phone' || dt === 'email',
+                isTextArea: dt === 'textarea' || dt === 'richtext',
+                isNumber: dt === 'number' || dt === 'currency' || dt === 'percent',
+                isDate: dt === 'date' || dt === 'datetime',
+                isCheckbox: dt === 'checkbox' || dt === 'boolean',
+                isPicklist: dt === 'picklist' && q.picklistOptions && q.picklistOptions.length > 0,
+                options: q.picklistOptions || []
+            };
+        });
+    }
+
+    get customQuestionsAboutOrg() {
+        return this._getCustomQuestionsForSection('SEC_ABOUT_ORG', 'Q2');
+    }
+    get hasCustomQuestionsAboutOrg() {
+        return this.customQuestionsAboutOrg && this.customQuestionsAboutOrg.length > 0;
+    }
+
+    get customQuestionsJobFulfillment() {
+        return this._getCustomQuestionsForSection('SEC_JOB_FULFILLMENT', `Q${this.qNum?.Q14 || '14'}`);
+    }
+    get hasCustomQuestionsJobFulfillment() {
+        return this.customQuestionsJobFulfillment && this.customQuestionsJobFulfillment.length > 0;
+    }
+
+    get customQuestionsJobCreation() {
+        return this._getCustomQuestionsForSection('SEC_JOB_CREATION', `Q${this.qNum?.Q18 || '18'}`);
+    }
+    get hasCustomQuestionsJobCreation() {
+        return this.customQuestionsJobCreation && this.customQuestionsJobCreation.length > 0;
+    }
+
+    get customQuestionsLivelihood() {
+        return this._getCustomQuestionsForSection('SEC_LIVELIHOOD', `Q${this.qNum?.Q23 || '23'}`);
+    }
+    get hasCustomQuestionsLivelihood() {
+        return this.customQuestionsLivelihood && this.customQuestionsLivelihood.length > 0;
+    }
+
+    get customQuestionsWhyWadhwani() {
+        return this._getCustomQuestionsForSection('SEC_WHY_WADHWANI', `Q${this.qNum?.Q28 || '28'}`);
+    }
+    get hasCustomQuestionsWhyWadhwani() {
+        return this.customQuestionsWhyWadhwani && this.customQuestionsWhyWadhwani.length > 0;
+    }
+
     loadDraftData() {
         this.isLoading = true;
         getDynamicDraft({ recordId: this.recordId })
@@ -995,6 +1076,13 @@ export default class WcfDynamicForm extends LightningElement {
         if (this.isDeviationExplanationRequired) {
             labelValue('Explanation of Deviation', form.Revenue_Explanation__c, 'Q10');
         }
+        if (this.hasCustomQuestionsAboutOrg) {
+            this.customQuestionsAboutOrg.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
 
         // ══ SECTION 2 — Job Fulfillment ══
         if (this.hasJobFulfillmentTrack) {
@@ -1022,6 +1110,14 @@ export default class WcfDynamicForm extends LightningElement {
                 ['Placement %', `${val(this.computedJfPlacePctProj)}%`],
                 ['Avg Cost per Placement', val$(form.JF_COST_PROJ)]
             ]);
+
+            if (this.hasCustomQuestionsJobFulfillment) {
+                this.customQuestionsJobFulfillment.forEach(cq => {
+                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                        labelValue(cq.label, String(cq.value), cq.displayNumber);
+                    }
+                });
+            }
         }
 
         // ══ SECTION 3 — Job Creation ══
@@ -1052,6 +1148,14 @@ export default class WcfDynamicForm extends LightningElement {
                 ['# jobs created by existing businesses', val(form.JC_EXIST_JOBS_PROJ)],
                 ['Total Avg Cost per Job Created', val$(form.JC_COST_PROJ)]
             ]);
+
+            if (this.hasCustomQuestionsJobCreation) {
+                this.customQuestionsJobCreation.forEach(cq => {
+                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                        labelValue(cq.label, String(cq.value), cq.displayNumber);
+                    }
+                });
+            }
         }
 
         // ══ SECTION 4 — Livelihood Upliftment ══
@@ -1086,6 +1190,14 @@ export default class WcfDynamicForm extends LightningElement {
                 ['Households expected to meet outcome criteria', val(form.LIV_OUTCOME_PROJ)],
                 ['Avg. cost per outcome (USD) - projected', val$(form.LIV_COST_PROJ)]
             ]);
+
+            if (this.hasCustomQuestionsLivelihood) {
+                this.customQuestionsLivelihood.forEach(cq => {
+                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                        labelValue(cq.label, String(cq.value), cq.displayNumber);
+                    }
+                });
+            }
         }
 
         // ══ SECTION 5 — Why Wadhwani Grants ══
@@ -1101,6 +1213,14 @@ export default class WcfDynamicForm extends LightningElement {
         labelValue('Operational Synergies - Description', form.GenieAI_Synergies_Description__c, 'Q27');
         if (this.q28UploadedFiles && this.q28UploadedFiles.length > 0) {
             labelValue('Supporting Documents', this.q28UploadedFiles.map(f => f.name).join(', '), 'Q28');
+        }
+
+        if (this.hasCustomQuestionsWhyWadhwani) {
+            this.customQuestionsWhyWadhwani.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
         }
 
         section('CONFIRMATION OF ACCURACY');
