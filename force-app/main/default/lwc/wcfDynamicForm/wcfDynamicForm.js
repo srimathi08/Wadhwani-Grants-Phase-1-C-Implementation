@@ -75,6 +75,23 @@ export default class WcfDynamicForm extends LightningElement {
 
     @track fiscalYears = {};
 
+    // ── Dynamic Child Grids & File State ─────────────────────────────────
+    @track skillingDomainRows = [
+        { id: 1, name: '', hours: '', duration: '', whenStarted: '', enrollment: '', displayWhenStarted: '' }
+    ];
+    @track businessSectorRows = [
+        { id: 1, sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', enterprises: '', jobs: '', displayWhenBegan: '' }
+    ];
+    @track livelihoodProgramRows = [
+        { id: 1, name: '', yearStarted: '', households: '', interventionType: '' }
+    ];
+    @track communityRows = [
+        { id: 1, state: '', district: '', communities: '' }
+    ];
+    @track docRows = [];
+    @track q24UploadedFiles = [];
+    @track q28UploadedFiles = [];
+
     // ── Funder & Reference Toggle State (Q7 & Q8) ─────────────────────────
     @track showFunder2 = false;
     @track showFunder3 = false;
@@ -219,8 +236,10 @@ export default class WcfDynamicForm extends LightningElement {
         return custom.map((q, idx) => {
             const val = this.formValues[q.targetField] !== undefined ? this.formValues[q.targetField] : '';
             const dt = (q.displayType || 'Text').toLowerCase();
+            const keyVal = q.developerName || q.questionCode || q.id || `cq-${sectionCode}-${idx}`;
             return {
                 ...q,
+                key: keyVal,
                 displayNumber: `${baseNumberPrefix}.${idx + 1}`,
                 value: val,
                 isText: dt === 'text' || dt === 'string' || dt === 'phone' || dt === 'email',
