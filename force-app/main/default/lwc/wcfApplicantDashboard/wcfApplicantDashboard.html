@@ -600,6 +600,24 @@
         </div>
     </template>
 
+    <!-- =======================================================
+         RFI APPLICATION FORM VIEW
+    ======================================================== -->
+    <template if:true={showFormView}>
+        <div class="dash-form-overlay">
+            <lightning-button
+                label="← Back to dashboard"
+                onclick={handleBackToDashboard}
+                class="dash-back-btn">
+            </lightning-button>
+            <c-wcf-dynamic-form
+                record-id={recordId}
+                selected-language={selectedLanguage}
+                onsubmitted={handleBackToDashboard}>
+            </c-wcf-dynamic-form>
+        </div>
+    </template>
+
 
 
     <!-- =======================================================
