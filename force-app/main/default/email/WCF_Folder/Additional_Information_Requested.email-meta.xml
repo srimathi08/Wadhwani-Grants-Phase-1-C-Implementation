@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Additional Information Requested</name>
+    <style>none</style>
+    <subject>[Org Name] Additional information requested</subject>
+    <textOnly>Subject: [{{{org_name}}}] Additional information requested
+
+Hello {{{contact_first_name}}},
+
+Your application for {{{org_name}}} is currently under review, and our team needs a little more information from you.
+
+Request:
+{{{clarification_text}}}
+
+Please respond by {{{due_date}}} so your application can continue moving forward without delay.
+
+Submit your response here:
+{{{clarification_link}}}
+
+If anything is unclear, reply to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Warm regards,
+The Wadhwani Grants Team
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

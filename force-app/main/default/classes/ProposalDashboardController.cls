@@ -1,10 +1,11 @@
 public without sharing class ProposalDashboardController {
 
     @AuraEnabled(cacheable=true)
-    public static Map<String, Integer> getDashboardStages(
-        Integer selectedYear,
-        Integer selectedMonth,
-        String  selectedDate       // ✅ NEW: "YYYY-MM-DD" or null
+   public static Map<String, Integer> getDashboardStages(
+    Integer selectedYear,
+    Integer selectedMonth,
+    String  fromDate,
+    String  toDate     // ✅ NEW: "YYYY-MM-DD" or null
     ) {
 
         Map<String, Integer> counts = new Map<String, Integer>{
@@ -31,20 +32,27 @@ public without sharing class ProposalDashboardController {
             Id accountId = currentUser?.Contact?.AccountId;
             if (accountId == null) return counts;
 
-            // ── Parse date if provided ────────────────────────────────────────
-            Date      filterDate = null;
-            DateTime  dayStart   = null;
-            DateTime  dayEnd     = null;
+           // ── Parse date range (based on AppliedDate) ─────────────────────────────────
+DateTime rangeStart = null;
+DateTime rangeEnd   = null;
 
-            if (String.isNotBlank(selectedDate)) {
-                try {
-                    filterDate = Date.valueOf(selectedDate); // expects "YYYY-MM-DD"
-                    dayStart   = DateTime.newInstance(filterDate, Time.newInstance(0,  0,  0,   0));
-                    dayEnd     = DateTime.newInstance(filterDate, Time.newInstance(23, 59, 59, 999));
-                } catch (Exception ex) {
-                    System.debug('ProposalDashboardController: invalid date format: ' + selectedDate);
-                }
-            }
+if (String.isNotBlank(fromDate)) {
+    try {
+        Date d = Date.valueOf(fromDate);
+        rangeStart = DateTime.newInstance(d, Time.newInstance(0, 0, 0, 0));
+    } catch (Exception ex) {
+        System.debug('ProposalDashboardController: invalid fromDate: ' + fromDate);
+    }
+}
+
+if (String.isNotBlank(toDate)) {
+    try {
+        Date d = Date.valueOf(toDate);
+        rangeEnd = DateTime.newInstance(d, Time.newInstance(23, 59, 59, 999));
+    } catch (Exception ex) {
+        System.debug('ProposalDashboardController: invalid toDate: ' + toDate);
+    }
+}
 
             // ── Build query dynamically ───────────────────────────────────────
             String baseQuery =
@@ -52,17 +60,24 @@ public without sharing class ProposalDashboardController {
                 'FROM IndividualApplication ' +
                 'WHERE AccountId = :accountId ' +
                 '  AND ApplicationType = \'WIN Project Proposal\' ' +
-                '  AND CALENDAR_YEAR(CreatedDate) = :selectedYear';
+                '  AND CALENDAR_YEAR(AppliedDate) = :selectedYear';
 
-            // Month filter (only when no specific date is selected)
-            if (filterDate == null && selectedMonth != null && selectedMonth >= 1 && selectedMonth <= 12) {
-                baseQuery += ' AND CALENDAR_MONTH(CreatedDate) = :selectedMonth';
-            }
+           // Month filter — skipped when a date range is active
+if (rangeStart == null && rangeEnd == null
+        && selectedMonth != null
+        && selectedMonth >= 1 && selectedMonth <= 12) {
+    baseQuery += ' AND CALENDAR_MONTH(AppliedDate) = :selectedMonth';
+}
 
-            // ✅ Date filter — exact day range (overrides month filter)
-            if (filterDate != null) {
-                baseQuery += ' AND CreatedDate >= :dayStart AND CreatedDate <= :dayEnd';
-            }
+// From date
+if (rangeStart != null) {
+    baseQuery += ' AND AppliedDate >= :rangeStart';
+}
+
+// To date
+if (rangeEnd != null) {
+    baseQuery += ' AND AppliedDate <= :rangeEnd';
+}
 
             List<IndividualApplication> apps = Database.query(baseQuery);
 

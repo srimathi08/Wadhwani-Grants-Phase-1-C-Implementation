@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Draft Saved</name>
+    <style>none</style>
+    <subject>Your Wadhwani Grants application {!IndividualApplication.Name} draft saved</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+We’ve saved your application draft for {!Account.WCF_Organizational_Name__c}.
+
+Your progress is secure, and you can return anytime to continue where you left off.
+
+Resume your application:
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+Take the time you need. If you have any questions, simply reply to this email and our team will be happy to help.
+
+Warm regards,
+The Wadhwani Grants Team
+
+Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {!YEAR(TODAY())} Wadhwani Grants Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

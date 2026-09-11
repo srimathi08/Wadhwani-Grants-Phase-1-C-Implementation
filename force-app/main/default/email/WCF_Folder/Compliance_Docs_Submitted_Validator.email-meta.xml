@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Docs Submitted Validator</name>
+    <style>none</style>
+    <subject>{{{org_name}}} — compliance documents submitted for review</subject>
+    <textOnly>Subject: {{{org_name}}} — compliance documents submitted for review
+
+Hello {{{validator_first_name}}},
+
+{{{org_name}}} has submitted compliance documents for review.
+
+Submitted documents:
+{{{document_list}}}
+
+Please review the submitted documents and record your validation outcome in the portal.
+
+Review here:
+{{{validation_link}}}
+
+Wadhwani Grants Platform
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

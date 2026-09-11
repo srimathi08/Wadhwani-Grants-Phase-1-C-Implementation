@@ -1,12 +1,17 @@
 <template>
-   <lightning-card title="Proposal Status">
+    <lightning-card title="Proposal Status">
         <div class="path-container">
             <template for:each={computedPath} for:item="item">
                 <div key={item.label} class={item.combinedClass}>
-                    <template if:true={item.isCompleted}>
-                        <span class="tick-icon">✔</span>
-                    </template>
-                    <span>{item.label}</span>
+                    <div class="step-marker">
+                        <template if:true={item.isCompleted}>
+                            <span class="tick-icon">✔</span>
+                        </template>
+                        <template if:false={item.isCompleted}>
+                            <span class="step-number">{item.displayNumber}</span>
+                        </template>
+                    </div>
+                    <span class="step-label">{item.label}</span>
 
                     <template if:false={item.isLast}>
                         <div class={item.connectorClass}></div>

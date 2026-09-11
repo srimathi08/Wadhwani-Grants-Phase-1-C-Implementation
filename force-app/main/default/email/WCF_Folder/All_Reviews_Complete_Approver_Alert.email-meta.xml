@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>All Reviews Complete Approver Alert</name>
+    <style>none</style>
+    <subject>{!Account.WCF_Organizational_Name__c} — all evaluations complete, ready for decision</subject>
+    <textOnly>Subject: {{{org_name}}} — All evaluations complete, ready for decision
+
+Hello {{{approver_first_name}}},
+
+All assigned evaluations for {{{org_name}}} are now complete.
+
+Details:
+Organization: {{{org_name}}}
+Evaluations completed: {{{evaluations_count}}}
+Completed on: {{{completion_date}}}
+
+The application is now ready for deliberation and final decision.
+
+Review it here:
+{{{decision_link}}}
+
+Wadhwani Grants Platform
+
+For questions, reply to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

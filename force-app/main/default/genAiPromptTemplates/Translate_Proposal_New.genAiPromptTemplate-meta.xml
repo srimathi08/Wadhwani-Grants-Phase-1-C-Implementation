@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</activeVersionIdentifier>
+    <developerName>Translate_Proposal_New</developerName>
+    <masterLabel>Translate_Proposal_New</masterLabel>
+    <overridable>false</overridable>
+    <templateVersions>
+        <content>You are an expert proposal translator.
+
+Translate the following Salesforce proposal JSON into {!$Input:targetLanguage}:
+
+{!$Input:proposal_json}
+
+Please return a JSON object containing all translated fields with the same structure as the input.
+Do not miss any fields.
+Only translate the field values, do not change the field names or structure.
+
+Return only the JSON object, with no code block, no triple backticks, no markdown, and no explanation.
+
+</content>
+        <inputs>
+            <apiName>targetLanguage</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>targetLanguage</masterLabel>
+            <referenceName>Input:targetLanguage</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>proposal_json</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>proposal_json</masterLabel>
+            <referenceName>Input:proposal_json</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

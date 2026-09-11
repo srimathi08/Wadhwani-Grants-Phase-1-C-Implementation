@@ -17,7 +17,8 @@ public with sharing class externalController {
             SELECT Salutation, FirstName, LastName, Phone, PersonEmail, EmailCustom__c,
                    Current_Organization__pc, Current_Role__pc, Field_of_specialization__pc, Profile_Executive_Summary__pc,
                    BillingStreet, BillingCity, BillingCountryCode, BillingStateCode, BillingPostalCode,
-                   PAN_Number__pc, Bank_Account_Name__pc, Account_Number__pc, Bank_Name__pc, Branch_Name__pc, IFSC_Code__pc
+                   PAN_Number__pc, Bank_Account_Name__pc, Account_Number__pc, Bank_Name__pc, Branch_Name__pc, IFSC_Code__pc,
+                   LinkedIn_Profile_URL__c
             FROM Account
             WHERE Id = :accountId
             LIMIT 1
@@ -47,7 +48,8 @@ public with sharing class externalController {
         String accountNumber,
         String bankName,
         String branchName,
-        String ifscCode
+        String ifscCode,
+        String linkedInUrl
     ) {
         if (accountId == null) {
             throw new AuraHandledException('No Account ID provided.');
@@ -57,7 +59,6 @@ public with sharing class externalController {
 
         acc.Salutation = salutation;
         acc.FirstName = firstName;
-       // acc.MiddleName = middleName;
         acc.LastName = lastName;
         acc.Phone = phone;
         acc.PersonEmail = personEmail;
@@ -77,6 +78,7 @@ public with sharing class externalController {
         acc.Bank_Name__pc = bankName;
         acc.Branch_Name__pc = branchName;
         acc.IFSC_Code__pc = ifscCode;
+        acc.LinkedIn_Profile_URL__c = linkedInUrl;
 
         update acc;
     }
@@ -91,31 +93,3 @@ public with sharing class externalController {
         }
     }
 }
-
-
-
-
-/*public with sharing class externalController {
-
-    @AuraEnabled(cacheable=true)
-    public static Map<String, Id> getPersonAccountAndContactId() {
-        User u = [SELECT Contact.AccountId, ContactId FROM User WHERE Id = :UserInfo.getUserId()];
-        Map<String, Id> result = new Map<String, Id>();
-        if (u.ContactId != null) {
-            result.put('accountId', u.Contact.AccountId);
-            result.put('contactId', u.ContactId);
-        }
-        return result;
-    }
- @AuraEnabled
-    public static void markReviewerRegistered(Id accountId) {
-        if (accountId != null) {
-            Account acc = [SELECT Id, Reviewer_registered__c FROM Account WHERE Id = :accountId LIMIT 1];
-            acc.Reviewer_registered__c = true;
-
-           acc.Reviewer_Registration_Date__c = System.now();
-     
-
-            update acc;
-        }
-    }*/

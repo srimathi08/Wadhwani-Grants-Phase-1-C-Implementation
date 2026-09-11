@@ -16,37 +16,38 @@ import { LightningElement, track, wire } from 'lwc';
     import { CurrentPageReference } from 'lightning/navigation';
     import deleteBudgetRecord from '@salesforce/apex/WinProjectProposalFormController.deleteBudgetRecord';
     import deleteMilestoneRecord from '@salesforce/apex/WinProjectProposalFormController.deleteMilestoneRecord';
+    import deleteCoFounderRecord from '@salesforce/apex/WinProjectProposalFormController.deleteCoFounderRecord';
 
 
-export default class ResumeWinSaveDraftForm extends NavigationMixin(LightningElement) {
+export default class ResumeDraftSandbox extends NavigationMixin(LightningElement) {
        // @track recordId = null; // IA draft Id
-        @track recordId;
+            @track recordId;
+            
+            @track applicationRecordId; // Stores Application_Form__c ID after creation
+            winLogoUrl = WIN_LOGO; // Set logo URL
         
-        @track applicationRecordId; // Stores Application_Form__c ID after creation
-        winLogoUrl = WIN_LOGO; // Set logo URL
-       
-        @track showForm = true; // Initially hide form
-        //@track isButtonDisabled = false; // Apply Now button is enabled initially
-        showFundingSources = false;
-     
-        @track applicationData = {}; 
+            @track showForm = true; // Initially hide form
+            //@track isButtonDisabled = false; // Apply Now button is enabled initially
+            showFundingSources = false;
         
-        @track activeField = null; 
-       
-        @track milestones =[];
-        @track isModalOpen = false;
-        @track modalValue = '';
-        @track modalField = '';
-        @track modalRowId = null;
-        @track modalTitle = '';
-    
-        @track budgets = [];
-       //@track budgets =[];
-       @track isBudgetModalOpen = false;
-       @track budgetModalValue = '';
-       @track budgetModalField = '';
-       @track budgetModalRowId = null;
-       @track budgetModalTitle = '';
+            @track applicationData = {}; 
+            
+            @track activeField = null; 
+        
+            @track milestones =[];
+            @track isModalOpen = false;
+            @track modalValue = '';
+            @track modalField = '';
+            @track modalRowId = null;
+            @track modalTitle = '';
+        
+            @track budgets = [];
+        //@track budgets =[];
+        @track isBudgetModalOpen = false;
+        @track budgetModalValue = '';
+        @track budgetModalField = '';
+        @track budgetModalRowId = null;
+        @track budgetModalTitle = '';
     
         @track primaryFocusAreaOptions = [];
         @track subFocusAreaOptions = [];
@@ -93,13 +94,13 @@ export default class ResumeWinSaveDraftForm extends NavigationMixin(LightningEle
             Proposed_Solution__c: '',
             Current_status_of_the_Project_Work_und__c: '',
             Novelty_of_the_Project__c: '',
-            Competitive_Advantage__c: '', //changed Competitive_Landscape__c
+            Competitive_Advantage__c: '', //changed Competitive_Landscape__c Competitive_Advantage__c
             Details_of_IPR_Filed_Granted__c: '',
             Details_of_Ethical_Received__c: '',
             Full_Proposal_Citations__c: '',
             Target_Market_Industry_Application__c: '',
             Customer_and_Beneficiaries__c: '',
-            Plan_for_Commercialization__c: '', //Potential_for_Commercialization__c
+            Plan_for_Commercialization__c: '', //Potential_for_Commercialization__c  Plan_for_Commercialization__c
             Business_Model_for_Commercialization__c: '',
             Project_Revenue_Strategy__c: '', //Potential_Revenue_Generation_Strategy_fo__c
             Previous_Funding_Details__c: '', // Previous_Funding_Details__c
@@ -126,11 +127,79 @@ export default class ResumeWinSaveDraftForm extends NavigationMixin(LightningEle
             PI_Institution__c:'',
             IsSubmitted:'',
             Primary_Focus_Area_Other__c: '',
-        Sub_Focus_Area_Other__c: '',
-         Primary_Focus_Area_Other__c: '',
-        Sub_Focus_Area_Other__c: ''
+             Sub_Focus_Area_Other__c: '',
+             Primary_Focus_Area_Other__c: '',
+             Sub_Focus_Area_Other__c: '',
+             Describe_Objective_Relevance_of_Project__c:'',
+             Work_undertaken_supporting_current_TRL__c: '',
+             Strategy_for_raising_funds_from_Investor__c: '',
+            Strategy_for_transfer_of_technology__c: '',
+            Startup_Name__c: '',
+Founder_Name__c: '',
+Founder_Designation__c: '',
+Founder_Institution__c: '',
+Founder_Mobile__c: '',
+Founder_Email__c: '',
+Is_Startup_Registered__c: '',
+Startup_Registration_Date__c: '',
+Startup_Registration_No__c: '',
+Is_Startup_DPIIT_Registered__c: '',
+DPIIT_Registration_No__c: '',
         }; 
     
+        @track coFounders = [{
+    uniqueId: 1,
+    Name: '',
+    Designation__c: '',
+    Institution__c: '',
+    Mobile__c: '',
+    Email__c: ''
+}];
+
+handleCoFounderChange(event) {
+    const field = event.target.dataset.field;
+    const uniqueId = parseInt(event.target.dataset.id, 10);
+    const value = event.target.value;
+
+    this.coFounders = this.coFounders.map(cf =>
+        cf.uniqueId === uniqueId ? { ...cf, [field]: value } : cf
+    );
+}
+
+addCoFounder() {
+    const newId = this.coFounders.length
+        ? Math.max(...this.coFounders.map(c => c.uniqueId)) + 1
+        : 1;
+    this.coFounders = [...this.coFounders, {
+        uniqueId: newId,
+        Name: '',
+        Designation__c: '',
+        Institution__c: '',
+        Mobile__c: '',
+        Email__c: ''
+    }];
+}
+
+deleteCoFounderRow(event) {
+    const uniqueId = parseInt(event.currentTarget.dataset.id, 10);
+    const rowToDelete = this.coFounders.find(c => c.uniqueId === uniqueId);
+
+    if (rowToDelete?.Id) {
+        deleteCoFounderRecord({ coFounderId: rowToDelete.Id })
+            .then(() => {
+                this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+            })
+            .catch(error => {
+                this.dispatchEvent(new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body?.message || 'Failed to delete co-founder row.',
+                    variant: 'error'
+                }));
+            });
+    } else {
+        this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+    }
+}
        @track projectDuration = '';
        @track projectStartDate = '';
        @track projectEndDate = '';
@@ -188,11 +257,12 @@ export default class ResumeWinSaveDraftForm extends NavigationMixin(LightningEle
                 { name: 'Document_TRL', label: '8.1. Document demonstrating current status of the project / current TRL', helpText: '', uploadedFileName: '', required: true },
                 { name: 'Resume_PI', label: '8.2. Resume / Biodata of Principal Investigator', helpText: '', uploadedFileName: '', required: true },
                 { name: 'Resume_Co_PI', label: '8.3. Resume / Biodata of Co-Principal Investigator', helpText: '' , uploadedFileName: '' },
-                { name: 'Letter_Support', label: '8.4. Letter of Support from Institution', helpText: '', uploadedFileName: '' },
-                { name: 'Letter_Endorsement', label: '8.5. Letter of Endorsement from Industry Collaborators / Partners', helpText: '', uploadedFileName: '', required: true },  
+                { name: 'Letter_Support', label: '8.4. Letter of Support from Institution / Organization / Incubator', helpText: '', uploadedFileName: '', required: true },
+                { name: 'Letter_Endorsement', label: '8.5. Letter of Endorsement from Industry Collaborators/ Clinical Partners/ Others', helpText: '', uploadedFileName: '' },  
                 { name: 'Detailed_WorkPlan', label: '8.6 Detailed Work Plan and Methodology (figures, flow chart, diagrams)', helpText: '', uploadedFileName: '', required: true },
                 { name: 'Supporting_Documents', label: '8.7. Supporting documents of IPR filed / granted', helpText: '', uploadedFileName: '' },
-                { name: 'Supporting_Documents_prior', label: '8.8. Supporting documents of prior funding received under the project', helpText: '' ,uploadedFileName: '' }
+                { name: 'Supporting_Documents_prior', label: '8.8. Supporting documents of prior funding received under the project', helpText: '' ,uploadedFileName: '' },
+                { name: 'Any_Other_Documents', label: '8.9. Any other documents', helpText: '', uploadedFileName: '' }
             ];
         
         //Budget Table
@@ -211,7 +281,7 @@ export default class ResumeWinSaveDraftForm extends NavigationMixin(LightningEle
     displayIndex: index + 1,
     Name: '',
     Total_Amount__c: '',
-    Total_Amount_INR__c: '',
+    //Total_Amount_INR__c: '',
     Justification__c: ''
 }));    
     
@@ -251,7 +321,7 @@ get previewMilestones() {
         Project_Start_Date__c: "",
         Project_End_Date__c: "",
         Budget_Required__c: "",
-        Budget_Required_INR__c: ""
+        //Budget_Required_INR__c: ""
     },
     {
         uniqueId: 2,
@@ -263,7 +333,7 @@ get previewMilestones() {
         Project_Start_Date__c: "",
         Project_End_Date__c: "",
         Budget_Required__c: "",
-        Budget_Required_INR__c: ""
+        //Budget_Required_INR__c: ""
     },
     {
         uniqueId: 3,
@@ -274,8 +344,8 @@ get previewMilestones() {
         Output_and_Deliverables__c: "",
         Project_Start_Date__c: "",
         Project_End_Date__c: "",
-        Budget_Required__c: "",
-        Budget_Required_INR__c: ""
+       Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
     },
     {
         uniqueId: 4,
@@ -287,14 +357,10 @@ get previewMilestones() {
         Project_Start_Date__c: "",
         Project_End_Date__c: "",
         Budget_Required__c: "",
-        Budget_Required_INR__c: ""
+        //Budget_Required_INR__c: ""
     }
 ];
            
-
-
-
-
         @wire(getObjectInfo, { objectApiName: INDIVIDUALAPPLICATION_OBJECT })
         objectInfo;
     
@@ -509,42 +575,55 @@ handlePrimaryFocusChange(event) {
         }
     
         
-        handlePaste(event) {
-            event.preventDefault(); // Stop the default paste behavior
-        
-            const plainText = event.clipboardData.getData('text/plain');
-        
-            // Optional: Clean up special characters or trim spaces
-            const sanitizedText = plainText.trim();
-        
-            // Insert plain text at caret position
-            this.insertPlainTextAtCursor(sanitizedText);
+   handlePaste(event) {
+    event.preventDefault();
+
+    let text = '';
+
+    // Try HTML first to get proper text extraction
+    const html = event.clipboardData.getData('text/html');
+    if (html) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        text = tempDiv.innerText || tempDiv.textContent || '';
+    } else {
+        text = event.clipboardData.getData('text/plain');
+    }
+
+    text = text
+        .replace(/\u00A0/g, ' ')     // replace &nbsp; with space
+        .replace(/<[^>]*>/g, '')      // strip any remaining HTML tags
+        .replace(/\r\n|\r/g, '\n')   // normalize line endings
+        .replace(/\n{3,}/g, '\n\n')  // collapse excessive newlines
+        .replace(/\n+$/, '')          // ← add this: strip trailing newlines
+        .trim();
+
+    this.insertPlainTextAtCursor(text);
+}
+
+insertPlainTextAtCursor(text) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+
+    const lines = text.split('\n');
+
+    // Loop in reverse to maintain proper order
+    for (let i = lines.length - 1; i >= 0; i--) {
+        if (i < lines.length - 1) {
+            const br = document.createElement('br');
+            range.insertNode(br);
         }
-    
-        insertPlainTextAtCursor(text) {
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-        
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-        
-            const lines = text.split('\n');
-    
-    
-              // 🔁 Loop in reverse to maintain proper order
-        for (let i = lines.length - 1; i >= 0; i--) {
-            if (i < lines.length - 1) {
-                const br = document.createElement('br');
-                range.insertNode(br);
-            }
-            range.insertNode(document.createTextNode(lines[i]));
-        }
-        
-            // Move cursor to the end
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
+        range.insertNode(document.createTextNode(lines[i]));
+    }
+
+    // Move cursor to the end
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
             
        /* 
        old working without - numbering list
@@ -647,10 +726,19 @@ handlePrimaryFocusChange(event) {
         }
     }
     
-        handleInput(event) {
-            const field = event.target.dataset.field;
-            this.applicationData[field] = event.target.innerHTML;
-        }
+       handleInput(event) {
+    const field = event.target.dataset.field;
+    let rawHtml = event.target.innerHTML;
+
+    const cleaned = rawHtml
+        .replace(/<div><br\s*\/?><\/div>/gi, '')   // remove empty div+br blocks
+        .replace(/<br\s*\/?>\s*$/gi, '')            // remove trailing <br> tag
+        .replace(/&lt;br&gt;\s*$/gi, '')            // remove literal &lt;br&gt; at end
+        .replace(/&lt;br\s*\/&gt;\s*$/gi, '')       // remove literal &lt;br /&gt; at end
+        .trim();
+
+    this.applicationData[field] = cleaned;
+}
         
     
         
@@ -684,10 +772,22 @@ handlePrimaryFocusChange(event) {
   get totalUSD() {
     return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount__c) || 0), 0);
 }
+yesNoOptions = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' }
+];
 
-get totalINR() {
-    return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount_INR__c) || 0), 0);
+get showStartupRegDetails() {
+    return this.applicationData.Is_Startup_Registered__c === 'Yes';
 }
+
+get showDpiitRegDetails() {
+    return this.applicationData.Is_Startup_DPIIT_Registered__c === 'Yes';
+}
+
+/*get totalINR() {
+    return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount_INR__c) || 0), 0);
+}*/
 
     budgetOpenModal(event) {
     const target = event.currentTarget;
@@ -728,19 +828,24 @@ get totalINR() {
     let value = event.target.value;
 
     // Only parse as number for year fields
-    if (['Year_1__c', 'Year_2__c', 'Year_3_USD__c'].includes(field)) {
-        value = parseInt(value) || 0;
+      // Convert numbers
+      //new lines
+    if (field === 'Total_Amount__c' || field === 'Total_Amount_INR__c') {
+        value = Number(value) || 0;
     }
+  /*  if (['Year_1__c', 'Year_2__c', 'Year_3_USD__c'].includes(field)) {
+        value = parseInt(value) || 0;
+    }*/
 
     this.budgets = this.budgets.map(budget => {
         if (budget.uniqueId === uniqueId) {
             let updatedBudget = { ...budget, [field]: value };
 
-            const y1 = parseInt(updatedBudget.Year_1__c) || 0;
+           /* const y1 = parseInt(updatedBudget.Year_1__c) || 0;
             const y2 = parseInt(updatedBudget.Year_2__c) || 0;
             const y3 = parseInt(updatedBudget.Year_3_USD__c) || 0;
 
-            updatedBudget.Total_Amount__c = y1 + y2 + y3;
+            updatedBudget.Total_Amount__c = y1 + y2 + y3;*/
 
             return updatedBudget;
         }
@@ -861,7 +966,7 @@ validateMonthYear(event) {
         displayIndex: newId,
         Name: '',
         Total_Amount__c: '',
-        Total_Amount_INR__c: '',
+        //Total_Amount_INR__c: '',
         Justification__c: ''
     }];
 }        
@@ -969,7 +1074,7 @@ validateMonthYear(event) {
         }
         
         
-        addRow() {
+       /* addRow() {
             let newId = this.milestones.length + 1;
             this.milestones = [...this.milestones, {
                 uniqueId: newId,
@@ -979,9 +1084,82 @@ validateMonthYear(event) {
                 Target_Completion_Months__c: '',
                 Justification__c: ''
             }];
-        }      
+        } */     
                 //Target_Completion_Month__c: '',
                // Milestone_Target_Date__c: '',
+
+    
+    //new lines
+    addRow() {
+
+    // Step 1: Clone list
+    let list = JSON.parse(JSON.stringify(this.milestones));
+
+    // Step 2: Insert ABOVE last row
+    let lastIndex = list.length - 1;
+
+    let insertIndex = lastIndex; // insert before M4 Completion row
+
+    // Step 3: Create a new row object
+    const newRow = {
+        uniqueId: null, // will be recalculated
+        InstallmentLabel: "",
+        StaticMilestoneLabel: "",
+        Milestone_Description__c: "",
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    };
+
+    // Step 4: Insert new row BEFORE completion row
+    list.splice(insertIndex, 0, newRow);
+
+    // Step 5: Rebuild Installment Labels dynamically
+    /*let total = list.length;
+
+    list = list.map((row, i) => {
+        row.uniqueId = i + 1;
+
+        if (i < total - 1) {
+            // Normal installments
+            row.InstallmentLabel = `Instalment – ${i + 1} (≈30%)`;
+            row.StaticMilestoneLabel = `M${i + 1}`;
+        } else {
+            // Last row -> always Completion Report
+            row.InstallmentLabel = `Instalment – ${total} (≈10%)`;
+            row.StaticMilestoneLabel = `M${total} – Completion Report`;
+        }
+        return row;
+    }); */
+    // Step 5: Rebuild Installment Labels dynamically
+let total = list.length;
+
+list = list.map((row, i) => {
+    row.uniqueId = i + 1;
+
+    if (i < 3) {
+        // First 3 rows → show percentage
+        row.InstallmentLabel = `Instalment – ${i + 1} (≈30%)`;
+        row.StaticMilestoneLabel = `M${i + 1}`;
+    } else {
+        // M4, M5, M6... → NO percentage
+        row.InstallmentLabel = `Instalment – ${i + 1}`;
+        row.StaticMilestoneLabel = `M${i + 1}`;
+    }
+
+    // Last row should always be Completion Report
+    if (i === total - 1) {
+        row.StaticMilestoneLabel = `M${i + 1} – Completion Report`;
+    }
+
+    return row;
+});
+
+    this.milestones = list;
+}           
 
         deleteMilestoneRow(event) {
     const uniqueId = parseInt(event.currentTarget.dataset.id, 10);
@@ -1094,6 +1272,7 @@ validateMonthYear(event) {
 
     console.log('✅ Budgets after merge:', JSON.stringify(this.budgets, null, 2));
 }*/
+/* Before budget
 mergeDraftAndDefaultBudgets(draftBudgets) {
     const existing = Array.isArray(draftBudgets) ? draftBudgets : [];
 
@@ -1114,7 +1293,44 @@ mergeDraftAndDefaultBudgets(draftBudgets) {
     this.budgets = merged;
 
     console.log('✅ Budgets after merge:', JSON.stringify(this.budgets, null, 2));
+}*/
+mergeDraftAndDefaultBudgets(draftBudgets) {
+    const existing = Array.isArray(draftBudgets) ? draftBudgets : [];
+    console.log('Inside mergeDraftAndDefaultBudgets');
+
+    // If no draft → initialize default rows
+    if (existing.length === 0) {
+        console.log('Inside no draft found');
+        this.budgets = Array.from({ length: 3 }, (_, index) => ({
+            uniqueId: index + 1,
+            displayIndex: index + 1,
+            Name: '',
+            Total_Amount__c: '',
+            //Total_Amount_INR__c: '',
+            Justification__c: '',
+            Status: 'Draft'
+        }));
+        return;
+    }
+
+    // Merge when draft exists
+    console.log('Inside draft budget found');
+    const merged = existing.map((b, index) => ({
+        Id: b.Id || null,
+        Name: b.Name || '',
+        Total_Amount__c: b.Total_Amount__c || 0,
+        //Total_Amount_INR__c: b.Total_Amount_INR__c || 0,
+        Justification__c: b.Justification__c || '',        
+        Status: b.Status || 'Draft',
+        uniqueId: index + 1,
+        displayIndex: index + 1 
+    }));
+
+    this.budgets = merged;
+
+    console.log('✅ Budgets after merge:', JSON.stringify(this.budgets, null, 2));
 }
+
 
 /*mergeDraftAndDefaultMilestones(draftMilestones) {
     const existing = Array.isArray(draftMilestones) ? draftMilestones : [];
@@ -1135,7 +1351,7 @@ mergeDraftAndDefaultBudgets(draftBudgets) {
     console.log('✅ Milestones after merge:', JSON.stringify(this.milestones, null, 2));
 }*/
 //new lines
-mergeDraftAndDefaultMilestones(draftMilestones) {
+/*mergeDraftAndDefaultMilestones(draftMilestones) {
     const saved = Array.isArray(draftMilestones) ? draftMilestones : [];
 
     // 🟢 Base 4 Milestones (static structure from new WIN form)
@@ -1211,8 +1427,87 @@ mergeDraftAndDefaultMilestones(draftMilestones) {
     this.milestones = merged;
 
     console.log('✅ Merged Milestones:', JSON.stringify(this.milestones, null, 2));
+} */
+//new code:
+applyMilestoneLabels(list) {
+    let total = list.length;
+
+    return list.map((row, i) => {
+        row.uniqueId = i + 1;  // always reassign uniqueId
+
+        // First 3 rows fixed at 30%
+        if (i < 3) {
+            row.InstallmentLabel = `Instalment – ${i + 1} (≈30%)`;
+            row.StaticMilestoneLabel = `M${i + 1}`;
+        }
+
+        // Middle rows (4,5,… second to last)
+        else if (i < total - 1) {
+            row.InstallmentLabel = `Instalment – ${i + 1}`;
+            row.StaticMilestoneLabel = `M${i + 1}`;
+        }
+
+        // Last row → always completion
+        else {
+            row.InstallmentLabel = `Instalment – ${i + 1}`;
+            row.StaticMilestoneLabel = `M${i + 1} – Completion Report`;
+        }
+
+        return row;
+    });
 }
 
+//new lines - changed
+mergeDraftAndDefaultMilestones(draftMilestones) {
+    const saved = Array.isArray(draftMilestones) ? draftMilestones : [];
+
+    // Sort saved based on Installment number (1...6)
+    saved.sort((a, b) => {
+        const getNum = (m) => {
+            if (m.Installment_of_Funds_1__c) return 1;
+            if (m.Installment_of_Funds_2__c) return 2;
+            if (m.Installment_of_Funds_3__c) return 3;
+            if (m.Installment_of_Funds_4__c) return 4;
+            if (m.Installment_of_Funds_5__c) return 5;
+            if (m.Installment_of_Funds_6__c) return 6;
+            return 999;
+        };
+        return getNum(a) - getNum(b);
+    });
+
+    // Base 4 default rows
+    const defaults = [
+        { InstallmentLabel: "Instalment – 1 (≈30%)", StaticMilestoneLabel: "Signing of Grant Agreement with WIN COE - M1" },
+        { InstallmentLabel: "Instalment – 2 (≈30%)", StaticMilestoneLabel: "M2" },
+        { InstallmentLabel: "Instalment – 3 (≈30%)", StaticMilestoneLabel: "M3" },
+        { InstallmentLabel: "Instalment – 4",         StaticMilestoneLabel: "M4 – Completion Report" }
+    ];
+
+    // Start with 4 defaults
+    let merged = defaults.map((d, i) => ({
+        uniqueId: i + 1,
+        ...d,
+        ...saved[i]   // merge data from saved
+    }));
+
+    // Add remaining saved milestones (5th, 6th…)
+    for (let i = 4; i < saved.length; i++) {
+        merged.push({
+            uniqueId: i + 1,
+            InstallmentLabel: `Instalment – ${i + 1}`,
+            StaticMilestoneLabel: `M${i + 1}`,
+            ...saved[i]
+        });
+    }
+
+    // 🔥 FINAL PATCH: Apply dynamic labels including Completion Report
+    merged = this.applyMilestoneLabels(merged);
+
+    // Save final output
+    this.milestones = merged;
+
+    console.log("Final merged milestones:", JSON.stringify(this.milestones, null, 2));
+}
 
 
     
@@ -1333,7 +1628,39 @@ restoreDependentPicklistOptions() {
                    /* this.applicationData.Primary_Focus_Area__c = data.primary_focus_area__c;
                  
                     this.applicationData.Sub_Focus_Area__c = data.sub_focus_area__c ? data.sub_focus_area__c.split(';') : []; */
-                  
+                  // Page 2 - Startup / Founder Details
+this.applicationData.Startup_Name__c =
+    data.startup_name__c || '';
+
+this.applicationData.Founder_Name__c =
+    data.founder_name__c || '';
+
+this.applicationData.Founder_Designation__c =
+    data.founder_designation__c || '';
+
+this.applicationData.Founder_Institution__c =
+    data.founder_institution__c || '';
+
+this.applicationData.Founder_Mobile__c =
+    data.founder_mobile__c || '';
+
+this.applicationData.Founder_Email__c =
+    data.founder_email__c || '';
+
+this.applicationData.Is_Startup_Registered__c =
+    data.is_startup_registered__c || '';
+
+this.applicationData.Startup_Registration_Date__c =
+    data.startup_registration_date__c || '';
+
+this.applicationData.Startup_Registration_No__c =
+    data.startup_registration_no__c || '';
+
+this.applicationData.Is_Startup_DPIIT_Registered__c =
+    data.is_startup_dpiit_registered__c || '';
+
+this.applicationData.DPIIT_Registration_No__c =
+    data.dpiit_registration_no__c || '';
 
             // -----------------------------
             // 3.2️⃣ Restore "Other" visibility BEFORE picklist is ready
@@ -1396,7 +1723,7 @@ waitForPicklist();
     this.applicationData.Novelty_of_the_Project__c = data.novelty_of_the_project__c;
     this.applicationData.Objectives_of_the_Project__c = data.objectives_of_the_project__c;
     this.applicationData.Current_Technology_Readiness_Level_TRL__c = data.current_technology_readiness_level_trl__c;
-    this.applicationData.Work_undertaken_supporting_current = data.work_undertaken_supporting_current;
+    this.applicationData.Work_undertaken_supporting_current_TRL__c = data.work_undertaken_supporting_current_trl__c;
     this.applicationData.Expected_TRL_at_the_end_of_the_Project__c = data.expected_trl_at_the_end_of_the_project__c;
     this.applicationData.Current_status_of_the_Project_Work_und__c = data.current_status_of_the_project_work_und__c; 
     this.applicationData.Project_Approach_and_Work_Plan__c = data.project_approach_and_work_plan__c;
@@ -1406,6 +1733,7 @@ waitForPicklist();
     this.applicationData.Full_Proposal_Citations__c = data.full_proposal_citations__c;
     
     // PAGE 4 
+      console.log("Plan_for_Commercialization__c", this.applicationData.Plan_for_Commercialization__c);
     this.applicationData.Target_Market_Industry_Application__c = data.target_market_industry_application__c;
     this.applicationData.Customer_and_Beneficiaries__c = data.customer_and_beneficiaries__c;
     this.applicationData.Plan_for_Commercialization__c = data.plan_for_commercialization__c;
@@ -1416,12 +1744,12 @@ waitForPicklist();
     this.applicationData.Potential_for_Startup_Formation__c = data.potential_for_startup_formation__c;
     this.applicationData.Incubator_Association_Details__c = data.incubator_association_details__c;
     this.applicationData.Strategy_for_transfer_of_technology__c = data.strategy_for_transfer_of_technology__c;
-    this.applicationData.Strategy_for_raising_funds_from_Investor__c  = data.strategy_for_raising_funds_from_investor__c ;
+    this.applicationData.Strategy_for_raising_funds_from_Investor__c = data.strategy_for_raising_funds_from_investor__c ;
     
     
     //Page 5
     this.applicationData.Total_Project_Budget_in_USD__c = data.total_project_budget_in_usd__c;
-    this.applicationData.Total_Project_Budget_INR__c = data.total_project_budget_inr__c;
+    //this.applicationData.Total_Project_Budget_INR__c = data.total_project_budget_inr__c;
     //this.applicationData.Proposed_WIN_Grant_Utilization__c = data.proposed_win_grant_utilization__c;
     this.applicationData.Previous_Funding_Details__c = data.previous_funding_details__c;
     //this.applicationData.Additional_Funding_Plans__c = data.additional_funding_plans__c;
@@ -1504,9 +1832,56 @@ if (result.budgets && result.budgets.length > 0) {
         Status: 'Draft'
     }));
 } */
+// Restore Co-Founders
+if (result.coFounders && result.coFounders.length > 0) {
+    this.coFounders = result.coFounders.map((c, index) => ({
+        Id: c.Id || null,
+        uniqueId: index + 1,
+        Name: c.Name || '',
+        Designation__c: c.Designation__c || '',
+        Institution__c: c.Institution__c || '',
+        Mobile__c: c.Mobile__c || '',
+        Email__c: c.Email__c || ''
+    }));
+} else {
+    this.coFounders = [{
+        uniqueId: 1,
+        Name: '',
+        Designation__c: '',
+        Institution__c: '',
+        Mobile__c: '',
+        Email__c: ''
+    }];
+}
 
     this.mergeDraftAndDefaultBudgets(result.budgets);
     this.mergeDraftAndDefaultMilestones(result.milestones);
+    // Restore Co-Founders
+if (result.coFounders && result.coFounders.length > 0) {
+    this.coFounders = result.coFounders.map((cf, index) => ({
+        Id: cf.Id || null,
+        uniqueId: index + 1,
+        Name: cf.Name || '',
+        Designation__c: cf.Designation__c || '',
+        Institution__c: cf.Institution__c || '',
+        Mobile__c: cf.Mobile__c || '',
+        Email__c: cf.Email__c || ''
+    }));
+} else {
+    this.coFounders = [{
+        uniqueId: 1,
+        Name: '',
+        Designation__c: '',
+        Institution__c: '',
+        Mobile__c: '',
+        Email__c: ''
+    }];
+}
+
+console.log(
+    '👥 Loaded draft Co-Founders:',
+    JSON.stringify(this.coFounders, null, 2)
+);
 
 console.log('🐞 Loaded draft milestones:', JSON.stringify(result.milestones, null, 2));
         
@@ -1562,8 +1937,8 @@ console.log('🐞 Loaded draft milestones:', JSON.stringify(result.milestones, n
                 "Full_Proposal_Citations__c",
                 "Target_Market_Industry_Application__c",
                 "Customer_and_Beneficiaries__c",
-                "Plan_for_Commercialization__c", // Plan_for_Commercialization__c
-                "Business_Model_for_Commercialization__c", 
+                "Plan_for_Commercialization__c", // Plan_for_Commercialization__c Potential_for_Commercialization__c
+                "Business_Model_for_Commercialization__c",  
                 "Project_Revenue_Strategy__c", // Project_Revenue_Strategy__c
                 "Previous_Funding_Details__c", //
                 "Additional_Funding_Plans__c",
@@ -1828,7 +2203,7 @@ console.log('🐞 Loaded draft milestones:', JSON.stringify(result.milestones, n
     return this.budgets.filter(b =>
         b.Name?.trim() ||
         b.Total_Amount__c ||
-        b.Total_Amount_INR__c ||
+      //  b.Total_Amount_INR__c ||
         b.Justification__c?.trim()
     ).map(b => ({
         ...b,
@@ -1836,18 +2211,22 @@ console.log('🐞 Loaded draft milestones:', JSON.stringify(result.milestones, n
     }));
 }
 
-
-
        get filledMilestones() {
         return this.milestones
             .filter(m =>
                 (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
-                (m.Deliverables__c && m.Deliverables__c.trim() !== '') ||
-                (m.Budget_Required__c && m.Budget_Required__c.trim() !== '') || 
-                (m.Target_Completion_Months__c && m.Target_Completion_Months__c.trim() !== '') ||
+                //(m.Deliverables__c && m.Deliverables__c.trim() !== '') ||
+                (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
+                (m.Output_and_Deliverables__c && m.Output_and_Deliverables__c.trim() !== '') ||
+                //(m.Budget_Required_INR__c && m.Budget_Required_INR__c.trim() !== '') ||
+                (m.Project_Start_Date__c && m.Project_Start_Date__c.trim() !== '') ||
+                (m.Project_End_Date__c && m.Project_End_Date__c.trim() !== '') ||
+                (m.Activities_under_this_Milestone__c && m.Activities_under_this_Milestone__c.trim() !== '')||
+                (m.Budget_Required__c && m.Budget_Required__c.trim() !== '') 
+                //(m.Target_Completion_Months__c && m.Target_Completion_Months__c.trim() !== '') ||
                 //(m.Target_Completion_Month__c && m.Target_Completion_Month__c.trim() !== '') ||
-                //(m.Milestone_Target_Date__c && m.Milestone_Target_Date__c.trim() !== '') ||
-                (m.Justification__c && m.Justification__c.trim() !== '')
+                //(m.Milestone_Target_Date__c && m.Milestone_Target_Date__c.trim() !== '')||
+                //(m.Justification__c && m.Justification__c.trim() !== '')
             )
             .map(milestone => ({
                 ...milestone,
@@ -1926,8 +2305,8 @@ get sanitizedBudgets() {
                             { name: 'Proposed_Solution__c', label: 'Proposed Solution' },
                             { name: 'Novelty_of_the_Project__c', label: 'Novelty of the Project' },
                             { name: 'Objectives_of_the_Project__c', label: 'Objectives of the Project' },
-                            { name: 'Current_status_of_the_Project_Work_und__c', label: 'Current status of the Project / Work undertaken so far' },
-                            { name: 'Work_undertaken_supporting_current_TRL__c', label: 'Work undertaken for supporting current TRL' },
+                            { name: 'Current_status_of_the_Project_Work_und__c', label: 'Current status of the Project' },
+                            { name: 'Work_undertaken_supporting_current_TRL__c', label: 'Details of activities supporting the current TRL of the Project' },
                             { name: 'Project_Approach_and_Work_Plan__c', label: 'Project Approach and Work Plan' },
                             { name: 'Competitive_Advantage__c', label: 'Competitive Advantage' },
                             { name: 'Details_of_IPR_Filed_Granted__c', label: 'Details of IPR Filed / Granted' }                            
@@ -1940,8 +2319,8 @@ get sanitizedBudgets() {
                             { name: 'Customer_and_Beneficiaries__c', label: 'Details of Customers, End-users, and Beneficiaries' },
                             { name: 'Plan_for_Commercialization__c', label: 'Plan for Commercialization and Market Entry' },
                             { name: 'Business_Model_for_Commercialization__c', label: 'Business Model for Commercialization' },
-                            { name: 'Project_Revenue_Strategy__c', label: 'Potential Revenue Generation Strategy for Project' },
-                            { name: 'Strategy_for_raising_funds_from_Investor__c ', label: 'Strategy for Raising Funds from Investor' }
+                            //{ name: 'Project_Revenue_Strategy__c', label: 'Potential Revenue Generation Strategy for Project' },
+                            { name: 'Strategy_for_raising_funds_from_Investor__c', label: 'Strategy for Raising Funds from Investor' }
 
                         );
                         break; 
@@ -1992,7 +2371,9 @@ get sanitizedBudgets() {
     
             updateRichTextFieldsForCurrentPage() {
                // const pageToUse = this.isPreviewVisible ? this.previewPage : this.currentPage;
+             
                 const pageFields = {
+                    
     
                     2:[
                         "Project_Team_Members__c",
@@ -2007,7 +2388,7 @@ get sanitizedBudgets() {
                         "Work_undertaken_supporting_current_TRL__c",
                         "Current_status_of_the_Project_Work_und__c",
                         "Project_Approach_and_Work_Plan__c",
-                        "Competitive_Advantage__c",
+                        "Competitive_Advantage__c", //Competitive_Landscape__c Competitive_Advantage__c
                         "Details_of_IPR_Filed_Granted__c",
                         "Details_of_Ethical_Received__c",
                          "Full_Proposal_Citations__c"               
@@ -2015,7 +2396,7 @@ get sanitizedBudgets() {
                     4: [
                         "Target_Market_Industry_Application__c",
                         "Customer_and_Beneficiaries__c",
-                        "Plan_for_Commercialization__c",
+                        "Plan_for_Commercialization__c", //Potential_for_Commercialization__c Plan_for_Commercialization__c
                         "Business_Model_for_Commercialization__c",
                         "Project_Revenue_Strategy__c",
                          "Main_Risks_and_Barriers__c",
@@ -2023,7 +2404,7 @@ get sanitizedBudgets() {
                          "Potential_for_Startup_Formation__c",
                          "Incubator_Association_Details__c",
                          "Strategy_for_transfer_of_technology__c",
-                         "Strategy_for_raising_funds_from_Investor__c "
+                         "Strategy_for_raising_funds_from_Investor__c"
                          
                     ],
                     5: [
@@ -2107,7 +2488,7 @@ get sanitizedBudgets() {
     }
     
     get formattedCompetitiveLandscape() {
-        return this.cleanRichText(this.applicationData.Competitive_Advantage__c);
+        return this.cleanRichText(this.applicationData.Competitive_Advantage__c); //Competitive_Landscape__c Competitive_Advantage__c
     }
     
     get formattedDetailIPR() {
@@ -2145,7 +2526,7 @@ get sanitizedBudgets() {
         return this.cleanRichText(this.applicationData.Strategy_for_transfer_of_technology__c);
     }
      get formattedStrategyFunds() {
-        return this.cleanRichText(this.applicationData.Strategy_for_raising_funds_from_Investor__c );
+        return this.cleanRichText(this.applicationData.Strategy_for_raising_funds_from_Investor__c);
     }
     get formattedMainRisk() {
         return this.cleanRichText(this.applicationData.Main_Risks_and_Barriers__c);
@@ -2358,7 +2739,7 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
     this.applicationData.ApplicationType = 'WIN Project Proposal';
     this.applicationData.Category        = 'Grant Application';
     this.applicationData.Status          = 'Draft';
-    this.applicationData.recordTypeId    = '012F6000000UQbBIAW'; //012GA000000nZOnYAM 012F6000000UQbBIAW
+    this.applicationData.recordTypeId    = '012GA000000nZOnYAM'; //012GA000000nZOnYAM 012F6000000UQbBIAW
 
     // 2️⃣ Flatten multi-picklist
     let payload = { ...this.applicationData };
@@ -2403,14 +2784,14 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
         .filter(b =>
             b.Name?.trim() ||
             b.Total_Amount__c ||
-            b.Total_Amount_INR__c ||
+            //b.Total_Amount_INR__c ||
             b.Justification__c?.trim()
         )
         .map(b => {
             const clean = { ...b };
 
             clean.Total_Amount__c = parseInt(clean.Total_Amount__c) || 0;
-            clean.Total_Amount_INR__c = parseInt(clean.Total_Amount_INR__c) || 0;
+            //clean.Total_Amount_INR__c = parseInt(clean.Total_Amount_INR__c) || 0;
 
             delete clean.uniqueId;
             return clean;
@@ -2455,10 +2836,16 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
             (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
             (m.Activities_under_this_Milestone__c && m.Activities_under_this_Milestone__c.trim() !== '') ||
             (m.Output_and_Deliverables__c && m.Output_and_Deliverables__c.trim() !== '') ||
+            (m.Installment_of_Funds_1__c && m.Installment_of_Funds_1__c.toString().trim() !== '') ||
+            (m.Installment_of_Funds_2__c && m.Installment_of_Funds_2__c.toString().trim() !== '') ||
+            (m.Installment_of_Funds_3__c && m.Installment_of_Funds_3__c.toString().trim() !== '') ||
+            (m.Installment_of_Funds_4__c && m.Installment_of_Funds_4__c.toString().trim() !== '') ||
+            (m.Installment_of_Funds_5__c && m.Installment_of_Funds_5__c.toString().trim() !== '') ||
+            (m.Installment_of_Funds_6__c && m.Installment_of_Funds_6__c.toString().trim() !== '') ||
             (m.Project_Start_Date__c && m.Project_Start_Date__c !== '') ||
             (m.Project_End_Date__c && m.Project_End_Date__c !== '') ||
-            (m.Budget_Required__c && m.Budget_Required__c.toString().trim() !== '') ||
-            (m.Budget_Required_INR__c && m.Budget_Required_INR__c.toString().trim() !== '')
+            (m.Budget_Required__c && m.Budget_Required__c.toString().trim() !== '') 
+            //m.Budget_Required_INR__c && m.Budget_Required_INR__c.toString().trim() !== '') 
         )
         .map(m => {
             const clean = { ...m };
@@ -2467,18 +2854,20 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
             clean.Milestone_Description__c = clean.Milestone_Description__c?.trim();
 
             // Normalize dates
-            if (clean.Project_Start_Date__c) {
+/*if (clean.Project_Start_Date__c) {
                 clean.Project_Start_Date__c = clean.Project_Start_Date__c.split('T')[0];
             }
             if (clean.Project_End_Date__c) {
                 clean.Project_End_Date__c = clean.Project_End_Date__c.split('T')[0];
-            }
+            } */
 
             // Map installment label to API name
             if (m.uniqueId === 1) clean.Installment_of_Funds_1__c = m.InstallmentLabel;
             if (m.uniqueId === 2) clean.Installment_of_Funds_2__c = m.InstallmentLabel;
             if (m.uniqueId === 3) clean.Installment_of_Funds_3__c = m.InstallmentLabel;
             if (m.uniqueId === 4) clean.Installment_of_Funds_4__c = m.InstallmentLabel;
+            if (m.uniqueId === 5) clean.Installment_of_Funds_5__c = 'Installment 5' ;
+            if (m.uniqueId === 6) clean.Installment_of_Funds_6__c = 'Installment 6' ;
 
             return clean;
         })
@@ -2505,12 +2894,30 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
             return clean;
         }); */
 
+        const seenCoFounders = new Set();
+const draftCoFounders = this.coFounders
+    .filter(c =>
+        c.Name?.trim() || c.Designation__c?.trim() || c.Institution__c?.trim() ||
+        c.Mobile__c?.trim() || c.Email__c?.trim()
+    )
+    .map(c => {
+        const clean = { ...c };
+        delete clean.uniqueId;
+        return clean;
+    })
+    .filter(c => {
+        const key = (c.Name || '').trim().toLowerCase();
+        if (!key || seenCoFounders.has(key)) return false;
+        seenCoFounders.add(key);
+        return true;
+    });
     // 6️⃣ Save to Apex
     saveDraftApplication({
         applicationId:   this.recordId,
         applicationData: payload,
         milestones:      draftMilestones,
         budgets:         draftBudgets,
+         coFounders:      draftCoFounders,
         recordTypeId:    payload.recordTypeId,
         category:        payload.Category
     })
@@ -2524,8 +2931,9 @@ console.log('💾 Clean Budgets to save:', JSON.stringify(draftBudgets, null, 2)
         // 7️⃣ Update local budgets with returned Ids
         this.budgets = this.budgets.map(local => {
             const match = response.savedBudgets.find(saved =>
-                saved.Name === local.Name &&
-               saved.Total_Amount__c == (local.Total_Amount__c || 0)
+                saved.Name === local.Name 
+                //&&
+               //saved.Total_Amount__c == (local.Total_Amount__c || 0)
             );
             return match ? { ...local, Id: match.Id } : local;
         });
@@ -2582,11 +2990,12 @@ this.milestones = this.milestones.map(local => {
         this.applicationData.ApplicationType       = 'WIN Project Proposal';
         this.applicationData.Category              = 'Grant Application';
         this.applicationData.Status                = 'Proposal Submitted to COE Admin';
-        this.applicationData.recordTypeId          = '012F6000000UQbBIAW';//Prod - 012GA000000nZOnYAM Sandbox - 012F6000000UQbBIAW
+        this.applicationData.recordTypeId          = '012GA000000nZOnYAM';//Prod - 012GA000000nZOnYAM Sandbox - 012F6000000UQbBIAW
         this.applicationData.IsSubmitted           = true;
         // ensure these were set by getLoggedInUserDetails earlier:
         this.applicationData.AccountId             = this.applicationData.AccountId;
         this.applicationData.ContactId             = this.applicationData.ContactId;
+
     
         // 2) Validate presence of Funding Opportunity
         if (!this.applicationData.FundingOpportunityId) {
@@ -2610,16 +3019,52 @@ this.milestones = this.milestones.map(local => {
         // Convert milestone target dates to "YYYY-MM-DD"
     const cleanedMilestones = this.milestones.map(m => {
         let clone = { ...m };
+           // Normalize milestone dates
+          /*  if (clone.Project_Start_Date__c) {
+                clone.Project_Start_Date__c =
+                    clone.Project_Start_Date__c.split('T')[0];
+            }
+            if (clone.Project_End_Date__c) {
+                clone.Project_End_Date__c =
+                    clone.Project_End_Date__c.split('T')[0];
+            } */
+
+            // 🔥 REQUIRED → Installment mapping
+            clone.Installment_of_Funds_1__c =
+                m.uniqueId === 1 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_2__c =
+                m.uniqueId === 2 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_3__c =
+                m.uniqueId === 3 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_4__c =
+                m.uniqueId === 4 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_5__c =
+                m.uniqueId === 5 ? 'Installment 5' : null;
+            clone.Installment_of_Funds_6__c =
+                m.uniqueId === 6 ? 'Installment 6'  : null;    
+
       /*  if (clone.Milestone_Target_Date__c) {
             clone.Milestone_Target_Date__c = clone.Milestone_Target_Date__c.split('T')[0];
         } */
         return clone;
     }).filter(m =>
         m.Milestone_Description__c?.trim() ||
-        m.Deliverables__c?.trim() ||
-        m.Budget_Required__c?.toString().trim() ||  
-        m.Target_Completion_Months__c?.trim() ||   
-        m.Justification__c?.trim()
+        m.Activities_under_this_Milestone__c?.trim() ||
+        m.Output_and_Deliverables__c?.trim() ||
+        m.Budget_Required__c?.toString().trim() || 
+        //m.Budget_Required_INR__c?.toString().trim() ||
+        m.Installment_of_Funds_1__c?.trim() ||
+        m.Installment_of_Funds_2__c?.trim() ||
+        m.Installment_of_Funds_3__c?.trim() ||
+        m.Installment_of_Funds_4__c?.trim() ||
+        m.Installment_of_Funds_5__c?.trim() ||
+        m.Installment_of_Funds_6__c?.trim() ||
+        m.Project_Start_Date__c ||
+         m.Project_End_Date__c
+        //m.Budget_Required__c?.toString().trim() ||
+        //m.Deliverables__c?.trim() ||
+        //m.Target_Completion_Months__c?.trim() ||   
+        //m.Justification__c?.trim()
     );
     
       //m.Target_Completion_Month__c?.trim() ||
@@ -2639,15 +3084,28 @@ this.milestones = this.milestones.map(local => {
         // 6) Filter out blank Milestones & Budgets
         const filledMilestones = this.milestones.filter(m =>
             m.Milestone_Description__c?.trim() ||
-            m.Deliverables__c?.trim() ||
-            m.Budget_Required__c?.toString().trim() ||   
-             m.Target_Completion_Months__c?.trim() || 
+            m.Activities_under_this_Milestone__c?.trim() ||
+            m.Output_and_Deliverables__c?.trim() ||
+            m.Budget_Required__c?.toString().trim() || 
+           // m.Budget_Required_INR__c?.toString().trim() ||
+            m.Installment_of_Funds_1__c?.trim() ||
+            m.Installment_of_Funds_2__c?.trim() ||
+            m.Project_Start_Date__c ||
+              m.Project_End_Date__c ||
+            m.Installment_of_Funds_3__c?.trim() ||
+            m.Installment_of_Funds_4__c?.trim() ||
+            m.Installment_of_Funds_5__c?.trim() ||
+            m.Installment_of_Funds_6__c?.trim() 
+            //m.Deliverables__c?.trim() ||
+             //m.Target_Completion_Months__c?.trim() || 
             //m.Milestone_Target_Date__c?.trim() ||
-            m.Justification__c?.trim()
+            //m.Justification__c?.trim()
         );
          const filledBudgets = this.budgets.filter(b =>
             b.Name?.trim() ||
-            b.Year_1__c || b.Year_2__c || b.Year_3_USD__c ||
+            b.Total_Amount__c ||
+           // b.Total_Amount_INR__c ||
+            //b.Year_1__c || b.Year_2__c || b.Year_3_USD__c ||
             //b.Amount?.toString().trim() ||
             b.Justification__c?.trim()
         );
@@ -2657,12 +3115,13 @@ this.milestones = this.milestones.map(local => {
         console.log('📑 Milestones:', JSON.stringify(filledMilestones, null, 2));
     
         // 7) Apex call
-        saveApplicationWithMilestones({
-            applicationData: payload,
-            milestones:      cleanedMilestones, // filledMilestones
-            budgets:         filledBudgets,
-            fileIds:         this.uploadedFiles.map(f => f.documentId)
-        })
+     saveApplicationWithMilestones({
+    applicationData: payload,
+    milestones: cleanedMilestones,
+    budgets: filledBudgets,
+    fileIds: this.uploadedFiles.map(f => f.documentId),
+    coFounders: this.coFounders
+})
         .then(appId => {
             console.log('✅ Submitted. ID:', appId);
             this.recordId = appId;

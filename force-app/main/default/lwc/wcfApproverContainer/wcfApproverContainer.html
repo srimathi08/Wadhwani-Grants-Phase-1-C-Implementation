@@ -1,0 +1,259 @@
+<template>
+
+    <!-- Top bar -->
+    <div class="appr-topbar">
+        <div class="appr-topbar-left">
+            <button class="back-btn" onclick={handleBack}>
+                <lightning-icon icon-name="utility:chevronleft" size="xx-small"></lightning-icon>
+                Back to Queue
+            </button>
+            <div class="brand-rule"></div>
+            <div>
+                <h2 class="appr-title">Approver Decision</h2>
+                <span class="appr-sub">{appName} &mdash; Review {reviewId}</span>
+            </div>
+        </div>
+
+        <div class="appr-topbar-right">
+            <template if:true={existingDecision}>
+
+                <!-- ══ Returned to Reviewer — distinct banner, no revoke controls ══ -->
+                <template if:true={isReturned}>
+                    <span class="returned-banner">
+                        <lightning-icon icon-name="utility:reply" size="xx-small"></lightning-icon>
+                        Returned to Reviewer on {returnedDateFormatted} &mdash; awaiting Reviewer decision
+                    </span>
+                </template>
+
+                <!-- ══ Normal finalized decision — badge + revoke controls (unchanged) ══ -->
+                <template if:false={isReturned}>
+                    <span class={existingDecisionClass}>
+                        Decision recorded: {existingDecision}
+                    </span>
+
+                    <!-- Revoke window open -->
+                    <template if:true={isRevokable}>
+                        <span class="revoke-timer">
+                            &#9203; {daysRemaining} day(s) left to revoke
+                        </span>
+                        <button class="revoke-btn" onclick={handleRevokeClick}>
+                            Revoke Decision
+                        </button>
+                    </template>
+
+                    <!-- Revoke window closed -->
+                    <template if:false={isRevokable}>
+                        <span class="revoke-expired">&#128274; Revoke window closed</span>
+                    </template>
+                </template>
+
+            </template>
+        </div>
+    </div>
+
+<template if:true={showConversationThread}>
+    <div class="convo-thread">
+        <div class="convo-thread-header">
+            <lightning-icon icon-name="utility:chat" size="x-small" class="convo-header-icon"></lightning-icon>
+            <span class="convo-header-title">Return Conversation</span>
+        </div>
+
+        <div class="convo-thread-body">
+            <template if:true={isBackFromReviewer}>
+                <div class="convo-msg convo-msg--approver">
+                    <div class="convo-msg-meta">
+                        <span class="convo-msg-author">You (Approver)</span>
+                        <span class="convo-msg-date">{priorReturnDateFormatted}</span>
+                    </div>
+                    <p class="convo-msg-text">{priorReturnComment}</p>
+                </div>
+            </template>
+
+            <template if:true={hasReviewerComment}>
+                <div class="convo-msg convo-msg--reviewer">
+                    <div class="convo-msg-meta">
+                        <span class="convo-msg-author">Reviewer</span>
+                    </div>
+                    <p class="convo-msg-text">{reviewerComment}</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
+
+    <!-- Split pane -->
+<div class="split-pane">
+    <div class={leftPaneClass}>
+        <div class="pane-label">
+            <span class="pane-label-text">Applicant Proposal (RFI)</span>
+            <button class="pane-toggle-btn" onclick={handleToggleLeftPane} title={leftToggleTitle}>
+                <lightning-icon icon-name={leftToggleIcon} size="xx-small"></lightning-icon>
+            </button>
+        </div>
+        <template if:false={leftCollapsed}>
+            <div class="pane-body">
+                <c-wcf-form-preview record-id={applicationId}></c-wcf-form-preview>
+            </div>
+        </template>
+    </div>
+
+    <div class="resizer" onmousedown={handleResizerMouseDown} if:true={showResizer}></div>
+
+    <div class={rightPaneClass}>
+        <div class="pane-label">
+            <span class="pane-label-text">Reviewer Evaluation</span>
+            <button class="pane-toggle-btn" onclick={handleToggleRightPane} title={rightToggleTitle}>
+                <lightning-icon icon-name={rightToggleIcon} size="xx-small"></lightning-icon>
+            </button>
+        </div>
+        <template if:false={rightCollapsed}>
+            <div class="pane-body">
+                <c-wcf-reviewer-form-preview
+                    review-id={reviewId}
+                    outcome-developer-name={outcomeDeveloperName}
+                ></c-wcf-reviewer-form-preview>
+            </div>
+        </template>
+    </div>
+</div>
+
+<div class="action-bar">
+    <div class="action-bar-inner">
+
+        <!-- Reveal-on-Accept-or-Reject panel: comment always; reasons only for Reject -->
+        <template if:true={showDecisionPanel}>
+            <div class="comment-wrap">
+                <label class="comment-label">
+                    Decision Comment
+                    <span class="required">* required</span>
+                </label>
+                <textarea
+                    class="comment-box"
+                    placeholder="Add context for your decision…"
+                    rows="2"
+                    oninput={handleCommentInput}
+                    value={comment}
+                ></textarea>
+            </div>
+
+            <template if:true={isReturnDecision}>
+                <div class="reasons-wrap">
+                    <label class="comment-label">
+                        Rejection Reason(s)
+                        <span class="required">* required</span>
+                    </label>
+                    <div class="reason-tile-grid">
+                        <template for:each={rejectionReasonTiles} for:item="opt">
+                            <label key={opt.value} class={opt.tileClass}>
+                                <input type="checkbox"
+                                       checked={opt.isChecked}
+                                       data-value={opt.value}
+                                       onchange={handleReasonToggle} />
+                                <span class="reason-tile-label">{opt.label}</span>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <div class="btn-group">
+                <button class="dec-btn btn-cancel-return" onclick={handleCancelDecisionPanel}>
+                    Cancel
+                </button>
+                <button class="dec-btn btn-return" onclick={handleDecisionPanelContinue}>
+                    <lightning-icon icon-name="utility:check" size="xx-small" class="dec-icon"></lightning-icon>
+                    {decisionPanelButtonLabel}
+                </button>
+            </div>
+        </template>
+
+        <!-- Default state: just Accept / Reject buttons -->
+        <template if:false={showDecisionPanel}>
+            <div class="btn-group">
+                <button class="dec-btn btn-approve" onclick={handleApprove} disabled={isDecisionMade}>
+                    <lightning-icon icon-name="utility:check" size="xx-small" class="dec-icon"></lightning-icon>
+                    Accept
+                </button>
+                <button class="dec-btn btn-return" onclick={handleReturn} disabled={isDecisionMade}>
+                    <lightning-icon icon-name="utility:reply" size="xx-small" class="dec-icon"></lightning-icon>
+                    Reject
+                </button>
+            </div>
+        </template>
+
+    </div>
+</div>
+    <!-- Decision confirmation modal -->
+    <template if:true={showModal}>
+        <div class="modal-backdrop">
+            <div class="modal-box">
+                <div class={modalHeaderClass}>
+                    <h3 class="modal-title">{modalTitle}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>{modalMessage}</p>
+
+                    <template if:true={comment}>
+                        <div class="modal-comment">
+                            <strong>Comment:</strong> {comment}
+                        </div>
+                    </template>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn btn-cancel"
+                            onclick={handleModalCancel}
+                            disabled={isSubmitting}>
+                        Cancel
+                    </button>
+                    <button class={modalConfirmClass}
+                            onclick={handleModalConfirm}
+                            disabled={isConfirmDisabled}>
+                        <template if:true={isSubmitting}>
+                            <lightning-spinner alternative-text="Saving" size="small"></lightning-spinner>
+                        </template>
+                        <template if:false={isSubmitting}>
+                            Confirm {pendingDecision}
+                        </template>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Revoke confirmation modal -->
+    <template if:true={showRevokeModal}>
+        <div class="modal-backdrop">
+            <div class="modal-box">
+                <div class="modal-header modal-decline">
+                    <h3 class="modal-title">Revoke Decision</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Are you sure you want to revoke the
+                        <strong>{existingDecision}</strong> decision for
+                        <strong>{appName}</strong>?
+                        This will mark the decision as Revoked and allow a new one to be submitted.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn btn-cancel"
+                            onclick={handleRevokeCancel}
+                            disabled={isRevoking}>
+                        Cancel
+                    </button>
+                    <button class="modal-btn btn-confirm-decline"
+                            onclick={handleRevokeConfirm}
+                            disabled={isRevoking}>
+                        <template if:true={isRevoking}>
+                            <lightning-spinner alternative-text="Revoking" size="small"></lightning-spinner>
+                        </template>
+                        <template if:false={isRevoking}>
+                            Yes, Revoke
+                        </template>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</template>

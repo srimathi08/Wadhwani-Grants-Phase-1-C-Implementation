@@ -1,0 +1,80 @@
+<template>
+    <template if:true={isOpen}>
+
+        <!-- STANDALONE: plain full page, no overlay -->
+        <template if:true={standalone}>
+            <div class="eligibility-page-standalone">
+                <div class="modal-header">
+                    <h2 class="modal-title">Eligibility Criteria</h2>
+                </div>
+
+<div class="modal-body">
+   <!--  <p class="modal-intro">
+        Wadhwani Grants deploys catalytic capital to external organizations
+        to drive exponential impact. Capital is disbursed against <strong>verified employment outcomes</strong>, not activities, plans, or reports.
+    </p> -->
+
+    <ul class="eligibility-list">
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>You are a registered organization in a country listed in the application form. Nonprofits, social enterprises, and for-profit organizations are all welcome.</span>
+        </li>
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>Your core work directly helps people get jobs (skilling and placement) or creates jobs (supporting entrepreneurs and small businesses).</span>
+        </li>
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>You can show your employment outcomes with records that someone outside your organization could check.</span>
+        </li>
+        <li class="eligibility-item eligibility-item--excluded">
+            <lightning-icon icon-name="utility:warning" size="x-small" class="eligibility-icon eligibility-icon--excluded"></lightning-icon>
+            <span>Organizations whose primary work is research, policy advocacy, or convening are not eligible: our grants fund direct employment outcomes.</span>
+        </li>
+    </ul>
+</div>
+            </div>
+        </template>
+
+        <!-- POPUP: original modal behavior, unchanged -->
+        <template if:false={standalone}>
+            <div class="modal-backdrop" onclick={handleBackdropClick}>
+                <div class="modal-container" onclick={stopPropagation}>
+
+                    <div class="modal-header">
+                        <h2 class="modal-title">Eligibility Criteria</h2>
+                        <button class="modal-close" onclick={handleClose}>✕</button>
+                    </div>
+
+<div class="modal-body">
+ <!--   <p class="modal-intro">
+        Wadhwani Grants deploys catalytic capital to external organizations
+        to drive exponential impact. Capital is disbursed against <strong>verified employment outcomes</strong>, not activities, plans, or reports.
+    </p> -->
+
+    <ul class="eligibility-list">
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>You are a registered organization in a country listed in the application form. Nonprofits, social enterprises, and for-profit organizations are all welcome.</span>
+        </li>
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>Your core work directly helps people get jobs (skilling and placement) or creates jobs (supporting entrepreneurs and small businesses).</span>
+        </li>
+        <li class="eligibility-item">
+            <lightning-icon icon-name="utility:check" size="x-small" class="eligibility-icon"></lightning-icon>
+            <span>You can show your employment outcomes with records that someone outside your organization could check.</span>
+        </li>
+        <li class="eligibility-item eligibility-item--excluded">
+            <lightning-icon icon-name="utility:warning" size="x-small" class="eligibility-icon eligibility-icon--excluded"></lightning-icon>
+            <span>Organizations whose primary work is research, policy advocacy, or convening are not eligible: our grants fund direct employment outcomes.</span>
+        </li>
+    </ul>
+</div>
+
+                </div>
+            </div>
+        </template>
+
+    </template>
+</template>

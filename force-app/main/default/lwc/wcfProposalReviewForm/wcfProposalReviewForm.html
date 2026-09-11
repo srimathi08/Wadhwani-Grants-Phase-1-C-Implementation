@@ -1,132 +1,493 @@
 <template>
-    <!-- Loading Spinner 
-    <template if:true={isLoading}>
-        <div class="slds-p-around_medium slds-text-align_center">
-            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
-        </div>
-    </template>-->
 
-    <!-- Main Form Content -->
+    <!-- Main Form -->
     <template if:true={showForm}>
-        <div class="form-container">
-            <div class="logo-section">
-                <img src={logoUrl} alt="WIN Logo" class="logo-img" />
-                <h1 class="form-title">WCF PROJECT PROPOSAL REVIEW</h1>
+        <div class="form-wrap">
+
+            <!-- Form Header Band -->
+            <div class="formhead">
+                <h2 class="form-title serif">Wadhwani Grants Project Proposal Review</h2>
+                <div class="applicant">
+                    <div><strong>Applicant:</strong>&nbsp;{institutionName}</div>
+                    <div class="sep">·</div>
+                    <div><strong>ID:</strong>&nbsp;{applicationName}</div>
+                    <template if:true={hasOutcomeType}>
+                        <div class="sep">·</div>
+                        <div>
+                            <strong>Outcome:</strong>&nbsp;
+                            <span class="track-badge">
+                                <span class="dot"></span>
+                                {outcomeDisplayLabel}
+                            </span>
+                        </div>
+                    </template>
+                </div>
+                <div class="savebar">
+                    <div class={saveStateClass}>{saveStateText}</div>
+                    <div class="step-meta">
+                        <span class="stepnum">Step {currentStepDisplay} of 9 · {currentStepTitle}</span>
+                        <div class="progress">
+                            <template for:each={progressDots} for:item="dot">
+                                <span
+                                    key={dot.idx}
+                                    data-idx={dot.idx}
+                                    class={dot.cls}
+                                    title={dot.title}
+                                    onclick={handleProgressClick}
+                                ></span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <lightning-card>
-                <div class="slds-m-around_medium">
+            <!-- Step Body -->
+            <div class="body">
 
-                    <!-- Organizational Fit -->
-                    <div class="section-divider">Organizational Fit</div>
-                    <div class="single-column">
-                        <div class="rating-guide"><strong> How would you rate the organization's financial stability over the past 3 years?</strong></div>
-                        <lightning-combobox label="Rating" name="Rate_financial_stability_over_3_years__c" value={reviewData.Rate_financial_stability_over_3_years__c} options={RateStabilityOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Financial_Stability_Comments_3Y__c" value={reviewData.Financial_Stability_Comments_3Y__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>How complete and credible are the submitted financial records?</strong></div>
-                        <lightning-combobox label="Rating" name="Financial_records_credible_complete__c" value={reviewData.Financial_records_credible_complete__c} options={CredibleRecordsOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Financial_Records_Comments__c" value={reviewData.Financial_Records_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>How strong is the organization’s vision and plan for sustainability?</strong></div>
-                        <lightning-combobox label="Rating" name="How_strong_is_the_sustainability_vision__c" value={reviewData.How_strong_is_the_sustainability_vision__c} options={SustainabilityVisionOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Sustainability_Plan_Comments__c" value={reviewData.Sustainability_Plan_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                <!-- ===== DIMENSION STEPS (0–5) ===== -->
+                <template if:true={isDimStep}>
+                    <div class="step-intro">
+                        <div class="dim-head">
+                            <div class="dim-num serif">{currentDim.id}</div>
+                            <div class="dim-title">
+                                <h3 class="serif">{currentDim.title}</h3>
+                                <p class="lede">{currentDim.lede}</p>
+                            </div>
+                        </div>
+                        <div class="dim-tools">
+                            <button class={rubricBtnClass} type="button" onclick={toggleRubric}>
+                                {rubricBtnLabel} <span class="chev">▾</span>
+                            </button>
+                            <span class="qcount">{currentDim.questionCount} sub-questions</span>
+                        </div>
+                        <div class={rubricClass}>
+                            <h4>What each rating means · {currentDim.title}</h4>
+                            <div class="rubric-grid">
+                                <template for:each={currentDim.rubricCols} for:item="col">
+                                    <div key={col.lvl} class={col.cls}>
+                                        <div class="lvl">{col.lvl} <span class="n">{col.n}</span></div>
+                                        <p>{col.text}</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Strategic Alignment -->
-                    <div class="section-divider">Strategic Alignment</div>
-                    <div class="single-column">
-                        <div class="rating-guide"><strong>How well are the organization's programs (Job Fulfillment) aligned with WCF's strategic priorities?</strong></div>
-                        <lightning-combobox label="Rating" name="Program_alignment_with_WCF_priorities__c" value={reviewData.Program_alignment_with_WCF_priorities__c} options={ProgramAligmentOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Program_Job_Alignment_WCF_Comments__c" value={reviewData.Program_Job_Alignment_WCF_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                    <template for:each={currentQuestions} for:item="q">
+                        <div key={q.id} class={q.cardClass}>
+                            <div class="subq-top">
+                                <div class="subq-q">
+                                    <div class="qtext">{q.text}</div>
+                                    <template if:true={q.hint}>
+                                        <div class="qhint">{q.hint}</div>
+                                    </template>
+                                </div>
+                                <template if:true={q.showTag}>
+                                    <span class={q.tagClass}>{q.tagLabel}</span>
+                                </template>
+                            </div>
+                            <div class="rating-row">
+                                <span class="rating-label">Rating <span class="req">*</span></span>
+                                <div class="segmented" role="radiogroup">
+                                    <template for:each={q.ratingBtns} for:item="rb">
+                                        <button
+                                            key={rb.n}
+                                            type="button"
+                                            class={rb.cls}
+                                            data-qid={q.id}
+                                            data-rate={rb.n}
+                                            onclick={handleRating}
+                                        >
+                                            <span class="num">{rb.n}</span>
+                                            {rb.label}
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class={q.commentClass}>
+                                <div class="clab">
+                                    <span class="l">
+                                        Comment
+                                        <template if:true={q.commentRequired}>
+                                            <span class="req"> *</span>
+                                        </template>
+                                    </span>
+                                    <span class="help">{q.commentHelp}</span>
+                                </div>
+                                <div class="textarea-wrap">
+                                    <textarea
+                                        class={q.commentTextareaClass}
+                                        data-qid={q.id}
+                                        placeholder={q.commentPlaceholder}
+                                        rows="3"
+                                        oninput={handleCommentInput}
+                                        onkeydown={handleCommentKeyDown}
+                                        onpaste={handleCommentPaste}
+                                    >{q.commentValue}</textarea>
+                                    <div class={q.wordCountClass}>{q.wordCountDisplay}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
 
-                        <div class="rating-guide"><strong>How would you rate the organization's current scale of operations in terms of the Foundation's funding strategy? (~10K placements per year OR ~5K new jobs added per year)</strong></div>
-                        <lightning-combobox label="Rating" name="Org_scale_vs_funding_goals__c" value={reviewData.Org_scale_vs_funding_goals__c} options={OrgScaleOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Org_Scale_vs_WCF_Strategy_Comments__c" value={reviewData.Org_Scale_vs_WCF_Strategy_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                </template>
+
+                <!-- ===== STEP 7: Strengths & Weaknesses ===== -->
+                <template if:true={isSwStep}>
+                    <div class="step-intro">
+                        <div class="dim-head">
+                            <div class="dim-num serif">7</div>
+                            <div class="dim-title">
+                                <h3 class="serif">Strengths and weaknesses</h3>
+                                <p class="lede">Capture your top three strengths and your top three weaknesses or concerns at the proposal level — these are not per-dimension. Order matters: the first item should be the most material. At least one entry is required in each block.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sw-indent">
+                        <div class="sw-block">
+                            <h4 class="serif">Up to 3 strengths · ranked</h4>
+                            <p class="sub">First entry is the most material strength. Each entry: 1–2 sentences.</p>
+                            <template for:each={strengthRows} for:item="row">
+                                <div key={row.idx} class="ranked-row">
+                                    <div class="rank serif">{row.num}</div>
+                                    <lightning-input
+                                        type="text"
+                                        name={row.strengthField}
+                                        value={row.strengthValue}
+                                        placeholder={row.sPlaceholder}
+                                        onchange={handleSwChange}
+                                        data-kind="strength"
+                                        data-idx={row.idx}
+                                    ></lightning-input>
+                                    <span class="req-mark">{row.reqMark}</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="sw-block">
+                            <h4 class="serif">Up to 3 weaknesses · ranked</h4>
+                            <p class="sub">First entry is the most material concern. Each entry: 1–2 sentences.</p>
+                            <template for:each={weaknessRows} for:item="row">
+                                <div key={row.idx} class="ranked-row">
+                                    <div class="rank serif">{row.num}</div>
+                                    <lightning-input
+                                        type="text"
+                                        name={row.weaknessField}
+                                        value={row.weaknessValue}
+                                        placeholder={row.wPlaceholder}
+                                        onchange={handleSwChange}
+                                        data-kind="weakness"
+                                        data-idx={row.idx}
+                                    ></lightning-input>
+                                    <span class="req-mark">{row.reqMark}</span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
 
-                    <!-- Use of Funds -->
-                    <div class="section-divider">Use of Funds</div>
-                    <div class="single-column">
-                        <div class="rating-guide"><strong>How well-articulated, feasible, and outcome-linked is the proposed use of $1M/year funding?</strong></div>
-                        <lightning-combobox label="Rating" name="X1M_plan_clear_feasible_linked__c" value={reviewData.X1M_plan_clear_feasible_linked__c} options={PlanClearOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Proposed_1M_Funding_Use_Comments__c" value={reviewData.Proposed_1M_Funding_Use_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                </template>
 
-                        <div class="rating-guide"><strong>What is your best estimate of the increment in job placements if WCF funding is provided as requested?</strong><br>
-                                                   (Guideline: The answer should be a numerical value indicating no. of additional placments) </div>
-                        <lightning-combobox label="Rating" name="Estimated_Jobs_with_WCF_Funding__c" value={reviewData.Estimated_Jobs_with_WCF_Funding__c} options={EstdJobPlacementsOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Estd_job_placements_comments__c" value={reviewData.Estd_job_placements_comments__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>Describe your rationale for the additional job placements</strong></div>
-                        <lightning-textarea label="Comment" name="Rationale_for_Added_Placements_Comments__c" value={reviewData.Rationale_for_Added_Placements_Comments__c} onchange={handleInputChange} required></lightning-textarea>
+                <!-- ===== STEP 8: Final Recommendation ===== -->
+                <template if:true={isRecStep}>
+                    <div class="step-intro">
+                        <div class="dim-head">
+                            <div class="dim-num serif">8</div>
+                            <div class="dim-title">
+                                <h3 class="serif">Final Recommendation</h3>
+                                <p class="lede">Based on your evaluation across the six dimensions, do you recommend this applicant proceed to Stage 5 (Committee Decision)? Your recommendation is your independent view; the Approver will reconcile across all reviewers before deciding.</p>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- GenieAI Synergy -->
-                    <div class="section-divider">GenieAI Synergy</div>
-                    <div class="single-column">
-                        <div class="rating-guide"><strong>How strong is the potential for meaningful GenieAI adoption?</strong></div>
-                        <lightning-combobox label="Rating" name="GenieAI_adoption_potential__c" value={reviewData.GenieAI_adoption_potential__c} options={GenAIOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="GenieAI_Adoption_Strength_Comments__c" value={reviewData.GenieAI_Adoption_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-                    </div>
-
-                    <!-- Skilling Model & Outcomes -->
-                    <div class="section-divider">Skilling Model & Outcomes</div>
-                    <div class="single-column">
-
-                         <div class="rating-guide"><strong>How well is the skilling and placement model articulated and how innovative is it?</strong></div>
-                        <lightning-combobox label="Rating" name="Skilling_model_clarity_innovation__c" value={reviewData.Skilling_model_clarity_innovation__c} options={SkillingModelOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Model_Articulation_Innovation_Comments__c" value={reviewData.Model_Articulation_Innovation_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>How credible and well-attributed are enrollment and placement numbers over the past 3 years?</strong></div>
-                        <lightning-combobox label="Rating" name="X3yr_enrollment_placement_credibility__c" value={reviewData.X3yr_enrollment_placement_credibility__c} options={EnrollmentPlacementOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Enrollment_Placement_Credibility_Comment__c" value={reviewData.Enrollment_Placement_Credibility_Comment__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>How reasonable is the cost per placement compared to benchmarks?</strong></div>
-                        <lightning-combobox label="Rating" name="Cost_placement_vs_benchmark__c" value={reviewData.Cost_placement_vs_benchmark__c} options={CostPlacementOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Cost_Per_Placement_Benchmarks_Comments__c" value={reviewData.Cost_Per_Placement_Benchmarks_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-
-                        <div class="rating-guide"><strong>How credible is the evidence of third-party validation and long-term employment?</strong></div>
-                        <lightning-combobox label="Rating" name="Evidence_of_validation_long_term_jobs__c" value={reviewData.Evidence_of_validation_long_term_jobs__c} options={EvidenceValidationOptions} onchange={handleInputChange} required></lightning-combobox>
-                        <lightning-textarea label="Comment" name="Evidence_of_Validation_Jobs_Comments__c" value={reviewData.Evidence_of_Validation_Jobs_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-                    </div>
-
-                    <!-- Final Recommendation -->
-                    <div class="section-divider">Final Recommendation</div>
-                    <div class="single-column">
-                        <lightning-combobox label="Do you recommend this application for CEO review?" name="Recommend_for_CEO_review__c" value={reviewData.Recommend_for_CEO_review__c} options={recommendForCeoOptions} onchange={handleInputChange} required></lightning-combobox>
+                    <div class="finalrec">
+                        <div class="yesno-row">
+                            <span class="ynl">Recommendation <span class="req">*</span></span>
+                            <div class="yesno yesno-4">
+                                <button type="button" class={recStronglyRecommendClass} data-rec="Strongly Recommend" onclick={handleRecChoice}>
+                                    ✓ Strongly recommend
+                                </button>
+                                <button type="button" class={recRecommendClass} data-rec="Recommend" onclick={handleRecChoice}>
+                                    ✓ Recommend
+                                </button>
+                                <button type="button" class={recReservationsClass} data-rec="Recommend with Reservations" onclick={handleRecChoice}>
+                                    ~ Recommend with reservations
+                                </button>
+                                <button type="button" class={recDoNotRecommendClass} data-rec="Do Not Recommend" onclick={handleRecChoice}>
+                                    ✕ Do not recommend
+                                </button>
+                            </div>
+                        </div>
 
                         <template if:true={showCeoRecommendationYes}>
-                            <div class="rating-guide"><strong>How strongly do you recommend FOR consideration of this proposal?</strong></div>
-                            <lightning-combobox label="Strength of recommendation?" name="Strength_of_recommendation__c" value={reviewData.Strength_of_recommendation__c} options={StrengthRecommendationOptions} onchange={handleInputChange} required></lightning-combobox>
-                            <lightning-textarea label="Recommendation Strength Comments" name="Recommendation_Strength_Comments__c" value={reviewData.Recommendation_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-                            <lightning-textarea label="List up to 3 strengths of this proposal, in ranked order" name="Top_3_proposal_strengths_ranked__c" value={reviewData.Top_3_proposal_strengths_ranked__c} onchange={handleInputChange} required></lightning-textarea>
-                            <lightning-textarea label="List up to 3 weaknesses of this proposal, in ranked order" name="Top_3_proposal_weaknesses_ranked__c" value={reviewData.Top_3_proposal_weaknesses_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                            <div class="path yes">
+                                <div class="pathlab good">↳ Recommendation Strength</div>
+                                <div class="subform-row">
+                                    <span class="l">How strongly do you recommend FOR consideration of this proposal? <span class="req">*</span></span>
+                                    <div class="segmented yes-seg" role="radiogroup">
+                                        <template for:each={recStrengthBtns} for:item="rb">
+                                            <button key={rb.n} type="button" class={rb.yesSelCls} data-recstr={rb.n} onclick={handleRecStrength}>
+                                                <span class="num">{rb.n}</span>{rb.label}
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="subform-row">
+                                    <span class="l">Recommendation strength comments <span class="req">*</span></span>
+                                    <div class="textarea-wrap">
+                                        <textarea
+                                            class="lwc-textarea"
+                                            data-field="Recommendation_Strength_Comments__c"
+                                            placeholder="Why this recommendation strength?"
+                                            rows="3"
+                                            oninput={handleRecCommentInput}
+                                            onkeydown={handleRecCommentKeyDown}
+                                            onpaste={handleRecCommentPaste}
+                                        >{reviewData.Recommendation_Strength_Comments__c}</textarea>
+                                        <div class={recYesWordCountClass}>{recYesWordCountDisplay}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </template>
 
                         <template if:true={showCeoRecommendationNo}>
-                            <div class="rating-guide"><strong>How strongly do you recommend AGAINST consideration of this proposal?</strong></div>
-                            <lightning-combobox label="Strength of non-recommendation?" name="Strength_of_non_recommendation__c" value={reviewData.Strength_of_non_recommendation__c} options={StrengthNoRecommendationOptions} onchange={handleInputChange} required></lightning-combobox>
-                            <lightning-textarea label="Non-Recommendation Strength Comments" name="Non_Recommendation_Strength_Comments__c" value={reviewData.Non_Recommendation_Strength_Comments__c} onchange={handleInputChange} required></lightning-textarea>
-                            <lightning-textarea label="List up to 3 strengths of this proposal, in ranked order" name="Top_3_proposal_strengths_ranked__c" value={reviewData.Top_3_proposal_strengths_ranked__c} onchange={handleInputChange} required></lightning-textarea>
-                            <lightning-textarea label="List up to 3 weaknesses of this proposal, in ranked order" name="Top_3_proposal_weaknesses_ranked__c" value={reviewData.Top_3_proposal_weaknesses_ranked__c} onchange={handleInputChange} required></lightning-textarea>
+                            <div class="path no">
+                                <div class="pathlab danger">↳ Do Not Recommend</div>
+
+                                <!-- ===== Rejection Reason(s) ===== -->
+                                <div class="subform-row">
+                                    <span class="l">Rejection reason(s) <span class="req">*</span></span>
+                                    <div class="checkbox-grid" role="group">
+                                        <template for:each={rejectionReasonRows} for:item="r">
+                                            <label key={r.value} class="checkbox-row">
+                                                <input
+                                                    type="checkbox"
+                                                    data-value={r.value}
+                                                    checked={r.checked}
+                                                    onchange={handleRejectionReasonToggle}
+                                                />
+                                                <span>{r.label}</span>
+                                            </label>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- ===== Rejection Comment ===== -->
+                                <!-- Per build spec 3.2/3.3: when "Other" is selected, the reason -->
+                                <!-- is written inside this comment itself — no separate note field. -->
+                                <div class="subform-row">
+                                    <span class="l">
+                                        Rejection comment <span class="req">*</span>
+                                        <template if:true={showRejectionOther}>
+                                            <span class="help"> — describe the "Other" reason here</span>
+                                        </template>
+                                    </span>
+                                    <div class="textarea-wrap">
+                                        <textarea
+                                            class="lwc-textarea"
+                                            placeholder="Explain the basis for rejection…"
+                                            rows="3"
+                                            oninput={handleRejectionCommentInput}
+                                            onkeydown={handleRejectionCommentKeyDown}
+                                            onpaste={handleRejectionCommentPaste}
+                                        >{reviewData.Rejection_Comment__c}</textarea>
+                                        <div class={rejectionCommentWordCountClass}>{rejectionCommentWordCountDisplay}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:false={hasRecChoice}>
+                            <div class="rec-placeholder">Select a recommendation option above to continue.</div>
                         </template>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="button-container">
-                        <lightning-button variant="destructive-text" label="Save Draft" onclick={handleSaveDraft}></lightning-button>
-                        <lightning-button class="slds-m-left_medium" variant="destructive-text" label="Submit" onclick={handleSubmit}></lightning-button>
+                    <!-- ===== Supporting Documents upload (Rec step) ===== -->
+                    <div class="upload-section upload-section-rec">
+                        <div class="upload-header">
+                            <span class="upload-title">Supporting Documents</span>
+                            <span class="upload-sub">Optional — attach any files to support your recommendation</span>
+                        </div>
+                        <template if:true={reviewRecordId}>
+                            <lightning-file-upload
+                                label="Attach files"
+                                name="supportingDocs"
+                                accept={acceptedFormats}
+                                record-id={reviewRecordId}
+                                multiple
+                                onuploadfinished={handleUploadFinished}
+                            ></lightning-file-upload>
+                            <template if:true={uploadedFiles.length}>
+                                <div class="uploaded-list">
+                                    <template for:each={uploadedFiles} for:item="f">
+                                        <div key={f.documentId} class="uploaded-file">
+                                            <span class="file-icon">📎</span>
+                                            <span class="file-name">{f.name}</span>
+                                            <button
+                                                class="file-delete-btn"
+                                                type="button"
+                                                title="Remove file"
+                                                data-docid={f.documentId}
+                                                onclick={handleDeleteFile}
+                                            >✕</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={reviewRecordId}>
+                            <div class="upload-hint">
+                                <span>Save a draft first to enable file upload.</span>
+                                <button class="btn btn-secondary btn-sm" type="button" onclick={handleSaveDraft}>Save draft now</button>
+                            </div>
+                        </template>
                     </div>
 
+                </template>
+
+                <!-- ===== STEP 9: Review & Submit ===== -->
+                <template if:true={isReviewStep}>
+                    <div class="step-intro">
+                        <div class="dim-head">
+                            <div class="dim-num serif">9</div>
+                            <div class="dim-title">
+                                <h3 class="serif">Review &amp; submit</h3>
+                                <p class="lede">A summary of your evaluation. Use the progress bar above to jump back to any step and revise. When you submit, this evaluation is sealed and visible to the Approver alongside the other reviewers' evaluations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-summary">
+                        <template for:each={reviewSummaryDims} for:item="dim">
+                            <div key={dim.id} class="review-dim">
+                                <div class="head">
+                                    <div class="name">
+                                        <span class="num serif">{dim.id}</span>
+                                        <span class="ttl serif">{dim.title}</span>
+                                    </div>
+                                    <div class="mean serif"><span class="lab">Mean</span>{dim.mean}</div>
+                                </div>
+                                <template for:each={dim.qs} for:item="rq">
+                                    <div key={rq.id} class="review-q">
+                                        <div class="qx">{rq.text}</div>
+                                        <div class="rx">
+                                            <span class={rq.pipCls}>{rq.ratingLabel}</span>&nbsp;<span>{rq.ratingNum}</span>
+                                        </div>
+                                        <template if:true={rq.hasComment}>
+                                            <div class="review-q-comment">{rq.comment}</div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <div class="review-other">
+                            <h5 class="serif">Strengths</h5>
+                            <ul>
+                                <template for:each={reviewStrengths} for:item="s">
+                                    <li key={s}>{s}</li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div class="review-other">
+                            <h5 class="serif">Weaknesses</h5>
+                            <ul>
+                                <template for:each={reviewWeaknesses} for:item="w">
+                                    <li key={w}>{w}</li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div class="review-rec">
+                            <h5 class="serif">Final recommendation</h5>
+                            <div class="recvalue-row">
+                                <span class={recValueClass}>{recValueIcon} {recChoiceDisplayLabel}</span>
+                                <template if:true={recStrengthLabel}>
+                                    <span class="strength">Strength: {recStrengthLabel}</span>
+                                </template>
+                            </div>
+
+                            <template if:true={showCeoRecommendationYes}>
+                                <template if:true={reviewData.Recommendation_Strength_Comments__c}>
+                                    <div class="review-q-comment">{reviewData.Recommendation_Strength_Comments__c}</div>
+                                </template>
+                            </template>
+
+                            <template if:true={showCeoRecommendationNo}>
+                                <!-- ===== Rejection reasons + comment preview ===== -->
+                                <template if:true={reviewRejectionReasonLabels.length}>
+                                    <div class="review-q-comment">
+                                        <strong>Rejection reasons:</strong>
+                                        <ul>
+                                            <template for:each={reviewRejectionReasonLabels} for:item="rr">
+                                                <li key={rr}>{rr}</li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
+                                <template if:true={reviewData.Rejection_Comment__c}>
+                                    <div class="review-q-comment">{reviewData.Rejection_Comment__c}</div>
+                                </template>
+                            </template>
+                        </div>
+
+                        <!-- ===== Uploaded files summary in Review step ===== -->
+                        <template if:true={uploadedFiles.length}>
+                            <div class="review-other">
+                                <h5 class="serif">Attached Documents</h5>
+                                <div class="uploaded-list uploaded-list-review">
+                                    <template for:each={uploadedFiles} for:item="f">
+                                        <div key={f.documentId} class="uploaded-file">
+                                            <span class="file-icon">📎</span>
+                                            <span class="file-name">{f.name}</span>
+                                            <button
+                                                class="file-delete-btn"
+                                                type="button"
+                                                title="Remove file"
+                                                data-docid={f.documentId}
+                                                onclick={handleDeleteFile}
+                                            >✕</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                    </div>
+                </template>
+
+            </div><!-- /body -->
+
+            <!-- Validation Banner -->
+            <template if:true={validationError}>
+                <div class="validate show">
+                    <strong>Cannot continue:</strong> {validationError}
                 </div>
-            </lightning-card>
+            </template>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="left">
+                    <button class="btn btn-secondary" type="button" onclick={prevStep} disabled={isPrevDisabled}>← Previous</button>
+                </div>
+                <div class="right">
+                    <span class="step-here">Step {currentStepDisplay} of 9</span>
+                    <button class="btn btn-secondary" type="button" onclick={handleSaveDraft}>Save draft</button>
+                    <button class={nextBtnClass} type="button" onclick={nextStep}>{nextBtnLabel}</button>
+                </div>
+            </div>
+
         </div>
     </template>
 
-    <!-- Already Reviewed Message -->
-    <template if:true={alreadyReviewed}>
-        <div class="slds-box slds-theme_alert-texture slds-theme_error slds-align_absolute-center slds-text-heading_medium slds-m-around_large">
-            A review has already been submitted for this proposal.
+    <!-- Submitted Success — shown right after a fresh submit AND after a
+         refresh when the reviewer already submitted. One consistent screen,
+         one Back to Dashboard button. -->
+    <template if:true={submitted}>
+        <div class="form-wrap">
+            <div class="done-state">
+                <div class="done-icon">✓</div>
+                <h3 class="serif">Evaluation submitted</h3>
+                <p>Your evaluation of <strong>{institutionName}</strong> has been sealed and is now visible to the Approver. You'll be notified when all reviewers have submitted and the Approver opens the aggregate view.</p>
+                <button class="btn btn-secondary" type="button" onclick={handleBackToDashboard}>
+                    Back to Dashboard
+                </button>
+            </div>
         </div>
     </template>
+
 </template>

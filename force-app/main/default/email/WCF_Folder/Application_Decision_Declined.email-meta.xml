@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Decision Declined</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c}] Update on your Wadhwani Grants application</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+Thank you for the time and care you put into your application.
+
+After careful consideration, we’ve decided not to move forward at this time. This reflects our current priorities and the volume of strong applications we receive.
+
+This is not a judgment on the value of your work, and we truly appreciate the opportunity to learn about it.
+
+We’d be glad to stay in touch, and warmly invite you to apply again in the future as our focus evolves.
+
+If you&apos;d like further clarification, feel free to reach us at:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+With appreciation and best wishes,
+{!Account.PL_of_Record__r}
+Wadhwani Grants
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{!Account.Preferences_URL__c}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

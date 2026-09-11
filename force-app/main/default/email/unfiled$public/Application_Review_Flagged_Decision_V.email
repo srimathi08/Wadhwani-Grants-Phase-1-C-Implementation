@@ -1,0 +1,26 @@
+<html>
+<body style="font-family:Arial, sans-serif; font-size:14px; color:#333;">
+
+<p>Dear {!IndividualApplication__c.Account__r.Name},</p>
+
+<p>Thank you for submitting your application to Wadhwani Foundation – WCF Grant Management.
+We are writing to inform you of an important update regarding the review of your application.</p>
+
+<p>
+<strong>Application ID:</strong> {!IndividualApplication__c.Name}<br/>
+<strong>Review Decision (Sec 1.2):</strong> {!IndividualApplication__c.Decision_Final_Decision_from_Sec_1_2__c}<br/>
+<strong>Flagging Rationale:</strong> {!IndividualApplication__c.Flag_rationale_Flagging_Criteria__c}
+</p>
+
+<p>Your application has been flagged for additional review.
+Please note this is <strong>not a final decision</strong>.
+Our team will follow up if further information is required.</p>
+
+<p>For any queries, please contact us at [SupportEmail].</p>
+
+<p>Yours sincerely,<br/>
+<strong>WCF Grant Management Team</strong><br/>
+Wadhwani Foundation</p>
+
+</body>
+</html>

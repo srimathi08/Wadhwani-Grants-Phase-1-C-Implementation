@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Action Required Update Application</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c}] Action required: please update your application</subject>
+    <textOnly>[{{{WCF_Organizational_Name__c}}}] Action required: please update your application
+
+Hello {{{FirstName}}},
+
+Thank you for your submission for {{{WCF_Organizational_Name__c}}}.
+
+Before your application moves to review, we need a few items clarified or completed.
+
+Our notes:
+{{{field_comments}}}
+
+Please update the highlighted fields and resubmit by {{{due_date}}}.
+
+Everything else you entered has been saved.
+
+Update your application:
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+If anything is unclear, write to us at [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org).
+
+Best regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

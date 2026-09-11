@@ -1,0 +1,48 @@
+<template>
+    <div class="pl-page">
+
+        <div class="page-header">
+            <div class="greeting-block">
+                <h1 class="greeting-title">
+                    Assigned as <span class="accent">PL of Record</span>
+                </h1>
+                <p class="greeting-sub">
+                    Organisations where you are the Programme Lead of Record
+                </p>
+            </div>
+        </div>
+
+        <div class="pl-body">
+            <p class="pl-count-label">{plOrgCountLabel}</p>
+
+            <div class="workspace-card workspace-card-full">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ORGANISATION</th>
+                            <th>ROLE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={plOrgRows} for:item="row">
+                            <tr key={row.orgId}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-bold">{row.orgName}</td>
+                                <td><span class={row.roleClass}>{row.roleLabel}</span></td>
+                            </tr>
+                        </template>
+                        <template if:true={noPLOrgRows}>
+                            <tr>
+                                <td colspan="3" class="preview-empty">
+                                    No organisations assigned to you as PL of Record
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</template>

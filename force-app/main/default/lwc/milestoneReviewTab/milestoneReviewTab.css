@@ -175,6 +175,27 @@
     transform: translateY(-1px);
 }
 
+/* ✅ Disabled state for outline / primary action buttons
+   (kicks in automatically when the `disabled` attribute is bound) */
+.btn-outline:disabled,
+.btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    pointer-events: none;
+}
+
+.btn-outline:disabled:hover {
+    background: #ffffff;
+    transform: none;
+}
+
+.btn-primary:disabled:hover {
+    background: linear-gradient(180deg, #2563eb, #1d4ed8);
+    transform: none;
+}
+
 /* ✅ Status chips */
 .status-chip {
     padding: 6px 12px;
@@ -233,6 +254,28 @@
 .tickBtn.done:hover {
     transform: none;
     cursor: default;
+}
+
+/* ✅ Locked tick (status is not Report Approved) */
+.tickBtn.disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.tickBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    animation: none;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.tickBtn:disabled:hover {
+    transform: none;
+    background: #f1f5f9;
 }
 
 @keyframes pulseGlow {

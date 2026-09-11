@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Evaluation Due Soon</name>
+    <style>none</style>
+    <subject>{!Account.WCF_Organizational_Name__c} — reviewer evaluation due soon</subject>
+    <textOnly>{{{org_name}}} — Reviewer evaluation due soon
+
+Hello {{{reviewer_first_name}}},
+
+A quick reminder that your evaluation for {{{org_name}}} is due soon.
+
+Organization: {{{org_name}}}
+Due date: {{{sla_due_date}}}
+Time remaining: {{{days_remaining}}}
+
+Complete your evaluation:
+{{{review_link}}}
+
+If you&apos;re blocked or need more time, please let {{{pl_name}}} know.
+
+Wadhwani Grants Platform
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

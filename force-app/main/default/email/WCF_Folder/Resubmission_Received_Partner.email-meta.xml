@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Resubmission Received Partner</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c}] We&apos;ve received your updated application</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+Thank you — we’ve received the updated application for {!Account.WCF_Organizational_Name__c}.
+
+Your submission is now back with our team, and the review will continue from where it left off.
+
+No further action is needed from you right now.
+
+You can view your application anytime here:
+
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+Warm regards,
+The Wadhwani Grants Team
+
+Questions? Contact us:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

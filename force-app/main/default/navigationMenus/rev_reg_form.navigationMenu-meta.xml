@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NavigationMenu xmlns="http://soap.sforce.com/2006/04/metadata">
+    <container>ProposallReviewerPortal</container>
+    <containerType>Network</containerType>
+    <label>rev reg form</label>
+    <navigationMenuItem>
+        <defaultListViewId>All_IndividualApplication</defaultListViewId>
+        <label>Proposals</label>
+        <position>1</position>
+        <publiclyAvailable>false</publiclyAvailable>
+        <target>IndividualApplication</target>
+        <type>SalesforceObject</type>
+    </navigationMenuItem>
+    <navigationMenuItem>
+        <defaultListViewId>All_ApplicationReviews</defaultListViewId>
+        <label>Proposal reviews</label>
+        <position>2</position>
+        <publiclyAvailable>false</publiclyAvailable>
+        <target>ApplicationReview</target>
+        <type>SalesforceObject</type>
+    </navigationMenuItem>
+    <navigationMenuItem>
+        <label>Reviewer Query List</label>
+        <position>3</position>
+        <publiclyAvailable>false</publiclyAvailable>
+        <target>/reviewer-query-list</target>
+        <type>InternalLink</type>
+    </navigationMenuItem>
+</NavigationMenu>

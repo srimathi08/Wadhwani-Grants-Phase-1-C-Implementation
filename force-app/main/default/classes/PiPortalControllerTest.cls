@@ -7,12 +7,33 @@ public class PiPortalControllerTest {
         Account acc = new Account(Name = 'Draft Test Institution');
         insert acc;
 
+        // Resolve a valid Contact RecordTypeId.
+        // If you know the exact DeveloperName your org uses for PI/standard
+        // Contacts, replace 'YOUR_RECORD_TYPE_DEVELOPER_NAME' below with it,
+        // e.g. .get('PI_Contact') or .get('Master').
+        Map<String, Schema.RecordTypeInfo> contactRTs =
+            Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName();
+
+        Id contactRecordTypeId;
+        if (contactRTs.containsKey('YOUR_RECORD_TYPE_DEVELOPER_NAME')) {
+            contactRecordTypeId = contactRTs.get('YOUR_RECORD_TYPE_DEVELOPER_NAME').getRecordTypeId();
+        } else {
+            // Fallback: grab the first available active, non-master record type
+            for (Schema.RecordTypeInfo rti : contactRTs.values()) {
+                if (rti.isAvailable() && !rti.isMaster()) {
+                    contactRecordTypeId = rti.getRecordTypeId();
+                    break;
+                }
+            }
+        }
+
         Contact pi = new Contact(
             LastName = 'Pi',
             Email = 'pi@example.com',
             COE_PI__c = true,
             New_PI__c = true,
-            AccountId = acc.Id
+            AccountId = acc.Id,
+            RecordTypeId = contactRecordTypeId
         );
         insert pi;
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WCF_Reviews</fullName>
+    <columns>Name</columns>
+    <columns>Application</columns>
+    <columns>ApplicationRecommendation</columns>
+    <columns>DueDate</columns>
+    <columns>Status</columns>
+    <columns>ReviewedBy</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RecordType</field>
+        <operation>equals</operation>
+        <value>ApplicationReview.WCF_Job_Fulfillment,ApplicationReview.WCF_Job_Creation_Review,ApplicationReview.WCF_Job_Fulfillment_Job_Creation</value>
+    </filters>
+    <label>WCF Reviews</label>
+</ListView>

@@ -1,0 +1,102 @@
+/* wcfPLOfRecord.css */
+
+.pl-page {
+    font-family: 'Inter', 'Salesforce Sans', Arial, sans-serif;
+    background: #f5f6fa;
+    min-height: 100vh;
+    padding: 0 0 48px 0;
+    color: #1B2A4A;
+}
+
+.page-header {
+    padding: 32px 40px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e8eaf0;
+    margin-bottom: 28px;
+}
+
+.greeting-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1B2A4A;
+    margin: 0 0 4px;
+}
+
+.greeting-title .accent { color: #C8391D; }
+
+.greeting-sub {
+    font-size: 13px;
+    color: #8a92a3;
+    margin: 0;
+}
+
+.pl-body {
+    padding: 0 40px;
+}
+
+.pl-count-label {
+    font-size: 13px;
+    color: #8a92a3;
+    margin-bottom: 14px;
+}
+
+.workspace-card {
+    background: #fff;
+    border: 1px solid #e8eaf0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.workspace-card-full { width: 100%; }
+
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.preview-table thead tr {
+    background: #f8f9fb;
+    border-bottom: 1px solid #e8eaf0;
+}
+
+.preview-table th {
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #8a92a3;
+    text-align: left;
+}
+
+.preview-table td {
+    padding: 12px 14px;
+    color: #374151;
+    border-bottom: 1px solid #f0f1f5;
+    vertical-align: middle;
+}
+
+.preview-table tbody tr:last-child td { border-bottom: none; }
+.preview-table tbody tr:hover { background: #fafbfc; }
+
+.cell-bold { font-weight: 600; color: #1B2A4A; }
+
+.preview-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 32px 0 !important;
+    font-size: 13px;
+}
+
+.sc-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sc-chip-wsn { background: #fff7ed; color: #c2410c; }
+.sc-chip-wcf { background: #eff6ff; color: #1d4ed8; }

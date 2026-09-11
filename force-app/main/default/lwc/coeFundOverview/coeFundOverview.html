@@ -10,7 +10,7 @@
         <div class="stats-grid">
 
             <div class="stat-card">
-                <p class="label">Total Funds Received</p>
+                <p class="label">Total Grant Received</p>
                 <p class="amount">$ {summary.total}</p>
             </div>
 
@@ -41,13 +41,17 @@
                 <p class="label">Available Operational Grant</p>
                 <p class="amount blue">$ {summary.availableOperationalGrant}</p>
             </div>
+<div class="stat-card get-fund">
+                <div class="fund-actions">
+                    <button class="request-btn" onclick={openFundModal}>
+                        Request Fund
+                    </button>
 
-            <div class="stat-card get-fund">
-                <button class="request-btn" onclick={openFundModal}>
-                    Request Fund
-                </button>
+                    <button class="request-btn generate-doc-btn" onclick={navigateToReport}>
+                        Generate Document
+                    </button>
+                </div>
             </div>
-
         </div>
 
         <!-- ================= PROJECT LIST ================= -->
@@ -88,22 +92,26 @@
                     </div>
 
                     <div class="budget-grid">
-                        <div class="budget-item">
-                            <p class="budget-label">Total Budget</p>
-                            <p class="budget-value">$ {p.totalBudget}</p>
-                        </div>
+    <div class="budget-item">
+        <p class="budget-label">Total Budget</p>
+        <p class="budget-value">$ {p.totalBudget}</p>
+    </div>
 
-                        <div class="budget-item">
-                            <p class="budget-label">Disbursed</p>
-                            <p class="budget-value green">$ {p.disbursed}</p>
-                        </div>
+    <div class="budget-item">
+        <p class="budget-label">Total Disbursed</p>
+        <p class="budget-value green">$ {p.disbursed}</p>
+    </div>
 
-                        <div class="budget-item">
-                            <p class="budget-label">Remaining</p>
-                            <p class="budget-value blue">$ {p.remaining}</p>
-                        </div>
-                    </div>
+    <div class="budget-item">
+        <p class="budget-label">Total Utilized</p>
+        <p class="budget-value">$ {p.totalUtilized}</p>
+    </div>
 
+    <div class="budget-item">
+        <p class="budget-label">Remaining</p>
+        <p class="budget-value blue">$ {p.remaining}</p>
+    </div>
+</div>
                     <div class="bar project-bar">
                         <div class="fill project-fill" data-id={p.proposalId}></div>
                     </div>

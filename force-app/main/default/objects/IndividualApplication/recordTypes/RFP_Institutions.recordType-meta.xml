@@ -1,0 +1,1311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RFP_Institutions</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>COE_PROPOSAL_ADMIN_VIEW</compactLayoutAssignment>
+    <label>COE Proposal</label>
+    <picklistValues>
+        <picklist>ApplicationCategory</picklist>
+        <values>
+            <fullName>Basic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Special</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ApplicationType</picklist>
+        <values>
+            <fullName>COE Proposal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WIN Project Proposal</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Approval_status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Send back for additional information</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Baseline_Technology_Readiness_Level__c</picklist>
+        <values>
+            <fullName>1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>10</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Category</picklist>
+        <values>
+            <fullName>Grant Application</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Letter of Intent</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Collaboration_with_Institute_Incubator__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Current_Technology_Readiness_Level_TRL__c</picklist>
+        <values>
+            <fullName>10</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Expected_TRL_at_the_end_of_the_Project__c</picklist>
+        <values>
+            <fullName>4</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>5</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>7</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Focus_Area_2__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HealthTech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SpaceTech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Focus_Area_3__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HealthTech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SpaceTech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Funder_1_Type__c</picklist>
+        <values>
+            <fullName>Equity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grant</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In-Kind</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Loan</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Funder_2_Type__c</picklist>
+        <values>
+            <fullName>Equity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grant</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In-Kind</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Loan</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Funder_3_Type__c</picklist>
+        <values>
+            <fullName>Equity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grant</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In-Kind</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Loan</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GenieAI_Interest_Level__c</picklist>
+        <values>
+            <fullName>Maybe%2C want to learn more</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not at this time</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes%2C interested</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Institution__c</picklist>
+        <values>
+            <fullName>C-CAMP Banaglore</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IISc Bangalore</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IIT Delhi</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IIT Dhanbad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IIT Hyderabad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IITMadras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Test - IIT Madras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Test IIT Delhi</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>InternalStatus</picklist>
+        <values>
+            <fullName>Admin screening in progress</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Is_Startup_DPIIT_Registered__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Is_Startup_Registered__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Language__c</picklist>
+        <values>
+            <fullName>English</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Portuguese</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Spanish</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Legal_Type__c</picklist>
+        <values>
+            <fullName>For-profit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Government-affiliated</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hybrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Non-profit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Organizational_Area_s_for_Funding_Inves__c</picklist>
+        <values>
+            <fullName>Both Job Fulfillment and Job Creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Job Creation Only</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Job Fulfillment Only</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Phone_Country_Code__c</picklist>
+        <values>
+            <fullName>%2B1 United States %2F Canada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B20 Egypt</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B234 Nigeria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B27 Eningizimu Afrika</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B31 Netherlands</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B33 France</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B34 Spain</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B39 Italy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B41 Switzerland</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B44 United Kingdom</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B49 Germany</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B52 Mexico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B54 Argentina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B55 Brazil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B60 Malaysia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B61 Australia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B62 Indonesia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B63 Philippines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B64 New Zealand</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B65 Singapore</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B7 Russia %2F Kazakhstan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B81 Japan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B82 South Korea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B86 China</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B91 India</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B966 Saudi Arabia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B971 United Arab Emirates</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Primary_Focus_Area__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HealthTech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SpaceTech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Prio_Research_Funding_Yes_No__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Registration_Jurisdiction__c</picklist>
+        <values>
+            <fullName>Brazil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>India</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Indonesia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mexico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Philippines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>United States</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Review_Status__c</picklist>
+        <values>
+            <fullName>Externally Under Review</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Assigned</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Review Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reviewer Assigned</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Approved - Level 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Approved - Level 2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funded</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Review</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected - Level 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected - Level 2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revision Requested</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Submitted</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Focus_Area_2__c</picklist>
+        <values>
+            <fullName>AI for Human-Agent and Human-Robot Interaction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for Information Security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for MSMEs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Energy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Logistics and Mobility%3A AI-powered edge computing for smart city infrastructure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in healthtech and agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in pharma R%26D</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI%2FML in mining %26 exploration</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Agri Biotech%3A Biostimulant%2CBiofertilizers%2C Biopesticide%2C Projects related to doubling farmer income projects</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Animal Biotech%3A Disease Rearing%2C Derived products%2C disease%2F health management solutions%2C breeding%2C etc</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Application oriented platform technologies%2C product specific innovations that can impact translational research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Assistive technologies for elderly and disabled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-Imaging and AI algorithms as diagnostic tools</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biomimetic models for diseases %26 tissues Multisensory systems for visually impaired infants%2C 3D Bioprinting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy in Mining Industry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Creating affordable medtech device to manage non-communicable diseases like diabetes%2C cardiovascular disorders and Geriatric healtcare</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Mineral Extraction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Develop affordable Medtech devices for infectious diseases like Hepatitis also developing low cost efficient devices for dialysis</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Future Communication%2C Autonomus navigation smart mobility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Editing and CRISPR Technology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Implants %28Ortho%2C neuro%2C cardiac%2C cancer%2C radiology%2C dental etc%2E%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Bio-based Chemicals and Enzymes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Bioprocesses%2C scale up platforms</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Cell based manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Innovations enabling import substitution indigenous manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Process innovation for bio-manufacturing of smart protein</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Synthetic and Engineering Biology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Large language models %28LLMs%29 for high-risk infant care guidance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Life style disorders%2C Rare diseases%2C India%2F LMIC centric diseases</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Multilingual chatbots with retrieval-augmented generation %28RAG%29 pipelines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalized medicine in Cancer %28Omics%29 %26 Rehabilitation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalized%2F Precision medicine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology Peripherals%3A Development of hardware and infrastructure to support quantum computing%2C communication%2C and sensing%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology for Security%3A Advancement of quantum sensing technologies for defense%2C cryptography%2C and threat detection%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum computing for crop modeling and simulation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum computing for drug discovery and development</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for healthcare data security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for secured food supply chains</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum enhanced sensors for soil and environmental monitoring</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum machine learning for precision agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum sensors for enhancing medical imaging and diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Stem cells%2C Gene therapy%2C mAbs%2C Cell products like exosomes related innovations</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Focus_Area_3__c</picklist>
+        <values>
+            <fullName>AI for Human-Agent and Human-Robot Interaction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for Information Security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for MSMEs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Energy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Logistics and Mobility%3A AI-powered edge computing for smart city infrastructure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in healthtech and agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in pharma R%26D</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI%2FML in mining %26 exploration</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Agri Biotech%3A Biostimulant%2CBiofertilizers%2C Biopesticide%2C Projects related to doubling farmer income projects</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Animal Biotech%3A Disease Rearing%2C Derived products%2C disease%2F health management solutions%2C breeding%2C etc</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Application oriented platform technologies%2C product specific innovations that can impact translational research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Assistive technologies for elderly and disabled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-Imaging and AI algorithms as diagnostic tools</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biomimetic models for diseases %26 tissues Multisensory systems for visually impaired infants%2C 3D Bioprinting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy in Mining Industry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Creating affordable medtech device to manage non-communicable diseases like diabetes%2C cardiovascular disorders and Geriatric healtcare</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Mineral Extraction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Develop affordable Medtech devices for infectious diseases like Hepatitis also developing low cost efficient devices for dialysis</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Future Communication%2C Autonomus navigation smart mobility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gene Editing and CRISPR Technology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Implants %28Ortho%2C neuro%2C cardiac%2C cancer%2C radiology%2C dental etc%2E%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Bio-based Chemicals and Enzymes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Bioprocesses%2C scale up platforms</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Cell based manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Innovations enabling import substitution indigenous manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Process innovation for bio-manufacturing of smart protein</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotech%3A Synthetic and Engineering Biology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Large language models %28LLMs%29 for high-risk infant care guidance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Life style disorders%2C Rare diseases%2C India%2F LMIC centric diseases</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Multilingual chatbots with retrieval-augmented generation %28RAG%29 pipelines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalized medicine in Cancer %28Omics%29 %26 Rehabilitation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Precision medicine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology Peripherals%3A Development of hardware and infrastructure to support quantum computing%2C communication%2C and sensing%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology for Security%3A Advancement of quantum sensing technologies for defense%2C cryptography%2C and threat detection%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum computing for crop modeling and simulation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum computing for drug discovery and development</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for healthcare data security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for secured food supply chains</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum enhanced sensors for soil and environmental monitoring</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum machine learning for precision agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum sensors for enhancing medical imaging and diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Stem cells%2C Gene therapy%2C mAbs%2C Cell products like exosomes related innovations</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Focus_Area_Focus_area_2__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HealthTech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SpaceTech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Focus_Area_Focus_area_3__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HealthTech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SpaceTech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Focus_Area__c</picklist>
+        <values>
+            <fullName>AI for Human-Agent and Human-Robot Interaction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for Information Security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI for MSMEs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Energy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in Logistics and Mobility%3A AI-powered edge computing for smart city infrastructure</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in health tech and agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI in pharma R%26D</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AI%2FML in mining %26 exploration</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Affordable Launch Vehicles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Affordable Medical Devices to manage infectious and non-infectious diseases %28for diagnosis%2C prognosis%2F monitoring and treatment%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Agriculture Biotech%3A Bio stimulant%2C Biofertilizer%2C Biopesticide%2C Projects related to doubling farmer income projects</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Animal Biotechnology%3A Disease Rearing%2C Derived products%2C disease%2F health management solutions%2C breeding%2C etc</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Application oriented platform technologies%2C product specific innovations that can impact translational research</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Applications in Communication%2C Healthcare%2C etc</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Assistive technologies for elderly and disabled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-Imaging and AI algorithms as diagnostic tools %28AI powered diagnostics%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biomimetic models for diseases %26 tissues Multisensory systems for visually impaired infants%2C 3D Bioprinting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Circular Economy in Mining Industry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Creating affordable MedTech device to manage non-communicable diseases like diabetes%2C cardiovascular disorders and Geriatric healthcare</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Mineral Extraction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Future Communication%2C Autonomous navigation smart mobility</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Implants %28Ortho%2C neuro%2C cardiac%2C cancer%2C radiology%2C dental etc%2E%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Bio-based Chemicals and Enzymes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Bioprocesses%2C scale up platforms</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Cell based manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Innovations enabling import substitution indigenous manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Process innovation for bio-manufacturing of smart protein</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial Biotechnology%3A Synthetic and Engineering Biology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Large language models %28LLMs%29 for high-risk infant care guidance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Life style disorders%2C Rare diseases%2C India%2F LMIC centric diseases</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Low cost wearable health devices</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marine Biotechnology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mental Health Platforms</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Multilingual chatbots with retrieval-augmented generation %28RAG%29 pipelines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>None</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalized medicine in Cancer %28Omics%29 %26 Rehabilitation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Personalized%2F Precision medicine</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Plant Biotech%3A Gene Editing and CRISPR Technology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Communication</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Computation and Simulation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Materials and Devices</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Sensing and Meteorology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology Peripherals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum Technology for Security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum computing for crop modelling and simulation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for healthcare data security</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum cryptography for secured food supply chains</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum enhanced sensors for soil and environmental monitoring</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum machine learning for precision agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum sensors for medical imaging and diagnostics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Satellite-based Disaster Management</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Stem cells%2C Gene therapy%2C mAbs%2C Cell products like exosomes related innovations</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Waste to Energy Biotechnology</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,3 +1,31 @@
+/* Embossed Lightning Card (outer container only) */
+lightning-card {
+    --slds-card-color-background: #ffffff;
+    border-radius: 14px;
+
+    /* Embossed + soft shadow */
+    box-shadow:
+        4px 4px 12px rgba(0, 0, 0, 0.15),      /* outer shadow */
+        -4px -4px 12px rgba(255, 255, 255, 0.9); /* light emboss */
+    
+    padding: 20px !important;
+    margin-bottom: 24px !important;
+    display: block;
+}
+
+/* Remove default Lightning Card header border/background */
+lightning-card .slds-card__header {
+    background: transparent !important;
+    border: none !important;
+    padding-bottom: 0 !important;
+}
+
+/* Remove default padding around inside body (optional) */
+lightning-card .slds-card__body {
+    padding: 0 !important;
+}
+
+
 .form-container {
     padding: 1.5rem;
     max-width: 900px;
@@ -45,8 +73,38 @@
 }
 
 /* Milestones Table */
+.static-text {
+    font-weight: 600;
+    display: block;
+    padding: 6px 4px;
+}
+
+.field-with-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.static-label {
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #444;
+}
+
+.underlined-input lightning-input input {
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    padding-left: 0 !important;
+}
+.display-value {
+    font-size: 0.75rem;
+    color: #444;
+    margin-top: 3px;
+}
+
 .table-container {
     overflow-x: auto;
+     margin-bottom: 20px !important;  /* <-- Add spacing below the table */
 }
 
 .milestone-table th {
@@ -197,6 +255,23 @@
 }
 
 /* Styling for the milestone table */
+
+/* Allow wrapping inside milestone table headers */
+.slds-table th {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.2;
+    padding: 8px;
+}
+/* Optional: Control maximum width of long headers */
+.slds-table th:nth-child(5) {
+    max-width: 180px;
+}
+.wrap-header {
+    white-space: normal !important;
+}
+
 .milestone-table-container {
     overflow-x: auto;
 }
@@ -368,6 +443,7 @@
     resize: vertical; /* Enables resizing */
     width: 100%;
     font-family: Arial, sans-serif;
+    list-style-type: disc;
 }
 .text-area1 {
     min-height: 150px;
@@ -406,11 +482,93 @@
     padding-right: 8px;
 }
 
-.required {
-    color: red;
-    margin-left: 4px;
+/* Generate PDF */
+table td {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.text-area ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+.text-area li {
+    display: list-item !important;
+}
+.text-area ol {
+    border: 1px dashed red;
 }
 
 .delete-icon {
     color: #8A1C1C;
+}
+
+/* Expand milestone table width ONLY on Page 6 */
+.milestone-wide table {
+    width: 1300px !important;     /* Wider table */
+    table-layout: fixed !important;
+}
+
+/* Generic cell styling */
+.milestone-wide th,
+.milestone-wide td {
+    padding: 10px !important;
+    white-space: normal !important;
+}
+
+/* 🔒 FIX S.No. & Action small width */
+.milestone-wide th:nth-child(1),
+.milestone-wide td:nth-child(1),
+.milestone-wide th:nth-child(9),
+.milestone-wide td:nth-child(9) {
+    width: 60px !important;       /* Small fixed width */
+    max-width: 60px !important;
+    min-width: 60px !important;
+}
+
+/* Installment of Funds column */
+.milestone-wide th:nth-child(2),
+.milestone-wide td:nth-child(2) {
+    width: 140px !important;
+}
+
+/* Milestone Description column */
+.milestone-wide th:nth-child(3),
+.milestone-wide td:nth-child(3) {
+    width: 200px !important;
+}
+
+/* Activities column */
+.milestone-wide th:nth-child(4),
+.milestone-wide td:nth-child(4) {
+    width: 180px !important;
+}
+
+/* Outputs column */
+.milestone-wide th:nth-child(5),
+.milestone-wide td:nth-child(5) {
+    width: 200px !important;
+}
+
+/* Start & End date columns */
+.milestone-wide th:nth-child(6),
+.milestone-wide td:nth-child(6),
+.milestone-wide th:nth-child(7),
+.milestone-wide td:nth-child(7) {
+    width: 150px !important;
+}
+
+/* Budget USD & INR */
+.milestone-wide th:nth-child(8),
+.milestone-wide td:nth-child(8)
+/*.milestone-wide th:nth-child(9),
+.milestone-wide td:nth-child(9)*/ {
+    width: 130px !important;
+}
+
+/* Allow horizontal scrolling only for Page 6 */
+.milestone-wide {
+    overflow-x: auto !important;
+    display: block;
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Master MoU Renewal Reminder</name>
+    <style>none</style>
+    <subject>Master MoU renewal reminder — 180 days</subject>
+    <textOnly>[{{{org_name}}}] Master MoU renewal reminder — 180 days
+
+Hello {{{contact_first_name}}},
+
+As we look ahead, I wanted to flag that the Master MoU between Wadhwani Grants and {{{org_name}}} is due to expire on {{{mou_expiry_date}}} — about 180 days from now.
+
+There&apos;s plenty of time, and nothing urgent to do today. I&apos;d simply like to start the conversation about renewing our partnership and what the next chapter could look like together.
+
+View MoU &amp; renewal:
+{{{portal_url}}}
+
+I&apos;ll reach out to find a good time to talk. As always, you can reach me at [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org).
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

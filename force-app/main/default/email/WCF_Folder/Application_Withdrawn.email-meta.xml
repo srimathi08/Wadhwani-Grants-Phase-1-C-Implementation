@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Withdrawn</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Your application has been withdrawn</subject>
+    <textOnly>Subject: [{{{org_name}}}] Your application has been withdrawn
+
+Hello {{{contact_first_name}}},
+
+This confirms that the application for {{{org_name}}} has been withdrawn as of {{{withdrawal_date}}}.
+
+No further action is needed. The work you’ve already put in isn’t lost — if circumstances change, you’re always welcome to submit a fresh application.
+
+Portal:
+{{{portal_url}}}
+
+If this withdrawal is unexpected, reply to this email and we’ll help sort it out.
+
+Warm regards,
+The Wadhwani Grants Team
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

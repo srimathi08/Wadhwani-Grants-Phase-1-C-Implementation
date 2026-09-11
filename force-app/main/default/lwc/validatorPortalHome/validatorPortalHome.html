@@ -1,0 +1,97 @@
+<template>
+    <div class="portal-body">
+
+        <!-- SIDEBAR — exactly one role block renders, chosen by active role -->
+        <div class="sidebar">
+
+            <template if:true={rolesLoaded}>
+
+                <!-- ===================== VALIDATOR ===================== -->
+                <template if:true={showValidatorNav}>
+
+                    <div class="sb-section-label">VALIDATOR</div>
+
+                    <div class={navClass_vDashboard} data-view="v-dashboard" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-red"></span>
+                        <span class="sb-label">Dashboard</span>
+                    </div>
+
+                    <div class={navClass_vQueue} data-view="v-queue" onclick={handleValidatorQueueNav}>
+                        <span class="sb-icon-dot sb-dot-red"></span>
+                        <span class="sb-label">Validation Queue</span>
+                        <template if:true={vQueueBadge}>
+                            <span class="sb-badge sb-badge-amber">{vQueueBadge}</span>
+                        </template>
+                    </div>
+
+                    <div class="sb-divider"></div>
+                    <div class="sb-section-label">REPORTS</div>
+
+                    <div class={navClass_scReport} data-view="sc-report" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-amber"></span>
+                        <span class="sb-label">Sourcing Channel</span>
+                    </div>
+
+                </template>
+
+                <!-- ===================== REVIEWER ===================== -->
+                <template if:true={showReviewerNav}>
+
+                    <div class="sb-section-label">REVIEWER</div>
+
+                    <div class={navClass_rDashboard} data-view="r-dashboard" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-blue"></span>
+                        <span class="sb-label">Dashboard</span>
+                    </div>
+
+                    <div class={navClass_rQueue} data-view="r-queue" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-amber"></span>
+                        <span class="sb-label">Review Queue</span>
+                        <template if:true={rQueueBadge}>
+                            <span class="sb-badge sb-badge-amber">{rQueueBadge}</span>
+                        </template>
+                    </div>
+
+                    <div class="sb-divider"></div>
+                    <div class="sb-section-label">MY WORK</div>
+
+                    <div class={navClass_compliance} data-view="compliance" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-blue"></span>
+                        <span class="sb-label">Compliance Document Requests</span>
+                    </div>
+
+                </template>
+
+                <!-- ===================== APPROVER ===================== -->
+                <template if:true={showApproverNav}>
+
+                    <div class="sb-section-label">APPROVER</div>
+
+                    <div class={navClass_approverDashboard} data-view="approver-dashboard" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-purple"></span>
+                        <span class="sb-label">Approver Dashboard</span>
+                    </div>
+
+                    <div class={navClass_approverQueue} data-view="approver-queue" onclick={handleNav}>
+                        <span class="sb-icon-dot sb-dot-purple"></span>
+                        <span class="sb-label">Approver Queue</span>
+                        <template if:true={approverQueueBadge}>
+                            <span class="sb-badge sb-badge-amber">{approverQueueBadge}</span>
+                        </template>
+                    </div>
+
+                </template>
+
+            </template>
+
+        </div>
+        <!-- END SIDEBAR -->
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <c-wcf-home-dashboard active-role={activeRole}></c-wcf-home-dashboard>
+        </div>
+        <!-- END MAIN CONTENT -->
+
+    </div>
+</template>

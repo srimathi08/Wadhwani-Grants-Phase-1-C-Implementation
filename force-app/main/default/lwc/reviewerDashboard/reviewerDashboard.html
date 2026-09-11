@@ -8,7 +8,7 @@
                 <div class="progress-header">
                     <h2 class="section-title">Your Onboarding Journey</h2>
                 </div>
-
+                
                 <!-- Progress Stepper -->
                 <div class="stepper-container">
                     <!-- Step 1: Registration -->
@@ -122,7 +122,7 @@
 
                 <!-- Total Assigned -->
                 <lightning-card class="metric-card">
-                    <div class="card-content">
+                    <div class="card-content" onclick={handleTotalClick}>
                         <div class="metric-header">
                             <div class="icon-wrapper icon-blue">
                                 <lightning-icon icon-name="standard:task2" size="medium"></lightning-icon>
@@ -133,16 +133,14 @@
                             </div>
                         </div>
                         <div class="metric-footer">
-                            <span class="footer-link" onclick={handleTotalClick}>
-                                View All →
-                            </span>
+                            <span class="footer-link">View All →</span>
                         </div>
                     </div>
                 </lightning-card>
 
                 <!-- Yet to Start -->
                 <lightning-card class="metric-card">
-                    <div class="card-content">
+                    <div class="card-content" onclick={handleYetToStartClick}>
                         <div class="metric-header">
                             <div class="icon-wrapper icon-orange">
                                 <lightning-icon icon-name="utility:pause" size="medium"></lightning-icon>
@@ -153,16 +151,14 @@
                             </div>
                         </div>
                         <div class="metric-footer">
-                            <span class="footer-link" onclick={handleYetToStartClick}>
-                                Start Review →
-                            </span>
+                            <span class="footer-link">Start Review →</span>
                         </div>
                     </div>
                 </lightning-card>
 
                 <!-- In Progress -->
                 <lightning-card class="metric-card">
-                    <div class="card-content">
+                    <div class="card-content" onclick={handleInProgressClick}>
                         <div class="metric-header">
                             <div class="icon-wrapper icon-blue">
                                 <lightning-icon icon-name="utility:edit" size="medium"></lightning-icon>
@@ -173,16 +169,14 @@
                             </div>
                         </div>
                         <div class="metric-footer">
-                            <span class="footer-link" onclick={handleDraftClick}>
-                                View Drafts →
-                            </span>
+                            <span class="footer-link">View Drafts →</span>
                         </div>
                     </div>
                 </lightning-card>
 
                 <!-- Completed -->
                 <lightning-card class="metric-card">
-                    <div class="card-content">
+                    <div class="card-content" onclick={handleReviewedClick}>
                         <div class="metric-header">
                             <div class="icon-wrapper icon-green">
                                 <lightning-icon icon-name="utility:check" size="medium"></lightning-icon>
@@ -193,17 +187,70 @@
                             </div>
                         </div>
                         <div class="metric-footer">
-                            <span class="footer-link" onclick={handleReviewedClick}>
-                                View History →
-                            </span>
+                            <span class="footer-link">View History →</span>
                         </div>
                     </div>
                 </lightning-card>
 
+                <!-- 🔥 NEW: Rejected -->
+                <!-- Rejected -->
+                <lightning-card class="metric-card">
+                     <div class="card-content" onclick={handleRejectedClick}>
+                        <div class="metric-header">
+                            <div class="icon-wrapper icon-red">
+                                <lightning-icon icon-name="utility:close" size="medium"></lightning-icon>
+                            </div>
+                        <div class="metric-info">
+                            <span class="metric-label">Rejected</span>
+                            <!-- ✅ COUNT (same as others) -->
+                            <span class="metric-value metric-error">{rejected}</span>
+                        </div>
+                     </div>
+                    <div class="metric-footer">
+                        <span class="footer-link">View Rejected →</span>
+                    </div>
+                </div>
+                </lightning-card>
+            </div>
+
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <lightning-card>
+                    <div slot="title">
+                        <div class="card-title">
+                            <lightning-icon icon-name="standard:timeslot" size="small" class="title-icon"></lightning-icon>
+                            <span>Recent Activity</span>
+                        </div>
+                    </div>
+
+                    <div class="activity-container">
+                        <template if:true={hasActivity}>
+                            <template for:each={recentActivities} for:item="activity">
+                                <div key={activity.id} class="activity-item">
+                                    <div class={activity.statusClass}>
+                                        <lightning-icon icon-name={activity.icon} size="xx-small"></lightning-icon>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">{activity.description}</div>
+                                        <div class="activity-time">{activity.timeAgo}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+
+                        <template if:false={hasActivity}>
+                            <div class="empty-state">
+                                <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                                <p class="empty-text">No recent activity to display</p>
+                            </div>
+                        </template>
+                    </div>
+                </lightning-card>
             </div>
         </template>
 
-        <!-- Error Handling -->
+        <!-- Error -->
         <template if:true={error}>
             <div class="error-banner">
                 <lightning-icon icon-name="utility:error" size="small"></lightning-icon>

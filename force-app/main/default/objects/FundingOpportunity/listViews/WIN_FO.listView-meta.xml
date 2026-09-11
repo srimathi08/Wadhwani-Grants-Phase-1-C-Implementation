@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WIN_FO</fullName>
+    <columns>Name</columns>
+    <columns>Program</columns>
+    <columns>EndDate</columns>
+    <columns>StartDate</columns>
+    <columns>Status</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RecordType</field>
+        <operation>equals</operation>
+        <value>FundingOpportunity.COE_Proposal,FundingOpportunity.WIN_Project_Proposal</value>
+    </filters>
+    <label>WIN FO</label>
+    <sharedTo>
+        <role>CEO</role>
+        <role>MD</role>
+        <role>Program_Head</role>
+        <role>Program_Mnager</role>
+    </sharedTo>
+</ListView>

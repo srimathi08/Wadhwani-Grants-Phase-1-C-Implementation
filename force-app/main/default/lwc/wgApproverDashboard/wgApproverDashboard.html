@@ -1,0 +1,113 @@
+<template>
+    <div class="ad-page">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="greeting-block">
+                <div class="greeting-meta">APPROVER PORTAL</div>
+                <h1 class="greeting-title">{greeting}, <span class="accent">Approver</span></h1>
+                <p class="greeting-sub">{todayDate}</p>
+            </div>
+        </div>
+
+        <!-- KPI TILES -->
+        <div class="kpi-row kpi-row-4">
+            <template for:each={approverCards} for:item="c">
+                <div key={c.id}
+                     class={c.kpiClass}
+                     data-status={c.status}
+                     onclick={handleApproverTileClick}>
+                    <div class="kpi-header">
+                        <span class="kpi-label">{c.label}</span>
+                        <span class={c.dotClass}></span>
+                    </div>
+                    <div class="kpi-count">{c.count}</div>
+                    <div class="kpi-sub">{c.subtitle}</div>
+                </div>
+            </template>
+        </div>
+
+        <!-- PENDING DECISIONS PREVIEW TABLE -->
+        <div class="queue-preview-section">
+            <div class="qp-header">
+                <div>
+                    <div class="qp-title">Pending Decisions — Approver Queue</div>
+                    <div class="qp-sub">Reviewed proposals awaiting approval decision, newest recommendation first</div>
+                </div>
+                <div class="qp-link" onclick={handleViewAllApproverQueue}>
+                    View all in Queue →
+                </div>
+            </div>
+
+            <div class="workspace-card workspace-card-full">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>APPLICATION ID</th>
+                            <th>ORGANIZATION</th>
+                            <th>TRACK</th>
+                            <th>RECOMMENDATION</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={approverPreviewRows} for:item="row">
+                            <tr key={row.applicationId}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-id">{row.applicationName}</td>
+                                <td>{row.organizationName}</td>
+                                <td><span class={row.trackPillClass}>{row.track}</span></td>
+                                <td><span class={row.recPillClass}>{row.recommendation}</span></td>
+                                <td><span class={row.statusPillClass}>{row.decisionLabel}</span></td>
+                                <td>
+                                    <!-- Already decided -->
+                                    <template if:true={row.hasDecision}>
+                                        <button class="preview-action-btn preview-action-view"
+                                                data-id={row.applicationId}
+                                                data-appname={row.applicationName}
+                                                data-review-id={row.reviewId}
+                                                onclick={handlePreviewApprove}>
+                                            View Decision
+                                        </button>
+                                    </template>
+                                    <!-- Ready to approve -->
+                                    <template if:false={row.hasDecision}>
+                                        <template if:true={row.isReady}>
+                                            <button class="preview-action-btn preview-action-approve"
+                                                    data-id={row.applicationId}
+                                                    data-appname={row.applicationName}
+                                                    data-review-id={row.reviewId}
+                                                    onclick={handlePreviewApprove}>
+                                                Start Approve
+                                            </button>
+                                        </template>
+                                        <!-- Not ready (no review yet) -->
+                                        <template if:false={row.isReady}>
+                                            <button class="preview-action-btn preview-action-disabled" disabled>
+                                                Not Ready
+                                            </button>
+                                        </template>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                        <template if:true={noApproverPreviewRows}>
+                            <tr>
+                                <td colspan="7" class="preview-empty">
+                                    No proposals awaiting approval decision
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="preview-footer" onclick={handleViewAllApproverQueue}>
+                View full queue →
+            </div>
+        </div>
+
+    </div>
+</template>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Clarification Overdue Partner</name>
+    <style>none</style>
+    <subject>[{{{org_name}}}] Action needed — our information request is overdue</subject>
+    <textOnly>Subject: [{{{org_name}}}] Action needed — our information request is overdue
+
+Hello {{{contact_first_name}}},
+
+The response window for our information request regarding {{{org_name}}}&apos;s application passed on {{{due_date}}}.
+
+Requested information:
+{{{clarification_text}}}
+
+Your application is currently paused until we hear back from you. Once you respond, the review will continue immediately.
+
+Respond here:
+{{{clarification_link}}}
+
+If you need more time or support, simply reply to this email.
+
+Warm regards,
+The Wadhwani Grants Team
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

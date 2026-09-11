@@ -153,6 +153,11 @@ handleGeneratePdf() {
             }
         };
 
+        const fmtCurrency = (val) => {
+    if (val === null || val === undefined || val === '') return '';
+    return `$${val}`;
+};
+
         const section = title => {
             checkPageSpace(20);
             y += 4;
@@ -263,11 +268,11 @@ if (orgInfo.Legal_Structure__c) {
                 startY: y,
                 head: [['', 'Prior Fiscal Year', 'Two Years Prior', 'Three Years Prior']],
                 body: [
-                    ['Balance at Start of Year', hist.CY1_Balance_Start_CFY_1__c || '', hist.CY2_Balance_Start_CFY_2__c || '', hist.CY3_Balance_Start_CFY_3__c || ''],
-                    ['Revenue', hist.CY1_Revenue__c || '', hist.CY2_Revenue__c || '', hist.CY3_Revenue__c || ''],
-                    ['Expense', hist.CY1_Expense__c || '', hist.CY2_Expense__c || '', hist.CY3_Expense__c || ''],
-                    ['Balance at End of Year', hist.CY1_Balance_End__c || '', hist.CY2_Balance_End__c || '', hist.CY3_Balance_End__c || '']
-                ],
+    ['Balance at Start of Year', fmtCurrency(hist.CY1_Balance_Start_CFY_1__c), fmtCurrency(hist.CY2_Balance_Start_CFY_2__c), fmtCurrency(hist.CY3_Balance_Start_CFY_3__c)],
+    ['Revenue', fmtCurrency(hist.CY1_Revenue__c), fmtCurrency(hist.CY2_Revenue__c), fmtCurrency(hist.CY3_Revenue__c)],
+    ['Expense', fmtCurrency(hist.CY1_Expense__c), fmtCurrency(hist.CY2_Expense__c), fmtCurrency(hist.CY3_Expense__c)],
+    ['Balance at End of Year', fmtCurrency(hist.CY1_Balance_End__c), fmtCurrency(hist.CY2_Balance_End__c), fmtCurrency(hist.CY3_Balance_End__c)]
+],
                 theme: 'grid',
                 styles: { fontSize: 10 },
                 headStyles: { fillColor: [191, 32, 38], textColor: 255 }
@@ -284,10 +289,10 @@ if (orgInfo.Legal_Structure__c) {
                 startY: y,
                 head: [['', 'Budget', 'Current Projection', 'Variance', 'Explanation']],
                 body: [
-                    ['Revenue', fy.Revenue_Budget__c || '', fy.Revenue_Projection__c || '', fy.Revenue_Variance__c || '', parseHtmlToText(fy.Revenue_Explanation__c)],
-                    ['Expense', fy.Expense_Budget__c || '', fy.Expense_Projection__c || '', fy.Expense_Variance__c || '', parseHtmlToText(fy.Expense_Explanation__c)],
-                    ['Revenue - Expense', fy.Net_Budget__c || '', fy.Net_Projection__c || '', fy.Net_Variance__c || '', parseHtmlToText(fy.Net_Position_Explanation__c)]
-                ],
+    ['Revenue', fmtCurrency(fy.Revenue_Budget__c), fmtCurrency(fy.Revenue_Projection__c), fmtCurrency(fy.Revenue_Variance__c), parseHtmlToText(fy.Revenue_Explanation__c)],
+    ['Expense', fmtCurrency(fy.Expense_Budget__c), fmtCurrency(fy.Expense_Projection__c), fmtCurrency(fy.Expense_Variance__c), parseHtmlToText(fy.Expense_Explanation__c)],
+    ['Revenue - Expense', fmtCurrency(fy.Net_Budget__c), fmtCurrency(fy.Net_Projection__c), fmtCurrency(fy.Net_Variance__c), parseHtmlToText(fy.Net_Position_Explanation__c)]
+],
                 theme: 'grid',
                 styles: { fontSize: 10 },
                 headStyles: { fillColor: [191, 32, 38], textColor: 255 }
@@ -359,7 +364,7 @@ if (orgInfo.Organizational_Sustainability__c) {
                     ['# of learner enrollments', outcome.Projected_Learner_Enrollments_CFY__c || '', outcome.Projected_Learner_Enrollments_FY_1__c || '', outcome.Projected_Learner_Enrollments_FY_2__c || '', outcome.Projected_Learner_Enrollments_FY_3__c || ''],
                     ['# of learner placements', outcome.Projected_Learner_Placements_CFY__c || '', outcome.Projected_Learner_Placements_FY_1__c || '', outcome.Projected_Learner_Placements_FY_2__c || '', outcome.Projected_Learner_Placements_FY_3__c || ''],
                     ['Learner placement %', outcome.Projected_Learner_placement_CFY__c || '', outcome.Projected_Learner_placement_FY_1__c || '', outcome.Projected_Learner_placement_FY_2__c || '', outcome.Projected_Learner_placement_FY_3__c || ''],
-                    ['Average cost per placement', outcome.Avg_Cost_per_Placement_CFY__c || '', outcome.Avg_Cost_per_Placement_FY_1__c || '', outcome.Avg_Cost_per_Placement_FY_2__c || '', outcome.Avg_Cost_per_Placement_FY_3__c || ''],
+                    ['Average cost per placement', fmtCurrency(outcome.Avg_Cost_per_Placement_CFY__c), fmtCurrency(outcome.Avg_Cost_per_Placement_FY_1__c), fmtCurrency(outcome.Avg_Cost_per_Placement_FY_2__c), fmtCurrency(outcome.Avg_Cost_per_Placement_FY_3__c)],
                     ['Placement verification via 3rd party', outcome.X3rd_Party_Placement_Verification_CFY__c || '', outcome.X3rd_Party_Placement_Verification_FY_1__c || '', outcome.X3rd_Party_Placement_Verification_FY_2__c || '', outcome.X3rd_Party_Placement_Verification_FY_3__c || ''],
                     ['3rd-Party Verification Description', plain(outcome.X3rd_Party_Verification_Description_CFY__c), plain(outcome.X3rd_Party_Verification_Description_FY_1__c), plain(outcome.X3rd_Party_Verification_Description_FY_2__c), plain(outcome.X3rd_Party_Verification_Description_FY_3__c)],
                     ['Long-Term Outcomes', outcome.Long_Term_Outcomes_CFY__c || '', outcome.Long_Term_Outcomes_FY_1__c || '', outcome.Long_Term_Outcomes_FY_2__c || '', outcome.Long_Term_Outcomes_FY_3__c || ''],
@@ -384,7 +389,7 @@ if (orgInfo.Organizational_Sustainability__c) {
                     ['# of jobs created by new businesses', outcome.Projected_Jobs_from_New_Businesses_CFY__c || '', outcome.Projected_Jobs_from_New_Businesses_FY1__c || '', outcome.Projected_Jobs_from_New_Businesses_FY2__c || '', outcome.Projected_Jobs_from_New_Businesses_FY3__c || ''],
                     ['# of existing businesses helped to grow', outcome.Growing_Businesses_Supported_CFY__c || '', outcome.Growing_Businesses_Supported_FY_1__c || '', outcome.Growing_Businesses_Supported_FY_2__c || '', outcome.Growing_Businesses_Supported_FY_3__c || ''],
                     ['# of jobs created by existing businesses', outcome.Jobs_from_Growing_Businesses_CFY__c || '', outcome.Jobs_from_Growing_Businesses_FY_1__c || '', outcome.Jobs_from_Growing_Businesses_FY_2__c || '', outcome.Jobs_from_Growing_Businesses_FY_3__c || ''],
-                    ['Total average cost per job created', outcome.Avg_Cost_per_Job_CFY__c || '', outcome.Avg_Cost_per_Job_FY_1__c || '', outcome.Avg_Cost_per_Job_FY_2__c || '', outcome.Avg_Cost_per_Job_FY_3__c || ''],
+                    ['Total average cost per job created', fmtCurrency(outcome.Avg_Cost_per_Job_CFY__c), fmtCurrency(outcome.Avg_Cost_per_Job_FY_1__c), fmtCurrency(outcome.Avg_Cost_per_Job_FY_2__c), fmtCurrency(outcome.Avg_Cost_per_Job_FY_3__c)],
                     ['Job creation verification via 3rd party', outcome.Job_Verification_3rd_Party_CFY__c || '', outcome.Job_Verification_3rd_Party_FY1__c || '', outcome.Job_Verification_3rd_Party_FY2__c || '', outcome.Job_Verification_3rd_Party_FY3__c || ''],
                     ['3rd party verification details', plain(outcome.X3rd_party_verification_details_CFY__c), plain(outcome.X3rd_party_verification_details_FY1__c), plain(outcome.X3rd_party_verification_details_FY2__c), plain(outcome.X3rd_party_verification_details_FY3__c)],
                 ],

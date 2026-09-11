@@ -14,53 +14,57 @@
             <!-- BODY -->
             <div class="slds-modal__content slds-p-around_large">
 
-                <!-- ROW 1 -->
-                <div class="form-row">
-                    <lightning-input 
-                        class="half-width"
-                        label="Name"
-                        value={faName}
-                        onchange={handleChange}>
-                    </lightning-input>
+                <template if:false={readOnly}>
 
-                    <lightning-combobox 
-                        class="half-width"
-                        label="Funding Type"
-                        value={fundingType}
-                        options={fundingOptions}
-                        onchange={handleFundingTypeChange}>
-                    </lightning-combobox>
-                </div>
+                    <!-- ROW 1 -->
+                    <div class="form-row">
+                        <lightning-input 
+                            class="half-width"
+                            label="Name"
+                            value={faName}
+                            onchange={handleChange}>
+                        </lightning-input>
 
-                <!-- ROW 2 -->
-                <div class="form-row">
-                    <lightning-input 
-                        class="half-width"
-                        type="number"
-                        label="Amount"
-                        value={amount}
-                        onchange={handleChange}>
-                    </lightning-input>
+                        <lightning-combobox 
+                            class="half-width"
+                            label="Funding Type"
+                            value={fundingType}
+                            options={fundingOptions}
+                            onchange={handleFundingTypeChange}>
+                        </lightning-combobox>
+                    </div>
 
-                    <lightning-input 
-                        class="half-width"
-                        type="date"
-                        label="Awarded Date"
-                        value={AwardedDate}
-                        onchange={handleChange}>
-                    </lightning-input>
-                </div>
+                    <!-- ROW 2 -->
+                    <div class="form-row">
+                        <lightning-input 
+                            class="half-width"
+                            type="number"
+                            label="Amount"
+                            value={amount}
+                            onchange={handleChange}>
+                        </lightning-input>
 
-                <!-- Comments Full Width -->
-                <div class="full-width">
-                    <lightning-textarea 
-                        label="Comments"
-                        value={comments}
-                        onchange={handleChange}>
-                    </lightning-textarea>
-                </div>
+                        <lightning-input 
+                            class="half-width"
+                            type="date"
+                            label="Awarded Date"
+                            value={AwardedDate}
+                            onchange={handleChange}>
+                        </lightning-input>
+                    </div>
 
-                <!-- Tranche History -->
+                    <!-- Comments Full Width -->
+                    <div class="full-width">
+                        <lightning-textarea 
+                            label="Comments"
+                            value={comments}
+                            onchange={handleChange}>
+                        </lightning-textarea>
+                    </div>
+
+                </template>
+
+                <!-- Tranche History (always visible) -->
                 <h3 class="slds-m-top_large slds-text-heading_small">Tranche History</h3>
 
                 <lightning-datatable 
@@ -75,7 +79,9 @@
             <!-- FOOTER -->
             <footer class="slds-modal__footer custom-footer">
                 <lightning-button variant="neutral" label="Close" onclick={closeModal}></lightning-button>
-                <lightning-button variant="brand" label="Submit" onclick={submitForm}></lightning-button>
+                <template if:false={readOnly}>
+                    <lightning-button variant="brand" label="Submit" onclick={submitForm}></lightning-button>
+                </template>
             </footer>
 
         </div>

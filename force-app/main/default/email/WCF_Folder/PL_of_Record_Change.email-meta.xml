@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>PL of Record Change</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Your new point of contact at Wadhwani Grants</subject>
+    <textOnly>Subject: [{{{org_name}}}] Your new point of contact at Wadhwani Grants
+
+Hello {{{contact_first_name}}},
+
+A small update from our side: I’m {{{pl_name}}}, and I’ll be your point of contact at Wadhwani Grants going forward, taking over from {{{previous_pl_name}}}.
+
+Nothing changes about our partnership or any work currently underway — we’ll continue seamlessly from where things stand.
+
+Portal:
+{{{portal_url}}}
+
+Feel free to reply anytime if you need anything.
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

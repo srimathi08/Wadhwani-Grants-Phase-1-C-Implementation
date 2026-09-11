@@ -1,0 +1,102 @@
+<template>
+    <div class="page-shell">
+
+        <!-- ══ VALIDATOR FORM VIEW (when recordId is set) ══ -->
+        <template if:true={showValidatorForm}>
+            <c-wcf-validator-form
+                record-id={selectedRecordId}
+                onbacktolist={handleBackToList}>
+            </c-wcf-validator-form>
+        </template>
+
+        <!-- ══ LIST VIEW (default) ══ -->
+        <template if:true={showList}>
+
+            <!-- Header Bar -->
+            <div class="page-header">
+                <div class="header-left">
+                    <span class="status-pill">{status}</span>
+                    <h1 class="page-title">Applications</h1>
+                </div>
+                <div class="header-right">
+                    <span class="record-count" if:true={hasApplications}>
+                        {applications.length} records
+                    </span>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <template if:true={isLoading}>
+                <div class="loading-box">
+                    <lightning-spinner
+                        alternative-text="Loading..."
+                        size="medium"
+                        variant="brand">
+                    </lightning-spinner>
+                    <p class="loading-text">Fetching applications…</p>
+                </div>
+            </template>
+
+            <!-- Error -->
+            <template if:true={error}>
+                <div class="error-box">
+                    <span class="error-icon">⚠</span>
+                    <span>{error}</span>
+                </div>
+            </template>
+
+            <!-- Table -->
+            <template if:true={hasApplications}>
+                <div class="table-card">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th class="col-num">#</th>
+                                <th>Review Name</th>
+                                <th>Application ID</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th class="col-action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={applications} for:item="app" for:index="idx">
+                                <tr key={app.Id} class="table-row">
+                                    <td class="col-num muted">{idx}</td>
+                                    <td class="name-cell">{app.Name}</td>
+                                    <td class="muted">{app.ApplicationId}</td>
+                                    <td>
+                                        <span class="status-badge">{app.Status}</span>
+                                    </td>
+                                    <td class="muted">{app.DueDate}</td>
+                                    <td class="col-action">
+                                        <button
+                                            class="review-btn"
+                                            onclick={handleReview}
+                                            data-id={app.Id}>
+                                            Review ↗
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:true={isEmpty}>
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p class="empty-title">No Applications Found</p>
+                    <p class="empty-sub">
+                        There are no <strong>{status}</strong> applications at this time.
+                    </p>
+                </div>
+            </template>
+
+        </template>
+        <!-- end showList -->
+
+    </div>
+</template>

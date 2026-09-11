@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>IndividualApplication</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Application Status</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>COE_Approval_Comments__c</fieldNames>
+        <picklistValueName>Proposal Rejected by COE Admin</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Status</fieldNames>
+        <picklistValueName>Submitted</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>RFP_Applicants</recordTypeName>
+</PathAssistant>

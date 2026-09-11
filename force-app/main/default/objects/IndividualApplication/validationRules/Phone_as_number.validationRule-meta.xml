@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Phone_as_number</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+  AND(
+    NOT(ISBLANK(CO_PI_Phone__c )),
+    NOT(REGEX(CO_PI_Phone__c , &quot;^[+()0-9 -]*$&quot;))
+  ),
+  AND(
+    NOT(ISBLANK( PI_Phone__c )),
+    NOT(REGEX(PI_Phone__c, &quot;^[+()0-9 -]*$&quot;))
+  )
+)</errorConditionFormula>
+    <errorMessage>Please enter only numbers</errorMessage>
+</ValidationRule>

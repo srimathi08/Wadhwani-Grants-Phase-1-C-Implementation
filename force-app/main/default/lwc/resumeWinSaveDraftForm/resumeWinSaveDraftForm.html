@@ -15,7 +15,7 @@
        <!-- PAGE 1 -->
         <template if:true={isPage1}>
             <div class="form-page page1">
-        <h2 class="section-headings">1. GENERAL DETAILS</h2>
+        <h2 class="section-headings">1. GENERAL DETAILS </h2>
         <lightning-layout multiple-rows>
 
             <lightning-layout-item size="12" class="slds-p-around_small">
@@ -73,7 +73,7 @@
               </template>
 
             <lightning-layout-item size="12" class="slds-p-around_small">
-                <lightning-input  label="1.4. Project Duration (In Months) (between 2 – 3 years)" name="Project_Duration__c" value={applicationData.Project_Duration__c} field-level-help="(In Months)" onchange={handleInputChange} required></lightning-input>
+                <lightning-input  label="1.4. Project Duration (In Months) " name="Project_Duration__c" value={applicationData.Project_Duration__c} field-level-help="In Months (between 2 – 3 years)" onchange={handleInputChange} required></lightning-input>
             </lightning-layout-item>
 
             <lightning-layout-item size="12" class="slds-p-around_small">
@@ -118,19 +118,15 @@
             </template>
 
         <!--**************************************** Applicant Details  ******************************************  -->
-        <!-- PAGE 2 -->
+      <!-- PAGE 2 -->
         <template if:true={isPage2}>
             <div class="form-page page2">
         <h2 class="section-headings">2. APPLICANT DETAILS</h2>
         <lightning-layout multiple-rows>
-             <!-- Display the Account Name -->
-          <lightning-layout-item size="12" class="slds-p-around_small">
-            <lightning-input label="COE Institution Name" value={applicationData.Institution_Name__c} disabled></lightning-input>
-        </lightning-layout-item>
 
         <!-- PI Contact Name as Text -->
             <lightning-layout-item size="12" class="slds-p-around_small">
-                <div class="slds-text-title_bold slds-m-bottom_x-small">2.1. Details of Principal Investigator</div>
+                <div class="form-subsection-heading">2.1. Details of Principal Investigator</div>
                 <lightning-layout>
                     <lightning-layout-item size="6" class="slds-p-right_small">             
                       <lightning-input label="Principal Investigator (PI)" name="PI_Name__c" value={applicationData.PI_Name__c} variant="standard" onchange={handleInputChange} required></lightning-input>
@@ -141,11 +137,10 @@
                 </lightning-layout>
             </lightning-layout-item>
 
-            
              <!-- Display the Account Name -->
-              <lightning-layout-item size="12" class="slds-p-around_small">
-                <lightning-input label="Institution / Organization" name="PI_Institution__c" value={applicationData.PI_Institution__c} variant="standard" onchange={handleInputChange} required></lightning-input>
-            </lightning-layout-item>
+          <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-input label="Institution Name" value={applicationData.Institution_Name__c} disabled></lightning-input>
+        </lightning-layout-item>
 
             <!-- PI DETAILS -->
            <lightning-layout-item size="12" class="slds-p-around_small">
@@ -163,7 +158,7 @@
 
             <!-- CO-PI Contact Name as Text -->
             <lightning-layout-item size="12" class="slds-p-around_small">
-                <div class="slds-text-title_bold slds-m-bottom_x-small">2.2. Details of Co-Principal Investigator</div>
+                <div class="form-subsection-heading">2.2. Details of Co-Principal Investigator</div>
                 <lightning-layout>
                     <lightning-layout-item size="6" class="slds-p-right_small">             
                         <lightning-input label="Co-Principal Investigator (Co-PI)" name="Co_Principal_Investigator_Co_PI__c" value={applicationData.Co_Principal_Investigator_Co_PI__c} variant="standard" onchange={handleInputChange}></lightning-input>
@@ -395,6 +390,151 @@
            <p class="error-msg" data-error="Expertise_and_Experience_of_Team_in_Spec__c"></p>
             </div>
         </lightning-layout-item>
+        <!-- 2.5 Start-up Details -->
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <div class="form-subsection-heading">
+                2.5. Start-up Details
+            </div>
+            <p class="note-text">
+                (applicable if the applicant is a Start-up, not an academic/faculty team;
+                PI and one of the founders shall be same)
+            </p>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-input label="2.5.1. Name of Start-up" name="Startup_Name__c"
+                value={applicationData.Startup_Name__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+
+        <!-- 2.6 Founder -->
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <div class="form-subsection-heading">2.5.2. Details of Founder/Co-Founder</div>
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input label="Name" name="Founder_Name__c"
+                        value={applicationData.Founder_Name__c} onchange={handleInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input label="Designation" name="Founder_Designation__c"
+                        value={applicationData.Founder_Designation__c} onchange={handleInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-input label="Institution / Organization" name="Founder_Institution__c"
+                value={applicationData.Founder_Institution__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input type="text" label="Mobile Number" name="Founder_Mobile__c"
+                        value={applicationData.Founder_Mobile__c} onchange={handleInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input type="Email" label="Email ID" name="Founder_Email__c"
+                        value={applicationData.Founder_Email__c} onchange={handleInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-layout-item>
+
+        <!-- 2.7 Co-Founder -->
+       <!-- 2.7 Co-Founder(s) — repeatable -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <div class="form-subsection-heading">2.5.3. Details of Co-Founder(s)</div>
+
+    <template for:each={coFounders} for:item="cofounder">
+        <div key={cofounder.uniqueId} class="slds-box slds-m-bottom_small">
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input label="Name" data-id={cofounder.uniqueId} data-field="Name"
+                        value={cofounder.Name} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input label="Designation" data-id={cofounder.uniqueId} data-field="Designation__c"
+                        value={cofounder.Designation__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-input label="Institution / Organization" data-id={cofounder.uniqueId} data-field="Institution__c"
+                value={cofounder.Institution__c} onchange={handleCoFounderChange}>
+            </lightning-input>
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input type="text" label="Mobile Number" data-id={cofounder.uniqueId} data-field="Mobile__c"
+                        value={cofounder.Mobile__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input type="Email" label="Email ID" data-id={cofounder.uniqueId} data-field="Email__c"
+                        value={cofounder.Email__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <div class="slds-text-align_right">
+                <lightning-button-icon icon-name="utility:delete" alternative-text="Delete Co-Founder"
+                    title="Remove" variant="bare" data-id={cofounder.uniqueId} onclick={deleteCoFounderRow}>
+                </lightning-button-icon>
+            </div>
+        </div>
+    </template>
+
+    <lightning-button label="+ Add Co-Founder" variant="destructive-text" onclick={addCoFounder}></lightning-button>
+</lightning-layout-item>
+
+        <!-- 2.8 Registration status -->
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-combobox label="2.5.4. Is the start-up registered?"
+                name="Is_Startup_Registered__c"
+                value={applicationData.Is_Startup_Registered__c}
+                options={yesNoOptions}
+                onchange={handleInputChange}>
+            </lightning-combobox>
+        </lightning-layout-item>
+        <template if:true={showStartupRegDetails}>
+            <lightning-layout-item size="12" class="slds-p-around_small">
+                <lightning-layout>
+                    <lightning-layout-item size="6" class="slds-p-right_small">
+                        <lightning-input type="date" label="Date of Incorporation"
+                            name="Startup_Registration_Date__c"
+                            value={applicationData.Startup_Registration_Date__c}
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6">
+                        <lightning-input label="Registration No. / CIN"
+                            name="Startup_Registration_No__c"
+                            value={applicationData.Startup_Registration_No__c}
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-layout-item>
+        </template>
+
+        <lightning-layout-item size="12" class="slds-p-around_small">
+            <lightning-combobox label="2.5.5. Is the start-up DPIIT registered?"
+                name="Is_Startup_DPIIT_Registered__c"
+                value={applicationData.Is_Startup_DPIIT_Registered__c}
+                options={yesNoOptions}
+                onchange={handleInputChange}>
+            </lightning-combobox>
+        </lightning-layout-item>
+        <template if:true={showDpiitRegDetails}>
+            <lightning-layout-item size="12" class="slds-p-around_small">
+                <lightning-input label="DPIIT Registration No."
+                    name="DPIIT_Registration_No__c"
+                    value={applicationData.DPIIT_Registration_No__c}
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </lightning-layout-item>
+        </template>
           
             </lightning-layout>
 
@@ -426,6 +566,7 @@
                 </div>
                 </template>
 
+
 <!--   **************************************** PROJECT DETAILS ******************************************  -->
             <!-- PAGE 3 -->
             <template if:true={isPage3}>
@@ -439,7 +580,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="projectSummary">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.1. Project Summary (Word Limit: 100)</label>
+                            3.1. Project Summary</label>
                         <lightning-helptext content="Project Overview including Problem Statement, Rationale for the Project and Alignment with National/ Global Priorities"></lightning-helptext>
                     </div>
         
@@ -540,7 +681,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="keyProblem">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.2. Key Problem Being Solved (Word Limit: 25)</label>
+                            3.2. Key Problem Being Solved</label>
                       <!-- <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> --> 
                     </div>
         
@@ -640,7 +781,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="proposedSoultion">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.3. Proposed Solution (Word Limit: 50)</label>
+                            3.3. Proposed Solution</label>
                         <lightning-helptext content="Product / Technology being developed"></lightning-helptext>
                     </div>
         
@@ -740,7 +881,7 @@
                 <div class="label-container">
                     <label class="slds-form-element__label" for="noveltyProject">
                         <abbr class="slds-required" title="required">*</abbr>
-                        3.4. Novelty of the Project (Word Limit: 25)</label>
+                        3.4. Novelty of the Project</label>
                 </div>
     
                 <div class="editor-container">
@@ -839,7 +980,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="objectiveOfProject">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.5. Objectives of the Project (Word Limit: 100)</label>
+                            3.5. Objectives of the Project</label>
                         <lightning-helptext content="Define clear and measurable objectives with definite deliverables in bullet points"></lightning-helptext>
                     </div>
         
@@ -954,7 +1095,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="projectApproach">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.7. Work undertaken so far supporting the current TRL of the project:  </label>
+                            3.7. Details of activities supporting the current TRL of the Project </label>
                             <lightning-helptext content="Details of PoC developed, data (if any) supporting it/ technology tested outside the laboratory / pilot study undertaken"></lightning-helptext>
                     </div>
         
@@ -1049,7 +1190,7 @@
                     </div>
                 </lightning-layout-item>
                
-                <!--3.8 Work undertaken supporting current TRL--> 
+                <!--3.8 Expected TRL--> 
                 <lightning-layout-item size="12" class="slds-p-around_small">
                 <lightning-combobox 
                     label="3.8. Expected TRL at the end of the Project" 
@@ -1068,7 +1209,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="currentProjectStatus">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.9. Current status of the Project / Work undertaken so far (Word Limit: 50)</label>
+                            3.9. Current status of the Project</label>
                         <lightning-helptext content="Details of technology tested outside of laboratory / pilot studies undertaken"></lightning-helptext>
                     </div>
         
@@ -1168,7 +1309,7 @@
                     <div class="label-container">
                         <label class="slds-form-element__label" for="projectApproach">
                             <abbr class="slds-required" title="required">*</abbr>
-                            3.10. Project Approach and Work Plan (Word Limit: 100)</label>
+                            3.10. Project Approach and Work Plan</label>
                     </div>
         
                     <div class="editor-container">
@@ -1268,7 +1409,7 @@
                 <div class="label-container">
                     <label class="slds-form-element__label" for="competitiveLand">
                         <abbr class="slds-required" title="required">*</abbr>
-                        3.11. Competitive Landscape (Word Limit: 25)</label>
+                        3.11. Competitive Landscape</label>
                     <lightning-helptext content="explain how project is novel, more efficacious or cost effective compared to existing global / national products / technologies"></lightning-helptext>
                 </div>
     
@@ -1355,10 +1496,10 @@
                     
     
                     <!-- Editable Text Area -->
-                    <div class="text-area" contenteditable="true" data-field="Competitive_Landscape__c"
+                    <div class="text-area" contenteditable="true" data-field="Competitive_Advantage__c"
                     onclick={setActiveField}  oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
                         <!-- Error message container -->
-               <p class="error-msg" data-error="Competitive_Landscape__c"></p>
+               <p class="error-msg" data-error="Competitive_Advantage__c"></p>
                 </div>
             </lightning-layout-item>
 
@@ -1368,7 +1509,7 @@
                 <div class="label-container">
                     <label class="slds-form-element__label" for="detailsIPR">
                         <abbr class="slds-required" title="required">*</abbr>
-                        3.12. Details of IPR Filed / Granted (Word Limit: 50)</label>
+                        3.12. Details of IPR Filed / Granted</label>
                 </div>
     
                 <div class="editor-container">
@@ -1465,7 +1606,7 @@
             <lightning-layout-item size="12" class="slds-p-around_small">
                 <!-- Label with Help Text -->
                 <div class="label-container">
-                    <label class="slds-form-element__label" for="detailsEthical">3.13. Details of Ethical / Regulatory / Safety Approval sought / received: (if applicable) (Word Limit: 25)</label>
+                    <label class="slds-form-element__label" for="detailsEthical">3.13. Details of Ethical / Regulatory / Safety Approval sought / received: (if applicable)</label>
                 </div>
     
                 <div class="editor-container">
@@ -1561,7 +1702,7 @@
             <lightning-layout-item size="12" class="slds-p-around_small">
                 <!-- Label with Help Text -->
                 <div class="label-container">
-                    <label class="slds-form-element__label" for="provideReference">3.14. Provide References with full citations that are relevant to the Proposal: (if applicable) (Word Limit: 50)</label>
+                    <label class="slds-form-element__label" for="provideReference">3.14. Provide References with full citations that are relevant to the Proposal: (if applicable)</label>
                 </div>
     
                 <div class="editor-container">
@@ -1692,7 +1833,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="marketPlan">
                 <abbr class="slds-required" title="required">*</abbr>
-                4.1. Target Market, Market Demand and Plans to Expand it Further (Word Limit: 50)</label>
+                4.1. Target Market, Market Demand and Plans to Expand it Further</label>
          <!--   <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -1791,7 +1932,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="customerBen">
                 <abbr class="slds-required" title="required">*</abbr>
-                4.2. Details of Customers, End-users, and Beneficiaries (Word Limit: 25)</label>
+                4.2. Details of Customers, End-users, and Beneficiaries</label>
          <!--  <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> --> 
         </div>
 
@@ -1890,7 +2031,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="ponComm">
                 <abbr class="slds-required" title="required">*</abbr>
-                4.3. Plan for Commercialization and Market Entry (Word Limit: 25)</label>
+                4.3. Plan for Commercialization and Market Entry</label>
           <!--  <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -1977,10 +2118,10 @@
             
 
             <!-- Editable Text Area -->
-            <div class="text-area" contenteditable="true" data-field="Potential_for_Commercialization__c"
+            <div class="text-area" contenteditable="true" data-field="Plan_for_Commercialization__c"
     onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
         <!-- Error message container -->
-        <p class="error-msg" data-error="Potential_for_Commercialization__c"></p>
+        <p class="error-msg" data-error="Plan_for_Commercialization__c"></p>
         </div>
     </lightning-layout-item>
 
@@ -1989,7 +2130,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="businessModel">
                 <abbr class="slds-required" title="required">*</abbr>
-                4.4. Business Model for Commercialization (Word Limit: 50) </label>
+                4.4. Business Model for Commercialization </label>
           <!--  <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -2088,7 +2229,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="potentialRev">
                 <abbr class="slds-required" title="required">*</abbr>
-                4.5. Potential Revenue Generation Strategy for Project (Word Limit: 25)</label>
+                4.5. Potential Revenue Generation Strategy for Project</label>
           <!--  <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -2175,17 +2316,17 @@
             
 
             <!-- Editable Text Area -->
-            <div class="text-area" contenteditable="true" data-field="Potential_Revenue_Generation_Strategy_fo__c"
+            <div class="text-area" contenteditable="true" data-field="Project_Revenue_Strategy__c"
     onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
         <!-- Error message container -->
-        <p class="error-msg" data-error="Potential_Revenue_Generation_Strategy_fo__c"></p>
+        <p class="error-msg" data-error="Project_Revenue_Strategy__c"></p>
         </div>
     </lightning-layout-item>    
 
     <lightning-layout-item size="12" class="slds-p-around_small">
         <!-- Label with Help Text -->
         <div class="label-container">
-            <label class="slds-form-element__label" for="mainRisk">4.6. Main Risks and Barriers (Word Limit: 25)</label>
+            <label class="slds-form-element__label" for="mainRisk">4.6. Main Risks and Barriers</label>
             <lightning-helptext content="considering the innovation, team, market and business model"></lightning-helptext>
         </div>
 
@@ -2283,7 +2424,7 @@
     <lightning-layout-item size="12" class="slds-p-around_small">
         <!-- Label with Help Text -->
         <div class="label-container">
-            <label class="slds-form-element__label" for="paternship">4.7. Partnerships with Relevant Industry / Potential Adopters (if applicable) (Word Limit: 25)</label>
+            <label class="slds-form-element__label" for="paternship">4.7. Partnerships with Relevant Industry / Potential Adopters (if applicable)</label>
             <!-- <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -2381,7 +2522,7 @@
     <lightning-layout-item size="12" class="slds-p-around_small">
         <!-- Label with Help Text -->
         <div class="label-container">
-            <label class="slds-form-element__label" for="startupDetails">4.8. Details of Startup Incorporation, if applicable (Word Limit: 25)</label>
+            <label class="slds-form-element__label" for="startupDetails">4.8. Details of Startup Incorporation, if applicable</label>
         <!--   <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> --> 
         </div>
 
@@ -2478,7 +2619,7 @@
     <lightning-layout-item size="12" class="slds-p-around_small">
         <!-- Label with Help Text -->
         <div class="label-container">
-            <label class="slds-form-element__label" for="associateDetails">4.9. Details of Association with Technology Business Incubator (if applicable) (Word Limit: 25)</label>
+            <label class="slds-form-element__label" for="associateDetails">4.9. Details of Association with Technology Business Incubator (if applicable)</label>
          <!--   <lightning-helptext content="Explain the problem and why it is significant"></lightning-helptext> -->
         </div>
 
@@ -2806,11 +2947,11 @@
     </lightning-layout-item>    
 </lightning-layout>
 
-<lightning-layout multiple-rows class="slds-m-bottom_medium">
+<!--<lightning-layout multiple-rows class="slds-m-bottom_medium">
     <lightning-layout-item size="12" class="slds-p-right_small">
         <lightning-input  type="number" name="Total_Project_Budget_INR__c" label="5.2. Total Project Budget (in INR)" value={applicationData.Total_Project_Budget_INR__c} onchange={handleInputChange} required></lightning-input>
     </lightning-layout-item>    
-</lightning-layout>
+</lightning-layout>-->
 
     <!--<lightning-layout multiple-rows>
         <p class="note-text">
@@ -2968,7 +3109,7 @@
                 <th>S.No.</th>
                 <th>Budget Head</th>
                 <th>Total Amount (USD)</th>
-                <th>Total Amount (INR)</th>
+                <!--<th>Total Amount (INR)</th>-->
                 <th>Detailed Justification</th>
                 <th>Action</th>
             </tr>
@@ -3010,7 +3151,7 @@
                         </div>
                     </td>
 
-                    <!-- INR Amount -->
+                    <!-- INR Amount 
                     <td>
                         <div class="slds-form-element">
                             <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
@@ -3026,7 +3167,7 @@
                                     value={budget.Total_Amount_INR__c}>
                             </div>
                         </div>
-                    </td>
+                    </td>-->
 
                     <!-- Detailed Justification -->
                     <td>
@@ -3065,10 +3206,10 @@
                     <strong>${totalUSD}</strong>
                 </td>
 
-                <!-- INR TOTAL -->
+                <!-- INR TOTAL 
                 <td class="slds-text-align_right">
                     <strong>₹{totalINR}</strong>
-                </td>
+                </td>-->
 
                 <td></td>
                 <td></td>
@@ -3094,7 +3235,7 @@
         <div class="label-container">
             <label class="slds-form-element__label" for="listFunding">
                 <abbr class="slds-required" title="required">*</abbr>
-                5.3. Details of Prior Funding received / approved under this Project (Word Limit: 50)</label>
+                5.3. Details of Prior Funding received / approved under this Project</label>
             <lightning-helptext content="source, type and quantum of funding – grants, institutional support, personal financing, venture capital investment, strategic corporate investment, etc"></lightning-helptext>
         </div>
 
@@ -3181,10 +3322,10 @@
             
 
             <!-- Editable Text Area -->
-            <div class="text-area" contenteditable="true" data-field="List_of_Existing_Funding_Sources_and_Fun__c"
+            <div class="text-area" contenteditable="true" data-field="Previous_Funding_Details__c"
     onclick={setActiveField} oninput={handleInput}  onpaste={handlePaste} onkeydown={handleKeyDown}></div>
         <!-- Error message container -->
-        <p class="error-msg" data-error="List_of_Existing_Funding_Sources_and_Fun__c"></p>
+        <p class="error-msg" data-error="Previous_Funding_Details__c"></p><!-- List_of_Existing_Funding_Sources_and_Fun__c-->
         </div>
     </lightning-layout-item>
 
@@ -3534,6 +3675,7 @@
            <!--PAGE 6-->
         
 <template if:true={isPage6}>
+    
 <h2 class="section-headings">6. MILESTONES AND DELIVERABLES</h2>
 
  <!--  <lightning-layout multiple-rows class="slds-m-bottom_medium">
@@ -3564,12 +3706,15 @@
 
 
 <lightning-layout multiple-rows>
+   
     <p class="note-text">
-        6.1. Key milestones, with timelines for completion.
+        6.1. Key milestones, with timelines for completion. </br></br>
+        *No. of milestones will be capped at nos. 4-6.
     </p>
+  
 
-    <div class="table-container">
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+    <div class="table-container milestone-wide"> <!--//"table-container milestone-wide" table-container-->
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer milestone-table">
             <thead>
                 <tr>
                     <th>S.No.</th>
@@ -3582,12 +3727,12 @@
                     <th>Month of start of Milestone</th>
                     <th>Month of end of Milestone</th>
                     <th>Budget Required (USD)</th>
-                    <th>Budget Required (INR)</th>
+                    <!--<th>Budget Required (INR)</th>-->
                    <!--<th>Target Completion Months
                          <lightning-helptext content="MM/YYYY"></lightning-helptext>
                     </th>
                     <th>Justification</th>-->
-                    <!--<th>Actions</th>-->
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -3650,39 +3795,39 @@
                                 onclick={openModal}>
                             </lightning-input>
                         </td>
-                         <!-- Start Date -->
+                         <!-- Start Date --> <!--type="date"-->
                     <td>
                         <lightning-input 
-                            type="date"
+                            type="text"
                             data-id={milestone.uniqueId}
                             data-field="Project_Start_Date__c"
                             onchange={handleMilestoneChange}
                             value={milestone.Project_Start_Date__c}>
                         </lightning-input>
 
-                         <!-- Display value -->
+                         <!-- Display value 
                      <div class="display-value">
                          {milestone.Project_Start_Date__c}
-                     </div>
+                     </div>-->
                     </td>
-                      <!-- End Date -->
+                      <!-- End Date --> <!--type="date"-->
                     <td>
                         <lightning-input 
-                            type="date"
+                            type="text"
                             data-id={milestone.uniqueId}
                             data-field="Project_End_Date__c"
                             onchange={handleMilestoneChange}
                             value={milestone.Project_End_Date__c}>
                         </lightning-input>
 
-                         <!-- Display value -->
+                         <!-- Display value 
                      <div class="display-value">
                          {milestone.Project_End_Date__c}
-                     </div>
+                     </div>-->
                     </td>
 
                         
-                        <td>
+                       <td>
                             <div class="slds-form-element">
                                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                                     <lightning-icon icon-name="utility:moneybag" size="x-small"
@@ -3696,12 +3841,9 @@
                                         value={milestone.Budget_Required__c}>
                                 </div>
                             </div>
-                               <!-- Display value -->
-                               <div class="display-value">
-                                     $ {milestone.Budget_Required__c}
-                              </div>
+                              
                         </td>
-                        <td>
+                        <!--<td>
                             <div class="slds-form-element">
                                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                                     <lightning-icon icon-name="utility:currency" size="x-small"
@@ -3714,12 +3856,11 @@
                                         onkeypress={preventDecimal}
                                         value={milestone.Budget_Required_INR__c}>
                                 </div>
-                            </div>
-                            <!-- Display value -->
+                            </div>-->
+                            <!-- Display value 
                                <div class="display-value">
                                    ₹ {milestone.Budget_Required_INR__c}
-                              </div>
-                        </td>
+                              </div>-->
 
                         
 
@@ -3753,7 +3894,7 @@
                             </lightning-input>
                         </td> -->
                        
-                        <!--<td>
+                        <td>
                          <lightning-button-icon 
                             icon-name="utility:delete" 
                             alternative-text="Delete" 
@@ -3762,14 +3903,14 @@
                              data-id={milestone.uniqueId}
                              class="delete-icon">
                           </lightning-button-icon>
-                       </td>-->
+                       </td>
                     </tr>
                 </template>
             </tbody>
         </table>
     </div>
 
-   <!--<lightning-button label="Add Row" onclick={addRow} variant="destructive-text" class="slds-m-top_small"></lightning-button>-->
+   <lightning-button label="Add Row" onclick={addRow} variant="destructive-text" class="slds-m-top_small"></lightning-button>
 </lightning-layout>
 
 <!-- Modal Window for Rich Text Editing -->
@@ -3912,6 +4053,7 @@
     </div>
   </div>
 
+
 </template>
 
 <!--**************************************** Project Outcomes & Impact  ******************************************  -->   
@@ -3927,7 +4069,7 @@
                        <div class="label-container">
                            <label class="slds-form-element__label" for="proposedOutcomes">
                             <abbr class="slds-required" title="required">*</abbr>
-                            7.1. Proposed Outcomes / Deliverables under the Project (Word limit: 100)</label>
+                            7.1. Proposed Outcomes / Deliverables under the Project</label>
                        </div>
            
                        <div class="editor-container">
@@ -4024,7 +4166,7 @@
                        <div class="label-container">
                            <label class="slds-form-element__label" for="impactProject">
                             <abbr class="slds-required" title="required">*</abbr>
-                            7.2. Envisaged Impact of the Project (Word Limit 100)</label>
+                            7.2. Envisaged Impact of the Project</label>
                            <lightning-helptext content="Technical / Socio – Economic Impact and alignment with national/ global priorities"></lightning-helptext>
                        </div>
            
@@ -4487,7 +4629,7 @@
         <!-- 2.3 & 2.4 Rich Text -->
         <div class="preview-row">
             <div class="label-column">
-                2.3. Details of Team Members / Mentors / Advisers involved in the Project
+                2.3. Details of Team Members / Mentors / Advisers involved in the Project AV
             </div>
             <div class="value-column">
                 <lightning-formatted-rich-text value={applicationData.Project_Team_Members__c}></lightning-formatted-rich-text>
@@ -4502,6 +4644,99 @@
                 <lightning-formatted-rich-text value={applicationData.Expertise_and_Experience_of_Team_in_Spec__c}></lightning-formatted-rich-text>
             </div>
         </div>
+        <!-- Startup Details -->
+<div class="preview-row">
+    <div class="label-column">2.5.1. Name of Start-up</div>
+    <div class="value-column">
+        {applicationData.Startup_Name__c}
+    </div>
+</div>
+
+<div class="preview-row">
+    <div class="label-column">2.5.2. Founder Name</div>
+    <div class="value-column">
+        {applicationData.Founder_Name__c}
+    </div>
+</div>
+
+<div class="preview-row">
+    <div class="label-column">Founder Designation</div>
+    <div class="value-column">
+        {applicationData.Founder_Designation__c}
+    </div>
+</div>
+
+<div class="preview-row">
+    <div class="label-column">Founder Institution / Organization</div>
+    <div class="value-column">
+        {applicationData.Founder_Institution__c}
+    </div>
+</div>
+
+<div class="preview-row">
+    <div class="label-column">Founder Mobile</div>
+    <div class="value-column">
+        {applicationData.Founder_Mobile__c}
+    </div>
+</div>
+
+<div class="preview-row">
+    <div class="label-column">Founder Email</div>
+    <div class="value-column">
+        {applicationData.Founder_Email__c}
+    </div>
+</div>
+<div class="preview-row">
+    <div class="label-column">2.5.3. Co-Founder(s)</div>
+    <div class="value-column">
+        <template for:each={coFounders} for:item="coFounder">
+            <div key={coFounder.uniqueId} class="preview-cofounder">
+                <strong>{coFounder.Name}</strong><br/>
+                Designation: {coFounder.Designation__c}<br/>
+                Institution / Organization: {coFounder.Institution__c}<br/>
+                Mobile: {coFounder.Mobile__c}<br/>
+                Email: {coFounder.Email__c}
+            </div>
+        </template>
+    </div>
+</div>
+<div class="preview-row">
+    <div class="label-column">2.5.4. Start-up Registered?</div>
+    <div class="value-column">
+        {applicationData.Is_Startup_Registered__c}
+    </div>
+</div>
+
+<template if:true={showStartupRegDetails}>
+    <div class="preview-row">
+        <div class="label-column">Registration / Incorporation Date</div>
+        <div class="value-column">
+            {applicationData.Startup_Registration_Date__c}
+        </div>
+    </div>
+
+    <div class="preview-row">
+        <div class="label-column">Registration No. / CIN</div>
+        <div class="value-column">
+            {applicationData.Startup_Registration_No__c}
+        </div>
+    </div>
+</template>
+<div class="preview-row">
+    <div class="label-column">2.5.5. DPIIT Registered?</div>
+    <div class="value-column">
+        {applicationData.Is_Startup_DPIIT_Registered__c}
+    </div>
+</div>
+
+<template if:true={showDpiitRegDetails}>
+    <div class="preview-row">
+        <div class="label-column">DPIIT Registration No.</div>
+        <div class="value-column">
+            {applicationData.DPIIT_Registration_No__c}
+        </div>
+    </div>
+</template>
 
     </div>
 </template>
@@ -4562,7 +4797,7 @@
 
         <!-- 3.7 Work undertaken supporting current TRL -->
         <div class="preview-row">
-            <div class="label-column">3.7. Work undertaken supporting the current TRL of the Project</div>
+            <div class="label-column">3.7. Details of activities supporting the current TRL of the Project</div>
             <div class="value-column">
                 <lightning-formatted-rich-text value={applicationData.Work_undertaken_supporting_current_TRL__c}></lightning-formatted-rich-text>
             </div>
@@ -4576,7 +4811,7 @@
 
         <!-- 3.9 Current status -->
         <div class="preview-row">
-            <div class="label-column">3.9. Current status of the Project / Work undertaken so far</div>
+            <div class="label-column">3.9. Current status of the Project</div>
             <div class="value-column">
                 <lightning-formatted-rich-text value={applicationData.Current_status_of_the_Project_Work_und__c}></lightning-formatted-rich-text>
             </div>
@@ -4594,7 +4829,7 @@
         <div class="preview-row">
             <div class="label-column">3.11. Competitive Landscape</div>
             <div class="value-column">
-                <lightning-formatted-rich-text value={applicationData.Competitive_Landscape__c}></lightning-formatted-rich-text>
+                <lightning-formatted-rich-text value={applicationData.Competitive_Advantage__c}></lightning-formatted-rich-text>
             </div>
         </div>
 
@@ -4651,7 +4886,7 @@
         <div class="preview-row">
             <div class="label-column">4.3. Plan for Commercialization and Market Entry:</div>
             <div class="value-column">
-                <lightning-formatted-rich-text value={applicationData.Potential_for_Commercialization__c}></lightning-formatted-rich-text>
+                <lightning-formatted-rich-text value={applicationData.Plan_for_Commercialization__c}></lightning-formatted-rich-text>
             </div>
         </div>
 
@@ -4667,7 +4902,7 @@
         <div class="preview-row">
             <div class="label-column">4.5. Potential Revenue Generation Strategy for Project:</div>
             <div class="value-column">
-                <lightning-formatted-rich-text value={applicationData.Potential_Revenue_Generation_Strategy_fo__c}></lightning-formatted-rich-text>
+                <lightning-formatted-rich-text value={applicationData.Project_Revenue_Strategy__c}></lightning-formatted-rich-text>
             </div>
         </div>
 
@@ -4732,11 +4967,11 @@
         <div class="value-column">{applicationData.Total_Project_Budget_in_USD__c}</div>
     </div>
 
-    <!-- 5.2 -->
+    <!-- 5.2 
     <div class="preview-row">
         <div class="label-column">5.2. Total Project Budget (in INR):</div>
         <div class="value-column">{applicationData.Total_Project_Budget_INR__c}</div>
-    </div>
+    </div>-->
 
     <!-- New Budget Table -->
     <table class="slds-table slds-table_bordered slds-table_cell-buffer">
@@ -4745,7 +4980,7 @@
                 <th>S.No.</th>
                 <th>Budget Head</th>
                 <th>Total Amount (USD)</th>
-                <th>Total Amount (INR)</th>
+                <!--<th>Total Amount (INR)</th>-->
                 <th>Detailed Justification</th>
             </tr>
         </thead>
@@ -4763,8 +4998,8 @@
                     <!-- USD -->
                     <td class="slds-text-align_right"> $ {budget.Total_Amount__c}</td>
 
-                    <!-- INR -->
-                    <td class="slds-text-align_right"> ₹ {budget.Total_Amount_INR__c}</td>
+                    <!-- INR 
+                    <td class="slds-text-align_right"> ₹ {budget.Total_Amount_INR__c}</td>-->
 
                     <!-- Detailed Justification -->
                     <td class="wrapped-text">
@@ -4781,7 +5016,7 @@
                 <td><strong>Total</strong></td>
                 <td></td>
                 <td class="slds-text-align_right"><strong>${totalUSD}</strong></td>
-                <td class="slds-text-align_right"><strong>₹{totalINR}</strong></td>
+                <!--<td class="slds-text-align_right"><strong>₹{totalINR}</strong></td>-->
                 <td></td>
             </tr>
         </tfoot>
@@ -4791,7 +5026,7 @@
     <div class="preview-row">
         <div class="label-column">5.3. Details of Prior Funding received / approved under this Project:</div>
         <div class="value-column">
-            <lightning-formatted-rich-text value={applicationData.List_of_Existing_Funding_Sources_and_Fun__c}></lightning-formatted-rich-text>
+            <lightning-formatted-rich-text value={applicationData.Previous_Funding_Details__c}></lightning-formatted-rich-text>
         </div>
     </div>
 
@@ -4825,7 +5060,7 @@
                 <th>Month of start of Milestone</th>
                 <th>Month of end of Milestone</th>
                <th>Budget Required (USD)</th>
-               <th>Budget Required (INR)</th>
+               <!--<th>Budget Required (INR)</th>-->
             </tr>
         </thead>
 
@@ -4862,10 +5097,10 @@
                         $ {milestone.Budget_Required__c}
                     </td>
 
-                    <!-- Budget Required INR -->
+                    <!-- Budget Required INR 
                     <td class="slds-text-align_right">
                         ₹ {milestone.Budget_Required_INR__c}
-                    </td>
+                    </td>-->
 
                 </tr>
             </template>
@@ -4883,7 +5118,7 @@
         <!-- 7.1 Proposed Outcomes -->
         <div class="preview-row">
             <div class="label-column">
-                7.1. Proposed Outcomes / Deliverables under the Project (Word limit: 100)
+                7.1. Proposed Outcomes / Deliverables under the Project
             </div>
             <div class="value-column">
                 <lightning-formatted-rich-text 
@@ -4895,7 +5130,7 @@
         <!-- 7.2 Envisaged Impact -->
         <div class="preview-row">
             <div class="label-column">
-                7.2. Envisaged Impact of the Project (Word Limit 100)
+                7.2. Envisaged Impact of the Project
             </div>
             <div class="value-column">
                 <lightning-formatted-rich-text 

@@ -31,6 +31,7 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
     /* ================= MODE ================= */
 
     @track isCoeMode = false;
+    @track selectedFundingYear = null;
 
     /* ================= DATA ================= */
 
@@ -53,12 +54,12 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
     @track appliedFundingYear = null;
     @track appliedFundingType = null;
 
-    fundingYearOptions = [
-        { label: 'All Years', value: null },
-        { label: '2024', value: '2024' },
-        { label: '2025', value: '2025' },
-        { label: '2026', value: '2026' }
-    ];
+   fundingYearOptions = [
+    { label: 'All Years', value: '' },
+    { label: '2024', value: '2024' },
+    { label: '2025', value: '2025' },
+    { label: '2026', value: '2026' }
+];
 
     fundingTypeOptions = [
         { label: 'COE Operational Grant', value: 'COE Operational Grant' },
@@ -75,10 +76,12 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
     connectedCallback() {
         const currentYear = new Date().getFullYear().toString();
 
-        this.uiFundingYear = currentYear;
+        //this.uiFundingYear = currentYear;
         this.uiFundingType = null;
-
-        this.appliedFundingYear = currentYear;
+        this.selectedFundingYear = currentYear;
+this.uiFundingYear = currentYear;
+this.appliedFundingYear = currentYear;
+        //this.appliedFundingYear = currentYear;
         this.appliedFundingType = null;
 
         this.isCoeMode = false;
@@ -144,9 +147,10 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
 
     /* ================= FILTER HANDLERS ================= */
 
-    handleFundingYearChange(event) {
-        this.uiFundingYear = event.detail.value || null;
-    }
+  handleFundingYearChange(event) {
+    this.selectedFundingYear = event.detail.value;
+    this.uiFundingYear = event.detail.value || null;
+}
 
     handleFundingTypeChange(event) {
         this.uiFundingType = event.detail.value || null;
@@ -217,7 +221,9 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
     get coeTabClass() {
         return this.showCoeTab ? 'tab-pill active' : 'tab-pill';
     }
-
+    get isReadOnly() {
+    return true;
+}
     /* ================= NAV ================= */
 
     handleOpenProposal(event) {
@@ -265,4 +271,16 @@ export default class AwardeeDashboard extends NavigationMixin(LightningElement) 
         if (type === 'pending') return 'milestone-chip red';
         return 'milestone-chip gray';
     }
+    @track isHistoryModalOpen = false;
+@track historyAccountId = null;
+
+handleOpenHistoryModal(event) {
+    this.historyAccountId = event.currentTarget.dataset.accountId;
+    this.isHistoryModalOpen = true;
+}
+
+handleCloseHistoryModal() {
+    this.isHistoryModalOpen = false;
+    this.historyAccountId = null;
+}
 }

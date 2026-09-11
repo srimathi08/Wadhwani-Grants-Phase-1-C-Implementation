@@ -1,0 +1,710 @@
+/* ═══════════════════════════════════════════════════════════════
+    WCF Proposal List
+    Unified Wadhwani portal design system — shares the token set used
+    by the dashboards and the application list.
+    Visual layer only: every class name, selector and markup contract
+    is unchanged.
+    ═══════════════════════════════════════════════════════════════ */
+
+    :host {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+
+        /* Brand */
+        --wcf-brand: #BF2026;
+        --wcf-brand-hover: #A31B20;
+        --wcf-brand-active: #8E171C;
+        --wcf-brand-soft: #FEF2F2;
+        --wcf-navy: #1E2D4F;
+
+        /* Status */
+        --wcf-success: #2E8B57;
+        --wcf-success-soft: #ECFDF5;
+        --wcf-warning: #F59E0B;
+        --wcf-warning-soft: #FFFBEB;
+        --wcf-error: #DC2626;
+        --wcf-error-soft: #FEF2F2;
+        --wcf-info: #2563EB;
+        --wcf-info-soft: #EFF6FF;
+        --wcf-returned: #EA580C;
+        --wcf-returned-soft: #FFF7ED;
+        --wcf-draft: #6B7280;
+        --wcf-draft-soft: #F3F4F6;
+
+        /* Surfaces & text */
+        --wcf-bg: #F8FAFC;
+        --wcf-surface: #FFFFFF;
+        --wcf-surface-alt: #F8FAFC;
+        --wcf-border: #E5E7EB;
+        --wcf-border-soft: #F1F3F6;
+        --wcf-text: #1F2937;
+        --wcf-text-muted: #6B7280;
+
+        /* Shape & elevation */
+        --wcf-radius-control: 6px;
+        --wcf-radius-pill: 999px;
+
+        /* 8px spacing scale */
+        --wcf-space-1: 4px;
+        --wcf-space-2: 8px;
+        --wcf-space-3: 16px;
+        --wcf-space-4: 24px;
+        --wcf-space-5: 32px;
+        --wcf-space-6: 40px;
+
+        /* Controls */
+        --wcf-control-height: 32px;
+        --wcf-input-height: 36px;
+
+        /* Shared gutter */
+        --wcf-gutter: 24px;
+    }
+
+    /* ── Page shell ───────────────────────────────────────────────── */
+    .shell {
+        font-family: 'Inter', 'Salesforce Sans', -apple-system, Arial, sans-serif;
+        background: var(--wcf-bg);
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0;
+        color: var(--wcf-text);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══ TOP BAR ═══════════════════════════════════════════════════ */
+    .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--wcf-space-2);
+        background: var(--wcf-surface);
+        padding: var(--wcf-space-4) var(--wcf-gutter);
+        border-bottom: 1px solid var(--wcf-border);
+        box-sizing: border-box;
+    }
+
+    .top-bar-left { display: flex; align-items: center; gap: var(--wcf-space-2); }
+
+    .brand-rule {
+        width: 3px;
+        height: 40px;
+        background: var(--wcf-brand);
+        border-radius: var(--wcf-radius-pill);
+        flex-shrink: 0;
+    }
+
+    /* Headings use navy — brand red is reserved for actions and emphasis */
+    .top-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--wcf-navy);
+        margin: 0 0 var(--wcf-space-1);
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+    }
+
+    .top-sub {
+        font-size: 13px;
+        color: var(--wcf-text-muted);
+        line-height: 1.5;
+    }
+
+    .top-bar-right { display: flex; align-items: center; gap: var(--wcf-space-2); flex-wrap: wrap; }
+
+    /* ── Search ───────────────────────────────────────────────────── */
+    .search-wrap {
+        display: flex;
+        align-items: center;
+        gap: var(--wcf-space-2);
+        height: var(--wcf-input-height);
+        background: var(--wcf-surface);
+        border: 1px solid var(--wcf-border);
+        border-radius: var(--wcf-radius-control);
+        padding: 0 var(--wcf-space-3);
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    /* FIX: the focus ring was navy-tinted rgba while the border went red */
+    .search-wrap:focus-within {
+        border-color: var(--wcf-brand);
+        box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12);
+        background: var(--wcf-surface);
+    }
+
+    .search-icon {
+        color: var(--wcf-text-muted);
+        --sds-c-icon-color-foreground-default: var(--wcf-text-muted);
+    }
+
+    .search-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: var(--wcf-text);
+        width: 220px;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .search-input::placeholder { color: #9CA3AF; }
+
+    .filter-combo { --slds-c-input-sizing-min-width: 148px; }
+
+    .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--wcf-input-height);
+        height: var(--wcf-input-height);
+        border: 1px solid var(--wcf-border);
+        border-radius: var(--wcf-radius-control);
+        background: var(--wcf-surface);
+        cursor: pointer;
+        color: var(--wcf-navy);
+        --sds-c-icon-color-foreground-default: var(--wcf-navy);
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+        background: var(--wcf-surface-alt);
+        border-color: var(--wcf-brand);
+        color: var(--wcf-brand);
+        --sds-c-icon-color-foreground-default: var(--wcf-brand);
+    }
+
+    .icon-btn:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: 2px;
+    }
+
+    /* ══ SUMMARY ROW ═══════════════════════════════════════════════ */
+    /* Was a solid maroon band with white text. Now a neutral strip: the
+    counts read as data, and each metric carries its own status color
+    instead of three near-identical whites. */
+    .summary-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        background: var(--wcf-surface-alt);
+        border-bottom: 1px solid var(--wcf-border);
+        padding: var(--wcf-space-3) var(--wcf-gutter);
+        gap: 0;
+    }
+
+    .summary-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 var(--wcf-space-4) 0 0;
+    }
+
+    .summary-div {
+        width: 1px;
+        height: 32px;
+        background: var(--wcf-border);
+        margin: 0 var(--wcf-space-4) 0 0;
+        flex-shrink: 0;
+    }
+
+    .summary-num {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--wcf-navy);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: var(--wcf-space-1);
+    }
+
+    /* The originals were #fcfcfc / #feffff / #fdfdfd / #ffffff — near-white
+    values that only worked on the old maroon band. All counts now use
+    navy, matching the KPI tiles on the dashboards; the label beneath
+    each number carries the meaning, so color isn't doing that job. */
+    .s-reviewed,
+    .s-progress,
+    .s-pending,
+    .s-flagged { color: var(--wcf-navy); }
+
+    .summary-lbl {
+        font-size: 11px;
+        color: var(--wcf-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    /* ══ TABLE WRAPPER ═════════════════════════════════════════════ */
+    .table-wrap {
+        width: 100%;
+        background: var(--wcf-surface);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+    }
+
+    /* ══ TABLE — auto layout preserved ═════════════════════════════ */
+    .tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        table-layout: auto;          /* KEY: dynamic sizing, no fixed widths */
+    }
+
+    /* ── Column hints — min widths only, browser distributes rest ── */
+    .c-sno       { white-space: nowrap; width: 48px; }
+    .c-id        { white-space: nowrap; min-width: 148px; }
+    .c-org       { min-width: 130px; }
+    .c-hq        { min-width: 110px; }
+    .c-sub       { min-width: 110px; }
+    .c-track     { white-space: nowrap; min-width: 72px; }
+    .c-appstatus { white-space: nowrap; min-width: 120px; }
+    .c-revstatus { white-space: nowrap; min-width: 120px; }
+    .c-due       { white-space: nowrap; min-width: 88px; }
+    .c-action    { white-space: nowrap; min-width: 136px; }
+
+    /* ── Table head ───────────────────────────────────────────────── */
+    .th {
+        padding: var(--wcf-space-2) var(--wcf-space-3);
+        height: var(--wcf-control-height);
+        background: var(--wcf-surface-alt);
+        color: var(--wcf-text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border: none;
+        border-bottom: 1px solid var(--wcf-border);
+        text-align: left;
+    }
+
+    .th.tc { text-align: center; }
+
+    .th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .th.sortable:hover {
+        background: #EEF1F5;
+        color: var(--wcf-navy);
+    }
+
+    .th.sortable:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: -2px;
+    }
+
+    .th-inner { display: inline-flex; align-items: center; gap: var(--wcf-space-1); }
+.id-text {
+    color: inherit;
+    font-weight: 500;
+}
+    /* ── Table rows ───────────────────────────────────────────────── */
+    .td {
+        padding: var(--wcf-space-2) var(--wcf-space-3);
+        height: 56px;
+        border-bottom: 1px solid var(--wcf-border-soft);
+        vertical-align: middle;
+        color: var(--wcf-text);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .td.tc { text-align: center; }
+    .td.c-action { text-align: right; padding: var(--wcf-space-2) var(--wcf-space-3); }
+
+    /* Zebra striping removed — row borders and hover carry the separation,
+    matching the dashboard tables. Classes kept so bindings still resolve. */
+    .row-even { background: var(--wcf-surface); }
+    .row-odd  { background: var(--wcf-surface); }
+
+    .tbl tbody tr:last-child .td { border-bottom: none; }
+
+    .tbl tbody tr:hover .td {
+        background: var(--wcf-surface-alt) !important;
+        transition: background 0.15s ease;
+    }
+
+    /* FIX: the hover rule added a 3px left border that didn't exist at rest,
+    nudging every row sideways on hover. The border is now always present
+    and only changes color. */
+    .c-sno { border-left: 3px solid transparent; }
+    .tbl tbody tr:hover .c-sno { border-left-color: var(--wcf-brand); }
+
+    /* ── Helper classes ───────────────────────────────────────────── */
+    .tc { text-align: center; }
+
+    /* org / hq / sub columns still truncate with ellipsis */
+    .c-org .trunc,
+    .c-hq  .trunc,
+    .c-sub .trunc {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 180px;          /* soft cap so long names don't blow the table */
+    }
+
+    .td-sno {
+        color: var(--wcf-text-muted);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* ── App ID link ──────────────────────────────────────────────── */
+    .id-link {
+        color: var(--wcf-brand);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+        transition: color 0.15s ease;
+    }
+
+    .id-link:hover {
+        color: var(--wcf-brand-hover);
+        text-decoration: underline;
+    }
+
+    .id-link:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: 2px;
+        border-radius: var(--wcf-radius-control);
+    }
+
+    /* ── Shared pill geometry ─────────────────────────────────────── */
+    /* Track, status and review badges now share one shape, matching the
+    .status-pill family on the dashboards. */
+    .track-badge,
+    .status-badge,
+    .review-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 96px;
+        height: 24px;
+        padding: 0 var(--wcf-space-2);
+        border-radius: var(--wcf-radius-pill);
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        border: 1px solid transparent;
+        box-sizing: border-box;
+    }
+
+    /* ── Track badges ─────────────────────────────────────────────── */
+    /* Track is a category, not a status — kept neutral so it doesn't
+    compete with the two status columns beside it. */
+    .track-badge { min-width: 64px; }
+
+    .track-jf   { background: var(--wcf-info-soft);   color: #1D4ED8; border-color: #BFDBFE; }
+    .track-jc   { background: var(--wcf-draft-soft);  color: #374151; border-color: #E5E7EB; }
+    .track-both { background: var(--wcf-surface-alt); color: var(--wcf-navy); border-color: #D6DAE1; }
+
+    /* ── App status badges ────────────────────────────────────────── */
+    /* Submitted moves green → blue per the portal badge scale
+    (Submitted/Info = blue, Success/Approved = green). */
+    .status-submitted    { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
+    .status-revision     { background: var(--wcf-returned-soft); color: #C2410C; border-color: #FED7AA; }
+    .status-draft        { background: var(--wcf-draft-soft);    color: #4B5563; border-color: #E5E7EB; }
+    .status-under-review { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
+
+    /* ── Review status badges ─────────────────────────────────────── */
+    .review-not-started { background: var(--wcf-draft-soft);    color: #4B5563; border-color: #E5E7EB; }
+    .review-progress    { background: var(--wcf-warning-soft);  color: #B45309; border-color: #FDE68A; }
+    .review-done        { background: var(--wcf-success-soft);  color: #1F6B44; border-color: #A7DFC1; }
+
+    /* ── Due date ─────────────────────────────────────────────────── */
+    .due-date    { font-size: 13px; color: var(--wcf-text); white-space: nowrap; }
+    .due-overdue { font-size: 13px; font-weight: 600; color: var(--wcf-error); white-space: nowrap; }
+    .due-urgent  { font-size: 13px; font-weight: 600; color: #B45309; white-space: nowrap; }
+
+    /* ── Action buttons ───────────────────────────────────────────── */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--wcf-space-1);
+        height: var(--wcf-control-height);
+        min-width: 120px;
+        padding: 0 var(--wcf-space-3);
+        border: 1px solid transparent;
+        border-radius: var(--wcf-radius-control);
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1;
+        cursor: pointer;
+        white-space: nowrap;
+        font-family: inherit;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        letter-spacing: 0;
+    }
+
+    /* FIX: hover was `opacity: 0.87` + a 1px lift, which faded the label
+    along with the fill. Solid color changes keep contrast constant. */
+    .action-btn:active { transform: none; }
+
+    .action-btn:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: 2px;
+    }
+
+    /* Primary */
+    .btn-start,
+    .btn-resume {
+        background: var(--wcf-brand);
+        color: var(--wcf-surface);
+        border-color: var(--wcf-brand);
+    }
+
+    .btn-start:hover,
+    .btn-resume:hover {
+        background: var(--wcf-brand-hover);
+        border-color: var(--wcf-brand-hover);
+    }
+
+    .btn-start:active,
+    .btn-resume:active {
+        background: var(--wcf-brand-active);
+        border-color: var(--wcf-brand-active);
+    }
+
+    /* Done — secondary, neutral */
+    .btn-done {
+        background: var(--wcf-surface);
+        color: var(--wcf-navy);
+        border-color: var(--wcf-border);
+    }
+
+    .btn-done:hover {
+        background: var(--wcf-surface-alt);
+        border-color: #D6DAE1;
+    }
+
+    /* Compliance — success action */
+    .action-btn.btn-compliance {
+        background: var(--wcf-success);
+        color: var(--wcf-surface);
+        border-color: var(--wcf-success);
+    }
+
+    .action-btn.btn-compliance:hover {
+        background: #256F46;
+        border-color: #256F46;
+        transform: none;
+    }
+
+    /* Disabled */
+    .btn-disabled,
+    .action-btn:disabled,
+    .action-btn[disabled] {
+        background: var(--wcf-draft-soft);
+        color: var(--wcf-text-muted);
+        border-color: var(--wcf-border);
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .btn-disabled:hover {
+        opacity: 1;
+        transform: none;
+        background: var(--wcf-draft-soft);
+    }
+
+    .btn-icon {
+        pointer-events: none;
+        flex-shrink: 0;
+        --sds-c-icon-color-foreground-default: currentColor;
+    }
+
+    /* Neutral buttons need their icon to follow the dark label */
+    .btn-done .btn-icon,
+    .btn-disabled .btn-icon {
+        --sds-c-icon-color-foreground-default: currentColor;
+    }
+
+    /* ══ PAGINATION BAR ════════════════════════════════════════════ */
+    .pg-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--wcf-space-2);
+        padding: var(--wcf-space-3) var(--wcf-gutter);
+        background: var(--wcf-surface);
+        border-top: 1px solid var(--wcf-border);
+    }
+
+    .pg-info { font-size: 13px; color: var(--wcf-text-muted); }
+
+    .pg-controls { display: flex; gap: var(--wcf-space-1); align-items: center; }
+
+    .pg-btn {
+        min-width: var(--wcf-control-height);
+        height: var(--wcf-control-height);
+        padding: 0 var(--wcf-space-2);
+        border: 1px solid var(--wcf-border);
+        background: var(--wcf-surface);
+        color: var(--wcf-navy);
+        border-radius: var(--wcf-radius-control);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        font-family: inherit;
+    }
+
+    .pg-btn:hover:not(:disabled) {
+        background: var(--wcf-surface-alt);
+        border-color: var(--wcf-brand);
+        color: var(--wcf-brand);
+    }
+
+    .pg-btn:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: 2px;
+    }
+
+    .pg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .pg-btn-active {
+        background: var(--wcf-brand) !important;
+        color: var(--wcf-surface) !important;
+        border-color: var(--wcf-brand) !important;
+        font-weight: 600;
+    }
+
+    .pg-size-row { display: flex; align-items: center; gap: var(--wcf-space-2); }
+    .pg-size-lbl { font-size: 13px; color: var(--wcf-text-muted); }
+    .pg-size-combo { --slds-c-input-sizing-min-width: 76px; }
+
+    /* ══ LOADING ═══════════════════════════════════════════════════ */
+    .loading-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--wcf-space-6) var(--wcf-gutter);
+        background: var(--wcf-surface);
+    }
+
+    .loading-text {
+        margin-top: var(--wcf-space-3);
+        font-size: 13px;
+        color: var(--wcf-text-muted);
+    }
+
+    /* ══ EMPTY STATE ═══════════════════════════════════════════════ */
+    .empty-block {
+        text-align: center;
+        padding: var(--wcf-space-6) var(--wcf-gutter);
+        background: var(--wcf-surface);
+    }
+
+    .empty-icon {
+        color: #D1D5DB;
+        --sds-c-icon-color-foreground-default: #D1D5DB;
+        margin-bottom: var(--wcf-space-3);
+    }
+
+    /* FIX: this was #ffffff — white text on a white empty state, so the
+    title was invisible. */
+    .empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--wcf-navy);
+        line-height: 1.4;
+        margin: 0 0 var(--wcf-space-1);
+    }
+
+    .empty-sub {
+        font-size: 13px;
+        color: var(--wcf-text-muted);
+        line-height: 1.5;
+        margin: 0 0 var(--wcf-space-3);
+    }
+
+    .ghost-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--wcf-control-height);
+        padding: 0 var(--wcf-space-3);
+        border: 1px solid var(--wcf-brand);
+        border-radius: var(--wcf-radius-control);
+        background: var(--wcf-surface);
+        color: var(--wcf-brand);
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .ghost-btn:hover {
+        background: var(--wcf-brand);
+        color: var(--wcf-surface);
+    }
+
+    .ghost-btn:focus-visible {
+        outline: 2px solid var(--wcf-brand);
+        outline-offset: 2px;
+    }
+
+    /* ══ RESPONSIVE ════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        :host { --wcf-gutter: 16px; }
+
+        .top-bar {
+            align-items: flex-start;
+            gap: var(--wcf-space-3);
+        }
+
+        .top-bar-right { width: 100%; }
+
+        .search-wrap { flex: 1 1 auto; }
+
+        .search-input { width: 100%; }
+
+        .summary-row { gap: var(--wcf-space-2) 0; }
+
+        .top-title { font-size: 18px; }
+
+        .pg-bar { justify-content: center; }
+    }
+
+    /* ══ MOTION PREFERENCE ═════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+        .shell * {
+            transition: none !important;
+        }
+    }
+
+    /* ══ HIGH CONTRAST ═════════════════════════════════════════════ */
+    @media (forced-colors: active) {
+        .track-badge,
+        .status-badge,
+        .review-badge,
+        .action-btn,
+        .pg-btn,
+        .icon-btn,
+        .ghost-btn {
+            border: 1px solid CanvasText;
+        }
+    }

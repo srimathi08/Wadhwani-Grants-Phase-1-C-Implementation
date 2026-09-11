@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Revision Requested</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Action required: compliance document updates</subject>
+    <textOnly>Subject: [{{{org_name}}}] Action required: compliance document updates
+
+Hello {{{contact_first_name}}},
+
+Thank you for submitting {{{org_name}}}&apos;s compliance documents.
+
+After review, one or more submitted documents need updates before we can proceed with approval.
+
+Comments:
+{{{document_comments}}}
+
+Please review and resubmit the required documents by {{{due_date}}}.
+
+Update your documents here:
+{{{portal_url}}}
+
+If you have any questions or need additional time, please contact us at:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Best regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

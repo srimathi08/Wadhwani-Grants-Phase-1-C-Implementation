@@ -68,7 +68,7 @@ export default class ProposalReviewDashboard extends NavigationMixin(LightningEl
     /* =====================================================
        TRANSFORM DATA
     ===================================================== */
-    prepareTable(data) {
+prepareTable(data) {
 
         this.proposals = data.map(proposal => {
 
@@ -82,9 +82,9 @@ export default class ProposalReviewDashboard extends NavigationMixin(LightningEl
             });
 
             let decisionClass = '';
-            if (proposal.finalDecision === 'Approved - Level 1') {
+            if (proposal.finalDecision === 'Shortlisted for presentation') {
                 decisionClass = 'decision-approved';
-            } else if (proposal.finalDecision === 'Rejected - Level 1') {
+            } else if (proposal.finalDecision === 'Not shortlisted for presentation') {
                 decisionClass = 'decision-rejected';
             }
 

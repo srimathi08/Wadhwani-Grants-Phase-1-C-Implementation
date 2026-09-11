@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>WCF_Flag_mail_to_Approver</fullName>
+        <ccEmails>testaisfdc@gmail.com</ccEmails>
+        <description>WCF Flag mail to Approver</description>
+        <protected>false</protected>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/WCF_Flag_mail_for_Approver</template>
+    </alerts>
+    <alerts>
+        <fullName>WCF_Pass_Mail_to_Reviewer</fullName>
+        <ccEmails>ananthavigneshr@gmail.com</ccEmails>
+        <description>WCF Pass Mail to Reviewer</description>
+        <protected>false</protected>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/WCF_Pass_mail_for_Reviewer</template>
+    </alerts>
+</Workflow>

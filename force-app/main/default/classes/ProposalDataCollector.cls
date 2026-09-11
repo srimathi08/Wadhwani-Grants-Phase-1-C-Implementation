@@ -28,7 +28,9 @@ public class Request {
             Legal_Structure_Strength__c, Legal_Structure_Weakness__c, Legal_Structure_Summary__c, Legal_Rating__c,
             Organizational_Stability_Rating__c, Organizational_Stability_Strength__c, Organizational_Stability_Weakness__c, Organizational_Stability_Summary__c,
             Use_of_Funds_Rating__c, Use_of_Funds_Strength__c, Use_of_Funds_Weakness__c, Use_of_Funds_Summary__c, Operational_Synergies_Rating__c,
-            Operational_Synergies_Strength__c, Operational_Synergies_Weakness__c, Operational_Synergies_Summary__c
+            Operational_Synergies_Strength__c, Operational_Synergies_Weakness__c, Operational_Synergies_Summary__c, Skilling_Approach__c, Revenue_Explanation__c, Job_Creation_Approach__c,
+            Job_Creation_Rating__c, Job_Creation_Strength__c, Job_Creation_Weakness__c, Job_Creation_Summary__c,
+            Skilling_Approach_Rating__c, Skilling_Approach_Strength__c, Skilling_Approach_Weakness__c, Skilling_Approach_Summary__c
             FROM IndividualApplication
             WHERE Id = :req.proposalId
             LIMIT 1
@@ -63,6 +65,7 @@ public class Request {
                         Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_3__c, Projected_Learner_placement_CFY__c,
                         Projected_Learner_placement_FY_1__c, Projected_Learner_placement_FY_2__c, Projected_Learner_placement_FY_3__c, 
                         Avg_Cost_per_Placement_CFY__c, Avg_Cost_per_Placement_FY_1__c, Avg_Cost_per_Placement_FY_2__c, Avg_Cost_per_Placement_FY_3__c, 
+                        Manual_Avg_Cost_per_Placement_CFY__c, Manual_Avg_Cost_per_Placement_FY_1__c, Manual_Avg_Cost_per_Placement_FY_2__c, Manual_Avg_Cost_per_Placement_FY_3__c,
                         X3rd_Party_Placement_Verification_CFY__c, X3rd_Party_Placement_Verification_FY_1__c, X3rd_Party_Placement_Verification_FY_2__c, 
                         X3rd_Party_Placement_Verification_FY_3__c, X3rd_Party_Verification_Description_CFY__c, 
                         X3rd_Party_Verification_Description_FY_1__c, X3rd_Party_Verification_Description_FY_2__c, X3rd_Party_Verification_Description_FY_3__c,
@@ -75,6 +78,7 @@ public class Request {
                         Growing_Businesses_Supported_FY_2__c, Growing_Businesses_Supported_FY_3__c, Jobs_from_Growing_Businesses_CFY__c, 
                         Jobs_from_Growing_Businesses_FY_1__c, Jobs_from_Growing_Businesses_FY_2__c, Jobs_from_Growing_Businesses_FY_3__c, 
                         Avg_Cost_per_Job_CFY__c, Avg_Cost_per_Job_FY_1__c, Avg_Cost_per_Job_FY_2__c, Avg_Cost_per_Job_FY_3__c, 
+                        Manual_Avg_Cost_per_Job_CFY__c, Manual_Avg_Cost_per_Job_FY_1__c, Manual_Avg_Cost_per_Job_FY_2__c, Manual_Avg_Cost_per_Job_FY_3__c,
                         Job_Verification_3rd_Party_CFY__c, Job_Verification_3rd_Party_FY1__c, Job_Verification_3rd_Party_FY2__c, Job_Verification_3rd_Party_FY3__c,
                         X3rd_party_verification_details_CFY__c, X3rd_party_verification_details_FY1__c, X3rd_party_verification_details_FY2__c, X3rd_party_verification_details_FY3__c
                         FROM Outcomes_Data__c WHERE Proposal__c = :req.proposalId
@@ -107,6 +111,8 @@ public class Request {
             'Operational Synergies AI Feedback' => proposal.Operational_Synergies_AI_Feedback__c,
             'Organizational Stability AI Feedback' => proposal.Organizational_Stability_AI_Feedback__c,
             'Operational Synergies with WOF Both' => proposal.Operational_Synergies_with_WOF_Both__c,
+            'Job Creation Approach' => proposal.Job_Creation_Approach__c,
+            'Skilling Approach' => proposal.Skilling_Approach__c,   
             'Legal Rating' => proposal.Legal_Rating__c,
             'Legal Structure Strength' => proposal.Legal_Structure_Strength__c,
             'Legal Structure Weakness' =>  proposal.Legal_Structure_Weakness__c,
@@ -122,7 +128,15 @@ public class Request {
             'Operational Synergies Rating' => proposal.Operational_Synergies_Rating__c,
             'Operational Synergies Strength' => proposal.Operational_Synergies_Strength__c,
             'Operational Synergies Weakness' => proposal.Operational_Synergies_Weakness__c,
-            'Operational Synergies Summary' => proposal.Operational_Synergies_Summary__c   
+            'Operational Synergies Summary' => proposal.Operational_Synergies_Summary__c,
+            'Job Creation Rating' => proposal.Job_Creation_Rating__c,
+            'Job Creation Strength' => proposal.Job_Creation_Strength__c,
+            'Job Creation Weakness' => proposal.Job_Creation_Weakness__c,
+            'Job Creation Summary' =>  proposal.Job_Creation_Summary__c,
+            'Skilling Approach Rating' => proposal.Skilling_Approach_Rating__c,
+            'Skilling Approach Strength' => proposal.Skilling_Approach_Strength__c,
+            'Skilling Approach Weakness' => proposal.Skilling_Approach_Weakness__c,
+            'Skilling Approach Summary' =>  proposal.Skilling_Approach_Summary__c    
         };
         payload.put('Proposal', proposalMap);
 
@@ -173,10 +187,18 @@ public class Request {
                 'Avg. Cost per Job (FY-1)' => out.Avg_Cost_per_Job_FY_1__c,
                 'Avg. Cost per Job (FY-2)' => out.Avg_Cost_per_Job_FY_2__c,
                 'Avg. Cost per Job (FY-3)' => out.Avg_Cost_per_Job_FY_3__c,
+                'Manual Avg. Cost per Job (CFY)' => out.Manual_Avg_Cost_per_Job_CFY__c,
+                'Manual Avg. Cost per Job (FY-1)' => out.Manual_Avg_Cost_per_Job_FY_1__c,
+                'Manual Avg. Cost per Job (FY-2)' => out.Manual_Avg_Cost_per_Job_FY_2__c,
+                'Manual Avg. Cost per Job (FY-3)' => out.Manual_Avg_Cost_per_Job_FY_3__c,
                 'Avg. Cost per Placement(CFY)' => out.Avg_Cost_per_Placement_CFY__c,
             'Avg. Cost per Placement(FY-1)' => out.Avg_Cost_per_Placement_FY_1__c,
             'Avg. Cost per Placement(FY-2)' => out.Avg_Cost_per_Placement_FY_2__c,
             'Avg. Cost per Placement(FY-3)' => out.Avg_Cost_per_Placement_FY_3__c,
+            'Manual Avg. Cost per Placement(CFY)' => out.Manual_Avg_Cost_per_Placement_CFY__c,
+            'Manual Avg. Cost per Placement(FY-1)' => out.Manual_Avg_Cost_per_Placement_FY_1__c,
+            'Manual Avg. Cost per Placement(FY-2)' => out.Manual_Avg_Cost_per_Placement_FY_2__c,
+            'Manual Avg. Cost per Placement(FY-3)' => out.Manual_Avg_Cost_per_Placement_FY_3__c,
             'Growing Businesses Supported (CFY)' => out.Growing_Businesses_Supported_CFY__c,
             'Growing Businesses Supported (FY-1)' =>  out.Growing_Businesses_Supported_FY_1__c,
             'Growing Businesses Supported (FY-2)' => out.Growing_Businesses_Supported_FY_2__c,

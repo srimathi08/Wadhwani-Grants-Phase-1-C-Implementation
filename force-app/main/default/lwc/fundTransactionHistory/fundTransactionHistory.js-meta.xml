@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Fund Transaction History</masterLabel>
+    <description>Bank-statement style consolidated fund transaction history for the logged-in COE.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="cardTitle" type="String" default="Fund Transaction History"
+                       label="Card Title" description="Heading shown above the report" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

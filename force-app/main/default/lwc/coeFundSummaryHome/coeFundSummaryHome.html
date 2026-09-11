@@ -62,30 +62,26 @@
         <div class="panel">
             <h3>Metrics (Avg TRL, Expected TRL, Duration)</h3>
 
-            <!-- AVG TRL — CLICKABLE -->
             <div class="metric-card clickable" onclick={openTRLModal}>
                 <div class="metric-header">
                     <span>Average TRL <span class="click-hint">↗ View Details</span></span>
-                    <!-- <strong>{avgTRL} / 9</strong> -->
-                     <strong>{avgTRL} / {expectedTRL}</strong>
+                    <strong>{avgTRLFormatted} / {expectedTRLFormatted}</strong>
                 </div>
                 <div class="progress">
                     <div class="progress-fill" style={avgTRLStyle}></div>
                 </div>
             </div>
 
-            <!-- EXPECTED TRL — CLICKABLE -->
             <div class="metric-card clickable" onclick={openTRLModal}>
                 <div class="metric-header">
                     <span>Expected TRL <span class="click-hint">↗ View Details</span></span>
-                    <strong>{expectedTRL} / 9</strong>
+                    <strong>{expectedTRLFormatted} / 9</strong>
                 </div>
                 <div class="progress purple">
                     <div class="progress-fill" style={expectedTRLStyle}></div>
                 </div>
             </div>
 
-            <!-- DURATION -->
             <div class="metric-card">
                 <div class="metric-header">
                     <span>Duration</span>
@@ -114,64 +110,152 @@
 
             <div class="trl-modal-body">
 
-                <!-- TRL LEGEND -->
-                <div class="trl-legend">
-                    <div class="legend-row">
-                        <!-- ✅ Correct class names matching the CSS -->
-<span class="legend-dot current"></span>
-<span>Current TRL</span>
-<span class="legend-dot expected"></span>
-<span>Expected TRL</span>
+                <!-- FUNDING CYCLE PILLS -->
+                <div class="cycle-filter-bar">
+                    <span class="cycle-label">Funding Cycle</span>
+                    <div class="cycle-pills">
+                        <template for:each={fundingYears} for:item="yr">
+                            <button
+                                key={yr.value}
+                                class={yr.btnClass}
+                                data-year={yr.value}
+                                onclick={handleCycleFilter}>
+                                {yr.label}
+                            </button>
+                        </template>
                     </div>
                 </div>
 
-                <!-- TRL SCALE HEADER 
-                <div class="trl-scale-header">
-                    <template for:each={trlScaleLabels} for:item="n">
-                        <span key={n}>{n}</span>
+                <!-- DATE RANGE FILTER -->
+                <div class="date-range-bar">
+                    <span class="cycle-label">Date Range</span>
+                    <div class="date-range-inputs">
+
+                        <div class="date-input-group">
+                            <label>From</label>
+                            <lightning-input
+                                type="date"
+                                name="fromDate"
+                                value={fromDate}
+                                onchange={handleFromDateChange}
+                                variant="label-hidden">
+                            </lightning-input>
+                        </div>
+
+                        <span class="date-range-sep">→</span>
+
+                        <div class="date-input-group">
+                            <label>To</label>
+                            <lightning-input
+                                type="date"
+                                name="toDate"
+                                value={toDate}
+                                onchange={handleToDateChange}
+                                variant="label-hidden">
+                            </lightning-input>
+                        </div>
+
+                        <template if:true={hasDateRange}>
+                            <button class="clear-date-btn" onclick={handleClearDates}>
+                                ✕ Clear Dates
+                            </button>
+                        </template>
+
+                    </div>
+                </div>
+
+                <!-- FILTER RESULT COUNT -->
+                <div class="filter-count">
+                    Showing <strong>{filteredCount}</strong> of <strong>{totalCount}</strong> projects
+                    <template if:true={isFiltered}>
+                        &nbsp;·&nbsp;
+                        <template if:true={hasDateRange}>
+                            <template if:true={fromDate}>
+                                From <strong>{fromDate}</strong>&nbsp;
+                            </template>
+                            <template if:true={toDate}>
+                                To <strong>{toDate}</strong>
+                            </template>
+                        </template>
+                        <template if:false={hasDateRange}>
+                            Cycle <strong>{selectedCycle}</strong>
+                        </template>
                     </template>
-                </div> -->
+                </div>
+
+                <!-- TRL LEGEND -->
+                <div class="trl-legend">
+                    <div class="legend-row">
+                        <span class="legend-dot base"></span>
+                        <span>Base TRL</span>
+                        <span class="legend-dot current"></span>
+                        <span>Current TRL</span>
+                        <span class="legend-dot expected"></span>
+                        <span>Expected TRL</span>
+                    </div>
+                </div>
 
                 <!-- PER PROJECT ROWS -->
                 <template if:true={isTRLLoaded}>
-                    <template for:each={trlProjects} for:item="p">
-                        <div key={p.proposalId} class="trl-project-row">
 
-                            <div class="trl-project-name">
-                                <p class="proj-name">{p.name}</p>
-                                <template if:true={p.projectTitle}>
-                                    <p class="proj-title">{p.projectTitle}</p>
-                                </template>
-                            </div>
+                    <template if:true={hasFilteredProjects}>
+                        <template for:each={filteredTRLProjects} for:item="p">
+                            <div key={p.proposalId} class="trl-project-row">
 
-                            <!-- TRL SCALE: number + block per column -->
-                            <div class="trl-scale-wrapper">
-    <template for:each={p.steps} for:item="s">
-        <div key={s.n} class={s.colClass}>
-            <span class="trl-step-number">{s.n}</span>
-            <div class={s.stepClass}></div>
-        </div>
-    </template>
-</div>
+                                <div class="trl-project-name">
+                                    <div class="proj-name-row">
+                                        <p class="proj-name">{p.name}</p>
+                                        <template if:true={p.fundingYear}>
+                                            <span class="cycle-badge">{p.fundingYear}</span>
+                                        </template>
 
-                            <!-- NUMBERS -->
-                            <div class="trl-numbers">
-                                <span class="current-trl">Current: <strong>{p.currentTRL}</strong></span>
-                                <span class="expected-trl">Expected: <strong>{p.expectedTRL}</strong></span>
-                            </div>
-
-                            <!-- WORK DONE -->
-                            <template if:true={p.workDone}>
-                                <div class="work-done">
-                                    <p class="work-label">Work Supporting Current TRL:</p>
-                                    <lightning-formatted-rich-text
-                                        value={p.workDone}>
-                                    </lightning-formatted-rich-text>
+                                    </div>
+                                    <template if:true={p.projectTitle}>
+                                        <p class="proj-title">{p.projectTitle}</p>
+                                    </template>
                                 </div>
-                            </template>
 
+                                <!-- TRL SCALE -->
+                                <div class="trl-scale-wrapper">
+                                    <template for:each={p.steps} for:item="s">
+                                        <div key={s.n} class={s.colClass}>
+                                            <span class="trl-step-number">{s.n}</span>
+                                            <div class={s.stepClass}></div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- NUMBERS -->
+                                <div class="trl-numbers">
+                                    <span class="base-trl">Base: <strong>{p.baseTRL}</strong></span>
+                                    <span class="current-trl">Current: <strong>{p.currentTRL}</strong></span>
+                                    <span class="expected-trl">Expected: <strong>{p.expectedTRL}</strong></span>
+                                </div>
+
+                                <!-- WORK DONE -->
+                                <template if:true={p.workDone}>
+                                    <div class="work-done">
+                                        <p class="work-label">Work Supporting Current TRL:</p>
+                                        <lightning-formatted-rich-text
+                                            value={p.workDone}>
+                                        </lightning-formatted-rich-text>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- NO RESULTS STATE -->
+                    <template if:false={hasFilteredProjects}>
+                        <div class="no-results">
+                            <p>No projects found for the selected filter criteria.</p>
+                            <button class="filter-reset-btn" onclick={resetAllFilters}>
+                                Show All
+                            </button>
                         </div>
                     </template>
+
                 </template>
 
                 <template if:false={isTRLLoaded}>

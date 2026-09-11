@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Documents Reminder</name>
+    <style>none</style>
+    <subject>[Reminder] [Org Name] Compliance documents requested</subject>
+    <textOnly>[Reminder] [{{{org_name}}}] Compliance documents requested
+
+Hello {{{contact_first_name}}},
+
+This is a friendly reminder that your requested compliance documents are due on {{{due_date}}}.
+
+Required documents:
+{{{document_list}}}
+
+If you&apos;ve already submitted them, thank you and please disregard this reminder.
+
+Upload here:
+{{{portal_url}}}
+
+Need more time or have questions?
+Contact us at:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Warm regards,
+The Wadhwani Grants Team
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,99 @@
+<template>
+    <div class="vd-page">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="greeting-block">
+                <div class="greeting-meta">VALIDATOR PORTAL</div>
+                <h1 class="greeting-title">{greeting}, <span class="accent">Validator</span></h1>
+                <p class="greeting-sub">{todayDate}</p>
+            </div>
+        </div>
+
+        <!-- KPI TILES -->
+        <div class="kpi-row kpi-row-5">
+            <template for:each={validatorCards} for:item="c">
+                <div key={c.id}
+                     class={c.kpiClass}
+                     data-status={c.status}
+                     onclick={handleValidatorTileClick}>
+                    <div class="kpi-header">
+                        <span class="kpi-label">{c.label}</span>
+                        <span class={c.dotClass}></span>
+                    </div>
+                    <div class="kpi-count">{c.count}</div>
+                    <div class="kpi-sub">{c.subtitle}</div>
+                </div>
+            </template>
+        </div>
+
+        <!-- DUE SOON PREVIEW TABLE -->
+        <div class="queue-preview-section">
+            <div class="qp-header">
+                <div>
+                    <div class="qp-title">Due Soon — Validator Queue</div>
+                    <div class="qp-sub">Proposals awaiting validation, nearest due date first</div>
+                </div>
+                <!--  <div class="qp-link" onclick={handleViewAllValidatorQueue}>
+                    View all in Queue →
+                </div>  -->
+            </div>
+
+            <div class="workspace-card workspace-card-full">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>APPLICATION ID</th>
+                            <th>ACCOUNT</th>
+                            <th>DUE DATE</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={validatorPreviewRows} for:item="row">
+                            <tr key={row.id}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-id">{row.appId}</td>
+                                <td>{row.account}</td>
+                                <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
+                                <td><span class={row.statusClass}>{row.status}</span></td>
+                                <td>
+                                    <template if:true={row.hasDraft}>
+                                        <button class="preview-action-btn preview-action-resume"
+                                                data-id={row.id}
+                                                data-appname={row.appId}
+                                                onclick={handlePreviewValidate}>
+                                            ✎ Resume
+                                        </button>
+                                    </template>
+                                    <template if:false={row.hasDraft}>
+                                        <button class="preview-action-btn preview-action-validate"
+                                                data-id={row.id}
+                                                data-appname={row.appId}
+                                                onclick={handlePreviewValidate}>
+                                            Validate
+                                        </button>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                        <template if:true={noValidatorPreviewRows}>
+                            <tr>
+                                <td colspan="6" class="preview-empty">
+                                    No proposals awaiting validation
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="preview-footer" onclick={handleViewAllValidatorQueue}>
+                View full queue →
+            </div>
+        </div>
+
+    </div>
+</template>

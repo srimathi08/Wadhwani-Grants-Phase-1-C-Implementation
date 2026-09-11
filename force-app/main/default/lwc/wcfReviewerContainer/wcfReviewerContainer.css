@@ -1,0 +1,1210 @@
+/* ═══════════════════════════════════════════════════════════
+   WCF Reviewer Container  ·  wcfReviewerContainer.css
+
+   UPDATED: overflow fix — the review panel could be forced
+   wider than its allotted space (min-width 480px vs the drag
+   logic's 400px floor + padding delta), pushing the form out
+   of its container. Panel now shrinks to fit instead.
+
+   UPDATED (this pass): added rail-collapse toggle buttons for
+   BOTH the RFI drawer and the review form panel, mirroring the
+   pane-toggle-btn pattern from wcfApproverContainer. The old
+   "View RFI"/"Close RFI" open/close button is untouched — these
+   new toggles just let either side collapse to a 44px rail
+   while the drawer is open.
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ── Shell ──────────────────────────────────────────────────── */
+.rc-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f0f2f5;
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   TOP BAR
+   ════════════════════════════════════════════════════════════ */
+.rc-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px;
+    height: 56px;
+    background: #ffffff;
+    border-bottom: 1px solid #e4e7ec;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.rc-topbar-spacer {
+    flex: 1;
+}
+
+/* Back button */
+.rc-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid #dde1e8;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #4a5568;
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1;
+}
+
+.rc-back-btn:hover {
+    background: #f7f8fa;
+    border-color: #b8bec9;
+}
+
+.rc-back-icon {
+    --lwc-colorTextIconDefault: #4a5568;
+}
+
+
+/* ── "View RFI" animated button ──────────────────────────────── */
+.rc-rfi-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: #1e3a5f;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.22);
+}
+
+.rc-rfi-btn:hover {
+    background: #163055;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(30, 58, 95, 0.32);
+}
+
+.rc-rfi-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(30, 58, 95, 0.2);
+}
+
+/* Subtle shimmer sweep on hover */
+.rc-rfi-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255,255,255,0.18) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.rc-rfi-btn:hover::after {
+    opacity: 1;
+    animation: rc-shimmer 0.55s ease forwards;
+}
+
+@keyframes rc-shimmer {
+    0%   { left: -75%; }
+    100% { left: 125%; }
+}
+
+/* Pulsing dot — draws attention when RFI is closed */
+.rc-rfi-btn-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c0392b;
+    flex-shrink: 0;
+    animation: rc-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rc-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.55; transform: scale(0.75); }
+}
+
+.rc-rfi-icon {
+    --lwc-colorTextIconDefault: #ffffff;
+}
+
+.rc-rfi-btn-label {
+    letter-spacing: 0.01em;
+}
+
+.rc-rfi-btn-arrow {
+    font-size: 14px;
+    margin-left: 2px;
+    opacity: 0.8;
+    transition: transform 0.2s;
+}
+
+.rc-rfi-btn:hover .rc-rfi-btn-arrow {
+    transform: translateX(3px);
+    opacity: 1;
+}
+
+/* Active / close state */
+.rc-rfi-btn--active {
+    background: #c0392b;
+    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.22);
+}
+
+.rc-rfi-btn--active:hover {
+    background: #a93226;
+    box-shadow: 0 4px 14px rgba(192, 57, 43, 0.32);
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   CONTENT AREA  (review panel + drawer side by side)
+   ════════════════════════════════════════════════════════════ */
+.rc-content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    align-items: flex-start;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 24px 32px;
+    box-sizing: border-box;
+}
+
+
+
+/* ── Reviewer form panel ─────────────────────────────────────── */
+.rc-review-panel {
+    order: 2;                       /* was implicit 0 — now sits on the right */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100%;                /* never wider than the content area */
+    background: #ffffff;
+    transition: flex 0.3s ease;
+}
+
+
+.rc-review-panel--with-drawer {
+    flex: 0 0 55%;
+    min-width: 320px;               /* sits safely below the drag floor */
+    flex-shrink: 1 !important;      /* lets the panel shrink instead of overflowing */
+    border-radius: 0 12px 12px 0;   /* rounded only on its outer (right) edge */
+    box-shadow: 0 2px 16px rgba(20, 30, 50, 0.06);
+    overflow-x: hidden;             /* belt-and-braces clip */
+}
+
+
+.rc-form-inner {
+    padding: 28px 32px 40px;
+    min-width: 0;                   /* inner content may shrink with the panel */
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RFI DRAWER  (slides in from the right)
+   ════════════════════════════════════════════════════════════ */
+.rc-drawer {
+    order: 1;                       /* now renders first → left side */
+    flex: 0 0 45%;
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100% - 320px);  /* drawer can never crush the review panel
+                                        below its 320px minimum */
+    background: #ffffff;
+    border-right: 1px solid #e4e7ec;   /* was border-left */
+    border-radius: 12px 0 0 12px;      /* rounded only on its outer (left) edge */
+    box-shadow: 0 2px 16px rgba(20, 30, 50, 0.06);
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    animation: rc-drawer-in 0.28s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes rc-drawer-in {
+    from { transform: translateX(-100%); opacity: 0.4; }   /* was +100% */
+    to   { transform: translateX(0);     opacity: 1;   }
+}
+
+/* ── Resize handle — left edge of drawer ────────────────────── */
+.rc-resize-handle {
+    position: absolute;
+    right: 0;      /* was left: 0 */
+    left: auto;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.rc-resize-handle:hover,
+.rc-resize-handle:active {
+    background: rgba(30, 58, 95, 0.06);
+}
+
+/* Three-dot grip indicator */
+.rc-resize-grip {
+    width: 3px;
+    height: 32px;
+    border-radius: 2px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #c8cdd6 0px,
+        #c8cdd6 3px,
+        transparent 3px,
+        transparent 6px
+    );
+    transition: background 0.15s;
+    pointer-events: none;
+}
+
+.rc-resize-handle:hover .rc-resize-grip {
+    background: repeating-linear-gradient(
+        to bottom,
+        #1e3a5f 0px,
+        #1e3a5f 3px,
+        transparent 3px,
+        transparent 6px
+    );
+}
+
+/* Drawer header */
+.rc-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e4e7ec;
+    background: #f8f9fb;
+    flex-shrink: 0;
+    min-height: 50px;
+}
+
+.rc-drawer-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ── NEW: groups the rail-collapse toggle + the full close (X) button ── */
+.rc-drawer-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.rc-drawer-badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: #1a56c4;
+    background: #e8f0fe;
+    border: 1px solid #c7d9fb;
+    border-radius: 20px;
+    padding: 2px 10px;
+}
+
+.rc-drawer-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a2130;
+}
+
+.rc-drawer-close {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #dde1e8;
+    border-radius: 7px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4a5568;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+}
+
+.rc-drawer-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    --lwc-colorTextIconDefault: #c0392b;
+}
+
+/* Drawer scrollable body */
+.rc-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 20px 32px;
+}
+
+.rc-drawer-body::-webkit-scrollbar { width: 5px; }
+.rc-drawer-body::-webkit-scrollbar-track { background: transparent; }
+.rc-drawer-body::-webkit-scrollbar-thumb {
+    background: #ced3da;
+    border-radius: 4px;
+}
+.rc-drawer-body::-webkit-scrollbar-thumb:hover { background: #a3aab5; }
+
+
+/* ════════════════════════════════════════════════════════════
+   NEW: PANE LABEL BAR + RAIL-COLLAPSE TOGGLE
+   (mirrors the .pane-label / .pane-toggle-btn pattern used in
+   wcfApproverContainer, restyled to the Reviewer Container's
+   navy/white palette)
+   ════════════════════════════════════════════════════════════ */
+.rc-pane-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #e4e7ec;
+    padding: 12px 20px;
+    min-height: 50px;
+    flex-shrink: 0;
+}
+
+.rc-pane-label-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a2130;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rc-pane-toggle-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #dde1e8;
+    border-radius: 7px;
+    background: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.rc-pane-toggle-btn:hover {
+    background: #f0f2f6;
+    border-color: #1e3a5f;
+}
+
+/* ── Rail-collapse modifier — shared by both the drawer and the
+     review panel. Shrinks the pane to a 44px strip and hides its
+     body content (the body itself is removed from the DOM via
+     if:false in the template, so this mainly governs sizing). ── */
+.rc-pane-collapsed {
+    flex: 0 0 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    overflow: hidden;
+}
+
+.rc-pane-collapsed .rc-pane-label,
+.rc-pane-collapsed .rc-drawer-header {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 12px 4px;
+    gap: 10px;
+}
+
+.rc-pane-collapsed .rc-pane-label-text,
+.rc-pane-collapsed .rc-drawer-header-left,
+.rc-pane-collapsed .rc-drawer-close {
+    display: none;
+}
+
+.rc-pane-collapsed .rc-resize-handle {
+    pointer-events: none;
+}
+
+/* When one pane collapses to a rail, let the other pane fill the
+   freed-up space — same trick as wcfApproverContainer's :has() rule. */
+.rc-content:has(.rc-drawer.rc-pane-collapsed) .rc-review-panel:not(.rc-pane-collapsed) {
+    flex: 1 1 auto !important;
+    max-width: none;
+}
+.rc-content:has(.rc-review-panel.rc-pane-collapsed) .rc-drawer:not(.rc-pane-collapsed) {
+    flex: 1 1 auto !important;
+    max-width: none;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   EMPTY / ERROR STATE
+   ════════════════════════════════════════════════════════════ */
+.rc-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #f0f2f5;
+    padding: 40px;
+}
+
+.rc-empty-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 420px;
+}
+
+.rc-empty-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a2130;
+    margin: 0;
+}
+
+.rc-empty-msg {
+    font-size: 13px;
+    color: #6b7585;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 320px;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — stack on narrow viewports
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+    .rc-content { flex-direction: column; }
+
+
+    .rc-review-panel--with-drawer {
+        flex: unset;
+        min-width: 0;
+        width: 100%;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .rc-drawer {
+        flex: unset;
+        max-width: 100%;            /* release the desktop cap when stacked */
+        position: static;
+        height: auto;
+        max-height: 60vh;
+        border-right: none;
+        border-top: none;
+        border-radius: 12px 12px 0 0;
+        animation: rc-drawer-up 0.28s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    }
+
+    /* Rail-collapse doesn't make sense stacked — always show full width */
+    .rc-pane-collapsed {
+        flex: unset !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+    .rc-pane-collapsed .rc-pane-label,
+    .rc-pane-collapsed .rc-drawer-header {
+        flex-direction: row;
+        padding: 12px 20px;
+    }
+    .rc-pane-collapsed .rc-pane-label-text,
+    .rc-pane-collapsed .rc-drawer-header-left,
+    .rc-pane-collapsed .rc-drawer-close {
+        display: flex;
+    }
+
+
+    @keyframes rc-drawer-up {
+        from { transform: translateY(40px); opacity: 0.4; }
+        to   { transform: translateY(0);    opacity: 1;   }
+    }
+}
+/* ════════════════════════════════════════════════════════════
+   FLAG NOTICE PANEL
+   ════════════════════════════════════════════════════════════ */
+.rc-flag-notice {
+    background    : #ffffff;
+    border        : 1.5px solid #f59e0b;
+    border-radius : 12px;
+    padding       : 28px 32px;
+    margin-bottom : 24px;
+    box-shadow    : 0 4px 20px rgba(245, 158, 11, 0.12);
+}
+
+.rc-flag-notice-header {
+    display       : flex;
+    align-items   : center;
+    gap           : 12px;
+    margin-bottom : 12px;
+}
+
+.rc-flag-icon {
+    --lwc-colorTextIconDefault: #d97706;
+    flex-shrink: 0;
+}
+
+.rc-flag-notice-title {
+    font-size   : 17px;
+    font-weight : 700;
+    color       : #92400e;
+    line-height : 1.3;
+}
+
+.rc-flag-notice-sub {
+    font-size     : 13px;
+    color         : #6b7280;
+    line-height   : 1.6;
+    margin        : 0 0 24px 0;
+    padding-left  : 36px;
+}
+
+/* ── Flag sections (Decision Rationale / Flag Rationale) ── */
+.rc-flag-section {
+    background    : #fffbeb;
+    border        : 1px solid #fde68a;
+    border-radius : 8px;
+    padding       : 16px 20px;
+    margin-bottom : 16px;
+}
+
+.rc-flag-section:last-of-type {
+    margin-bottom : 24px;
+}
+
+.rc-flag-label {
+    display       : flex;
+    align-items   : center;
+    gap           : 8px;
+    font-size     : 11px;
+    font-weight   : 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color         : #92400e;
+    margin-bottom : 10px;
+}
+
+.rc-flag-label-icon {
+    --lwc-colorTextIconDefault: #d97706;
+    flex-shrink: 0;
+}
+
+.rc-flag-value {
+    font-size   : 14px;
+    color       : #1a2130;
+    line-height : 1.65;
+    white-space : pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* ── Action buttons ── */
+.rc-flag-actions {
+    display : flex;
+    gap     : 12px;
+    flex-wrap: wrap;
+}
+
+.rc-flag-btn {
+    display       : inline-flex;
+    align-items   : center;
+    gap           : 8px;
+    padding       : 10px 22px;
+    border-radius : 8px;
+    font-size     : 13px;
+    font-weight   : 600;
+    cursor        : pointer;
+    border        : none;
+    transition    : background 0.18s, transform 0.12s, box-shadow 0.18s;
+    white-space   : nowrap;
+    font-family   : inherit;
+    line-height   : 1;
+}
+
+.rc-flag-btn:disabled {
+    opacity: 0.6;
+    cursor : not-allowed;
+}
+
+.rc-flag-btn-approve {
+    background : #065f46;
+    color      : #ffffff;
+    box-shadow : 0 2px 8px rgba(6, 95, 70, 0.25);
+}
+
+.rc-flag-btn-approve:hover:not(:disabled) {
+    background : #047857;
+    transform  : translateY(-1px);
+    box-shadow : 0 4px 14px rgba(6, 95, 70, 0.32);
+}
+
+.rc-flag-btn-reject {
+    background : #ffffff;
+    color      : #c0392b;
+    border     : 1.5px solid #c0392b;
+    box-shadow : 0 2px 8px rgba(192, 57, 43, 0.10);
+}
+
+.rc-flag-btn-reject:hover:not(:disabled) {
+    background : #fef2f2;
+    transform  : translateY(-1px);
+    box-shadow : 0 4px 14px rgba(192, 57, 43, 0.18);
+}
+
+.rc-flag-btn-icon {
+    --lwc-colorTextIconDefault: currentColor;
+    flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   FLAG APPROVED BANNER
+   ════════════════════════════════════════════════════════════ */
+.rc-flag-approved-banner {
+    display       : flex;
+    align-items   : flex-start;
+    gap           : 14px;
+    background    : #ecfdf5;
+    border        : 1px solid #6ee7b7;
+    border-radius : 10px;
+    padding       : 16px 20px;
+    margin-bottom : 24px;
+}
+
+.rc-approved-icon {
+    --lwc-colorTextIconDefault: #065f46;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.rc-approved-text {
+    display        : flex;
+    flex-direction : column;
+    gap            : 4px;
+    flex           : 1;
+    min-width      : 0;
+}
+
+.rc-approved-title {
+    font-size   : 13px;
+    font-weight : 700;
+    color       : #065f46;
+}
+
+.rc-approved-sub {
+    font-size  : 12px;
+    color      : #374151;
+    line-height: 1.5;
+}
+
+.rc-approved-dismiss {
+    background  : transparent;
+    border      : none;
+    cursor      : pointer;
+    color       : #6b7280;
+    font-size   : 14px;
+    padding     : 2px 6px;
+    border-radius: 4px;
+    flex-shrink : 0;
+    line-height : 1;
+    transition  : background 0.15s, color 0.15s;
+}
+
+.rc-approved-dismiss:hover {
+    background : #d1fae5;
+    color      : #065f46;
+}
+/* Numbered flag rationale list */
+.rc-flag-rationale-list {
+    margin: 0.5rem 0 0 1.25rem;
+    padding: 0;
+    list-style: decimal;
+}
+
+.rc-flag-rationale-item {
+    padding: 0.25rem 0;
+    font-size: 0.875rem;
+    color: var(--lwc-colorTextDefault, #3e3e3c);
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+/* Slightly muted style for the Other detail text */
+.rc-flag-value--other {
+    font-style: italic;
+    color: var(--lwc-colorTextWeak, #706e6b);
+}
+.rc-submitted-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    max-width: 520px;
+    margin: 60px auto;
+}
+
+.rc-submitted-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.rc-submitted-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin: 0 0 10px;
+}
+
+.rc-submitted-msg {
+    color: #555;
+    line-height: 1.5;
+    margin: 0 0 28px;
+}
+
+.rc-submitted-actions {
+    display: flex;
+    gap: 12px;
+}
+/* ════════════════════════════════════════════════════════════
+   SUBMISSION REVIEW WRAPPER (wraps the shared preview component)
+   ════════════════════════════════════════════════════════════ */
+.rc-submission-view {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 0 24px;
+}
+
+.rc-submission-view > .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid #dde1e8;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #4a5568;
+    background: #ffffff;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: background 0.15s, border-color 0.15s;
+    font-family: inherit;
+}
+
+.rc-submission-view > .btn-secondary:hover {
+    background: #f7f8fa;
+    border-color: #b8bec9;
+}
+
+/* Give the child preview component's host element the card look,
+   without touching its internal CSS file */
+.rc-submission-view c-wcf-reviewer-form-preview {
+    display: block;
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+/* ════════════════════════════════════════════════════════════
+   APPROVER RETURN NOTICE PANEL — navy accent (matches the
+   Approver portal's brand color), distinct from the amber
+   Flag panel so the two states are never visually confused
+   ════════════════════════════════════════════════════════════ */
+.rc-return-notice {
+    background    : #ffffff;
+    border        : 1.5px solid #1e3a5f;
+    border-radius : 12px;
+    padding       : 28px 32px;
+    margin-bottom : 24px;
+    box-shadow    : 0 4px 20px rgba(30, 58, 95, 0.12);
+}
+
+.rc-return-notice-header {
+    display       : flex;
+    align-items   : center;
+    gap           : 12px;
+    margin-bottom : 12px;
+}
+
+.rc-return-icon {
+    --lwc-colorTextIconDefault: #1e3a5f;
+    flex-shrink: 0;
+}
+
+.rc-return-notice-title {
+    font-size   : 17px;
+    font-weight : 700;
+    color       : #1e3a5f;
+    line-height : 1.3;
+}
+
+.rc-return-notice-sub {
+    font-size     : 13px;
+    color         : #6b7280;
+    line-height   : 1.6;
+    margin        : 0 0 24px 0;
+    padding-left  : 36px;
+}
+
+.rc-return-section {
+    background    : #f0f4f9;
+    border        : 1px solid #c7d9fb;
+    border-radius : 8px;
+    padding       : 16px 20px;
+    margin-bottom : 20px;
+}
+
+.rc-return-label {
+    display       : flex;
+    align-items   : center;
+    gap           : 8px;
+    font-size     : 11px;
+    font-weight   : 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color         : #1e3a5f;
+    margin-bottom : 10px;
+}
+
+.rc-return-label-icon {
+    --lwc-colorTextIconDefault: #1e3a5f;
+    flex-shrink: 0;
+}
+
+.rc-return-value {
+    font-size   : 14px;
+    color       : #1a2130;
+    line-height : 1.65;
+    white-space : pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.rc-return-comment-wrap {
+    margin-bottom: 20px;
+}
+
+.rc-return-comment-label {
+    font-size     : 11px;
+    font-weight   : 700;
+    color         : #1e3a5f;
+    display       : block;
+    margin-bottom : 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rc-return-required {
+    color        : #c0392b;
+    font-weight  : 600;
+    margin-left  : 6px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.rc-return-comment-box {
+    width         : 100%;
+    border        : 1.5px solid #dde1e8;
+    border-radius : 8px;
+    padding       : 10px 14px;
+    font-size     : 13px;
+    resize        : vertical;
+    outline       : none;
+    font-family   : inherit;
+    color         : #1a2130;
+    background    : #f9fafc;
+    transition    : border-color 0.15s, box-shadow 0.15s;
+    box-sizing    : border-box;
+}
+
+.rc-return-comment-box:focus {
+    border-color : #1e3a5f;
+    background   : #fff;
+    box-shadow   : 0 0 0 3px rgba(30, 58, 95, 0.08);
+}
+
+.rc-return-actions {
+    display : flex;
+    gap     : 12px;
+    flex-wrap: wrap;
+}
+
+.rc-return-btn {
+    display       : inline-flex;
+    align-items   : center;
+    gap           : 8px;
+    padding       : 10px 22px;
+    border-radius : 8px;
+    font-size     : 13px;
+    font-weight   : 600;
+    cursor        : pointer;
+    border        : none;
+    transition    : background 0.18s, transform 0.12s, box-shadow 0.18s;
+    white-space   : nowrap;
+    font-family   : inherit;
+    line-height   : 1;
+}
+
+.rc-return-btn:disabled {
+    opacity: 0.6;
+    cursor : not-allowed;
+}
+
+.rc-return-btn-approve {
+    background : #065f46;
+    color      : #ffffff;
+    box-shadow : 0 2px 8px rgba(6, 95, 70, 0.25);
+}
+
+.rc-return-btn-approve:hover:not(:disabled) {
+    background : #047857;
+    transform  : translateY(-1px);
+    box-shadow : 0 4px 14px rgba(6, 95, 70, 0.32);
+}
+
+.rc-return-btn-toapplicant {
+    background : #1e3a5f;
+    color      : #ffffff;
+    box-shadow : 0 2px 8px rgba(30, 58, 95, 0.25);
+}
+
+.rc-return-btn-toapplicant:hover:not(:disabled) {
+    background : #163055;
+    transform  : translateY(-1px);
+    box-shadow : 0 4px 14px rgba(30, 58, 95, 0.32);
+}
+
+.rc-return-btn-icon {
+    --lwc-colorTextIconDefault: currentColor;
+    flex-shrink: 0;
+}
+.rc-return-comments-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+.rc-return-comments-row .rc-return-comment-wrap {
+    flex: 1 1 50%;
+    min-width: 0;
+}
+.rc-return-reason-list {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.rc-return-reason-item {
+    font-size: 13px;
+    color: #1a2130;
+    line-height: 1.6;
+    margin-bottom: 4px;
+    padding-left: 4px;
+}
+
+.rc-return-reason-item::marker {
+    color: #c0392b;
+}
+/* ── COMPACT flag notice — single-line hint version ── */
+.rc-flag-notice--compact {
+    display        : flex;
+    flex-direction : column;
+    gap            : 8px;
+    padding        : 12px 16px;
+    background     : #fdfaf3;
+    border         : 1px solid #ecdca8;
+    border-left    : 3px solid #d9a441;
+    border-radius  : 8px;
+    margin-bottom  : 16px;
+    box-shadow     : none;
+}
+
+.rc-flag-notice-row {
+    display     : flex;
+    align-items : center;
+    gap         : 8px;
+}
+
+.rc-flag-notice--compact .rc-flag-icon {
+    --lwc-colorTextIconDefault: #b6801f;
+    flex-shrink: 0;
+}
+
+.rc-flag-notice--compact .rc-flag-notice-title {
+    font-size   : 12.5px;
+    font-weight : 700;
+    color       : #8a6116;
+    white-space : nowrap;
+}
+
+.rc-flag-divider {
+    color: #d3c093;
+    font-size: 12px;
+}
+
+.rc-flag-label-inline {
+    font-size      : 10.5px;
+    font-weight    : 700;
+    text-transform : uppercase;
+    letter-spacing : 0.5px;
+    color          : #8a6116;
+    white-space    : nowrap;
+}
+
+.rc-flag-pills {
+    display     : flex;
+    flex-wrap   : wrap;
+    gap         : 6px;
+    padding-left: 22px;   /* aligns under the icon/title above */
+}
+
+.rc-flag-pill {
+    background    : #f7edd4;
+    color         : #7a5814;
+    border        : 1px solid #ecdca8;
+    padding       : 2px 10px;
+    border-radius : 10px;
+    font-size     : 11px;
+    font-weight   : 500;
+    white-space   : nowrap;
+}
+
+.rc-flag-other-row {
+    display      : flex;
+    align-items  : baseline;
+    flex-wrap    : wrap;
+    gap          : 8px;
+    padding-left : 22px;
+    padding-top  : 6px;
+    border-top   : 1px dashed #ecdca8;
+}
+
+.rc-flag-other-inline {
+    color      : #5c4a2a;
+    font-size  : 12.5px;
+    font-style : italic;
+}
+/* ── Custom toast (replaces standard ShowToastEvent styling) ── */
+.rc-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 480px;
+    width: calc(100% - 40px);
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 8px 28px rgba(20, 30, 50, 0.18);
+    border-left: 4px solid #c0392b;
+    animation: rc-toast-in 0.25s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.rc-toast--success {
+    border-left-color: #065f46;
+}
+
+.rc-toast--error {
+    border-left-color: #c0392b;
+}
+
+.rc-toast-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.rc-toast--success .rc-toast-icon {
+    --lwc-colorTextIconDefault: #065f46;
+}
+
+.rc-toast--error .rc-toast-icon {
+    --lwc-colorTextIconDefault: #c0392b;
+}
+
+.rc-toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rc-toast-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a2130;
+    margin-bottom: 2px;
+}
+
+.rc-toast-message {
+    font-size: 12.5px;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.rc-toast-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 2px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.rc-toast-close:hover {
+    background: #f0f2f6;
+}
+
+@keyframes rc-toast-in {
+    from { transform: translate(-50%, -12px); opacity: 0; }
+    to   { transform: translate(-50%, 0);      opacity: 1; }
+}

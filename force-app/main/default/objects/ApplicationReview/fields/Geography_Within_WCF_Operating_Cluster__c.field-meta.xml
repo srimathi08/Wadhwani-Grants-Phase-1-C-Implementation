@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Geography_Within_WCF_Operating_Cluster__c</fullName>
+    <label>Geography-Within WCF Operating Cluster?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Within active clusters</fullName>
+                <default>false</default>
+                <label>Within active clusters</label>
+            </value>
+            <value>
+                <fullName>Borderline</fullName>
+                <default>false</default>
+                <label>Borderline</label>
+            </value>
+            <value>
+                <fullName>Outside active clusters</fullName>
+                <default>false</default>
+                <label>Outside active clusters</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,165 @@
+{
+  "type" : "sfdc_cms__view",
+  "title" : "Register",
+  "contentBody" : {
+    "component" : {
+      "children" : [ {
+        "children" : [ {
+          "attributes" : {
+            "backgroundImageConfig" : "",
+            "backgroundImageOverlay" : "rgba(0,0,0,0)",
+            "componentSpacerSize" : "",
+            "dxpStyle" : {
+              "margin" : {
+                "bottom" : "30px",
+                "left" : "30px",
+                "right" : "30px",
+                "top" : "30px"
+              },
+              "padding" : {
+                "bottom" : "10px",
+                "left" : "10px",
+                "right" : "10px",
+                "top" : "10px"
+              }
+            },
+            "layoutDirectionDesktop" : "row",
+            "layoutDirectionMobile" : "column",
+            "layoutDirectionTablet" : "column",
+            "maxContentWidth" : "",
+            "sectionColumnGutterWidth" : "",
+            "sectionConfig" : "{\"UUID\":\"d0e92d7e-8f80-4916-9195-aa44525c2399\",\"columns\":[{\"UUID\":\"229017b4-9a08-4a49-8ade-a20f066fc3a9\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}",
+            "sectionMinHeight" : "",
+            "sectionVerticalAlign" : "flex-start"
+          },
+          "children" : [ {
+            "children" : [ {
+              "attributes" : {
+                "cancelLinkLabel" : "Already have an account?",
+                "confirmPasswordLabel" : "Confirm Password",
+                "dxpStyle" : { },
+                "emailLabel" : "Email",
+                "firstnameLabel" : "First Name",
+                "includePasswordField" : true,
+                "lastnameLabel" : "Last Name",
+                "passwordLabel" : "Create Password",
+                "regConfirmUrl" : "./CheckPasswordResetEmail",
+                "submitButtonLabel" : "Sign Up"
+              },
+              "definition" : "community_login:selfRegister",
+              "id" : "f5bc3807-ac05-4672-9a01-8870fbf4db3c",
+              "type" : "component"
+            }, {
+              "attributes" : {
+                "dxpStyle" : {
+                  "margin" : {
+                    "bottom" : "50px",
+                    "left" : "500px",
+                    "right" : "500px",
+                    "top" : "50px"
+                  },
+                  "padding" : {
+                    "bottom" : "10px",
+                    "left" : "10px",
+                    "right" : "10px",
+                    "top" : "10px"
+                  }
+                },
+                "propertyPanelSettings" : {
+                  "accessLevelMode" : "System",
+                  "accountId" : "001F600001DMFUGIA5",
+                  "createNotFound" : true,
+                  "customQuery" : "SELECT Id,AccountId,Email, FROM Contact WHERE Email = :Email LIMIT 1",
+                  "enablePasswordlessLogin" : false,
+                  "errorOnCreate" : "There was a problem registering your details. Please contact us for assistance.",
+                  "failedCodeVerificationMessage" : "There was a problem validating the verification code. Please check and try again, or contact us for further assistance.",
+                  "multipleRecordsFoundError" : "There was a problem locating your details, please check them and try again or contact us for further assistance.",
+                  "noRecordFoundError" : "There was a problem locating your details, please check them and try again or contact us for further assistance.",
+                  "objectCreateType" : "Contact",
+                  "passwordMatchError" : "Passwords do not match",
+                  "passwordlessMethod" : "Email",
+                  "personAccountRecordTypeId" : "COE",
+                  "portalErrorSendVerificationCode" : "There was a problem sending a verification code. Please try again later or contact us for further assistance.",
+                  "portalLoginError" : "There was a problem logging you into the portal. Please contact us for further assistance.",
+                  "portalRegistrationError" : "There was a problem during registration. Please contact us for further assistance.",
+                  "portalRegistrationRedirect" : "/",
+                  "portalRegistrationUserExists" : "User is already registered. Please login to continue.",
+                  "registerButtonAwaitingCodeMessage" : "Submit Verification Code",
+                  "registerButtonSignUpMessage" : "Sign Up",
+                  "registerButtonWaitingMessage" : "Registering... Please Wait.",
+                  "sendEmailConfirmation" : true,
+                  "usernameTakenMessage" : "The specified username is already taken. Please choose a unique username."
+                }
+              },
+              "definition" : "expcloud:customSelfRegistrationCPropEditor",
+              "id" : "86a7aeeb-c25b-424b-89bf-7931eccfa3e9",
+              "type" : "component"
+            }, {
+              "attributes" : {
+                "alignment" : "left",
+                "dxpStyle" : { },
+                "imageInfo" : "",
+                "imageInfoMobile" : "",
+                "logoWidth" : 250
+              },
+              "definition" : "dxp_content_layout:siteLogo",
+              "id" : "1a324e0a-236a-4c15-9c69-40c8bae86d38",
+              "type" : "component"
+            }, {
+              "attributes" : {
+                "cancelLinkLabel" : "Already have an account?",
+                "confirmPasswordLabel" : "Confirm Password",
+                "dxpStyle" : { },
+                "emailLabel" : "Email",
+                "firstnameLabel" : "First Name",
+                "includePasswordField" : true,
+                "lastnameLabel" : "Last Name",
+                "passwordLabel" : "Create Password",
+                "regConfirmUrl" : "./CheckPasswordResetEmail",
+                "submitButtonLabel" : "Sign Up"
+              },
+              "definition" : "community_login:selfRegister",
+              "id" : "25ea4040-a5c6-4e57-8a01-4214c0fe61c4",
+              "type" : "component"
+            } ],
+            "id" : "229017b4-9a08-4a49-8ade-a20f066fc3a9",
+            "name" : "col1",
+            "title" : "Column 1",
+            "type" : "region"
+          } ],
+          "definition" : "community_layout:section",
+          "id" : "d0e92d7e-8f80-4916-9195-aa44525c2399",
+          "type" : "component"
+        } ],
+        "id" : "00cd8fda-e748-4d34-bed2-969b7700b221",
+        "name" : "content",
+        "title" : "Content",
+        "type" : "region"
+      }, {
+        "children" : [ {
+          "attributes" : {
+            "customHeadTags" : "",
+            "description" : "",
+            "dxpStyle" : { },
+            "pageTitle" : "Register",
+            "recordId" : "{!recordId}"
+          },
+          "definition" : "community_builder:seoAssistant",
+          "id" : "b0ee9611-05ae-4cf0-b046-24d3ba4cdf36",
+          "type" : "component"
+        } ],
+        "id" : "2b877cc6-3e6a-477e-a8f3-03d1039780a2",
+        "name" : "sfdcHiddenRegion",
+        "title" : "sfdcHiddenRegion",
+        "type" : "region"
+      } ],
+      "definition" : "community_layout:sldsFlexibleLayout",
+      "id" : "e06d973c-58d0-4409-8d84-7ab04c5c2690",
+      "type" : "component"
+    },
+    "dataProviders" : [ ],
+    "themeLayoutType" : "Inner",
+    "viewType" : "self-register"
+  },
+  "urlName" : "register"
+}

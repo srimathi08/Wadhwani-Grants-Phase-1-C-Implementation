@@ -1,0 +1,165 @@
+<template>
+    <div class="rfi-welcome-wrapper">
+        <div class="rfi-welcome-container">
+
+            <!-- Top Header & Logo Section -->
+            <header class="rfi-welcome-header">
+                <div class="logo-wrapper">
+                    <img src={winLogoUrl} alt="WIN Logo" class="win-logo" />
+                </div>
+                <h2 class="sub-header-title">Wadhwani Grants – Request for Information (RFI)</h2>
+                <h1 class="main-title">Before you start</h1>
+                <p class="main-subtitle">
+                    You can save and come back at any time. Nothing has to be finished in one sitting.
+                </p>
+            </header>
+
+            <!-- Language Alert Callout Box 
+            <div class="alert-box language-alert">
+                <div class="alert-icon-wrapper">
+                    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#f97316" stroke-width="2" fill="none"/>
+                        <path d="M12 8v5M12 16h.01" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="alert-content">
+                    <p>Once you select a language and begin filling out the form, the language preference cannot be changed during the application process.</p>
+                </div>
+            </div>-->
+
+            <!-- 2x2 Grid Layout -->
+            <div class="rfi-grid">
+
+                <!-- Card 1: What to have ready -->
+                <div class="rfi-card">
+                    <h3 class="card-title">What to have ready</h3>
+                    <ul class="rfi-bullet-list">
+                        <li>
+                            <strong>Registration.</strong> Entity type, country, and registration date.
+                        </li>
+                        <li>
+                            <strong>Any of these you hold.</strong> 501(c)(3) status, an Equivalency Determination (lets
+                            a foreign nonprofit take US grant money), or FCRA registration.
+                        </li>
+                        <li>
+                            <strong>Who is applying.</strong> Name, title, work email, phone with country code.
+                        </li>
+                        <li>
+                            <strong>Financials for four years.</strong> Three full years, plus this year.
+                        </li>
+                        <li>
+                            <strong>Results for four years.</strong> Same years. Placements, jobs created, or household
+                            incomes.
+                        </li>
+                        <li>
+                            <strong>Files, if you have them.</strong> Any outside review of your results. You upload
+                            these inside the form.
+                        </li>
+                    </ul>
+                    <p class="card-footer-note">
+                        Most of these fields are required, so gather them before you start.
+                    </p>
+                </div>
+
+                <!-- Card 2: Five sections -->
+                <div class="rfi-card">
+                    <h3 class="card-title">Five sections</h3>
+                    <ul class="rfi-numbered-list">
+                        <li><span class="step-num">1.</span> <span class="step-text">About Your Organization</span></li>
+                        <li><span class="step-num">2.</span> <span class="step-text">What You Do</span></li>
+                        <li><span class="step-num">3.</span> <span class="step-text">What You've Delivered</span></li>
+                        <li><span class="step-num">4.</span> <span class="step-text">Why Wadhwani Grants</span></li>
+                        <li><span class="step-num">5.</span> <span class="step-text">Review and Submit</span></li>
+                    </ul>
+                    <div class="card-divider"></div>
+                    <p class="card-footer-note section-note">
+                        You see one section at a time. Sections 2 and 3 change based on the tracks you pick in Section
+                        1. Fields marked * must be filled before you can move on.
+                    </p>
+                </div>
+
+                <!-- Card 3: Getting the numbers right -->
+                <div class="rfi-card">
+                    <h3 class="card-title">Getting the numbers right</h3>
+                    <ul class="rfi-bullet-list">
+                        <li>Take figures from records you already keep.</li>
+                        <li>One year per field. Not a running total since you started.</li>
+                        <li>Name real programs and real numbers in the written answers.</li>
+                        <li>Describe one decision you actually made, not your work in general.</li>
+                    </ul>
+
+                    <!-- Inner Orange Callout: Livelihood track only -->
+                    <div class="inner-callout orange-callout">
+                        <div class="callout-header">
+                            <svg class="callout-icon" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#ea580c" stroke-width="2" />
+                                <path d="M12 8v5M12 16h.01" stroke="#ea580c" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span class="callout-title">Livelihood track only</span>
+                        </div>
+                        <p class="callout-body">
+                            A household counts when both are true in the same year: income of Rs 1,00,000 or more, and
+                            30% above what it was when that household joined you. Count it once, the first year both are
+                            true.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Saving and submitting -->
+                <div class="rfi-card">
+                    <h3 class="card-title">Saving and submitting</h3>
+                    <ul class="rfi-bullet-list">
+                        <li>Leave and return as often as you need.</li>
+                        <li>Review every section on the last step.</li>
+                        <li>Download a PDF copy of your application for your records.</li>
+                        <li>About 45 minutes, once your numbers are to hand.</li>
+                    </ul>
+
+                    <!-- Inner Orange Callout: Save as you go -->
+                    <div class="inner-callout orange-callout">
+                        <div class="callout-header">
+                            <svg class="callout-icon" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#ea580c" stroke-width="2" />
+                                <path d="M12 8v5M12 16h.01" stroke="#ea580c" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span class="callout-title">Save as you go</span>
+                        </div>
+                        <p class="callout-body">
+                            This form saves your progress only when you click Save Draft or Next. Save before you leave
+                            the page.
+                        </p>
+                    </div>
+
+                    <!-- Inner Blue Callout: Questions? -->
+                    <div class="inner-callout blue-callout">
+                        <div class="callout-header">
+                            <svg class="callout-icon blue-icon" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="#0284c7" stroke-width="2" />
+                                <path d="M12 8v5M12 16h.01" stroke="#0284c7" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <span class="callout-title blue-title">Questions?</span>
+                        </div>
+                        <p class="callout-body">
+                            <a href="mailto:grants.support@wadhwanifoundation.org"
+                                class="email-link">grants.support@wadhwanifoundation.org</a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Optional Start/Continue Button -->
+            <template if:true={showStartButton}>
+                <div class="action-footer">
+                    <button class="btn-start" onclick={handleStartClick}>
+                        {startButtonLabel}
+                    </button>
+                </div>
+            </template>
+
+        </div>
+    </div>
+</template>

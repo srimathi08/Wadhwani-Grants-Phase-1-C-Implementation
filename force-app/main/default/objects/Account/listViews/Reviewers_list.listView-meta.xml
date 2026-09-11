@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reviewers_list</fullName>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>ACCOUNT.ADDRESS1_STATE_CODE</columns>
+    <columns>ACCOUNT.PHONE1</columns>
+    <columns>ACCOUNT.TYPE</columns>
+    <columns>ACCOUNT.RECORDTYPE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Reviewer__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Reviewers list</label>
+    <sharedTo>
+        <role>CEO</role>
+        <role>MD</role>
+        <role>Program_Head</role>
+        <role>Program_Mnager</role>
+    </sharedTo>
+</ListView>

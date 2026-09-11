@@ -1,47 +1,87 @@
-import { LightningElement, wire } from 'lwc';
-import getReviewSummary from '@salesforce/apex/ReviewSummaryController.getReviewSummary';
+import { LightningElement, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import getValidatedProposals from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
+import getReviewStatusMap    from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
 
 export default class ReviewSummary extends NavigationMixin(LightningElement) {
-    totalAssigned = 0;
-    submitted = 0;
-    yetToStart = 0;
-    error;
+    @track total      = 0;
+    @track reviewed   = 0;
+    @track inProgress = 0;
+    @track notStarted = 0;
+    @track flagged    = 0;   // NEW
+    @track error      = null;
 
-    @wire(getReviewSummary)
-    wiredSummary({ error, data }) {
+    _proposals        = [];
+    _reviewMap        = null;
+    _proposalsLoaded  = false;
+    _mapLoaded        = false;
+
+    @wire(getValidatedProposals)
+    wiredProposals({ data, error }) {
         if (data) {
-            this.totalAssigned = data.totalAssigned;
-            this.submitted = data.submitted;
-            this.yetToStart = data.yetToStart;
+            this._proposals      = data;
+            this._proposalsLoaded = true;
+            this._computeCounts();
         } else if (error) {
             this.error = error;
+            console.error('ReviewSummary - proposals error:', error);
         }
     }
 
-    handleTotalClick() {
-        this.navigateToListView('IndividualApplicationShare', 'All');
+    @wire(getReviewStatusMap)
+    wiredReviewMap({ data, error }) {
+        if (data) {
+            this._reviewMap = data;
+            this._mapLoaded = true;
+            this._computeCounts();
+        } else if (error) {
+            this.error = error;
+            console.error('ReviewSummary - reviewMap error:', error);
+        }
     }
 
-    handleReviewedClick() {
-        this.navigateToListView('RApplicationReview', 'Submitted');
+    _computeCounts() {
+        if (!this._proposalsLoaded || !this._mapLoaded) return;
+
+        const map = this._reviewMap || {};
+        let reviewed = 0, inProgress = 0, notStarted = 0, flagged = 0;
+
+        for (const p of this._proposals) {
+            const info = map[p.Id] || {};
+
+            // Count flagged separately (a flagged proposal can also be not-started from reviewer side)
+            if (info.isFlagged) {
+                flagged++;
+            }
+
+            if (info.isSubmitted || info.status === 'Review Submitted') {
+                reviewed++;
+            } else if (info.status === 'In Progress') {
+                inProgress++;
+            } else {
+                notStarted++;
+            }
+        }
+
+        this.total      = this._proposals.length;
+        this.reviewed   = reviewed;
+        this.inProgress = inProgress;
+        this.notStarted = notStarted;
+        this.flagged    = flagged;
     }
 
-    handleYetToStartClick() {
-        // Custom logic: maybe navigate to ApplicationShare list or a filtered page
-        this.navigateToListView('IndividualApplicationShare', 'YetToStart');
-    }
-
-    navigateToListView(objectApiName, filterName) {
+    navigate(filter) {
         this[NavigationMixin.Navigate]({
-            type: 'ApplicationReview',
+            type: 'standard__webPage',
             attributes: {
-                objectApiName: ApplicationReview,
-                actionName: 'list'
-            },
-            state: {
-                filterName: 'Project_Proposal_Review'
+                url: `/reviewersite/s/wcf-reviewer-application-list?reviewFilter=${filter}`
             }
         });
     }
+
+    handleTotalClick()      { this.navigate('all');      }
+    handleReviewedClick()   { this.navigate('reviewed'); }
+    handleInProgressClick() { this.navigate('inProgress'); }
+    handleNotStartedClick() { this.navigate('notStarted'); }
+    handleFlaggedClick()    { this.navigate('flagged');  }  // NEW
 }

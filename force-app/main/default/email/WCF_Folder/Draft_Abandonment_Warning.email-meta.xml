@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Draft Abandonment Warning</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Your application draft is waiting</subject>
+    <textOnly>Subject: [{{{org_name}}}] Your application draft is waiting
+
+Hello {{{contact_first_name}}},
+
+Just a gentle reminder — the application draft for {{{org_name}}} hasn&apos;t been updated since {{{last_activity_date}}}. Everything you entered is saved and secure.
+
+If there’s no activity by {{{abandonment_date}}}, the draft may be marked as withdrawn.
+
+Resume your application here:
+{{{rfi_link}}}
+
+Not planning to continue? Simply ignore this email or reply to let us know.
+
+Warm regards,
+The Wadhwani Grants Team
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

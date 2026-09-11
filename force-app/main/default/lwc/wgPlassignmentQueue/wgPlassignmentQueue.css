@@ -1,0 +1,893 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   wcfPlAssignmentQueue.css
+   Wadhwani brand tokens
+     Maroon  : #A12026   (primary action, accents, KPI bar bg)
+     Orange  : #F05A28   (secondary highlight, hover)
+     Navy    : #1B2A4A   (headings, dark text)
+     Warm-bg : #FAF9F7   (page background)
+     Border  : #E6E1DB   (dividers, outlines)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Root container ─────────────────────────────────────────────────────────── */
+.pla-root {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    background: #FAF9F7;
+    min-height: 60vh;
+    padding: 0 0 2.5rem;
+}
+
+/* ── Header bar ─────────────────────────────────────────────────────────────── */
+.pla-header-bar {
+    background: #ffffff;
+    border-bottom: 1px solid #E6E1DB;
+    padding: 1.4rem 2rem 1.1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pla-title-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+}
+
+.pla-title-accent {
+    width: 3px;
+    height: 2.6rem;
+    background: linear-gradient(180deg, #A12026 0%, #F05A28 100%);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+.pla-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1B2A4A;
+    margin: 0 0 0.2rem;
+    letter-spacing: -0.015em;
+}
+
+.pla-subtitle {
+    font-size: 0.78rem;
+    color: #8a8078;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* ── Controls (search + filters) ────────────────────────────────────────────── */
+.pla-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: flex-end;
+}
+
+.pla-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pla-search-icon {
+    position: absolute;
+    left: 0.65rem;
+    color: #b0a89e;
+    pointer-events: none;
+}
+
+.pla-search-input {
+    padding: 0.48rem 0.85rem 0.48rem 2.1rem;
+    border: 1px solid #E6E1DB;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: #1B2A4A;
+    background: #FDFCFB;
+    width: 22rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pla-search-input::placeholder { color: #b8b0a6; }
+
+.pla-search-input:focus {
+    border-color: #A12026;
+    box-shadow: 0 0 0 3px rgba(161, 32, 38, 0.08);
+}
+
+.pla-filter-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pla-select {
+    padding: 0.42rem 0.7rem;
+    border: 1px solid #E6E1DB;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #1B2A4A;
+    background: #ffffff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: auto;
+}
+
+.pla-select:focus { border-color: #A12026; }
+
+.pla-refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid #E6E1DB;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    color: #8a8078;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pla-refresh-btn:hover {
+    background: #FFF5F3;
+    border-color: #F05A28;
+    color: #F05A28;
+}
+
+/* ── KPI bar — maroon/red theme matching Reviewer Queue ─────────────────────── */
+.pla-kpi-bar {
+    background: #A12026;                       /* ← was #1B2A4A (navy) */
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    gap: 0;
+    min-height: 5rem;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.15); /* subtle dark underline */
+}
+
+.pla-kpi-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 2.5rem 1rem 0;
+}
+
+.pla-kpi-item.kpi-clickable {
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 0.9rem 1.75rem;
+    transition: background 0.15s;
+}
+
+.pla-kpi-item.kpi-clickable:hover {
+    background: rgba(0, 0, 0, 0.08);          /* ← darkened overlay on maroon */
+}
+
+.pla-kpi-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+/* Keep accent colours but lighter on maroon bg so they still pop */
+.pla-kpi-num.kpi-gold  { color: #FFD97A; }   /* ← warmer gold on red bg */
+.pla-kpi-num.kpi-amber { color: #FFB38A; }   /* ← lighter peach-orange */
+
+.pla-kpi-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.60);         /* ← slightly more opaque on red */
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.pla-kpi-divider {
+    width: 1px;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 0.20);   /* ← brighter divider on red */
+    margin-right: 2.5rem;
+}
+
+/* ── Loading / empty states ─────────────────────────────────────────────────── */
+.pla-loading {
+    display: flex;
+    justify-content: center;
+    padding: 5rem 0;
+}
+
+.pla-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5rem 1rem;
+}
+
+.pla-empty-icon { color: #d4cdc7; margin-bottom: 1rem; }
+
+.pla-empty-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    margin: 0 0 0.3rem;
+}
+
+.pla-empty-sub {
+    font-size: 0.82rem;
+    color: #aaa;
+    margin: 0;
+}
+
+/* ── Table wrapper ──────────────────────────────────────────────────────────── */
+.pla-table-wrap {
+    overflow-x: auto;
+    margin: 0;
+    background: #ffffff;
+    border-top: 1px solid #E6E1DB;
+}
+
+.pla-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+/* Table head */
+.pla-thead-row {
+    background: #F5F2EE;
+}
+
+.pla-th {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #7a6e66;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1.5px solid #E6E1DB;
+}
+
+.pla-th-sno    { width: 2.5rem; padding-left: 1.5rem; }
+.pla-th-track  { width: 5rem; }
+.pla-th-action { width: 9rem; text-align: center; }
+
+/* Table body */
+.pla-tr {
+    border-bottom: 1px solid #F0EDE9;
+    transition: background 0.1s;
+}
+
+.pla-tr-even { background: #ffffff; }
+.pla-tr-odd  { background: #FDFCFB; }
+
+.pla-tr:hover { background: #FFF8F6; }
+
+.pla-td {
+    padding: 0.8rem 1rem;
+    color: #2c2c2c;
+    vertical-align: middle;
+}
+
+.pla-td-sno    { color: #bbb; font-size: 0.74rem; padding-left: 1.5rem; }
+.pla-td-org    { font-weight: 600; color: #1B2A4A; }
+.pla-td-action { text-align: center; }
+
+.pla-app-id {
+    font-weight: 700;
+    color: #A12026;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+}
+
+/* Current PL display */
+.pla-current-pl {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.pla-pl-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #3d9e46;
+    flex-shrink: 0;
+}
+
+.pla-pl-name {
+    font-weight: 600;
+    color: #1B2A4A;
+    font-size: 0.82rem;
+}
+
+.pla-unassigned {
+    color: #c0b8b0;
+    font-style: italic;
+    font-size: 0.79rem;
+}
+
+/* ── Track badges ────────────────────────────────────────────────────────────── */
+.track-badge {
+    display: inline-block;
+    padding: 0.22rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: #EDEBE8;
+    color: #666;
+}
+
+.track-jf   { background: #EBF2FC; color: #1a5fa8; }
+.track-jc   { background: #FEF0EB; color: #A12026; }
+.track-both { background: #FEF5EB; color: #8a4a00; }
+
+/* ── Validation status badges ────────────────────────────────────────────────── */
+.val-badge {
+    display: inline-block;
+    padding: 0.24rem 0.7rem;
+    border-radius: 4px;
+    font-size: 0.71rem;
+    font-weight: 600;
+    background: #F0EDE9;
+    color: #777;
+}
+
+.val-under-review  { background: #FFF8E6; color: #8a6200; }
+.val-validated     { background: #EAF5EB; color: #2a6e30; }
+.val-recommended   { background: #E8F4E8; color: #1a5e20; }
+
+/* ── Action buttons ──────────────────────────────────────────────────────────── */
+.pla-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.42rem 0.95rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.77rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.pla-action-btn:hover { opacity: 0.9; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.pla-action-btn:active { opacity: 1; box-shadow: none; }
+
+.btn-assign {
+    background: #A12026;
+    color: #ffffff;
+}
+
+.btn-assign:hover { background: #8a1a1f; }
+
+.btn-reassign {
+    background: #ffffff;
+    color: #1B2A4A;
+    border: 1.5px solid #D8D2CB;
+}
+
+.btn-reassign:hover {
+    border-color: #F05A28;
+    color: #F05A28;
+    background: #FFF8F6;
+}
+
+.pla-btn-icon { margin-right: 0.05rem; }
+
+/* ── Pagination ──────────────────────────────────────────────────────────────── */
+.pla-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.5rem;
+    background: #ffffff;
+    border-top: 1px solid #E6E1DB;
+}
+
+.pla-pg-info {
+    font-size: 0.78rem;
+    color: #a0978e;
+}
+
+.pla-pg-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.pla-pg-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.45rem;
+    border: 1px solid #E6E1DB;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #555;
+    font-size: 0.79rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.pla-pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.pla-pg-btn:not(:disabled):hover { background: #FEF0EB; border-color: #F05A28; color: #F05A28; }
+.pla-pg-active { background: #A12026 !important; color: #ffffff !important; border-color: #A12026 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.pla-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 18, 36, 0.5);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInBd 0.18s ease;
+}
+
+@keyframes fadeInBd {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.pla-modal {
+    background: #ffffff;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 680px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 16px 56px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.2s ease;
+    overflow: hidden;
+    border-top: 3px solid #A12026;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal header */
+.pla-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem 1rem;
+    border-bottom: 1px solid #EDE9E4;
+    background: #FDFCFB;
+}
+
+.pla-modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1B2A4A;
+    margin: 0 0 0.2rem;
+}
+
+.pla-modal-subtitle {
+    font-size: 0.79rem;
+    color: #8a8078;
+    margin: 0;
+}
+
+.pla-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #b0a89e;
+    padding: 0.2rem;
+    border-radius: 4px;
+    display: flex;
+    transition: color 0.12s, background 0.12s;
+}
+
+.pla-modal-close:hover { background: #FEF0EB; color: #A12026; }
+
+/* Modal search */
+.pla-modal-search-wrap {
+    position: relative;
+    padding: 0.8rem 1.25rem 0.65rem;
+    border-bottom: 1px solid #EDE9E4;
+    background: #ffffff;
+}
+
+.pla-modal-search-icon {
+    position: absolute;
+    left: 1.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b0a89e;
+    pointer-events: none;
+}
+
+.pla-modal-search {
+    width: 100%;
+    padding: 0.45rem 0.85rem 0.45rem 2.2rem;
+    border: 1px solid #E6E1DB;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: #1B2A4A;
+    background: #FDFCFB;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pla-modal-search:focus {
+    border-color: #A12026;
+    box-shadow: 0 0 0 3px rgba(161, 32, 38, 0.08);
+}
+
+/* Current assignment banner */
+.pla-current-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: #FFFBF5;
+    border-bottom: 1px solid #F0E8D8;
+    font-size: 0.81rem;
+    color: #6a5220;
+}
+
+.pla-remove-btn {
+    margin-left: auto;
+    padding: 0.25rem 0.75rem;
+    border: 1.5px solid #F05A28;
+    border-radius: 5px;
+    background: transparent;
+    color: #F05A28;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s;
+    white-space: nowrap;
+}
+
+.pla-remove-btn:hover { background: #FFF0EB; }
+.pla-remove-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Modal loading */
+.pla-modal-loading {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 0;
+}
+
+/* PL list */
+.pla-pl-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0.4rem 0;
+    max-height: 18rem;
+}
+
+.pla-pl-empty {
+    text-align: center;
+    padding: 2.5rem;
+    color: #b0a89e;
+    font-size: 0.84rem;
+}
+
+.pla-pl-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.85rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 1px solid #F5F2EE;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+}
+
+.pla-pl-row:hover { background: #FDFAF8; }
+
+.pla-pl-selected {
+    background: #FFF7F5 !important;
+    border-left-color: #A12026;
+}
+
+/* Radio indicator */
+.pla-pl-radio { flex-shrink: 0; margin-top: 0.22rem; }
+
+.pl-radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #D0C8C0;
+    background: #ffffff;
+    transition: border-color 0.12s;
+}
+
+.pl-radio-on {
+    border-color: #A12026;
+    background: radial-gradient(circle, #A12026 44%, transparent 44%);
+}
+
+/* PL info */
+.pla-pl-info { flex: 0 0 auto; min-width: 10rem; }
+
+.pla-pl-row-name {
+    font-weight: 700;
+    color: #1B2A4A;
+    font-size: 0.84rem;
+    margin-bottom: 0.12rem;
+}
+
+.pla-pl-email { font-size: 0.73rem; color: #a09890; }
+
+/* PL workload section */
+.pla-pl-workload {
+    flex: 1;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.pla-pl-orgs-label { color: #b0a89e; font-size: 0.71rem; }
+
+.pla-pl-orgs {
+    color: #666;
+    font-size: 0.77rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pla-pl-free { color: #3a8a40; font-style: italic; font-size: 0.77rem; }
+
+/* Workload badges */
+.load-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    width: fit-content;
+    margin-top: 0.25rem;
+    letter-spacing: 0.02em;
+}
+
+.load-free     { background: #EAF5EB; color: #2a6e30; }
+.load-moderate { background: #FFF8E6; color: #8a6200; }
+.load-heavy    { background: #FEF0EB; color: #A12026; }
+
+/* Modal footer */
+.pla-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 0.95rem 1.5rem;
+    border-top: 1px solid #EDE9E4;
+    background: #FDFCFB;
+}
+
+.pla-btn-cancel {
+    padding: 0.52rem 1.3rem;
+    border: 1.5px solid #D8D2CB;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #666;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.pla-btn-cancel:hover:not(:disabled) { background: #F5F2EE; border-color: #c0b8b0; }
+.pla-btn-cancel:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pla-btn-assign {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.52rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    background: #A12026;
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    min-width: 7.5rem;
+    justify-content: center;
+}
+
+.pla-btn-assign:hover:not(:disabled) {
+    background: #8a1a1f;
+    box-shadow: 0 3px 10px rgba(161, 32, 38, 0.25);
+}
+.pla-btn-assign:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pla-btn-icon-white { color: #ffffff; }
+
+/* Save error */
+.pla-save-error {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.5rem;
+    background: #FEF2F2;
+    color: #9b1c1c;
+    font-size: 0.79rem;
+    border-top: 1px solid #fecaca;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.pla-toast {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem 0.9rem 0;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+    min-width: 18rem;
+    max-width: 26rem;
+    overflow: hidden;
+    animation: slideInRight 0.22s ease;
+    border: 1px solid #E6E1DB;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.pla-toast-accent {
+    width: 4px;
+    align-self: stretch;
+    flex-shrink: 0;
+}
+
+.pla-toast-success .pla-toast-accent { background: #3a8a40; }
+.pla-toast-error   .pla-toast-accent { background: #A12026; }
+
+.pla-toast-icon { flex-shrink: 0; margin-top: 0.05rem; }
+
+.pla-toast-success .pla-toast-icon { color: #3a8a40; }
+.pla-toast-error   .pla-toast-icon { color: #A12026; }
+
+.pla-toast-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.pla-toast-title {
+    font-weight: 700;
+    font-size: 0.84rem;
+    color: #1B2A4A;
+}
+
+.pla-toast-msg {
+    font-size: 0.77rem;
+    color: #6b6358;
+    line-height: 1.45;
+}
+
+.pla-toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #c0b8b0;
+    padding: 0.1rem;
+    align-self: flex-start;
+    transition: color 0.12s;
+    margin-right: 0.3rem;
+}
+
+.pla-toast-close:hover { color: #6b6358; }
+
+.pla-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    animation: progressBar 4s linear forwards;
+}
+
+.pla-toast-success .pla-toast-progress { background: #3a8a40; }
+.pla-toast-error   .pla-toast-progress { background: #A12026; }
+
+@keyframes progressBar {
+    from { width: 100%; }
+    to   { width: 0%; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .pla-header-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem 1.25rem;
+    }
+    .pla-controls { align-items: stretch; }
+    .pla-search-input { width: 100%; }
+    .pla-filter-row   { flex-wrap: wrap; }
+    .pla-select       { flex: 1; }
+
+    .pla-kpi-bar {
+        flex-wrap: wrap;
+        padding: 0.75rem 1.25rem;
+        gap: 0.5rem;
+    }
+    .pla-kpi-divider { display: none; }
+    .pla-kpi-item.kpi-clickable { padding: 0.6rem 1rem; }
+
+    .pla-modal { width: 96%; max-height: 94vh; }
+    .pla-toast { right: 0.5rem; left: 0.5rem; min-width: unset; }
+}
+
+/* ── Role toggle ─────────────────────────────────────────────────────────── */
+.pla-role-toggle {
+    display: flex;
+    padding: 0.75rem 1.25rem 0.65rem;
+    border-bottom: 1px solid #EDE9E4;
+    background: #ffffff;
+    gap: 0;
+}
+
+.pla-role-btn {
+    flex: 1;
+    padding: 0.48rem 0;
+    border: 1.5px solid #E6E1DB;
+    background: #ffffff;
+    color: #888;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.pla-role-btn:first-child { border-radius: 6px 0 0 6px; }
+.pla-role-btn:last-child  { border-radius: 0 6px 6px 0; border-left: none; }
+
+.pla-role-active {
+    background: #A12026;
+    color: #ffffff;
+    border-color: #A12026;
+}
+
+/* ── Co-PL dot (orange vs green for PL) ─────────────────────────────────── */
+.pla-copl-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #F05A28;
+    flex-shrink: 0;
+}

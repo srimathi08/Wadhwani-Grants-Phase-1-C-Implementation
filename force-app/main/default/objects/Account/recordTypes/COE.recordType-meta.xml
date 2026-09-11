@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>COE</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>Institute_layout</compactLayoutAssignment>
+    <label>COE</label>
+    <picklistValues>
+        <picklist>AccountSource</picklist>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Website Contact</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Are_you_FCRA_exempted_compliant__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Do_you_have_a_US_501_c_3_organization__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Have_you_cleared_Equivalency_Determinat__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Industry</picklist>
+        <values>
+            <fullName>Agriculture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apparel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banking</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Biotechnology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Chemicals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Communications</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Construction</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Consulting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Electronics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Energy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entertainment</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Environmental</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Finance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Food %26 Beverage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Government</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Healthcare</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hospitality</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Insurance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Machinery</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manufacturing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Media</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not For Profit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recreation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Retail</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Shipping</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Technology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Telecommunications</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Transportation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Utilities</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Institute_Country_Code__c</picklist>
+        <values>
+            <fullName>%2B1 United States %2F Canada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B20 Egypt</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B234 Nigeria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B27 Eningizimu Afrika</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B31 Netherlands</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B33 France</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B34 Spain</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B39 Italy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B41 Switzerland</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B44 United Kingdom</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B49 Germany</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B52 Mexico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B54 Argentina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B55 Brazil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B60 Malaysia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B61 Australia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B62 Indonesia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B63 Philippines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B64 New Zealand</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B65 Singapore</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B7 Russia %2F Kazakhstan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B81 Japan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B82 South Korea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B86 China</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B91 India</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B966 Saudi Arabia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B971 United Arab Emirates</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Ownership</picklist>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Private</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Public</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Subsidiary</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Preferred_Laungage__c</picklist>
+        <values>
+            <fullName>en_US</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>pt_BR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Rating</picklist>
+        <values>
+            <fullName>Cold</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hot</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Warm</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Specialization__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Health tech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Space Tech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Stage__c</picklist>
+        <values>
+            <fullName>COE Onboarding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COE Proposal Evaluation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COE Proposal Submission</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COE Registration</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Review</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Submitted</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_Stage__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Registration pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rejected</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Submitted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yet to Start</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Reviewer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WIN COE</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Application_Approved_for_COE</fullName>
+        <description>Application Approved for COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Notification_to_COE_on_approval_WIN_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Application_Rejected_by_WIN</fullName>
+        <description>Application Rejected by WIN</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Rejection_Notification_WIN_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Approved_For_Funding_COE</fullName>
+        <description>Approved For Funding - COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Approved_for_Funding_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>COE_Application_Approved</fullName>
+        <description>COE_Application Approved</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/COE_Application_Approved</template>
+    </alerts>
+    <alerts>
+        <fullName>COE_Application_Rejected</fullName>
+        <description>COE_Application Rejected</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/COE_Application_Rejected</template>
+    </alerts>
+    <alerts>
+        <fullName>COE_Application_Submitted</fullName>
+        <description>COE_Application Submitted</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/COE_Confirmation_of_application_submission</template>
+    </alerts>
+    <alerts>
+        <fullName>COE_Resubmission_Required</fullName>
+        <description>COE_Resubmission Required</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/COE_Resubmission_Required</template>
+    </alerts>
+    <alerts>
+        <fullName>Email_to_mark</fullName>
+        <description>Email to mark</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>wadhwani@admin.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>unfiled$public/Acceptance_Notification</template>
+    </alerts>
+    <alerts>
+        <fullName>Level_1_Shortlisted_Email_to_COE</fullName>
+        <description>Level 1 Shortlisted Email to COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Level_1_shortlisted_proposal_to_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Level_1_not_Shortlisted_Email_to_COE</fullName>
+        <description>Level 1 not Shortlisted Email to COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Level_1_Not_shortlisted_proposal_to_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>New_Application_Validator_Queue</fullName>
+        <description>New Application Validator Queue</description>
+        <protected>false</protected>
+        <recipients>
+            <field>ContactId</field>
+            <type>contactLookup</type>
+        </recipients>
+        <senderAddress>grants.support@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WCF_Folder/New_Application_Validator_Queue</template>
+    </alerts>
+    <alerts>
+        <fullName>PI_Application_Approved</fullName>
+        <description>PI_Application Approved</description>
+        <protected>false</protected>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/PI_Application_Approved_Notification_Email</template>
+    </alerts>
+    <alerts>
+        <fullName>PI_Application_not_shortlisted_for_funding</fullName>
+        <description>PI_Application not shortlisted for funding</description>
+        <protected>false</protected>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/PI_Application_not_shortlisted_for_funding</template>
+    </alerts>
+    <alerts>
+        <fullName>PI_New_confirmation_proposal_submission</fullName>
+        <description>PI_New confirmation proposal submission</description>
+        <protected>false</protected>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/PI_Confirmation_of_Application_Submission</template>
+    </alerts>
+    <alerts>
+        <fullName>PI_Resubmission_Required</fullName>
+        <description>PI_Resubmission Required</description>
+        <protected>false</protected>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/PI_Resubmission_Required</template>
+    </alerts>
+    <alerts>
+        <fullName>Proposal_Submission_Confirmation</fullName>
+        <description>Proposal Submission Confirmation</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <recipients>
+            <recipient>winadmin@wadhwanifoundation.org</recipient>
+            <type>user</type>
+        </recipients>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/Proposal_Submission_Confirmation</template>
+    </alerts>
+    <alerts>
+        <fullName>Proposal_Submission_Confirmation_WIN_COE</fullName>
+        <description>Proposal Submission Confirmation - WIN COE</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>wadhwani@admin.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/WIN_Confirmation_of_Application_Submission</template>
+    </alerts>
+    <alerts>
+        <fullName>Proposal_Submission_Confirmation_to_COE</fullName>
+        <description>Proposal Submission Confirmation to COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Confirmation_of_Proposal_Submission</template>
+    </alerts>
+    <alerts>
+        <fullName>Rejected_For_Funding_COE</fullName>
+        <description>Rejected  For Funding - COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Rejected_For_Funding_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Resend_email_for_modification</fullName>
+        <description>Resend email for modification</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>testwcf@gmail.com</recipient>
+            <type>customerPortalUser</type>
+        </recipients>
+        <senderType>CurrentUser</senderType>
+        <template>unfiled$public/Admin_Notification_of_New_Submission</template>
+    </alerts>
+    <alerts>
+        <fullName>Resubmission_Required_by_COE</fullName>
+        <description>Resubmission Required by COE</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Request_for_Modifications_from_WIN_to_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Resubmission_Required_from_WIN_to_PI</fullName>
+        <description>Resubmission Required from WIN to PI</description>
+        <protected>false</protected>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Request_for_Modifications_from_WIN_to_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Send_email_for_project_proposal_recall_action</fullName>
+        <description>Send email for project proposal recall action</description>
+        <protected>false</protected>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Request_for_Modifications_from_WIN_to_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Send_email_to_CEO_admin_on_project_proposal_rejection</fullName>
+        <description>Send email to CEO admin on project proposal rejection</description>
+        <protected>false</protected>
+        <recipients>
+            <type>accountOwner</type>
+        </recipients>
+        <recipients>
+            <field>PI_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>WIN_Proposal_Emails/Rejection_Notification_WIN_COE</template>
+    </alerts>
+    <alerts>
+        <fullName>Send_email_to_COE_admin_on_approval_of_project_proposal</fullName>
+        <description>Send email to COE admin on approval of project proposal</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <recipients>
+            <field>COE_Approver__c</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/Acceptance_Notification</template>
+    </alerts>
+    <alerts>
+        <fullName>Send_email_to_WIN_admin_on_approval_process</fullName>
+        <description>Send  email to WIN admin on approval process</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>wadhwani@admin.com</recipient>
+            <type>user</type>
+        </recipients>
+        <senderAddress>wcf@wadhwanifoundation.org</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/Admin_Notification_of_New_Submission</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>ApplicationStatusUpdate</fullName>
+        <field>Status</field>
+        <literalValue>Proposal Submitted to WIN Admin</literalValue>
+        <name>ApplicationStatusUpdate</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>CEO_APPROVAL</fullName>
+        <field>InternalStatus</field>
+        <literalValue>CEO Review</literalValue>
+        <name>CEO APPROVAL</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>COE_Admin_Approves_the_Proposal</fullName>
+        <field>Status</field>
+        <literalValue>Approved</literalValue>
+        <name>COE Admin Approves the Proposal</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>FINAL_APPROVAL</fullName>
+        <field>Status</field>
+        <literalValue>Approved</literalValue>
+        <name>FINAL APPROVAL</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>IN_MD_REVIEW</fullName>
+        <field>InternalStatus</field>
+        <literalValue>MD Review</literalValue>
+        <name>IN MD REVIEW</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>In_mark_review</fullName>
+        <field>InternalStatus</field>
+        <literalValue>MD Review</literalValue>
+        <name>In mark review</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Internal_status</fullName>
+        <field>InternalStatus</field>
+        <literalValue>MD Review</literalValue>
+        <name>Internal status</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Mark_request_modification</fullName>
+        <field>InternalStatus</field>
+        <literalValue>Revision Requested</literalValue>
+        <name>Mark request modification</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>RECALL</fullName>
+        <field>InternalStatus</field>
+        <literalValue>Revision Requested</literalValue>
+        <name>RECALL</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>REJECTION</fullName>
+        <field>Status</field>
+        <literalValue>Rejected</literalValue>
+        <name>REJECTION</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Status_update</fullName>
+        <field>Status</field>
+        <literalValue>Proposal Approved by WIN Admin</literalValue>
+        <name>Status update</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Status_update_for_recall</fullName>
+        <field>Status</field>
+        <literalValue>Asked for Resubmission by WIN Admin</literalValue>
+        <name>Status update for recall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Status_update_rejection</fullName>
+        <field>Status</field>
+        <literalValue>Proposal Rejected by WIN Admin</literalValue>
+        <name>Status update</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Update_the_field_to_submitted</fullName>
+        <field>Status</field>
+        <literalValue>Proposal Submitted to WIN Admin</literalValue>
+        <name>Update the field to submitted</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>application_status</fullName>
+        <field>Status</field>
+        <literalValue>In Review</literalValue>
+        <name>application status</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>rejected_status_updated</fullName>
+        <field>Status</field>
+        <literalValue>Rejected</literalValue>
+        <name>rejected status updated</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+</Workflow>

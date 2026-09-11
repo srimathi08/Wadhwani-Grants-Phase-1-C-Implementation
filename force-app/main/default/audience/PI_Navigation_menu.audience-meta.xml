@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>PI</audienceName>
+    <container>Wadhwani Org</container>
+    <criteria>
+        <criterion>
+            <criteriaNumber>1</criteriaNumber>
+            <criterionValue>
+                <entityField>Profile.Name</entityField>
+                <entityType>User</entityType>
+                <fieldValue>PI User Partner Profile</fieldValue>
+            </criterionValue>
+            <operator>Equal</operator>
+            <type>FieldBased</type>
+        </criterion>
+    </criteria>
+    <formulaFilterType>AllCriteriaMatch</formulaFilterType>
+    <isDefaultAudience>false</isDefaultAudience>
+    <targets>
+        <target>
+            <groupName>00fdc151-2eee-4051-9a69-dbcde85b1b16</groupName>
+            <priority>2</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Home_PI_LOGGED_IN_PAGE_Page</targetValue>
+        </target>
+        <target>
+            <groupName>7705d099-0232-4892-a03f-5b44281f41d5$#$80b4298e-b097-4e5c-8b67-ecc53c076172</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Home_Theme_Navigation_Menu_Component_Properties</targetValue>
+        </target>
+        <target>
+            <groupName>ca1d1e27-272b-4c40-8974-903fcecdf0e3</groupName>
+            <priority>1</priority>
+            <targetType>ExperienceVariation</targetType>
+            <targetValue>Individual_Application_Detail_IndividualApplication_Detail_page_PI_Page</targetValue>
+        </target>
+    </targets>
+</Audience>

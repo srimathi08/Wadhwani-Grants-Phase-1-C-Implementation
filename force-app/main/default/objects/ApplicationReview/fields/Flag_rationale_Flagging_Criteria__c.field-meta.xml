@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Flag_rationale_Flagging_Criteria__c</fullName>
+    <label>Flag rationale-Flagging Criteria</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Geographic scope outside active clusters</fullName>
+                <default>false</default>
+                <label>Geographic scope outside active clusters</label>
+            </value>
+            <value>
+                <fullName>Mandate misfit (work not Job Fulfilment / Job Creation aligned)</fullName>
+                <default>false</default>
+                <label>Mandate misfit (work not Job Fulfilment / Job Creation aligned)</label>
+            </value>
+            <value>
+                <fullName>Sanctions / debarment / watchlist concern</fullName>
+                <default>false</default>
+                <label>Sanctions / debarment / watchlist concern</label>
+            </value>
+            <value>
+                <fullName>Materially below missing-middle floor</fullName>
+                <default>false</default>
+                <label>Materially below missing-middle floor</label>
+            </value>
+            <value>
+                <fullName>Materially above missing-middle ceiling</fullName>
+                <default>false</default>
+                <label>Materially above missing-middle ceiling</label>
+            </value>
+            <value>
+                <fullName>Outcome credibility concern at first read</fullName>
+                <default>false</default>
+                <label>Outcome credibility concern at first read</label>
+            </value>
+            <value>
+                <fullName>Institutional credibility concern at first read</fullName>
+                <default>false</default>
+                <label>Institutional credibility concern at first read</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

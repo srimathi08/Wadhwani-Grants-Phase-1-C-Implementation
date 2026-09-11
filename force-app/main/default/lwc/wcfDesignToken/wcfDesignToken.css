@@ -1,0 +1,152 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   WADHWANI GRANTS — SHARED DESIGN TOKENS
+   ───────────────────────────────────────────────────────────────────────
+   This is an LWC *CSS module*. The folder must contain ONLY this file
+   (no .js, no .html, no meta.xml).
+
+       force-app/main/default/lwc/wcfDesignTokens/wcfDesignTokens.css
+
+   Import it as the FIRST line of every form stylesheet:
+
+       @import 'c/wcfDesignTokens';
+
+   Every colour, radius, shadow and type decision for the Validator form,
+   the Reviewer form and any future form lives here. Change it once, it
+   changes everywhere.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:host {
+
+    /* ── Surfaces ──────────────────────────────────────────────────────
+       bg      : the page behind the cards (warm paper)
+       surface : the cards themselves
+       sunken  : hint boxes, rubric panels, read-only strips            */
+    --wg-bg              : #F7F3EC;
+    --wg-bg-warm         : #FBF8F2;
+    --wg-surface         : #FFFFFF;
+    --wg-surface-sunken  : #FAF8F4;
+    --wg-overlay         : rgba(255, 255, 255, .78);
+
+    /* ── Ink ─────────────────────────────────────────────────────────── */
+    --wg-ink             : #1F1B17;
+    --wg-ink-soft        : #4A443C;
+    --wg-ink-mute        : #857C71;
+    --wg-ink-invert      : #FFFFFF;
+
+    /* ── Rules & dividers ────────────────────────────────────────────── */
+    --wg-rule            : #E5DED1;
+    --wg-rule-soft       : #EFEAE0;
+
+    /* ── Brand ───────────────────────────────────────────────────────── */
+    --wg-brand           : #A41E22;   /* Wadhwani red — primary actions, markers */
+    --wg-brand-deep      : #7A1418;   /* hover / pressed                         */
+    --wg-brand-tint      : #FCF2F1;   /* selected row background                 */
+    --wg-brand-ring      : rgba(164, 30, 34, .15);
+    --wg-accent          : #E87842;   /* warm orange — dots, small emphasis only */
+    --wg-accent-soft     : #FCEFE3;
+
+    /* ── Semantic states ─────────────────────────────────────────────── */
+    --wg-good            : #2E7D5B;
+    --wg-good-tint       : #F1F8F4;
+    --wg-good-rule       : #D8EAE0;
+
+    --wg-warn            : #B8761F;
+    --wg-warn-tint       : #FDF6EA;
+    --wg-warn-rule       : #EEDCBB;
+
+    --wg-danger          : #B43030;
+    --wg-danger-tint     : #FCF4F1;
+    --wg-danger-rule     : #EDD9D2;
+
+    --wg-info            : #3A5F8A;
+    --wg-info-tint       : #F0F4F9;
+    --wg-info-rule       : #D5E0EC;
+
+    /* ── Radii ───────────────────────────────────────────────────────── */
+    --wg-r-xs            : 4px;
+    --wg-r-sm            : 6px;
+    --wg-r-md            : 8px;
+    --wg-r-lg            : 12px;
+    --wg-r-pill          : 999px;
+
+    /* ── Elevation ───────────────────────────────────────────────────── */
+    --wg-shadow-sm       : 0 1px 2px rgba(31, 27, 23, .05), 0 1px 1px rgba(31, 27, 23, .03);
+    --wg-shadow-md       : 0 4px 14px rgba(31, 27, 23, .06), 0 2px 4px rgba(31, 27, 23, .04);
+    --wg-shadow-up       : 0 -3px 10px rgba(31, 27, 23, .07);
+
+    /* ── Typography ──────────────────────────────────────────────────── */
+    --wg-font            : 'Inter', 'Salesforce Sans', ui-sans-serif, system-ui,
+                           -apple-system, Arial, sans-serif;
+    --wg-font-display    : 'Georgia', 'Times New Roman', serif;
+
+    --wg-fs-base         : 14.5px;
+    --wg-fs-title        : 26px;   /* form title            */
+    --wg-fs-h3           : 22px;   /* section / step title  */
+    --wg-fs-body         : 14.5px;
+    --wg-fs-sm           : 13px;
+    --wg-fs-xs           : 12.5px;
+    --wg-fs-micro        : 10.5px; /* eyebrows, uppercase labels */
+
+    /* ── Layout rhythm ───────────────────────────────────────────────── */
+    --wg-gutter          : 36px;   /* outer page gutter, stepped down by @container */
+    --wg-gap             : 14px;
+    --wg-card-pad        : 18px 20px;
+
+    /* ── Focus ring (accessibility floor) ────────────────────────────── */
+    --wg-focus           : 0 0 0 3px var(--wg-brand-ring);
+
+    /* ── Base type applied to the whole component ────────────────────── */
+    font-family : var(--wg-font);
+    font-size   : var(--wg-fs-base);
+    line-height : 1.55;
+    color       : var(--wg-ink);
+
+    display     : block;
+    width       : 100%;
+    max-width   : 100%;
+    box-sizing  : border-box;
+
+    /* Enables @container queries so forms respond to the SPLIT-PANE width,
+       not the browser viewport. Both forms rely on this.                 */
+    container-type : inline-size;
+}
+
+/* ── Shared helper: serif display face ─────────────────────────────── */
+.serif,
+.wg-serif {
+    font-family : var(--wg-font-display);
+}
+
+/* ── Shared helper: required / optional markers ────────────────────── */
+.req,
+.wcf-req {
+    color        : var(--wg-brand);
+    font-weight  : 700;
+    margin-left  : 2px;
+}
+
+.wcf-opt {
+    color       : var(--wg-ink-mute);
+    font-weight : 400;
+}
+
+/* ── Accessibility floor: visible keyboard focus everywhere ────────── */
+:host button:focus-visible,
+:host [tabindex]:focus-visible,
+:host textarea:focus-visible,
+:host input:focus-visible {
+    outline        : 2px solid var(--wg-brand);
+    outline-offset : 2px;
+    border-radius  : var(--wg-r-xs);
+}
+
+/* ── Respect reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    :host *,
+    :host *::before,
+    :host *::after {
+        animation-duration        : .001ms !important;
+        animation-iteration-count : 1 !important;
+        transition-duration       : .001ms !important;
+    }
+}

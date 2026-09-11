@@ -154,14 +154,14 @@
                                     </div>
                                 </td>
 
-                                <td class="action-col">
-                                    <button class="viewall-btn"
-                                            data-proposal-id={p.proposalId}
-                                            data-account-id={p.accountId}
-                                            onclick={handleViewAllMilestones}>
-                                        View All →
-                                    </button>
-                                </td>
+                                <td>
+    <button class="viewall-btn"
+            data-proposal-id={p.proposalId}
+            data-account-id={p.accountId}
+            onclick={handleViewAllMilestones}>
+        View All →
+    </button>
+</td>
 
                             </tr>
                         </template>
@@ -247,13 +247,13 @@
                                     </template>
                                 </td>
 
-                                <td>
-                                    <a href={c.accountLink}
-                                       target="_blank"
-                                       class="record-link">
-                                        View All
-                                    </a>
-                                </td>
+                               <td>
+    <button class="history-link-btn"
+            data-account-id={c.accountId}
+            onclick={handleOpenHistoryModal}>
+        View All
+    </button>
+</td>
 
                                 <td class="action-col">
                                     <button class="disburse-btn"
@@ -275,14 +275,21 @@
         <!-- =================================================
              MODAL
         ================================================= -->
-
-        <template if:true={isDisburseModalOpen}>
-            <c-disburse-fund-modal
-                selected-account-id={selectedAccountId}
-                onclosemodal={handleCloseModal}
-                onrecordsaved={handleRecordSaved}>
-            </c-disburse-fund-modal>
-        </template>
+<!-- DISBURSE MODAL -->
+<template if:true={isDisburseModalOpen}>
+    <c-disburse-fund-modal
+        selected-account-id={selectedAccountId}
+        onclosemodal={handleCloseModal}
+        onrecordsaved={handleRecordSaved}>
+    </c-disburse-fund-modal>
+</template>
+        <template if:true={isHistoryModalOpen}>
+    <c-disburse-fund-modal
+        selected-account-id={historyAccountId}
+        read-only={isReadOnly}
+        onclosemodal={handleCloseHistoryModal}>
+    </c-disburse-fund-modal>
+</template>
 
     </lightning-card>
 </template>

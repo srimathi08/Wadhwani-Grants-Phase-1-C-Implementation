@@ -17,7 +17,6 @@
 
                         <div class="tile-meta">
 
-                            <!-- ✅ UPDATED: Project Start & End Month -->
                             <div>
                                 <span class="lbl">Project Start Month:</span>
                                     {m.projectStartDate}
@@ -29,14 +28,13 @@
                             </div>
 
                             <div>
-                                <span class="lbl">Budget Req:</span>
+                                <span class="lbl">Grants Required:</span>
                                 {m.budgetRequired}
                             </div>
 
-                            <!-- ✅ Amount logic (UNCHANGED) -->
                             <template if:true={m.disbursedAmount}>
                                 <div>
-                                    <span class="lbl">Disbursed Amount:</span>
+                                    <span class="lbl">Grant Disbursed:</span>
                                     {m.disbursedAmount}
                                 </div>
                             </template>
@@ -48,6 +46,16 @@
                                 </div>
                             </template>
 
+                            <div>
+                                <span class="lbl">Grant Utilized:</span>
+                                {m.totalUtilized}
+                            </div>
+
+                            <div>
+                                <span class="lbl">Current TRL:</span>
+                                {m.currentTRL}
+                            </div>
+
                         </div>
 
                         <div class="actions">
@@ -57,14 +65,23 @@
                                 View Details
                             </button>
 
-                            <button class="btn primary"
-                                data-id={m.milestoneId}
-                                data-name={m.name}
-                                data-budgetrequired={m.budgetRequired}
-                                onclick={handleManageFund}>
-                                Manage Fund
-                            </button>
+                            <template if:true={m.showManageFund}>
+                                <button class="btn primary"
+                                    data-id={m.milestoneId}
+                                    data-name={m.name}
+                                    data-budgetrequired={m.budgetRequired}
+                                    onclick={handleManageFund}>
+                                    Manage Fund
+                                </button>
+                            </template>
 
+                            <template if:true={m.showApprove}>
+                                <button class="btn primary"
+                                    data-id={m.milestoneId}
+                                    onclick={handleApproveReport}>
+                                    Approve
+                                </button>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -77,7 +94,6 @@
             </div>
         </template>
 
-        <!-- Modal Component -->
         <c-coe-manage-fund-modal></c-coe-manage-fund-modal>
 
     </div>

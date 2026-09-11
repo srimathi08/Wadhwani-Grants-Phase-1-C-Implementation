@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reviewer</fullName>
+    <active>true</active>
+    <description>Details about reviewers</description>
+    <label>Reviewer</label>
+    <picklistValues>
+        <picklist>BuyerAttributes</picklist>
+        <values>
+            <fullName>BusinessUser</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buyer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Champion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DecisionMaker</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Detractor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Evaluator</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ExecutiveSponsor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TechnicalExpert</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Category_of_Applicant__c</picklist>
+        <values>
+            <fullName>Clinician</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Entrepreneur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Faculty</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Innovator</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Potential Entrepreneur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Project Team Member</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Student</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Contract_Status__c</picklist>
+        <values>
+            <fullName>Send MOU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Send NDA</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Field_of_specialization__c</picklist>
+        <values>
+            <fullName>Advance Computing and AI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bio-tech and Bio-engineering</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Minerals and Mining</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Health tech</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Investment%2F Business</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Quantum</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Space Tech</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>GenderIdentity</picklist>
+        <values>
+            <fullName>Female</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Male</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nonbinary</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Listed</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>LeadSource</picklist>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Website Contact</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Name</picklist>
+        <values>
+            <fullName>Dr%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mr%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mrs%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ms%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mx%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prof%2E</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Pronouns</picklist>
+        <values>
+            <fullName>He%2FHim</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>He%2FThey</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Listed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>She%2FHer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>She%2FThey</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>They%2FThem</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SPOC_Country_Code__c</picklist>
+        <values>
+            <fullName>%2B1 United States %2F Canada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B20 Egypt</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B234 Nigeria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B27 Eningizimu Afrika</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B31 Netherlands</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B33 France</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B34 Spain</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B39 Italy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B41 Switzerland</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B44 United Kingdom</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B49 Germany</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B52 Mexico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B54 Argentina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B55 Brazil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B60 Malaysia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B61 Australia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B62 Indonesia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B63 Philippines</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B64 New Zealand</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B65 Singapore</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B7 Russia %2F Kazakhstan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B81 Japan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B82 South Korea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B86 China</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B91 India</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B966 Saudi Arabia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%2B971 United Arab Emirates</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

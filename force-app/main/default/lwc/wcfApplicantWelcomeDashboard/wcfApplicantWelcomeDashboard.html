@@ -1,0 +1,50 @@
+<template>
+    <div class="wcf-dashboard">
+
+        <div class="wcf-disclaimer-banner">
+            <svg class="wcf-disclaimer-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+           <!-- AFTER -->
+<p class="wcf-disclaimer-text">
+    <strong>{label.noFee}</strong> {label.noFeeDisclaimer} <a href="mailto:grants.support@wadhwanifoundation.org">grants.support@wadhwanifoundation.org</a>.
+</p>
+        </div>
+
+        <div class="wcf-header">
+            <div>
+                <h1 class="wcf-title">{label.welcomeToYourDashboard} {applicantName}.</h1>
+                <p class="wcf-subtitle">{organizationName}  {headquarters}</p>
+            </div>
+
+            <div class="lang-toggle">
+                <template for:each={languageOptions} for:item="lang">
+                    <button
+                        key={lang.code}
+                        class={lang.cssClass}
+                        data-code={lang.code}
+                        onclick={handleLanguageSelect}
+                    >{lang.label}</button>
+                </template>
+            </div>
+        </div>
+
+        <div class="wcf-content">
+            <div class="wcf-card">
+                <p class="wcf-eyebrow">{label.noApplicationYet}</p>
+                <h2 class="wcf-card-title">{label.youHaventStarted}</h2>
+                <p class="wcf-card-desc">{label.fourSectionCopy}</p>
+                <div class="wcf-actions">
+                    <button class="btn-primary" onclick={handleStartApplication}>{label.startYourApplication}</button>
+                    <a href="javascript:void(0);" class="link-secondary"></a>
+                </div>
+            </div>
+
+             <!-- WITH -->
+<div class="wcf-sidebar">
+    <c-wcf-application-timeline current-status="NotStarted"></c-wcf-application-timeline>
+</div>
+          
+        </div>
+    </div>
+</template>

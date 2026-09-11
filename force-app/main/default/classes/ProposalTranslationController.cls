@@ -45,7 +45,10 @@ public static Map<String, Object> getTranslatedProposal(Id translatedProposalId)
         SELECT Id, Organization_Name__c, Headquarters_City_and_Country__c, Primary_Service_Regions__c, Leader_Name__c, Leader_Title__c, 
             Submitter_Name__c, Job_Title__c, Work_Email_ID__c, Phone_number__c, Legal_Structure__c, Organizational_Sustainability__c, 
             Use_of_Additional_Funding__c, Operational_Synergies_with_WOF__c, Use_of_Additional_Funding_JC__c, Operational_Synergies_with_WOF_JC__c,
-        	Operational_Synergies_with_WOF_Both__c, Organizational_Area_s_for_Funding__c
+        	Operational_Synergies_with_WOF_Both__c, Organizational_Area_s_for_Funding__c,
+            // ---- Job Creation / Skilling Approach + AI review fields ----
+            Job_Creation_Approach__c, Job_Creation_Rating__c, Job_Creation_Strength__c, Job_Creation_Weakness__c, Job_Creation_Summary__c,
+            Skilling_Approach__c, Skilling_Approach_Rating__c, Skilling_Approach_Strength__c, Skilling_Approach_Weakness__c, Skilling_Approach_Summary__c
         FROM Translated_Proposal__c
         WHERE Id = :translatedProposalId
         LIMIT 1
@@ -91,7 +94,10 @@ public static Map<String, Object> getTranslatedProposal(Id translatedProposalId)
         X3rd_Party_Placement_Verification_FY_2__c, X3rd_Party_Placement_Verification_FY_3__c, X3rd_Party_Verification_Description_CFY__c, X3rd_Party_Verification_Description_FY1__c,
         X3rd_Party_Verification_Description_FY2__c, X3rd_Party_Verification_Description_FY3__c, X3rd_party_verification_details_CFY__c, X3rd_party_verification_details_FY1__c,
         X3rd_party_verification_details_FY2__c, X3rd_party_verification_details_FY3__c,Projected_Learner_Placements_CFY__c, Projected_Learner_Placements_FY_1__c,
-        Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_3__c
+        Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_3__c,
+        // ---- Manual Avg Cost per Job / Placement fields ----
+        Manual_Avg_Cost_per_Job_CFY__c, Manual_Avg_Cost_per_Job_FY_1__c, Manual_Avg_Cost_per_Job_FY_2__c, Manual_Avg_Cost_per_Job_FY_3__c,
+        Manual_Avg_Cost_per_Placement_CFY__c, Manual_Avg_Cost_per_Placement_FY_1__c, Manual_Avg_Cost_per_Placement_FY_2__c, Manual_Avg_Cost_per_Placement_FY_3__c
         FROM Translated_Outcome_Data__c
         WHERE Translated_Proposal__c = :translatedProposalId
         LIMIT 1

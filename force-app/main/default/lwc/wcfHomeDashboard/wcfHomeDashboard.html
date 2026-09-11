@@ -1,0 +1,137 @@
+<template>
+    <div class="ps-root">
+
+        <!-- Access notice — replaces the silent navigation that used to
+             drop a validator into the reviewer queue -->
+        <template if:true={accessNotice}>
+            <div class="ps-notice" role="status">
+                <lightning-icon
+                    icon-name="utility:lock"
+                    size="x-small"
+                    class="ps-notice-icon">
+                </lightning-icon>
+
+                <div class="ps-notice-body">
+                    <div class="ps-notice-title">{accessNotice.title}</div>
+                    <div class="ps-notice-text">{accessNotice.body}</div>
+                </div>
+
+                <div class="ps-notice-actions">
+                    <template if:true={accessNotice.canSwitch}>
+                        <button type="button" class="ps-notice-btn" onclick={handleSwitchRole}>
+                            {accessNotice.switchLabel}
+                        </button>
+                    </template>
+                    <button
+                        type="button"
+                        class="ps-notice-dismiss"
+                        onclick={dismissNotice}
+                        aria-label="Dismiss">
+                        &times;
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Row 1: Intake -->
+        <div class="ps-row-label">
+            <span class="ps-row-text">Intake</span>
+        </div>
+        <div class="ps-grid">
+            <template for:each={intakeTiles} for:item="tile">
+                <div
+                    key={tile.key}
+                    class={tile.cardClass}
+                    data-key={tile.key}
+                    onclick={handleTileClick}>
+
+                    <div class="ps-card-top">
+                        <lightning-icon
+                            icon-name={tile.icon}
+                            size="x-small"
+                            class={tile.iconClass}>
+                        </lightning-icon>
+
+                        <template if:true={tile.locked}>
+                            <lightning-icon
+                                icon-name="utility:lock"
+                                size="xx-small"
+                                class="ps-card-lock">
+                            </lightning-icon>
+                        </template>
+                        <template if:false={tile.locked}>
+                            <span class={tile.dotClass}></span>
+                        </template>
+                    </div>
+
+                    <div class={tile.countClass}>{tile.count}</div>
+                    <div class="ps-label">{tile.label}</div>
+
+                    <template if:true={tile.locked}>
+                        <div class="ps-sub ps-sub--locked">{tile.lockHint}</div>
+                    </template>
+                    <template if:false={tile.locked}>
+                        <div class="ps-sub">{tile.sub}</div>
+                    </template>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- Divider -->
+        <div class="ps-divider"></div>
+
+        <!-- Row 2: Evaluation -->
+        <div class="ps-row-label">
+            <span class="ps-row-text">Evaluation</span>
+        </div>
+        <div class="ps-grid">
+            <template for:each={evaluationTiles} for:item="tile">
+                <div
+                    key={tile.key}
+                    class={tile.cardClass}
+                    data-key={tile.key}
+                    onclick={handleTileClick}>
+
+                    <div class="ps-card-top">
+                        <lightning-icon
+                            icon-name={tile.icon}
+                            size="x-small"
+                            class={tile.iconClass}>
+                        </lightning-icon>
+
+                        <template if:true={tile.locked}>
+                            <lightning-icon
+                                icon-name="utility:lock"
+                                size="xx-small"
+                                class="ps-card-lock">
+                            </lightning-icon>
+                        </template>
+                        <template if:false={tile.locked}>
+                            <span class={tile.dotClass}></span>
+                        </template>
+                    </div>
+
+                    <div class={tile.countClass}>{tile.count}</div>
+                    <div class="ps-label">{tile.label}</div>
+
+                    <template if:true={tile.locked}>
+                        <div class="ps-sub ps-sub--locked">{tile.lockHint}</div>
+                    </template>
+                    <template if:false={tile.locked}>
+                        <div class="ps-sub">{tile.sub}</div>
+                    </template>
+
+                </div>
+            </template>
+        </div>
+
+        <!-- Loading spinner -->
+        <template if:true={isLoading}>
+            <div class="ps-loading">
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template>
+
+    </div>
+</template>

@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <developerName>Flex_Translation_Prompt</developerName>
+    <masterLabel>Flex_Translation_Prompt</masterLabel>
+    <overridable>false</overridable>
+    <templateVersions>
+        <content>You are an expert proposal translator.
+
+Translate the following grant proposal and its related sections into {!$Input:targetLanguage}
+
+Main proposal fields:
+{!$RecordSnapshot:proposal.Snapshot}
+
+Historical data:
+{!$RecordSnapshot:historicalData.Snapshot}
+
+Current fiscal year data:
+{!$RecordSnapshot:fiscalData.Snapshot}
+
+Outcome data:
+{!$RecordSnapshot:outcomeData.Snapshot}
+
+
+Please return a JSON object containing all translated fields with the same structure as the input, so it can be updated in Salesforce. 
+**Only translate the field values, do not change the field names or structure.**
+
+</content>
+        <inputs>
+            <apiName>proposal</apiName>
+            <definition>SOBJECT://IndividualApplication</definition>
+            <masterLabel>proposal</masterLabel>
+            <referenceName>Input:proposal</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>historicalData</apiName>
+            <definition>SOBJECT://Historical_Data__c</definition>
+            <masterLabel>historicalData</masterLabel>
+            <referenceName>Input:historicalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>fiscalData</apiName>
+            <definition>SOBJECT://Current_fiscal_year_data__c</definition>
+            <masterLabel>fiscalData</masterLabel>
+            <referenceName>Input:fiscalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>outcomeData</apiName>
+            <definition>SOBJECT://Outcomes_Data__c</definition>
+            <masterLabel>outcomeData</masterLabel>
+            <referenceName>Input:outcomeData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>targetLanguage</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>targetLanguage</masterLabel>
+            <referenceName>Input:targetLanguage</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:proposal.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:proposal</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:historicalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:historicalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:fiscalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:fiscalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:outcomeData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:outcomeData</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are an expert proposal translator.
+
+Translate the following grant proposal and its related sections into {!$Input:targetLanguage}
+
+Main proposal fields:
+{!$RecordSnapshot:proposal.Snapshot}
+
+Historical data:
+{!$RecordSnapshot:historicalData.Snapshot}
+
+Current fiscal year data:
+{!$RecordSnapshot:fiscalData.Snapshot}
+
+Outcome data:
+{!$RecordSnapshot:outcomeData.Snapshot}
+
+
+Please return a JSON object containing all translated fields with the same structure as the input, so it can be updated in Salesforce.
+**Only translate the field values, do not change the field names or structure.**
+
+Return only the JSON object, with no code block, no triple backticks, no markdown, and no explanation.
+
+</content>
+        <inputs>
+            <apiName>proposal</apiName>
+            <definition>SOBJECT://IndividualApplication</definition>
+            <masterLabel>proposal</masterLabel>
+            <referenceName>Input:proposal</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>historicalData</apiName>
+            <definition>SOBJECT://Historical_Data__c</definition>
+            <masterLabel>historicalData</masterLabel>
+            <referenceName>Input:historicalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>fiscalData</apiName>
+            <definition>SOBJECT://Current_fiscal_year_data__c</definition>
+            <masterLabel>fiscalData</masterLabel>
+            <referenceName>Input:fiscalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>outcomeData</apiName>
+            <definition>SOBJECT://Outcomes_Data__c</definition>
+            <masterLabel>outcomeData</masterLabel>
+            <referenceName>Input:outcomeData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>targetLanguage</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>targetLanguage</masterLabel>
+            <referenceName>Input:targetLanguage</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:proposal.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:proposal</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:historicalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:historicalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:fiscalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:fiscalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:outcomeData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:outcomeData</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_2</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are an expert proposal translator.
+
+Translate the following grant proposal and its related sections into {!$Input:targetLanguage}
+
+Main proposal fields:
+{!$RecordSnapshot:proposal.Snapshot}
+
+Historical data:
+{!$RecordSnapshot:historicalData.Snapshot}
+
+Current fiscal year data:
+{!$RecordSnapshot:fiscalData.Snapshot}
+
+Outcome data:
+{!$RecordSnapshot:outcomeData.Snapshot}
+
+
+Please return a JSON object containing all translated fields with the same structure as the input, so it can be updated in Salesforce.
+**Only translate the field values, do not change the field names or structure.**
+
+Return only the JSON object, with no code block, no triple backticks, no markdown, and no explanation.
+
+</content>
+        <inputs>
+            <apiName>proposal</apiName>
+            <definition>SOBJECT://IndividualApplication</definition>
+            <masterLabel>proposal</masterLabel>
+            <referenceName>Input:proposal</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>historicalData</apiName>
+            <definition>SOBJECT://Historical_Data__c</definition>
+            <masterLabel>historicalData</masterLabel>
+            <referenceName>Input:historicalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>fiscalData</apiName>
+            <definition>SOBJECT://Current_fiscal_year_data__c</definition>
+            <masterLabel>fiscalData</masterLabel>
+            <referenceName>Input:fiscalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>outcomeData</apiName>
+            <definition>SOBJECT://Outcomes_Data__c</definition>
+            <masterLabel>outcomeData</masterLabel>
+            <referenceName>Input:outcomeData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>targetLanguage</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>targetLanguage</masterLabel>
+            <referenceName>Input:targetLanguage</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:proposal.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:proposal</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:historicalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:historicalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:fiscalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:fiscalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:outcomeData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:outcomeData</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_3</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are an expert proposal translator.
+
+Translate the following grant proposal and its related sections into {!$Input:targetLanguage}
+
+Main proposal fields:
+{!$RecordSnapshot:proposal.Snapshot}
+
+Historical data:
+{!$RecordSnapshot:historicalData.Snapshot}
+
+Current fiscal year data:
+{!$RecordSnapshot:fiscalData.Snapshot}
+
+Outcome data:
+{!$RecordSnapshot:outcomeData.Snapshot}
+
+
+Please return a JSON object containing all translated fields with the same structure as the input do not miss any fields, so it can be updated in Salesforce.
+**Only translate the field values, do not change the field names or structure.**
+
+Return only the JSON object, with no code block, no triple backticks, no markdown, and no explanation.
+
+</content>
+        <inputs>
+            <apiName>proposal</apiName>
+            <definition>SOBJECT://IndividualApplication</definition>
+            <masterLabel>proposal</masterLabel>
+            <referenceName>Input:proposal</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>historicalData</apiName>
+            <definition>SOBJECT://Historical_Data__c</definition>
+            <masterLabel>historicalData</masterLabel>
+            <referenceName>Input:historicalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>fiscalData</apiName>
+            <definition>SOBJECT://Current_fiscal_year_data__c</definition>
+            <masterLabel>fiscalData</masterLabel>
+            <referenceName>Input:fiscalData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>outcomeData</apiName>
+            <definition>SOBJECT://Outcomes_Data__c</definition>
+            <masterLabel>outcomeData</masterLabel>
+            <referenceName>Input:outcomeData</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>targetLanguage</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>targetLanguage</masterLabel>
+            <referenceName>Input:targetLanguage</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultGPT5</primaryModel>
+        <status>Published</status>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:proposal.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:proposal</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:fiscalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:fiscalData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:outcomeData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:outcomeData</referenceName>
+        </templateDataProviders>
+        <templateDataProviders>
+            <definition>invocable://getDataForGrounding</definition>
+            <parameters>
+                <definition>primitive://String</definition>
+                <isRequired>true</isRequired>
+                <parameterName>recordId</parameterName>
+                <valueExpression>{!$Input:historicalData.Id}</valueExpression>
+            </parameters>
+            <referenceName>RecordSnapshot:historicalData</referenceName>
+        </templateDataProviders>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_4</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Final_recommendation_ExternalReviewer__c</fullName>
+    <label>Funding Recommendation</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Recommended for Funding</fullName>
+                <default>false</default>
+                <label>Shortlisted</label>
+            </value>
+            <value>
+                <fullName>Not Recommended for Funding</fullName>
+                <default>false</default>
+                <label>Not Shortlisted</label>
+            </value>
+            <value>
+                <fullName>To be considered for Funding after Modifications</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>To be considered for Funding after Modifications</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

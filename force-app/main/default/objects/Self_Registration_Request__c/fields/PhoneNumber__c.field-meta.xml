@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PhoneNumber__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+    AND(NOT(ISPICKVAL(Country_Code__c, &quot;&quot;)), NOT(ISBLANK(Phone_Number__c))),
+    TEXT(Country_Code__c) &amp; &quot; &quot; &amp; Phone_Number__c,
+    IF(
+        NOT(ISPICKVAL(Country_Code__c, &quot;&quot;)),
+        TEXT(Country_Code__c),
+        Phone_Number__c
+    )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Phone Number F</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

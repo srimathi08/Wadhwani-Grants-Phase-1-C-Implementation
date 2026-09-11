@@ -1,0 +1,94 @@
+<template>
+    <div class="navbar slds-border_bottom">
+
+        <!-- Logo (Left) -->
+        <div class="navbar-logo">
+            <a href={homeUrl} class="wcf-header__logo">
+                <img src={logoUrl} alt={logoAlt} onerror={handleLogoError} />
+            </a>
+        </div>
+
+        <!-- Nav Menu (Center) -- includes "Home" automatically when addHomeMenuItem is true -->
+        <nav role="navigation" class="slds-align_absolute-center navbar-nav">
+            <ul class="slds-list_horizontal slds-has-dividers_right slds-has-block-links_space">
+                <template for:each={menuItems} for:item="item">
+                    <li key={item.id} class="slds-item">
+                        <c-navigation-menu-item item={item}></c-navigation-menu-item>
+                    </li>
+                </template>
+            </ul>
+        </nav>
+
+        <!-- Language selector + Login / Account (Right) -->
+        <div class="navbar-right">
+
+            <div class="navbar-lang">
+                <template if:true={isLoadingLang}>
+                    <div class="lang-loading">
+                        <div class="lang-spinner"></div>
+                    </div>
+                </template>
+
+                <template if:false={isLoadingLang}>
+                    <template if:true={hasLanguages}>
+                        <div class="lang-selector">
+                          <!--   <span class="lang-globe-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                </svg>
+                            </span>
+                          <select class="lang-select" value={selectedLanguage} onchange={handleLanguageChange}>
+                                <template for:each={availableLanguages} for:item="lang">
+                                    <option key={lang.value} value={lang.value} selected={lang.isSelected}>
+                                        {lang.label}
+                                    </option>
+                                </template>
+                            </select>
+                            <span class="lang-chevron">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span> --> 
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <div class="navbar-account">
+                <!-- Guest: simple Log in link -->
+                <template if:true={isGuest}>
+                    <a href={loginUrl} class="login-link">Log in</a>
+                </template>
+
+                <!-- Logged in: name/initials chip with Profile / Log out menu -->
+                <template if:false={isGuest}>
+                    <div class="account-wrap">
+                        <button type="button" class="account-btn" onclick={toggleAccountMenu}
+                                aria-haspopup="true" aria-expanded={showAccountMenu}>
+                            <span class="account-avatar">{initials}</span>
+                            <span class="account-name">{displayName}</span>
+                            <svg class="account-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <template if:true={showAccountMenu}>
+                            <div class="account-menu" role="menu">
+                                <a href={profileUrl} class="account-menu-item" role="menuitem">Profile</a>
+                                <a href={logoutUrl} class="account-menu-item" role="menuitem">Log out</a>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </div>
+</template>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Conditionally Approved</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c}] Wadhwani Grants application conditionally approved</subject>
+    <textOnly>[{{{org_name}}}] Wadhwani Grants application conditionally approved
+
+Hello {{{contact_first_name}}},
+
+I&apos;m pleased to let you know that your application has been conditionally approved.
+
+Before we proceed, a few conditions need to be addressed:
+
+{{{conditions_text}}}
+
+Once these are resolved, we’ll move ahead with onboarding.
+
+Review conditions:
+{{{portal_url}}}
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

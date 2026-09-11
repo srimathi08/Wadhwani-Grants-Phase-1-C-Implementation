@@ -1,0 +1,25 @@
+<template>
+    <div class="banner-shell">
+        <span class="banner-badge">{label.CL_Action_Required}</span>
+
+        <p class="banner-feedback">
+            {label.CL_Feedback_on_your_application},
+            {label.CL_Update_and_resubmit}
+        </p>
+
+        <template if:true={hasNotes}>
+            <ul class="banner-list">
+                <template for:each={sortedNotes} for:item="note">
+                    <li key={note.questionNum} class="banner-list-item">
+                        <span class="banner-q-pill">Q{note.questionNum}</span>
+                        <span class="banner-reason">{note.returnText}</span>
+                    </li>
+                </template>
+            </ul>
+        </template>
+
+        <button class="banner-view-original" onclick={handleViewOriginal}>
+            {label.CL_View_original_submission}
+        </button>
+    </div>
+</template>

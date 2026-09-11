@@ -1,0 +1,202 @@
+/* ── Shell ───────────────────────────────────────────── */
+.page-shell {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f7fb;
+    min-height: 100vh;
+    padding: 1.5rem 2rem;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-pill {
+    background: #c04018;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.record-count {
+    font-size: 0.85rem;
+    color: #6b7280;
+    background: #e5e7eb;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* ── Table Card ──────────────────────────────────────── */
+.table-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    overflow: hidden;
+}
+
+.app-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+/* Head */
+.app-table thead tr {
+    background: #1a1a2e;
+    color: #ffffff;
+}
+
+.app-table thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Body rows */
+.table-row {
+    border-bottom: 1px solid #f0f0f5;
+    transition: background 0.15s ease;
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.table-row:hover {
+    background: #fef6f3;
+}
+
+.app-table tbody td {
+    padding: 13px 18px;
+    color: #1f2937;
+    vertical-align: middle;
+}
+
+.col-num {
+    width: 48px;
+    text-align: center;
+}
+
+.col-action {
+    width: 120px;
+    text-align: center;
+}
+
+.name-cell {
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.muted {
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #fde8df;
+    color: #c04018;
+    white-space: nowrap;
+}
+
+/* Review Button */
+.review-btn {
+    background: linear-gradient(135deg, #e05a28, #c04018);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    white-space: nowrap;
+}
+
+.review-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+/* ── Loading ─────────────────────────────────────────── */
+.loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+    gap: 1rem;
+}
+
+.loading-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* ── Error ───────────────────────────────────────────── */
+.error-box {
+    background: #fff1f0;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    color: #b91c1c;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.error-icon {
+    font-size: 1.2rem;
+}
+
+/* ── Empty State ─────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 0.5rem;
+}
+
+.empty-sub {
+    font-size: 0.9rem;
+    color: #6b7280;
+}

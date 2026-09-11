@@ -60,20 +60,36 @@ export default class ProposalLevel1Action extends LightningElement {
 
         // ← Pass coeComments to Apex
         escalateToPI({ recordId: this.recordId, coeComments: this.coeComments })
-            .then(() => {
-                this.isEscalated = true;
-                const now = new Date();
-                this.escalatedAt = 'Sent on ' + now.toLocaleDateString('en-GB', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                }) + ' at ' + now.toLocaleTimeString('en-GB', {
-                    hour: '2-digit', minute: '2-digit'
-                });
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Email sent to PI successfully',
-                    variant: 'success'
-                }));
-            })
+         .then(() => {
+    this.isEscalated = true;
+
+    this.dispatchEvent(
+        new CustomEvent('mailcompleted')
+    );
+
+    const now = new Date();
+
+    this.escalatedAt =
+        'Sent on ' +
+        now.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }) +
+        ' at ' +
+        now.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+    this.dispatchEvent(
+        new ShowToastEvent({
+            title: 'Success',
+            message: 'Email sent to PI successfully',
+            variant: 'success'
+        })
+    );
+})
             .catch(error => {
                 this.dispatchEvent(new ShowToastEvent({
                     title: 'Error',

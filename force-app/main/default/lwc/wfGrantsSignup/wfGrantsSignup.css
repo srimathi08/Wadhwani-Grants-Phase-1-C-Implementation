@@ -1,0 +1,561 @@
+/* ── Brand tokens ──────────────────────────────────────────────── */
+.login-shell {
+    --color-red:        #BF2026; /* primary button / CTA */
+    --color-red-deep:   #A3181D; /* red pressed state */
+    --color-orange:     #F2672A; /* accent, hover, secondary */
+    --color-orange-deep:#D8551E; /* orange pressed state */
+    --color-white:      #FFFFFF;
+    --color-text:       #414041; /* body text — dark gray, not black */
+    --color-text-muted: #767171; /* lighter body text, still off-black */
+    --color-hairline:   #E3DEDE;
+    --color-field-bg:   #FFFFFF;
+
+    --color-error-bg:     #FCEBEA;
+    --color-error-border: #B3261E;
+    --color-warning-bg:     #FEF2E4;
+    --color-warning-border: #F68720;
+    --color-success-bg:     #EAF4EA;
+    --color-success-border: #2E7D32;
+    --color-info-bg:        #E9F3FB;
+    --color-info-border:    #2380D1;
+}
+
+/* ── Shell ─────────────────────────────────────────────────────── */
+.login-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 10px;
+    background: var(--color-white);
+    font-family: var(--lwc-fontFamily, Barlow), 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--color-text);
+    box-sizing: border-box;
+}
+
+.login-panel {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── Brand ─────────────────────────────────────────────────────── */
+.brand-header {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--color-red);
+    border-radius: 0;
+    padding: 14px 20px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.brand-logo { max-height: 72px; max-width: 280px; object-fit: contain; display: block; }
+.brand-fallback {
+    color: var(--color-white);
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── Card ──────────────────────────────────────────────────────── */
+.login-card {
+    width: 100%;
+    background: var(--color-white);
+    border: 1px solid var(--color-hairline);
+    border-radius: 0;
+    box-shadow: 0 12px 32px rgba(65, 64, 65, 0.08);
+    padding: 14px 20px 14px;
+    box-sizing: border-box;
+}
+
+.card-title {
+    margin: 0 0 3px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: center;
+}
+
+.card-subtitle {
+    margin: 0 0 8px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.sent-to { color: var(--color-text); }
+
+/* ── Fields ────────────────────────────────────────────────────── */
+.field-group { margin-bottom: 7px; }
+
+.field-row {
+    display: flex;
+    gap: 10px;
+}
+.field-row .field-group { flex: 1; margin-bottom: 7px; }
+
+.field-label {
+    display: block;
+    margin-bottom: 3px;
+    font-family: var(--lwc-fontFamily, Barlow), 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.field-hint {
+    margin: 3px 0 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+.email-input,
+.iti-phone-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 11px;
+    border: 1px solid #CBC5C5;
+    border-radius: 0;
+    font-family: var(--lwc-fontFamily, Barlow), 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    color: var(--color-text);
+    background: var(--color-field-bg);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.email-input:focus,
+.iti-phone-input:focus {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(242, 103, 42, 0.18);
+}
+
+/* Password field with show/hide */
+.password-wrap { position: relative; }
+.password-wrap .email-input { padding-right: 54px; }
+
+/* Hide the browser's native password reveal/clear icons (Edge/IE) so only
+   the app's own Show/Hide control is shown — keeps the control consistent. */
+.password-wrap input::-ms-reveal,
+.password-wrap input::-ms-clear {
+    display: none;
+}
+
+.eye-btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px 6px;
+}
+
+.eye-btn:hover { color: var(--color-orange); }
+
+.eye-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Inline field-level validation message (e.g. phone number) */
+.field-error {
+    margin: 5px 2px 0;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--color-error-border);
+}
+
+/* Live "passwords match" indicator under the confirm-password field */
+.match-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 2px 0;
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 600;
+}
+.match-hint--ok  { color: var(--color-success-border); }
+.match-hint--bad { color: var(--color-error-border); }
+.hint-icon { width: 14px; height: 14px; flex: 0 0 14px; }
+
+/* Live password-strength meter under the Create password field */
+.strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 2px 0;
+}
+.strength-track {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+.strength-seg {
+    height: 4px;
+    flex: 1;
+    border-radius: 0;
+    background: var(--color-hairline);
+    transition: background-color 0.2s ease;
+}
+.strength-seg--weak   { background: #D64545; }
+.strength-seg--fair   { background: #E08A1E; }
+.strength-seg--good   { background: #2F8FE0; }
+.strength-seg--strong { background: var(--color-success-border); }
+
+.strength-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    min-width: 44px;
+    text-align: right;
+}
+.strength-label--weak   { color: #D64545; }
+.strength-label--fair   { color: #E08A1E; }
+.strength-label--good   { color: #2F8FE0; }
+.strength-label--strong { color: var(--color-success-border); }
+
+/* ── Consent (Terms of Use + Privacy Policy — mandatory, compendium §12) ── */
+.consent-group {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.consent-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.consent-box {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin-top: 1px;
+    accent-color: var(--color-red);
+    cursor: pointer;
+}
+
+.consent-box:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+    border-radius: 0;
+}
+
+.consent-text {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+}
+
+.consent-link {
+    color: var(--color-orange);
+    font-weight: 600;
+    text-decoration: none;
+}
+.consent-link:hover {
+    text-decoration: underline;
+    color: var(--color-orange-deep);
+}
+
+/* ── Status banners (error is active today; others ready for reuse) ── */
+.error-banner,
+.warning-banner,
+.success-banner,
+.info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 0;
+    border-left: 3px solid transparent;
+    padding: 9px 11px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.error-banner {
+    background: var(--color-error-bg);
+    border-left-color: var(--color-error-border);
+}
+.error-banner .error-icon { color: var(--color-error-border); }
+
+.warning-banner {
+    background: var(--color-warning-bg);
+    border-left-color: var(--color-warning-border);
+}
+.success-banner {
+    background: var(--color-success-bg);
+    border-left-color: var(--color-success-border);
+}
+.info-banner {
+    background: var(--color-info-bg);
+    border-left-color: var(--color-info-border);
+}
+
+.error-icon { width: 15px; height: 15px; flex: 0 0 15px; margin-top: 1px; }
+.success-icon { width: 15px; height: 15px; flex: 0 0 15px; margin-top: 1px; color: var(--color-success-border); }
+.success-banner .success-icon { color: var(--color-success-border); }
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.primary-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 0;
+    background: var(--color-red);
+    color: var(--color-white);
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.primary-btn:hover:not(:disabled)  { background: var(--color-red-deep); }
+.primary-btn:active:not(:disabled) { background: var(--color-red-deep); transform: translateY(1px); }
+.primary-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.primary-btn:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+}
+
+.helper-text {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.5;
+}
+
+.switch-line {
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.switch-link {
+    color: var(--color-orange);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+}
+.switch-link:hover { text-decoration: underline; color: var(--color-orange-deep); }
+
+.link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--color-orange);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+}
+.link-btn:hover { text-decoration: underline; color: var(--color-orange-deep); }
+.link-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.resend-icon { width: 14px; height: 14px; }
+
+/* ── Spinner ───────────────────────────────────────────────────── */
+.spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: var(--color-white);
+    border-radius: 50%;
+    animation: wcf-spin 0.7s linear infinite;
+}
+
+.spinner--sm {
+    width: 12px;
+    height: 12px;
+    border-color: rgba(242, 103, 42, 0.3);
+    border-top-color: var(--color-orange);
+}
+
+@keyframes wcf-spin { to { transform: rotate(360deg); } }
+
+/* ── OTP boxes ─────────────────────────────────────────────────── */
+.otp-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 4px 0 16px;
+}
+
+.otp-box {
+    width: 46px;
+    height: 54px;
+    text-align: center;
+    font-family: var(--lwc-fontFamily, Barlow), 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    border: 1px solid #CBC5C5;
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.otp-box:focus {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(242, 103, 42, 0.18);
+}
+
+/* ── OTP actions / resend timer ────────────────────────────────── */
+.otp-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.action-sep { color: #C9C3C3; }
+
+.resend-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.timer-ring-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+}
+
+.timer-ring { width: 36px; height: 36px; transform: rotate(-90deg); }
+
+.timer-ring__track {
+    fill: none;
+    stroke: var(--color-hairline);
+    stroke-width: 4;
+}
+
+.timer-ring__progress {
+    fill: none;
+    stroke: var(--color-orange);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.timer-count {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.timer-label { font-weight: 600; }
+
+/* ── Step indicator (sign-up) ──────────────────────────────────── */
+.step-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Reserve room for the absolutely-positioned step labels below the dots
+       so they don't overlap / merge into the login card. */
+    margin-bottom: 20px;
+    padding-bottom: 22px;
+}
+
+.step-dot {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-hairline);
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.step-dot .step-name {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.step-current { background: var(--color-red); color: var(--color-white); }
+.step-current .step-name { color: var(--color-red); }
+.step-done { background: #F5D9D5; color: var(--color-red); }
+
+.step-bar {
+    width: 42px;
+    height: 3px;
+    border-radius: 0;
+    background: var(--color-hairline);
+}
+
+/* ── Footer ────────────────────────────────────────────────────── */
+.login-footer {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+    .login-card { padding: 14px 16px 14px; }
+    .otp-box { width: 40px; height: 48px; font-size: 19px; }
+    .field-row { flex-direction: column; gap: 0; }
+    .field-row .field-group { margin-bottom: 7px; }
+}
+
+/* Very short viewports: trim a little further as a safety net. */
+@media (max-height: 620px) {
+    .brand-header { padding: 10px 20px; margin-bottom: 6px; }
+    .brand-logo { max-height: 56px; }
+    .login-card { padding: 12px 18px 12px; }
+    .card-title { font-size: 16px; }
+    .card-subtitle { margin-bottom: 8px; }
+    .field-group,
+    .field-row .field-group { margin-bottom: 7px; }
+    .consent-group { margin-top: 8px; margin-bottom: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner { animation-duration: 1.4s; }
+    .timer-ring__progress { transition: none; }
+}

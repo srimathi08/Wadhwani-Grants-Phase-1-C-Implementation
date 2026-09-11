@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Onboarding Complete Partner</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Onboarding complete — welcome aboard</subject>
+    <textOnly>Subject: [{{{org_name}}}] Onboarding complete — welcome aboard
+
+Hello {{{contact_first_name}}},
+
+With your agreement executed and compliance documentation approved, {{{org_name}}}&apos;s onboarding with Wadhwani Grants is now complete.
+
+Welcome — we’re delighted to be working with you.
+
+We’ll be in touch shortly with the next steps to get your program underway. In the meantime, you can access your portal here:
+
+{{{portal_url}}}
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+Questions? Contact us at:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

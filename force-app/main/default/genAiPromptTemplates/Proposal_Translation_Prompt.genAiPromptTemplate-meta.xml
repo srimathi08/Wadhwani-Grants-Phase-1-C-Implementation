@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <developerName>Proposal_Translation_Prompt</developerName>
+    <masterLabel>Proposal Translation Prompt</masterLabel>
+    <overridable>false</overridable>
+    <templateVersions>
+        <content>You are a translation engine. Given a JSON object of Salesforce record fields and values, translate only the values (not the field names) to {!$Input:target_language}.
+
+Return a JSON object with the same field names as keys, and the translated values as values.
+
+Input JSON: {!$Input:input_json}
+
+Target language: {!$Input:target_language}
+</content>
+        <inputs>
+            <apiName>input_json</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>input json</masterLabel>
+            <referenceName>Input:input_json</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>target_language</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>target language</masterLabel>
+            <referenceName>Input:target_language</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Documents Approved</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Compliance documents approved</subject>
+    <textOnly>Subject: [{{{org_name}}}] Compliance documents approved
+
+Hello {{{contact_first_name}}},
+
+Good news — all the compliance documents submitted for {{{org_name}}} have been reviewed and approved.
+
+There’s nothing further required from you at this stage.
+
+You can view your current status here:
+{{{portal_url}}}
+
+Thank you for your prompt submissions and cooperation. It helps keep everything moving smoothly.
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+Questions? Contact us at:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

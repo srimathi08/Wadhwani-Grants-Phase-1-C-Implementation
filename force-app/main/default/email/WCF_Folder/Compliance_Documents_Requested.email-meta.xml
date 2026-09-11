@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Documents Requested</name>
+    <style>none</style>
+    <subject>[Org Name] Compliance documents requested</subject>
+    <textOnly>[{{{org_name}}}] Compliance documents requested
+
+Hello {{{contact_first_name}}},
+
+To continue your onboarding, we need the following documents:
+
+{{{document_list}}}
+
+Please submit them by: {{{due_date}}}
+
+Upload documents here:
+{{{portal_url}}}
+
+If you need more time or run into issues, please reach out to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Best regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

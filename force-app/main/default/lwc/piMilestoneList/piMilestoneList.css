@@ -1,4 +1,17 @@
 .page {
+    --wf-red: #b31217;
+    --wf-red-dark: #8f0e12;
+    --wf-red-tint: rgba(179, 18, 23, 0.15);
+    --wf-amber: #f0b429;
+    --wf-amber-bg: #fffdf7;
+    --wf-text-dark: #2c3642;
+    --wf-text-mid: #4e5a6a;
+    --wf-text-muted: #6c7889;
+    --wf-border: #eef1f5;
+    --wf-border-strong: #d8dee7;
+}
+
+.page {
     padding: 18px 18px 40px 18px;
 }
 
@@ -14,11 +27,12 @@
     font-size: 22px;
     font-weight: 800;
     margin: 0;
+    color: var(--wf-text-dark);
 }
 
 .subtitle {
     margin-top: 4px;
-    color: #5f6b7a;
+    color: var(--wf-text-muted);
     font-size: 13px;
 }
 
@@ -45,10 +59,15 @@
 
 .card {
     background: white;
-    border: 1px solid #eef1f5;
+    border: 1px solid var(--wf-border);
     border-radius: 18px;
     padding: 14px;
     box-shadow: 0px 10px 35px rgba(16, 24, 40, 0.05);
+    transition: box-shadow 0.15s ease;
+}
+
+.card:hover {
+    box-shadow: 0px 14px 40px rgba(16, 24, 40, 0.08);
 }
 
 .cardHeader {
@@ -62,11 +81,12 @@
 .name {
     font-weight: 800;
     font-size: 15px;
+    color: var(--wf-text-dark);
 }
 
 .appName {
     font-size: 12px;
-    color: #7a8796;
+    color: var(--wf-text-muted);
     margin-top: 4px;
 }
 
@@ -80,7 +100,7 @@
 .metaItem .label {
     display: block;
     font-size: 11px;
-    color: #7a8796;
+    color: var(--wf-text-muted);
 }
 
 .metaItem .value {
@@ -88,11 +108,12 @@
     font-size: 13px;
     font-weight: 700;
     margin-top: 2px;
+    color: var(--wf-text-dark);
 }
 
 .block {
     background: #fafbfc;
-    border: 1px solid #eef1f5;
+    border: 1px solid var(--wf-border);
     border-radius: 14px;
     padding: 10px;
     margin-top: 10px;
@@ -102,17 +123,17 @@
     font-weight: 800;
     font-size: 12px;
     margin-bottom: 4px;
-    color: #2c3642;
+    color: var(--wf-text-dark);
 }
 
 .blockText {
     font-size: 12px;
-    color: #4e5a6a;
+    color: var(--wf-text-mid);
     line-height: 1.5;
 }
 
 .funding {
-    border-left: 4px solid #b31217;
+    border-left: 4px solid var(--wf-red);
 }
 
 .actions {
@@ -128,17 +149,34 @@
     padding: 8px 14px;
     cursor: pointer;
     color: white;
-    background: #b31217;
+    background: var(--wf-red);
     font-weight: 800;
+    transition: background 0.15s ease;
+}
+
+.btnPrimary:hover {
+    background: var(--wf-red-dark);
+}
+
+.btnPrimary:disabled {
+    background: #d8b3b4;
+    cursor: not-allowed;
 }
 
 .btnOutline {
-    border: 1px solid #d8dee7;
+    border: 1px solid var(--wf-border-strong);
     background: white;
     border-radius: 999px;
     padding: 8px 14px;
     cursor: pointer;
     font-weight: 800;
+    color: var(--wf-text-dark);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btnOutline:hover {
+    background: #f7f9fc;
+    border-color: #c7cfda;
 }
 
 /* ✅ BADGES (Keep single definition only) */
@@ -176,7 +214,7 @@
 /* ❌ RED */
 .badgeDanger {
     background: #ffecec;
-    color: #ffc1c1;
+    color: var(--wf-red-dark);
     border-color: #ffc1c1;
 }
 
@@ -198,11 +236,12 @@
 .emptyTitle {
     font-weight: 900;
     font-size: 16px;
+    color: var(--wf-text-dark);
 }
 
 .emptySub {
     margin-top: 8px;
-    color: #6c7889;
+    color: var(--wf-text-muted);
 }
 
 /* ✅ MODAL BACKDROP */
@@ -240,7 +279,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid #eef1f5;
+    border-bottom: 1px solid var(--wf-border);
 }
 
 /* ✅ header fonts reduced */
@@ -248,11 +287,12 @@
     font-size: 16px;
     font-weight: 900;
     line-height: 1.2;
+    color: var(--wf-text-dark);
 }
 
 .modalSub {
     font-size: 12px;
-    color: #6c7889;
+    color: var(--wf-text-muted);
     margin-top: 2px;
 }
 
@@ -266,7 +306,7 @@
 /* ✅ footer always visible */
 .modalFooter {
     padding: 12px 16px;
-    border-top: 1px solid #eef1f5;
+    border-top: 1px solid var(--wf-border);
     display: flex;
     justify-content: flex-end;
     background: #fff;
@@ -281,7 +321,7 @@
 }
 
 .docCard {
-    border: 1px solid #eef1f5;
+    border: 1px solid var(--wf-border);
     background: #fafbfc;
     border-radius: 16px;
     padding: 12px;
@@ -291,12 +331,12 @@
     font-size: 14px;
     font-weight: 900;
     margin-bottom: 6px;
-    color: #2c3642;
+    color: var(--wf-text-dark);
 }
 
 .docHint {
     font-size: 12px;
-    color: #6c7889;
+    color: var(--wf-text-muted);
     line-height: 1.4;
     margin-bottom: 10px;
 }
@@ -337,7 +377,7 @@
     margin: 10px 0 0;
     padding-left: 18px;
     font-size: 12px;
-    color: #4e5a6a;
+    color: var(--wf-text-mid);
 }
 
 .fileItem {
@@ -393,19 +433,19 @@
     font-weight: 900;
     font-size: 13px;
     margin-bottom: 6px;
-    color: #2c3642;
+    color: var(--wf-text-dark);
 }
 
 .hintText {
     font-size: 12px;
-    color: #4e5a6a;
+    color: var(--wf-text-mid);
     line-height: 1.5;
 }
 
 .hintExample {
     margin-top: 6px;
     font-size: 12px;
-    color: #2c3642;
+    color: var(--wf-text-dark);
 }
 
 /* upload card full width */
@@ -418,7 +458,7 @@
     margin-top: 12px;
     font-weight: 900;
     font-size: 13px;
-    color: #2c3642;
+    color: var(--wf-text-dark);
 }
 .requiredChip {
     display: inline-block;
@@ -434,4 +474,172 @@
 
 .namingError {
     margin-top: 12px;
+}
+/* ✅ Editable/mandatory block — neutral by default, red only when invalid */
+.editableBlock {
+    background: #fafbfc;
+    border: 1.5px dashed var(--wf-border-strong);
+    position: relative;
+}
+
+.editableBlock.invalidBlock {
+    background: #fff5f5;
+    border: 1.5px dashed var(--wf-red);
+}
+
+.blockTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.requiredMark {
+    color: var(--wf-red);
+}
+
+.editBadge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eef1f5;
+    color: var(--wf-text-mid);
+    border: 1px solid var(--wf-border-strong);
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+.editBadge.invalidBadge {
+    background: #ffecec;
+    color: var(--wf-red-dark);
+    border-color: #ffc1c1;
+}
+
+.fieldError {
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--wf-red-dark);
+}
+
+/* Make the lightning-input itself pop and show a clear focus ring */
+.utilizedInput {
+    --slds-c-input-color-border: var(--wf-amber);
+    --slds-c-input-radius-border: 10px;
+}
+
+.utilizedInput lightning-input {
+    width: 100%;
+}
+
+/* Focus state - stronger highlight while typing */
+.utilizedInput:focus-within {
+    --slds-c-input-color-border: var(--wf-red);
+    --slds-c-input-shadow-focus: 0 0 0 3px var(--wf-red-tint);
+}
+
+.currencyInputWrap {
+    position: relative;
+    margin-top: 2px;
+}
+
+.currencyPrefix {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    color: var(--wf-text-mid);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.utilizedInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 12px 9px 26px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--wf-text-dark);
+    border: 1.5px solid var(--wf-amber);
+    border-radius: 10px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.utilizedInput::placeholder {
+    color: #a8b0bb;
+}
+
+.utilizedInput:focus {
+    border-color: var(--wf-red);
+    box-shadow: 0 0 0 3px var(--wf-red-tint);
+}
+
+/* remove native spinner clutter for a cleaner look (optional) */
+.utilizedInput::-webkit-outer-spin-button,
+.utilizedInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ============================
+   ✅ Current TRL dropdown
+   ============================ */
+
+/* .trlSelect reuses .utilizedInput's border/radius/focus look but needs
+   its own padding, cursor, and a custom arrow since <select> renders
+   very differently from <input> across browsers. */
+.trlSelect {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 34px 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--wf-text-dark);
+    background-color: #fff;
+
+    border: 1.5px solid var(--wf-amber);
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    /* Custom chevron so it matches the rest of the design instead of
+       the OS-default select arrow */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1L5 5L9 1' stroke='%234E5A6A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 6px;
+}
+
+.trlSelect:focus {
+    border-color: var(--wf-red);
+    box-shadow: 0 0 0 3px var(--wf-red-tint);
+}
+
+.trlSelect:hover {
+    border-color: #d99a1f;
+}
+
+/* Placeholder-style "Select TRL" option renders muted like a placeholder */
+.trlSelect option[value=""] {
+    color: #a8b0bb;
+}
+
+.trlSelect option {
+    color: var(--wf-text-dark);
+}
+/* red border on the field itself when invalid */
+.utilizedInput.invalidInput,
+.trlSelect.invalidInput {
+    border-color: var(--wf-red);
+    box-shadow: 0 0 0 3px var(--wf-red-tint);
 }

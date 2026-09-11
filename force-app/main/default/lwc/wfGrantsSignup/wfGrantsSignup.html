@@ -1,0 +1,282 @@
+<template>
+    <section class="login-shell">
+        <div class="login-panel">
+
+            <!-- Brand -->
+           <!--   <div class="brand-header">
+                <template if:false={logoFailed}>
+                    <img src={logoimg} alt="Wadhwani Foundation" class="brand-logo" onerror={handleLogoError} />
+                </template>
+                <template if:true={logoFailed}>
+                    <span class="brand-fallback">Wadhwani Foundation</span>
+                </template>
+            </div> -->
+
+            <!-- Step indicator -->
+            <div class="step-track" aria-label="Sign up progress">
+                <span class={step1Class}>1<span class="step-name">Details</span></span>
+                <span class="step-bar" aria-hidden="true"></span>
+                <!-- SMS verification (disabled for now): step-name was "Verify phone" -->
+                <span class={step2Class}>2<span class="step-name">Verify email</span></span>
+            </div>
+
+            <!-- ── STEP 1 : DETAILS ────────────────────────────── -->
+            <template if:true={detailsPage}>
+                <article class="login-card">
+                    <h1 class="card-title">Create your account</h1>
+                    <!-- SMS verification (disabled for now): subtitle was
+                         "We'll verify your phone with an OTP and send a verification link to your email" -->
+                    <p class="card-subtitle">We'll email you a verification code to confirm your account</p>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="firstNameInput">First name</label>
+                            <input id="firstNameInput" class="email-input" type="text"
+                                autocomplete="given-name" placeholder="First name"
+                                value={firstName} data-field="firstName" oninput={handleTextInput} />
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="lastNameInput">Last name</label>
+                            <input id="lastNameInput" class="email-input" type="text"
+                                autocomplete="family-name" placeholder="Last name"
+                                value={lastName} data-field="lastName" oninput={handleTextInput} />
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="orgNameInput">Organization name</label>
+                        <input id="orgNameInput" class="email-input" type="text"
+                            autocomplete="organization" placeholder="Your organization's name"
+                            value={organizationName} data-field="organizationName" oninput={handleTextInput} />
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="emailInput">Email address</label>
+                        <input id="emailInput" class="email-input" type="email"
+                            inputmode="email" autocomplete="email" placeholder="you@example.com"
+                            value={email} data-field="email" oninput={handleTextInput} onblur={handleEmailBlur} />
+                        <template if:true={emailError}>
+                            <p class="field-error" role="alert">{emailError}</p>
+                        </template>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="phoneInput">Phone number</label>
+                        <input id="phoneInput" data-id="phone" class="iti-phone-input"
+                            type="tel" inputmode="numeric" autocomplete="tel-national"
+                            oninput={handlePhoneInput} onblur={handlePhoneBlur} />
+                        <template if:true={phoneError}>
+                            <p class="field-error" role="alert">{phoneError}</p>
+                        </template>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="passwordInput">Create password</label>
+                        <div class="password-wrap">
+                            <input id="passwordInput" class="email-input" type={passwordInputType}
+                                autocomplete="new-password" placeholder="At least 8 characters, 1 letter, 1 number"
+                                value={password} data-field="password" oninput={handleTextInput} onblur={handlePasswordBlur} />
+                            <button class="eye-btn" type="button" onclick={togglePasswordVisibility}
+                                    aria-label="Show or hide password">
+                                <template if:false={showPassword}>
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </template>
+                                <template if:true={showPassword}>
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                        <line x1="1" y1="1" x2="23" y2="23"/>
+                                    </svg>
+                                </template>
+                            </button>
+                        </div>
+                        <template if:true={passwordStrength.show}>
+                            <div class="strength" aria-hidden="true">
+                                <div class="strength-track">
+                                    <template for:each={passwordStrength.segments} for:item="seg">
+                                        <span key={seg.key} class={seg.class}></span>
+                                    </template>
+                                </div>
+                                <span class={passwordStrength.labelClass}>{passwordStrength.label}</span>
+                            </div>
+                        </template>
+                        <template if:true={passwordError}>
+                            <p class="field-error" role="alert">{passwordError}</p>
+                        </template>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="confirmInput">Confirm password</label>
+                        <div class="password-wrap">
+                            <input id="confirmInput" class="email-input" type={confirmPasswordInputType}
+                                autocomplete="new-password" placeholder="Re-enter your password"
+                                value={confirmPassword} data-field="confirmPassword" oninput={handleTextInput} />
+                            <button class="eye-btn" type="button" onclick={toggleConfirmPasswordVisibility}
+                                    aria-label="Show or hide confirm password">
+                                <template if:false={showConfirmPassword}>
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </template>
+                                <template if:true={showConfirmPassword}>
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                        <line x1="1" y1="1" x2="23" y2="23"/>
+                                    </svg>
+                                </template>
+                            </button>
+                        </div>
+                        <template if:true={showPasswordMatch}>
+                            <p class={matchHintClass} role="status">
+                                <template if:true={passwordsMatch}>
+                                    <svg class="hint-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </template>
+                                <template if:false={passwordsMatch}>
+                                    <svg class="hint-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                </template>
+                                {matchHintText}
+                            </p>
+                        </template>
+                    </div>
+
+                    <!-- ── Mandatory Terms of Use + Privacy Policy consent (compendium §12) ── -->
+                    <div class="field-group consent-group">
+                        <label class="consent-check" for="acceptTermsInput">
+                            <input id="acceptTermsInput" class="consent-box" type="checkbox"
+                                checked={acceptedTerms} onchange={handleTermsChange}
+                                aria-describedby="consentText" />
+                            <span id="consentText" class="consent-text">
+                                I have read and accept the 
+                                <a class="consent-link" href="https://wadhwanifoundation.org/terms-of-use-wadhwani-charitable-foundation/"
+                                    target="_blank" rel="noopener noreferrer"> Terms of Use </a>
+                                and 
+                                <a class="consent-link" href="https://wadhwanifoundation.org/privacy-policy-wadhwani-charitable-foundation/"
+                                    target="_blank" rel="noopener noreferrer"> Privacy Policy</a>.
+                            </span>
+                        </label>
+                    </div>
+
+                    <template if:true={showErrorMessage}>
+                        <div class="error-banner" role="alert">
+                            <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{errorMessage}</span>
+                        </div>
+                    </template>
+
+                    <button class="primary-btn" type="button" onclick={handleContinue} disabled={isSending}>
+                        <template if:true={isSending}>
+                            <span class="spinner" aria-hidden="true"></span>Sending OTP…
+                        </template>
+                        <template if:false={isSending}>Continue</template>
+                    </button>
+
+                    <p class="switch-line">
+                        Already have an account?
+                        <a class="switch-link" href={loginUrl}>Log in</a>
+                    </p>
+                </article>
+            </template>
+
+            <!-- ── STEP 2 : EMAIL OTP (SMS OTP disabled for now, see comments) ── -->
+            <template if:true={phoneOtpPage}>
+                <article class="login-card otp-card">
+                    <!-- SMS verification (disabled for now): title was "Verify your phone" -->
+                    <h1 class="card-title">Verify your email</h1>
+                    <p class="card-subtitle">
+                        Enter the 6-digit code we sent to<br/>
+                        <!-- SMS verification (disabled for now): used {maskedPhone} here -->
+                        <strong class="sent-to">{maskedEmail}</strong>
+                    </p>
+
+                    <div class="otp-row" aria-label="Email verification code">
+                        <template for:each={otpDigits} for:item="digit">
+                            <input key={digit.index} class="otp-box" type="text"
+                                inputmode="numeric" maxlength="1" value={digit.value}
+                                data-index={digit.index}
+                                oninput={handleOtpDigitInput}
+                                onkeydown={handleOtpDigitKeydown}
+                                onpaste={handleOtpPaste} />
+                        </template>
+                    </div>
+
+                    <template if:true={showErrorMessage}>
+                        <div class="error-banner" role="alert">
+                            <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{errorMessage}</span>
+                        </div>
+                    </template>
+
+                    <template if:true={showSuccessMessage}>
+                        <div class="success-banner" role="status">
+                            <svg class="success-icon" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{successMessage}</span>
+                        </div>
+                    </template>
+
+                    <button class="primary-btn" type="button" onclick={handleCompleteSignUp} disabled={disableVerifyButton}>
+                        <template if:true={isVerifying}>
+                            <span class="spinner" aria-hidden="true"></span>Creating account…
+                        </template>
+                        <template if:false={isVerifying}>Verify &amp; Create account</template>
+                    </button>
+
+                    <!-- SMS verification (disabled for now) used to show this helper text,
+                         pointing users to click a separate email confirmation link:
+                         "After sign up, we'll email a verification link to {email} — click it to verify your email address."
+                         Not needed now since the code above IS the email verification. -->
+
+                    <div class="otp-actions">
+                        <template if:false={canResend}>
+                            <div class="resend-timer" aria-label="Resend available in {resendCountdown} seconds">
+                                <div class="timer-ring-wrap">
+                                    <svg class="timer-ring" viewBox="0 0 44 44" aria-hidden="true">
+                                        <circle class="timer-ring__track" cx="22" cy="22" r="18"/>
+                                        <circle class="timer-ring__progress" cx="22" cy="22" r="18"
+                                            stroke-dasharray="113.1" stroke-dashoffset={timerDashoffset}/>
+                                    </svg>
+                                    <span class="timer-count" aria-live="polite">{timerDisplay}</span>
+                                </div>
+                                <span class="timer-label">Resend in</span>
+                            </div>
+                        </template>
+
+                        <template if:true={canResend}>
+                            <button class="link-btn resend-ready" type="button" onclick={handleResendOtp} disabled={isSending}>
+                                <template if:true={isSending}>
+                                    <span class="spinner spinner--sm" aria-hidden="true"></span>Sending…
+                                </template>
+                                <template if:false={isSending}>
+                                    <svg class="resend-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Resend OTP
+                                </template>
+                            </button>
+                        </template>
+
+                        <span class="action-sep" aria-hidden="true">·</span>
+                        <button class="link-btn" type="button" onclick={backToDetails}>Edit details</button>
+                    </div>
+                </article>
+            </template>
+
+            <footer class="login-footer">&copy; {currentYear} Wadhwani Charitable Foundation. All rights reserved.</footer>
+        </div>
+    </section>
+</template>

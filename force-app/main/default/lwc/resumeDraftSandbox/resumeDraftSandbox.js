@@ -16,6 +16,7 @@ import { LightningElement, track, wire } from 'lwc';
     import { CurrentPageReference } from 'lightning/navigation';
     import deleteBudgetRecord from '@salesforce/apex/WinProjectProposalFormController.deleteBudgetRecord';
     import deleteMilestoneRecord from '@salesforce/apex/WinProjectProposalFormController.deleteMilestoneRecord';
+    import deleteCoFounderRecord from '@salesforce/apex/WinProjectProposalFormController.deleteCoFounderRecord';
 
 
 export default class ResumeDraftSandbox extends NavigationMixin(LightningElement) {
@@ -57,7 +58,27 @@ export default class ResumeDraftSandbox extends NavigationMixin(LightningElement
           @track showPrimaryOther = false;
             @track showSubOther = false;
           
-    
+        @track coFounders = [{
+    uniqueId: 1,
+    Name: '',
+    Designation__c: '',
+    Institution__c: '',
+    Mobile__c: '',
+    Email__c: ''
+}];
+
+yesNoOptions = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' }
+];
+
+get showStartupRegDetails() {
+    return this.applicationData.Is_Startup_Registered__c === 'Yes';
+}
+
+get showDpiitRegDetails() {
+    return this.applicationData.Is_Startup_DPIIT_Registered__c === 'Yes';
+}
         @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
         if (currentPageReference?.state?.recordId) {
@@ -132,7 +153,18 @@ export default class ResumeDraftSandbox extends NavigationMixin(LightningElement
              Describe_Objective_Relevance_of_Project__c: '',
              Work_undertaken_supporting_current_TRL__c: '',
              Strategy_for_raising_funds_from_Investor__c: '',
-            Strategy_for_transfer_of_technology__c: ''
+            Strategy_for_transfer_of_technology__c: '',
+            Startup_Name__c: '',
+Founder_Name__c: '',
+Founder_Designation__c: '',
+Founder_Institution__c: '',
+Founder_Mobile__c: '',
+Founder_Email__c: '',
+Is_Startup_Registered__c: '',
+Startup_Registration_Date__c: '',
+Startup_Registration_No__c: '',
+Is_Startup_DPIIT_Registered__c: '',
+DPIIT_Registration_No__c: '',
         }; 
     
        @track projectDuration = '';
@@ -353,7 +385,50 @@ get previewMilestones() {
             // Assign directly as array
             this.applicationData.Sub_Focus_Area__c = event.detail.value;
         }*/
-    
+handleCoFounderChange(event) {
+    const field = event.target.dataset.field;
+    const uniqueId = parseInt(event.target.dataset.id, 10);
+    const value = event.target.value;
+
+    this.coFounders = this.coFounders.map(cf =>
+        cf.uniqueId === uniqueId ? { ...cf, [field]: value } : cf
+    );
+}
+
+addCoFounder() {
+    const newId = this.coFounders.length
+        ? Math.max(...this.coFounders.map(c => c.uniqueId)) + 1
+        : 1;
+    this.coFounders = [...this.coFounders, {
+        uniqueId: newId,
+        Name: '',
+        Designation__c: '',
+        Institution__c: '',
+        Mobile__c: '',
+        Email__c: ''
+    }];
+}
+
+deleteCoFounderRow(event) {
+    const uniqueId = parseInt(event.currentTarget.dataset.id, 10);
+    const rowToDelete = this.coFounders.find(c => c.uniqueId === uniqueId);
+
+    if (rowToDelete?.Id) {
+        deleteCoFounderRecord({ coFounderId: rowToDelete.Id })
+            .then(() => {
+                this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+            })
+            .catch(error => {
+                this.dispatchEvent(new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body?.message || 'Failed to delete co-founder row.',
+                    variant: 'error'
+                }));
+            });
+    } else {
+        this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+    }
+}
 handlePrimaryFocusChange(event) {
     const selectedVal = event.detail.value;
     console.log('>>> PRIMARY SELECTED:', selectedVal);
@@ -1518,6 +1593,29 @@ restoreDependentPicklistOptions() {
                      // 👇 Restore Primary & Sub Focus
                    this.applicationData.Primary_Focus_Area__c = data.primary_focus_area__c;
                    this.applicationData.Sub_Focus_Area__c = data.sub_focus_area__c ? data.sub_focus_area__c.split(';') : [];
+                   this.applicationData.Startup_Name__c = data.startup_name__c;
+this.applicationData.Founder_Name__c = data.founder_name__c;
+this.applicationData.Founder_Designation__c = data.founder_designation__c;
+this.applicationData.Founder_Institution__c = data.founder_institution__c;
+this.applicationData.Founder_Mobile__c = data.founder_mobile__c;
+this.applicationData.Founder_Email__c = data.founder_email__c;
+this.applicationData.Is_Startup_Registered__c = data.is_startup_registered__c;
+this.applicationData.Startup_Registration_Date__c = data.startup_registration_date__c;
+this.applicationData.Startup_Registration_No__c = data.startup_registration_no__c;
+this.applicationData.Is_Startup_DPIIT_Registered__c = data.is_startup_dpiit_registered__c;
+this.applicationData.DPIIT_Registration_No__c = data.dpiit_registration_no__c;
+
+if (result.coFounders && result.coFounders.length > 0) {
+    this.coFounders = result.coFounders.map((c, index) => ({
+        uniqueId: index + 1,
+        Id: c.Id || null,
+        Name: c.Name || '',
+        Designation__c: c.Designation__c || '',
+        Institution__c: c.Institution__c || '',
+        Mobile__c: c.Mobile__c || '',
+        Email__c: c.Email__c || ''
+    }));
+}
 
                     // 👇 Restore Other text fields
                     console.log('Other value of Primary Focus Area:', data.primary_focus_area_other__c);
@@ -2714,13 +2812,30 @@ clean[fieldName] = m.InstallmentLabel;*/
             const { uniqueId, ...clean } = m;
             return clean;
         }); */
-
+const seenCoFounders = new Set();
+const draftCoFounders = this.coFounders
+    .filter(c =>
+        c.Name?.trim() || c.Designation__c?.trim() || c.Institution__c?.trim() ||
+        c.Mobile__c?.trim() || c.Email__c?.trim()
+    )
+    .map(c => {
+        const clean = { ...c };
+        delete clean.uniqueId;
+        return clean;
+    })
+    .filter(c => {
+        const key = (c.Name || '').trim().toLowerCase();
+        if (!key || seenCoFounders.has(key)) return false;
+        seenCoFounders.add(key);
+        return true;
+    });
     // 6️⃣ Save to Apex
     saveDraftApplication({
         applicationId:   this.recordId,
         applicationData: payload,
         milestones:      draftMilestones,
         budgets:         draftBudgets,
+        coFounders: draftCoFounders,
         recordTypeId:    payload.recordTypeId,
         category:        payload.Category
     })

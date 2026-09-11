@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Compliance Document Expiry</name>
+    <style>none</style>
+    <subject>[{{org_name}}] A compliance document is expiring soon</subject>
+    <textOnly>Subject: [{{{org_name}}}] A compliance document is expiring soon
+
+Hello {{{contact_first_name}}},
+
+One of the compliance documents we hold for {{{org_name}}} is nearing expiry.
+
+Document: {{{document_name}}}
+Expiry Date: {{{document_expiry_date}}}
+
+To keep your compliance record current, please upload an updated version.
+
+Upload here:
+{{{portal_url}}}
+
+If you need any help, just reply to this email.
+
+Best regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

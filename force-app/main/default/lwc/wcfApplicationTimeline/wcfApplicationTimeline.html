@@ -1,0 +1,131 @@
+<template>
+    <div class="timeline-card">
+
+        <div class="tl-head">
+            <h3 class="timeline-title">{label.CL_Application_Timeline}</h3>
+            <span class="tl-counter">{stepCounterLabel}</span>
+        </div>
+
+        <div class="tl-progress">
+            <div class={progressFillClass}></div>
+        </div>
+
+        <template if:true={isComplete}>
+            <div class="tl-complete">
+                <div class="tl-complete-icon">✓</div>
+                <p class="tl-complete-title">{t.completeTitle}</p>
+                <p class="tl-complete-body">{t.completeBody}</p>
+            </div>
+        </template>
+
+        <ul class="tl-phases">
+            <template for:each={phases} for:item="phase">
+                <li key={phase.key} class={phase.rowClass}>
+
+                    <button type="button" class="tl-phase-head" data-phase={phase.key} aria-expanded={phase.expandedStr}
+                        onclick={handleTogglePhase}>
+                        <span class={phase.iconClass}>
+                            <template if:true={phase.isDone}>✓</template>
+                            <template if:false={phase.isDone}>{phase.number}</template>
+                        </span>
+                        <span class="tl-phase-text">
+                            <span class="tl-phase-label">{phase.label}</span>
+                            <span class="tl-phase-meta">{phase.meta}</span>
+                        </span>
+                        <template if:true={phase.isActive}>
+                            <span class={phase.badgeClass}>{phase.badgeText}</span>
+                        </template>
+                        <span class={phase.chevronClass}>&#8964;</span>
+                    </button>
+
+                    <template if:true={phase.expanded}>
+                        <div class="tl-phase-body">
+
+                            <template for:each={phase.visibleSteps} for:item="step">
+                                <div key={step.key} class="tl-step">
+                                    <span class="tl-rail">
+                                        <span class={step.dotClass}>
+                                            <template if:true={step.isDone}>✓</template>
+                                        </span>
+                                        <template if:false={step.hideLine}>
+                                            <span class={step.lineClass}></span>
+                                        </template>
+                                    </span>
+
+                                    <div class="tl-step-body">
+
+                                        <template if:false={step.isActive}>
+                                            <span class="tl-step-row">
+                                                <span class="tl-step-label">{step.label}</span>
+                                                <span class="timeline-info-icon" tabindex="0">
+                                                    <span class="timeline-info-icon-glyph">i</span>
+                                                    <span class="timeline-tooltip">{step.tooltip}</span>
+                                                </span>
+                                            </span>
+                                        </template>
+
+                                        <template if:true={step.isActive}>
+                                            <div class={activeCardClass}>
+                                                <p class="tl-active-title">{step.label}</p>
+                                                <p class="tl-active-desc">{step.tooltip}</p>
+                                                <template if:true={step.subLabel}>
+                                                    <p class="tl-active-note">{step.subLabel}</p>
+                                                </template>
+                                                <template if:true={showComplianceAction}>
+                                                    <button type="button" class="tl-action"
+                                                        onclick={handleComplianceAction}>
+                                                        {complianceActionLabel}
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={phase.showRemaining}>
+                                <div class="tl-step tl-step--remaining">
+                                    <span class="tl-rail">
+                                        <span class="tl-dot tl-dot--ghost"></span>
+                                    </span>
+                                    <div class="tl-step-body">
+                                        <span class="tl-remaining-label">{phase.remainingLabel}</span>
+                                        <span class="tl-remaining-names">{phase.remainingNames}</span>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+
+                </li>
+            </template>
+        </ul>
+
+        <a href="#" class="tl-toggle-all" onclick={handleToggleAll}>{toggleAllLabel}</a>
+
+        <div class="timeline-links-card">
+            <h4 class="timeline-lead-title">{label.CL_Useful_links}</h4>
+            <ul class="timeline-link-list">
+                <li>
+                    <a href={faqUrl} onclick={handleOpenFaq}>{label.CL_Application_FAQ}</a>
+                </li>
+                <li>
+                    <a href={eligibilityUrl} onclick={handleOpenEligibility}>
+                        {label.CL_Eligibility_criteria}
+                    </a>
+                </li>
+                <h4 class="timeline-lead-title">{label.CL_For_any_queries}</h4>
+                <li><a href="mailto:grants.support@wadhwanifoundation.org">grants.support@wadhwanifoundation.org</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <c-wcf-eligibility-modal is-open={showEligibilityModal} onclose={handleCloseEligibility}>
+    </c-wcf-eligibility-modal>
+
+    <c-wcf-application-faq-modal is-open={showFaqModal} category='Welcome Application FAQ' onclose={handleCloseFaq}>
+    </c-wcf-application-faq-modal>
+</template>

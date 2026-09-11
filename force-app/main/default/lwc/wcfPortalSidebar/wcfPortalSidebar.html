@@ -1,0 +1,63 @@
+<template>
+    <div class="sidebar">
+
+        <div class="sb-section-label">VALIDATOR</div>
+
+        <div class={navClass_vDashboard} data-page="Home" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-red"></span>
+            <span class="sb-label">Dashboard</span>
+            <template if:true={vQueueBadge}>
+                <span class="sb-badge">{vQueueBadge}</span>
+            </template>
+        </div>
+
+        <div class={navClass_vQueue} data-page="ValidatorPortal__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-red"></span>
+            <span class="sb-label">Validation Queue</span>
+            <template if:true={vQueueBadge}>
+                <span class="sb-badge sb-badge-amber">{vQueueBadge}</span>
+            </template>
+        </div>
+
+        <div class="sb-divider"></div>
+        <div class="sb-section-label">REVIEWER</div>
+
+        <div class={navClass_rDashboard} data-page="WCF_Reviewer_Dashboard__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-blue"></span>
+            <span class="sb-label">Dashboard</span>
+        </div>
+
+        <div class={navClass_rQueue} data-page="WCF_Reviewer_Application_List__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-amber"></span>
+            <span class="sb-label">Review Queue</span>
+            <template if:true={rQueueBadge}>
+                <span class="sb-badge sb-badge-amber">{rQueueBadge}</span>
+            </template>
+        </div>
+
+        <div class="sb-divider"></div>
+        <div class="sb-section-label">REPORTS</div>
+
+        <div class={navClass_scReport} data-page="WCF_Sourcing_Channel__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-amber"></span>
+            <span class="sb-label">Sourcing Channel</span>
+        </div>
+
+        <div class="sb-divider"></div>
+        <div class="sb-section-label">MY WORK</div>
+
+        <div class={navClass_plRecord} data-page="WCF_PL_of_Record__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-amber"></span>
+            <span class="sb-label">Assigned as PL of Record</span>
+            <template if:true={plRecordBadge}>
+                <span class="sb-badge sb-badge-amber">{plRecordBadge}</span>
+            </template>
+        </div>
+
+        <div class={navClass_compliance} data-page="WCF_Compliance_Documents__c" onclick={handleNav}>
+            <span class="sb-icon-dot sb-dot-red"></span>
+            <span class="sb-label">Compliance Document Requests</span>
+        </div>
+
+    </div>
+</template>

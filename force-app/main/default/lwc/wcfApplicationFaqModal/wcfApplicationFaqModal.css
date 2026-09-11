@@ -1,0 +1,216 @@
+/* ── Backdrop (Popup Modal Mode) ── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ── Container (Popup Modal Mode) ── */
+.modal-container {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 820px;
+    max-width: 94vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* ── Modal Header ── */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 26px;
+    border-bottom: 2px solid #ea580c;
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.modal-title {
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #64748b;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.modal-close:hover { 
+    background: #f1f5f9; 
+    color: #0f172a;
+}
+
+/* ── Modal Body ── */
+.modal-body {
+    padding: 24px;
+}
+
+.faq-page-standalone {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* ── Block 3 Card Box Style ── */
+.rfi-card-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.faq-card-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Accordion Items (Dashed Dividers matching Block 3) ── */
+.faq-item {
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+/* ── Question Header Row (Flex Inline Symbol + Title) ── */
+.faq-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+    transition: color 0.15s ease;
+}
+
+.faq-header.clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.faq-header:hover .faq-question-text {
+    color: #ea580c;
+}
+
+/* ── Symbol (- / +) on the left ── */
+.faq-symbol {
+    font-weight: 700;
+    color: #c2410c;
+    font-size: 16px;
+    line-height: 1;
+    min-width: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Question Title Text ── */
+.faq-question-text {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ── Content Body (Indented under Question) ── */
+.faq-content-body {
+    padding-top: 10px;
+    padding-left: 24px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.faq-content-body p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.faq-content-body blockquote,
+.faq-content-body .faq-example-box,
+.faq-content-body .example-box {
+    background: #f8fafc;
+    border-left: 3px solid #f97316;
+    padding: 10px 14px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    font-size: 13.5px;
+    color: #334155;
+    line-height: 1.5;
+    border-radius: 0 6px 6px 0;
+}
+
+.faq-content-body blockquote strong,
+.faq-content-body .faq-example-box strong,
+.faq-content-body .example-box strong {
+    color: #1e293b;
+    font-weight: 700;
+}
+
+/* ── Contact Footer ── */
+.faq-contact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+}
+
+.faq-contact-icon {
+    flex-shrink: 0;
+    --lwc-colorTextIconDefault: #0284c7;
+}
+
+.faq-contact-text {
+    margin: 0;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: #0369a1;
+    line-height: 1.5;
+}
+
+.faq-link {
+    color: #0284c7;
+    font-weight: 600;
+    text-decoration: underline;
+}
+.faq-link:hover { 
+    color: #0369a1; 
+}

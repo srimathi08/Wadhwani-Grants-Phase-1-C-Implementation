@@ -51,37 +51,104 @@
                             </div>
                         </div>
 
-                        <!-- Milestone Description -->
-                        <template if:true={m.milestoneDescription}>
-                            <div class="block">
-                                <div class="blockTitle">Milestone Description</div>
-                                <div class="blockText"
-                                     lwc:dom="manual"
-                                     data-mid={m.milestoneId}
-                                     data-type="desc"></div>
-                            </div>
-                        </template>
+                       <!-- Milestone Description -->
+<template if:true={m.milestoneDescription}>
+    <div class="block">
+        <div class="blockTitle">Milestone Description</div>
+        <div class="blockText"
+             lwc:dom="manual"
+             data-mid={m.milestoneId}
+             data-type="desc"></div>
+    </div>
+</template>
 
-                        <!-- Disbursed Amount -->
-                        <template if:true={m.disbursedAmount}>
-                            <div class="block">
-                                <div class="blockTitle">Disbursed Amount</div>
-                                <div class="blockText">
-                                    $ {m.disbursedAmount}
-                                </div>
-                            </div>
-                        </template>
+<!-- Total Budget (renamed from Budget Required (INR)) -->
+<template if:true={m.budgetRequiredINR}>
+    <div class="block">
+        <div class="blockTitle">Total Budget</div>
+        <div class="blockText">$ {m.budgetRequiredINR}</div>
+    </div>
+</template>
 
-                        <!-- Budget Required -->
-                        <template if:true={m.budgetRequiredINR}>
-                            <div class="block">
-                                <div class="blockTitle">Budget Required (INR)</div>
-                                <div class="blockText">
-                                    $ {m.budgetRequiredINR}
-                                </div>
-                            </div>
-                        </template>
+<!-- Total Disbursed (renamed from Disbursed Amount) -->
+<template if:true={m.disbursedAmount}>
+    <div class="block">
+        <div class="blockTitle">Total Disbursed</div>
+        <div class="blockText">$ {m.disbursedAmount}</div>
+    </div>
+</template>
 
+<!-- Total Utilized & Current TRL (editable at report submission) -->
+<template if:true={m.disbursedAmount}>
+
+    <!-- Total Utilized - LOCKED (already submitted) -->
+    <template if:true={m.isAlreadyUploaded}>
+        <div class="block">
+            <div class="blockTitle">Total Utilized</div>
+            <div class="blockText">
+                $ {m.totalUtilizedInput}
+            </div>
+        </div>
+    </template>
+
+    <!-- Total Utilized - EDITABLE (not yet submitted) -->
+<template if:false={m.isAlreadyUploaded}>
+    <div class={m.utilizedBlockClass}>
+        <div class="blockTitleRow">
+            <div class="blockTitle">Total Utilized</div>
+            <span class={m.utilizedBadgeClass}>Enter Value</span>
+        </div>
+        <div class="currencyInputWrap">
+            <span class="currencyPrefix">$</span>
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                class={m.utilizedInputClass}
+                placeholder="Enter amount utilized"
+                value={m.totalUtilizedInput}
+                data-id={m.milestoneId}
+                onchange={handleTotalUtilizedChange}
+            />
+        </div>
+        <template if:true={m.utilizedInvalid}>
+            <div class="fieldError">Please enter Total Utilized before uploading.</div>
+        </template>
+    </div>
+</template>
+<!-- Current TRL - LOCKED (already submitted) -->
+<template if:true={m.isAlreadyUploaded}>
+    <div class="block">
+        <div class="blockTitle">Current TRL</div>
+        <div class="blockText">
+            {m.currentTRLInput}
+        </div>
+    </div>
+</template>
+    <!-- Current TRL - EDITABLE (not yet submitted) -->
+<template if:false={m.isAlreadyUploaded}>
+    <div class={m.trlBlockClass}>
+        <div class="blockTitleRow">
+            <div class="blockTitle">Current TRL</div>
+            <span class={m.trlBadgeClass}>Enter Value</span>
+        </div>
+        <div class="currencyInputWrap">
+           <select
+    class={m.trlSelectClass}
+    data-id={m.milestoneId}
+    onchange={handleCurrentTRLChange}
+>
+    <template for:each={m.trlOptionsForRow} for:item="opt">
+        <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+    </template>
+</select>
+        </div>
+        <template if:true={m.trlInvalid}>
+            <div class="fieldError">Please select the Current TRL before uploading.</div>
+        </template>
+    </div>
+</template>
+</template>
                         <!-- Actions -->
                         <div class="actions">
                             <button class="btnOutline"

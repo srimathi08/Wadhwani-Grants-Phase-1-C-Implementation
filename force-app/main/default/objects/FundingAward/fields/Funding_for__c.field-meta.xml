@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Funding_for__c</fullName>
+    <label>Funding type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>COE award</fullName>
+                <default>false</default>
+                <label>COE award</label>
+            </value>
+            <value>
+                <fullName>Project award</fullName>
+                <default>false</default>
+                <label>Project award</label>
+            </value>
+            <value>
+                <fullName>Co-Fund</fullName>
+                <default>false</default>
+                <label>Co-Fund</label>
+            </value>
+            <value>
+                <fullName>Fixed tranche</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Fixed tranche</label>
+            </value>
+            <value>
+                <fullName>Milestone-based</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Milestone-based</label>
+            </value>
+            <value>
+                <fullName>Outcome-based</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Outcome-based</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

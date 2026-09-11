@@ -15,7 +15,7 @@ private class ProposalEvaluationControllerTest {
         insert con;
         
         // 3) COE User Profile / Partner Community Clone Reviewer profile
-        Profile p = [SELECT Id FROM Profile WHERE Name = 'External Reviewer' LIMIT 1];//   External Reviewer Reviewer profile
+        Profile p = [SELECT Id FROM Profile WHERE Name = 'WG Partners' LIMIT 1];//   External Reviewer Reviewer profile
         
         // 4) Create a User associated to that Contact
         User u = new User(

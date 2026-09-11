@@ -1,5 +1,10 @@
 public without sharing class ProposalLevel1ActionController {
 
+    // ⚠️ TEMP TEST FLAG — set to false before going live.
+    // When true, skips the actual email send so no mail reaches the PI,
+    // but still runs the status update logic so you can test that alone.
+    private static final Boolean SKIP_EMAIL_SEND_FOR_TESTING = true;
+
     @AuraEnabled(cacheable=true)
     public static String getStatus(Id recordId) {
         try {
@@ -15,7 +20,6 @@ public without sharing class ProposalLevel1ActionController {
     }
 
     @AuraEnabled
-    // ← NEW: added coeComments parameter
     public static void escalateToPI(Id recordId, String coeComments) {
         try {
             IndividualApplication app = [
@@ -29,18 +33,9 @@ public without sharing class ProposalLevel1ActionController {
                 throw new AuraHandledException('PI is not linked to this application.');
             }
 
-            // ← Save COE comments to the record field BEFORE sending email
-            // Replace COE_Comments__c with your actual field API name
+            // Save COE comments to the record field BEFORE sending email
             app.COE_Comments__c = coeComments;
             update app;
-
-            // Re-query after update so email template merge fields pick up new value
-            app = [
-                SELECT Id, Status, PI__c, COE_Comments__c
-                FROM IndividualApplication
-                WHERE Id = :recordId
-                LIMIT 1
-            ];
 
             User piUser = [
                 SELECT Id, Email, ContactId
@@ -64,43 +59,60 @@ public without sharing class ProposalLevel1ActionController {
                 throw new AuraHandledException('No template for status: ' + app.Status);
             }
 
-            EmailTemplate tmpl = [
-                SELECT Id FROM EmailTemplate
-                WHERE DeveloperName = :templateDevName
-                LIMIT 1
-            ];
+            Boolean emailSentSuccessfully;
 
-            List<OrgWideEmailAddress> owaList = [
-                SELECT Id FROM OrgWideEmailAddress
-                WHERE Address LIKE '%wadhwanifoundation%'
-                LIMIT 1
-            ];
-
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            mail.setTemplateId(tmpl.Id);
-            mail.setWhatId(app.Id);
-            mail.setSaveAsActivity(false);
-
-            if (!owaList.isEmpty()) {
-                mail.setOrgWideEmailAddressId(owaList[0].Id);
-            }
-
-            if (piUser.ContactId != null) {
-                mail.setTargetObjectId(piUser.ContactId);
-                mail.setTreatTargetObjectAsRecipient(true);
+            if (SKIP_EMAIL_SEND_FOR_TESTING) {
+                // Pretend the send succeeded — no actual email goes out
+                System.debug('SKIP_EMAIL_SEND_FOR_TESTING is true — email send skipped for template: ' + templateDevName);
+                emailSentSuccessfully = true;
             } else {
-                mail.setTargetObjectId(piUser.Id);
-                mail.setToAddresses(new List<String>{ piUser.Email });
+                EmailTemplate tmpl = [
+                    SELECT Id FROM EmailTemplate
+                    WHERE DeveloperName = :templateDevName
+                    LIMIT 1
+                ];
+
+                List<OrgWideEmailAddress> owaList = [
+                    SELECT Id FROM OrgWideEmailAddress
+                    WHERE Address LIKE '%wadhwanifoundation%'
+                    LIMIT 1
+                ];
+
+                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                mail.setTemplateId(tmpl.Id);
+                mail.setWhatId(app.Id);
+                mail.setSaveAsActivity(false);
+
+                if (!owaList.isEmpty()) {
+                    mail.setOrgWideEmailAddressId(owaList[0].Id);
+                }
+
+                if (piUser.ContactId != null) {
+                    mail.setTargetObjectId(piUser.ContactId);
+                    mail.setTreatTargetObjectAsRecipient(true);
+                } else {
+                    mail.setTargetObjectId(piUser.Id);
+                    mail.setToAddresses(new List<String>{ piUser.Email });
+                }
+
+                Messaging.SendEmailResult[] results = Messaging.sendEmail(
+                    new Messaging.SingleEmailMessage[]{ mail }
+                );
+
+                emailSentSuccessfully = results[0].isSuccess();
+
+                if (!emailSentSuccessfully) {
+                    throw new AuraHandledException(
+                        'Email failed: ' + results[0].getErrors()[0].getMessage()
+                    );
+                }
             }
 
-            Messaging.SendEmailResult[] results = Messaging.sendEmail(
-                new Messaging.SingleEmailMessage[]{ mail }
-            );
-
-            if (!results[0].isSuccess()) {
-                throw new AuraHandledException(
-                    'Email failed: ' + results[0].getErrors()[0].getMessage()
-                );
+            // Status transition only fires on confirmed (or simulated) success,
+            // and only for the resubmission case — Approved/Rejected untouched
+            if (emailSentSuccessfully && app.Status == 'Asked for Resubmission by WIN Admin') {
+                app.Status = 'Asked for Resubmission by COE Admin';
+                update app;
             }
 
         } catch (AuraHandledException e) {

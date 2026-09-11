@@ -23,6 +23,15 @@
                     disabled={isButtonDisabled}>
                 Resubmit
             </button>
+
+            <!-- NEW: Escalate to PI — only shown once WIN Admin has made a Level 1 decision -->
+            <template if:true={showEscalateButton}>
+                <button class="slds-button action-btn escalate-btn"
+                        data-action="Escalate"
+                        onclick={handleAction}>
+                    Escalate to PI
+                </button>
+            </template>
         </div>
 
         <!-- MODAL -->
@@ -40,10 +49,10 @@
                     <!-- BODY -->
                     <div class="slds-modal__content modal-body">
 
-                        <!-- STEP 1 : COMMENTS -->
+                        <!-- STEP 1 : COMMENTS (also used for Escalate) -->
                         <template if:true={isCommentsStep}>
                             <lightning-textarea
-                                label="Comments"
+                                label={commentsLabel}
                                 value={comments}
                                 onchange={handleCommentsChange}
                                 required>
@@ -83,20 +92,33 @@
                                 onclick={closeModal}>
                             </lightning-button>
 
-                            <template if:false={isResubmit}>
+                            <!-- NEW: Escalate footer -->
+                            <template if:true={isEscalateAction}>
                                 <lightning-button
-                                    variant="brand"
-                                    label="Next"
-                                    onclick={goToFormStep}>
+                                    variant="destructive"
+                                    label="Send Email to PI"
+                                    icon-name="utility:send"
+                                    icon-position="left"
+                                    onclick={handleEscalateSubmit}>
                                 </lightning-button>
                             </template>
 
-                            <template if:true={isResubmit}>
-                                <lightning-button
-                                    variant="brand"
-                                    label="Submit"
-                                    onclick={handleResubmit}>
-                                </lightning-button>
+                            <template if:false={isEscalateAction}>
+                                <template if:false={isResubmit}>
+                                    <lightning-button
+                                        variant="brand"
+                                        label="Next"
+                                        onclick={goToFormStep}>
+                                    </lightning-button>
+                                </template>
+
+                                <template if:true={isResubmit}>
+                                    <lightning-button
+                                        variant="brand"
+                                        label="Submit"
+                                        onclick={handleResubmit}>
+                                    </lightning-button>
+                                </template>
                             </template>
                         </template>
 
@@ -107,12 +129,6 @@
                                 label="Back"
                                 onclick={goBackToComments}>
                             </lightning-button>
-
-                            <!--<lightning-button
-                                variant="brand"
-                                label="Submit Review"
-                                onclick={submitReview}>
-                            </lightning-button>-->
                         </template>
 
                     </footer>

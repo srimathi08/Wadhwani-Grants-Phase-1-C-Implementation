@@ -1,44 +1,67 @@
 <template>
-    <!-- Custom header instead of lightning-card -->
-    <div class="custom-card-header">
-        <lightning-icon icon-name="standard:metrics" size="small" class="header-icon"></lightning-icon>
-        <span class="custom-title">My Review Summary</span>
+    <div class="summary-root">
+        <div class="dashboard-title">Reviewer Dashboard</div>
+        <div class="grid">
+
+            <article class="card card-total" onclick={handleTotalClick} title="Total Assigned">
+                <div class="card-header">
+                    <span class="card-title">Total Assigned</span>
+                    <span class="corner-icon">
+                        <lightning-icon icon-name="standard:task2" size="xx-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="card-count">{total}</div>
+                <div class="card-subtitle">All proposals assigned to you</div>
+            </article>
+
+            <article class="card card-reviewed" onclick={handleReviewedClick} title="Reviewed">
+                <div class="card-header">
+                    <span class="card-title">Reviewed</span>
+                    <span class="corner-icon">
+                        <lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="card-count">{reviewed}</div>
+                <div class="card-subtitle">Submitted review forms</div>
+            </article>
+
+            <article class="card card-progress" onclick={handleInProgressClick} title="In Progress">
+                <div class="card-header">
+                    <span class="card-title">In Progress</span>
+                    <span class="corner-icon">
+                        <lightning-icon icon-name="utility:spinner" size="xx-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="card-count">{inProgress}</div>
+                <div class="card-subtitle">Reviews started but not submitted</div>
+            </article>
+
+            <article class="card card-notstarted" onclick={handleNotStartedClick} title="Not Started">
+                <div class="card-header">
+                    <span class="card-title">Not Started</span>
+                    <span class="corner-icon">
+                        <lightning-icon icon-name="utility:pause" size="xx-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="card-count">{notStarted}</div>
+                <div class="card-subtitle">Awaiting your first action</div>
+            </article>
+
+             <article class="card card-flagged" onclick={handleFlaggedClick} title="Flagged">
+                <div class="card-header">
+                    <span class="card-title">Flagged</span>
+                    <span class="corner-icon">
+                        <lightning-icon icon-name="utility:flag" size="xx-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="card-count">{flagged}</div>
+                <div class="card-subtitle">Validator raised a concern</div>
+            </article>
+
+        </div>
+
+        <template if:true={error}>
+            <div class="error-msg">Error loading summary. Please try again.</div>
+        </template>
     </div>
-
-    <div class="slds-grid slds-wrap slds-p-around_large slds-text-align_center">
-
-        <!-- Total Assigned -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-            <div class="metric-box" onclick={handleTotalClick}>
-                <lightning-icon icon-name="standard:task2" size="medium" class="metric-icon"></lightning-icon>
-                <p class="metric-label">Total Assigned</p>
-                <p class="metric-value">{totalAssigned}</p>
-            </div>
-        </div>
-
-        <!-- Reviewed -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-            <div class="metric-box" onclick={handleReviewedClick}>
-                <lightning-icon icon-name="utility:check" size="medium" class="metric-icon"></lightning-icon>
-                <p class="metric-label">Reviewed</p>
-                <p class="metric-value slds-text-color_success">{submitted}</p>
-            </div>
-        </div>
-
-        <!-- Yet to Start -->
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-            <div class="metric-box" onclick={handleYetToStartClick}>
-                <lightning-icon icon-name="utility:pause" size="medium" class="metric-icon"></lightning-icon>
-                <p class="metric-label">Yet to Start</p>
-                <p class="metric-value slds-text-color_error">{yetToStart}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Error message -->
-    <template if:true={error}>
-        <div class="slds-text-color_error slds-p-horizontal_medium slds-text-align_center">
-            Error loading data. Please try again later.
-        </div>
-    </template>
 </template>

@@ -27,17 +27,26 @@ export default class CoeApplicationStatusDashboard extends NavigationMixin(Light
     }
 
     // ── Persist Date to sessionStorage ───────────────────────────────────────
-    get selectedDate() {
-        return sessionStorage.getItem('coe_dash_date') || '';
-    }
-    set selectedDate(val) {
-        sessionStorage.setItem('coe_dash_date', val);
-    }
+   // ── Persist From Date to sessionStorage ──────────────────────────────────
+get selectedFromDate() {
+    return sessionStorage.getItem('coe_dash_from_date') || '';
+}
+set selectedFromDate(val) {
+    sessionStorage.setItem('coe_dash_from_date', val);
+}
 
-    // ── Computed: whether a date is currently selected ───────────────────────
-    get hasSelectedDate() {
-        return !!this.selectedDate;
-    }
+// ── Persist To Date to sessionStorage ────────────────────────────────────
+get selectedToDate() {
+    return sessionStorage.getItem('coe_dash_to_date') || '';
+}
+set selectedToDate(val) {
+    sessionStorage.setItem('coe_dash_to_date', val);
+}
+
+// ── Computed: whether any date range is selected ──────────────────────────
+get hasDateRange() {
+    return !!this.selectedFromDate || !!this.selectedToDate;
+}
 
     // ── Year options ─────────────────────────────────────────────────────────
     yearOptions = [
@@ -163,13 +172,14 @@ export default class CoeApplicationStatusDashboard extends NavigationMixin(Light
                 : parseInt(this.selectedMonth, 10);
 
             // Pass null for date when no date is selected
-            const dateParam = this.selectedDate || null;
+            //const dateParam = this.selectedDate || null;
 
-            const res = await getDashboardStages({
+           const res = await getDashboardStages({
                 selectedYear:  parseInt(this.selectedYear, 10),
                 selectedMonth: monthParam,
-                selectedDate:  dateParam      // ✅ NEW: pass date param
-            });
+                fromDate:      this.selectedFromDate || null,
+                toDate:        this.selectedToDate   || null
+        });
 
             const data = res?.counts || res || {};
 
@@ -255,34 +265,40 @@ export default class CoeApplicationStatusDashboard extends NavigationMixin(Light
     // EVENT HANDLERS
     // ══════════════════════════════════════
 
-    handleYearChange(event) {
-        this.selectedYear = event.detail.value;
-        this.selectedDate = '';   // ✅ Clear date when year changes
-        this._resetFilters();
-        this.loadCounts();
-    }
+   handleYearChange(event) {
+    this.selectedYear     = event.detail.value;
+    this.selectedFromDate = '';
+    this.selectedToDate   = '';
+    this._resetFilters();
+    this.loadCounts();
+}
 
     handleMonthChange(event) {
-        this.selectedMonth = event.detail.value;
-        this.selectedDate  = '';  // ✅ Clear date when month changes
-        this._resetFilters();
-        this.loadCounts();
-    }
+    this.selectedMonth    = event.detail.value;
+    this.selectedFromDate = '';
+    this.selectedToDate   = '';
+    this._resetFilters();
+    this.loadCounts();
+}
 
-    // ✅ NEW: Date filter handler
-    handleDateChange(event) {
-        const raw = event.detail.value; // "YYYY-MM-DD" or ""
-        this.selectedDate = raw || '';
-        this._resetFilters();
-        this.loadCounts();
-    }
+   handleFromDateChange(event) {
+    this.selectedFromDate = event.detail.value || '';
+    this._resetFilters();
+    this.loadCounts();
+}
 
-    // ✅ NEW: Clear date handler
-    handleClearDate() {
-        this.selectedDate = '';
-        this._resetFilters();
-        this.loadCounts();
-    }
+handleToDateChange(event) {
+    this.selectedToDate = event.detail.value || '';
+    this._resetFilters();
+    this.loadCounts();
+}
+
+handleClearDates() {
+    this.selectedFromDate = '';
+    this.selectedToDate   = '';
+    this._resetFilters();
+    this.loadCounts();
+}
 
     _resetFilters() {
         this.activeTile   = 'all';
@@ -335,11 +351,12 @@ export default class CoeApplicationStatusDashboard extends NavigationMixin(Light
             type: 'standard__namedPage',
             attributes: { name: 'My_Applications__c' },
             state: {
-                c__statusKey: statusKey,
-                c__year:      this.selectedYear,
-                c__month:     this.selectedMonth,
-                c__date:      this.selectedDate   // ✅ NEW: pass date to list view
-            }
+    c__statusKey: statusKey,
+    c__year:      this.selectedYear,
+    c__month:     this.selectedMonth,
+    c__fromDate:  this.selectedFromDate,
+    c__toDate:    this.selectedToDate
+}
         });
     }
 }

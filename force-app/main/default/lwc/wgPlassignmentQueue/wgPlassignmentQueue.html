@@ -1,0 +1,289 @@
+<template>
+    <div class="pla-root">
+
+        <!-- ── Header ─────────────────────────────────────────────────────── -->
+        <div class="pla-header-bar">
+            <div class="pla-title-block">
+                <div class="pla-title-accent"></div>
+                <div>
+                    <h1 class="pla-title">Wadhwani Grants — PL Assignment</h1>
+                    <p class="pla-subtitle">{totalCount} validated proposal(s) awaiting PL assignment</p>
+                </div>
+            </div>
+            <div class="pla-controls">
+                <div class="pla-search-wrap">
+                    <lightning-icon icon-name="utility:search" size="x-small" class="pla-search-icon"></lightning-icon>
+                    <input type="text" class="pla-search-input"
+                        placeholder="Search by ID, organisation, submitter…"
+                        value={searchTerm} oninput={handleSearch} />
+                </div>
+                <div class="pla-filter-row">
+                    <select class="pla-select" onchange={handleTrackFilter}>
+                        <template for:each={trackOptions} for:item="opt">
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        </template>
+                    </select>
+                    <button class="pla-refresh-btn" onclick={handleRefresh} title="Refresh">
+                        <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── KPI bar ────────────────────────────────────────────────────── -->
+        <div class="pla-kpi-bar">
+            <div class="pla-kpi-item">
+                <span class="pla-kpi-num">{totalCount}</span>
+                <span class="pla-kpi-label">TOTAL PROPOSALS</span>
+            </div>
+            <div class="pla-kpi-divider"></div>
+            <div class="pla-kpi-item kpi-clickable" onclick={filterAssigned}>
+                <span class="pla-kpi-num kpi-gold">{assignedCount}</span>
+                <span class="pla-kpi-label">PL ASSIGNED</span>
+            </div>
+            <div class="pla-kpi-divider"></div>
+            <div class="pla-kpi-item kpi-clickable" onclick={filterUnassigned}>
+                <span class="pla-kpi-num kpi-amber">{unassignedCount}</span>
+                <span class="pla-kpi-label">UNASSIGNED</span>
+            </div>
+        </div>
+
+        <!-- ── Loading ────────────────────────────────────────────────────── -->
+        <template if:true={isLoading}>
+            <div class="pla-loading">
+                <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+
+            <!-- ── Empty state ────────────────────────────────────────────── -->
+            <template if:false={hasRows}>
+                <div class="pla-empty">
+                    <lightning-icon icon-name="utility:list" size="large" class="pla-empty-icon"></lightning-icon>
+                    <p class="pla-empty-text">No validated proposals found.</p>
+                    <p class="pla-empty-sub">Adjust filters or check back once proposals are validated.</p>
+                </div>
+            </template>
+
+            <!-- ── Table ──────────────────────────────────────────────────── -->
+            <template if:true={hasRows}>
+                <div class="pla-table-wrap">
+                    <table class="pla-table">
+                        <thead>
+                            <tr class="pla-thead-row">
+                                <th class="pla-th pla-th-sno">#</th>
+                                <th class="pla-th">APPLICATION ID</th>
+                                <th class="pla-th">ORGANISATION</th>
+                                <th class="pla-th">SUBMITTER</th>
+                                <th class="pla-th pla-th-track">TRACK</th>
+                                <th class="pla-th">CURRENT PL</th>
+                                <th class="pla-th">CURRENT CO-PL</th>
+                                <th class="pla-th pla-th-action">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={paginatedRows} for:item="row">
+                                <tr key={row.applicationSfId} class={row.rowClass}>
+                                    <td class="pla-td pla-td-sno">{row.sno}</td>
+                                    <td class="pla-td">
+                                        <span class="pla-app-id">{row.applicationId}</span>
+                                    </td>
+                                    <td class="pla-td pla-td-org">{row.organizationName}</td>
+                                    <td class="pla-td">{row.submitterName}</td>
+                                    <td class="pla-td">
+                                        <span class={row.trackBadgeClass}>{row.trackShort}</span>
+                                    </td>
+                                    <!-- Current PL -->
+                                    <td class="pla-td">
+                                        <template if:true={row.currentPlName}>
+                                            <div class="pla-current-pl">
+                                                <span class="pla-pl-dot"></span>
+                                                <span class="pla-pl-name">{row.currentPlName}</span>
+                                            </div>
+                                        </template>
+                                        <template if:false={row.currentPlName}>
+                                            <span class="pla-unassigned">Unassigned</span>
+                                        </template>
+                                    </td>
+                                    <!-- Current Co-PL -->
+                                    <td class="pla-td">
+                                        <template if:true={row.currentCoplName}>
+                                            <div class="pla-current-pl">
+                                                <span class="pla-copl-dot"></span>
+                                                <span class="pla-pl-name">{row.currentCoplName}</span>
+                                            </div>
+                                        </template>
+                                        <template if:false={row.currentCoplName}>
+                                            <span class="pla-unassigned">Unassigned</span>
+                                        </template>
+                                    </td>
+                                    <td class="pla-td pla-td-action">
+                                        <button
+                                            class={row.actionBtnClass}
+                                            data-org-id={row.organizationAccountId}
+                                            data-org-name={row.organizationName}
+                                            data-current-pl-id={row.currentPlId}
+                                            data-current-pl-name={row.currentPlName}
+                                            data-current-copl-id={row.currentCoplId}
+                                            data-current-copl-name={row.currentCoplName}
+                                            onclick={handleOpenModal}
+                                        >
+                                            <lightning-icon icon-name={row.actionIcon} size="x-small" class="pla-btn-icon"></lightning-icon>
+                                            {row.actionLabel}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ── Pagination ──────────────────────────────────────────── -->
+                <div class="pla-pagination">
+                    <span class="pla-pg-info">Showing {paginationStart}–{paginationEnd} of {filteredCount}</span>
+                    <div class="pla-pg-controls">
+                        <button class="pla-pg-btn" disabled={isFirstPage} onclick={handlePrevPage}>
+                            <lightning-icon icon-name="utility:chevronleft" size="x-small"></lightning-icon>
+                        </button>
+                        <template for:each={pageNumbers} for:item="pg">
+                            <button key={pg.num} class={pg.btnClass} data-page={pg.num} onclick={handlePageClick}>{pg.num}</button>
+                        </template>
+                        <button class="pla-pg-btn" disabled={isLastPage} onclick={handleNextPage}>
+                            <lightning-icon icon-name="utility:chevronright" size="x-small"></lightning-icon>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+    </div><!-- /pla-root -->
+
+
+    <!-- ── Modal ──────────────────────────────────────────────────────────── -->
+    <template if:true={showModal}>
+        <div class="pla-modal-backdrop" onclick={handleBackdropClick}>
+            <div class="pla-modal" onclick={stopPropagation}>
+
+                <!-- Header -->
+                <div class="pla-modal-header">
+                    <div class="pla-modal-title-block">
+                        <h2 class="pla-modal-title">Assign Program Lead</h2>
+                        <p class="pla-modal-subtitle">Organisation: <strong>{modalOrgName}</strong></p>
+                    </div>
+                    <button class="pla-modal-close" onclick={handleCloseModal} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+
+                <!-- Role toggle -->
+                <div class="pla-role-toggle">
+                    <button class={roleBtnPL} data-role="PL" onclick={handleRoleSelect}>
+                        Assign as PL
+                    </button>
+                    <button class={roleBtnCoPL} data-role="Co-PL" onclick={handleRoleSelect}>
+                        Assign as Co-PL
+                    </button>
+                </div>
+
+                <!-- Search -->
+                <div class="pla-modal-search-wrap">
+                    <lightning-icon icon-name="utility:search" size="x-small" class="pla-modal-search-icon"></lightning-icon>
+                    <input type="text" class="pla-modal-search"
+                        placeholder="Search Program Leads…"
+                        value={modalSearchTerm} oninput={handleModalSearch} />
+                </div>
+
+                <!-- Current assignment banner -->
+                <template if:true={modalRolePlName}>
+                    <div class="pla-current-banner">
+                        <lightning-icon icon-name="utility:user" size="x-small"></lightning-icon>
+                        <span>Currently assigned to: <strong>{modalRolePlName}</strong></span>
+                        <button class="pla-remove-btn" onclick={handleRemovePL} disabled={isSaving}>
+                            Remove Assignment
+                        </button>
+                    </div>
+                </template>
+
+                <!-- PL list loading -->
+                <template if:true={isLoadingPLs}>
+                    <div class="pla-modal-loading">
+                        <lightning-spinner alternative-text="Loading PLs" size="small" variant="brand"></lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- PL list -->
+                <template if:false={isLoadingPLs}>
+                    <div class="pla-pl-list">
+                        <template if:false={hasFilteredPLs}>
+                            <div class="pla-pl-empty">No program leads found matching your search.</div>
+                        </template>
+                        <template for:each={filteredPLRows} for:item="pl">
+                            <div key={pl.plAccountId} class={pl.rowClass}
+                                data-pl-id={pl.plAccountId} data-pl-name={pl.plName}
+                                onclick={handleSelectPL}>
+                                <div class="pla-pl-radio">
+                                    <div class={pl.radioClass}></div>
+                                </div>
+                                <div class="pla-pl-info">
+                                    <div class="pla-pl-row-name">{pl.plName}</div>
+                                    <div class="pla-pl-email">{pl.plEmail}</div>
+                                </div>
+                                <div class="pla-pl-workload">
+                                    <template if:true={pl.assignedOrgNames}>
+                                        <div class="pla-pl-orgs-label">Currently assigned ({pl.assignedOrgCount}):</div>
+                                        <div class="pla-pl-orgs">{pl.assignedOrgNames}</div>
+                                    </template>
+                                    <template if:false={pl.assignedOrgNames}>
+                                        <span class="pla-pl-free">No current assignments</span>
+                                    </template>
+                                    <span class={pl.loadBadgeClass}>{pl.loadLabel}</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Footer -->
+                <div class="pla-modal-footer">
+                    <button class="pla-btn-cancel" onclick={handleCloseModal} disabled={isSaving}>Cancel</button>
+                    <button class="pla-btn-assign" onclick={handleConfirmAssign} disabled={isAssignDisabled}>
+                        <template if:true={isSaving}>
+                            <lightning-spinner alternative-text="Saving" size="x-small" variant="inverse"></lightning-spinner>
+                        </template>
+                        <template if:false={isSaving}>
+                            <lightning-icon icon-name="utility:check" size="x-small" class="pla-btn-icon-white"></lightning-icon>
+                            {assignBtnLabel}
+                        </template>
+                    </button>
+                </div>
+
+                <!-- Inline error -->
+                <template if:true={saveError}>
+                    <div class="pla-save-error">
+                        <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                        {saveError}
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- ── Toast ──────────────────────────────────────────────────────────── -->
+    <template if:true={showToast}>
+        <div class={toastClass}>
+            <div class="pla-toast-accent"></div>
+            <lightning-icon icon-name={toastIcon} size="small" class="pla-toast-icon"></lightning-icon>
+            <div class="pla-toast-body">
+                <span class="pla-toast-title">{toastTitle}</span>
+                <span class="pla-toast-msg">{toastMessage}</span>
+            </div>
+            <button class="pla-toast-close" onclick={dismissToast}>
+                <lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+            </button>
+            <div class="pla-toast-progress"></div>
+        </div>
+    </template>
+
+</template>

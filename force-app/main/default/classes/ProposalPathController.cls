@@ -1,5 +1,10 @@
 public with sharing class ProposalPathController {
 
+    // Every Status value that represents a final decision has been reached.
+    // Once a record's Status is in this set, the tracker must reflect that
+    // decision exactly — the "Under Review" reviewer-flag check below must
+    // never override it, and syncUnderReviewStatus must never touch
+    // Review_Status__c on these records again.
     private static final Set<String> TERMINAL_STATUSES = new Set<String>{
         'Recommended',
         'Not Recommended',
@@ -7,8 +12,12 @@ public with sharing class ProposalPathController {
         'Approved for Funding',
         'Not Recommended for Funding',
         'Approved with Resubmission',
+        'Submitted Back - Approved for Funding Resubmission',
         'Approved - Level 1',
-        'Submitted Back - Approved for Funding Resubmission'
+        'Rejected - Level 1',
+        'Approved - Level 2',
+        'Rejected - Level 2',
+        'Funded'
     };
 
     private without sharing class SystemUpdater {
@@ -31,50 +40,47 @@ public with sharing class ProposalPathController {
 
         String s = app.Status;
 
-        if (app.Review_Status__c == 'Externally Under Review') {
-            return 'Under Review';
-        }
-
-        if (s == 'Draft' || s == 'Revision Requested') {
+        if (s == null || s == 'Draft' || s == 'Revision Requested') {
             return 'Draft';
         }
 
+        // --- Terminal/decision statuses ALWAYS win, before the reviewer
+        // flag is even considered. This is the fix: previously the
+        // Review_Status__c == 'Externally Under Review' check ran first
+        // and unconditionally, so a record could reach "Approved for
+        // Funding" (or any later status) and still be reported as
+        // "Under Review" forever, because nothing ever reset that flag.
+        if (TERMINAL_STATUSES.contains(s)) {
+            return s;
+        }
+
+        // --- The Review_Status__c flag is only ever meaningful for ONE
+        // transition: right after WIN Admin approves, before the record
+        // is formally moved to Status = 'Under Review'. It must NOT be
+        // allowed to override earlier stages or "sent back" statuses —
+        // in practice the flag is never cleared when a proposal is later
+        // asked for resubmission, so treating it as authoritative for
+        // every non-terminal status caused statuses like "Asked for
+        // Resubmission by WIN Admin" to incorrectly show as "Under
+        // Review" too.
+        Set<String> WIN_APPROVED_AWAITING_REVIEW = new Set<String>{
+            'Proposal Approved by WIN Admin',
+            'Proposal Approved by Win Admin'
+        };
+
         if (
-            s == 'Submitted'
-            || s == 'Proposal Submitted to COE Admin'
-            || s == 'Proposal Resubmitted to COE Admin'
+            WIN_APPROVED_AWAITING_REVIEW.contains(s)
+            && app.Review_Status__c == 'Externally Under Review'
         ) {
-            return 'Submitted to COE Admin';
+            return 'Under Review';
         }
 
-        if (s != null && s.contains('COE Admin')) {
-            return 'COE Admin Actions';
-        }
-
-        if (
-            s == 'Proposal Submitted to WIN Admin'
-            || s == 'Proposal Resubmitted to WIN Admin'
-        ) {
-            return 'Submitted to WIN Admin';
-        }
-
-        if (s != null && s.contains('WIN Admin')) {
-            return 'WIN Admin Actions';
-        }
-
-        if (
-            s == 'Recommended'
-            || s == 'Not Recommended'
-            || s == 'Recommended for Resubmission'
-            || s == 'Approved for Funding'
-            || s == 'Not Recommended for Funding'
-            || s == 'Approved with Resubmission'
-            || s == 'Submitted Back - Approved for Funding Resubmission'
-        ) {
-            return 'Decision';
-        }
-
-        return 'Draft';
+        // --- Otherwise pass the raw workflow status straight through
+        // (e.g. 'Proposal Submitted to COE Admin', 'Proposal Approved by
+        // COE Admin', 'Asked for Resubmission by WIN Admin', 'In Review',
+        // 'Submitted', etc.) — the LWC's STATUS_CONFIG map already knows
+        // how to render every one of these exactly.
+        return s;
     }
 
     @AuraEnabled

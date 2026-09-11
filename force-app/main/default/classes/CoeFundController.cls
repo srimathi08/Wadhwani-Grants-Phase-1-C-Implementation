@@ -1,7 +1,7 @@
 public without sharing class CoeFundController {
 
     /* =========================================================
-       GET FUND PROJECTS (UNCHANGED CORE LOGIC)
+       GET FUND PROJECTS
     ========================================================= */
     @AuraEnabled(cacheable=true)
     public static FundResponse getFundProjects() {
@@ -14,12 +14,10 @@ public without sharing class CoeFundController {
         response.summary.disbursed = 0;
         response.summary.available = 0;
 
-        // 🔹 NEW – initialize new fields
         response.summary.projectGrantReceived = 0;
         response.summary.operationalGrantReceived = 0;
         response.summary.totalReceived = 0;
 
-        // 🔹 NEW – initialize availability split
         response.summary.availableProjectGrant = 0;
         response.summary.availableOperationalGrant = 0;
 
@@ -52,6 +50,21 @@ public without sharing class CoeFundController {
         Set<Id> appIds = new Set<Id>();
         for (IndividualApplication ia : apps) {
             appIds.add(ia.Id);
+        }
+
+        /* ---------------- TOTAL UTILIZED PER PROPOSAL ----------------
+           Rolled up from each proposal's milestones (Total_Utilized__c) */
+        Map<Id, Decimal> utilizedByApp = new Map<Id, Decimal>();
+
+        for (AggregateResult ar : [
+            SELECT Individual_Application__c app, SUM(Total_Utilized__c) total
+            FROM Milestone__c
+            WHERE Individual_Application__c IN :appIds
+            GROUP BY Individual_Application__c
+        ]) {
+            Decimal total = (Decimal) ar.get('total');
+            if (total == null) total = 0;
+            utilizedByApp.put((Id) ar.get('app'), total);
         }
 
         /* ---------------- TOTAL FUNDS RECEIVED ---------------- */
@@ -103,7 +116,7 @@ public without sharing class CoeFundController {
             totalDisbursed += total;
         }
 
-        /* ---------------- Milestones (UNCHANGED) ---------------- */
+        /* ---------------- Milestones ---------------- */
         Map<Id, Integer> totalMilestonesByApp = new Map<Id, Integer>();
         for (AggregateResult ar : [
             SELECT Individual_Application__c appId, COUNT(Id) cnt
@@ -125,7 +138,7 @@ public without sharing class CoeFundController {
             submittedMilestonesByApp.put((Id) ar.get('appId'), (Integer) ar.get('cnt'));
         }
 
-        /* ---------------- Build Project Wrappers (UNCHANGED) ---------------- */
+        /* ---------------- Build Project Wrappers ---------------- */
         for (IndividualApplication ia : apps) {
 
             Decimal totalBudget =
@@ -138,15 +151,21 @@ public without sharing class CoeFundController {
                 ? disbursedByApp.get(ia.Id)
                 : 0;
 
+            Decimal totalUtilized =
+                utilizedByApp.containsKey(ia.Id)
+                ? utilizedByApp.get(ia.Id)
+                : 0;
+
             FundProjectWrapper w = new FundProjectWrapper();
             w.proposalId = ia.Id;
             w.name = ia.Name;
             w.piName = u.Contact.Name;
             w.projectTitle = ia.Project_Title__c;
 
-            w.totalBudget = totalBudget;
-            w.disbursed = disbursed;
-            w.remaining = totalBudget - disbursed;
+            w.totalBudget    = totalBudget;
+            w.disbursed      = disbursed;
+            w.totalUtilized  = totalUtilized;
+            w.remaining      = totalBudget - disbursed;   // ← see note below
 
             w.totalMilestones =
                 totalMilestonesByApp.containsKey(ia.Id)
@@ -161,7 +180,7 @@ public without sharing class CoeFundController {
             response.projects.add(w);
         }
 
-        /* ---------------- EXISTING SUMMARY (UNCHANGED) ---------------- */
+        /* ---------------- EXISTING SUMMARY ---------------- */
         response.summary.total = totalApproved;
         response.summary.disbursed = totalDisbursed;
         response.summary.available = totalApproved - totalDisbursed;
@@ -173,7 +192,6 @@ public without sharing class CoeFundController {
             projectGrantReceived + operationalGrantReceived;
 
         /* ---------------- CORRECT AVAILABLE SPLIT ---------------- */
-        // All disbursements are from Project Grant only
         response.summary.availableProjectGrant =
             projectGrantReceived - totalDisbursed;
 
@@ -181,7 +199,6 @@ public without sharing class CoeFundController {
             response.summary.availableProjectGrant = 0;
         }
 
-        // Operational grant is never disbursed
         response.summary.availableOperationalGrant =
             operationalGrantReceived;
 
@@ -189,7 +206,7 @@ public without sharing class CoeFundController {
     }
 
     /* =========================================================
-       CREATE FUND REQUEST (UNCHANGED)
+       CREATE FUND REQUEST
     ========================================================= */
     @AuraEnabled
     public static Id createFundRequest(
@@ -242,12 +259,10 @@ public without sharing class CoeFundController {
         @AuraEnabled public Decimal disbursed;
         @AuraEnabled public Decimal available;
 
-        // 🔹 EXISTING NEW
         @AuraEnabled public Decimal projectGrantReceived;
         @AuraEnabled public Decimal operationalGrantReceived;
         @AuraEnabled public Decimal totalReceived;
 
-        // 🔹 FIXED AVAILABILITY
         @AuraEnabled public Decimal availableProjectGrant;
         @AuraEnabled public Decimal availableOperationalGrant;
     }
@@ -260,6 +275,7 @@ public without sharing class CoeFundController {
 
         @AuraEnabled public Decimal totalBudget;
         @AuraEnabled public Decimal disbursed;
+        @AuraEnabled public Decimal totalUtilized;   // ← NEW
         @AuraEnabled public Decimal remaining;
 
         @AuraEnabled public Integer totalMilestones;

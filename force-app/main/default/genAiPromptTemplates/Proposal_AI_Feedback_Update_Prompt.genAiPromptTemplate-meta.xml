@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_6</activeVersionIdentifier>
+    <developerName>Proposal_AI_Feedback_Update_Prompt</developerName>
+    <masterLabel>Proposal AI Feedback Update Prompt</masterLabel>
+    <overridable>false</overridable>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – Please describe the legal structure of your entity. Include details about how the entity operates under local law, including context about whether the entity is considered for-profit, non-profit, or some specific hybrid form. Also include any information about related entities, such as subsidiaries and owners.
+Response: 
+
+2. Organizational Sustainability – Describe your plan to ensure organizational sustainability over the next three years. Identify key risks and mitigation strategies.
+Response:
+
+3. Use of Additional Funds – Please describe how you would deploy additional funding/investment to scale your impact across more beneficiaries and how you would measure this impact effectively. Assume funding of $1M per year for 5 years (or specify a lesser amount). Be specific about the use of funds and measurable impact.
+Response: 
+
+4. Operational Synergies – Please describe your organization’s interest in adopting the GenieAI Platform for your target beneficiaries (entrepreneurs/businesses and/or employment candidates). Include estimated beneficiaries and how adoption would deepen impact.
+Response: 
+
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – Please describe the legal structure of your entity. Include details about how the entity operates under local law, including context about whether the entity is considered for-profit, non-profit, or some specific hybrid form. Also include any information about related entities, such as subsidiaries and owners.
+Response: {!$Input:legalStructureResponse}
+
+2. Organizational Sustainability – Describe your plan to ensure organizational sustainability over the next three years. Identify key risks and mitigation strategies.
+Response: {!$Input:orgSustainabilityResponse}
+
+3. Use of Additional Funds – Please describe how you would deploy additional funding/investment to scale your impact across more beneficiaries and how you would measure this impact effectively. Assume funding of $1M per year for 5 years (or specify a lesser amount). Be specific about the use of funds and measurable impact.
+Response: {!$Input:useOfFundsResponse}
+
+4. Operational Synergies – Please describe your organization’s interest in adopting the GenieAI Platform for your target beneficiaries (entrepreneurs/businesses and/or employment candidates). Include estimated beneficiaries and how adoption would deepen impact.
+Response:  {!$Input:operationalSynergyResponse}
+
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_2</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – In 100 words or fewer, briefly describe your organisation&apos;s governance and operational structure. Cover: (1) how the entity is governed (board composition, oversight); (2) who leads the organisation day-to-day; (3) any key affiliations, related entities, or ownership structures.
+ 
+Entity type, registration jurisdiction, and
+incorporation date are captured in separate
+structured fields — do not repeat them here.
+Response: {!$Input:legalStructureResponse}
+
+2. Organizational Sustainability – In about 100 words, describe how your organisation sustains its work. Cover:
+(1) funding mix — main revenue sources;
+(2) programmatic resilience — dependence on
+any single programme or contract; (3) funder concentration risk and how it is managed.
+ 
+A plain-language picture is expected. Financial projections, detailed risk models, and multi-year plans are not required at this stage.
+Response: {!$Input:orgSustainabilityResponse}
+
+3. Use of Additional Funds – In 200 words or fewer, describe how you would deploy additional funding to scale impact. Assume a baseline of $1M/year for 5 years; calibrate up or down based on your context.
+ 
+This is a directional question. A complete
+response identifies 1–3 specific uses of funding (e.g., geographic expansion, new programme offerings, technology, team scale-up) and gives a broad sense of the scale ambition (additional reach or beneficiaries).
+ 
+A detailed budget breakdown, M&amp;E framework, or post-grant sustainability plan is NOT required. Do not penalise directional answers for lacking this depth.
+Response: {!$Input:useOfFundsResponse}
+
+4. Operational Synergies – The applicant has expressed interest in the GenieAI Platform (Wadhwani Foundation&apos;s AI tool for career advisory, skilling, placement, and progression). In 200 words or fewer, they have been asked to describe: (1) how GenieAI could contribute to their work — specific use cases; (2) which features they would most want to use; (3) any concerns or constraints on adoption.
+ 
+Evaluate whether the response is substantive and specific — does it go beyond generic enthusiasm to describe concrete use cases or grounded concerns? Do not penalise for not providing beneficiary estimates. Do not penalise for raising concerns rather than enthusiasm.
+Response:  {!$Input:operationalSynergyResponse}
+
+5.Skilling Approach - Tell us about your job creation work in roughly 500 words. Cover: (i) your support model — the kinds of support you provide (capital, mentorship, business advisory, sector-specific technical assistance, market linkages, etc.); (ii) your theory of change — the journey from engagement through to jobs created and sustained; (iii) what&apos;s distinctive about your approach relative to peers. For your primary support model(s), please indicate (a) approximate annual jobs created/sustained in your most recent full year, and (b) the share of these jobs you estimate would have been created without your intervention (baseline) versus those attributable to your programme (incremental). Directional ranges are acceptable; precision will be tested at due diligence.
+Response: {!$Input:skillingApproach}
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>skillingApproach</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>skillingApproach</masterLabel>
+            <referenceName>Input:skillingApproach</referenceName>
+            <required>false</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateFormat>FormulaExpression</templateFormat>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_3</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – In 100 words or fewer, briefly describe your organisation&apos;s governance and operational structure. Cover: (1) how the entity is governed (board composition, oversight); (2) who leads the organisation day-to-day; (3) any key affiliations, related entities, or ownership structures.
+ 
+Entity type, registration jurisdiction, and
+incorporation date are captured in separate
+structured fields — do not repeat them here.
+Response: {!$Input:legalStructureResponse}
+
+2. Organizational Sustainability – In about 100 words, describe how your organisation sustains its work. Cover:
+(1) funding mix — main revenue sources;
+(2) programmatic resilience — dependence on
+any single programme or contract; (3) funder concentration risk and how it is managed.
+ 
+A plain-language picture is expected. Financial projections, detailed risk models, and multi-year plans are not required at this stage.
+Response: {!$Input:orgSustainabilityResponse}
+
+3. Use of Additional Funds – In 200 words or fewer, describe how you would deploy additional funding to scale impact. Assume a baseline of $1M/year for 5 years; calibrate up or down based on your context.
+ 
+This is a directional question. A complete
+response identifies 1–3 specific uses of funding (e.g., geographic expansion, new programme offerings, technology, team scale-up) and gives a broad sense of the scale ambition (additional reach or beneficiaries).
+ 
+A detailed budget breakdown, M&amp;E framework, or post-grant sustainability plan is NOT required. Do not penalise directional answers for lacking this depth.
+Response: {!$Input:useOfFundsResponse}
+
+4. Operational Synergies – The applicant has expressed interest in the GenieAI Platform (Wadhwani Foundation&apos;s AI tool for career advisory, skilling, placement, and progression). In 200 words or fewer, they have been asked to describe: (1) how GenieAI could contribute to their work — specific use cases; (2) which features they would most want to use; (3) any concerns or constraints on adoption.
+ 
+Evaluate whether the response is substantive and specific — does it go beyond generic enthusiasm to describe concrete use cases or grounded concerns? Do not penalise for not providing beneficiary estimates. Do not penalise for raising concerns rather than enthusiasm.
+Response:  {!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}
+
+5.Skilling Approach - Tell us about your job creation work in roughly 500 words. Cover: (i) your support model — the kinds of support you provide (capital, mentorship, business advisory, sector-specific technical assistance, market linkages, etc.); (ii) your theory of change — the journey from engagement through to jobs created and sustained; (iii) what&apos;s distinctive about your approach relative to peers. For your primary support model(s), please indicate (a) approximate annual jobs created/sustained in your most recent full year, and (b) the share of these jobs you estimate would have been created without your intervention (baseline) versus those attributable to your programme (incremental). Directional ranges are acceptable; precision will be tested at due diligence.
+Response: {!$Input:skillingApproach}
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>skillingApproach</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>skillingApproach</masterLabel>
+            <referenceName>Input:skillingApproach</referenceName>
+            <required>false</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateFormat>FormulaExpression</templateFormat>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_4</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – In 100 words or fewer, briefly describe your organisation&apos;s governance and operational structure. Cover: (1) how the entity is governed (board composition, oversight); (2) who leads the organisation day-to-day; (3) any key affiliations, related entities, or ownership structures.
+ 
+Entity type, registration jurisdiction, and
+incorporation date are captured in separate
+structured fields — do not repeat them here.
+Response: {!$Input:legalStructureResponse}
+
+2. Organizational Sustainability – In about 100 words, describe how your organisation sustains its work. Cover:
+(1) funding mix — main revenue sources;
+(2) programmatic resilience — dependence on
+any single programme or contract; (3) funder concentration risk and how it is managed.
+ 
+A plain-language picture is expected. Financial projections, detailed risk models, and multi-year plans are not required at this stage.
+Response: {!$Input:orgSustainabilityResponse}
+
+3. Use of Additional Funds – In 200 words or fewer, describe how you would deploy additional funding to scale impact. Assume a baseline of $1M/year for 5 years; calibrate up or down based on your context.
+ 
+This is a directional question. A complete
+response identifies 1–3 specific uses of funding (e.g., geographic expansion, new programme offerings, technology, team scale-up) and gives a broad sense of the scale ambition (additional reach or beneficiaries).
+ 
+A detailed budget breakdown, M&amp;E framework, or post-grant sustainability plan is NOT required. Do not penalise directional answers for lacking this depth.
+Response: {!$Input:useOfFundsResponse}
+
+4. Operational Synergies – The applicant has expressed interest in the GenieAI Platform (Wadhwani Foundation&apos;s AI tool for career advisory, skilling, placement, and progression). In 200 words or fewer, they have been asked to describe: (1) how GenieAI could contribute to their work — specific use cases; (2) which features they would most want to use; (3) any concerns or constraints on adoption.
+ 
+Evaluate whether the response is substantive and specific — does it go beyond generic enthusiasm to describe concrete use cases or grounded concerns? Do not penalise for not providing beneficiary estimates. Do not penalise for raising concerns rather than enthusiasm.
+Response:  {!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}
+
+5.Skilling Approach - Tell us about your job creation work in roughly 500 words. Cover: (i) your support model — the kinds of support you provide (capital, mentorship, business advisory, sector-specific technical assistance, market linkages, etc.); (ii) your theory of change — the journey from engagement through to jobs created and sustained; (iii) what&apos;s distinctive about your approach relative to peers. For your primary support model(s), please indicate (a) approximate annual jobs created/sustained in your most recent full year, and (b) the share of these jobs you estimate would have been created without your intervention (baseline) versus those attributable to your programme (incremental). Directional ranges are acceptable; precision will be tested at due diligence.
+Response: {!$Input:skillingApproach}
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>skillingApproach</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>skillingApproach</masterLabel>
+            <referenceName>Input:skillingApproach</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateFormat>FormulaExpression</templateFormat>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_5</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Grants, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+ &quot;legalStructure&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;organizationalSustainability&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;useOfFunds&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; },
+ &quot;operationalSynergies&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. Legal Structure – In 100 words or fewer, briefly describe your organisation&apos;s governance and operational structure. Cover: (1) how the entity is governed (board composition, oversight); (2) who leads the organisation day-to-day; (3) any key affiliations, related entities, or ownership structures.
+ 
+Entity type, registration jurisdiction, and
+incorporation date are captured in separate
+structured fields — do not repeat them here.
+Response: {!$Input:legalStructureResponse}
+
+2. Organizational Sustainability – In about 100 words, describe how your organisation sustains its work. Cover:
+(1) funding mix — main revenue sources;
+(2) programmatic resilience — dependence on
+any single programme or contract; (3) funder concentration risk and how it is managed.
+ 
+A plain-language picture is expected. Financial projections, detailed risk models, and multi-year plans are not required at this stage.
+Response: {!$Input:orgSustainabilityResponse}
+
+3. Use of Additional Funds – In 200 words or fewer, describe how you would deploy additional funding to scale impact. Assume a baseline of $1M/year for 5 years; calibrate up or down based on your context.
+ 
+This is a directional question. A complete
+response identifies 1–3 specific uses of funding (e.g., geographic expansion, new programme offerings, technology, team scale-up) and gives a broad sense of the scale ambition (additional reach or beneficiaries).
+ 
+A detailed budget breakdown, M&amp;E framework, or post-grant sustainability plan is NOT required. Do not penalise directional answers for lacking this depth.
+Response: {!$Input:useOfFundsResponse}
+
+4. Operational Synergies – The applicant has expressed interest in the GenieAI Platform (Wadhwani Foundation&apos;s AI tool for career advisory, skilling, placement, and progression). In 200 words or fewer, they have been asked to describe: (1) how GenieAI could contribute to their work — specific use cases; (2) which features they would most want to use; (3) any concerns or constraints on adoption.
+ 
+Evaluate whether the response is substantive and specific — does it go beyond generic enthusiasm to describe concrete use cases or grounded concerns? Do not penalise for not providing beneficiary estimates. Do not penalise for raising concerns rather than enthusiasm.
+Response:  {!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}{!$Input:operationalSynergyResponse}
+
+5.Skilling Approach - Tell us about your job creation work in roughly 500 words. Cover: (i) your support model — the kinds of support you provide (capital, mentorship, business advisory, sector-specific technical assistance, market linkages, etc.); (ii) your theory of change — the journey from engagement through to jobs created and sustained; (iii) what&apos;s distinctive about your approach relative to peers. For your primary support model(s), please indicate (a) approximate annual jobs created/sustained in your most recent full year, and (b) the share of these jobs you estimate would have been created without your intervention (baseline) versus those attributable to your programme (incremental). Directional ranges are acceptable; precision will be tested at due diligence.
+Response: {!$Input:skillingApproach}
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>legalStructureResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>legalStructureResponse</masterLabel>
+            <referenceName>Input:legalStructureResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>orgSustainabilityResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>orgSustainabilityResponse</masterLabel>
+            <referenceName>Input:orgSustainabilityResponse</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>useOfFundsResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>useOfFundsResponse</masterLabel>
+            <referenceName>Input:useOfFundsResponse</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>operationalSynergyResponse</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>operationalSynergyResponse</masterLabel>
+            <referenceName>Input:operationalSynergyResponse</referenceName>
+            <required>false</required>
+        </inputs>
+        <inputs>
+            <apiName>skillingApproach</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>skillingApproach</masterLabel>
+            <referenceName>Input:skillingApproach</referenceName>
+            <required>false</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <templateFormat>FormulaExpression</templateFormat>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_6</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

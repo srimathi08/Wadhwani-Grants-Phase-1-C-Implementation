@@ -1,5 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import getMilestones from '@salesforce/apex/CoeMilestoneController.getMilestones';
+import approveMilestoneReport from '@salesforce/apex/CoeMilestoneController.approveMilestoneReport';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class CoeMilestoneTiles extends LightningElement {
     @track milestones = [];
@@ -32,34 +34,39 @@ export default class CoeMilestoneTiles extends LightningElement {
         }
     }
 
-    async loadMilestones() {
-        this.isLoading = true;
-        this.error = null;
+  async loadMilestones() {
+    this.isLoading = true;
+    this.error = null;
 
-        try {
-            const result = await getMilestones({ appId: this.appId });
+    const HIDE_MANAGE_FUND_STATUSES = new Set([
+        'Fund Disbursed',
+        'Report Submitted',
+        'Report Approved'
+    ]);
 
-            this.milestones = (result || []).map((m) => {
+    try {
+        const result = await getMilestones({ appId: this.appId });
+
+        this.milestones = (result || []).map((m) => {
             return {
-                            ...m,
+                ...m,
+                projectStartDate: m.projectStartDate,
+                projectEndDate: m.projectEndDate,
+                statusClass: this.getStatusClass(m.status),
+                showManageFund: !HIDE_MANAGE_FUND_STATUSES.has(m.status),
+                showApprove: m.status === 'Report Submitted'
+            };
+        });
 
-                         // show exactly what Salesforce stores
-                            projectStartDate: m.projectStartDate,
-                            projectEndDate: m.projectEndDate,
-
-                            statusClass: this.getStatusClass(m.status)
-                    };
-    });
-
-        } catch (err) {
-            this.error = err?.body?.message || err?.message || 'Unknown error';
-            // eslint-disable-next-line no-console
-            console.error('Error loading milestones:', err);
-            this.milestones = [];
-        } finally {
-            this.isLoading = false;
-        }
+    } catch (err) {
+        this.error = err?.body?.message || err?.message || 'Unknown error';
+        // eslint-disable-next-line no-console
+        console.error('Error loading milestones:', err);
+        this.milestones = [];
+    } finally {
+        this.isLoading = false;
     }
+}
 
     formatDate(dt) {
         if (!dt || dt === 'null') return '-';
@@ -106,4 +113,45 @@ export default class CoeMilestoneTiles extends LightningElement {
         else if (typeof modal.openModal === 'function') modal.openModal(payload);
         else if (typeof modal.show === 'function') modal.show(payload);
     }
+ 
+
+async handleApproveReport(event) {
+    const milestoneId = event.currentTarget.dataset.id;
+    try {
+        await approveMilestoneReport({ milestoneId });
+
+        // Update locally instead of refetching — getMilestones is cacheable
+        // and an immediate refetch can return stale data
+        this.milestones = this.milestones.map((m) => {
+            if (m.milestoneId !== milestoneId) return m;
+            const updatedStatus = 'Report Approved';
+            return {
+                ...m,
+                status: updatedStatus,
+                statusClass: this.getStatusClass(updatedStatus),
+                showManageFund: false,
+                showApprove: false
+            };
+        });
+
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: 'Success',
+                message: 'Report approved successfully.',
+                variant: 'success'
+            })
+        );
+    } catch (err) {
+        this.error = err?.body?.message || err?.message || 'Unable to approve report.';
+        console.error('Error approving report:', err);
+
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title: 'Error approving report',
+                message: this.error,
+                variant: 'error'
+            })
+        );
+    }
+}
 }

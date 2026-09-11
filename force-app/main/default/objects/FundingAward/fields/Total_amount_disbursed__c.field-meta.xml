@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_amount_disbursed__c</fullName>
+    <label>Total amount disbursed</label>
+    <summarizedField>FundingDisbursement.Amount</summarizedField>
+    <summaryForeignKey>FundingDisbursement.FundingAwardId</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

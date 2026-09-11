@@ -13,18 +13,21 @@ import getActiveFundingOpportunityId from '@salesforce/apex/WinProjectProposalFo
 import { NavigationMixin } from 'lightning/navigation';
 //import getDraftApplication  from '@salesforce/apex/winFormSaveDraft.getDraftApplication';
 import saveDraftApplication from '@salesforce/apex/WinProjectProposalFormController.saveDraftApplication';
+import deleteCoFounderRecord from '@salesforce/apex/WinProjectProposalFormController.deleteCoFounderRecord';
+//import deleteContentDocument from '@salesforce/apex/WinProjectProposalFormController.deleteFileFromSalesforce';
+import getDraftApplication from '@salesforce/apex/WinProjectProposalFormController.getDraftApplication';     
 
 export default class WinFormWithSaveDraft extends NavigationMixin(LightningElement) {
     @track recordId = null; // IA draft Id
-    
-   // @track applicationRecordId; // Stores Application_Form__c ID after creation
+
+    @track applicationRecordId; // Stores Application_Form__c ID after creation
     winLogoUrl = WIN_LOGO; // Set logo URL
    
     @track showForm = true; // Initially hide form
     //@track isButtonDisabled = false; // Apply Now button is enabled initially
     showFundingSources = false;
  
-    //@track applicationData = {}; 
+    @track applicationData = {}; 
     
     @track activeField = null; 
    
@@ -35,8 +38,7 @@ export default class WinFormWithSaveDraft extends NavigationMixin(LightningEleme
     @track modalRowId = null;
     @track modalTitle = '';
 
-   // @track budgetRows = [];
-   @track budgets =[];
+    @track budgetRows = [];
    @track isBudgetModalOpen = false;
    @track budgetModalValue = '';
    @track budgetModalField = '';
@@ -48,9 +50,21 @@ export default class WinFormWithSaveDraft extends NavigationMixin(LightningEleme
     @track selectedPrimaryFocusArea;
     @track selectedSubFocusAreas = [];
 
-    @track showPrimaryOther = false;
+     @track showPrimaryOther = false;
     @track showSubOther = false;
+    @track coFounders = [{
+    uniqueId: 1,
+    Name: '',
+    Designation__c: '',
+    Institution__c: '',
+    Mobile__c: '',
+    Email__c: ''
+}];
 
+yesNoOptions = [
+    { label: 'Yes', value: 'Yes' },
+    { label: 'No', value: 'No' }
+];
   
 
     @track applicationData = {
@@ -69,6 +83,7 @@ export default class WinFormWithSaveDraft extends NavigationMixin(LightningEleme
         Project_Duration__c: '',
         Expertise_and_Experience_of_Team_in_Spec__c: '',
         Keywords__c: '',
+        Describe_Objective_Relevance_of_Project__c: '',
         Primary_Focus_Area__c: '',
         Sub_Focus_Area__c: '',
         //Project_Start_Date__c: '',
@@ -77,31 +92,46 @@ export default class WinFormWithSaveDraft extends NavigationMixin(LightningEleme
         Project_Summary__c: '', // Project_Summary_Max_500_words__c
         Objectives_of_the_Project__c: '',
         Project_Approach_and_Work_Plan__c: '',
+        Work_undertaken_supporting_current_TRL__c: '',
         Key_Problem_Being_Solved__c: '',
         Proposed_Solution__c: '',
         Current_status_of_the_Project_Work_und__c: '',
         Novelty_of_the_Project__c: '',
-        Competitive_Advantage__c: '', //Competitive_Landscape__c
+        Competitive_Advantage__c: '', //changed Competitive_Landscape__c
         Details_of_IPR_Filed_Granted__c: '',
         Details_of_Ethical_Received__c: '',
         Full_Proposal_Citations__c: '',
         Target_Market_Industry_Application__c: '',
         Customer_and_Beneficiaries__c: '',
-        Plan_for_Commercialization__c: '',//Potential_for_Commercialization__c
+        Potential_for_Commercialization__c: '',
+        Startup_Name__c: '',
+Founder_Name__c: '',
+Founder_Designation__c: '',
+Founder_Institution__c: '',
+Founder_Mobile__c: '',
+Founder_Email__c: '',
+Is_Startup_Registered__c: '',
+Startup_Registration_Date__c: '',
+Startup_Registration_No__c: '',
+Is_Startup_DPIIT_Registered__c: '',
+DPIIT_Registration_No__c: '',
         Business_Model_for_Commercialization__c: '',
-        Project_Revenue_Strategy__c: '', //Potential_Revenue_Generation_Strategy_fo__c
+        Project_Revenue_Strategy__c: '', //Potential_Revenue_Generation_Strategy_fo__c Project_Revenue_Strategy__c
         Previous_Funding_Details__c: '', // Previous_Funding_Details__c List_of_Existing_Funding_Sources_and_Fun__c
         Additional_Funding_Plans__c: '',
         WIN_Support__c: '',
         Proposed_Outcomes_Deliverables_under_t__c: '',
         Envisioned_Project_Impact__c: '',
-        Future_Plan_for_next_3_5_on_comple__c: '', //Future_Plan_for_next_3_5_Years_on_comple__c
+        Future_Plan_for_next_3_5_Years_on_comple__c: '',
         Potential_for_Startup_Formation__c: '',
         Main_Risks_and_Barriers__c: '',
         Relevant_Partnerships__c: '',
         Potential_for_Startup_Formation__c: '',
         Incubator_Association_Details__c: '',
-        Total_Project_Budget_in_USD__c: '',
+        Strategy_for_transfer_of_technology__c: '',
+        Strategy_for_raising_funds_from_Investor__c: '',
+        //Total_Project_Budget_in_USD__c: '',
+        Total_Project_Budget_INR__c: '',
         FundingOpportunityId: '',
         ApplicationType: '',
         Category: '',
@@ -123,10 +153,8 @@ export default class WinFormWithSaveDraft extends NavigationMixin(LightningEleme
    @track projectStartDate = '';
    @track projectEndDate = '';
 
-
     @track currentPage = 1; //Pagination
-   
-  //For progress bar  
+    
     totalPages = 8;
 
 get currentPage() {
@@ -145,52 +173,115 @@ get currentPage() {
  get progressClass() {
     return `slds-progress-bar__value slds-size_${this.currentPage}-of-${this.totalPages}`;
 }
-
     
     //Picklist Values declaration
-   // @track primaryFocusAreaOptions = [];
-    //@track subFocusAreaOptions = [];
+    @track primaryFocusAreaOptions = [];
+    @track subFocusAreaOptions = [];
     @track priorResearchFundingOptions = [];
     @track trlOptions = [];
     @track expectedTrlOptions = [];
 
-    //File upload declarations
+
+       //File upload declarations
     @track fileUploadFields = [
-        { name: 'Resume_PI', label: '8.1. Resume / Biodata of Principal Investigator:', helpText: '', uploadedFileName: '', required: true },
-        { name: 'Govt_ID_of_PI', label: '8.2. PAN Card / Aadhar / Passport Copy or any Govt ID of Principal Investigator:', helpText: '', uploadedFileName: '', required: true },
-        { name: 'Resume_Co_PI', label: '8.3. Resume / Biodata of Co-Principal Investigator:', helpText: '' , uploadedFileName: '' },
-        { name: 'Govt_ID_of_CO_PI', label: '8.4. PAN Card / Aadhar / Passport Copy or any Govt ID of Co-Principal Investigator:', helpText: '', uploadedFileName: '' },
-        { name: 'Letter_Support', label: '8.5. Letter of Support from Institution/Organization:', helpText: '', uploadedFileName: '', required: true},
-        { name: 'Letter_Endorsement', label: '8.6. Letter of Endorsement from Industry Collaborators / Partners', helpText: '', uploadedFileName: '' },
-        { name: 'Letter_Endorsement_Incubator', label: '8.7. Letter of Endorsement from Incubator:', helpText: '', uploadedFileName: '' },
-        { name: 'Detailed_WorkPlan', label: '8.8. Detailed Work Plan and Methodology (figures, flow chart, diagrams)', helpText: '', uploadedFileName: '', required: true },
-        { name: 'Document_TRL', label: '8.9. Document demonstrating current status of the project / current TRL:', helpText: '', uploadedFileName: '', required: true },
-        { name: 'Supporting_Documents', label: '8.10. Supporting documents of IPR filed / granted:', helpText: '', uploadedFileName: '' },
-        { name: 'Supporting_Documents_prior', label: '8.11. Supporting documents of prior funding received under the project:', helpText: '' ,uploadedFileName: '' }
+        { name: 'Document_TRL', label: '8.1. Document demonstrating current status of the project / current TRL', helpText: '', uploadedFileName: '', required: true },
+        { name: 'Resume_PI', label: '8.2. Resume / Biodata of Principal Investigator', helpText: '', uploadedFileName: '', required: true },
+        { name: 'Resume_Co_PI', label: '8.3. Resume / Biodata of Co-Principal Investigator', helpText: '' , uploadedFileName: '' },
+        { name: 'Letter_Support', label: '8.4. Letter of Support from Institution', helpText: '', uploadedFileName: '' },
+        { name: 'Letter_Endorsement', label: '8.5. Letter of Endorsement from Industry Collaborators/ Clinical Partners/ Others', helpText: '', uploadedFileName: ''},  
+        { name: 'Detailed_WorkPlan', label: '8.6 Detailed Work Plan and Methodology (figures, flow chart, diagrams)', helpText: '', uploadedFileName: '', required: true },
+        { name: 'Supporting_Documents', label: '8.7. Supporting documents of IPR filed / granted', helpText: '', uploadedFileName: '' },
+        { name: 'Supporting_Documents_prior', label: '8.8. Supporting documents of prior funding received under the project', helpText: '' ,uploadedFileName: '' },
+        { name: 'Any_Other_Documents', label: '8.9. Any other documents', helpText: '', uploadedFileName: '' }
     ];
     
     //Budget Table
     @track budgets = Array.from({ length: 3 }, (_, index) => ({
-        uniqueId: index + 1,
-        Name: '',
-        Year_1__c: '',
-        Year_2__c: '',
-        Year_3_USD__c: '',
-        Justification__c: '',
-        Total_Amount__c: ''
-    }));
+    uniqueId: index + 1,
+     displayIndex: index + 1,
+    Name: '',
+    Total_Amount__c: '',
+    //Total_Amount_INR__c: '',
+    Justification__c: ''
+}));
 
     
     @track uploadedFiles = []; // To store uploaded file details
-    @track milestones = Array.from({ length: 5 }, (_, index) => ({
+/*@track milestones = Array.from({ length: 5 }, (_, index) => ({
         uniqueId: index + 1,
         Milestone_Description__c: '',
         Deliverables__c: '',
         Budget_Required__c: '',
         Target_Completion_Months__c: '',
+        //Target_Completion_Month__c: '',
         //Milestone_Target_Date__c: '',
         Justification__c: ''
+    }));*/
+
+    get indexPlusOne() {
+    return (index) => index + 1;
+}
+
+get previewMilestones() {
+    return this.filledMilestones.map((milestone, idx) => ({
+        ...milestone,
+        indexNumber: idx + 1,   // <-- This fixes S.No
+        uniqueKey: milestone.uniqueId || idx
     }));
+}
+
+
+    @track milestones = [
+    {
+        uniqueId: 1,
+        InstallmentLabel: "Instalment – 1 (30%)",
+        StaticMilestoneLabel: "Signing of Grant Agreement with WIN COE - M1",
+        Milestone_Description__c: "", //
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    },
+    {
+        uniqueId: 2,
+        InstallmentLabel: "Instalment – 2 (30%)",
+        StaticMilestoneLabel: "M2",
+        Milestone_Description__c: "", //
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    },
+    {
+        uniqueId: 3,
+        InstallmentLabel: "Instalment – 3 (30%)",
+        StaticMilestoneLabel: "M3",
+        Milestone_Description__c: "",//
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    },
+    {
+        uniqueId: 4,
+        InstallmentLabel: "Instalment – 4",
+        StaticMilestoneLabel: "M4 – Completion Report",
+        Milestone_Description__c: "", //
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    }
+];
+
 
     @wire(getObjectInfo, { objectApiName: INDIVIDUALAPPLICATION_OBJECT })
     objectInfo;
@@ -237,7 +328,6 @@ get currentPage() {
         }
     }
 
-    //old one
    /* handlePrimaryFocusChange(event) {
         this.applicationData.Primary_Focus_Area__c = event.detail.value;
     
@@ -249,14 +339,14 @@ get currentPage() {
     
         // Reset dependent picklist array correctly
         this.applicationData.Sub_Focus_Area__c = [];
-
     }
     handleSubFocusChange(event) {
         // Assign directly as array
         this.applicationData.Sub_Focus_Area__c = event.detail.value;
     }*/
-   
-   handlePrimaryFocusChange(event) {
+
+//New Lines
+      handlePrimaryFocusChange(event) {
     const selectedVal = event.detail.value;
     console.log('>>> PRIMARY SELECTED:', selectedVal);
 
@@ -311,7 +401,6 @@ handleSubFocusChange(event) {
     console.log('>>> showSubOther:', this.showSubOther);
 }
 
-
   
     get isPage1() {
         return this.currentPage === 1;        
@@ -354,6 +443,13 @@ handleSubFocusChange(event) {
         get isLastPage() {       
         return this.currentPage === 8;        
         }
+        get showStartupRegDetails() {
+    return this.applicationData.Is_Startup_Registered__c === 'Yes';
+}
+
+get showDpiitRegDetails() {
+    return this.applicationData.Is_Startup_DPIIT_Registered__c === 'Yes';
+}
 
 
   
@@ -415,32 +511,91 @@ handleSubFocusChange(event) {
 
     setActiveField(event) {
         this.activeField = event.target;
+        
     }
 
     
-    handlePaste(event) {
-        event.preventDefault(); // Stop the default paste behavior
-    
-        const plainText = event.clipboardData.getData('text/plain');
-    
-        // Optional: Clean up special characters or trim spaces
-        const sanitizedText = plainText.trim();
-    
-        // Insert plain text at caret position
-        this.insertPlainTextAtCursor(sanitizedText);
+  handlePaste(event) {
+    event.preventDefault();
+
+    let text = '';
+
+    // Try HTML first to get proper text extraction
+    const html = event.clipboardData.getData('text/html');
+    if (html) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        text = tempDiv.innerText || tempDiv.textContent || '';
+    } else {
+        text = event.clipboardData.getData('text/plain');
     }
 
-    insertPlainTextAtCursor(text) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-    
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-    
-        const lines = text.split('\n');
+    text = text
+        .replace(/\u00A0/g, ' ')     // replace &nbsp; with space
+        .replace(/<[^>]*>/g, '')      // strip any remaining HTML tags
+        .replace(/\r\n|\r/g, '\n')   // normalize line endings
+        .replace(/\n{3,}/g, '\n\n')  // collapse excessive newlines
+        .replace(/\n+$/, '')          // ← add this: strip trailing newlines
+        .trim();
 
+    this.insertPlainTextAtCursor(text);
+}
 
-          // 🔁 Loop in reverse to maintain proper order
+handleCoFounderChange(event) {
+    const field = event.target.dataset.field;
+    const uniqueId = parseInt(event.target.dataset.id, 10);
+    const value = event.target.value;
+
+    this.coFounders = this.coFounders.map(cf =>
+        cf.uniqueId === uniqueId ? { ...cf, [field]: value } : cf
+    );
+}
+
+addCoFounder() {
+    const newId = this.coFounders.length
+        ? Math.max(...this.coFounders.map(c => c.uniqueId)) + 1
+        : 1;
+    this.coFounders = [...this.coFounders, {
+        uniqueId: newId,
+        Name: '',
+        Designation__c: '',
+        Institution__c: '',
+        Mobile__c: '',
+        Email__c: ''
+    }];
+}
+
+deleteCoFounderRow(event) {
+    const uniqueId = parseInt(event.currentTarget.dataset.id, 10);
+    const rowToDelete = this.coFounders.find(c => c.uniqueId === uniqueId);
+
+    if (rowToDelete?.Id) {
+        deleteCoFounderRecord({ coFounderId: rowToDelete.Id })
+            .then(() => {
+                this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+            })
+            .catch(error => {
+                this.dispatchEvent(new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body?.message || 'Failed to delete co-founder row.',
+                    variant: 'error'
+                }));
+            });
+    } else {
+        this.coFounders = this.coFounders.filter(c => c.uniqueId !== uniqueId);
+    }
+}
+
+insertPlainTextAtCursor(text) {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+
+    const lines = text.split('\n');
+
+    // Loop in reverse to maintain proper order
     for (let i = lines.length - 1; i >= 0; i--) {
         if (i < lines.length - 1) {
             const br = document.createElement('br');
@@ -448,13 +603,12 @@ handleSubFocusChange(event) {
         }
         range.insertNode(document.createTextNode(lines[i]));
     }
-    
-        // Move cursor to the end
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
 
+    // Move cursor to the end
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
     deleteBudgetRow(event) {
     const idToDelete = parseInt(event.target.dataset.id, 10);
     this.budgets = this.budgets.filter(b => b.uniqueId !== idToDelete);
@@ -476,10 +630,10 @@ deleteMilestoneRow(event) {
         uniqueId: index + 1
     }));
 }
+
         
-   /* Works without Numbering List
-   
-   handleKeyDown(event) {
+   //old - without bullet
+   /*handleKeyDown(event) {
         // Prevent Enter or Backspace from duplicating the selection
         if ((event.key === 'Enter' || event.key === 'Backspace') && window.getSelection) {
             const selection = window.getSelection();
@@ -489,8 +643,8 @@ deleteMilestoneRow(event) {
             }
         }
     } */
-            
-  /* handleKeyDown(event) {
+    
+ /* handleKeyDown(event) {
     if (event.key === 'Enter') {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -576,11 +730,22 @@ handleKeyDown(event) {
             return;
         }
     }
-}    
-    handleInput(event) {
-        const field = event.target.dataset.field;
-        this.applicationData[field] = event.target.innerHTML;
-    }
+}
+        
+
+   handleInput(event) {
+    const field = event.target.dataset.field;
+    let rawHtml = event.target.innerHTML;
+
+    const cleaned = rawHtml
+        .replace(/<div><br\s*\/?><\/div>/gi, '')   // remove empty div+br blocks
+        .replace(/<br\s*\/?>\s*$/gi, '')            // remove trailing <br> tag
+        .replace(/&lt;br&gt;\s*$/gi, '')            // remove literal &lt;br&gt; at end
+        .replace(/&lt;br\s*\/&gt;\s*$/gi, '')       // remove literal &lt;br /&gt; at end
+        .trim();
+
+    this.applicationData[field] = cleaned;
+}
     
 
     
@@ -607,9 +772,17 @@ handleKeyDown(event) {
       return sum + amt;
     }, 0);
   } */
-    get totalBudget() {
+     get totalBudget() {
     return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount__c) || 0), 0);
 }
+  get totalUSD() {
+    return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount__c) || 0), 0);
+}
+
+/*get totalINR() {
+    return this.budgets.reduce((sum, b) => sum + (Number(b.Total_Amount_INR__c) || 0), 0);
+}*/
+
         budgetOpenModal(event) {
             this.budgetModalRowId = event.target.dataset.id;
             this.budgetModalField = event.target.dataset.field;
@@ -631,41 +804,24 @@ handleKeyDown(event) {
         this.isBudgetModalOpen = false;
     }
 
-
-   /* handleBudgetChange(event) {
-        const field = event.target.dataset.field;
-        const uniqueId = parseInt(event.target.dataset.id, 10);
-        let value = event.target.value;
-    
-        this.budgets = this.budgets.map(budget =>
-            budget.uniqueId === uniqueId ? { ...budget, [field]: value } : budget
-        );
-    } */
-     handleBudgetChange(event) {
+handleBudgetChange(event) {
     const field = event.target.dataset.field;
     const uniqueId = parseInt(event.target.dataset.id, 10);
     let value = event.target.value;
 
-    // Only parse as number for year fields
-    if (['Year_1__c', 'Year_2__c', 'Year_3_USD__c'].includes(field)) {
+    if (['Total_Amount__c', 'Total_Amount_INR__c'].includes(field)) {
         value = parseInt(value) || 0;
     }
 
-    this.budgets = this.budgets.map(budget => {
-        if (budget.uniqueId === uniqueId) {
-            let updatedBudget = { ...budget, [field]: value };
-
-            const y1 = parseInt(updatedBudget.Year_1__c) || 0;
-            const y2 = parseInt(updatedBudget.Year_2__c) || 0;
-            const y3 = parseInt(updatedBudget.Year_3_USD__c) || 0;
-
-            updatedBudget.Total_Amount__c = y1 + y2 + y3;
-
-            return updatedBudget;
+    this.budgets = this.budgets.map(b => {
+        if (b.uniqueId === uniqueId) {
+            return { ...b, [field]: value };
         }
-        return budget;
+        return b;
     });
 }
+    
+
         saveBudgetModalData() {
             let editableDiv = this.template.querySelector(".text-area1");
             if (editableDiv) {
@@ -685,38 +841,19 @@ handleKeyDown(event) {
             this.budgetCloseModal();
         }
     
-       
-        
+    
+   addBudgetRow() {
+    let newId = this.budgets.length + 1;
+    this.budgets = [...this.budgets, {
+        uniqueId: newId,
+        displayIndex: newId,
+        Name: '',
+        Total_Amount__c: '',
+        //Total_Amount_INR__c: '',
+        Justification__c: ''
+    }];
+}
 
-    handleAmountChange(event) {
-        const field = event.target.dataset.field;
-        const uniqueId = parseInt(event.target.dataset.id, 10);
-        let value = event.target.value;
-    
-        if (field === 'Amount') {
-            // Numeric field: remove decimals
-            value = Math.floor(Number(value));
-        }
-    
-        // For all other fields (e.g., dates, text), value remains as-is
-        this.budgets = this.budgets.map(budget =>
-            budget.uniqueId === uniqueId ? { ...budget, [field]: value } : budget
-        );
-    }
-    
-    
-    addBudgetRow() {
-        let newId = this.budgets.length + 1;
-        this.budgets = [...this.budgets, {
-            uniqueId: newId,
-            Name: '', 
-            Year_1__c: '',
-            Year_2__c: '',
-            Year_3_USD__c: '',  
-            Justification__c: '',
-            Total_Amount__c: ''
-        }];
-    }
 
      // ======== OPEN MODAL (Handles Milestone) ========
      openModal(event) {
@@ -777,17 +914,6 @@ handleKeyDown(event) {
         this.closeModal();
     }
 
-    validateMonthYear(event) {
-    const value = event.target.value.trim();
-    const regex = /^(0[1-9]|1[0-2])\/\d{4}$/; // MM/YYYY format
-
-    if (!regex.test(value)) {
-        event.target.setCustomValidity('Enter a valid month/year in MM/YYYY format (e.g., 06/2025)');
-    } else {
-        event.target.setCustomValidity('');
-    }
-    event.target.reportValidity();
-}
     handleMilestoneChange(event) {
         const field = event.target.dataset.field;
         const uniqueId = parseInt(event.target.dataset.id, 10);
@@ -805,7 +931,7 @@ handleKeyDown(event) {
     }
     
     
-    addRow() {
+   /* addRow() {
         let newId = this.milestones.length + 1;
         this.milestones = [...this.milestones, {
             uniqueId: newId,
@@ -813,17 +939,90 @@ handleKeyDown(event) {
             Deliverables__c: '',
             Budget_Required__c: '',
             Target_Completion_Months__c: '',
+            //Target_Completion_Month__c: '',
             //Milestone_Target_Date__c: '',
             Justification__c: ''
         }];
+    }*/
+   
+    //new lines
+    addRow() {
+
+    // Step 1: Clone list
+    let list = JSON.parse(JSON.stringify(this.milestones));
+
+    // Step 2: Insert ABOVE last row
+    let lastIndex = list.length - 1;
+
+    let insertIndex = lastIndex; // insert before M4 Completion row
+
+    // Step 3: Create a new row object
+    const newRow = {
+        uniqueId: null, // will be recalculated
+        InstallmentLabel: "",
+        StaticMilestoneLabel: "",
+        Milestone_Description__c: "",
+        Activities_under_this_Milestone__c: "",
+        Output_and_Deliverables__c: "",
+        Project_Start_Date__c: "",
+        Project_End_Date__c: "",
+        Budget_Required__c: "",
+        //Budget_Required_INR__c: ""
+    };
+
+    // Step 4: Insert new row BEFORE completion row
+    list.splice(insertIndex, 0, newRow);
+
+    // Step 5: Rebuild Installment Labels dynamically
+    /*let total = list.length;
+
+    list = list.map((row, i) => {
+        row.uniqueId = i + 1;
+
+        if (i < total - 1) {
+            // Normal installments
+            row.InstallmentLabel = `Instalment – ${i + 1} (≈30%)`;
+            row.StaticMilestoneLabel = `M${i + 1}`;
+        } else {
+            // Last row -> always Completion Report
+            row.InstallmentLabel = `Instalment – ${total} (≈10%)`;
+            row.StaticMilestoneLabel = `M${total} – Completion Report`;
+        }
+        return row;
+    }); */
+    // Step 5: Rebuild Installment Labels dynamically
+let total = list.length;
+
+list = list.map((row, i) => {
+    row.uniqueId = i + 1;
+
+    if (i < 3) {
+        // First 3 rows → show percentage
+        row.InstallmentLabel = `Instalment – ${i + 1} (≈30%)`;
+        row.StaticMilestoneLabel = `M${i + 1}`;
+    } else {
+        // M4, M5, M6... → NO percentage
+        row.InstallmentLabel = `Instalment – ${i + 1}`;
+        row.StaticMilestoneLabel = `M${i + 1}`;
     }
+
+    // Last row should always be Completion Report
+    if (i === total - 1) {
+        row.StaticMilestoneLabel = `M${i + 1} – Completion Report`;
+    }
+
+    return row;
+});
+
+    this.milestones = list;
+}
 
     preventDecimal(event) {
         if (event.key === '.') {
             event.preventDefault();
         }
     }
-
+    
     validateFileUploads() {
         let isValid = true;
         let missingFiles = [];
@@ -875,183 +1074,157 @@ handleKeyDown(event) {
 
     initializeTables() {
         // 💰 Budget Table - Ensure at least 3 rows
-          if (!this.budgets || this.budgets.length === 0) {
-    this.budgets = [];
-    for (let i = 0; i < 3; i++) {
-        this.budgets.push({
-            uniqueId: i + 1, // ✅ ADD THIS to make each row identifiable
-            Name: '',
-            Year_1__c: '',
-            Year_2__c: '',
-            Year_3_USD__c: '',  
-            Justification__c: '',
-            Total_Amount__c: '',
-            Status: 'Draft'
-            
-        });
-    }
-}
-  /*  if (!this.budgetRows || this.budgetRows.length === 0) {
+    if (!this.budgetRows || this.budgetRows.length === 0) {
         this.budgetRows = [];
         for (let i = 0; i < 3; i++) {
             this.budgetRows.push({
                 Name: '',
-                Amount: '',
+                Total_Amount__c: '',
+                //Total_Amount_INR__c: '',
+                //Year_1__c: '',
+                //Year_2__c: '',
+                //Year_3_USD__c: '',  
                 Justification__c: '',
                 Status: 'Draft'
             });
         }
-    } */
+    }
     
-    if (!this.milestones || this.milestones.length === 0) {
+    /*if (!this.milestones || this.milestones.length === 0) {
         this.milestones = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             this.milestones.push({
                 uniqueId: i + 1, // 👈 VERY IMPORTANT!
                 Milestone_Description__c: '',
                 Deliverables__c: '',
                 Budget_Required__c: '',
                 Target_Completion_Months__c: '',
+                //Target_Completion_Month__c: '',
+                //Milestone_Target_Date__c: '',
                 Justification__c: '',
                 Status__c: 'Draft'
             });
         }
-    }
+    }*/
     }
     
     
 
-    connectedCallback() {
-        console.log('🔄 connectedCallback fired');
-      
-        // 1) Funding Opp
-        console.log('📥 Fetching Funding Opportunity ID…');
-        getActiveFundingOpportunityId()
-          .then(id => {
-            console.log('✅ Funding Opportunity ID:', id);
-            this.applicationData.FundingOpportunityId = id;
-          })
-          .catch(err => console.error('❌ Funding Opp error:', err));
-      
-        // 2) User details
-        console.log('📥 Fetching logged‑in user details…');
-        getLoggedInUserDetails()
-          .then(result => {
-            console.log('👤 User details:', result);
-            this.applicationData.Institution_Name__c = result.AccountName; //COE Institution Name
-            //this.applicationData.COE_Admin__c        = result.ContactName; //before
-            this.applicationData.PI_Name__c          = result.ContactName; // PI
-            this.applicationData.PI_Institution__c   = result.AccountName; // Institution / Organization
-            this.applicationData.PI_Email__c         = result.ContactEmail; // PI Email
-            this.applicationData.COE_Admin__c        = result.ContactId;
-            this.applicationData.AccountId          = result.AccountId;
-            this.applicationData.ContactId          = result.ContactId;
+   connectedCallback() {
+    console.log('🔄 connectedCallback fired');
 
-          })
-          .catch(error => console.error('❌ User details error:', error));
-      
-        // 3) Draft load
-      /*  getDraftApplication()
-        .then(result => {
-            if (result && result.applicationData) {
-                console.log('👤 IA details:', result.applicationData);
+    // 1) Funding Opp
+    console.log('📥 Fetching Funding Opportunity ID…');
+    getActiveFundingOpportunityId()
+      .then(id => {
+        console.log('✅ Funding Opportunity ID:', id);
+        this.applicationData.FundingOpportunityId = id;
+      })
+      .catch(err => console.error('❌ Funding Opp error:', err));
+
+    // 2) User details
+    console.log('📥 Fetching logged‑in user details…');
+    getLoggedInUserDetails()
+      .then(result => {
+        console.log('👤 User details:', result);
+
+        this.applicationData.Institution_Name__c = result.AccountName || '';
+        this.applicationData.PI_Name__c = `${result.FirstName || ''} ${result.LastName || ''}`.trim();
+        this.applicationData.PI_Email__c = result.Email || '';
+        this.applicationData.PI_Phone__c = result.Phone || '';
+        this.applicationData.PI_Institution__c = result.AccountName || '';
+        this.applicationData.PI__c = result.UserId || '';
+        this.applicationData.AccountId = result.AccountId || '';
+      })
+      .catch(error => console.error('❌ User details error:', error));
+
+    // 3) Draft load — only runs if recordId is already known
+    if (this.recordId) {
+        console.log('📥 Fetching draft application for recordId:', this.recordId);
+        getDraftApplication({ recordId: this.recordId })
+            .then(result => {
+                if (!result || !result.applicationData) {
+                    console.warn('⚠️ No draft found for recordId:', this.recordId);
+                    return;
+                }
+
                 const data = result.applicationData;
-    
-                // 🔁 Explicitly assign each form field value
-                this.applicationData.Project_Title__c = data.project_title__c;
-                this.applicationData.Project_Duration__c = data.project_duration__c;
-                this.applicationData.Project_Website_if_any__c = data.project_website_if_any__c;
-                this.applicationData.Keywords__c = data.keywords__c;
-                this.applicationData.Primary_Focus_Area__c = data.primary_focus_area__c;
-               // this.applicationData.Sub_Focus_Area__c = data.sub_focus_area__c;
-                this.applicationData.Sub_Focus_Area__c = data.sub_focus_area__c ? data.sub_focus_area__c.split(';') : [];
+                console.log('👤 Draft applicationData:', data);
 
+                // Merge every returned key into applicationData
+                // (server keys are the actual field API names, case-sensitive)
+                this.applicationData = { ...this.applicationData, ...data };
 
-                //Page 2
-                this.applicationData.PI_Name__c = data.pi_name__c;
-this.applicationData.PI_Designation__c = data.pi_designation__c;
-this.applicationData.PI_Phone__c = data.pi_phone__c;
-this.applicationData.PI_Email__c = data.pi_email__c;
-this.applicationData.Institution_Name__c = data.AccountName;
-this.applicationData.Co_Principal_Investigator_Co_PI__c = data.co_principal_investigator_co_pi__c;
-this.applicationData.CO_PI_Designation__c = data.co_pi_designation__c;
-this.applicationData.CO_PI_Institution__c = data.co_pi_institution__c;
-this.applicationData.CO_PI_Phone__c = data.co_pi_phone__c;
-this.applicationData.CO_PI_Email__c = data.co_pi_email__c;
-this.applicationData.Project_Team_Members__c = data.project_team_members__c;
-this.applicationData.Expertise_and_Experience_of_Team_in_Spec__c = data.expertise_and_experience_of_team_in_spec__c;
-              
-            //page 3
-          
-this.applicationData.Project_Summary__c = data.project_summary__c;
-this.applicationData.Objectives_of_the_Project__c = data.objectives_of_the_project__c;
-this.applicationData.Project_Approach_and_Work_Plan__c = data.project_approach_and_work_plan__c;
-this.applicationData.Key_Problem_Being_Solved__c = data.key_problem_being_solved__c;
-this.applicationData.Proposed_Solution__c = data.proposed_solution__c;
-this.applicationData.Current_status_of_the_Project_Work_und__c = data.current_status_of_the_project_work_und__c;
-this.applicationData.Current_Technology_Readiness_Level_TRL__c = data.current_technology_readiness_level_trl__c;
-this.applicationData.Expected_TRL_at_the_end_of_the_Project__c = data.expected_trl_at_the_end_of_the_project__c;
-this.applicationData.Novelty_of_the_Project__c = data.novelty_of_the_project__c;
-this.applicationData.Competitive_Advantage__c = data.competitive_advantage__c;
-this.applicationData.Details_of_IPR_Filed_Granted__c = data.details_of_ipr_filed_granted__c;
-this.applicationData.Details_of_Ethical_Received__c = data.details_of_ethical_received__c;
-this.applicationData.Full_Proposal_Citations__c = data.full_proposal_citations__c;
+                // Sub_Focus_Area__c comes back as a semicolon string — convert to array for dual-listbox
+                if (typeof this.applicationData.Sub_Focus_Area__c === 'string') {
+                    this.applicationData.Sub_Focus_Area__c = this.applicationData.Sub_Focus_Area__c
+                        ? this.applicationData.Sub_Focus_Area__c.split(';')
+                        : [];
+                }
 
-// PAGE 4 
-this.applicationData.Target_Market_Industry_Application__c = data.target_market_industry_application__c;
-this.applicationData.Customer_and_Beneficiaries__c = data.customer_and_beneficiaries__c;
-this.applicationData.Plan_for_Commercialization__c = data.plan_for_commercialization__c;
-this.applicationData.Business_Model_for_Commercialization__c = data.business_model_for_commercialization__c;
-this.applicationData.Project_Revenue_Strategy__c = data.project_revenue_strategy__c;
-this.applicationData.Main_Risks_and_Barriers__c = data.main_risks_and_barriers__c;
-this.applicationData.Relevant_Partnerships__c = data.relevant_partnerships__c;
-this.applicationData.Potential_for_Startup_Formation__c = data.potential_for_startup_formation__c;
-this.applicationData.Incubator_Association_Details__c = data.incubator_association_details__c;
+                // Re-derive the "Other" toggles so the conditional inputs render
+                this.showPrimaryOther = this.applicationData.Primary_Focus_Area__c === 'Other';
+                this.showSubOther = Array.isArray(this.applicationData.Sub_Focus_Area__c)
+                    && this.applicationData.Sub_Focus_Area__c.includes('Other');
 
-
-//Page 5
-this.applicationData.Total_Project_Budget_in_USD__c = data.total_project_budget_in_usd__c;
-this.applicationData.Proposed_WIN_Grant_Utilization__c = data.proposed_win_grant_utilization__c;
-this.applicationData.Previous_Funding_Details__c = data.previous_funding_details__c;
-this.applicationData.Additional_Funding_Plans__c = data.additional_funding_plans__c;
-this.WIN_Support__c = data.win_support__c;
-
-//Page 6
-this.applicationData.Project_Start_Date__c = data.project_start_date__c;
-this.applicationData.Project_End_Date__c = data.project_end_date__c;
-
-//Page 7
-this.applicationData.Proposed_Outcomes_Deliverables_under_t__c = data.proposed_outcomes_deliverables_under_t__c;
-this.applicationData.Envisioned_Project_Impact__c = data.envisioned_project_impact__c;
-this.applicationData.Future_Plan_for_next_3_5_on_comple__c = data.future_plan_for_next_3_5_on_comple__c;
-
-
-    
-                // 🔁 Assign other values if needed
-                //this.draftId = result.Id;
                 this.recordId = result.Id;
-                //this.milestoneRows = result.milestones || [];
-                this.milestones = result.milestones || [];
-                this.milestones = this.milestones.map((m, index) => ({
-                    ...m,
-                    uniqueId: index + 1 // 👈 Ensure uniqueId exists for rendering
-                }));
-                //this.budgetRows = result.budgets || [];
-                this.budgets = result.budgets || [];
 
-                this.initializeTables(); 
+                // ── Milestones ──
+                if (result.milestones && result.milestones.length) {
+                    this.milestones = result.milestones.map((m, index) => {
+                        const uniqueId = index + 1;
+                        const isLast = index === result.milestones.length - 1;
+                        return {
+                            uniqueId,
+                            Id: m.Id,
+                            InstallmentLabel: m['Installment_of_Funds_' + uniqueId + '__c']
+                                || (index < 3 ? `Instalment – ${uniqueId} (≈30%)` : `Instalment – ${uniqueId}`),
+                            StaticMilestoneLabel: isLast ? `M${uniqueId} – Completion Report` : `M${uniqueId}`,
+                            Milestone_Description__c: m.Milestone_Description__c || '',
+                            Activities_under_this_Milestone__c: m.Activities_under_this_Milestone__c || '',
+                            Output_and_Deliverables__c: m.Output_and_Deliverables__c || '',
+                            Project_Start_Date__c: m.Project_Start_Date__c || '',
+                            Project_End_Date__c: m.Project_End_Date__c || '',
+                            Budget_Required__c: m.Budget_Required__c || ''
+                        };
+                    });
+                }
 
-    
-                // Rich Text restore if needed
+                // ── Budgets ──
+                if (result.budgets && result.budgets.length) {
+                    this.budgets = result.budgets.map((b, index) => ({
+                        uniqueId: index + 1,
+                        displayIndex: index + 1,
+                        Id: b.Id,
+                        Name: b.Name || '',
+                        Total_Amount__c: b.Total_Amount__c || '',
+                        Justification__c: b.Justification__c || ''
+                    }));
+                }
+
+                // ── Co-Founders ──
+                if (result.coFounders && result.coFounders.length) {
+                    this.coFounders = result.coFounders.map((cf, index) => ({
+                        uniqueId: index + 1,
+                        Id: cf.Id,
+                        Name: cf.Name || '',
+                        Designation__c: cf.Designation__c || '',
+                        Institution__c: cf.Institution__c || '',
+                        Mobile__c: cf.Mobile__c || '',
+                        Email__c: cf.Email__c || ''
+                    }));
+                }
+
+                // Restore rich-text editor content once the DOM for the current page has rendered
                 setTimeout(() => {
                     this.restoreEditorContent();
                 }, 300);
-            }
-        })
-        .catch(error => {
-            console.error('❌ Error fetching draft application:', error);
-        }); */
-      }
+            })
+            .catch(error => {
+                console.error('❌ Error fetching draft application:', error);
+            });
+    }
+}
       
       
 
@@ -1071,10 +1244,7 @@ this.applicationData.Future_Plan_for_next_3_5_on_comple__c = data.future_plan_fo
             );
         }
     }
-    
 
-  
-    
     //old code
     restoreEditorContent() {
         // List of all rich text fields
@@ -1084,17 +1254,18 @@ this.applicationData.Future_Plan_for_next_3_5_on_comple__c = data.future_plan_fo
             "Project_Summary__c", // Project_Summary_Max_500_words__c
             "Objectives_of_the_Project__c",
             "Project_Approach_and_Work_Plan__c",
+            "Work_undertaken_supporting_current_TRL__c",
             "Key_Problem_Being_Solved__c",
             "Proposed_Solution__c",
             "Current_status_of_the_Project_Work_und__c",
            "Novelty_of_the_Project__c",
-            "Competitive_Advantage__c",  // Competitive_Advantage__c
+            "Competitive_Advantage__c",  // Competitive_Advantage__c  Competitive_Landscape__c
             "Details_of_IPR_Filed_Granted__c",
             "Details_of_Ethical_Received__c",
             "Full_Proposal_Citations__c",
             "Target_Market_Industry_Application__c",
             "Customer_and_Beneficiaries__c",
-            "Plan_for_Commercialization__c", // Plan_for_Commercialization__c
+            "Plan_for_Commercialization__c", // Plan_for_Commercialization__c  Potential_for_Commercialization__c
             "Business_Model_for_Commercialization__c", 
             "Project_Revenue_Strategy__c", // Project_Revenue_Strategy__c
             "Previous_Funding_Details__c", //
@@ -1108,16 +1279,23 @@ this.applicationData.Future_Plan_for_next_3_5_on_comple__c = data.future_plan_fo
             "Relevant_Partnerships__c",
             "Potential_for_Startup_Formation__c",
             "Incubator_Association_Details__c",
+            "Strategy_for_raising_funds_from_Investor__c ",
+            "Strategy_for_transfer_of_technology__c"
         ];
-    
-        richTextFields.forEach(field => {
-            if (this.applicationData[field]) {
-                let richTextElement = this.template.querySelector(`[data-field="${field}"]`);
-                if (richTextElement) {
-                    richTextElement.innerHTML = this.applicationData[field] || ""; // Restore HTML content
-                }
-            }
-        });
+
+        // Inside restoreEditorContent()
+richTextFields.forEach(field => {
+    if (this.applicationData[field]) {
+        let richTextElement = this.template.querySelector(`[data-field="${field}"]`);
+        if (richTextElement) {
+            richTextElement.innerHTML = this.applicationData[field] || "";
+            
+            // NEW: Simulate click to reassign activeField
+            richTextElement.click(); 
+        }
+    }
+});
+
     } 
     
     
@@ -1201,11 +1379,7 @@ handlePreviewPrevious() {
                 document.execCommand('underline', false, null);
                 }
         }
-        
-      /*  insertBulletPoints() {
-            document.execCommand('insertUnorderedList', false, null);
-        } */
-        
+                                                                         
 
     // Align Left
 alignLeft(event) {
@@ -1244,7 +1418,8 @@ changeFontSize(event) {
         }
 }
 
-insertNumberList() {
+  //working super
+ insertNumberList() {
     const field = this.activeField;
     if (!field) return;
 
@@ -1265,11 +1440,6 @@ insertNumberList() {
     selection.removeAllRanges();
     selection.addRange(range);
 } 
- 
-get previewTotalBudget() {
-    return this.filledBudgets
-      .reduce((sum, row) => sum + (Number(row.Amount) || 0), 0);
-  }
 
 //Bullet
  insertBulletPoints() {
@@ -1292,52 +1462,43 @@ get previewTotalBudget() {
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
-}  
-  
+} 
 
-                /** 
- * Only include budget rows where at least one field is non‑empty,
- * and strip any HTML out of the Justification text.
- */
-/*get filledBudgets() {
-   
-    const rows = Array.isArray(this.budgets) ? this.budgets : [];
-    return rows
-      .filter(b => {
-        const hasName = b.Name?.trim() !== '';
-        const hasAmt  = b.Amount != null && String(b.Amount).trim() !== '';
-        const hasJust = b.Justification__c?.trim() !== '';
-        return hasName || hasAmt || hasJust;
-      })
-      .map(budget => ({
-        ...budget,
-        Justification__c: this.sanitizeRichText(budget.Justification__c)
-      }));
-  } */
-  get filledBudgets() {
-    const rows = Array.isArray(this.budgets) ? this.budgets : [];
-    return rows
-        .filter(b => {
-            const hasName = b.Name?.trim() !== '';
-            const hasAnyYear = b.Year_1__c || b.Year_2__c || b.Year_3_USD__c;
-            const hasJust = b.Justification__c?.trim() !== '';
-            return hasName || hasAnyYear || hasJust;
-        })
-        .map(budget => ({
-            ...budget,
-            Justification__c: this.sanitizeRichText(budget.Justification__c)
-        }));
+
+get previewTotalBudget() {
+    return this.filledBudgets
+      .reduce((sum, row) => sum + (Number(row.Total_Amount__c) || 0), 0);
+  }
+  
+get filledBudgets() {
+    return this.budgets.filter(b =>
+        b.Name?.trim() ||
+        b.Total_Amount__c ||
+        //b.Total_Amount_INR__c ||
+        b.Justification__c?.trim()
+    ).map(b => ({
+        ...b,
+        Justification__c: this.sanitizeRichText(b.Justification__c)
+    }));
 }
+
+
 
        get filledMilestones() {
         return this.milestones
             .filter(m =>
-                (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
-                (m.Deliverables__c && m.Deliverables__c.trim() !== '') ||
-                (m.Budget_Required__c && m.Budget_Required__c.trim() !== '') || 
-                (m.Target_Completion_Months__c && m.Target_Completion_Months__c.trim() !== '') ||
+                (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||(m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
+                (m.Output_and_Deliverables__c && m.Output_and_Deliverables__c.trim() !== '') ||
+                (m.Activities_under_this_Milestone__c && m.Activities_under_this_Milestone__c.trim() !== '') ||
+                //(m.Budget_Required_INR__c && m.Budget_Required_INR__c.trim() !== '') ||
+                (m.Project_Start_Date__c && m.Project_Start_Date__c.trim() !== '') ||
+                (m.Project_End_Date__c && m.Project_End_Date__c.trim() !== '') ||
+                //(m.Deliverables__c && m.Deliverables__c.trim() !== '') ||
+                (m.Budget_Required__c && m.Budget_Required__c.trim() !== '') 
+                //(m.Target_Completion_Months__c && m.Target_Completion_Months__c.trim() !== '') ||
+                //(m.Target_Completion_Month__c && m.Target_Completion_Month__c.trim() !== '') ||
                 //(m.Milestone_Target_Date__c && m.Milestone_Target_Date__c.trim() !== '') ||
-                (m.Justification__c && m.Justification__c.trim() !== '')
+                //(m.Justification__c && m.Justification__c.trim() !== '')
             )
             .map(milestone => ({
                 ...milestone,
@@ -1365,8 +1526,8 @@ get sanitizedMilestones() {
     return this.filledMilestones.map(milestone => ({
         ...milestone,
         Milestone_Description__c: this.sanitizeRichText(milestone.Milestone_Description__c),
-        Deliverables__c: this.sanitizeRichText(milestone.Deliverables__c),
-        Justification__c: this.sanitizeRichText(milestone.Justification__c)
+        Output_and_Deliverables__c: this.sanitizeRichText(milestone.Output_and_Deliverables__c),
+        Activities_under_this_Milestone__c: this.sanitizeRichText(milestone.Activities_under_this_Milestone__c)
     }));
 }
 
@@ -1378,88 +1539,87 @@ get sanitizedBudgets() {
 
 }
 
- //Using this now        
-        validateRichTextFields() {
-            let isValid = true;
-            const requiredFields = [];
-        
-            // Only validate from Page 2 to Page 7
-            switch (this.currentPage) {
-
-                case 2:
-                    requiredFields.push(
-                        { name: 'Project_Team_Members__c', label: 'Details of Team Members / Mentors / Advisers involved in the Project' },
-                        { name: 'Expertise_and_Experience_of_Team_in_Spec__c', label: 'Expertise and Experience of Team in Specific Focus Area of Project' }
-                    );
-                    break;     
-
-                case 3:
-                    requiredFields.push(
-                        { name: 'Project_Summary__c', label: 'Project Summary' },
-                        { name: 'Objectives_of_the_Project__c', label: 'Objectives of the Project' },
-                        { name: 'Project_Approach_and_Work_Plan__c', label: 'Project Approach and Work Plan' },
-                        { name: 'Key_Problem_Being_Solved__c', label: 'Key Problem being Solved' },
-                        { name: 'Proposed_Solution__c', label: 'Proposed Solution' },
-                        { name: 'Current_status_of_the_Project_Work_und__c', label: 'Current status of the Project / Work undertaken so far' },
-                        { name: 'Novelty_of_the_Project__c', label: 'Novelty of the Project' },
-                        { name: 'Competitive_Advantage__c', label: 'Competitive Landscape' },
-                        { name: 'Details_of_IPR_Filed_Granted__c', label: 'Details of IPR Filed / Granted' }
-                    );
-                    break;
-        
-                case 4:
-                    requiredFields.push(
-                       { name: 'Target_Market_Industry_Application__c', label: 'Target Market, Market Demand and Plans to Expand it Further' },
-                        { name: 'Customer_and_Beneficiaries__c', label: 'Details of Customers, End-users, and Beneficiaries' },
-                        { name: 'Plan_for_Commercialization__c', label: 'Plan for Commercialization and Market Entry' },
-                        { name: 'Business_Model_for_Commercialization__c', label: 'Business Model for Commercialization' },
-                        { name: 'Project_Revenue_Strategy__c', label: 'Potential Revenue Generation Strategy for Project' }
-                    );
-                    break; 
-        
-                case 5:
-                    requiredFields.push(
-                        { name: 'Previous_Funding_Details__c', label: 'Details of Prior Funding received / approved under this Project' }
-                    );
-                    break; 
-        
-                case 7:
-                    requiredFields.push(
-                        { name: 'Proposed_Outcomes_Deliverables_under_t__c', label: 'Proposed Outcomes / Deliverables under the Project' },
-                        { name: 'Envisioned_Project_Impact__c', label: 'Envisaged Impact of the Project' },
-                        { name: 'Future_Plan_for_next_3_5_on_comple__c', label: 'Future Plan for next 3-5 Years on completion of Project' }
-                    );
-                    break; 
-        
-                // Page 6 usually has file upload — skip
-                default:
-                    break;
-            }
-        
-            requiredFields.forEach(fieldObj => {
-                const field = this.template.querySelector(`[data-field="${fieldObj.name}"]`);
-                const errorMsg = this.template.querySelector(`[data-error="${fieldObj.name}"]`);
-                console.log(`🧪 Validating ${fieldObj.name} →`, field?.innerHTML);
-        
-                if (!field || field.innerHTML.trim() === '') {
-                    console.warn(`❌ Field failed: ${fieldObj.name}`);
-                    field?.classList.add('invalid-field');
-                    if (errorMsg) {
-                        errorMsg.textContent = `${fieldObj.label} is required.`;
-                        errorMsg.style.display = 'block';
-                    }
-                    isValid = false;
-                } else {
-                    field?.classList.remove('invalid-field');
-                    if (errorMsg) {
-                        errorMsg.textContent = '';
-                        errorMsg.style.display = 'none';
-                    }
+            validateRichTextFields() {
+                let isValid = true;
+                const requiredFields = [];
+            
+                switch (this.currentPage) {
+                    case 2:
+                        requiredFields.push(
+                            { name: 'Project_Team_Members__c', label: 'Details of Team Members / Mentors / Advisers involved in the Project' },
+                            { name: 'Expertise_and_Experience_of_Team_in_Spec__c', label: 'Expertise and Experience of Team in Specific Focus Area of Project' }
+                        );
+                        break;
+                    case 3:
+                        requiredFields.push(
+                            { name: 'Project_Summary__c', label: 'Project Summary' },
+                            { name: 'Objectives_of_the_Project__c', label: 'Objectives of the Project' },
+                            { name: 'Project_Approach_and_Work_Plan__c', label: 'Project Approach and Work Plan' },
+                            { name: 'Work_undertaken_supporting_current_TRL__c', label: 'Details of activities supporting the current TRL of the Project' },//Work undertaken so far supporting the current TRL of the project
+                            { name: 'Key_Problem_Being_Solved__c', label: 'Key Problem being Solved' },
+                            { name: 'Proposed_Solution__c', label: 'Proposed Solution' },
+                            { name: 'Current_status_of_the_Project_Work_und__c', label: 'Current status of the Project' },
+                            { name: 'Novelty_of_the_Project__c', label: 'Novelty of the Project' },
+                            { name: 'Competitive_Advantage__c', label: 'Competitive Advantage' },
+                            { name: 'Details_of_IPR_Filed_Granted__c', label: 'Details of IPR Filed / Granted' }
+                        );
+                        break;
+                    case 4:
+                        requiredFields.push(
+                            { name: 'Target_Market_Industry_Application__c', label: 'Target Market, Market Demand and Plans to Expand it Further' },
+                            { name: 'Customer_and_Beneficiaries__c', label: 'Details of Customers, End-users, and Beneficiaries' },
+                            { name: 'Plan_for_Commercialization__c', label: 'Plan for Commercialization and Market Entry' },
+                            { name: 'Business_Model_for_Commercialization__c', label: 'Business Model for Commercialization' },
+                            { name: 'Project_Revenue_Strategy__c', label: 'Potential Revenue Generation Strategy for Project' }
+                        );
+                        break;
+                    case 5:
+                        requiredFields.push(
+                            { name: 'Previous_Funding_Details__c', label: 'Details of Prior Funding received / approved under this Project' }
+                        );
+                        break;
+                    case 7:
+                        requiredFields.push(
+                            { name: 'Proposed_Outcomes_Deliverables_under_t__c', label: 'Proposed Outcomes / Deliverables under the Project' },
+                            { name: 'Envisioned_Project_Impact__c', label: 'Envisaged Impact of the Project' },
+                            { name: 'Future_Plan_for_next_3_5_on_comple__c', label: 'Future Plan for next 3-5 Years on completion of Project' }
+                        );
+                        break;
+                    default:
+                        break;
                 }
-            });
-        
-            return isValid;
-        } 
+            
+                requiredFields.forEach(fieldObj => {
+                    const field = this.template.querySelector(`[data-field="${fieldObj.name}"]`);
+                    const errorMsg = this.template.querySelector(`[data-error="${fieldObj.name}"]`);
+            
+                    if (!field) {
+                        console.warn(`⚠️ Field not found: ${fieldObj.name}`);
+                        return;
+                    }
+            
+                    const plainText = field.textContent?.replace(/\u00A0/g, ' ').trim();
+            
+                    if (!plainText) {
+                        console.warn(`❌ Field failed: ${fieldObj.name}`);
+                        field.classList.add('invalid-field');
+                        if (errorMsg) {
+                            errorMsg.textContent = `${fieldObj.label} is required.`;
+                            errorMsg.style.display = 'block';
+                        }
+                        isValid = false;
+                    } else {
+                        field.classList.remove('invalid-field');
+                        if (errorMsg) {
+                            errorMsg.textContent = '';
+                            errorMsg.style.display = 'none';
+                        }
+                    }
+                });
+            
+                return isValid;
+            }
+            
 
         updateRichTextFieldsForCurrentPage() {
            // const pageToUse = this.isPreviewVisible ? this.previewPage : this.currentPage;
@@ -1473,6 +1633,7 @@ get sanitizedBudgets() {
                     "Project_Summary__c", //Project_Summary_Max_500_words__c
                     "Objectives_of_the_Project__c",
                     "Project_Approach_and_Work_Plan__c",
+                    "Work_undertaken_supporting_current_TRL__c",
                     "Key_Problem_Being_Solved__c",
                     "Proposed_Solution__c",
                     "Current_status_of_the_Project_Work_und__c",
@@ -1491,7 +1652,9 @@ get sanitizedBudgets() {
                      "Main_Risks_and_Barriers__c",
                      "Relevant_Partnerships__c",
                      "Potential_for_Startup_Formation__c",
-                     "Incubator_Association_Details__c"
+                     "Incubator_Association_Details__c",
+                     "Strategy_for_transfer_of_technology__c",
+                     "Strategy_for_raising_funds_from_Investor__c"
                 ],
                 5: [
                     "Previous_Funding_Details__c",
@@ -1506,7 +1669,8 @@ get sanitizedBudgets() {
             };
             
            // const fields = pageFields[pageToUse] || [];
-            const fields = pageFields[this.currentPage] || [];
+         //  old working
+          const fields = pageFields[this.currentPage] || [];
         
             fields.forEach(field => {
                 const el = this.template.querySelector(`[data-field="${field}"]`);
@@ -1515,6 +1679,8 @@ get sanitizedBudgets() {
                 }
             });
             console.log("Updated rich text fields for preview:", JSON.stringify(this.applicationData, null, 2));
+            
+           
         } 
                 
 
@@ -1551,6 +1717,10 @@ get cleanedObjectives() {
 
 get formattedProjectApproach() {
     return this.cleanRichText(this.applicationData.Project_Approach_and_Work_Plan__c);
+}
+
+get formattedWork() {
+    return this.cleanRichText(this.applicationData.Work_undertaken_supporting_current_TRL__c);
 }
 
 get formattedKeyProblem() {
@@ -1602,7 +1772,7 @@ get formattedBusiness() {
 }
 
 get formattedPotentialRevenue() {
-    return this.cleanRichText(this.applicationData.Project_Revenue_Strategy__c);
+    return this.cleanRichText(this.applicationData.Project_Revenue_Strategy__c); 
 }
 
 get formattedMainRisk() {
@@ -1619,6 +1789,13 @@ get formattedPotentialforStartupFormation() {
 
 get formattedIncubator() {
     return this.cleanRichText(this.applicationData.Incubator_Association_Details__c);
+}
+
+get formattedStrategyTransfer() {
+    return this.cleanRichText(this.applicationData.Strategy_for_transfer_of_technology__c);
+}
+get formattedStrategyFunds() {
+    return this.cleanRichText(this.applicationData.Strategy_for_raising_funds_from_Investor__c );
 }
 get formattedExistingFundingSources() {
     return this.cleanRichText(this.applicationData.Previous_Funding_Details__c);
@@ -1690,61 +1867,40 @@ removeUploadedFile(event) {
 handleSaveDraft() {
     console.log('💾 Save Draft clicked');
     this.updateCustomRichTextFields(); 
-    // 1) Metadata
+
+    // 1️⃣ Metadata
     this.applicationData.ApplicationType = 'WIN Project Proposal';
     this.applicationData.Category       = 'Grant Application';
     this.applicationData.Status         = 'Draft';
-    this.applicationData.recordTypeId   = '012GA000000nZOnYAM';
-    // ensure we have the right lookups
-    // (these were set by getLoggedInUserDetails on init)
-    this.applicationData.AccountId       = this.applicationData.AccountId;
-    this.applicationData.ContactId       = this.applicationData.ContactId;
+    this.applicationData.recordTypeId   = '012GA000000nZOnYAM'; //012F6000000UQbBIAW 012GA000000nZOnYAM
+    this.applicationData.AccountId      = this.applicationData.AccountId;
+    this.applicationData.ContactId      = this.applicationData.ContactId;
 
-
-    
-
-    // 2) Convert multi‑picklist to semicolon string
+    // 2️⃣ Convert multipicklist
     let payload = { ...this.applicationData };
     if (Array.isArray(payload.Sub_Focus_Area__c)) {
         payload.Sub_Focus_Area__c = payload.Sub_Focus_Area__c.join(';');
     }
-
-  
-
-      // 3️⃣ Prepare draftBudgets — filter, strip `uniqueId`, deduplicate
+ console.log('before draft budget');
+    // 3️⃣ Prepare draftBudgets — filter, strip `uniqueId`, deduplicate
     const seenBudgets = new Set();
- /*   const draftBudgets = this.budgets
-        .filter(b =>
-            b.Name?.trim() ||
-            b.Amount?.toString().trim() ||
-            b.Justification__c?.trim()
-        )
-        .map(b => {
-            const clean = { ...b };
-            delete clean.uniqueId;
-            return clean;
-        })
-        .filter(b => {
-            const key = (b.Name || '').trim().toLowerCase();
-            if (!key || seenBudgets.has(key)) return false;
-            seenBudgets.add(key);
-            return true;
-        });
-
-    console.log('📤 Budgets going to Apex:', JSON.stringify(draftBudgets, null, 2)); */
-    const draftBudgets = this.budgets
+   const draftBudgets = this.budgets
     .filter(b =>
         b.Name?.trim() ||
-        b.Year_1__c || b.Year_2__c || b.Year_3_USD__c ||
+        //b.Year_1__c || b.Year_2__c || b.Year_3_USD__c ||
+        b.Total_Amount__c || 
+        //b.Total_Amount_INR__c ||
         b.Justification__c?.trim()
     )
     .map(b => {
         const clean = { ...b };
 
         // Sanitize: ensure year fields are numbers
-        clean.Year_1__c = parseInt(clean.Year_1__c) || 0;
+        clean.Total_Amount__c = parseInt(clean.Total_Amount__c) || 0;
+        //clean.Total_Amount_INR__c = parseInt(clean.Total_Amount_INR__c) || 0;
+        /*clean.Year_1__c = parseInt(clean.Year_1__c) || 0;
         clean.Year_2__c = parseInt(clean.Year_2__c) || 0;
-        clean.Year_3_USD__c = parseInt(clean.Year_3_USD__c) || 0;
+        clean.Year_3_USD__c = parseInt(clean.Year_3_USD__c) || 0;*/
 
         delete clean.uniqueId;
         return clean;
@@ -1757,17 +1913,44 @@ handleSaveDraft() {
     const seenMilestones = new Set();
     const draftMilestones = this.milestones
         .filter(m =>
-            m.Milestone_Description__c?.trim() ||
+          /*  m.Milestone_Description__c?.trim() ||
             m.Deliverables__c?.trim() ||
             m.Budget_Required__c?.toString().trim() ||
             m.Target_Completion_Months__c?.trim() ||
            //m.Target_Completion_Month__c?.trim() ||
-            m.Justification__c?.trim()
+            m.Justification__c?.trim() */
+        (m.Milestone_Description__c && m.Milestone_Description__c.trim() !== '') ||
+        (m.Activities_under_this_Milestone__c && m.Activities_under_this_Milestone__c.trim() !== '') ||
+        (m.Output_and_Deliverables__c && m.Output_and_Deliverables__c.trim() !== '') ||
+        (m.Installment_of_Funds_1__c && m.Installment_of_Funds_1__c.toString().trim() !== '') ||
+        (m.Installment_of_Funds_2__c && m.Installment_of_Funds_2__c.toString().trim() !== '') ||
+        (m.Installment_of_Funds_3__c && m.Installment_of_Funds_3__c.toString().trim() !== '') ||
+        (m.Installment_of_Funds_4__c && m.Installment_of_Funds_4__c.toString().trim() !== '') ||
+        (m.Installment_of_Funds_5__c && m.Installment_of_Funds_5__c.toString().trim() !== '') ||
+        (m.Installment_of_Funds_6__c && m.Installment_of_Funds_6__c.toString().trim() !== '') ||
+        (m.Project_Start_Date__c && m.Project_Start_Date__c !== '') ||
+        (m.Project_End_Date__c && m.Project_End_Date__c !== '') ||
+        (m.Budget_Required__c && m.Budget_Required__c.toString().trim() !== '') 
+        //(m.Budget_Required_INR__c && m.Budget_Required_INR__c.toString().trim() !== '')
         )
         .map(m => {
             const clean = { ...m };
             delete clean.uniqueId;
             clean.Milestone_Description__c = clean.Milestone_Description__c?.trim();
+               // Normalize milestone dates → "YYYY-MM-DD"
+  /*  if (clean.Project_Start_Date__c) {
+        clean.Project_Start_Date__c = clean.Project_Start_Date__c.split('T')[0];
+    }
+    if (clean.Project_End_Date__c) {
+        clean.Project_End_Date__c = clean.Project_End_Date__c.split('T')[0];
+    }*/
+              // Map installment label to correct Salesforce API fields
+        if (m.uniqueId === 1) clean.Installment_of_Funds_1__c = m.InstallmentLabel;
+        if (m.uniqueId === 2) clean.Installment_of_Funds_2__c = m.InstallmentLabel;
+        if (m.uniqueId === 3) clean.Installment_of_Funds_3__c = m.InstallmentLabel;
+        if (m.uniqueId === 4) clean.Installment_of_Funds_4__c = m.InstallmentLabel;
+        if (m.uniqueId === 5) clean.Installment_of_Funds_5__c = 'Installment 5' ;
+        if (m.uniqueId === 6) clean.Installment_of_Funds_6__c = 'Installment 6' ;
             return clean;
         })
         .filter(m => {
@@ -1778,18 +1961,36 @@ handleSaveDraft() {
         });
 
     console.log('📤 Milestone going to Apex:', JSON.stringify(draftMilestones, null, 2));
+    console.log('📋 Budget Rows (raw):', JSON.stringify(this.budgets, null, 2));
 
-
-    // 5) Call Apex
+    const seenCoFounders = new Set();
+const draftCoFounders = this.coFounders
+    .filter(c =>
+        c.Name?.trim() || c.Designation__c?.trim() || c.Institution__c?.trim() ||
+        c.Mobile__c?.trim() || c.Email__c?.trim()
+    )
+    .map(c => {
+        const clean = { ...c };
+        delete clean.uniqueId;
+        return clean;
+    })
+    .filter(c => {
+        const key = (c.Name || '').trim().toLowerCase();
+        if (!key || seenCoFounders.has(key)) return false;
+        seenCoFounders.add(key);
+        return true;
+    });
+    // 5️⃣ Call Apex
     saveDraftApplication({
-        applicationId:   this.recordId,     // null for first draft
+        applicationId:   this.recordId,
         applicationData: payload,
         milestones:      draftMilestones,
         budgets:         draftBudgets,
+         coFounders:      draftCoFounders,
         recordTypeId:    payload.recordTypeId,
         category:        payload.Category
     })
-     .then((response) => {
+    .then((response) => {
         if (!response || !response.applicationId) {
             throw new Error('⚠️ Invalid server response: Missing applicationId');
         }
@@ -1799,18 +2000,11 @@ handleSaveDraft() {
         // 6️⃣ Update local budget Ids
         this.budgets = this.budgets.map(local => {
             const match = response.savedBudgets.find(saved =>
-                saved.Name === local.Name &&
-                saved.Total_Amount__c == (local.Total_Amount__c || 0)
+                saved.Name === local.Name                       //&&
+                //saved.Total_Amount__c == (local.Total_Amount__c || 0)
             );
             return match ? { ...local, Id: match.Id } : local;
         });
-               // Update milestone Ids after draft save
-this.milestones = this.milestones.map(local => {
-    const match = response.savedMilestones.find(saved =>
-        saved.Milestone_Description__c?.trim() === local.Milestone_Description__c?.trim()
-    );
-    return match ? { ...local, Id: match.Id } : local;
-});
 
         this.recordId = response.applicationId;
 
@@ -1831,9 +2025,7 @@ this.milestones = this.milestones.map(local => {
             variant: 'error'
         }));
     });
-  
 }
-
 
 
 handleSubmit() {
@@ -1849,16 +2041,19 @@ handleSubmit() {
             variant: 'error'
         }));
 
-        return; // Prevent form from hiding
+        return; // 💥 Prevent form from hiding
     }
+
     this.showForm = false;
+  
+
 
     // 1) Metadata
     this.applicationData.ApplicationType       = 'WIN Project Proposal';
     this.applicationData.Category              = 'Grant Application';
-    this.applicationData.Status                = 'Proposal Submitted to COE Admin'; //
-    this.applicationData.recordTypeId          = '012F6000000UQbBIAW'; //sb - 012F6000000UQbBIAW prod - 012GA000000nZOnYAM
-    //this.applicationData.AppliedDate           = Date.now();
+    this.applicationData.Status                = 'Proposal Submitted to COE Admin'; //Submitted;
+    this.applicationData.recordTypeId          = '012GA000000nZOnYAM'; //012F6000000UQbBIAW 012GA000000nZOnYAM
+    //this.applicationData.AppliedDate = new Date();
     this.applicationData.IsSubmitted           = true;
     // ensure these were set by getLoggedInUserDetails earlier:
     this.applicationData.AccountId             = this.applicationData.AccountId;
@@ -1874,30 +2069,75 @@ handleSubmit() {
     }
 
     // 3) Compute total budget
-    const totalBudget = this.budgets
+   /* const totalBudget = this.budgets
       .filter(b => b.Amount != null && String(b.Amount).trim() !== '')
       .reduce((sum, b) => sum + Number(b.Amount), 0);
     this.applicationData.Total_Budget__c = totalBudget;
+    */
+   const totalBudget = this.budgets
+  .filter(b => b.Total_Amount__c != null)
+  .reduce((sum, b) => sum + (Number(b.Total_Amount__c) || 0), 0);
+   this.applicationData.Total_Budget__c = totalBudget;
+
 
     // Convert milestone target dates to "YYYY-MM-DD"
 const cleanedMilestones = this.milestones.map(m => {
     let clone = { ...m };
-    /*if (clone.Milestone_Target_Date__c) {
+
+       // Normalize milestone dates
+          /*  if (clone.Project_Start_Date__c) {
+                clone.Project_Start_Date__c =
+                    clone.Project_Start_Date__c.split('T')[0];
+            }
+            if (clone.Project_End_Date__c) {
+                clone.Project_End_Date__c =
+                    clone.Project_End_Date__c.split('T')[0];
+            }*/
+
+            // 🔥 REQUIRED → Installment mapping
+            clone.Installment_of_Funds_1__c =
+                m.uniqueId === 1 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_2__c =
+                m.uniqueId === 2 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_3__c =
+                m.uniqueId === 3 ? m.InstallmentLabel : null;
+            clone.Installment_of_Funds_4__c =
+                m.uniqueId === 4 ? m.InstallmentLabel : null;
+             clone.Installment_of_Funds_5__c =
+                m.uniqueId === 5 ? 'Installment 5' : null;
+            clone.Installment_of_Funds_6__c =
+                m.uniqueId === 6 ? 'Installment 6'  : null;      
+
+      
+  /*  if (clone.Milestone_Target_Date__c) {
         clone.Milestone_Target_Date__c = clone.Milestone_Target_Date__c.split('T')[0];
+
     } */
     return clone;
 }).filter(m =>
     m.Milestone_Description__c?.trim() ||
-    m.Deliverables__c?.trim() ||
-    m.Budget_Required__c?.toString().trim() ||  
-    m.Target_Completion_Months__c?.trim() ||
+    m.Installment_of_Funds_1__c?.trim() ||
+    m.Installment_of_Funds_2__c?.trim() ||
+    m.Installment_of_Funds_3__c?.trim() ||
+    m.Installment_of_Funds_4__c?.trim() ||
+    m.Installment_of_Funds_5__c?.trim() ||
+    m.Installment_of_Funds_6__c?.trim() ||
+    m.Activities_under_this_Milestone__c?.trim() ||
+    m.Output_and_Deliverables__c?.trim() ||
+    m.Project_Start_Date__c ||
+    m.Project_End_Date__c ||
+    m.Budget_Required__c?.toString().trim() 
+    //m.Deliverables__c?.trim() ||
+    //m.Budget_Required_INR__c?.toString().trim()
+    //m.Target_Completion_Months__c?.trim() ||
+    //m.Target_Completion_Month__c?.trim() ||
     //m.Milestone_Target_Date__c?.trim() ||
-    m.Justification__c?.trim()
+    //m.Justification__c?.trim()
 );
 
 
     // 4) Normalize dates
-    /*const fmt = ds => ds ? ds.split('T')[0] : null;
+   /* const fmt = ds => ds ? ds.split('T')[0] : null;
     this.applicationData.Project_Start_Date__c = fmt(this.applicationData.Project_Start_Date__c);
     this.applicationData.Project_End_Date__c   = fmt(this.applicationData.Project_End_Date__c); */
 
@@ -1911,15 +2151,30 @@ const cleanedMilestones = this.milestones.map(m => {
     // 6) Filter out blank Milestones & Budgets
     const filledMilestones = this.milestones.filter(m =>
         m.Milestone_Description__c?.trim() ||
-        m.Deliverables__c?.trim() ||
-        m.Budget_Required__c?.toString().trim() ||
-        m.Target_Completion_Months__c?.trim() ||
+        m.Installment_of_Funds_1__c?.trim() ||
+        m.Installment_of_Funds_2__c?.trim() ||
+        m.Installment_of_Funds_3__c?.trim() ||
+        m.Installment_of_Funds_4__c?.trim() ||
+        m.Installment_of_Funds_5__c?.trim() ||
+        m.Installment_of_Funds_6__c?.trim()  ||
+        m.Activities_under_this_Milestone__c?.trim() ||
+        m.Output_and_Deliverables__c?.trim() ||
+        m.Project_Start_Date__c ||
+        m.Project_End_Date__c  ||
+        m.Budget_Required__c?.toString().trim() 
+        //m.Deliverables__c?.trim() ||
+        //m.Budget_Required_INR__c?.toString().trim()     
+        //m.Target_Completion_Months__c?.trim() ||
+        //m.Target_Completion_Month__c?.trim() ||
         //m.Milestone_Target_Date__c?.trim() ||
-        m.Justification__c?.trim()
+        //m.Justification__c?.trim()
     );
     const filledBudgets = this.budgets.filter(b =>
         b.Name?.trim() ||
-        b.Amount?.toString().trim() ||
+        b.Total_Amount__c || 
+        //b.Total_Amount_INR__c ||
+        //b.Year_1__c || b.Year_2__c || b.Year_3_USD__c ||
+        //b.Amount?.toString().trim() ||
         b.Justification__c?.trim()
     );
 
@@ -1932,7 +2187,8 @@ const cleanedMilestones = this.milestones.map(m => {
         applicationData: payload,
         milestones:      cleanedMilestones, // filledMilestones
         budgets:         filledBudgets,
-        fileIds:         this.uploadedFiles.map(f => f.documentId)
+        fileIds:         this.uploadedFiles.map(f => f.documentId),
+         coFounders:      this.coFounders 
     })
     .then(appId => {
         console.log('✅ Submitted. ID:', appId);
@@ -1946,7 +2202,7 @@ const cleanedMilestones = this.milestones.map(m => {
         this.showSubmitSuccessPrompt = true;
 
         // redirect after a brief pause
-        setTimeout(() => {
+       setTimeout(() => {
             window.location.href = 'https://wadhwanifoundation.my.site.com/coe/s/';
         }, 1500); 
     })

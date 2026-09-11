@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Agreement Executed Partner</name>
+    <style>none</style>
+    <subject>[{{org_name}}] {{agreement_type}} executed</subject>
+    <textOnly>Subject: [{{{org_name}}}] {{{agreement_type}}} executed
+
+Hello {{{contact_first_name}}},
+
+I’m pleased to confirm that the {{{agreement_type}}} between Wadhwani Grants and {{{org_name}}} has now been fully executed.
+
+Details:
+Agreement: {{{agreement_type}}}
+Executed on: {{{execution_date}}}
+
+A countersigned copy is now available in your portal, along with your compliance documentation.
+
+View your agreement here:
+{{{agreement_link}}}
+
+Thank you for your partnership and collaboration. We look forward to what comes next.
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+For questions, reply to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

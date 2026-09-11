@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Type__c</fullName>
+    <label>Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Reviewer</fullName>
+                <default>false</default>
+                <label>Reviewer</label>
+            </value>
+            <value>
+                <fullName>Grantee</fullName>
+                <default>false</default>
+                <label>Grantee</label>
+            </value>
+            <value>
+                <fullName>WCF</fullName>
+                <default>false</default>
+                <label>WCF</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

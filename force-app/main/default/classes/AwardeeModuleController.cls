@@ -302,7 +302,7 @@ public static Decimal getTotalFundsAvailableSafe(
             SELECT Individual_Application__c appId, COUNT(Id) submittedCnt
             FROM Milestone__c
             WHERE Individual_Application__c IN :proposalIds
-            AND Status__c = 'Report Submitted'
+            AND  Status__c IN ('Report Submitted', 'Completed')
             GROUP BY Individual_Application__c
         ]) {
             reportSubmittedMap.put(
@@ -546,6 +546,7 @@ public static FundingAward createFundingAward(
         update ms;
     }
 
+
     /* --------------------------------------------
        Get Milestones By Proposal
     -------------------------------------------- */
@@ -561,6 +562,8 @@ public static FundingAward createFundingAward(
                    Status__c,
                    Disbursed_Amount__c,
                    Budget_Required_INR__c,
+                   Total_Utilized__c,
+                   Current_Technology_Readiness_Level_TRL__c,
                    Project_Start_Date__c,
                    Project_End_Date__c
             FROM Milestone__c

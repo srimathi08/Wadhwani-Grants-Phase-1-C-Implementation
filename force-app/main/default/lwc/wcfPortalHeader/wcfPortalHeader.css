@@ -1,0 +1,458 @@
+:host {
+    --wcf-navy: #1B2A4A;
+    --wcf-navy-soft: #2D3E63;
+    --wcf-red: #C8391D;
+    --wcf-gold: #E8A020;
+    --wcf-bg: #FFFFFF;
+    --wcf-border: #E6E9F0;
+    --wcf-hover-bg: #F3F5FA;
+    --wcf-active-bg: #EEF1FA;
+    --wcf-text: #445070;
+    --wcf-text-strong: #1B2A4A;
+    display: block;
+}
+
+.wcf-header {
+    background: var(--wcf-bg);
+    border-bottom: 1px solid var(--wcf-border);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
+    z-index: 40;
+
+    /* Break out of the parent Column/Panel's padding and span full viewport width */
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+/* Signature: a quiet 3px thread carrying all three brand colors */
+.wcf-header__thread {
+    height: 3px;
+    background: linear-gradient(90deg, var(--wcf-navy) 0%, var(--wcf-navy) 40%, var(--wcf-gold) 70%, var(--wcf-red) 100%);
+}
+
+.wcf-header__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    height: 64px;
+    padding: 0 2rem;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.wcf-header__logo {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Bumped up from 26px — the mark was reading too small next to the nav/profile weight */
+.wcf-header__logo img {
+    height: 34px;
+    display: block;
+}
+
+.wcf-header__divider {
+    width: 1px;
+    height: 28px;
+    background: var(--wcf-border);
+    flex-shrink: 0;
+}
+
+.wcf-header__loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--wcf-text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.wcf-header__loading-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--wcf-gold);
+    animation: wcf-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes wcf-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+/* Nav scrolls horizontally on narrow viewports instead of wrapping —
+   wrapped labels are what made the bar look cluttered. */
+.wcf-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.wcf-header__nav::-webkit-scrollbar {
+    display: none;
+}
+
+.wcf-nav-item {
+    color: var(--wcf-text);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 0 0.7rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 100%;
+    cursor: pointer;
+    background: none;
+    border: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+/* Accent bar on hover/active instead of a flat fill — reads as a tab, not a button */
+.wcf-nav-item::after {
+    content: "";
+    position: absolute;
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--wcf-red);
+    transform: scaleX(0);
+    transition: transform 0.15s ease;
+}
+
+.wcf-nav-item:hover {
+    color: var(--wcf-navy);
+}
+
+.wcf-nav-item:hover::after {
+    transform: scaleX(1);
+    background: var(--wcf-border);
+}
+
+.wcf-nav-item--active {
+    color: var(--wcf-navy);
+}
+
+.wcf-nav-item--active::after {
+    transform: scaleX(1);
+    background: var(--wcf-red);
+}
+
+.wcf-nav-item--dropdown {
+    position: relative;
+    flex-shrink: 0;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+}
+
+.wcf-nav-item__trigger {
+    color: var(--wcf-text);
+    background: none;
+    border: none;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    height: 100%;
+    padding: 0 0.7rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.wcf-nav-item__trigger:hover {
+    color: var(--wcf-navy);
+}
+
+.wcf-nav-item__trigger[aria-expanded="true"] {
+    color: var(--wcf-navy);
+}
+
+.wcf-header__icon {
+    --sds-c-icon-color-foreground-default: currentColor;
+    flex-shrink: 0;
+}
+
+.wcf-header__icon--chevron {
+    transition: transform 0.15s ease;
+}
+
+.wcf-nav-item__trigger[aria-expanded="true"] .wcf-header__icon--chevron {
+    transform: rotate(180deg);
+}
+
+.wcf-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #FFFFFF;
+    border: 1px solid var(--wcf-border);
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(16, 24, 40, 0.14);
+    min-width: 230px;
+    z-index: 100;
+    overflow: hidden;
+    padding: 0.4rem;
+}
+
+.wcf-dropdown--right {
+    left: auto;
+    right: 0;
+    min-width: 170px;
+}
+
+.wcf-dropdown__label {
+    margin: 0.25rem 0.6rem 0.35rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8A93AB;
+}
+
+.wcf-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.6rem;
+    color: var(--wcf-text-strong);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: background 0.12s ease;
+}
+
+.wcf-dropdown__icon {
+    --sds-c-icon-color-foreground-default: #8A93AB;
+    flex-shrink: 0;
+}
+
+.wcf-dropdown__item:hover {
+    background: var(--wcf-hover-bg);
+}
+
+.wcf-dropdown__item--logout {
+    color: var(--wcf-red);
+    font-weight: 600;
+}
+
+.wcf-dropdown__item--logout .wcf-dropdown__icon {
+    --sds-c-icon-color-foreground-default: var(--wcf-red);
+}
+
+/* Log In reads as a positive/neutral action, not a warning — keep it in brand navy */
+.wcf-dropdown__item--login {
+    color: var(--wcf-navy);
+    font-weight: 600;
+}
+
+.wcf-dropdown__item--login .wcf-dropdown__icon {
+    --sds-c-icon-color-foreground-default: var(--wcf-navy);
+}
+
+.wcf-badge {
+    background: var(--wcf-gold);
+    color: var(--wcf-navy);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.05rem 0.4rem;
+    border-radius: 10px;
+    line-height: 1.3;
+}
+
+.wcf-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.wcf-profile {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Brought down from 30px so it sits in proportion with the taller logo mark
+   instead of visually outweighing it */
+.wcf-profile__trigger {
+    background: var(--wcf-hover-bg);
+    border: 1px solid var(--wcf-border);
+    border-radius: 999px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wcf-profile__trigger:hover,
+.wcf-profile__trigger[aria-expanded="true"] {
+    background: var(--wcf-active-bg);
+    border-color: var(--wcf-navy);
+    box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08);
+}
+
+.wcf-profile__trigger lightning-icon {
+    --sds-c-icon-color-foreground-default: var(--wcf-text);
+    transform: scale(0.72);
+}
+
+/* Keyboard accessibility: this is an internal tool navigated by mouse and keyboard alike */
+.wcf-nav-item:focus-visible,
+.wcf-nav-item__trigger:focus-visible,
+.wcf-profile__trigger:focus-visible,
+.wcf-dropdown__item:focus-visible,
+.wcf-header__logo:focus-visible {
+    outline: 2px solid var(--wcf-navy);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .wcf-header__inner {
+        padding: 0 1rem;
+        gap: 0.75rem;
+    }
+
+    .wcf-header__divider {
+        display: none;
+    }
+}
+/* ── Role switcher ──────────────────────────────────────────────────
+   Append to wcfPortalHeader.css. Uses the existing token set; the gold
+   accent is reserved for the active role so the red stays exclusively
+   the nav's "you are here" signal.
+   ──────────────────────────────────────────────────────────────────── */
+
+.wcf-role {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.wcf-role__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--wcf-hover-bg);
+    border: 1px solid var(--wcf-border);
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    line-height: 1.3;
+    white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wcf-role__trigger:hover,
+.wcf-role__trigger[aria-expanded="true"] {
+    background: var(--wcf-active-bg);
+    border-color: var(--wcf-navy);
+    box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08);
+}
+
+.wcf-role__eyebrow {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #8A93AB;
+}
+
+.wcf-role__value {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--wcf-navy);
+}
+
+.wcf-dropdown--role {
+    min-width: 200px;
+}
+
+/* .wcf-dropdown__item is styled for <a>; these are <button>, so reset. */
+.wcf-dropdown__item--role {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.wcf-role__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--wcf-border);
+    flex-shrink: 0;
+    transition: background 0.12s ease;
+}
+
+.wcf-dropdown__item--role-active {
+    color: var(--wcf-navy);
+    font-weight: 700;
+    background: var(--wcf-active-bg);
+}
+
+.wcf-dropdown__item--role-active .wcf-role__dot {
+    background: var(--wcf-gold);
+}
+
+.wcf-role__trigger:focus-visible {
+    outline: 2px solid var(--wcf-navy);
+    outline-offset: 2px;
+}
+
+.wcf-dropdown__item--role:focus-visible {
+    outline: 2px solid var(--wcf-navy);
+    outline-offset: -2px;
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+    .wcf-role__eyebrow {
+        display: none;
+    }
+}
+/* Single-role users get the same chip without the affordances of a
+   control, so it reads as a status label rather than a dead button. */
+.wcf-role__trigger--static {
+    cursor     : default;
+    background : transparent;
+    border-color: transparent;
+}
+
+.wcf-role__trigger--static:hover {
+    background   : transparent;
+    border-color : transparent;
+    box-shadow   : none;
+}

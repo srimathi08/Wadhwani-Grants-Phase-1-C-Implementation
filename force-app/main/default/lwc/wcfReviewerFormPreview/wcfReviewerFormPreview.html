@@ -1,0 +1,99 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="preview-loading">
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            <p>Loading reviewer scores…</p>
+        </div>
+    </template>
+
+    <template if:false={isLoading}>
+        <template if:true={hasData}>
+            <div class="preview-wrap">
+
+                <!-- Header -->
+                <div class="preview-header">
+                    <h3 class="preview-title">Reviewer Evaluation</h3>
+                    <div class="preview-meta">
+                        <span class="meta-item">Review: <strong>{reviewName}</strong></span>
+                        <span class="meta-sep">·</span>
+                        <span class={recClass}>{recIcon} {recommendation}</span>
+                        <template if:true={recStrengthLabel}>
+                            <span class="meta-sep">·</span>
+                            <span class="strength-label">Strength: {recStrengthLabel} ({recStrengthNum})</span>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 6 Dimensions -->
+                <template for:each={dimensionSummary} for:item="dim">
+                    <div key={dim.id} class="dim-block">
+                        <div class="dim-header">
+                            <div class="dim-num">{dim.id}</div>
+                            <div class="dim-title-wrap">
+                                <span class="dim-title">{dim.title}</span>
+                                <span class="dim-mean">Mean: <strong>{dim.mean}</strong></span>
+                            </div>
+                        </div>
+                        <template for:each={dim.questions} for:item="q">
+                            <div key={q.id} class="q-row">
+                                <div class="q-text">{q.text}</div>
+                                <div class="q-right">
+                                    <span class={q.pipClass}>{q.ratingLabel} ({q.rating})</span>
+                                    <template if:true={q.comment}>
+                                        <div class="q-comment">{q.comment}</div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Strengths & Weaknesses -->
+                <div class="sw-block">
+                    <div class="sw-section">
+                        <h5 class="sw-title">Strengths</h5>
+                        <template for:each={strengthList} for:item="s">
+                            <div key={s.idx} class="sw-item">
+                                <span class="sw-num">{s.num}</span>
+                                <span class="sw-text">{s.text}</span>
+                            </div>
+                        </template>
+                        <template if:false={hasStrengths}>
+                            <span class="sw-empty">None provided</span>
+                        </template>
+                    </div>
+                    <div class="sw-section">
+                        <h5 class="sw-title">Weaknesses</h5>
+                        <template for:each={weaknessList} for:item="w">
+                            <div key={w.idx} class="sw-item">
+                                <span class="sw-num">{w.num}</span>
+                                <span class="sw-text">{w.text}</span>
+                            </div>
+                        </template>
+                        <template if:false={hasWeaknesses}>
+                            <span class="sw-empty">None provided</span>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Recommendation comments -->
+                <div class="rec-block">
+                    <h5 class="sw-title">Recommendation Comments</h5>
+                    <template if:true={recComments}>
+                        <p class="rec-comments">{recComments}</p>
+                    </template>
+                    <template if:false={recComments}>
+                        <span class="sw-empty">None provided</span>
+                    </template>
+                </div>
+
+            </div>
+        </template>
+
+        <template if:false={hasData}>
+            <div class="preview-empty">
+                <p>No reviewer data found for this application.</p>
+            </div>
+        </template>
+    </template>
+</template>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Account Locked</name>
+    <style>none</style>
+    <subject>our Wadhwani Grants account has been locked</subject>
+    <textOnly>Subject: Your Wadhwani Grants account has been locked
+
+Hello {{{contact_first_name}}},
+
+We noticed several unsuccessful sign-in attempts, so we&apos;ve temporarily locked your Wadhwani Grants account to protect it.
+
+To restore access, reset your password here:
+{{{reset_link}}}
+
+If this wasn&apos;t you, reply to this email so our team can investigate.
+
+Warm regards,
+The Wadhwani Grants Team
+
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

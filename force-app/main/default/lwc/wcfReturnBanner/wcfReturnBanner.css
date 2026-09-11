@@ -1,0 +1,74 @@
+.banner-shell {
+    background: #fffbf5;
+    border: 1px solid #f4cf9e;
+    border-left: 4px solid #f68721;
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-top: 16px;
+}
+
+/* "Action required" — distinct-color badge per spec */
+.banner-badge {
+    display: inline-block;
+    background: #fdeee2;
+    color: #b3410a;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.banner-feedback {
+    font-size: 15px;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.6;
+    margin: 0 0 12px 0;
+}
+
+.banner-list {
+    margin: 0 0 12px 0;
+    padding-left: 18px;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.banner-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.banner-q-pill {
+    flex-shrink: 0;
+    font-weight: 700;
+    color: #7a4200;
+    font-size: 13px;
+}
+
+.banner-reason {
+    flex: 1;
+    color: #222;
+}
+
+.banner-view-original {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #993c1d;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.banner-view-original:hover {
+    text-decoration: underline;
+}

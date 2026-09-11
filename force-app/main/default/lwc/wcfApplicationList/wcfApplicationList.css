@@ -1,0 +1,762 @@
+/* ═══════════════════════════════════════════════════════════════
+   WCF Application List (Validator Portal)
+   Unified Wadhwani portal design system — shares the token set used
+   by the validator, reviewer and approver dashboards.
+   Visual layer only: every class name, selector and markup contract
+   is unchanged.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Design tokens ────────────────────────────────────────────── */
+.wcf-list-wrapper {
+    /* Brand */
+    --wcf-brand: #BF2026;
+    --wcf-brand-hover: #A31B20;
+    --wcf-brand-active: #8E171C;
+    --wcf-brand-soft: #FEF2F2;
+    --wcf-navy: #1E2D4F;
+
+    /* Status */
+    --wcf-success: #2E8B57;
+    --wcf-success-soft: #ECFDF5;
+    --wcf-warning: #F59E0B;
+    --wcf-warning-soft: #FFFBEB;
+    --wcf-error: #DC2626;
+    --wcf-error-soft: #FEF2F2;
+    --wcf-info: #2563EB;
+    --wcf-info-soft: #EFF6FF;
+    --wcf-returned: #EA580C;
+    --wcf-returned-soft: #FFF7ED;
+    --wcf-draft: #6B7280;
+    --wcf-draft-soft: #F3F4F6;
+
+    /* Surfaces & text */
+    --wcf-bg: #F8FAFC;
+    --wcf-surface: #FFFFFF;
+    --wcf-surface-alt: #F8FAFC;
+    --wcf-border: #E5E7EB;
+    --wcf-border-soft: #F1F3F6;
+    --wcf-text: #1F2937;
+    --wcf-text-muted: #6B7280;
+
+    /* Shape & elevation */
+    --wcf-radius-card: 12px;
+    --wcf-radius-control: 6px;
+    --wcf-radius-pill: 999px;
+    --wcf-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    /* 8px spacing scale */
+    --wcf-space-1: 4px;
+    --wcf-space-2: 8px;
+    --wcf-space-3: 16px;
+    --wcf-space-4: 24px;
+    --wcf-space-5: 32px;
+    --wcf-space-6: 40px;
+
+    /* Controls */
+    --wcf-control-height: 32px;
+    --wcf-input-height: 36px;
+
+    /* Shared gutter */
+    --wcf-gutter: 24px;
+}
+
+/* ── Wrapper ──────────────────────────────────────────────────── */
+.wcf-list-wrapper {
+    font-family: 'Inter', 'Salesforce Sans', -apple-system, Arial, sans-serif;
+    background: var(--wcf-surface);
+    border-radius: 0;
+    border: none;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--wcf-text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ══ TOP BAR ═══════════════════════════════════════════════════ */
+.wcf-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wcf-space-2);
+    background: var(--wcf-surface);
+    padding: var(--wcf-space-4) var(--wcf-gutter);
+    border-bottom: 1px solid var(--wcf-border);
+    box-sizing: border-box;
+}
+
+.wcf-top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--wcf-space-2);
+}
+
+.wcf-brand-rule {
+    width: 3px;
+    height: 40px;
+    background: var(--wcf-brand);
+    border-radius: var(--wcf-radius-pill);
+    flex-shrink: 0;
+}
+
+.wcf-top-bar-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Headings use navy — brand red is reserved for actions and emphasis */
+.wcf-top-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--wcf-navy);
+    margin: 0 0 var(--wcf-space-1);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.wcf-top-sub {
+    font-size: 13px;
+    color: var(--wcf-text-muted);
+    line-height: 1.5;
+}
+
+.wcf-top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--wcf-space-2);
+    flex-wrap: wrap;
+}
+
+/* ── Search ───────────────────────────────────────────────────── */
+.wcf-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--wcf-space-2);
+    height: var(--wcf-input-height);
+    background: var(--wcf-surface);
+    border: 1px solid var(--wcf-border);
+    border-radius: var(--wcf-radius-control);
+    padding: 0 var(--wcf-space-3);
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wcf-search-wrap:focus-within {
+    border-color: var(--wcf-brand);
+    box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12);
+    background: var(--wcf-surface);
+}
+
+.wcf-search-icon {
+    color: var(--wcf-text-muted);
+    --sds-c-icon-color-foreground-default: var(--wcf-text-muted);
+}
+
+.wcf-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    color: var(--wcf-text);
+    width: 240px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.wcf-search-input::placeholder { color: #9CA3AF; }
+
+.wcf-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--wcf-input-height);
+    height: var(--wcf-input-height);
+    border: 1px solid var(--wcf-border);
+    border-radius: var(--wcf-radius-control);
+    background: var(--wcf-surface);
+    cursor: pointer;
+    color: var(--wcf-navy);
+    --sds-c-icon-color-foreground-default: var(--wcf-navy);
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.wcf-icon-btn:hover {
+    background: var(--wcf-surface-alt);
+    border-color: var(--wcf-brand);
+    color: var(--wcf-brand);
+    --sds-c-icon-color-foreground-default: var(--wcf-brand);
+}
+
+.wcf-icon-btn:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: 2px;
+}
+
+/* ══ SUMMARY ROW ═══════════════════════════════════════════════ */
+/* Was a solid maroon band with white text. Now a neutral strip so the
+   brand color stays reserved for actions — the counts read as data,
+   not as a banner. */
+.wcf-summary-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--wcf-surface-alt);
+    border-bottom: 1px solid var(--wcf-border);
+    padding: var(--wcf-space-3) var(--wcf-gutter);
+    gap: 0;
+}
+
+.wcf-summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 var(--wcf-space-4) 0 0;
+    cursor: pointer;
+    border-radius: var(--wcf-radius-control);
+    transition: opacity 0.15s ease;
+}
+
+.wcf-summary-item:hover { opacity: 0.75; }
+
+.wcf-summary-item:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: 2px;
+}
+
+.wcf-summary-div {
+    width: 1px;
+    height: 32px;
+    background: var(--wcf-border);
+    margin: 0 var(--wcf-space-4) 0 0;
+    flex-shrink: 0;
+}
+
+.wcf-summary-num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--wcf-navy);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--wcf-space-1);
+}
+
+.wcf-summary-lbl {
+    font-size: 11px;
+    color: var(--wcf-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* ══ TABLE WRAPPER ═════════════════════════════════════════════ */
+.wcf-table-wrapper {
+    width: 100%;
+    background: var(--wcf-surface);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+/* ══ TABLE ═════════════════════════════════════════════════════ */
+.wcf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: auto;
+}
+
+/* ── Column hints ── */
+.wcf-th-num    { width: 48px; }
+.wcf-th-action { text-align: right; white-space: nowrap; min-width: 140px; }
+
+/* ── Table head ───────────────────────────────────────────────── */
+.wcf-th {
+    padding: var(--wcf-space-2) var(--wcf-space-3);
+    height: var(--wcf-control-height);
+    background: var(--wcf-surface-alt);
+    color: var(--wcf-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: none;
+    border-bottom: 1px solid var(--wcf-border);
+    text-align: left;
+}
+
+.wcf-th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wcf-space-1);
+}
+
+.wcf-th-sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.wcf-th-sortable:hover {
+    background: #EEF1F5;
+    color: var(--wcf-navy);
+}
+
+.wcf-th-sortable:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: -2px;
+}
+
+.wcf-sort-icon {
+    --sds-c-icon-color-foreground-default: var(--wcf-navy);
+}
+
+/* ── Table rows ───────────────────────────────────────────────── */
+.wcf-td {
+    padding: var(--wcf-space-2) var(--wcf-space-3);
+    height: 56px;
+    border-bottom: 1px solid var(--wcf-border-soft);
+    vertical-align: middle;
+    color: var(--wcf-text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.wcf-td-num {
+    color: var(--wcf-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.wcf-td-id   { min-width: 160px; white-space: nowrap; }
+.wcf-td-date { white-space: nowrap; font-size: 13px; color: var(--wcf-text-muted); }
+.wcf-td-action { text-align: right; padding: var(--wcf-space-2) var(--wcf-space-3); }
+
+/* Zebra striping removed — row borders and the hover state carry the
+   separation, which is quieter and matches the dashboard tables.
+   Classes are kept so existing bindings still resolve. */
+.wcf-tr-even { background: var(--wcf-surface); }
+.wcf-tr-odd  { background: var(--wcf-surface); }
+
+.wcf-table tbody tr:last-child .wcf-td { border-bottom: none; }
+
+.wcf-table tbody tr:hover .wcf-td {
+    background: var(--wcf-surface-alt) !important;
+    transition: background 0.15s ease;
+}
+
+/* FIX: the hover rule added a 3px left border, shifting the whole row
+   1–3px sideways on hover. A transparent border of the same width is
+   always present, so only its color changes. */
+.wcf-td-num {
+    border-left: 3px solid transparent;
+}
+
+.wcf-table tbody tr:hover .wcf-td-num {
+    border-left-color: var(--wcf-brand);
+}
+
+/* Validated row — soft success tint instead of a warm red wash */
+.wcf-tr-validated { background: var(--wcf-success-soft) !important; }
+
+/* ── App ID link ──────────────────────────────────────────────── */
+.wcf-app-link {
+    color: var(--wcf-brand);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.wcf-app-link:hover {
+    color: var(--wcf-brand-hover);
+    text-decoration: underline;
+}
+
+.wcf-app-link:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: 2px;
+    border-radius: var(--wcf-radius-control);
+}
+
+.wcf-app-name {
+    font-size: 12px;
+    color: var(--wcf-text-muted);
+    margin-top: var(--wcf-space-1);
+    line-height: 1.4;
+}
+
+/* ── Status badges ────────────────────────────────────────────── */
+/* Pill shape and sizing now match the .status-pill family on the
+   dashboards, so a status reads the same everywhere in the portal. */
+.wcf-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    height: 24px;
+    padding: 0 var(--wcf-space-2);
+    border-radius: var(--wcf-radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+}
+
+.wcf-badge-grey  { background: var(--wcf-draft-soft);   color: #4B5563; border-color: #E5E7EB; }
+.wcf-badge-green { background: var(--wcf-success-soft); color: #1F6B44; border-color: #A7DFC1; }
+.wcf-badge-blue  { background: var(--wcf-info-soft);    color: #1D4ED8; border-color: #BFDBFE; }
+.wcf-badge-amber { background: var(--wcf-warning-soft); color: #B45309; border-color: #FDE68A; }
+.wcf-badge-red   { background: var(--wcf-error-soft);   color: #B91C1C; border-color: #FECACA; }
+
+/* ── Validated badge ──────────────────────────────────────────── */
+/* Validated is a completed state — green, matching the badge family */
+.wcf-validated-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wcf-space-1);
+    min-width: 96px;
+    height: 24px;
+    background: var(--wcf-success-soft);
+    color: #1F6B44;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0 var(--wcf-space-2);
+    border-radius: var(--wcf-radius-pill);
+    border: 1px solid #A7DFC1;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.wcf-validated-badge:hover {
+    background: #DCF5E7;
+    border-color: #8FD3AF;
+}
+
+.wcf-validated-icon {
+    --sds-c-icon-color-foreground-default: #1F6B44;
+}
+
+/* ── Awaiting badge ───────────────────────────────────────────── */
+/* Kept amber: "awaiting" is a pending state, and amber is the portal's
+   In Progress / Pending color. */
+.wcf-awaiting-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wcf-space-1);
+    min-width: 96px;
+    height: 24px;
+    padding: 0 var(--wcf-space-2);
+    border-radius: var(--wcf-radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    background: var(--wcf-warning-soft);
+    color: #B45309;
+    border: 1px solid #FDE68A;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.wcf-awaiting-icon {
+    --sds-c-icon-color-foreground-default: #B45309;
+}
+
+/* ── Action buttons ───────────────────────────────────────────── */
+.wcf-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wcf-space-1);
+    height: var(--wcf-control-height);
+    min-width: 120px;
+    padding: 0 var(--wcf-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--wcf-radius-control);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    letter-spacing: 0;
+}
+
+/* FIX: hover was `opacity: 0.87` + a 1px lift, which faded the label as
+   well as the fill. Solid color changes keep contrast constant. */
+.wcf-action-btn:active { transform: none; }
+
+.wcf-action-btn:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: 2px;
+}
+
+.wcf-action-btn:disabled,
+.wcf-action-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Primary actions */
+.wcf-btn-validate,
+.wcf-btn-revalidate {
+    background: var(--wcf-brand);
+    color: var(--wcf-surface);
+    border-color: var(--wcf-brand);
+}
+
+.wcf-btn-validate:hover,
+.wcf-btn-revalidate:hover {
+    background: var(--wcf-brand-hover);
+    border-color: var(--wcf-brand-hover);
+}
+
+.wcf-btn-validate:active,
+.wcf-btn-revalidate:active {
+    background: var(--wcf-brand-active);
+    border-color: var(--wcf-brand-active);
+}
+
+/* Resume — secondary, neutral (matches the dashboards) */
+.wcf-btn-resume {
+    background: var(--wcf-surface);
+    color: var(--wcf-navy);
+    border-color: var(--wcf-border);
+}
+
+.wcf-btn-resume:hover {
+    background: var(--wcf-surface-alt);
+    border-color: #D6DAE1;
+}
+
+.wcf-btn-resume:active {
+    background: #EEF1F5;
+}
+
+.wcf-btn-icon {
+    pointer-events: none;
+    flex-shrink: 0;
+    --sds-c-icon-color-foreground-default: currentColor;
+}
+
+/* Resume's icon needs to follow its dark label, not stay white */
+.wcf-btn-resume .wcf-btn-icon {
+    --sds-c-icon-color-foreground-default: var(--wcf-navy);
+}
+
+/* ══ PAGINATION BAR ════════════════════════════════════════════ */
+.wcf-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wcf-space-2);
+    padding: var(--wcf-space-3) var(--wcf-gutter);
+    background: var(--wcf-surface);
+    border-top: 1px solid var(--wcf-border);
+    font-size: 13px;
+    color: var(--wcf-text-muted);
+}
+
+.wcf-page-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--wcf-space-1);
+}
+
+.wcf-page-num {
+    font-weight: 600;
+    color: var(--wcf-navy);
+    font-size: 13px;
+    padding: 0 var(--wcf-space-1);
+}
+
+.wcf-page-info {
+    font-size: 13px;
+    color: var(--wcf-text-muted);
+}
+
+.wcf-pg-btn {
+    min-width: var(--wcf-control-height);
+    height: var(--wcf-control-height);
+    padding: 0 var(--wcf-space-2);
+    border: 1px solid var(--wcf-border);
+    background: var(--wcf-surface);
+    color: var(--wcf-navy);
+    border-radius: var(--wcf-radius-control);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    font-family: inherit;
+}
+
+.wcf-pg-btn:hover:not(:disabled) {
+    background: var(--wcf-surface-alt);
+    border-color: var(--wcf-brand);
+    color: var(--wcf-brand);
+}
+
+.wcf-pg-btn:focus-visible {
+    outline: 2px solid var(--wcf-brand);
+    outline-offset: 2px;
+}
+
+.wcf-pg-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ══ STATES ════════════════════════════════════════════════════ */
+
+/* Loading */
+.wcf-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--wcf-space-6) var(--wcf-gutter);
+    background: var(--wcf-surface);
+}
+
+.wcf-loading-text {
+    margin-top: var(--wcf-space-3);
+    font-size: 13px;
+    color: var(--wcf-text-muted);
+}
+
+/* Error */
+.wcf-error {
+    display: flex;
+    align-items: center;
+    gap: var(--wcf-space-2);
+    margin: var(--wcf-space-3) var(--wcf-gutter);
+    padding: var(--wcf-space-2) var(--wcf-space-3);
+    border: 1px solid #FECACA;
+    border-left: 3px solid var(--wcf-error);
+    border-radius: var(--wcf-radius-control);
+    background: var(--wcf-error-soft);
+    color: #B91C1C;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Empty */
+.wcf-empty {
+    text-align: center;
+    padding: var(--wcf-space-6) var(--wcf-gutter);
+    background: var(--wcf-surface);
+}
+
+.wcf-empty-icon {
+    color: #D1D5DB;
+    --sds-c-icon-color-foreground-default: #D1D5DB;
+    margin-bottom: var(--wcf-space-3);
+}
+
+.wcf-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--wcf-navy);
+    line-height: 1.4;
+    margin: 0 0 var(--wcf-space-1);
+}
+
+.wcf-empty-sub {
+    font-size: 13px;
+    color: var(--wcf-text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ── Track Badges ─────────────────────────────────────────────── */
+.wcf-track-badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+.wcf-trk-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.2px;
+}
+.wcf-trk-jf {
+    background-color: #EBF3FA;
+    color: #0176D3;
+    border: 1px solid #B8D5E5;
+}
+.wcf-trk-jc {
+    background-color: #FEF6EC;
+    color: #D97706;
+    border: 1px solid #FCD34D;
+}
+.wcf-trk-liv {
+    background-color: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #86EFAC;
+}
+
+/* ══ RESPONSIVE ════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .wcf-list-wrapper { --wcf-gutter: 16px; }
+
+    .wcf-top-bar {
+        align-items: flex-start;
+        gap: var(--wcf-space-3);
+    }
+
+    .wcf-top-bar-right { width: 100%; }
+
+    .wcf-search-wrap { flex: 1 1 auto; }
+
+    .wcf-search-input { width: 100%; }
+
+    .wcf-summary-row {
+        gap: var(--wcf-space-2) 0;
+    }
+
+    .wcf-top-title { font-size: 18px; }
+}
+
+/* ══ MOTION PREFERENCE ═════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .wcf-list-wrapper * {
+        transition: none !important;
+    }
+}
+
+/* ══ HIGH CONTRAST ═════════════════════════════════════════════ */
+@media (forced-colors: active) {
+    .wcf-badge,
+    .wcf-validated-badge,
+    .wcf-awaiting-badge,
+    .wcf-action-btn,
+    .wcf-pg-btn,
+    .wcf-icon-btn {
+        border: 1px solid CanvasText;
+    }
+}

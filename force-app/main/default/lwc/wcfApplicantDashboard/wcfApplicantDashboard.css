@@ -1,0 +1,508 @@
+/* ══════════════════════════════════════════════════════════════════
+   wcfApplicantDashboard.css
+   Full stylesheet — includes all existing rules PLUS the missing
+   Approved / Stage-4 track layout rules that were causing the
+   "title jammed into badge" and unstyled track rows issues.
+══════════════════════════════════════════════════════════════════ */
+
+/* ── Loading ──────────────────────────────────────────────────── */
+.dash-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 240px;
+}
+
+/* ── Greeting ─────────────────────────────────────────────────── */
+.dash-greeting {
+    padding: 24px 24px 0 24px;
+}
+
+.dash-greeting h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.dash-subtitle {
+    color: #6b6b6b;
+    margin-top: 4px;
+}
+
+/* ── Grid layout ──────────────────────────────────────────────── */
+.dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    padding: 20px 24px 32px 24px;
+}
+
+/* Approved state: side card is narrower (programme lead contact) */
+.dash-grid--approved {
+    grid-template-columns: 3fr 1.4fr;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .dash-grid,
+    .dash-grid--approved {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Cards ────────────────────────────────────────────────────── */
+.dash-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* ── Status badges (top of each card) ────────────────────────── */
+.dash-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.dash-badge--draft      { background: #fdecea; color: #c0392b; }
+.dash-badge--submitted  { background: #eaf6ec; color: #1e7e34; }
+.dash-badge--revision   { background: #fdecea; color: #c0392b; }
+.dash-badge--sealed     { background: #e9f0fb; color: #2c5cc5; }
+.dash-badge--review     { background: #fff3cd; color: #8a6d00; }
+.dash-badge--approved   { background: #d4f4e2; color: #04844b; }
+.dash-badge--decided    { background: #6b7280; color: #ffffff; }
+
+/* ── Card row (title + action button) ────────────────────────── */
+.dash-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.dash-app-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: #1a1a1a;
+}
+
+.dash-meta {
+    color: #888;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ── Draft progress bar ───────────────────────────────────────── */
+.dash-progress-wrapper {
+    margin-top: 20px;
+}
+
+.dash-progress-bar {
+    height: 6px;
+    background: #f0e6e6;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.dash-progress-fill {
+    height: 100%;
+    background: #993c1d !important;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.dash-progress-label {
+    font-size: 12px;
+    color: #999;
+    margin-top: 8px;
+}
+
+/* ── Info / warning / action banners ─────────────────────────── */
+.dash-info-banner {
+    background: #fff9e6;
+    border: 1px solid #f5e3a3;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 20px;
+}
+
+.dash-info-banner strong {
+    display: block;
+    color: #8a6d00;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.dash-info-banner p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b5e1f;
+}
+
+.dash-action-banner {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #fff4e5;
+    border: 1px solid #f4cf9e;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 16px 24px 0 24px;
+}
+
+.dash-action-banner strong {
+    display: block;
+    color: #93540a;
+    font-size: 14px;
+}
+
+.dash-action-banner p {
+    margin: 2px 0 0 0;
+    font-size: 13px;
+    color: #8a6d40;
+}
+
+/* ── Congratulations banner (Approved state top) ─────────────── */
+.dash-congrats-banner {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #eaf6ec;
+    border: 1px solid #a3d9b1;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 16px 24px 0 24px;
+}
+
+.dash-congrats-banner strong {
+    display: block;
+    color: #1e7e34;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.dash-congrats-banner p {
+    margin: 0;
+    font-size: 13px;
+    color: #2a5e35;
+}
+
+/* ── Note box (revision notes) ───────────────────────────────── */
+.dash-note-box {
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 18px;
+}
+
+.dash-note-title {
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #555;
+    margin: 0 0 8px 0;
+}
+
+.dash-note-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: #333;
+}
+
+.dash-note-list li {
+    margin-bottom: 6px;
+}
+
+.dash-view-original {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #993c1d;
+    text-decoration: none;
+}
+
+.dash-view-original:hover {
+    text-decoration: underline;
+}
+
+/* ── Side card ───────────────────────────────────────────────── */
+.dash-side-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #555;
+    margin: 0 0 12px 0;
+}
+
+.dash-link-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dash-link-list li {
+    margin-bottom: 10px;
+}
+
+.dash-link-list a {
+    color: #993c1d;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.dash-link-list a:hover {
+    text-decoration: underline;
+}
+
+/* Programme Lead contact (Approved side card) */
+.dash-pl-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+}
+
+.dash-pl-email {
+    font-size: 13px;
+    color: #993c1d;
+    text-decoration: none;
+}
+
+.dash-pl-email:hover {
+    text-decoration: underline;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STAGE 4 — APPROVED: three-track task list
+   These were ENTIRELY MISSING from the original stylesheet and are
+   the root cause of the "title jams into badge" rendering issue.
+══════════════════════════════════════════════════════════════════ */
+
+/* Each track row: icon on the left, content on the right */
+.dash-track-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 4px 0;
+}
+
+/* Locked (Programme Setup) row: slightly muted */
+.dash-track-row--locked {
+    opacity: 0.6;
+}
+
+/* Icon circle */
+.dash-track-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dash-track-icon--mou        { background: #fdecea; }
+.dash-track-icon--docs       { background: #e9f0fb; }
+.dash-track-icon--programme  { background: #f3f3f3; }
+
+/* Content column */
+.dash-track-body {
+    flex: 1;
+    min-width: 0; /* prevent text overflow from breaking layout */
+}
+
+/* Title + badge on the same line, spaced apart — this is the key
+   fix for "MoUAWAITING SIGNATURE" running together */
+.dash-track-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.dash-track-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.dash-track-desc {
+    font-size: 13px;
+    color: #5c5c5c;
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+}
+
+.dash-track-link {
+    font-size: 13px;
+    color: #993c1d;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.dash-track-link:hover {
+    text-decoration: underline;
+}
+
+.dash-track-pending-note {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Divider between track rows */
+.dash-track-divider {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    margin: 16px 0;
+}
+
+/* Per-track status pills (different from the card-level .dash-badge) */
+.dash-track-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.dash-track-badge--active     { background: #d4f4e2; color: #04844b; }
+.dash-track-badge--pending    { background: #ecebea; color: #514f4d; }
+.dash-track-badge--inprogress { background: #fff3cd; color: #8a6d00; }
+.dash-track-badge--expired    { background: #fdecea; color: #c23934; }
+
+/* Compliance progress bar fill (distinct class from draft .dash-progress-fill
+   so renderedCallback can target each independently) */
+.dash-compliance-fill {
+    height: 100%;
+    background: #04844b !important;   /* green, not red */
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Action button below the compliance progress bar */
+.dash-track-action-btn {
+    margin-top: 10px;
+}
+
+/* ── Form / preview overlay ───────────────────────────────────── */
+.dash-form-overlay {
+    padding: 16px 24px;
+}
+
+.dash-back-btn {
+    margin-bottom: 16px;
+}
+.dash-badge--decided-text {
+    text-transform: none;
+    white-space: normal;
+}
+
+/* Compliance Decision Badges */
+.dash-track-badge--rejected   { background-color: #fdecea; color: #c23934; }
+.dash-track-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
+.dash-track-badge--returned   { background-color: #fff4e5; color: #93540a; }
+
+/* Compliance Decision Banners */
+.decision-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    margin: 16px 24px 0 24px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.decision-content strong {
+    font-size: 1rem;
+    color: #1b1b1b;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.decision-content p {
+    color: #2b2b2b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Passed (Green) */
+.decision-banner--passed {
+    background-color: #eaf8f0;
+    border-color: #2e7d32;
+    border-left-width: 5px;
+}
+
+/* Rejected (Red) */
+.decision-banner--rejected {
+    background-color: #fdf2f2;
+    border-color: #d32f2f;
+    border-left-width: 5px;
+}
+
+/* Suspended (Yellow) */
+.decision-banner--suspended {
+    background-color: #fffde7;
+    border-color: #fbc02d;
+    border-left-width: 5px;
+}
+.decision-icon-suspended {
+    --sds-c-icon-color-foreground: #fbc02d;
+}
+
+/* Returned (Orange/Warning) */
+.decision-banner--returned {
+    background-color: #fff3e0;
+    border-color: #f57c00;
+    border-left-width: 5px;
+}
+.decision-icon-returned {
+    --sds-c-icon-color-foreground: #f57c00;
+}
+
+/* Returned Comments Box */
+.comments-section {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ffe0b2;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+}
+
+.comments-section strong {
+    font-size: 0.85rem;
+    color: #e65100;
+    margin-bottom: 0.25rem;
+}
+
+.reviewer-comments {
+    font-style: italic;
+    color: #4e342e !important;
+}
+
+.footer-note {
+    font-weight: 500;
+    margin-top: 0.5rem !important;
+}

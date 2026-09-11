@@ -1,0 +1,667 @@
+<template>
+<lightning-card>
+
+    <!-- ===========================================================
+         LOADING STATE
+    ============================================================ -->
+    <template if:true={isLoading}>
+        <div class="dash-loading">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </template>
+
+    <template if:false={isLoading}>
+
+        <!-- =======================================================
+             VIEW: NOT STARTED — show the RFI form to start
+        ======================================================== -->
+        <template if:true={isNotStarted}>
+    <c-wcf-applicant-welcome-dashboard
+        applicant-name={submitterFirstName}
+        organization-name={organizationName}
+        headquarters={headquarters}
+        onstart={handleStartApplication}
+        onopenfaq={handleOpenFaq}
+    onopeneligibility={handleOpenEligibility}>
+    </c-wcf-applicant-welcome-dashboard>
+</template>
+
+        <!-- =======================================================
+             VIEW: DRAFT — resume card
+        ======================================================== -->
+        <template if:true={isDraft}>
+            <div class="dash-greeting">
+                <h1>Hello, {submitterFirstName}.</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--draft">{labels.CL_DRAFT}</span>
+
+                    <div class="dash-card-row">
+                        <div>
+                            <h2 class="dash-app-name">{organizationName} — {selectedFundingArea}</h2>
+                            <p class="dash-meta">
+                                {labels.CL_Started} {createdDateFormatted} &middot; {labels.CL_Last_saved} {lastModifiedFormatted}
+                            </p>
+                        </div>
+                        <lightning-button
+                            variant="brand"
+                            label={labels.CL_Resume_application}
+                            onclick={handleResumeApplication}>
+                        </lightning-button>
+                    </div>
+
+                    <div class="dash-progress-wrapper">
+                        <div class="dash-progress-bar">
+                            <div class="dash-progress-fill"></div>
+                        </div>
+                        <p class="dash-progress-label">
+                            Step {currentStepNumber} of {totalSteps} &middot; {labels.CL_Auto_saves_on_every_field_blur}
+                        </p>
+                    </div>
+                </div>
+
+               <!-- isDraft block — FIXED -->
+<c-wcf-application-timeline
+    class="dash-card dash-card--side"
+    current-status={normalizedStatus}>
+</c-wcf-application-timeline>
+            </div>
+        </template>
+
+        <!-- =======================================================
+             VIEW: SUBMITTED — read-only + timeline
+        ======================================================== -->
+        <template if:true={isSubmitted}>
+            <div class="dash-greeting">
+                <h1>Hello, {submitterFirstName}.</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--submitted">{labels.CL_SUBMITTED}</span>
+
+                    <div class="dash-card-row">
+                        <div>
+                            <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                            <p class="dash-meta">Submitted {lastModifiedFormatted} &middot; {labels.CL_Read_only}</p>
+                        </div>
+                        <lightning-button
+                            variant="neutral"
+                            label={labels.CL_View_submission}
+                            onclick={handleViewSubmission}>
+                        </lightning-button>
+                    </div>
+
+                    <div class="dash-info-banner">
+                        <strong>{labels.CL_While_you_wait}</strong>
+                        <p>{labels.CL_Our_team_will_review_your_application_within_thirty_working_days_You_ll_hear}</p>
+                    </div>
+                </div>
+
+                <c-wcf-application-timeline
+                    class="dash-card dash-card--side"
+                    current-status={normalizedStatus}>
+                </c-wcf-application-timeline>
+            </div>
+        </template>
+
+        <!-- =======================================================
+             VIEW: REVISION REQUESTED — open & respond
+        ======================================================== -->
+        <template if:true={isRevisionRequestedStatus}>
+            <div class="dash-greeting">
+                <h1>Hello, {submitterFirstName}.</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-action-banner">
+                <lightning-icon icon-name="utility:warning" size="small"></lightning-icon>
+                <div>
+                    <strong>{labels.CL_Action_needed}</strong>
+                    <p>{labels.CL_Your_application_needs_a_revision}</p>
+                </div>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--revision">{labels.CL_REVISION_REQUESTED}</span>
+
+                    <div class="dash-card-row">
+                        <div>
+                            <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                            <p class="dash-meta">{labels.CL_Validator_note} &middot; {lastModifiedFormatted}</p>
+                        </div>
+                        <lightning-button
+                            variant="brand"
+                            label={labels.CL_Open_and_respond}
+                            onclick={handleOpenRevision}>
+                        </lightning-button>
+                    </div>
+
+                    <!-- wcfReturnBanner renders revision notes inline -->
+                    <c-wcf-return-banner
+    review-notes={reviewNotes}
+    question-return-notes={questionReturnNotes}
+    programme-lead-name={programmeLeadName}
+    programme-lead-email={programmeLeadEmail}
+    onvieworiginal={handleViewOriginal}>
+</c-wcf-return-banner>
+                </div>
+
+                <c-wcf-application-timeline
+                    class="dash-card dash-card--side"
+                    current-status={normalizedStatus}
+                    programme-lead-name={programmeLeadName}
+                    programme-lead-email={programmeLeadEmail}>
+                </c-wcf-application-timeline>
+            </div>
+        </template>
+
+        <template if:true={isAdditionalInfoRequestedStatus}>
+    <div class="dash-greeting">
+        <h1>Hello, {submitterFirstName}.</h1>
+        <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+    </div>
+
+    <div class="dash-action-banner">
+        <lightning-icon icon-name="utility:warning" size="small"></lightning-icon>
+        <div>
+            <strong>{labels.CL_Action_needed}</strong>
+            <p>{reviewerReturnComment}</p>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card dash-card--main">
+            <span class="dash-badge dash-badge--revision">ADDITIONAL INFO REQUESTED</span>
+
+            <div class="dash-card-row">
+                <div>
+                    <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta">Reviewer note &middot; {lastModifiedFormatted}</p>
+                </div>
+                <lightning-button
+                    variant="brand"
+                    label={labels.CL_Open_and_respond}
+                    onclick={handleOpenAdditionalInfo}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <c-wcf-application-timeline
+            class="dash-card dash-card--side"
+            current-status={normalizedStatus}
+            programme-lead-name={programmeLeadName}
+            programme-lead-email={programmeLeadEmail}>
+        </c-wcf-application-timeline>
+    </div>
+</template>
+
+        <!-- =======================================================
+             VIEW: SEALED / VALIDATED — read-only
+        ======================================================== -->
+        <template if:true={isSealed}>
+            <div class="dash-greeting">
+                <h1>Hello, {submitterFirstName}.</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--sealed">VALIDATED</span>
+
+                    <div class="dash-card-row">
+                        <div>
+                            <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                            <p class="dash-meta">Validated &middot; {labels.CL_Read_only}</p>
+                        </div>
+                        <lightning-button
+                            variant="neutral"
+                            label={labels.CL_View_submission}
+                            onclick={handleViewSubmission}>
+                        </lightning-button>
+                    </div>
+
+                    <div class="dash-info-banner">
+                        <strong>{labels.CL_While_you_wait}</strong>
+                        <p>{labels.CL_Our_team_will_review_your_application_within_thirty_working_days_You_ll_hear}</p>
+                    </div>
+                </div>
+
+                <c-wcf-application-timeline
+                    class="dash-card dash-card--side"
+                    current-status={normalizedStatus}>
+                </c-wcf-application-timeline>
+            </div>
+        </template>
+
+        <!-- =======================================================
+             VIEW: UNDER REVIEW — read-only
+        ======================================================== -->
+        <template if:true={isUnderReview}>
+            <div class="dash-greeting">
+                <h1>Hello, {submitterFirstName}.</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--review">{labels.CL_UNDER_REVIEW}</span>
+
+                    <div class="dash-card-row">
+                        <div>
+                            <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                            <p class="dash-meta">{labels.CL_Evaluation_in_progress} &middot; {labels.CL_4_8_weeks}</p>
+                        </div>
+                        <lightning-button
+                            variant="neutral"
+                            label={labels.CL_View_submission}
+                            onclick={handleViewSubmission}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <c-wcf-application-timeline
+                    class="dash-card dash-card--side"
+                    current-status={normalizedStatus}
+                    programme-lead-name={programmeLeadName}
+                    programme-lead-email={programmeLeadEmail}>
+                </c-wcf-application-timeline>
+            </div>
+        </template>
+
+<!-- =======================================================
+     VIEW: REVIEW SUBMITTED — evaluation done, decision pending
+======================================================== -->
+<template if:true={isReviewSubmitted}>
+    <div class="dash-greeting">
+        <h1>Hello, {submitterFirstName}.</h1>
+        <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card dash-card--main">
+            <span class="dash-badge dash-badge--review">{labels.CL_UNDER_REVIEW}</span>
+
+            <div class="dash-card-row">
+                <div>
+                    <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta">{labels.CL_Evaluation_complete} &middot; {labels.CL_Awaiting_final_decision}</p>
+                </div>
+                <lightning-button
+                    variant="neutral"
+                    label={labels.CL_View_submission}
+                    onclick={handleViewSubmission}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <c-wcf-application-timeline
+            class="dash-card dash-card--side"
+            current-status={normalizedStatus}
+            programme-lead-name={programmeLeadName}
+            programme-lead-email={programmeLeadEmail}>
+        </c-wcf-application-timeline>
+    </div>
+</template>
+
+<!-- =======================================================
+     VIEW: APPLICATION RESUBMITTED — waiting for re-validation
+======================================================== -->
+<template if:true={isApplicationResubmitted}>
+    <div class="dash-greeting">
+        <h1>Hello, {submitterFirstName}.</h1>
+        <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card dash-card--main">
+            <span class="dash-badge dash-badge--submitted">{labels.CL_RESUBMITTED}</span>
+
+            <div class="dash-card-row">
+                <div>
+                    <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta">Resubmitted {lastModifiedFormatted} &middot; {labels.CL_Awaiting_re_validation}</p>
+                </div>
+                <lightning-button
+                    variant="neutral"
+                    label={labels.CL_View_submission}
+                    onclick={handleViewSubmission}>
+                </lightning-button>
+            </div>
+
+            <div class="dash-info-banner">
+                <strong>{labels.CL_Resubmission_received}</strong>
+                <p>{labels.CL_Your_revised_application_is_with_our_validation_team_We_ll_notify_you_of_the}</p>
+            </div>
+        </div>
+
+        <c-wcf-application-timeline
+            class="dash-card dash-card--side"
+            current-status={normalizedStatus}>
+        </c-wcf-application-timeline>
+    </div>
+</template>
+
+<!-- =======================================================
+     VIEW: IN REVIEW — post-resubmission review
+======================================================== -->
+<template if:true={isInReview}>
+    <div class="dash-greeting">
+        <h1>Hello, {submitterFirstName}.</h1>
+        <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card dash-card--main">
+            <span class="dash-badge dash-badge--review">{labels.CL_UNDER_REVIEW}</span>
+
+            <div class="dash-card-row">
+                <div>
+                    <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta">{labels.CL_Evaluation_in_progress} &middot; {labels.CL_4_8_weeks}</p>
+                </div>
+                <lightning-button
+                    variant="neutral"
+                    label={labels.CL_View_submission}
+                    onclick={handleViewSubmission}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <c-wcf-application-timeline
+            class="dash-card dash-card--side"
+            current-status={normalizedStatus}
+            programme-lead-name={programmeLeadName}
+            programme-lead-email={programmeLeadEmail}>
+        </c-wcf-application-timeline>
+    </div>
+</template>
+
+        <!-- =======================================================
+             VIEW: DECIDED / APPROVED — Stage 4 three-track card
+        ======================================================== -->
+        <template if:true={isApproved}>
+            <div class="dash-greeting">
+                <h1>Congratulations, {submitterFirstName}!</h1>
+                <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+            </div>
+
+            <div class="dash-congrats-banner">
+                <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
+                <div>
+                    <strong>{labels.CL_Your_application_has_been_approved}</strong>
+                    <p>{labels.CL_Complete_the_three_steps_below_to_begin_your_partnership_with_Wadhwani_Grants}</p>
+                </div>
+            </div>
+
+            <!-- ── Compliance Review Decision Banners ── -->
+            <template if:true={showPassedBanner}>
+                <div class="decision-banner decision-banner--passed">
+                    <lightning-icon icon-name="utility:success" size="small" variant="success" class="decision-icon"></lightning-icon>
+                    <div class="decision-content">
+                        <strong>Compliance Review Passed</strong>
+                        <p>Congratulations! Your compliance documents have successfully passed the review. Your onboarding process is now complete, and your application has been successfully onboarded.</p>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showRejectedBanner}>
+                <div class="decision-banner decision-banner--rejected">
+                    <lightning-icon icon-name="utility:error" size="small" variant="error" class="decision-icon"></lightning-icon>
+                    <div class="decision-content">
+                        <strong>Compliance Review Rejected</strong>
+                        <p>We regret to inform you that your compliance documents did not meet the required review criteria and have been rejected. As a result, your application cannot proceed further. If you require additional information, please contact the support team.</p>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showSuspendedBanner}>
+                <div class="decision-banner decision-banner--suspended">
+                    <lightning-icon icon-name="utility:warning" size="small" class="decision-icon-suspended"></lightning-icon>
+                    <div class="decision-content">
+                        <strong>Compliance Review Suspended</strong>
+                        <p>Your compliance document review has been suspended. Your application is currently on hold while additional internal review or verification is being carried out. We will notify you if any further action is required from your side.</p>
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showReturnedBanner}>
+                <div class="decision-banner decision-banner--returned">
+                    <lightning-icon icon-name="utility:clock" size="small" class="decision-icon-returned"></lightning-icon>
+                    <div class="decision-content">
+                        <strong>Action Needed: Compliance Documents Returned</strong>
+                        <p>Your compliance documents have been returned for revision. Please review the reviewer comments below, make the required changes, and resubmit your compliance documents for review.</p>
+                        <div class="comments-section">
+                            <strong>Reviewer Comments:</strong>
+                            <p class="reviewer-comments">{complianceReviewerNotes}</p>
+                        </div>
+                        <p class="footer-note">Once you have addressed the feedback, please submit the updated documents to continue the review process.</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="dash-grid dash-grid--approved">
+
+                <!-- ── Main card: 3-track task list ── -->
+                <div class="dash-card dash-card--main">
+                    <span class="dash-badge dash-badge--approved">{labels.CL_APPROVED}</span>
+                    <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta" style="margin-bottom: 20px;">Approved {approvalDateFormatted} &middot; {labels.CL_Three_steps_to_activate_your_partnership}</p>
+
+                    <!-- Track 1: Master MoU -->
+                    <div class="dash-track-row">
+                        <div class="dash-track-icon dash-track-icon--mou">
+                            <lightning-icon icon-name="doctype:pdf" size="small"></lightning-icon>
+                        </div>
+                        <div class="dash-track-body">
+                            <div class="dash-track-header">
+                                <span class="dash-track-title">{labels.CL_Grant_Agreement}</span>
+                                <span class={mouStatusBadgeClass}>{mouStatusLabel}</span>
+                            </div>
+                            <p class="dash-track-desc">
+                                {labels.CL_Your_Grant_Agreement_of_Understanding_will_be_shared_via_Volody_for_e_signatu}
+                            </p>
+                            <template if:true={hasMouLink}>
+                                <a href={mouVolodyLink} target="_blank" class="dash-track-link">
+                                    Open in Volody →
+                                </a>
+                            </template>
+                            <template if:false={hasMouLink}>
+                                <p class="dash-track-pending-note">{labels.CL_Grant_Agreement_will_be_shared_by_your_Programme_Lead_shortly}</p>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="dash-track-divider"></div>
+
+                    <!-- Track 2: Compliance Documents -->
+                    <div class="dash-track-row">
+                        <div class="dash-track-icon dash-track-icon--docs">
+                            <lightning-icon icon-name="utility:file" size="small"></lightning-icon>
+                        </div>
+                        <div class="dash-track-body">
+                            <div class="dash-track-header">
+                                <span class="dash-track-title">{labels.CL_Compliance_Documents}</span>
+                                <span class={complianceStatusBadgeClass}>{complianceProgressLabel}</span>
+                            </div>
+                            <p class="dash-track-desc">
+                                {labels.CL_Upload_your_organisation_s_compliance_documents} {labels.CL_Required_documents_depend_on_your_geography}
+                            </p>
+                            <!-- Progress bar for compliance -->
+                            <div class="dash-compliance-progress">
+                                <div class="dash-progress-bar" style="margin-top: 8px;">
+                                    <div class="dash-compliance-fill"></div>
+                                </div>
+                                <p class="dash-progress-label">{complianceUploaded} of {complianceTotal} {labels.CL_documents_complete}</p>
+                            </div>
+                            <lightning-button
+                                variant="neutral"
+                                label={labels.CL_Manage_compliance_documents}
+                                onclick={handleOpenComplianceDocs}
+                                class="dash-track-action-btn">
+                            </lightning-button>
+                        </div>
+                    </div>
+
+                    <div class="dash-track-divider"></div>
+
+                    <!-- Track 3: Programme Setup (Phase 2 — locked) -->
+                    <div class="dash-track-row dash-track-row--locked">
+                        <div class="dash-track-icon dash-track-icon--programme">
+                            <lightning-icon icon-name="utility:settings" size="small"></lightning-icon>
+                        </div>
+                        <div class="dash-track-body">
+                            <div class="dash-track-header">
+                                <span class="dash-track-title">{labels.CL_Programme_Setup}</span>
+                                <span class="dash-track-badge dash-track-badge--pending">{labels.CL_COMING_SOON}</span>
+                            </div>
+                            <p class="dash-track-desc">
+                                {labels.CL_Your_Programme_Lead_will_configure_your_programme_details_funding_model_and}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Side card: Timeline ── -->
+                <c-wcf-application-timeline
+                    class="dash-card dash-card--side"
+                    current-status={normalizedStatus}
+                     compliance-doc-status={complianceDocStatus}
+                    compliance-has-uploads={complianceHasUploads}
+                     oncomplianceaction={handleOpenComplianceDocs}>
+                </c-wcf-application-timeline>
+            </div>
+
+
+        </template>
+
+            <!-- =======================================================
+     VIEW: DECIDED — Not Recommended for Fund / Rejected
+======================================================== -->
+<template if:true={isDecided}>
+    <div class="dash-greeting">
+        <h1>Hello, {submitterFirstName}.</h1>
+        <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card dash-card--main">
+            <span class="dash-badge dash-badge--decided">{decidedStatusLabel}</span>
+
+            <div class="dash-card-row">
+                <div>
+                    <h2 class="dash-app-name">{labels.CL_Application} {applicationName}</h2>
+                    <p class="dash-meta">{labels.CL_Final_decision} &middot; {labels.CL_Read_only}</p>
+                </div>
+                <lightning-button
+                    variant="neutral"
+                    label={labels.CL_View_submission}
+                    onclick={handleViewSubmission}>
+                </lightning-button>
+            </div>
+
+            <div class="dash-info-banner">
+                <strong>{labels.CL_Thank_you_for_applying}</strong>
+                <p>{labels.CL_After_careful_review_your_application_was_not_selected_for_funding_at_this_t}</p>
+            </div>
+        </div>
+
+        <c-wcf-application-timeline
+            class="dash-card dash-card--side"
+            current-status={normalizedStatus}>
+        </c-wcf-application-timeline>
+    </div>
+</template>
+
+    </template>
+
+
+
+    <!-- =======================================================
+         WELCOME / INSTRUCTIONS VIEW — Before You Start
+    ======================================================== -->
+    <template if:true={showWelcomeView}>
+        <div class="dash-form-overlay">
+            <lightning-button
+                label="← Back to dashboard"
+                onclick={handleBackToDashboard}
+                class="dash-back-btn">
+            </lightning-button>
+            <c-wcf-rfi-welcome-page
+                show-start-button="true"
+                start-button-label="Start Form"
+                onstartapplication={handleBeginForm}>
+            </c-wcf-rfi-welcome-page>
+        </div>
+    </template>
+
+
+
+    <!-- =======================================================
+         REVISION RESPONSE FORM — only returned questions
+    ======================================================== -->
+    <template if:true={showRevisionView}>
+      <div class="dash-form-overlay">
+        <lightning-button label="← Back to dashboard" onclick={handleBackToDashboard} class="dash-back-btn"></lightning-button>
+        <c-wcf-rfi-response-page
+          record-id={recordId}
+          application-name={applicationName}
+          question-return-notes={questionReturnNotes}
+          onsubmitted={handleRevisionSubmitted}
+          oncancel={handleBackToDashboard}>
+        </c-wcf-rfi-response-page>
+      </div>
+    </template>
+
+
+    <!-- =======================================================
+         SUBMISSION PREVIEW — read-only RFI view, no editing
+    ======================================================== -->
+    <template if:true={showPreviewView}>
+        <div class="dash-form-overlay">
+            <lightning-button
+                label="← Back to dashboard"
+                onclick={handleBackFromPreview}
+                class="dash-back-btn">
+            </lightning-button>
+
+             <c-wcf-form-preview 
+            record-id={recordId}
+            hide-auto-computed="true">
+        </c-wcf-form-preview>
+        </div>
+    </template>
+
+<!-- COMPLIANCE DOCS OVERLAY — outside isApproved, same level as showFormView -->
+    <template if:true={showComplianceView}>
+        <div class="dash-form-overlay">
+            <lightning-button
+                label="← Back to dashboard"
+                onclick={handleBackFromCompliance}
+                class="dash-back-btn">
+            </lightning-button>
+            <c-wcf-compliance-docs
+                record-id={recordId}
+                onuploadcomplete={handleComplianceUpdate}>
+            </c-wcf-compliance-docs>
+        </div>
+    </template>
+
+    <!-- At the bottom of lightning-card, alongside showFormView/showPreviewView -->
+<c-wcf-eligibility-modal
+    is-open={showEligibilityModal}
+    onclose={handleCloseEligibility}>
+</c-wcf-eligibility-modal>
+
+<c-wcf-application-faq-modal
+    is-open={showFaqModal}
+    onclose={handleCloseFaq}>
+</c-wcf-application-faq-modal>
+
+</lightning-card>
+</template>

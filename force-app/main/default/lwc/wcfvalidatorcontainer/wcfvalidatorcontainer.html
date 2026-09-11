@@ -1,0 +1,93 @@
+<template>
+    <!-- LIST VIEW MODE -->
+    <template if:false={showValidator}>
+
+        <!-- Filter banner — only visible when navigated from dashboard -->
+        <template if:true={hasStatusFilter}>
+            <div class="wcf-filter-banner">
+                <lightning-icon icon-name="utility:filter" size="xx-small"></lightning-icon>
+                <span>Filtered by: <strong>{activeFilterLabel}</strong></span>
+                <button class="wcf-clear-filter" onclick={clearFilter}>✕ Show All</button>
+            </div>
+        </template>
+
+        <c-wcf-application-list
+            status-filter={statusFilter}
+            onvalidateclick={handleValidateClick}>
+        </c-wcf-application-list>
+    </template>
+
+    <!-- SPLIT PANE MODE -->
+    <template if:true={showValidator}>
+        <div class="wcf-split-shell">
+
+            <!-- Top bar -->
+            <div class="wcf-split-topbar">
+                <button class="wcf-back-btn" onclick={handleBack}>
+                    <lightning-icon icon-name="utility:chevronleft" size="xx-small" class="wcf-back-icon"></lightning-icon>
+                    Back to Proposals
+                </button>
+                <div class="wcf-split-title">
+                    <lightning-icon icon-name="utility:shield" size="small"></lightning-icon>
+                    <span>Validating: <strong>{currentRecordName}</strong></span>
+                </div>
+                <div class="wcf-split-meta"></div>
+            </div>
+
+<!-- Split body -->
+<div class="wcf-split-body" data-id="splitBody">
+
+    <!-- LEFT PANEL -->
+    <div class={leftPaneClass} data-id="leftPanel">
+        <div class="wcf-panel-header">
+            <lightning-icon icon-name="utility:file" size="x-small"></lightning-icon>
+            <span class="wcf-panel-label-text">RFI Form Preview</span>
+            <span class="wcf-panel-hint wcf-panel-label-text">Read-only · scroll to review</span>
+            <lightning-button-icon
+                icon-name={leftToggleIcon}
+                alternative-text={leftToggleTitle}
+                title={leftToggleTitle}
+                onclick={handleToggleLeftPane}
+                class="wcf-preview-toggle">
+            </lightning-button-icon>
+        </div>
+        <template if:false={leftCollapsed}>
+            <div class="wcf-panel-body wcf-panel-scroll">
+                <c-wcf-form-preview record-id={currentRecordId}></c-wcf-form-preview>
+            </div>
+        </template>
+    </div>
+
+    <!-- DRAGGABLE DIVIDER — only when both panes are open -->
+    <template if:true={showResizer}>
+        <div class="wcf-divider" data-id="divider">
+            <div class="wcf-divider-handle"></div>
+        </div>
+    </template>
+
+    <!-- RIGHT PANEL -->
+    <div class={rightPaneClass} data-id="rightPanel">
+        <div class="wcf-panel-header wcf-panel-header-right">
+            <lightning-button-icon
+                icon-name={rightToggleIcon}
+                alternative-text={rightToggleTitle}
+                title={rightToggleTitle}
+                onclick={handleToggleRightPane}
+                class="wcf-preview-expand">
+            </lightning-button-icon>
+            <span class="wcf-panel-label-text">Validator Form</span>
+        </div>
+        <template if:false={rightCollapsed}>
+            <div class="wcf-panel-body wcf-panel-scroll">
+                <c-wcf-validator-form
+                    record-id={currentRecordId}
+                    onsealcomplete={handleSealComplete}>
+                </c-wcf-validator-form>
+            </div>
+        </template>
+    </div>
+
+</div>
+        </div>
+    </template>
+</template>

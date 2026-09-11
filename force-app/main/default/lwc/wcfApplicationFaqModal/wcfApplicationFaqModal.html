@@ -1,0 +1,72 @@
+<template>
+    <template if:true={isOpen}>
+
+        <!-- STANDALONE MODE: Single Card Box Accordion (Matching Block 3) -->
+        <template if:true={standalone}>
+            <div class="faq-page-standalone">
+                <template if:true={isLoading}>
+                    <lightning-spinner alternative-text="Loading FAQs..." size="medium"></lightning-spinner>
+                </template>
+                <template if:false={isLoading}>
+                    <div class="rfi-card-box faq-card-box">
+                        <template for:each={faqItems} for:item="faq">
+                            <div key={faq.id} class="faq-item">
+                                <div class="faq-header clickable" data-id={faq.id} onclick={handleToggle}>
+                                    <span class="faq-symbol">{faq.toggleIcon}</span>
+                                    <h3 class="faq-question-text">{faq.question}</h3>
+                                </div>
+                                <template if:true={faq.isExpanded}>
+                                    <div class="faq-content-body">
+                                        <lightning-formatted-rich-text value={faq.description}></lightning-formatted-rich-text>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- POPUP MODAL MODE: Overlay Dialog (Matching Block 3 Style) -->
+        <template if:false={standalone}>
+            <div class="modal-backdrop" onclick={handleBackdropClick}>
+                <div class="modal-container" onclick={stopPropagation}>
+                    <div class="modal-header">
+                        <h2 class="modal-title">Application FAQ</h2>
+                        <button class="modal-close" onclick={handleClose} title="Close">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <template if:true={isLoading}>
+                            <lightning-spinner alternative-text="Loading FAQs..." size="medium"></lightning-spinner>
+                        </template>
+                        <template if:false={isLoading}>
+                            <div class="rfi-card-box faq-card-box">
+                                <template for:each={faqItems} for:item="faq">
+                                    <div key={faq.id} class="faq-item">
+                                        <div class="faq-header clickable" data-id={faq.id} onclick={handleToggle}>
+                                            <span class="faq-symbol">{faq.toggleIcon}</span>
+                                            <h3 class="faq-question-text">{faq.question}</h3>
+                                        </div>
+                                        <template if:true={faq.isExpanded}>
+                                            <div class="faq-content-body">
+                                                <lightning-formatted-rich-text value={faq.description}></lightning-formatted-rich-text>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <div class="faq-contact">
+                            <lightning-icon icon-name="utility:email" size="x-small" class="faq-contact-icon"></lightning-icon>
+                            <p class="faq-contact-text">
+                                Questions about eligibility, submissions, or technical support? Contact <a href="mailto:grants.support@wadhwanifoundation.org" class="faq-link">grants.support@wadhwanifoundation.org</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </template>
+</template>

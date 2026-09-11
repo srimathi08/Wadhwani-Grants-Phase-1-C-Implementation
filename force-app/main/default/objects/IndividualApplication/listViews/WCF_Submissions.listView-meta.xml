@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WCF_Submissions</fullName>
+    <columns>CreatedDate</columns>
+    <columns>Name</columns>
+    <columns>Organization_Name__c</columns>
+    <columns>Submitter_Name__c</columns>
+    <columns>Status</columns>
+    <columns>ApplicationName</columns>
+    <columns>Account</columns>
+    <columns>RecordType</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RecordType</field>
+        <operation>equals</operation>
+        <value>IndividualApplication.WCF_Job_Creation_Proposals,IndividualApplication.WCF_Job_Fulfillment_Job_Creation_Proposals,IndividualApplication.WCF_Job_Fulfillment_Proposals</value>
+    </filters>
+    <label>WCF Submissions</label>
+</ListView>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>FundingOpportunity$Name</field>
+    </columns>
+    <columns>
+        <field>FundingOpportunity.IndividualApplication$Status</field>
+    </columns>
+    <columns>
+        <field>FundingOpportunity.IndividualApplication$ApplicationName</field>
+    </columns>
+    <columns>
+        <field>FundingOpportunity.IndividualApplication$Account</field>
+    </columns>
+    <columns>
+        <field>FundingOpportunity.IndividualApplication.ApplicationReview$Status</field>
+    </columns>
+    <currency>INR</currency>
+    <filter>
+        <criteriaItems>
+            <column>FundingOpportunity$RecordType</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>FundingOpportunity.WIN_Project_Proposal</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Tabular</format>
+    <name>New Funding Opp vs COE proposals Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Funding_Opp_vs_COE_proposals__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>FundingOpportunity$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

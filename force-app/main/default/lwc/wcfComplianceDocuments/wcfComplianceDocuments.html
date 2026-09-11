@@ -1,0 +1,355 @@
+<template>
+
+   <template if:true={showModal}>
+    <div class="modal-backdrop" onclick={handleBackdropClick}>
+        <div class="modal-box" onclick={stopProp}>
+            <div class="modal-header">
+                <span class="modal-title">{modalTitle}</span>
+                <button class="modal-close" onclick={closeModal}>✕</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Organisation -->
+                <div class="form-row">
+                    <label class="form-label">Organisation <span class="req">*</span></label>
+                    <select class="form-select" data-field="organisationId" onchange={handleFieldChange}>
+                        <option value="">— Select Organisation —</option>
+                        <template for:each={orgOptions} for:item="o">
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- Linked Proposal Banner -->
+                <template if:true={form.organisationId}>
+                    <div class="form-row">
+                        <label class="form-label">Linked Proposal</label>
+                        <template if:true={isFetchingApp}>
+                            <div class="app-banner app-banner-loading">
+                                Fetching approved proposal…
+                            </div>
+                        </template>
+                        <template if:false={isFetchingApp}>
+                            <template if:true={hasLinkedApp}>
+                                <div class="app-banner app-banner-found">
+                                    <span>{form.applicationName}</span>
+                                    <span class="app-badge">Recommend for Fund</span>
+                                </div>
+                            </template>
+                            <template if:true={noLinkedApp}>
+                                <div class="app-banner app-banner-missing">
+                                    No approved proposal found for this organisation.
+                                    The request will be created without a proposal link.
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </template>
+
+
+
+                <!-- Geography -->
+                <div class="form-row">
+                    <label class="form-label">Geography <span class="req">*</span></label>
+                    <select class="form-select" data-field="geography" onchange={handleFieldChange}>
+                        <option value="">— Select —</option>
+                        <option value="India">India</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="USA">USA</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Document Types -->
+                <div class="form-row">
+                    <label class="form-label">Document Types <span class="req">*</span></label>
+                    <div class="doc-type-grid">
+                        <template for:each={docTypeOptions} for:item="dt">
+                            <label key={dt.value} class="doc-type-label">
+                                <input type="checkbox"
+                                       value={dt.value}
+                                       checked={dt.checked}
+                                       data-dtype={dt.value}
+                                       onchange={handleDocTypeChange} />
+                                {dt.label}
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Requested Date / Due Date -->
+                <div class="form-row-2col">
+                    <div class="form-col">
+                        <label class="form-label">Requested Date</label>
+                        <input type="date" class="form-input" data-field="requestedDate"
+                               value={form.requestedDate} onchange={handleFieldChange} />
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Due Date <span class="req">*</span></label>
+                        <input type="date" class="form-input" data-field="dueDate"
+                               value={form.dueDate} onchange={handleFieldChange} />
+                    </div>
+                </div>
+
+                <!-- NEW: inline date error, right under the date row -->
+<template if:true={dateError}>
+    <div class="form-row">
+        <div class="form-error form-error-inline">{dateError}</div>
+    </div>
+</template>
+
+                <!-- Priority only — Status removed -->
+                <div class="form-row">
+                    <label class="form-label">Priority</label>
+                    <select class="form-select" data-field="priority" onchange={handleFieldChange}>
+                        <option value="Normal">Normal</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-row">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" rows="3"
+                              data-field="notes"
+                              value={form.notes}
+                              onchange={handleFieldChange}
+                              placeholder="Optional — internal notes for tracking this request">
+                    </textarea>
+                </div>
+
+                
+
+            </div>
+
+        
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick={closeModal}>Cancel</button>
+                <button class="btn-save" onclick={handleSave} disabled={isSaving}>
+                    <template if:true={isSaving}>Saving…</template>
+                    <template if:false={isSaving}>{saveLabel}</template>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+</template>
+
+<template if:true={showReviewModal}>
+    <div class="modal-backdrop" onclick={handleReviewBackdropClick}>
+        <div class="modal-box" onclick={stopProp}>
+            <div class="modal-header">
+                <span class="modal-title">Review Documents — {reviewRequestId}</span>
+                <button class="modal-close" onclick={closeReviewModal}>✕</button>
+            </div>
+            <div class="modal-body">
+                <template if:true={isLoadingReviewItems}>
+                    <div class="preview-empty">Loading documents…</div>
+                </template>
+                <template if:false={isLoadingReviewItems}>
+                    <template for:each={reviewItems} for:item="doc">
+                        <div key={doc.documentLabel} class="review-doc-row">
+                            <div class="review-doc-header">
+                                <span class="review-doc-label">{doc.documentLabel}</span>
+                                <span class={doc.statusPillClass}>{doc.status}</span>
+                            </div>
+                             <template if:true={doc.hasFile}>
+                                 <div class="review-doc-file">
+                                     <a href="javascript:void(0);" data-version-id={doc.contentVersionId} data-file-name={doc.fileName} onclick={handlePreviewFile}>{doc.fileName}</a>
+                                 </div>
+                                 <template if:true={doc.reviewerNotes}>
+                                     <div class="review-doc-notes"><strong>Note:</strong> {doc.reviewerNotes}</div>
+                                 </template>
+                             </template>
+                            <template if:false={doc.hasFile}>
+                                <div class="review-doc-nofile">No document uploaded yet.</div>
+                            </template>
+                        </div>
+                    </template>
+                </template>
+
+                <!-- ══ Decision panel — buttons first, form appears on click ══ -->
+                <div class="review-decision-panel">
+
+                    <template if:false={pendingDecision}>
+                        <div class="review-decision-actions">
+                            <button class="decision-btn decision-btn-pass"    data-decision="Pass"    onclick={handleChooseDecision}>Pass</button>
+                            <button class="decision-btn decision-btn-return"  data-decision="Return"  onclick={handleChooseDecision}>Return</button>
+                            <button class="decision-btn decision-btn-reject"  data-decision="Reject"  onclick={handleChooseDecision}>Reject</button>
+                            <button class="decision-btn decision-btn-suspend" data-decision="Suspend" onclick={handleChooseDecision}>Suspend</button>
+                        </div>
+                    </template>
+
+                    <template if:true={pendingDecision}>
+                        <div class="review-decision-form">
+                            <p class="review-picker-hint">Decision: <strong>{pendingDecision}</strong></p>
+
+                            <template if:true={isReturnDecision}>
+                                <div class="review-return-picker">
+                                    <p class="review-picker-hint">Select documents to return:</p>
+                                    <template for:each={reviewItems} for:item="doc">
+                                        <template if:true={doc.hasFile}>
+                                            <label key={doc.documentLabel} class="doc-type-label">
+                                                <input type="checkbox" data-label={doc.documentLabel} onchange={handleReturnCheckboxChange} />
+                                                {doc.documentLabel}
+                                            </label>
+                                        </template>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <textarea class="form-textarea" rows="2"
+                                placeholder="Required decision comment"
+                                oninput={handleDecisionNoteInput}></textarea>
+
+                            <div class="review-decision-form-actions">
+                                <button class="btn-cancel" onclick={handleCancelDecision}>Cancel</button>
+                                <button class="btn-save" onclick={handleConfirmDecision}>Confirm — {pendingDecision}</button>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick={closeReviewModal}>Close</button>
+            </div>
+        </div>
+    </div>
+</template>
+    <!-- ══ END MODAL ══ -->
+
+
+    <!-- ══ KPI TILES ══ -->
+    <div class="kpi-row">
+
+        <div class={kpiClassAll} data-filter="all" onclick={handleKpiClick}>
+            <div class="kpi-header">
+                <span class="kpi-label">All Requests</span>
+                <span class="kpi-dot kpi-dot-blue"></span>
+            </div>
+            <div class="kpi-count">{summary.allRequests}</div>
+            <div class="kpi-sub">All tracked document requests</div>
+        </div>
+
+        <div class={kpiClassPending} data-filter="pending" onclick={handleKpiClick}>
+            <div class="kpi-header">
+                <span class="kpi-label">Pending</span>
+                <span class="kpi-dot kpi-dot-amber"></span>
+            </div>
+            <div class="kpi-count">{summary.pending}</div>
+            <div class="kpi-sub">Awaiting document submission</div>
+        </div>
+
+        <div class={kpiClassOverdue} data-filter="overdue" onclick={handleKpiClick}>
+            <div class="kpi-header">
+                <span class="kpi-label">Overdue</span>
+                <span class="kpi-dot kpi-dot-red"></span>
+            </div>
+            <div class="kpi-count">{summary.overdue}</div>
+            <div class="kpi-sub">Past due date, not yet received</div>
+        </div>
+
+        <div class={kpiClassReceived} data-filter="received" onclick={handleKpiClick}>
+            <div class="kpi-header">
+                <span class="kpi-label">Received</span>
+                <span class="kpi-dot kpi-dot-green"></span>
+            </div>
+            <div class="kpi-count">{summary.received}</div>
+            <div class="kpi-sub">Documents confirmed received</div>
+        </div>
+
+    </div>
+
+    <!-- ══ DETAIL TABLE ══ -->
+    <div class="sc-detail-card">
+
+<div class="sc-detail-header">
+    <div>
+        <div class="sc-detail-title">{tableTitle}</div>
+        <div class="sc-detail-sub">Sorted by due date — nearest first. Click a row to edit.</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <template if:true={activeFilter}>
+            <button class="filter-clear-btn" onclick={clearFilter}>✕ Clear filter</button>
+        </template>
+        <button class="btn-new-request" onclick={openNewModal}>+ New Request</button>
+    </div>
+</div>
+
+        <template if:true={isLoading}>
+            <div class="preview-empty" style="padding: 32px;">Loading…</div>
+        </template>
+        <template if:false={isLoading}>
+            <div class="table-responsive">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>REQUEST ID</th>
+                            <th>APPLICATION NUMBER</th>
+                            <th>ORGANISATION</th>
+                            <th>DOCUMENTS</th>
+                            <th>REQUESTED</th>
+                            <th>DUE</th>
+                            <th>PRIORITY</th>
+                            <th>STATUS</th>
+                            <th class="col-action">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={pagedRows} for:item="row">
+                            <tr key={row.recordId}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-id">{row.requestId}</td>
+                                <td>{row.applicationName}</td>
+                                <td class="cell-bold">{row.orgName}</td>
+                                <td>
+                                    <div class="doc-chip-row">
+                                        <template for:each={row.documents} for:item="doc">
+                                            <span key={doc} class="doc-chip">{doc}</span>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="cell-muted">{row.requestedDate}</td>
+                                <td>
+                                    <span class={row.dueDateClass}>{row.dueDate}</span>
+                                </td>
+                                <td>
+                                    <span class={row.priorityClass}>{row.priority}</span>
+                                </td>
+                                <td>
+                                    <span class={row.statusClass}>{row.status}</span>
+                                </td>
+                                
+                                <td class="td c-action tc col-action">
+                                    <button class="preview-action-btn preview-action-validate" data-id={row.recordId} onclick={handleEdit}>Edit</button>
+                                    <button class="preview-action-btn preview-action-review-docs" data-id={row.recordId} onclick={handleOpenReview}>Review</button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template if:true={noRows}>
+                            <tr>
+                                <td colspan="10" class="preview-empty">{emptyMessage}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <template if:true={hasPagination}>
+                <div class="pagination-container">
+                    <button class="pagination-btn" onclick={handlePrevPage} disabled={isFirstPage}>Previous</button>
+                    <span class="pagination-info">Page {currentPage} of {totalPages}</span>
+                    <button class="pagination-btn" onclick={handleNextPage} disabled={isLastPage}>Next</button>
+                </div>
+            </template>
+        </template>
+    </div>
+    <!-- ══ END TABLE ══ -->
+
+</template>

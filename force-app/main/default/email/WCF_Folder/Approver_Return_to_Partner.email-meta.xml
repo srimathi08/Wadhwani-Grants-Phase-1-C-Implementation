@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Approver Return to Partner</name>
+    <style>none</style>
+    <subject>[{{org_name}}] Your application needs updates before a decision</subject>
+    <textOnly>Subject: [{{{org_name}}}] Your application needs updates before a decision
+
+Hello {{{contact_first_name}}},
+
+Our review team has carefully reviewed {{{org_name}}}&apos;s application. Before a decision can be made, we need a few updates or additional details.
+
+Review Notes:
+{{{return_comments}}}
+
+Please update and resubmit your application by {{{due_date}}}.
+
+You can access and update it here:
+{{{rfi_link}}}
+
+All previously entered information has been saved.
+
+If anything is unclear or you need help, reply to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Best regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

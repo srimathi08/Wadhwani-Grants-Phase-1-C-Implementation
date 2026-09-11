@@ -21,24 +21,26 @@ export default class CoeManageFundModal extends LightningElement {
 
     docCounter = 1;
 
-    @api
-    openModal({ appId, milestoneId, milestoneName, budgetRequired, approvedAmount }) {
-        this.appId = appId;
-        this.milestoneId = milestoneId;
-        this.milestoneName = milestoneName;
+   @api
+openModal({ appId, milestoneId, milestoneName, budgetRequired }) {
+    this.appId = appId;
+    this.milestoneId = milestoneId;
+    this.milestoneName = milestoneName;
 
-        // prefill from milestone tile
-        this.budgetRequired = budgetRequired;
-        this.approvedAmount = approvedAmount;
+    // prefill from milestone tile
+    this.budgetRequired = budgetRequired;
 
-        this.comments = '';
-        this.disbursementDate = null;
+    // ✅ Approved Amount always mirrors Budget Required, not editable
+    this.approvedAmount = budgetRequired ? Number(budgetRequired) : null;
 
-        this.docCounter = 1;
-        this.extraDocs = [{ id: this.docCounter, value: '' }];
+    this.comments = '';
+    this.disbursementDate = null;
 
-        this.isOpen = true;
-    }
+    this.docCounter = 1;
+    this.extraDocs = [{ id: this.docCounter, value: '' }];
+
+    this.isOpen = true;
+}
 
     close() {
         this.isOpen = false;

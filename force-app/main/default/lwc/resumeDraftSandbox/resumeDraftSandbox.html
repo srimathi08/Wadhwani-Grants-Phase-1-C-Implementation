@@ -15,7 +15,7 @@
        <!-- PAGE 1 -->
         <template if:true={isPage1}>
             <div class="form-page page1">
-        <h2 class="section-headings">1. GENERAL DETAILS</h2>
+        <h2 class="section-headings">1. GENERAL DETAILS test</h2>
         <lightning-layout multiple-rows>
 
             <lightning-layout-item size="12" class="slds-p-around_small">
@@ -395,6 +395,150 @@
            <p class="error-msg" data-error="Expertise_and_Experience_of_Team_in_Spec__c"></p>
             </div>
         </lightning-layout-item>
+        <!-- 2.5 Start-up Details -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <div class="slds-text-title_bold slds-m-bottom_x-small">
+        2.5. Start-up Details
+    </div>
+    <p class="note-text">
+        (applicable if the applicant is a Start-up, not an academic/faculty team;
+        PI and one of the founders shall be same)
+    </p>
+</lightning-layout-item>
+
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-input label="2.5.1. Name of Start-up" name="Startup_Name__c"
+        value={applicationData.Startup_Name__c} onchange={handleInputChange}>
+    </lightning-input>
+</lightning-layout-item>
+
+<!-- 2.6 Founder -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <div class="slds-text-title_bold slds-m-bottom_x-small">2.5.2. Details of Founder/Co-Founder </div>
+    <lightning-layout>
+        <lightning-layout-item size="6" class="slds-p-right_small">
+            <lightning-input label="Name" name="Founder_Name__c"
+                value={applicationData.Founder_Name__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item size="6">
+            <lightning-input label="Designation" name="Founder_Designation__c"
+                value={applicationData.Founder_Designation__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+    </lightning-layout>
+</lightning-layout-item>
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-input label="Institution / Organization" name="Founder_Institution__c"
+        value={applicationData.Founder_Institution__c} onchange={handleInputChange}>
+    </lightning-input>
+</lightning-layout-item>
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-layout>
+        <lightning-layout-item size="6" class="slds-p-right_small">
+            <lightning-input type="text" label="Mobile Number" name="Founder_Mobile__c"
+                value={applicationData.Founder_Mobile__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item size="6">
+            <lightning-input type="Email" label="Email ID" name="Founder_Email__c"
+                value={applicationData.Founder_Email__c} onchange={handleInputChange}>
+            </lightning-input>
+        </lightning-layout-item>
+    </lightning-layout>
+</lightning-layout-item>
+
+<!-- 2.7 Co-Founder(s) — repeatable -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <div class="slds-text-title_bold slds-m-bottom_x-small">2.5.3. Details of Co-Founder(s)</div>
+
+    <template for:each={coFounders} for:item="cofounder">
+        <div key={cofounder.uniqueId} class="slds-box slds-m-bottom_small">
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input label="Name" data-id={cofounder.uniqueId} data-field="Name"
+                        value={cofounder.Name} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input label="Designation" data-id={cofounder.uniqueId} data-field="Designation__c"
+                        value={cofounder.Designation__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-input label="Institution / Organization" data-id={cofounder.uniqueId} data-field="Institution__c"
+                value={cofounder.Institution__c} onchange={handleCoFounderChange}>
+            </lightning-input>
+            <lightning-layout>
+                <lightning-layout-item size="6" class="slds-p-right_small">
+                    <lightning-input type="text" label="Mobile Number" data-id={cofounder.uniqueId} data-field="Mobile__c"
+                        value={cofounder.Mobile__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input type="Email" label="Email ID" data-id={cofounder.uniqueId} data-field="Email__c"
+                        value={cofounder.Email__c} onchange={handleCoFounderChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <div class="slds-text-align_right">
+                <lightning-button-icon icon-name="utility:delete" alternative-text="Delete Co-Founder"
+                    title="Remove" variant="bare" data-id={cofounder.uniqueId} onclick={deleteCoFounderRow}>
+                </lightning-button-icon>
+            </div>
+        </div>
+    </template>
+
+    <lightning-button label="+ Add Co-Founder" variant="destructive-text" onclick={addCoFounder}></lightning-button>
+</lightning-layout-item>
+
+<!-- 2.8 Registration status -->
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-combobox label="2.5.4. Is the start-up registered?"
+        name="Is_Startup_Registered__c"
+        value={applicationData.Is_Startup_Registered__c}
+        options={yesNoOptions}
+        onchange={handleInputChange}>
+    </lightning-combobox>
+</lightning-layout-item>
+<template if:true={showStartupRegDetails}>
+    <lightning-layout-item size="12" class="slds-p-around_small">
+        <lightning-layout>
+            <lightning-layout-item size="6" class="slds-p-right_small">
+                <lightning-input type="date" label="Date of Incorporation"
+                    name="Startup_Registration_Date__c"
+                    value={applicationData.Startup_Registration_Date__c}
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </lightning-layout-item>
+            <lightning-layout-item size="6">
+                <lightning-input label="Registration No. / CIN"
+                    name="Startup_Registration_No__c"
+                    value={applicationData.Startup_Registration_No__c}
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-layout-item>
+</template>
+
+<lightning-layout-item size="12" class="slds-p-around_small">
+    <lightning-combobox label="2.5.5. Is the start-up DPIIT registered?"
+        name="Is_Startup_DPIIT_Registered__c"
+        value={applicationData.Is_Startup_DPIIT_Registered__c}
+        options={yesNoOptions}
+        onchange={handleInputChange}>
+    </lightning-combobox>
+</lightning-layout-item>
+<template if:true={showDpiitRegDetails}>
+    <lightning-layout-item size="12" class="slds-p-around_small">
+        <lightning-input label="DPIIT Registration No."
+            name="DPIIT_Registration_No__c"
+            value={applicationData.DPIIT_Registration_No__c}
+            onchange={handleInputChange}>
+        </lightning-input>
+    </lightning-layout-item>
+</template>
           
             </lightning-layout>
 

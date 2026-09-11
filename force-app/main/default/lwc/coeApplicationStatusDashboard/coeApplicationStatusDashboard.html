@@ -51,28 +51,44 @@
         </div>
     </div>
 
-    <div class="filter-divider"></div>
+    <!-- FROM DATE -->
+<div class="filter-divider"></div>
 
-    <div class="filter-segment">
-        <lightning-icon icon-name="utility:search" size="x-small" class="filter-icon"></lightning-icon>
-        <div class="filter-inner">
-            <span class="filter-label">Date</span>
-            <lightning-input
-                type="date"
-                value={selectedDate}
-                onchange={handleDateChange}
-                variant="label-hidden"
-                class="filter-date">
-            </lightning-input>
-        </div>
+<div class="filter-segment">
+    <lightning-icon icon-name="utility:search" size="x-small" class="filter-icon"></lightning-icon>
+    <div class="filter-inner">
+        <span class="filter-label">From Date</span>
+        <lightning-input
+            type="date"
+            value={selectedFromDate}
+            onchange={handleFromDateChange}
+            variant="label-hidden"
+            class="filter-date">
+        </lightning-input>
     </div>
+</div>
 
-    <template if:true={hasSelectedDate}>
-        <button class="filter-clear-btn" onclick={handleClearDate}>
-            ✕ Clear
-        </button>
-    </template>
+<div class="filter-divider"></div>
 
+<div class="filter-segment">
+    <lightning-icon icon-name="utility:search" size="x-small" class="filter-icon"></lightning-icon>
+    <div class="filter-inner">
+        <span class="filter-label">To Date</span>
+        <lightning-input
+            type="date"
+            value={selectedToDate}
+            onchange={handleToDateChange}
+            variant="label-hidden"
+            class="filter-date">
+        </lightning-input>
+    </div>
+</div>
+
+<template if:true={hasDateRange}>
+    <button class="filter-clear-btn" onclick={handleClearDates}>
+        ✕ Clear
+    </button>
+</template>
 </div>
         </div>
 

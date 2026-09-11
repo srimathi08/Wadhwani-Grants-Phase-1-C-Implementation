@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Reviewer Recused PL Alert</name>
+    <style>none</style>
+    <subject>{{{org_name}}} — reviewer recused, replacement needed</subject>
+    <textOnly>Subject: {{{org_name}}} — reviewer recused, replacement needed
+
+Hello {{{pl_first_name}}},
+
+A reviewer has recused from an evaluation assignment.
+
+Organization: {{{org_name}}}
+Reviewer: {{{reviewer_name}}}
+Reason: {{{recusal_reason}}}
+
+Please assign a replacement reviewer so the evaluation process can continue without delay.
+
+Open assignment:
+{{{assignment_link}}}
+
+Wadhwani Grants Platform
+
+Questions? Contact:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,54 @@
+<template>
+    <div class="city-search-wrapper">
+
+        <div class="slds-grid slds-gutters_small slds-wrap">
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_8-of-12 slds-large-size_8-of-12">
+                <lightning-input
+                    type="text"
+                    label=City
+                    value={searchKey}
+                    onchange={handleChange}
+                    onfocus={handleFocus}
+                    onblur={handleBlur}
+                    placeholder="Search city..."
+                    autocomplete="off">
+                </lightning-input>
+            </div>
+            <div class="slds-col slds-size_12-of-12 slds-medium-size_4-of-12 slds-large-size_4-of-12">
+                <lightning-input
+                    type="text"
+                    label=Country
+                    value={selectedCountry}
+                    disabled>
+                </lightning-input>
+            </div>
+        </div>
+
+        <template if:true={hasResults}>
+            <div class="dropdown">
+                <template for:each={results} for:item="item">
+                    <div key={item.value}
+                         class="dropdown-item"
+                         data-value={item.value}
+                         data-label={item.label}
+                         data-country={item.country}
+                         onmousedown={handleSelect}>
+                        <span class="city-name">{item.label}</span>
+                        <span class="city-detail">{item.subDisplay}</span>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={isLoading}>
+            <div class="loading-box">
+                <lightning-spinner alternative-text="Searching..." size="small"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={noResults}>
+            <div class="no-results">No cities found</div>
+        </template>
+
+    </div>
+</template>

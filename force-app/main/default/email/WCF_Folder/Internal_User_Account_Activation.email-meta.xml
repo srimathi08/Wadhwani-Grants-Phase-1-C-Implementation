@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Internal User Account Activation</name>
+    <style>none</style>
+    <subject>Your Wadhwani Grants Platform account — activate your access</subject>
+    <textOnly>Subject: Your Wadhwani Grants Platform account — activate your access
+
+Hello {{{user_first_name}}},
+
+You&apos;ve been set up on the Wadhwani Grants Platform as {{{role_name}}}.
+
+To get started, activate your account and choose your password here:
+
+{{{activation_link}}}
+
+This activation link expires in {{{link_expiry_hours}}} hours.
+
+Once you log in, any assignments already made for you will appear on your dashboard. Future assignments will also be shared by email.
+
+If you weren’t expecting this invitation, simply reply to this email.
+
+Wadhwani Grants Platform
+
+Questions? Contact us:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

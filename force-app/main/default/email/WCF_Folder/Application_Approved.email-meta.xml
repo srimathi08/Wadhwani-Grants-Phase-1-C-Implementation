@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Approved</name>
+    <style>none</style>
+    <subject>{!Account.WCF_Organizational_Name__c} Wadhwani Grants application approved</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+Congratulations — your application has been approved.
+
+I&apos;m delighted to share that {!Account.WCF_Organizational_Name__c}&apos;s application has been approved. We&apos;re looking forward to partnering with you.
+
+As your point of contact at Wadhwani Grants, I&apos;ll guide you through onboarding, agreements, and next steps.
+
+View next steps:
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+Warm regards,
+{!Account.PL_of_Record__r}
+Wadhwani Grants
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

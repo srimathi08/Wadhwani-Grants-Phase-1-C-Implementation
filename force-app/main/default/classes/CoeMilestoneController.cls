@@ -7,7 +7,6 @@ public without sharing class CoeMilestoneController {
 
         @AuraEnabled public Date targetDate;
 
-        // ✅ FIX: Send as String for portal/LWC stability
         @AuraEnabled public String projectStartDate;
         @AuraEnabled public String projectEndDate;
 
@@ -15,6 +14,10 @@ public without sharing class CoeMilestoneController {
         @AuraEnabled public Decimal amount;
         @AuraEnabled public Decimal disbursedAmount;
         @AuraEnabled public Id fundingDisbursementId;
+
+        // ✅ NEW
+        @AuraEnabled public Decimal totalUtilized;
+        @AuraEnabled public String currentTRL;
     }
 
     @AuraEnabled(cacheable=true)
@@ -26,7 +29,9 @@ public without sharing class CoeMilestoneController {
                    Budget_Required_INR__c, Amount__c, Disbursed_Amount__c,
                    Funding_Disbursement__c,
                    Project_Start_Date__c,
-                   Project_End_Date__c
+                   Project_End_Date__c,
+                   Total_Utilized__c,
+                   Current_Technology_Readiness_Level_TRL__c
             FROM Milestone__c
             WHERE Individual_Application__c = :appId
             ORDER BY CreatedDate ASC
@@ -42,7 +47,6 @@ public without sharing class CoeMilestoneController {
 
             w.targetDate = m.Milestone_Target_Date__c;
 
-            // ✅ FIX: return as string instead of Date
             w.projectStartDate =
                 (m.Project_Start_Date__c == null)
                 ? null
@@ -57,6 +61,9 @@ public without sharing class CoeMilestoneController {
             w.amount = m.Amount__c;
             w.disbursedAmount = m.Disbursed_Amount__c;
             w.fundingDisbursementId = m.Funding_Disbursement__c;
+
+            w.totalUtilized = m.Total_Utilized__c;
+            w.currentTRL = m.Current_Technology_Readiness_Level_TRL__c;
 
             wraps.add(w);
         }
@@ -83,7 +90,6 @@ public without sharing class CoeMilestoneController {
             throw new AuraHandledException('Date of Funds Disbursed is required.');
         }
 
-        // ✅ FIX: Force rounding to 0 decimals to avoid ₹1 reduction problem
         Decimal finalApprovedAmount =
             approvedAmount.setScale(0, System.RoundingMode.HALF_UP);
 
@@ -103,10 +109,6 @@ public without sharing class CoeMilestoneController {
             );
         }
 
-        /* -------------------------------------------------
-           Funding Award (COE wallet)
-           ✅ ONLY CHANGE: include Type_of_Fund__c
-        ------------------------------------------------- */
         List<FundingAward> faList = [
             SELECT Id, Status, Type_of_Fund__c
             FROM FundingAward
@@ -124,9 +126,6 @@ public without sharing class CoeMilestoneController {
 
         FundingAward fa = faList[0];
 
-        /* -------------------------------------------------
-           Create Funding Disbursement
-        ------------------------------------------------- */
         FundingDisbursement fd = new FundingDisbursement();
         fd.FundingAwardId = fa.Id;
         fd.Proposal__c = appId;
@@ -138,10 +137,6 @@ public without sharing class CoeMilestoneController {
 
         insert fd;
 
-        /* -------------------------------------------------
-           Update Milestone (ACTUAL SPEND)
-           ✅ ONLY CHANGE: populate Funding_Type__c
-        ------------------------------------------------- */
         update new Milestone__c(
             Id = milestoneId,
             Funding_Disbursement__c = fd.Id,
@@ -151,5 +146,28 @@ public without sharing class CoeMilestoneController {
         );
 
         return fd.Id;
+    }
+
+    @AuraEnabled
+    public static void approveMilestoneReport(Id milestoneId) {
+        if (milestoneId == null) {
+            throw new AuraHandledException('Missing Milestone Id.');
+        }
+
+        Milestone__c m = [
+            SELECT Id, Status__c
+            FROM Milestone__c
+            WHERE Id = :milestoneId
+            LIMIT 1
+        ];
+
+        if (m.Status__c != 'Report Submitted') {
+            throw new AuraHandledException('Only milestones with a submitted report can be approved.');
+        }
+
+        update new Milestone__c(
+            Id = milestoneId,
+            Status__c = 'Report Approved'
+        );
     }
 }

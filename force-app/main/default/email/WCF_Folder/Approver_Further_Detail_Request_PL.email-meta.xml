@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Approver Further Detail Request PL</name>
+    <style>none</style>
+    <subject>{{{org_name}}} — Approver requests further detail</subject>
+    <textOnly>Subject: {{{org_name}}} — Approver requests further detail
+
+Hello {{{pl_first_name}}},
+
+The Approver has requested further detail regarding {{{org_name}}} before making a final decision.
+
+Request:
+{{{request_text}}}
+
+Please paraphrase and relay this to the applicant as appropriate, then update the application record once their response is received.
+
+Open the application here:
+{{{application_link}}}
+
+Wadhwani Grants Platform
+
+Questions? Contact:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

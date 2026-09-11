@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Received</name>
+    <style>none</style>
+    <subject>Your Wadhwani Grants application has been received</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+Thank you — your application for {!Account.WCF_Organizational_Name__c} has been submitted successfully.
+
+Here’s what happens next:
+
+1. Validation — our team checks that your submission is complete.
+2. Review — once validated, your application is assessed by our review team.
+3. Decision — we’ll write to you with the outcome and any next steps.
+
+View your application:
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+Warm regards,
+The Wadhwani Grants Team
+
+Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {!YEAR(TODAY())} Wadhwani Grants. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

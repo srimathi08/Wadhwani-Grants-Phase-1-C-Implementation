@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>New Application Validator Queue</name>
+    <style>none</style>
+    <subject>New application in the Validator queue</subject>
+    <textOnly>Subject: {{{org_name}}} — new application in the Validator queue
+
+Hello {{{validator_first_name}}},
+
+An application is waiting in the Validator queue and is ready for validation.
+
+Application details:
+Organization: {{{org_name}}}
+Submitted: {{{submission_date}}}
+Round: {{{submission_round}}}
+Due: {{{sla_due_date}}} (5 working days)
+
+Please open the Validator queue to begin your review:
+
+{{{validation_link}}}
+
+If you have any questions, simply reply to this email or contact us at [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org).
+
+Wadhwani Grants Platform
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

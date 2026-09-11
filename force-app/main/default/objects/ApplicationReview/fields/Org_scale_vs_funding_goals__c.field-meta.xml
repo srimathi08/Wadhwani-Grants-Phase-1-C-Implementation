@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Org_scale_vs_funding_goals__c</fullName>
+    <inlineHelpText>How would you rate the organization&apos;s current scale of operations in terms of the Foundation&apos;s funding strategy? (~10K placements per year OR ~5K new jobs added per year)</inlineHelpText>
+    <label>Org scale vs funding goals?</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Excellent</fullName>
+                <default>false</default>
+                <label>Excellent</label>
+            </value>
+            <value>
+                <fullName>Good</fullName>
+                <default>false</default>
+                <label>Good</label>
+            </value>
+            <value>
+                <fullName>Satisfactory</fullName>
+                <default>false</default>
+                <label>Satisfactory</label>
+            </value>
+            <value>
+                <fullName>Poor</fullName>
+                <default>false</default>
+                <label>Poor</label>
+            </value>
+            <value>
+                <fullName>Very Poor</fullName>
+                <default>false</default>
+                <label>Very Poor</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

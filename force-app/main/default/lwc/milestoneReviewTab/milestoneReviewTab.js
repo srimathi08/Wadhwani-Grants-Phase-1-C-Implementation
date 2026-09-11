@@ -7,6 +7,9 @@ import getMilestonesByProposal from '@salesforce/apex/AwardeeModuleController.ge
 import getProposalHeader from '@salesforce/apex/AwardeeModuleController.getProposalHeader';
 import markMilestoneCompleted from '@salesforce/apex/AwardeeModuleController.markMilestoneCompleted';
 
+// ✅ Only this status unlocks Tick / Review Report / Send to Reviewer
+const REQUIRED_STATUS_FOR_ACTIONS = 'Report Approved';
+
 export default class MilestoneReviewTab extends NavigationMixin(LightningElement) {
 
     @track proposalId;
@@ -62,15 +65,30 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
         const { data, error } = result;
         if (data) {
             this.milestones = (data || []).map(m => {
-                const isDone = (m.Status__c || '').toLowerCase().includes('complete');
+                const status = (m.Status__c || '').trim();
+                const isDone = status.toLowerCase().includes('complete');
+                const isReportApproved = status === REQUIRED_STATUS_FOR_ACTIONS;
+
+                // ✅ Actions (tick / Review Report / Send to Reviewer) only unlock on "Report Approved"
+                const actionsDisabled = !isReportApproved;
 
                 return {
                     ...m,
-                    statusClass: this.getStatusClass(m.Status__c),
+                    statusClass: this.getStatusClass(status),
 
                     // ✅ Tick button UI state
-                    completeBtnClass: isDone ? 'tickBtn done' : 'tickBtn pulse',
-                    completeBtnTitle: isDone ? 'Already completed' : 'Mark as Completed'
+                    completeBtnClass: isDone
+                        ? 'tickBtn done'
+                        : (isReportApproved ? 'tickBtn pulse' : 'tickBtn disabled'),
+                    completeBtnTitle: isDone
+                        ? 'Already completed'
+                        : (isReportApproved
+                            ? 'Mark as Completed'
+                            : 'Available only when status is Report Approved'),
+
+                    // ✅ shared disabled flag for tick / Review Report / Send to Reviewer
+                    actionsDisabled,
+                    tickDisabled: isDone || actionsDisabled
                 };
             });
         } else if (error) {
@@ -89,6 +107,7 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
 
     /* ---------------------------------------------
        View Details -> open milestone record page
+       (always available regardless of status)
     --------------------------------------------- */
     handleViewDetails(event) {
         const milestoneId = event.currentTarget.dataset.id;
@@ -104,10 +123,16 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
     }
 
     /* ---------------------------------------------
-       ✅ NEW: Review Report -> open IndividualApplication record page
+       ✅ Review Report -> open IndividualApplication record page
+       Gated on Report Approved status
     --------------------------------------------- */
     handleReviewReport(event) {
         const propId = event.currentTarget.dataset.propid || this.proposalId;
+        const milestoneId = event.currentTarget.dataset.id;
+
+        if (!this.isActionAllowed(milestoneId)) {
+            return;
+        }
 
         if (!propId) {
             this.showToast('Error', 'Proposal record not found.', 'error');
@@ -125,10 +150,15 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
     }
 
     /* ---------------------------------------------
-       ✅ NEW: Tick button -> Mark Completed
+       ✅ Tick button -> Mark Completed
+       Gated on Report Approved status
     --------------------------------------------- */
     handleMarkCompleted(event) {
         const milestoneId = event.currentTarget.dataset.id;
+
+        if (!this.isActionAllowed(milestoneId)) {
+            return;
+        }
 
         // ✅ stop if already completed
         const existing = this.milestones.find(x => x.Id === milestoneId);
@@ -152,9 +182,16 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
 
     /* ---------------------------------------------
        Send To Reviewer -> open modal + start flow
+       Gated on Report Approved status
     --------------------------------------------- */
     handleSendToReviewer(event) {
-        this.selectedMilestoneId = event.currentTarget.dataset.id;
+        const milestoneId = event.currentTarget.dataset.id;
+
+        if (!this.isActionAllowed(milestoneId)) {
+            return;
+        }
+
+        this.selectedMilestoneId = milestoneId;
 
         if (!this.proposalId) {
             this.showToast('Error', 'Proposal Id not found. Please open from Awardee Module again.', 'error');
@@ -182,6 +219,24 @@ export default class MilestoneReviewTab extends NavigationMixin(LightningElement
 
             flow.startFlow(this.FLOW_API_NAME, inputVariables);
         }, 0);
+    }
+
+    /* ---------------------------------------------
+       ✅ Shared guard: is this milestone's status "Report Approved"?
+    --------------------------------------------- */
+    isActionAllowed(milestoneId) {
+        const existing = this.milestones.find(x => x.Id === milestoneId);
+        const status = (existing?.Status__c || '').trim();
+
+        if (status !== REQUIRED_STATUS_FOR_ACTIONS) {
+            this.showToast(
+                'Info',
+                'This action is only available when the milestone status is Report Approved.',
+                'info'
+            );
+            return false;
+        }
+        return true;
     }
 
     /* ---------------------------------------------

@@ -1,0 +1,120 @@
+<template>
+    <div class="sc-page">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="greeting-block">
+                <div class="greeting-meta">REPORTS — INTERNAL ONLY</div>
+                <h1 class="greeting-title">Sourcing <span class="accent">Channel Report</span></h1>
+                <p class="greeting-sub">Portfolio intelligence</p>
+            </div>
+        </div>
+
+        <div class="sc-page-body">
+
+            <!-- SUMMARY STRIP -->
+            <template if:true={sourceChannelData}>
+                <div class="sc-summary-strip">
+                    <div class="sc-summary-cell sc-summary-total">
+                        <div class="sc-summary-cell-label">Total Applications</div>
+                        <div class="sc-summary-cell-count">{scTotal}</div>
+                        <div class="sc-summary-cell-pct">All channels</div>
+                    </div>
+                    <template for:each={sourceChannelData} for:item="tile">
+                        <div key={tile.id} class="sc-summary-cell">
+                            <div class="sc-summary-cell-label">{tile.label}</div>
+                            <div class="sc-summary-cell-count">{tile.count}</div>
+                            <div class="sc-summary-cell-pct">{tile.pct}%</div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- BAR CHARTS -->
+            <div class="sc-charts-row">
+
+                <!-- Source Channel bars -->
+                <div class="sc-chart-card">
+                    <div class="sc-chart-title">Source Channel</div>
+                    <div class="sc-chart-sub">Application volume by intake channel</div>
+                    <template if:true={sourceChannelBars}>
+                        <template for:each={sourceChannelBars} for:item="bar">
+                            <div key={bar.id} class="sc-bar-row">
+                                <div class="sc-bar-label">{bar.label}</div>
+                                <div class="sc-bar-outer">
+                                    <div class={bar.barClass} style={bar.barStyle}></div>
+                                </div>
+                                <div class="sc-bar-count">{bar.count}</div>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+
+                <!-- Budget Range bars -->
+                <div class="sc-chart-card">
+                    <div class="sc-chart-title">Budget Range Distribution</div>
+                    <div class="sc-chart-sub">Application volume by annual budget bracket</div>
+                    <template if:true={budgetRangeBars}>
+                        <template for:each={budgetRangeBars} for:item="bar">
+                            <div key={bar.id} class="sc-bar-row">
+                                <div class="sc-bar-label">{bar.label}</div>
+                                <div class="sc-bar-outer">
+                                    <div class={bar.barClass} style={bar.barStyle}></div>
+                                </div>
+                                <div class="sc-bar-count">{bar.count}</div>
+                            </div>
+                        </template>
+                    </template>
+                    <template if:true={noBudgetRangeBars}>
+                        <div class="preview-empty">No budget range data available</div>
+                    </template>
+                </div>
+
+            </div>
+
+            <!-- ORGANISATION DETAIL TABLE -->
+            <div class="sc-detail-card">
+                <div class="sc-detail-header">
+                    <div class="sc-detail-title">Organisation Detail</div>
+                    <div class="sc-detail-sub">
+                        Per-organisation source channel, budget range, stage and validator decision
+                    </div>
+                </div>
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>APPLICATION ID</th>
+                            <th>ORGANISATION</th>
+                            <th>SOURCE CHANNEL</th>
+                            <th>BUDGET RANGE</th>
+                            <th>STAGE</th>
+                            <th>VALIDATOR DECISION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={sourceChannelRows} for:item="row">
+                            <tr key={row.recordId}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-id">{row.appName}</td>
+                                <td class="cell-bold">{row.orgName}</td>
+                                <td><span class={row.channelClass}>{row.sourceChannel}</span></td>
+                                <td class="cell-muted">{row.budgetRange}</td>
+                                <td>{row.stage}</td>
+                                <td><span class={row.decisionClass}>{row.decision}</span></td>
+                            </tr>
+                        </template>
+                        <template if:true={noSourceChannelRows}>
+                            <tr>
+                                <td colspan="7" class="preview-empty">
+                                    No sourcing channel data available
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</template>

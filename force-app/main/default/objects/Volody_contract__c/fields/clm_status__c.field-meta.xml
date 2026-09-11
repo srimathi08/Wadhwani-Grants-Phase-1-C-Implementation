@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>clm_status__c</fullName>
+    <label>clm_status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>In Request</fullName>
+                <default>false</default>
+                <label>In Request</label>
+            </value>
+            <value>
+                <fullName>Executed</fullName>
+                <default>false</default>
+                <label>Executed</label>
+            </value>
+            <value>
+                <fullName>Pending Approval</fullName>
+                <default>false</default>
+                <label>Pending Approval</label>
+            </value>
+            <value>
+                <fullName>Pending Legal</fullName>
+                <default>false</default>
+                <label>Pending Legal</label>
+            </value>
+            <value>
+                <fullName>Pending e-Stamp</fullName>
+                <default>false</default>
+                <label>Pending e-Stamp</label>
+            </value>
+            <value>
+                <fullName>Further Processing</fullName>
+                <default>false</default>
+                <label>Further Processing</label>
+            </value>
+            <value>
+                <fullName>Pending Signature</fullName>
+                <default>false</default>
+                <label>Pending Signature</label>
+            </value>
+            <value>
+                <fullName>Legal Review</fullName>
+                <default>false</default>
+                <label>Legal Review</label>
+            </value>
+            <value>
+                <fullName>Pending review</fullName>
+                <default>false</default>
+                <label>Pending review</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

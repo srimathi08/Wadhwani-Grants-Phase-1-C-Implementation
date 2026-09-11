@@ -42,7 +42,21 @@ public with sharing class ProposalTranslationUpdater {
             'Operational Synergies Rating' => 'Operational_Synergies_Rating__c',
             'Operational Synergies Strength' => 'Operational_Synergies_Strength__c',
             'Operational Synergies Weakness' => 'Operational_Synergies_Weakness__c',
-            'Operational Synergies Summary' => 'Operational_Synergies_Summary__c'   
+            'Operational Synergies Summary' => 'Operational_Synergies_Summary__c',
+
+            // ---- Job Creation Approach fields ----
+            'Job Creation Approach' => 'Job_Creation_Approach__c',
+            'Job Creation Rating' => 'Job_Creation_Rating__c',
+            'Job Creation Strength' => 'Job_Creation_Strength__c',
+            'Job Creation Weakness' => 'Job_Creation_Weakness__c',
+            'Job Creation Summary' => 'Job_Creation_Summary__c',
+
+            // ---- Skilling Approach fields ----
+            'Skilling Approach' => 'Skilling_Approach__c',
+            'Skilling Approach Rating' => 'Skilling_Approach_Rating__c',
+            'Skilling Approach Strength' => 'Skilling_Approach_Strength__c',
+            'Skilling Approach Weakness' => 'Skilling_Approach_Weakness__c',
+            'Skilling Approach Summary' => 'Skilling_Approach_Summary__c'
         };
 
         Map<String, String> historicalLabelToApi = new Map<String, String>{
@@ -83,6 +97,19 @@ public with sharing class ProposalTranslationUpdater {
             'Avg. Cost per Placement(FY-1)' => 'Avg_Cost_per_Placement_FY_1__c',
             'Avg. Cost per Placement(FY-2)' => 'Avg_Cost_per_Placement_FY_2__c',
             'Avg. Cost per Placement(FY-3)' => 'Avg_Cost_per_Placement_FY_3__c',
+
+            // ---- Manual Avg Cost per Job fields ----
+            'Manual Avg. Cost per Job (CFY)' => 'Manual_Avg_Cost_per_Job_CFY__c',
+            'Manual Avg. Cost per Job (FY-1)' => 'Manual_Avg_Cost_per_Job_FY_1__c',
+            'Manual Avg. Cost per Job (FY-2)' => 'Manual_Avg_Cost_per_Job_FY_2__c',
+            'Manual Avg. Cost per Job (FY-3)' => 'Manual_Avg_Cost_per_Job_FY_3__c',
+
+            // ---- Manual Avg Cost per Placement fields ----
+            'Manual Avg. Cost per Placement(CFY)' => 'Manual_Avg_Cost_per_Placement_CFY__c',
+            'Manual Avg. Cost per Placement(FY-1)' => 'Manual_Avg_Cost_per_Placement_FY_1__c',
+            'Manual Avg. Cost per Placement(FY-2)' => 'Manual_Avg_Cost_per_Placement_FY_2__c',
+            'Manual Avg. Cost per Placement(FY-3)' => 'Manual_Avg_Cost_per_Placement_FY_3__c',
+
             'Growing Businesses Supported (CFY)' => 'Growing_Businesses_Supported_CFY__c',
             'Growing Businesses Supported (FY-1)' =>  'Growing_Businesses_Supported_FY_1__c',
             'Growing Businesses Supported (FY-2)' => 'Growing_Businesses_Supported_FY_2__c',
@@ -95,6 +122,9 @@ public with sharing class ProposalTranslationUpdater {
             'Jobs from Growing Businesses (FY-1)' => 'Jobs_from_Growing_Businesses_FY_1__c',
             'Jobs from Growing Businesses (FY-2)' => 'Jobs_from_Growing_Businesses_FY_2__c',
             'Jobs from Growing Businesses (FY-3)'  => 'Jobs_from_Growing_Businesses_FY_3__c',
+            // NOTE: confirmed against object metadata — this field's real API name is
+            // Long_Term_Outcomes_CFY_c__c (not a typo here, the object field itself is
+            // named this way; its label just displays as "Long_Term_Outcomes_CFY__c").
             'Long-Term Outcomes (CFY)'  => 'Long_Term_Outcomes_CFY_c__c',
             'Long-Term Outcomes (FY-1)' => 'Long_Term_Outcomes_FY_1__c',
             'Long-Term Outcomes (FY-2)' => 'Long_Term_Outcomes_FY_2__c',
@@ -143,7 +173,7 @@ public with sharing class ProposalTranslationUpdater {
         Map<String, Schema.SObjectField> fiscalFieldsDescribe   = Schema.SObjectType.Translated_Current_Fiscal_Year_Data__c.fields.getMap();
         Map<String, Schema.SObjectField> outcomeFieldsDescribe  = Schema.SObjectType.Translated_Outcome_Data__c.fields.getMap();
 
-               // ---------------- Process Each Request ----------------
+        // ---------------- Process Each Request ----------------
         for (Request req : requests) {
             if (String.isBlank(req.jsonText) || req.translatedProposalId == null) continue;
 
@@ -194,10 +224,23 @@ public with sharing class ProposalTranslationUpdater {
                                    Map<String, Object> section) {
         for (String label : section.keySet()) {
             String apiName = labelToApi.get(label);
-            if (apiName == null) continue;
+            if (apiName == null) {
+                // Surfaces unmapped labels instead of silently skipping them.
+                // If a new field is ever added to ProposalDataCollector without a
+                // matching entry in the label→API map above, this line will flag it
+                // in the debug log instead of the data just quietly not saving.
+                System.debug('⚠️ No API mapping found for label: "' + label + '" — value was NOT saved.');
+                continue;
+            }
 
             Schema.SObjectField fld = fieldsDescribe.get(apiName);
-            if (fld == null) continue;
+            if (fld == null) {
+                // Same idea — apiName resolved but no such field exists on the object.
+                System.debug('⚠️ Label "' + label + '" mapped to "' + apiName +
+                             '" but no matching field exists on ' + record.getSObjectType() +
+                             ' — value was NOT saved.');
+                continue;
+            }
 
             Schema.DescribeFieldResult dfr = fld.getDescribe();
             Object val = section.get(label);

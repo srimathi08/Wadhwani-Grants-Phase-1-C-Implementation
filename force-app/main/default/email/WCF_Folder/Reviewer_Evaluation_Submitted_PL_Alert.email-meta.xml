@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Reviewer Evaluation Submitted PL Alert</name>
+    <style>none</style>
+    <subject>{{org_name}} — evaluation submitted by {{reviewer_name}}</subject>
+    <textOnly>Subject: {{{org_name}}} — evaluation submitted by {{{reviewer_name}}}
+
+Hello {{{pl_first_name}}},
+
+An evaluation has been completed.
+
+Organization: {{{org_name}}}
+Reviewer: {{{reviewer_name}}}
+Submitted: {{{submission_date}}}
+
+You can review it here:
+
+{{{review_link}}}
+
+Wadhwani Grants Platform
+
+Questions? Contact:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

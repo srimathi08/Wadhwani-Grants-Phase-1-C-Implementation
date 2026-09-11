@@ -10,11 +10,20 @@ public class AwardeeModuleControllerTest {
         Account acc = new Account(Name = 'Test COE Account');
         insert acc;
 
+        // ---- Resolve Contact RecordTypeId dynamically ----
+        // Avoids CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY when the org
+        // has multiple active Record Types on Contact and no
+        // default is assigned to the running user's profile.
+        Id contactRecordTypeId = getDefaultOrFirstRecordTypeId('Contact');
+
         Contact con = new Contact(
             LastName = 'COE Admin',
             AccountId = acc.Id,
             COE_Admin__c = true
         );
+        if (contactRecordTypeId != null) {
+            con.RecordTypeId = contactRecordTypeId;
+        }
         insert con;
 
         IndividualApplication app = new IndividualApplication(
@@ -56,6 +65,55 @@ public class AwardeeModuleControllerTest {
             Status__c = 'Fund Awarded',
             Date_of_Request__c = Date.today()
         );
+    }
+
+    /* =====================================================
+       HELPER: Resolve a safe RecordTypeId for any SObject
+       - Prefers the default RT mapping for the running user
+       - Falls back to the first active, NON-MASTER RT found
+       - Explicitly ignores the generic "Master" placeholder
+         (Id 012000000000000AAA), which is not a real,
+         assignable Record Type — objects with no custom
+         Record Types defined must NOT have RecordTypeId set
+       - Returns null when no real Record Type exists (i.e.
+         RecordTypeId should be left unset on the record)
+    ===================================================== */
+    // Generic placeholder Id Salesforce returns for the implicit
+    // "Master" record type on objects with no custom Record Types.
+    // Apex's Id type normalizes 15/18-char comparisons automatically,
+    // so a direct equality check against this constant is reliable.
+    static final Id MASTER_RT_ID = '012000000000000AAA';
+
+    static Id getDefaultOrFirstRecordTypeId(String sObjectApiName) {
+
+        Schema.SObjectType sObjType =
+            Schema.getGlobalDescribe().get(sObjectApiName);
+
+        if (sObjType == null) return null;
+
+        Map<String, Schema.RecordTypeInfo> rtInfoByName =
+            sObjType.getDescribe().getRecordTypeInfosByName();
+
+        Id fallbackId = null;
+        Id defaultId = null;
+
+        for (Schema.RecordTypeInfo rti : rtInfoByName.values()) {
+
+            if (!rti.isActive()) continue;
+
+            // Skip the generic Master placeholder — it's not a
+            // real, insertable Record Type.
+            if (rti.getRecordTypeId() == MASTER_RT_ID) continue;
+
+            if (rti.isDefaultRecordTypeMapping()) {
+                defaultId = rti.getRecordTypeId();
+            }
+            if (fallbackId == null) {
+                fallbackId = rti.getRecordTypeId();
+            }
+        }
+
+        return defaultId != null ? defaultId : fallbackId;
     }
 
     /* =====================================================
@@ -236,157 +294,159 @@ public class AwardeeModuleControllerTest {
 
         System.assertEquals('Completed', updated.Status__c);
     }
-@IsTest
-static void testHitAllRemainingControllerMethods() {
 
-    Account acc = [SELECT Id FROM Account LIMIT 1];
-    IndividualApplication app =
-        [SELECT Id FROM IndividualApplication LIMIT 1];
+    @IsTest
+    static void testHitAllRemainingControllerMethods() {
 
-    Test.startTest();
+        Account acc = [SELECT Id FROM Account LIMIT 1];
+        IndividualApplication app =
+            [SELECT Id FROM IndividualApplication LIMIT 1];
 
-    // ----- KPI methods never called -----
-    AwardeeModuleController.getTotalFundingAwardedSafe('2024', 'COE Project Grant');
-    AwardeeModuleController.getTotalFundingAwardedSafe(null, null);
+        Test.startTest();
 
-    AwardeeModuleController.getTotalCoeFundingAwardAmount('2024', 'COE Project Grant');
-    AwardeeModuleController.getTotalCoeFundingAwardAmount(null, null);
+        // ----- KPI methods never called -----
+        AwardeeModuleController.getTotalFundingAwardedSafe('2024', 'COE Project Grant');
+        AwardeeModuleController.getTotalFundingAwardedSafe(null, null);
 
-    AwardeeModuleController.getTotalFundsReleased(); // OLD KPI
-    AwardeeModuleController.getTotalFundsAvailable('2024'); // LEGACY KPI
-    AwardeeModuleController.getTotalFundsAvailable(null);
+        AwardeeModuleController.getTotalCoeFundingAwardAmount('2024', 'COE Project Grant');
+        AwardeeModuleController.getTotalCoeFundingAwardAmount(null, null);
 
-    // ----- OLD proposal table -----
-    AwardeeModuleController.getProposals(0, 5);
-    AwardeeModuleController.getProposals(null, null);
+        AwardeeModuleController.getTotalFundsReleased(); // OLD KPI
+        AwardeeModuleController.getTotalFundsAvailable('2024'); // LEGACY KPI
+        AwardeeModuleController.getTotalFundsAvailable(null);
 
-    // ----- Tranche history (account-wise) -----
-    AwardeeModuleController.getTrancheHistoryByAccount(acc.Id);
-    AwardeeModuleController.getTrancheHistoryByAccount(null); // early return
+        // ----- OLD proposal table -----
+        AwardeeModuleController.getProposals(0, 5);
+        AwardeeModuleController.getProposals(null, null);
 
-    // ----- Proposal header -----
-    AwardeeModuleController.getProposalHeader(app.Id);
-    AwardeeModuleController.getProposalHeader(null); // null path
+        // ----- Tranche history (account-wise) -----
+        AwardeeModuleController.getTrancheHistoryByAccount(acc.Id);
+        AwardeeModuleController.getTrancheHistoryByAccount(null); // early return
 
-    // ----- Milestones by proposal -----
-    AwardeeModuleController.getMilestonesByProposal(app.Id);
-    AwardeeModuleController.getMilestonesByProposal(null); // early return
+        // ----- Proposal header -----
+        AwardeeModuleController.getProposalHeader(app.Id);
+        AwardeeModuleController.getProposalHeader(null); // null path
 
-    // ----- Exception branches -----
-    try {
-        AwardeeModuleController.createFundingAward(
-            new FundingAward(Name='X', Amount=1, Status='New Fund'),
-            null
+        // ----- Milestones by proposal -----
+        AwardeeModuleController.getMilestonesByProposal(app.Id);
+        AwardeeModuleController.getMilestonesByProposal(null); // early return
+
+        // ----- Exception branches -----
+        try {
+            AwardeeModuleController.createFundingAward(
+                new FundingAward(Name='X', Amount=1, Status='New Fund'),
+                null
+            );
+        } catch (Exception e) { /* expected */ }
+
+        try {
+            AwardeeModuleController.markMilestoneCompleted(null);
+        } catch (Exception e) { /* expected */ }
+
+        Test.stopTest();
+
+        System.assert(true);
+    }
+
+    @IsTest
+    static void testFinalCoveragePush_ChipTypesAndEmptyCases() {
+
+        // ---------- Account with NO applications (empty COE list path) ----------
+        Account emptyAcc = new Account(Name = 'Empty COE Account');
+        insert emptyAcc;
+
+        // ---------- Account with applications ----------
+        Account acc = new Account(Name = 'ChipType Account');
+        insert acc;
+
+        // ---------- Application with NO milestones (chipType = none) ----------
+        IndividualApplication appNone = new IndividualApplication(
+            Status = 'Approved for Funding',
+            AccountId = acc.Id,
+            Funding_Year__c = '2024',
+            Total_Project_Budget_INR__c = 10000,
+            Category = 'Grant Application'
         );
-    } catch (Exception e) { /* expected */ }
+        insert appNone;
 
-    try {
-        AwardeeModuleController.markMilestoneCompleted(null);
-    } catch (Exception e) { /* expected */ }
+        // ---------- Application with milestones but NO report submitted (pending) ----------
+        IndividualApplication appPending = new IndividualApplication(
+            Status = 'Approved for Funding',
+            AccountId = acc.Id,
+            Funding_Year__c = '2024',
+            Total_Project_Budget_INR__c = 20000,
+            Category = 'Grant Application'
+        );
+        insert appPending;
 
-    Test.stopTest();
-
-    System.assert(true);
-}
-@IsTest
-static void testFinalCoveragePush_ChipTypesAndEmptyCases() {
-
-    // ---------- Account with NO applications (empty COE list path) ----------
-    Account emptyAcc = new Account(Name = 'Empty COE Account');
-    insert emptyAcc;
-
-    // ---------- Account with applications ----------
-    Account acc = new Account(Name = 'ChipType Account');
-    insert acc;
-
-    // ---------- Application with NO milestones (chipType = none) ----------
-    IndividualApplication appNone = new IndividualApplication(
-        Status = 'Approved for Funding',
-        AccountId = acc.Id,
-        Funding_Year__c = '2024',
-        Total_Project_Budget_INR__c = 10000,
-        Category = 'Grant Application'
-    );
-    insert appNone;
-
-    // ---------- Application with milestones but NO report submitted (pending) ----------
-    IndividualApplication appPending = new IndividualApplication(
-        Status = 'Approved for Funding',
-        AccountId = acc.Id,
-        Funding_Year__c = '2024',
-        Total_Project_Budget_INR__c = 20000,
-        Category = 'Grant Application'
-    );
-    insert appPending;
-
-    insert new Milestone__c(
-        Individual_Application__c = appPending.Id,
-        Status__c = 'Report Submitted',
-        Budget_Required_INR__c = 5000
-    );
-
-    // ---------- Application with partial reports (progress) ----------
-    IndividualApplication appProgress = new IndividualApplication(
-        Status = 'Approved for Funding',
-        AccountId = acc.Id,
-        Funding_Year__c = '2024',
-        Total_Project_Budget_INR__c = 30000,
-        Category = 'Grant Application'
-    );
-    insert appProgress;
-
-    insert new List<Milestone__c>{
-        new Milestone__c(
-            Individual_Application__c = appProgress.Id,
+        insert new Milestone__c(
+            Individual_Application__c = appPending.Id,
             Status__c = 'Report Submitted',
             Budget_Required_INR__c = 5000
-        ),
-        new Milestone__c(
-            Individual_Application__c = appProgress.Id,
-            Status__c = 'Report Submitted',
-            Budget_Required_INR__c = 5000
-        )
-    };
+        );
 
-    // ---------- Application with all reports submitted (completed) ----------
-    IndividualApplication appCompleted = new IndividualApplication(
-        Status = 'Approved for Funding',
-        AccountId = acc.Id,
-        Funding_Year__c = '2024',
-        Total_Project_Budget_INR__c = 40000,
-        Category = 'Grant Application'
-    );
-    insert appCompleted;
+        // ---------- Application with partial reports (progress) ----------
+        IndividualApplication appProgress = new IndividualApplication(
+            Status = 'Approved for Funding',
+            AccountId = acc.Id,
+            Funding_Year__c = '2024',
+            Total_Project_Budget_INR__c = 30000,
+            Category = 'Grant Application'
+        );
+        insert appProgress;
 
-    insert new List<Milestone__c>{
-        new Milestone__c(
-            Individual_Application__c = appCompleted.Id,
-            Status__c = 'Report Submitted',
-            Budget_Required_INR__c = 5000
-        ),
-        new Milestone__c(
-            Individual_Application__c = appCompleted.Id,
-            Status__c = 'Report Submitted',
-            Budget_Required_INR__c = 5000
-        )
-    };
+        insert new List<Milestone__c>{
+            new Milestone__c(
+                Individual_Application__c = appProgress.Id,
+                Status__c = 'Report Submitted',
+                Budget_Required_INR__c = 5000
+            ),
+            new Milestone__c(
+                Individual_Application__c = appProgress.Id,
+                Status__c = 'Report Submitted',
+                Budget_Required_INR__c = 5000
+            )
+        };
 
-    Test.startTest();
+        // ---------- Application with all reports submitted (completed) ----------
+        IndividualApplication appCompleted = new IndividualApplication(
+            Status = 'Approved for Funding',
+            AccountId = acc.Id,
+            Funding_Year__c = '2024',
+            Total_Project_Budget_INR__c = 40000,
+            Category = 'Grant Application'
+        );
+        insert appCompleted;
 
-    // 🔹 hit all chipType branches
-    AwardeeModuleController.getProposalsWithMilestoneStatus(
-        0, 20, acc.Id, '2024'
-    );
+        insert new List<Milestone__c>{
+            new Milestone__c(
+                Individual_Application__c = appCompleted.Id,
+                Status__c = 'Report Submitted',
+                Budget_Required_INR__c = 5000
+            ),
+            new Milestone__c(
+                Individual_Application__c = appCompleted.Id,
+                Status__c = 'Report Submitted',
+                Budget_Required_INR__c = 5000
+            )
+        };
 
-    // 🔹 hit empty COE list branch
-    AwardeeModuleController.getApprovedCoes();
+        Test.startTest();
 
-    // 🔹 mixed-param funding award branches
-    AwardeeModuleController.getTotalFundingAwardedSafe(null, 'COE Project Grant');
-    AwardeeModuleController.getTotalFundingAwardedSafe('2024', null);
+        // 🔹 hit all chipType branches
+        AwardeeModuleController.getProposalsWithMilestoneStatus(
+            0, 20, acc.Id, '2024'
+        );
 
-    Test.stopTest();
+        // 🔹 hit empty COE list branch
+        AwardeeModuleController.getApprovedCoes();
 
-    System.assert(true);
-}
+        // 🔹 mixed-param funding award branches
+        AwardeeModuleController.getTotalFundingAwardedSafe(null, 'COE Project Grant');
+        AwardeeModuleController.getTotalFundingAwardedSafe('2024', null);
+
+        Test.stopTest();
+
+        System.assert(true);
+    }
 }

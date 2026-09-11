@@ -42,6 +42,7 @@
                                         class={m.completeBtnClass}
                                         title={m.completeBtnTitle}
                                         data-id={m.Id}
+                                        disabled={m.tickDisabled}
                                         onclick={handleMarkCompleted}>
                                         ✓
                                     </button>
@@ -51,6 +52,26 @@
                             <!-- ✅ Tile Body -->
                             <div class="tile-body">
                                 <div class="field-row">
+                                    <span class="label">Grant Required</span>
+                                    <span class="value">$ {m.Budget_Required_INR__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Grant Disbursed</span>
+                                    <span class="value">$ {m.Disbursed_Amount__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Grant Utilized</span>
+                                    <span class="value">$ {m.Total_Utilized__c}</span>
+                                </div>
+
+                                <div class="field-row">
+                                    <span class="label">Current TRL</span>
+                                    <span class="value">{m.Current_Technology_Readiness_Level_TRL__c}</span>
+                                </div>
+
+                                <div class="field-row">
                                     <span class="label">Project Start Month</span>
                                     <span class="value">{m.Project_Start_Date__c}</span>
                                 </div>
@@ -58,16 +79,6 @@
                                 <div class="field-row">
                                     <span class="label">Project End Month</span>
                                     <span class="value">{m.Project_End_Date__c}</span>
-                                </div>
-
-                                <div class="field-row">
-                                    <span class="label">Budget Req</span>
-                                    <span class="value">$ {m.Budget_Required_INR__c}</span>
-                                </div>
-
-                                <div class="field-row">
-                                    <span class="label">Disbursed</span>
-                                    <span class="value">$ {m.Disbursed_Amount__c}</span>
                                 </div>
                             </div>
 
@@ -77,11 +88,20 @@
                                     View Details
                                 </button>
 
-                                <button class="btn-outline" data-propid={proposalId} onclick={handleReviewReport}>
+                                <button
+                                    class="btn-outline"
+                                    data-propid={proposalId}
+                                    data-id={m.Id}
+                                    disabled={m.actionsDisabled}
+                                    onclick={handleReviewReport}>
                                     Review Report
                                 </button>
 
-                                <button class="btn-primary" data-id={m.Id} onclick={handleSendToReviewer}>
+                                <button
+                                    class="btn-primary"
+                                    data-id={m.Id}
+                                    disabled={m.actionsDisabled}
+                                    onclick={handleSendToReviewer}>
                                     Send to Reviewer
                                 </button>
                             </div>

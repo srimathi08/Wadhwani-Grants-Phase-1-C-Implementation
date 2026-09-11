@@ -1,0 +1,145 @@
+/* ── Backdrop ── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Container ── */
+.modal-container {
+    background: #ffffff;
+    border-radius: 8px;
+    width: 640px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+/* ── Header ── */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 2px solid #7b0d1e;   /* WCF dark red */
+}
+
+.modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #7b0d1e;
+    margin: 0;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.modal-close:hover { background: #f5f5f5; }
+
+/* ── Body ── */
+.modal-body {
+    padding: 24px;
+}
+
+.modal-intro {
+    font-size: 0.875rem;
+    color: #3a3a3a;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+/* ── Eligibility list ── */
+.eligibility-list {
+    list-style: none;
+    margin: 0 0 4px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.eligibility-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fdf0f2;
+    border-left: 4px solid #7b0d1e;
+    border-radius: 4px;
+    padding: 12px 14px;
+}
+
+.eligibility-icon {
+    --slds-c-icon-color-foreground: #7b0d1e;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.eligibility-item span {
+    font-size: 0.85rem;
+    color: #3a3a3a;
+    line-height: 1.55;
+}
+
+.eligibility-item--excluded {
+    background: #fff4e5;
+    border-left-color: #b25c00;
+}
+
+.eligibility-icon--excluded {
+    --slds-c-icon-color-foreground: #b25c00;
+}
+
+/* ── Core rule banner ── */
+.core-rule {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fdf0f2;
+    border-left: 4px solid #7b0d1e;
+    border-radius: 4px;
+    padding: 14px 16px;
+}
+
+.core-rule p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #3a3a3a;
+    line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .objective-grid { grid-template-columns: 1fr; }
+}
+.modal-backdrop--standalone {
+    position: static;
+    background: transparent;
+    padding: 2rem 1rem;
+    display: block; /* override the flex-centering used for the popup modal */
+}
+
+.modal-container--standalone {
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: none;
+    max-height: none;
+}
+.eligibility-page-standalone {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px;
+}

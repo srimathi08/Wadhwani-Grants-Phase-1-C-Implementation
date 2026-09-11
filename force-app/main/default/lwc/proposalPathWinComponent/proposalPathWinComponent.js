@@ -2,12 +2,92 @@ import { LightningElement, api, wire, track } from 'lwc';
 import getProposalStatus from '@salesforce/apex/ProposalPathController.getProposalStatus';
 import syncUnderReviewStatus from '@salesforce/apex/ProposalPathController.syncUnderReviewStatus';
 
+/**
+ * Single source of truth for every Application Status picklist value.
+ * Each entry maps a status string to:
+ *   - stage:   index into STAGE_DEFINITIONS (0-7) — where the tracker sits
+ *   - variant: 'active' | 'approved' | 'rejected' | 'resubmit' — how the
+ *              current stage is colored
+ *   - label:   (optional) overrides the generic stage label with a
+ *              status-specific one, e.g. "Approved by COE Admin"
+ *
+ * IMPORTANT: If a new picklist value is ever added on the object, it MUST
+ * be added here too, or it will fall back to stage 0 (see statusConfig
+ * getter below) and a console.warn will fire so it's easy to catch in dev.
+ *
+ * NOTE: The Level 1 / Level 2 and "Submitted Back" mappings below are my
+ * best guess based on the label text — please confirm the intended stage
+ * for these with the business/Afrose, since I don't have visibility into
+ * the flow/Apex that sets them.
+ */
+const STATUS_CONFIG = {
+    // --- Stage 0: Draft ---
+    'Draft':                                              { stage: 0, variant: 'active' },
+    'Submitted':                                          { stage: 0, variant: 'approved' },
+    'Revision Requested':                                 { stage: 0, variant: 'resubmit' },
+
+    // --- Stage 1: Submitted to COE Admin ---
+    'Proposal Submitted to COE Admin':                    { stage: 1, variant: 'active' },
+    'Proposal Resubmitted to COE Admin':                  { stage: 1, variant: 'resubmit' },
+
+    // --- Stage 2: COE Admin decision ---
+    'Proposal Approved by COE Admin':                     { stage: 2, variant: 'approved', label: 'Approved by COE Admin' },
+    'Proposal Rejected by COE Admin':                     { stage: 2, variant: 'rejected', label: 'Not Shortlisted by COE Admin' },
+    'Asked for Resubmission by COE Admin':                { stage: 2, variant: 'resubmit', label: 'Revision Requested by COE Admin' },
+
+    // --- Stage 3: Submitted to WIN Admin ---
+    'Proposal Submitted to WIN Admin':                    { stage: 3, variant: 'active' },
+    'Proposal Resubmitted to WIN Admin':                  { stage: 3, variant: 'resubmit' },
+
+    // --- Stage 4: WIN Admin decision ---
+    'Proposal Approved by WIN Admin':                     { stage: 4, variant: 'approved', label: 'Approved by WIN Admin' },
+    'Proposal Approved by Win Admin':                     { stage: 4, variant: 'approved', label: 'Approved by WIN Admin' },
+    'Proposal Rejected by WIN Admin':                     { stage: 4, variant: 'rejected', label: 'Not Shortlisted by WIN Admin' },
+    'Proposal Rejected by Win Admin':                     { stage: 4, variant: 'rejected', label: 'Not Shortlisted by WIN Admin' },
+    'Asked for Resubmission by WIN Admin':                { stage: 4, variant: 'resubmit', label: 'Revision Requested by WIN Admin' },
+    'Asked for Resubmission by Win Admin':                { stage: 4, variant: 'resubmit', label: 'Revision Requested by WIN Admin' },
+
+    // --- Stage 5: Under review ---
+    'In Review':                                          { stage: 5, variant: 'active' },
+    'Under Review':                                       { stage: 5, variant: 'active' },
+
+    // --- Stage 6: Reviewer recommendation ---
+    'Approved':                                           { stage: 6, variant: 'approved', label: 'Approved' },
+    'Rejected':                                           { stage: 6, variant: 'rejected', label: 'Rejected' },
+    'Recommended':                                        { stage: 6, variant: 'approved', label: 'Recommended' },
+    'Not Recommended':                                    { stage: 6, variant: 'rejected', label: 'Not Recommended' },
+    'Approved with Resubmission':                         { stage: 6, variant: 'resubmit', label: 'Approved with Resubmission' },
+    'Submitted Back - Approved for Funding Resubmission': { stage: 6, variant: 'resubmit', label: 'Sent Back for Resubmission' },
+
+    // --- Stage 7: Final funding decision ---
+    'Approved for Funding':                               { stage: 7, variant: 'approved', label: 'Approved for Funding' },
+    'Not Recommended for Funding':                        { stage: 7, variant: 'rejected', label: 'Not Recommended for Funding' },
+    'Approved - Level 1':                                 { stage: 7, variant: 'approved', label: 'Approved - Level 1' },
+    'Rejected - Level 1':                                 { stage: 7, variant: 'rejected', label: 'Rejected - Level 1' },
+    'Approved - Level 2':                                 { stage: 7, variant: 'approved', label: 'Approved - Level 2' },
+    'Rejected - Level 2':                                 { stage: 7, variant: 'rejected', label: 'Rejected - Level 2' },
+    'Funded':                                             { stage: 7, variant: 'approved', label: 'Funded' }
+};
+
+// Base labels for each stage node, in display order.
+// Stages 2, 4, 6 and 7 get their label swapped dynamically based on
+// the specific status (see STATUS_CONFIG above).
+const STAGE_DEFINITIONS = [
+    { label: 'Draft' },
+    { label: 'Submitted to COE Admin' },
+    { label: 'COE Admin Actions' },
+    { label: 'Submitted to WIN Admin' },
+    { label: 'WIN Admin Actions' },
+    { label: 'Under Review' },
+    { label: 'Recommendation' },
+    { label: 'Decision' }
+];
+
 export default class ProposalPathWinComponent extends LightningElement {
     @api recordId;
     @track currentStatus;
     @track pathItems = [];
 
-    // Run once when component loads
     connectedCallback() {
         if (this.recordId) {
             syncUnderReviewStatus({ recordId: this.recordId })
@@ -23,129 +103,58 @@ export default class ProposalPathWinComponent extends LightningElement {
             this.currentStatus = data;
             this.initializePath();
         } else if (error) {
-            console.error(error);
+            console.error('Error fetching proposal status', error);
         }
+    }
+
+    // Looks up the config for the current status. Falls back to stage 0
+    // (and logs a warning) if a status ever shows up that isn't mapped —
+    // this is what prevented the "Approved for Funding stuck at Under
+    // Review" bug from happening silently.
+    get statusConfig() {
+        const config = STATUS_CONFIG[this.currentStatus];
+        if (!config) {
+            console.warn(
+                `ProposalPathWinComponent: unmapped status "${this.currentStatus}" ` +
+                `— add it to STATUS_CONFIG so the tracker can reflect it.`
+            );
+            return { stage: 0, variant: 'active' };
+        }
+        return config;
     }
 
     initializePath() {
-        const status = this.currentStatus;
+        const { stage, label } = this.statusConfig;
 
-        let coeLabel = 'COE Admin Actions';
-        let winLabel = 'WIN Admin Actions';
-        let recLabel = 'Decision';
-
-        // --- COE label updates ---
-        if (status === 'Proposal Approved by COE Admin') coeLabel = 'Approved by COE Admin';
-        else if (status === 'Proposal Rejected by COE Admin') coeLabel = 'Not Shortlisted by COE Admin';
-        else if (status === 'Asked for Resubmission by COE Admin') coeLabel = 'Ask for Revision by COE Admin';
-
-        // --- WIN label updates ---
-        if (status === 'Proposal Approved by WIN Admin' || status === 'Proposal Approved by Win Admin')
-            winLabel = 'Approved by WIN Admin';
-        else if (status === 'Proposal Rejected by WIN Admin' || status === 'Proposal Rejected by Win Admin')
-            winLabel = 'Not Shortlisted by WIN Admin';
-        else if (status === 'Asked for Resubmission by WIN Admin' || status === 'Asked for Resubmission by Win Admin')
-            winLabel = 'Ask for Revision by WIN Admin';
-
-        // --- Recommendation labels ---
-        if (status === 'Recommended') recLabel = 'Recommended';
-        else if (status === 'Not Recommended') recLabel = 'Not Recommended';
-        else if (status === 'Recommended for Resubmission') recLabel = 'Recommended for Resubmission';
-
-        // --- Dynamic label consistency ---
-        if (['Submitted to WIN Admin', 'Proposal Submitted to WIN Admin'].includes(status)) {
-            coeLabel = 'Approved';
-        }
-
-        if (status === 'Under Review') {
-            coeLabel = 'Approved';
-            winLabel = 'Approved';
-        }
-
-        if (['Recommended', 'Not Recommended', 'Recommended with Resubmission', 'Recommended for Resubmission'].includes(status)) {
-            coeLabel = 'Approved by COE Admin';
-            winLabel = 'Approved by WIN Admin';
-        }
-
-        // --- Build Path ---
-        this.pathItems = [
-            { label: 'Draft' },
-            { label: 'Submitted to COE Admin' },
-            { label: coeLabel },
-            { label: 'Submitted to WIN Admin' },
-            { label: winLabel },
-            { label: 'Under Review' },
-            { label: recLabel }
-        ].map((item, idx, arr) => ({
-            ...item,
-            isLast: idx === arr.length - 1
+        this.pathItems = STAGE_DEFINITIONS.map((item, idx) => ({
+            label: idx === stage && label ? label : item.label,
+            isLast: idx === STAGE_DEFINITIONS.length - 1
         }));
     }
 
-    // Determine active stage index
-    getPathStageIndex() {
-        const s = this.currentStatus;
-
-        if (!s) return 0;
-        if (s === 'Draft') return 0;
-
-        if (['Submitted to COE Admin', 'Proposal Submitted to COE Admin'].includes(s))
-            return 1;
-
-        if (s.includes('COE Admin'))
-            return 2;
-
-        if (['Submitted to WIN Admin', 'Proposal Submitted to WIN Admin'].includes(s))
-            return 3;
-
-        if (s.includes('WIN Admin'))
-            return 4;
-
-        if (s === 'Under Review')
-            return 5;
-
-        if (s.includes('Recommended'))
-            return 6;
-
-        return 0;
-    }
-
-    // Path coloring logic
     get computedPath() {
-
-        const activeIndex = this.getPathStageIndex();
-        const status = this.currentStatus?.toLowerCase() || '';
+        const { stage, variant } = this.statusConfig;
 
         return this.pathItems.map((item, index) => {
-
             let colorClass = 'upcoming';
             let connectorClass = 'connector-default';
             let isCompleted = false;
 
-            if (index < activeIndex) {
+            if (index < stage) {
                 colorClass = 'completed';
                 connectorClass = 'connector-green';
                 isCompleted = true;
-            }
-
-            else if (index === activeIndex) {
-
-                if (status.includes('rejected') || status === 'not recommended') {
+            } else if (index === stage) {
+                if (variant === 'rejected') {
                     colorClass = 'rejected-outline';
                     connectorClass = 'connector-red';
-                }
-
-                else if (status.includes('resubmission') || status.includes('resubmit')) {
+                } else if (variant === 'resubmit') {
                     colorClass = 'resubmit-outline';
                     connectorClass = 'connector-yellow';
-                }
-
-                else if (status.includes('approved') || status.includes('recommended')) {
+                } else if (variant === 'approved') {
                     colorClass = 'approved-outline';
                     connectorClass = 'connector-blue';
-                }
-
-                else {
+                } else {
                     colorClass = 'active';
                     connectorClass = 'connector-blue';
                 }
@@ -154,6 +163,7 @@ export default class ProposalPathWinComponent extends LightningElement {
             return {
                 ...item,
                 isCompleted,
+                displayNumber: index + 1,
                 combinedClass: `path-item ${colorClass}`,
                 connectorClass
             };

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Application Validated Under Review</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c}] Application validated — under review</subject>
+    <textOnly>Hello {!Account.FirstName},
+
+Good news — your application for {!Account.WCF_Organizational_Name__c} has passed our initial validation and is now with our review team for assessment.
+
+This stage typically takes a couple of weeks. There’s nothing you need to do for now. We’ll contact you as soon as there’s an update or if we need anything further.
+
+View your application status:
+https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal
+
+Warm regards,
+The Wadhwani Grants Team
+
+Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Budget_Requisite__c</fullName>
+    <inlineHelpText>Assess whether the proposed budget is realistic, well-justified, and aligned with the project scope and activities</inlineHelpText>
+    <label>Budget Adequacy</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Appropriate</fullName>
+                <default>false</default>
+                <label>Appropriate</label>
+            </value>
+            <value>
+                <fullName>Over-Budget</fullName>
+                <default>false</default>
+                <label>Over-Budget</label>
+            </value>
+            <value>
+                <fullName>Under-Budget</fullName>
+                <default>false</default>
+                <label>Under-Budget</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

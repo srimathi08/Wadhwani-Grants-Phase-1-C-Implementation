@@ -1,0 +1,168 @@
+<template>
+    <div class="shell">
+
+        <!-- ══ TOP BAR ══════════════════════════════════════════════ -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="brand-rule"></div>
+                <div class="top-bar-titles">
+                    <h1 class="top-title">Wadhwani Grants Approver Queue</h1>
+                  <!--  <span class="top-sub">{filteredCount} of {totalCount} proposal(s) with Review Submitted</span> -->
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="search-wrap">
+                    <lightning-icon icon-name="utility:search" size="x-small" class="search-icon"></lightning-icon>
+                    <input
+                        type="text"
+                        placeholder="Search by ID, organization, submitter…"
+                        class="search-input"
+                        value={searchTerm}
+                        oninput={handleSearch}
+                    />
+                </div>
+                <button class="icon-btn" onclick={handleRefresh} title="Refresh">
+                    <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- ══ SUMMARY ROW ═════════════════════════════════════════ -->
+        <template if:false={isLoading}>
+            <div class="summary-row">
+               <!-- <div class="summary-item" data-filter="pending" onclick={handleSummaryClick} title="Filter: Pending Decisions">
+                    <span class="summary-num">{pendingCount}</span>
+                    <span class="summary-lbl">Pending Decisions</span>
+                </div>-->
+                <div class="summary-div"></div>
+                <div class="summary-item" data-filter="recYes" onclick={handleSummaryClick} title="Filter: Recommended">
+                    <span class="summary-num">{recommendedCount}</span>
+                    <span class="summary-lbl">Pending Decisions</span>
+                </div>
+                <div class="summary-div"></div>
+                <div class="summary-item" data-filter="approved" onclick={handleSummaryClick} title="Filter: Approved">
+                    <span class="summary-num">{approvedCount}</span>
+                    <span class="summary-lbl">Approved</span>
+                </div>
+                <div class="summary-div"></div>
+                <div class="summary-item" data-filter="declined" onclick={handleSummaryClick} title="Filter: Declined">
+                    <span class="summary-num">{declinedCount}</span>
+                    <span class="summary-lbl">Declined</span>
+                </div>
+            </div>
+        </template>
+
+        <!-- ══ LOADING ══════════════════════════════════════════════ -->
+        <template if:true={isLoading}>
+            <div class="loading-block">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                <p class="loading-text">Loading approver queue…</p>
+            </div>
+        </template>
+
+        <!-- ══ TABLE ════════════════════════════════════════════════ -->
+        <template if:false={isLoading}>
+            <template if:true={hasItems}>
+                <div class="table-wrap">
+                    <table class="tbl">
+                        <thead>
+                            <tr>
+                                <th class="th c-sno">#</th>
+                                <th class="th c-id">Application ID</th>
+                                <th class="th c-org">Organization</th>
+                                <th class="th c-hq">Headquarters</th>
+                                <th class="th c-track tc">Track</th>
+                                <!--<th class="th c-appstatus">Review Status</th> -->
+                                <th class="th c-rec tc">Recommendation</th>
+                                <th class="th c-decision tc">Decision</th> 
+                                <th class="th c-action tc">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={paginatedItems} for:item="row">
+                                <tr key={row.applicationId} class={row.rowClass}>
+                                    <td class="td c-sno tc">{row.sno}</td>
+                                    <td class="td c-id">
+                                        <span class="id-link">{row.applicationName}</span>
+                                    </td>
+                                    <td class="td c-org">
+                                        <span class="trunc" title={row.organizationName}>{row.organizationName}</span>
+                                    </td>
+                                    <td class="td c-hq">
+                                        <span class="trunc" title={row.headquarters}>{row.headquarters}</span>
+                                    </td>
+                                    <td class="td c-track tc">
+                                        <span class={row.trackBadgeClass}>{row.track}</span>
+                                    </td>
+                                    <!--<td class="td c-appstatus">
+                                        <span class={row.reviewStatusClass}>Review Submitted</span>
+                                    </td> -->
+                                    <td class="td c-rec tc">
+                                        <span class={row.recBadgeClass}>{row.recommendation}</span>
+                                    </td> 
+                                    <td class="td c-decision tc">
+                                        <template if:true={row.existingDecision}>
+                                            <span class={row.decisionBadgeClass}>{row.decisionLabel}</span>
+                                        </template>
+                                        <template if:false={row.existingDecision}>
+                                            <span class="no-decision">—</span>
+                                        </template>
+                                    </td>
+                                    <td class="td c-action tc">
+                                        <button
+                                            class={row.actionBtnClass}
+                                            data-id={row.applicationId}
+                                            data-appname={row.applicationName}
+                                            data-review-id={row.reviewId}
+                                            onclick={handleStartApprove}
+                                        >
+                                            <lightning-icon icon-name={row.actionIcon} size="xx-small" class="btn-icon"></lightning-icon>
+                                            {row.actionLabel}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pg-bar">
+                    <span class="pg-info">Showing {paginationStart}–{paginationEnd} of {filteredCount}</span>
+                    <div class="pg-controls">
+                        <button class="pg-btn" onclick={handlePrevPage} disabled={isFirstPage}>
+                            <lightning-icon icon-name="utility:chevronleft" size="xx-small"></lightning-icon>
+                        </button>
+                        <template for:each={pageNumbers} for:item="pg">
+                            <button key={pg.num} class={pg.btnClass} data-page={pg.num} onclick={handlePageClick}>{pg.num}</button>
+                        </template>
+                        <button class="pg-btn" onclick={handleNextPage} disabled={isLastPage}>
+                            <lightning-icon icon-name="utility:chevronright" size="xx-small"></lightning-icon>
+                        </button>
+                    </div>
+                    <div class="pg-size-row">
+                        <span class="pg-size-lbl">Rows per page:</span>
+                        <lightning-combobox
+                            name="pageSize"
+                            label=""
+                            value={pageSizeStr}
+                            options={pageSizeOptions}
+                            onchange={handlePageSizeChange}
+                            class="pg-size-combo"
+                        ></lightning-combobox>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Empty state -->
+            <template if:false={hasItems}>
+                <div class="empty-block">
+                    <lightning-icon icon-name="utility:check" size="large" class="empty-icon"></lightning-icon>
+                    <p class="empty-title">No Proposals Awaiting Decision</p>
+                    <p class="empty-sub">All reviewed proposals have been decided, or no reviews have been submitted yet.</p>
+                </div>
+            </template>
+        </template>
+
+    </div>
+</template>

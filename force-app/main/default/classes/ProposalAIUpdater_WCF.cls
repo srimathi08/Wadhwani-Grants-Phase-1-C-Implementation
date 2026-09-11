@@ -1,11 +1,15 @@
 public with sharing class ProposalAIUpdater_WCF {
-    public class Request {
-        @InvocableVariable(required=true)
-        public Id proposalId;
-        
-        @InvocableVariable(required=true)
-        public String aiJson;
-    }
+   public class Request {
+
+    @InvocableVariable(required=true)
+    public Id proposalId;
+
+    @InvocableVariable(required=true)
+    public String aiJson;
+
+    @InvocableVariable
+    public String aiJson2;
+}
 
     @InvocableMethod(label='Update Proposal with AI Results')
     public static void updateProposal(List<Request> requests) {
@@ -20,13 +24,32 @@ public with sharing class ProposalAIUpdater_WCF {
 
             System.debug('💡 Cleaned JSON: ' + cleanJson);
 
-            Map<String, Object> parsed;
-            try {
-                parsed = (Map<String, Object>) JSON.deserializeUntyped(cleanJson);
-            } catch (Exception ex) {
-                System.debug('❌ JSON Parse Failed: ' + ex.getMessage());
-                continue;
-            }
+           Map<String, Object> parsed = new Map<String, Object>();
+
+try {
+    // First Prompt JSON
+    Map<String, Object> parsed1 =
+        (Map<String, Object>) JSON.deserializeUntyped(cleanJson);
+
+    parsed.putAll(parsed1);
+
+    // Second Prompt JSON
+    if (!String.isBlank(req.aiJson2)) {
+
+        String cleanJson2 = req.aiJson2.trim()
+            .replaceAll('[\\u00A0]', '')
+            .replaceAll('[\\u200B\\u200C\\u200D]', '');
+
+        Map<String, Object> parsed2 =
+            (Map<String, Object>) JSON.deserializeUntyped(cleanJson2);
+
+        parsed.putAll(parsed2);
+    }
+
+} catch (Exception ex) {
+    System.debug('❌ JSON Parse Failed: ' + ex.getMessage());
+    continue;
+}
 
             IndividualApplication p = new IndividualApplication(Id = req.proposalId);
 
@@ -65,7 +88,42 @@ public with sharing class ProposalAIUpdater_WCF {
                 p.Operational_Synergies_Weakness__c = (String) ops.get('weaknesses');
                 p.Operational_Synergies_Summary__c = (String) ops.get('summary');
             }
+            // Skilling Approach
+if (parsed.containsKey('SkillingApproach')) {
 
+    Map<String,Object> skill =
+        (Map<String,Object>) parsed.get('SkillingApproach');
+
+    p.Skilling_Approach_Rating__c =
+        (String) skill.get('rating');
+
+    p.Skilling_Approach_Strength__c =
+        (String) skill.get('strengths');
+
+    p.Skilling_Approach_Weakness__c =
+        (String) skill.get('weaknesses');
+
+    p.Skilling_Approach_Summary__c =
+        (String) skill.get('summary');
+}
+            // Job Creation Approach
+            if (parsed.containsKey('jobCreationApproach')) {
+
+            Map<String,Object> jc =
+                (Map<String,Object>) parsed.get('jobCreationApproach');
+
+            p.Job_Creation_Rating__c =
+                (String) jc.get('rating');
+
+                p.Job_Creation_Strength__c =
+                (String) jc.get('strengths');
+
+            p.Job_Creation_Weakness__c =
+            (String) jc.get('weaknesses');
+
+            p.Job_Creation_Summary__c =
+            (String) jc.get('summary');
+        }
             toUpdate.add(p);
         }
 

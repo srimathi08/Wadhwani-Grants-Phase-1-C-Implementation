@@ -2,6 +2,50 @@
 public class CoeFundControllerTest {
 
     /* =====================================================
+       CONTACT RECORD TYPE HELPER
+       Some orgs enforce Record Types on Contact with no
+       default assigned to the running user's profile, which
+       causes:
+       "CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY, record type
+        missing for: Contact"
+       This helper finds a usable RecordTypeId (if any exist)
+       and applies it so inserts succeed regardless of the
+       running user's default assignment.
+    ===================================================== */
+    private static Id contactRecordTypeId;
+    private static Boolean contactRecordTypeChecked = false;
+
+    private static Id getContactRecordTypeId() {
+        if (!contactRecordTypeChecked) {
+            contactRecordTypeChecked = true;
+            List<RecordType> rts = [
+                SELECT Id
+                FROM RecordType
+                WHERE SObjectType = 'Contact'
+                AND IsActive = true
+                ORDER BY IsPersonType ASC
+                LIMIT 1
+            ];
+            if (!rts.isEmpty()) {
+                contactRecordTypeId = rts[0].Id;
+            }
+        }
+        return contactRecordTypeId;
+    }
+
+    private static Contact buildContact(String lastName, Id accountId) {
+        Contact con = new Contact(
+            LastName = lastName,
+            AccountId = accountId
+        );
+        Id rtId = getContactRecordTypeId();
+        if (rtId != null) {
+            con.RecordTypeId = rtId;
+        }
+        return con;
+    }
+
+    /* =====================================================
        SAFE USER CREATION (PORTAL-AWARE, ORG-SAFE)
        ✔ Portal user ONLY when Contact exists
        ✔ Standard user when Contact is null
@@ -68,10 +112,7 @@ public class CoeFundControllerTest {
         Account acc = new Account(Name = 'COE Account');
         insert acc;
 
-        Contact con = new Contact(
-            LastName = 'PI User',
-            AccountId = acc.Id
-        );
+        Contact con = buildContact('PI User', acc.Id);
         insert con;
 
         User u = createUser(con);
@@ -147,10 +188,7 @@ public class CoeFundControllerTest {
         Account acc = new Account(Name = 'Empty Account');
         insert acc;
 
-        Contact con = new Contact(
-            LastName = 'User',
-            AccountId = acc.Id
-        );
+        Contact con = buildContact('User', acc.Id);
         insert con;
 
         User u = createUser(con);
@@ -193,10 +231,7 @@ public class CoeFundControllerTest {
         Account acc = new Account(Name = 'FR Account');
         insert acc;
 
-        Contact con = new Contact(
-            LastName = 'FR User',
-            AccountId = acc.Id
-        );
+        Contact con = buildContact('FR User', acc.Id);
         insert con;
 
         User u = createUser(con);
@@ -223,10 +258,7 @@ public class CoeFundControllerTest {
         Account acc = new Account(Name = 'Bad FR Account');
         insert acc;
 
-        Contact con = new Contact(
-            LastName = 'Bad User',
-            AccountId = acc.Id
-        );
+        Contact con = buildContact('Bad User', acc.Id);
         insert con;
 
         User u = createUser(con);

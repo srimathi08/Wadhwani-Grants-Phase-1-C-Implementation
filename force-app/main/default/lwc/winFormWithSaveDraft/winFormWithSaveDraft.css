@@ -1,30 +1,3 @@
-/* Embossed Lightning Card (outer container only) */
-lightning-card {
-    --slds-card-color-background: #ffffff;
-    border-radius: 14px;
-
-    /* Embossed + soft shadow */
-    box-shadow:
-        4px 4px 12px rgba(0, 0, 0, 0.15),      /* outer shadow */
-        -4px -4px 12px rgba(255, 255, 255, 0.9); /* light emboss */
-    
-    padding: 20px !important;
-    margin-bottom: 24px !important;
-    display: block;
-}
-
-/* Remove default Lightning Card header border/background */
-lightning-card .slds-card__header {
-    background: transparent !important;
-    border: none !important;
-    padding-bottom: 0 !important;
-}
-
-/* Remove default padding around inside body (optional) */
-lightning-card .slds-card__body {
-    padding: 0 !important;
-}
-
 .form-container {
     padding: 1.5rem;
     max-width: 900px;
@@ -72,38 +45,8 @@ lightning-card .slds-card__body {
 }
 
 /* Milestones Table */
-.static-text {
-    font-weight: 600;
-    display: block;
-    padding: 6px 4px;
-}
-
-.field-with-label {
-    display: flex;
-    flex-direction: column;
-}
-
-.static-label {
-    font-weight: 600;
-    margin-bottom: 2px;
-    color: #444;
-}
-
-.underlined-input lightning-input input {
-    border: none !important;
-    border-bottom: 1px solid #ccc !important;
-    border-radius: 0 !important;
-    padding-left: 0 !important;
-}
-.display-value {
-    font-size: 0.75rem;
-    color: #444;
-    margin-top: 3px;
-}
-
 .table-container {
     overflow-x: auto;
-     margin-bottom: 20px !important;  /* <-- Add spacing below the table */
 }
 
 .milestone-table th {
@@ -254,23 +197,6 @@ lightning-card .slds-card__body {
 }
 
 /* Styling for the milestone table */
-
-/* Allow wrapping inside milestone table headers */
-.slds-table th {
-    white-space: normal !important;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.2;
-    padding: 8px;
-}
-/* Optional: Control maximum width of long headers */
-.slds-table th:nth-child(5) {
-    max-width: 180px;
-}
-.wrap-header {
-    white-space: normal !important;
-}
-
 .milestone-table-container {
     overflow-x: auto;
 }
@@ -501,4 +427,52 @@ table td {
 
 .delete-icon {
     color: #8A1C1C;
+}
+/* =========================================================
+   FORM TYPOGRAPHY STANDARDIZATION
+   ========================================================= */
+
+/* Main page/section headings */
+.section-headings {
+    font-family: Arial, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 1.5rem 0;
+    color: #FC7666;
+    border-bottom: 2px solid #FC7666;
+    padding-bottom: 5px;
+}
+
+/* Sub-section headings - 2.1, 2.2, 2.5, etc. */
+.form-subsection-heading {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #181818;
+    margin: 0 0 0.5rem 0;
+}
+
+/* Smaller numbered headings - 2.5.1, 2.5.4, etc. */
+.form-field-heading {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #181818;
+    margin: 0 0 0.5rem 0;
+}
+
+/* Explanatory/help text */
+.note-text {
+    font-family: Arial, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #181818;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
 }

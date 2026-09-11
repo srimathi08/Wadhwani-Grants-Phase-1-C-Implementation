@@ -1,0 +1,807 @@
+﻿<template>
+    <div class="rfi-response-wrapper">
+
+        <!--  LOADING SPINNER  -->
+        <template if:true={isLoading}>
+            <div class="rfi-loading-box">
+                <lightning-spinner alternative-text="Loading revision data..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!--  SUBMITTED SUCCESS VIEW  -->
+        <template if:true={isSubmitted}>
+            <div class="rfi-success-container">
+                <div class="rfi-success-icon-wrap">
+                    <lightning-icon icon-name="utility:success" size="large" variant="success"></lightning-icon>
+                </div>
+                <h1 class="rfi-success-title">Revision Submitted Successfully</h1>
+                <p class="rfi-success-sub">
+                    Your answers for Application <strong>{applicationName}</strong> have been updated and resubmitted.
+                    The validator has been notified to resume their review.
+                </p>
+                <button class="btn-primary-red" onclick={handleBackToDashboard}>Back to Dashboard</button>
+            </div>
+        </template>
+
+        <!--  REVISION QUESTIONNAIRE VIEW  -->
+        <template if:false={isSubmitted}>
+            <template if:false={isLoading}>
+
+                <!-- Header banner -->
+                <div class="rfi-header-banner">
+                    <div class="rfi-header-icon-wrap">
+                        <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                    </div>
+                    <div>
+                        <h1 class="rfi-header-title">Revision Requested  Application {applicationName}</h1>
+                        <p class="rfi-header-sub">
+                            Please review the validator feedback notes below and update only the returned questions.
+                            All other answers in your application remain unchanged.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Flagged Questions List -->
+                <div class="rfi-questions-container">
+                    <template if:true={hasFlaggedQuestions}>
+                        <template for:each={flaggedQuestions} for:item="q">
+                            <div key={q.key} class="rfi-question-card">
+
+                                <!-- Reviewer Feedback Banner -->
+                                <div class="rfi-validator-note">
+                                    <div class="rfi-note-icon">
+                                        <lightning-icon icon-name="utility:announcement" size="xx-small" variant="error"></lightning-icon>
+                                    </div>
+                                    <div class="rfi-note-content">
+                                        <span class="rfi-note-qref">Question {q.displayNumber}  {q.title}</span>
+                                        <div class="rfi-note-text">
+                                            <strong>Validator Note:</strong> {q.returnText}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Question Body / Fields -->
+                                <div class="rfi-field-area">
+
+                                    <!--  Q1: Track Selection  -->
+                                    <template if:true={q.isQ1}>
+                                        <p class="rfi-field-hint">Select the tracks that represent your organization's work:</p>
+                                        <div class="rfi-grid-three">
+                                            <template for:each={trackCards} for:item="trk">
+                                                <div key={trk.code} class={trk.cssClass} onclick={handleTrackToggle} data-code={trk.code}>
+                                                    <div class="custom-checkbox">
+                                                        <template if:true={trk.isSelected}></template>
+                                                    </div>
+                                                    <span class="track-label-text">{trk.label}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q2: Organizational Identifying Info  -->
+                                    <template if:true={q.isQ2}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-input label="Organizational Name" value={formValues.Organization_Name__c}
+                                                data-field="Organization_Name__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <div class="location-autocomplete-container">
+                                                <lightning-input label="Headquarters City and Country"
+                                                    value={formValues.Headquarters_City_and_Country__c}
+                                                    data-field="Headquarters_City_and_Country__c"
+                                                    onchange={handleLocationInput}
+                                                    placeholder="Type city or country..."
+                                                    required>
+                                                </lightning-input>
+                                                <template if:true={showLocationDropdown}>
+                                                    <ul class="location-dropdown">
+                                                        <template for:each={locationResults} for:item="loc">
+                                                            <li key={loc.placeId} data-value={loc.fullLabel} onclick={handleSelectLocation}>
+                                                                {loc.fullLabel}
+                                                            </li>
+                                                        </template>
+                                                    </ul>
+                                                </template>
+                                            </div>
+
+                                            <lightning-input label="Primary Service Regions" value={formValues.Primary_Service_Regions__c}
+                                                data-field="Primary_Service_Regions__c" onchange={handleFieldChange} class="rfi-full-width" required></lightning-input>
+
+                                            <lightning-input label="Leader Name" value={formValues.Leader_Name__c}
+                                                data-field="Leader_Name__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <lightning-input label="Leader Title" value={formValues.Leader_Title__c}
+                                                data-field="Leader_Title__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <lightning-input label="Leader Tenure (Years)" value={formValues.Leader_Tenure__c}
+                                                data-field="Leader_Tenure__c" onchange={handleFieldChange} type="number" min="0"></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q3: Submitter Contact  -->
+                                    <template if:true={q.isQ3}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-input label="Submitter Name" value={formValues.Submitter_Name__c}
+                                                data-field="Submitter_Name__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <lightning-input label="Job Title" value={formValues.Job_Title__c}
+                                                data-field="Job_Title__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <lightning-input type="email" label="Work Email Address" value={formValues.Work_Email_ID__c}
+                                                data-field="Work_Email_ID__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <lightning-input type="tel" label="Phone number" value={formValues.Phone__c}
+                                                data-field="Phone__c" onchange={handleFieldChange} required></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q4: Legal Structure  -->
+                                    <template if:true={q.isQ4}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-combobox label="Legal Type" value={formValues.Legal_Type__c}
+                                                options={legalTypeOptions} data-field="Legal_Type__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+
+                                            <lightning-combobox label="Registration Jurisdiction" value={formValues.Registration_Jurisdiction__c}
+                                                options={countryOptions} data-field="Registration_Jurisdiction__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+
+                                            <lightning-input type="date" label="Incorporation Date" value={formValues.Incorporation_Date__c}
+                                                data-field="Incorporation_Date__c" onchange={handleFieldChange} required></lightning-input>
+
+                                            <template if:true={isLegalTypeOther}>
+                                                <lightning-input label="Please specify your legal structure type"
+                                                    value={formValues.Legal_Type_Other__c} data-field="Legal_Type_Other__c"
+                                                    onchange={handleFieldChange} required></lightning-input>
+                                            </template>
+
+                                            <template if:true={isRegistrationJurisdictionOther}>
+                                                <lightning-input label="Please specify the registration country"
+                                                    value={formValues.Registration_Jurisdiction_Other__c} data-field="Registration_Jurisdiction_Other__c"
+                                                    onchange={handleFieldChange} required></lightning-input>
+                                            </template>
+                                        </div>
+
+                                        <div class="rfi-richtext-wrapper" style="margin-top:16px;">
+                                            <label class="rfi-richtext-label">Brief Description of Legal Structure <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Legal_Structure__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q5: Fiscal Year End Date  -->
+                                    <template if:true={q.isQ5}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-combobox label="Fiscal Year End Month" value={formValues.Fiscal_Month__c}
+                                                options={fiscalMonthOptions} onchange={handleFiscalMonthChange} required></lightning-combobox>
+                                            <lightning-combobox label="Fiscal Year End Day" value={formValues.Fiscal_Day__c}
+                                                options={fiscalDayOptions} onchange={handleFiscalDayChange} required></lightning-combobox>
+                                            <lightning-input type="date" label="Current Fiscal Year End Date"
+                                                value={formValues.Current_fiscal_year_s_end_date__c}
+                                                data-field="Current_fiscal_year_s_end_date__c"
+                                                onchange={handleFieldChange} class="rfi-full-width"></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q6: Historical Financial Data  -->
+                                    <template if:true={q.isQ6}>
+                                        <p class="rfi-field-hint">All amounts in USD. Balance End rows are auto-computed.</p>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>FY-3 ({fiscalYears.fy3Year})</th>
+                                                        <th>FY-2 ({fiscalYears.fy2Year})</th>
+                                                        <th>FY-1 ({fiscalYears.fy1Year})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Balance at Start of Year ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.START_FY3} data-field="START_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cy3BalanceEnd} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cy2BalanceEnd} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Revenue ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.REV_FY3} data-field="REV_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.REV_FY2} data-field="REV_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.REV_FY1} data-field="REV_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Capital Expenditure ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CAP_FY3} data-field="CAP_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CAP_FY2} data-field="CAP_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CAP_FY1} data-field="CAP_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Operating Expenditure ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.OP_FY3} data-field="OP_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.OP_FY2} data-field="OP_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.OP_FY1} data-field="OP_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Balance at End of Year ($)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cy3BalanceEnd} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cy2BalanceEnd} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cy1BalanceEnd} /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q7: Current Fiscal Year Data  -->
+                                    <template if:true={q.isQ7}>
+                                        <p class="rfi-field-hint">All amounts in USD for Current FY ({fiscalYears.cfyYear}). Variances are auto-computed.</p>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Budget ($) <span class="required">*</span></th>
+                                                        <th>Projection ($) <span class="required">*</span></th>
+                                                        <th>Variance ($)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Revenue</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_REV_BUDGET} data-field="CFY_REV_BUDGET" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_REV_PROJ} data-field="CFY_REV_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyRevenueVariance} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Capital Expenditure</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_CAP_BUDGET} data-field="CFY_CAP_BUDGET" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_CAP_PROJ} data-field="CFY_CAP_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyCapexVariance} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Operating Expenditure</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_OP_BUDGET} data-field="CFY_OP_BUDGET" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.CFY_OP_PROJ} data-field="CFY_OP_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyOpexVariance} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Net Surplus / (Deficit)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyNetBudget} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyNetProj} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={cfyNetVariance} /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="rfi-richtext-wrapper" style="margin-top:16px;">
+                                            <label class="rfi-richtext-label">Explanation of Budget Variances</label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Revenue_Explanation__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q8: 501(c)(3) & Equivalency Determination  -->
+                                    <template if:true={q.isQ8}>
+                                        <div class="rfi-grid-two">
+                                            <div>
+                                                <label class="rfi-field-label">Do you hold 501(c)(3) status?</label>
+                                                <div class="rfi-radio-group">
+                                                    <label><input type="radio" name="501c3" value="Yes" checked={formValues.Has_501c3_Status__c} data-field="Has_501c3_Status__c" onchange={handleFieldChange}/> Yes</label>
+                                                    <label><input type="radio" name="501c3" value="No" data-field="Has_501c3_Status__c" onchange={handleFieldChange}/> No</label>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="rfi-field-label">Do you have an Equivalency Determination (ED)?</label>
+                                                <div class="rfi-radio-group">
+                                                    <label><input type="radio" name="ed" value="Yes" checked={formValues.Has_Equivalency_Determination__c} data-field="Has_Equivalency_Determination__c" onchange={handleFieldChange}/> Yes</label>
+                                                    <label><input type="radio" name="ed" value="No" data-field="Has_Equivalency_Determination__c" onchange={handleFieldChange}/> No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q9: FCRA Registration  -->
+                                    <template if:true={q.isQ9}>
+                                        <div>
+                                            <label class="rfi-field-label">Is your organization FCRA registered in India?</label>
+                                            <div class="rfi-radio-group">
+                                                <label><input type="radio" name="fcra" value="Yes" checked={formValues.Is_FCRA_Registered__c} data-field="Is_FCRA_Registered__c" onchange={handleFieldChange}/> Yes</label>
+                                                <label><input type="radio" name="fcra" value="No" data-field="Is_FCRA_Registered__c" onchange={handleFieldChange}/> No</label>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q10: Top Funders & References  -->
+                                    <template if:true={q.isQ10}>
+                                        <h3 class="rfi-section-subtitle">Top 3 Most Prominent Funders</h3>
+                                        <!-- Funder 1 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 1</span></div>
+                                            <div class="rfi-grid-two">
+                                                <lightning-input label="Funder Name" value={formValues.Funder_1_Name__c} data-field="Funder_1_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_1_Amount__c} data-field="Funder_1_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
+                                                <lightning-input type="date" label="Period Start" value={formValues.Funder_1_Period_Start__c} data-field="Funder_1_Period_Start__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="date" label="Period End" value={formValues.Funder_1_Period_End__c} data-field="Funder_1_Period_End__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-combobox label="Funding Type" value={formValues.Funder_1_Type__c} options={funderTypeOptions} data-field="Funder_1_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                            </div>
+                                        </div>
+                                        <!-- Funder 2 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 2</span></div>
+                                            <div class="rfi-grid-two">
+                                                <lightning-input label="Funder Name" value={formValues.Funder_2_Name__c} data-field="Funder_2_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_2_Amount__c} data-field="Funder_2_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
+                                                <lightning-input type="date" label="Period Start" value={formValues.Funder_2_Period_Start__c} data-field="Funder_2_Period_Start__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="date" label="Period End" value={formValues.Funder_2_Period_End__c} data-field="Funder_2_Period_End__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-combobox label="Funding Type" value={formValues.Funder_2_Type__c} options={funderTypeOptions} data-field="Funder_2_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                            </div>
+                                        </div>
+
+                                        <h3 class="rfi-section-subtitle" style="margin-top:20px;">References for Outreach</h3>
+                                        <div class="rfi-inner-card">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Reference 1</span></div>
+                                            <div class="rfi-grid-three">
+                                                <lightning-input label="Name" value={formValues.Reference_1_Name__c} data-field="Reference_1_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input label="Role / Title" value={formValues.Reference_1_Role__c} data-field="Reference_1_Role__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="email" label="Email" value={formValues.Reference_1_Email__c} data-field="Reference_1_Email__c" onchange={handleFieldChange}></lightning-input>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q11: Skilling Approach (JF)  -->
+                                    <template if:true={q.isQ11}>
+                                        <div class="rfi-richtext-wrapper">
+                                            <label class="rfi-richtext-label">Your Skilling & Placement Approach <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Skilling_Approach__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q12: Skilling Domains (JF)  -->
+                                    <template if:true={q.isQ12}>
+                                        <template for:each={skillingDomainRows} for:item="row">
+                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                                    <span class="rfi-inner-label">Domain {row.id}</span>
+                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveSkillingDomain}> Remove</button>
+                                                </div>
+                                                <div style="margin-bottom:10px;">
+                                                    <label class="rfi-field-label">Domain / Programme Name <span class="required">*</span></label>
+                                                    <input type="text" class="rfi-text-input" value={row.name} data-id={row.id} data-field="name" onchange={handleSkillingDomainChange} />
+                                                </div>
+                                                <div class="rfi-grid-four">
+                                                    <div>
+                                                        <label class="rfi-field-label">Training Hours</label>
+                                                        <input type="number" class="rfi-number-input" value={row.hours} data-id={row.id} data-field="hours" onchange={handleSkillingDomainChange} min="0" />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Duration (Months)</label>
+                                                        <input type="number" class="rfi-number-input" value={row.duration} data-id={row.id} data-field="duration" onchange={handleSkillingDomainChange} min="0" />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">When Started</label>
+                                                        <input type="date" class="rfi-date-input" value={row.whenStarted} data-id={row.id} data-field="whenStarted" onchange={handleSkillingDomainChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Annual Enrollment</label>
+                                                        <input type="number" class="rfi-number-input" value={row.enrollment} data-id={row.id} data-field="enrollment" onchange={handleSkillingDomainChange} min="0" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <button type="button" class="rfi-add-btn" onclick={handleAddSkillingDomain}>+ Add Domain</button>
+                                    </template>
+
+                                    <!--  Q13: JF Outcomes Actuals (JF)  -->
+                                    <template if:true={q.isQ13}>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Metric</th>
+                                                        <th>FY-3 ({fiscalYears.fy3Year})</th>
+                                                        <th>FY-2 ({fiscalYears.fy2Year})</th>
+                                                        <th>FY-1 ({fiscalYears.fy1Year})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Learner Enrollments</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY3} data-field="JF_ENROLL_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY2} data-field="JF_ENROLL_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY1} data-field="JF_ENROLL_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Learner Placements</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY3} data-field="JF_PLACE_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY2} data-field="JF_PLACE_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY1} data-field="JF_PLACE_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Avg Cost per Placement ($)</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY3} data-field="JF_COST_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY2} data-field="JF_COST_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY1} data-field="JF_COST_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q14: JF Outcomes Projections (JF)  -->
+                                    <template if:true={q.isQ14}>
+                                        <div class="rfi-grid-three">
+                                            <lightning-input type="number" label="Projected Learner Enrollments (CFY)" value={formValues.JF_ENROLL_PROJ} data-field="JF_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Learner Placements (CFY)" value={formValues.JF_PLACE_PROJ} data-field="JF_PLACE_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Cost per Placement ($)" value={formValues.JF_COST_PROJ} data-field="JF_COST_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q15: Job Creation Approach (JC)  -->
+                                    <template if:true={q.isQ15}>
+                                        <div class="rfi-richtext-wrapper">
+                                            <label class="rfi-richtext-label">Your Job Creation Approach <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Job_Creation_Approach__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q16: Business Sectors Served (JC)  -->
+                                    <template if:true={q.isQ16}>
+                                        <template for:each={businessSectorRows} for:item="row">
+                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                                    <span class="rfi-inner-label">Sector {row.id}</span>
+                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveBusinessSector}> Remove</button>
+                                                </div>
+                                                <div class="rfi-grid-two" style="margin-bottom:10px;">
+                                                    <div>
+                                                        <label class="rfi-field-label">Business Sector</label>
+                                                        <input type="text" class="rfi-text-input" value={row.sector} data-id={row.id} data-field="sector" onchange={handleBusinessSectorChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">When Did Support Begin</label>
+                                                        <input type="date" class="rfi-date-input" value={row.whenBegan} data-id={row.id} data-field="whenBegan" onchange={handleBusinessSectorChange} />
+                                                    </div>
+                                                </div>
+                                                <div style="max-width:240px;">
+                                                    <label class="rfi-field-label">Annual Enterprises Supported</label>
+                                                    <input type="number" class="rfi-number-input" value={row.enrollment} data-id={row.id} data-field="enrollment" onchange={handleBusinessSectorChange} min="0" />
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <button type="button" class="rfi-add-btn" onclick={handleAddBusinessSector}>+ Add Sector</button>
+                                    </template>
+
+                                    <!--  Q17: JC Outcomes Actuals (JC)  -->
+                                    <template if:true={q.isQ17}>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Metric</th>
+                                                        <th>FY-3 ({fiscalYears.fy3Year})</th>
+                                                        <th>FY-2 ({fiscalYears.fy2Year})</th>
+                                                        <th>FY-1 ({fiscalYears.fy1Year})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">New Businesses Started</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY3} data-field="JC_NEW_BIZ_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY2} data-field="JC_NEW_BIZ_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY1} data-field="JC_NEW_BIZ_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Jobs Created from New Businesses</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY3} data-field="JC_NEW_JOBS_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY2} data-field="JC_NEW_JOBS_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY1} data-field="JC_NEW_JOBS_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Existing Businesses Supported</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY3} data-field="JC_EXIST_BIZ_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY2} data-field="JC_EXIST_BIZ_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY1} data-field="JC_EXIST_BIZ_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Jobs Created from Existing Businesses</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY3} data-field="JC_EXIST_JOBS_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY2} data-field="JC_EXIST_JOBS_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY1} data-field="JC_EXIST_JOBS_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q18: JC Outcomes Projections (JC)  -->
+                                    <template if:true={q.isQ18}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-input type="number" label="Projected New Businesses (CFY)" value={formValues.JC_NEW_BIZ_PROJ} data-field="JC_NEW_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Jobs from New Businesses (CFY)" value={formValues.JC_NEW_JOBS_PROJ} data-field="JC_NEW_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Existing Businesses Supported (CFY)" value={formValues.JC_EXIST_BIZ_PROJ} data-field="JC_EXIST_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Jobs from Existing Businesses (CFY)" value={formValues.JC_EXIST_JOBS_PROJ} data-field="JC_EXIST_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q19: Livelihood Approach (Liv)  -->
+                                    <template if:true={q.isQ19}>
+                                        <div class="rfi-richtext-wrapper">
+                                            <label class="rfi-richtext-label">Livelihood Upliftment Approach <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Livelihood_Approach__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q20: Livelihood Programs (Liv)  -->
+                                    <template if:true={q.isQ20}>
+                                        <template for:each={livelihoodProgramRows} for:item="row">
+                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                                    <span class="rfi-inner-label">Program {row.id}</span>
+                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveLivelihoodProgram}> Remove</button>
+                                                </div>
+                                                <div class="rfi-grid-two" style="margin-bottom:10px;">
+                                                    <div>
+                                                        <label class="rfi-field-label">Program Name</label>
+                                                        <input type="text" class="rfi-text-input" value={row.programName} data-id={row.id} data-field="programName" onchange={handleLivelihoodProgramChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Intervention Type</label>
+                                                        <input type="text" class="rfi-text-input" value={row.interventionType} data-id={row.id} data-field="interventionType" onchange={handleLivelihoodProgramChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Target Population</label>
+                                                        <input type="text" class="rfi-text-input" value={row.targetPopulation} data-id={row.id} data-field="targetPopulation" onchange={handleLivelihoodProgramChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Annual Households</label>
+                                                        <input type="number" class="rfi-number-input" value={row.annualHouseholds} data-id={row.id} data-field="annualHouseholds" onchange={handleLivelihoodProgramChange} min="0" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <button type="button" class="rfi-add-btn" onclick={handleAddLivelihoodProgram}>+ Add Program</button>
+                                    </template>
+
+                                    <!--  Q21: Communities & Partners (Liv)  -->
+                                    <template if:true={q.isQ21}>
+                                        <template for:each={communityRows} for:item="row">
+                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
+                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                                    <span class="rfi-inner-label">Partner / Community {row.id}</span>
+                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveCommunity}> Remove</button>
+                                                </div>
+                                                <div class="rfi-grid-two">
+                                                    <div>
+                                                        <label class="rfi-field-label">Partner / Community Name</label>
+                                                        <input type="text" class="rfi-text-input" value={row.partnerName} data-id={row.id} data-field="partnerName" onchange={handleCommunityChange} />
+                                                    </div>
+                                                    <div>
+                                                        <label class="rfi-field-label">Geography</label>
+                                                        <input type="text" class="rfi-text-input" value={row.geography} data-id={row.id} data-field="geography" onchange={handleCommunityChange} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <button type="button" class="rfi-add-btn" onclick={handleAddCommunity}>+ Add Partner</button>
+                                    </template>
+
+                                    <!--  Q22: Livelihood Outcomes Actuals (Liv)  -->
+                                    <template if:true={q.isQ22}>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Metric</th>
+                                                        <th>FY-3 ({fiscalYears.fy3Year})</th>
+                                                        <th>FY-2 ({fiscalYears.fy2Year})</th>
+                                                        <th>FY-1 ({fiscalYears.fy1Year})</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Households Served</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY3} data-field="LIV_SERVED_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY2} data-field="LIV_SERVED_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY1} data-field="LIV_SERVED_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Households Enrolled</td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY3} data-field="LIV_ENROLL_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY2} data-field="LIV_ENROLL_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY1} data-field="LIV_ENROLL_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q23: Livelihood Outcomes Projections (Liv)  -->
+                                    <template if:true={q.isQ23}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-input type="number" label="Projected Households Served (CFY)" value={formValues.LIV_SERVED_PROJ} data-field="LIV_SERVED_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                            <lightning-input type="number" label="Projected Households Enrolled (CFY)" value={formValues.LIV_ENROLL_PROJ} data-field="LIV_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q24: Independent Verification of Outcomes  -->
+                                    <template if:true={q.isQ24}>
+                                        <div class="rfi-grid-two" style="margin-bottom:16px;">
+                                            <div>
+                                                <label class="rfi-field-label">Do you have third-party verified outcome data?</label>
+                                                <div class="rfi-radio-group">
+                                                    <label><input type="radio" name="q24_ver" value="Yes" checked={isQ24VerifiedYes} data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> Yes</label>
+                                                    <label><input type="radio" name="q24_ver" value="No" data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> No</label>
+                                                </div>
+                                            </div>
+                                            <lightning-input label="Report URL / Link (Optional)" value={formValues.Q24_REPORT_URL__c} data-field="Q24_REPORT_URL__c" onchange={handleFieldChange}></lightning-input>
+                                        </div>
+
+                                        <template if:true={isQ24VerifiedYes}>
+                                            <div class="rfi-upload-container">
+                                                <label class="rfi-field-label">Upload Verification Report (PDF only) <span class="required">*</span></label>
+                                                <lightning-file-upload
+                                                    label="Upload Verification Report"
+                                                    name="q24FileUpload"
+                                                    record-id={recordId}
+                                                    accept={pdfOnlyFormats}
+                                                    onuploadfinished={handleQ24UploadFinished}>
+                                                </lightning-file-upload>
+
+                                                <template if:true={hasQ24UploadedFiles}>
+                                                    <ul class="rfi-uploaded-list">
+                                                        <template for:each={q24UploadedFiles} for:item="f">
+                                                            <li key={f.documentId} class="rfi-uploaded-item">
+                                                                <lightning-icon icon-name="doctype:pdf" size="x-small"></lightning-icon>
+                                                                <span>{f.name}</span>
+                                                                <button type="button" class="rfi-remove-btn" data-id={f.documentId} onclick={handleRemoveQ24File}> Remove</button>
+                                                            </li>
+                                                        </template>
+                                                    </ul>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </template>
+
+                                    <!--  Q25: Sustainability Plan  -->
+                                    <template if:true={q.isQ25}>
+                                        <div class="rfi-richtext-wrapper">
+                                            <label class="rfi-richtext-label">Organizational Sustainability Plan <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Organizational_Sustainability__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q26: Direction & Use of Funds  -->
+                                    <template if:true={q.isQ26}>
+                                        <div class="rfi-richtext-wrapper">
+                                            <label class="rfi-richtext-label">Desired Use of Additional Funding / Investment <span class="required">*</span></label>
+                                            <div class="modern-toolbar">
+                                                <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                            </div>
+                                            <div class="modern-richtext-area" contenteditable="true"
+                                                data-field="Use_of_Additional_Funding__c"
+                                                oninput={handleRichTextInput}></div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q27: GenieAI & Operational Synergies  -->
+                                    <template if:true={q.isQ27}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-combobox label="Interest in GenieAI Integration"
+                                                value={formValues.GenieAI_Interest_Level__c}
+                                                options={genieAIOptions}
+                                                data-field="GenieAI_Interest_Level__c"
+                                                onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                        </div>
+                                        <template if:true={showSynergiesTextBox}>
+                                            <div class="rfi-richtext-wrapper" style="margin-top:16px;">
+                                                <label class="rfi-richtext-label">Describe Potential Synergies with GenieAI</label>
+                                                <div class="modern-toolbar">
+                                                    <button type="button" class="toolbar-min-btn" onclick={handleBold}>B</button>
+                                                    <button type="button" class="toolbar-min-btn" onclick={handleItalic}>I</button>
+                                                    <button type="button" class="toolbar-min-btn" onclick={handleUnderline}>U</button>
+                                                </div>
+                                                <div class="modern-richtext-area" contenteditable="true"
+                                                    data-field="Operational_Synergies_with_WOF__c"
+                                                    oninput={handleRichTextInput}></div>
+                                            </div>
+                                        </template>
+                                    </template>
+
+                                    <!--  Q28: Additional Supporting Docs  -->
+                                    <template if:true={q.isQ28}>
+                                        <div class="rfi-upload-container">
+                                            <label class="rfi-field-label">Upload Additional Supporting Documents</label>
+                                            <lightning-file-upload
+                                                label="Upload Supporting Documents"
+                                                name="q28FileUpload"
+                                                record-id={recordId}
+                                                accept={acceptedFileFormats}
+                                                multiple
+                                                onuploadfinished={handleQ28UploadFinished}>
+                                            </lightning-file-upload>
+
+                                            <template if:true={hasQ28UploadedFiles}>
+                                                <ul class="rfi-uploaded-list">
+                                                    <template for:each={q28UploadedFiles} for:item="f">
+                                                        <li key={f.documentId} class="rfi-uploaded-item">
+                                                            <lightning-icon icon-name="doctype:attachment" size="x-small"></lightning-icon>
+                                                            <span>{f.name}</span>
+                                                            <button type="button" class="rfi-remove-btn" data-id={f.documentId} onclick={handleRemoveQ28File}> Remove</button>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:false={hasFlaggedQuestions}>
+                        <div class="rfi-no-flagged-card">
+                            <lightning-icon icon-name="utility:info_alt" size="medium" variant="base"></lightning-icon>
+                            <h3>No Specific Questions Returned</h3>
+                            <p>All questions are in good standing or have already been updated. Click Resubmit below to complete the process.</p>
+                        </div>
+                    </template>
+
+                </div>
+
+                <!-- Action Footer -->
+                <div class="rfi-footer-bar">
+                    <button type="button" class="btn-secondary-outline" onclick={handleCancel}>Cancel</button>
+                    <button type="button" class="btn-primary-red" onclick={handleSubmitResponse} disabled={isSaving}>
+                        <template if:true={isSaving}>Submitting Revision...</template>
+                        <template if:false={isSaving}>Submit Revision</template>
+                    </button>
+                </div>
+
+            </template>
+        </template>
+
+    </div>
+</template>

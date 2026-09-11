@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Verify Email Address</name>
+    <style>none</style>
+    <subject>Verify your email address — Wadhwani Grants</subject>
+    <textOnly>Verify your email address — Wadhwani Grants
+
+Hello {{{contact_first_name}}},
+
+Thank you for signing up with Wadhwani Grants.
+
+To activate your account for {{{org_name}}}, please verify your email address by clicking the link below:
+
+{{{verification_link}}}
+
+This link will expire in {{{link_expiry_hours}}} hours.
+
+If you did not create this account, you can safely ignore this email.
+
+Warm regards,
+The Wadhwani Grants Team
+
+© {{{year}}} Wadhwani Grants. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

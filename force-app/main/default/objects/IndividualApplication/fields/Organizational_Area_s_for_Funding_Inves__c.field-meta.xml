@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Organizational_Area_s_for_Funding_Inves__c</fullName>
+    <label>Organizational Area(s) for Funding</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Job Fulfillment Only</fullName>
+                <default>false</default>
+                <label>Job Fulfillment Only</label>
+            </value>
+            <value>
+                <fullName>Job Creation Only</fullName>
+                <default>false</default>
+                <label>Job Creation Only</label>
+            </value>
+            <value>
+                <fullName>Both Job Fulfillment and Job Creation</fullName>
+                <default>false</default>
+                <label>Both Job Fulfillment and Job Creation</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

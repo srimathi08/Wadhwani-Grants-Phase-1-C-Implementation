@@ -95,6 +95,18 @@ export default class CoeFundOverview extends NavigationMixin(LightningElement) {
         });
     }
 
+
+    /* ================================
+       NAVIGATE TO REPORT / GENERATE DOCUMENT
+    ================================= */
+    navigateToReport() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: `/WadhwaniOrg/s/report`
+            }
+        });
+    }
     /* ================================
        MODAL CONTROL
     ================================= */

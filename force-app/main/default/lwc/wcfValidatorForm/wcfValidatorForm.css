@@ -1,0 +1,1374 @@
+/* ═══════════════════════════════════════════════════════
+   WCF VALIDATOR FORM — CSS  (Full-width + badge fix)
+
+   UPDATED: Container-query based responsiveness so the
+   form stays readable at ANY split-pane divider width —
+   layout reacts to the PANEL width, not the viewport.
+═══════════════════════════════════════════════════════ */
+
+/* ── HOST: stretch component to fill the Experience Cloud region ── */
+:host {
+    display        : block;
+    width          : 100%;
+    max-width      : 100%;
+    box-sizing     : border-box;
+    font-family    : 'Salesforce Sans', Arial, sans-serif;
+    container-type : inline-size;   /* ← ADDED: enables width-based container queries */
+}
+
+/* ──────────────────────────────────────────
+   HEADER
+────────────────────────────────────────── */
+.wcf-header {
+    display        : flex;
+    align-items    : center;
+    gap            : 1.5rem;
+    padding        : 0.75rem 2rem;
+    background     : #ffffff;
+    border-bottom  : 2px solid #e5e1d8;
+    position       : sticky;
+    top            : 0;
+    z-index        : 200;
+    width          : 100%;
+    box-sizing     : border-box;
+}
+
+.wcf-header-brand {
+    display     : flex;
+    align-items : center;
+    gap         : 0.6rem;
+    flex        : 0 0 auto;
+}
+
+.wcf-header-logo {
+    height      : 32px;
+    width       : auto;
+    object-fit  : contain;
+}
+
+.wcf-header-org {
+    font-size      : 1rem;
+    font-weight    : 700;
+    color          : #1a1a1a;
+    letter-spacing : 0.01em;
+}
+
+.wcf-header-nav {
+    display    : flex;
+    gap        : 1.75rem;
+    flex       : 1;
+    font-size  : 0.875rem;
+    color      : #6b6b6b;
+}
+
+.wcf-header-nav span {
+    cursor         : pointer;
+    padding-bottom : 3px;
+    transition     : color 0.15s;
+}
+.wcf-header-nav span:hover { color: #E8622A; }
+
+.wcf-nav-active {
+    color         : #E8622A !important;
+    font-weight   : 700;
+    border-bottom : 2px solid #E8622A;
+}
+
+.wcf-header-user {
+    display     : flex;
+    align-items : center;
+    gap         : 0.6rem;
+    margin-left : auto;
+    flex        : 0 0 auto;
+}
+
+.wcf-header-role {
+    font-size : 0.8rem;
+    color     : #555;
+}
+
+.wcf-header-avatar {
+    width           : 34px;
+    height          : 34px;
+    border-radius   : 50%;
+    background      : #E8622A;
+    color           : #fff;
+    font-size       : 0.75rem;
+    font-weight     : 700;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    flex-shrink     : 0;
+}
+
+/* ──────────────────────────────────────────
+   CONTEXT / APP META BAR
+────────────────────────────────────────── */
+.wcf-context-bar {
+    background    : #faf8f5;
+    border-bottom : 2px solid #e5e1d8;
+    padding       : 1.25rem 2rem 1rem;
+    width         : 100%;
+    box-sizing    : border-box;
+}
+
+.wcf-context-stage {
+    font-size      : 0.7rem;
+    font-weight    : 700;
+    letter-spacing : 0.1em;
+    color          : #999;
+    text-transform : uppercase;
+    margin-bottom  : 0.2rem;
+}
+
+.wcf-context-title {
+    font-size      : 1.7rem;
+    font-weight    : 800;
+    color          : #1a1a1a;
+    margin         : 0 0 0.75rem 0;
+    letter-spacing : -0.01em;
+}
+
+.wcf-context-meta {
+    display      : flex;
+    align-items  : center;
+    flex-wrap    : wrap;
+    gap          : 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.wcf-meta-item {
+    display     : flex;
+    align-items : baseline;
+    gap         : 0.4rem;
+    flex-wrap   : wrap;          /* ← ADDED: label/value pair wraps cleanly when narrow */
+    min-width   : 0;             /* ← ADDED */
+}
+
+.wcf-meta-label {
+    font-size      : 0.72rem;
+    color          : #999;
+    font-weight    : 600;
+    text-transform : uppercase;
+    letter-spacing : 0.04em;
+    white-space    : nowrap;     /* ← ADDED: "APPLICATION ID" never splits mid-label */
+}
+
+.wcf-meta-val {
+    font-size  : 0.875rem;
+    color      : #1a1a1a;
+    font-weight: 600;
+    overflow-wrap: break-word;   /* ← ADDED */
+    min-width  : 0;              /* ← ADDED */
+}
+
+.wcf-app-id {
+    font-family   : 'Courier New', monospace;
+    background    : #f0ece4;
+    padding       : 0.1em 0.45em;
+    border-radius : 4px;
+    font-size     : 0.82rem;
+    color         : #444;
+}
+
+.wcf-meta-pill {
+    background    : #fee8df;
+    border        : 1px solid #f4a07a;
+    border-radius : 999px;
+    padding       : 0.2rem 0.8rem;
+    font-size     : 0.78rem;
+    color         : #9a3810;
+    font-weight   : 600;
+}
+
+.wcf-context-autosave {
+    display     : flex;
+    align-items : center;
+    gap         : 0.5rem;
+    font-size   : 0.78rem;
+    color       : #888;
+}
+
+.wcf-autosave-dot {
+    width         : 8px;
+    height        : 8px;
+    border-radius : 50%;
+    background    : #22c55e;
+    display       : inline-block;
+    animation     : wcf-pulse 2s infinite;
+}
+
+@keyframes wcf-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+.wcf-template-tag {
+    margin-left    : auto;
+    font-size      : 0.7rem;
+    letter-spacing : 0.06em;
+    color          : #bbb;
+    text-transform : uppercase;
+    font-weight    : 600;
+}
+
+/* ──────────────────────────────────────────
+   FORM BODY WRAPPER — TRUE FULL WIDTH
+────────────────────────────────────────── */
+.wcf-vf-wrapper {
+    width      : 100%;
+    max-width  : 100%;
+    box-sizing : border-box;
+    padding    : 1.75rem 2.5rem 5rem;
+    margin     : 0;
+    background : #f5f3ef;
+}
+
+/* ──────────────────────────────────────────
+   SECTIONS
+────────────────────────────────────────── */
+.wcf-vf-section {
+    background    : #ffffff;
+    border        : 1px solid #e5e1d8;
+    border-radius : 12px;
+    padding       : 1.75rem 2rem;
+    margin-bottom : 1.5rem;
+    box-shadow    : 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.wcf-vf-sec-head {
+    display       : flex;
+    align-items   : flex-start;
+    gap           : 1rem;
+    margin-bottom : 1.5rem;
+}
+
+.wcf-vf-sec-num {
+    width           : 34px;
+    height          : 34px;
+    border-radius   : 50%;
+    background      : #E8622A;
+    color           : #fff;
+    font-size       : 0.9rem;
+    font-weight     : 800;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    flex-shrink     : 0;
+    box-shadow      : 0 2px 6px rgba(232,98,42,0.3);
+}
+
+.wcf-vf-sec-info { min-width: 0; }   /* ← ADDED: title/lede shrink inside flex row */
+
+.wcf-vf-sec-title {
+    font-size   : 1.15rem;
+    font-weight : 700;
+    color       : #1a1a1a;
+    margin      : 0 0 0.3rem 0;
+}
+
+.wcf-vf-sec-lede {
+    font-size   : 0.82rem;
+    color       : #777;
+    margin      : 0;
+    line-height : 1.55;
+}
+
+/* ──────────────────────────────────────────
+   FIELD ROWS
+────────────────────────────────────────── */
+.wcf-vf-field {
+    border-top  : 1px solid #f0ece4;
+    padding-top : 1.1rem;
+    margin-top  : 1.1rem;
+}
+.wcf-vf-field:first-of-type {
+    border-top  : none;
+    margin-top  : 0;
+    padding-top : 0;
+}
+
+.wcf-vf-field-top {
+    display         : flex;
+    align-items     : flex-start;
+    justify-content : space-between;
+    gap             : 0.5rem;
+    margin-bottom   : 0.45rem;
+}
+
+.wcf-vf-field-q {
+    font-size   : 0.9rem;
+    font-weight : 600;
+    color       : #1a1a1a;
+    line-height : 1.45;
+    flex        : 1;
+    min-width   : 0;             /* ← ADDED */
+    overflow-wrap: break-word;   /* ← ADDED: long question text stays inside the card */
+}
+
+.wcf-field-id {
+    font-size      : 0.68rem;
+    background     : #f0ece4;
+    color          : #999;
+    border-radius  : 4px;
+    padding        : 0.15em 0.5em;
+    font-weight    : 700;
+    white-space    : nowrap;
+    flex-shrink    : 0;
+    align-self     : flex-start;
+    letter-spacing : 0.03em;
+}
+
+.wcf-hint {
+    font-size   : 0.79rem;
+    color       : #999;
+    margin      : 0 0 0.6rem 0;
+    line-height : 1.55;
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.wcf-req { color: #E8622A; font-weight: 700; }
+.wcf-opt { color: #aaa;    font-weight: 400; }
+
+.wcf-char-count {
+    font-size  : 0.73rem;
+    color      : #bbb;
+    margin-top : 0.3rem;
+    text-align : right;
+}
+
+/* ──────────────────────────────────────────
+   AUTO-STATE INDICATOR
+────────────────────────────────────────── */
+.wcf-auto-state {
+    display       : flex;
+    align-items   : center;
+    gap           : 0.5rem;
+    font-size     : 0.82rem;
+    padding       : 0.45rem 0.85rem;
+    border-radius : 6px;
+    margin-bottom : 0.6rem;
+}
+.wcf-auto-state > div:last-child {
+    min-width    : 0;
+    overflow-wrap: break-word;
+    white-space  : pre-line;
+}
+.wcf-auto-green {
+    background : #f0fdf4;
+    color      : #166534;
+    border     : 1px solid #bbf7d0;
+}
+/* ← ADDED: amber state referenced by s1_2_stateClass but previously unstyled */
+.wcf-auto-amber {
+    background : #fffbeb;
+    color      : #92400e;
+    border     : 1px solid #fde68a;
+}
+.wcf-auto-icon { font-size: 0.9rem; font-weight: 700; flex-shrink: 0; }   /* ← ADDED flex-shrink */
+
+/* ──────────────────────────────────────────
+   CONFIRM PILLS  (S1.x)
+────────────────────────────────────────── */
+.wcf-confirm-row {
+    display    : flex;
+    gap        : 0.5rem;
+    flex-wrap  : wrap;
+    margin-top : 0.5rem;
+}
+
+.wcf-confirm-pill {
+    padding       : 0.38rem 1.1rem;
+    border-radius : 999px;
+    border        : 1.5px solid #d1cfc8;
+    background    : #fff;
+    font-size     : 0.82rem;
+    color         : #555;
+    cursor        : pointer;
+    transition    : all 0.15s ease;
+    user-select   : none;
+    font-weight   : 500;
+    text-align    : center;      /* ← ADDED: looks right when pill text wraps to 2 lines */
+}
+.wcf-confirm-pill:hover {
+    border-color : #E8622A;
+    color        : #E8622A;
+    background   : #fff4ef;
+}
+.wcf-confirm-pill-sel {
+    background   : #fff4ef;
+    border-color : #E8622A;
+    color        : #E8622A;
+    font-weight  : 700;
+}
+
+/* ──────────────────────────────────────────
+   STANDARD PICKLIST (radio style)
+────────────────────────────────────────── */
+.wcf-picklist {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.45rem;
+}
+.wcf-picklist-wrap {
+    display   : flex;
+    flex-wrap : wrap;
+    gap       : 0.45rem;
+}
+
+.wcf-pick-opt {
+    display       : flex;
+    align-items   : center;
+    gap           : 0.55rem;
+    padding       : 0.6rem 1rem;
+    border        : 1.5px solid #e2ddd5;
+    border-radius : 7px;
+    cursor        : pointer;
+    font-size     : 0.875rem;
+    color         : #333;
+    background    : #fff;
+    transition    : all 0.12s ease;
+    font-weight   : 500;
+    min-width     : 0;           /* ← ADDED */
+    overflow-wrap : break-word;  /* ← ADDED */
+}
+.wcf-pick-opt:hover { border-color: #E8622A; background: #fef9f9; }
+.wcf-pick-sel       { border-color: #E8622A; background: #fff4ef; color: #E8622A; font-weight: 700; }
+
+.wcf-pick-dot {
+    width         : 13px;
+    height        : 13px;
+    border-radius : 50%;
+    border        : 2px solid #c8c4bc;
+    flex-shrink   : 0;
+    transition    : all 0.12s;
+}
+.wcf-pick-sel .wcf-pick-dot {
+    border-color : #E8622A;
+    background   : #E8622A;
+    box-shadow   : 0 0 0 2px #fff, 0 0 0 4px #E8622A;
+}
+
+/* ──────────────────────────────────────────
+   BINARY PICKLIST  (S2.3)
+────────────────────────────────────────── */
+.wcf-picklist-binary {
+    display               : grid;
+    grid-template-columns : 1fr 1fr;
+    gap                   : 0.75rem;
+}
+
+.wcf-pick-binary {
+    display       : flex;
+    align-items   : flex-start;
+    gap           : 0.65rem;
+    padding       : 1rem 1.1rem;
+    border-radius : 8px;
+    border        : 1.5px solid #d8d4cc;
+    background    : #fff;
+    cursor        : pointer;
+    transition    : all 0.15s ease;
+    min-width     : 0;           /* ← ADDED: card can shrink inside the grid */
+}
+.wcf-pick-binary:hover         { border-color: #E8622A; background: #fef9f9; }
+.wcf-pick-binary.wcf-pick-sel  { border-color: #E8622A; background: #fff4ef; }
+
+.wcf-pick-radio {
+    width         : 16px;
+    height        : 16px;
+    border-radius : 50%;
+    border        : 2px solid #d8d4cc;
+    flex-shrink   : 0;
+    margin-top    : 2px;
+    transition    : all 0.15s;
+}
+.wcf-pick-binary.wcf-pick-sel .wcf-pick-radio {
+    border-color : #E8622A;
+    box-shadow   : inset 0 0 0 3px #fff, inset 0 0 0 8px #E8622A;
+}
+
+.wcf-pick-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }   /* ← ADDED min-width */
+.wcf-pick-main { font-size: 0.875rem; font-weight: 600; color: #1a1a1a; overflow-wrap: break-word; }   /* ← ADDED overflow-wrap */
+.wcf-pick-sub  { font-size: 0.78rem;  color: #999; font-style: italic; }
+
+/* ══════════════════════════════════════════════════════
+   DECISION CARDS  (S3.1)
+   KEY FIX: grid so all 3 cards always share equal width;
+   badge wraps on multiple lines instead of overflowing.
+══════════════════════════════════════════════════════ */
+.wcf-decision-cards {
+    display               : grid;
+    grid-template-columns : repeat(3, 1fr);
+    gap                   : 1rem;
+    width                 : 100%;
+    box-sizing            : border-box;
+}
+
+.wcf-dec-card {
+    box-sizing     : border-box;
+    border         : 2px solid #e2ddd5;
+    border-radius  : 10px;
+    padding        : 1.1rem;
+    cursor         : pointer;
+    background     : #fff;
+    transition     : all 0.15s ease;
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.5rem;
+    min-width      : 0;           /* crucial — prevents grid blowout */
+    overflow       : hidden;
+}
+.wcf-dec-card:hover {
+    border-color : #6b7280;
+    box-shadow   : 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Card title row: label + badge stacked vertically so badge never
+   pushes outside the card boundary                               */
+.wcf-dec-label {
+    display        : flex;
+    flex-direction : column;     /* ← stack vertically */
+    align-items    : flex-start;
+    gap            : 0.4rem;
+    font-size      : 1rem;
+    font-weight    : 700;
+    color          : #1a1a1a;
+    overflow-wrap  : break-word; /* ← ADDED */
+}
+
+/* Badge: wraps text, never clips */
+.wcf-dec-badge {
+    display        : inline-block;
+    font-size      : 0.6rem;
+    font-weight    : 700;
+    letter-spacing : 0.04em;
+    text-transform : uppercase;
+    border-radius  : 4px;
+    padding        : 0.2em 0.5em;
+    white-space    : normal;     /* ← allow wrap */
+    word-break     : break-word;
+    line-height    : 1.4;
+    max-width      : 100%;       /* never wider than card */
+}
+.wcf-dec-badge-pass   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.wcf-dec-badge-return { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.wcf-dec-badge-flag   { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.wcf-dec-desc { font-size: 0.8rem; color: #777; line-height: 1.5; }
+
+/* Selected states */
+.wcf-dec-sel-pass   { border-color: #059669 !important; background: #f0fdf4 !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.15); }
+.wcf-dec-sel-return { border-color: #d97706 !important; background: #fffbeb !important; box-shadow: 0 0 0 3px rgba(217,119,6,0.15); }
+.wcf-dec-sel-flag   { border-color: #db2777 !important; background: #fdf2f8 !important; box-shadow: 0 0 0 3px rgba(219,39,119,0.15); }
+
+/* ──────────────────────────────────────────
+   DEPENDENT FIELD WRAPPERS
+────────────────────────────────────────── */
+.wcf-dep-wrapper {
+    margin-top   : 0.85rem;
+    border-left  : 3px solid #e5e1d8;
+    padding-left : 1.1rem;
+    animation    : wcf-slide-in 0.2s ease;
+}
+
+.wcf-dep-nested {
+    margin-top   : 0.75rem;
+    border-left  : 3px solid #fde68a;
+    padding-left : 1rem;
+    animation    : wcf-slide-in 0.2s ease;
+}
+
+@keyframes wcf-slide-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.wcf-dep-banner {
+    font-size      : 0.7rem;
+    font-weight    : 700;
+    letter-spacing : 0.05em;
+    text-transform : uppercase;
+    color          : #aaa;
+    margin-bottom  : 0.6rem;
+    display        : flex;
+    align-items    : center;
+    gap            : 0.25rem;
+}
+
+.wcf-dep-banner-flag   { color: #b45309; }
+.wcf-dep-banner-return { color: #1d4ed8; }
+.wcf-dep-banner-other  { color: #6b21a8; }
+.wcf-dep-banner-notes  { color: #047857; }
+
+/* ──────────────────────────────────────────
+   CHECKLIST  (S3.3)
+────────────────────────────────────────── */
+.wcf-checklist {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.5rem;
+}
+
+.wcf-check-opt {
+    display       : flex;
+    align-items   : center;
+    gap           : 0.75rem;
+    padding       : 0.75rem 1rem;
+    border        : 1.5px solid #e2ddd5;
+    border-radius : 7px;
+    background    : #fff;
+    cursor        : pointer;
+    font-size     : 0.875rem;
+    color         : #333;
+    transition    : all 0.15s;
+    font-weight   : 500;
+    flex-wrap     : wrap;        /* ← ADDED: "Suggested by S2" tag drops below when narrow */
+}
+.wcf-check-opt:hover  { border-color: #E8622A; background: #fef9f9; }
+.wcf-check-sel        { border-color: #E8622A !important; background: #fff4ef !important; }
+.wcf-check-suggested  { border-color: #d97706; border-style: dashed; background: #fffbeb; }
+
+.wcf-checkbox {
+    width         : 17px;
+    height        : 17px;
+    border-radius : 4px;
+    border        : 2px solid #d8d4cc;
+    flex-shrink   : 0;
+    position      : relative;
+    transition    : all 0.15s;
+}
+.wcf-check-sel .wcf-checkbox { background: #E8622A; border-color: #E8622A; }
+.wcf-check-sel .wcf-checkbox::after {
+    content     : '✓';
+    position    : absolute;
+    top         : -2px;
+    left        : 1px;
+    font-size   : 11px;
+    color       : #fff;
+    font-weight : 800;
+}
+
+.wcf-check-label { flex: 1; min-width: 0; overflow-wrap: break-word; }   /* ← ADDED min-width + overflow-wrap */
+
+.wcf-suggest-tag {
+    font-size     : 0.68rem;
+    font-weight   : 700;
+    background    : #fef3c7;
+    color         : #92400e;
+    border        : 1px solid #fcd34d;
+    border-radius : 999px;
+    padding       : 0.1em 0.55em;
+    white-space   : nowrap;
+}
+
+/* ──────────────────────────────────────────
+   CONDITIONAL INNER BOX
+────────────────────────────────────────── */
+.wcf-cond-inner {
+    padding       : 0.85rem 1rem;
+    background    : #fafafa;
+    border        : 1px solid #e5e1d8;
+    border-radius : 7px;
+    margin-top    : 0.6rem;
+}
+
+.wcf-cond-label {
+    font-size    : 0.82rem;
+    font-weight  : 700;
+    color        : #444;
+    margin-bottom: 0.45rem;
+}
+
+/* ── Footer: compact strip ── */
+/* ── Footer: compact strip — now sticky to stay visible while scrolling ── */
+.wcf-vf-footer {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    padding        : 8px 16px;
+    background     : #fff;
+    border-top     : 1px solid #e0e0e0;
+    gap            : 10px;
+    flex-shrink    : 0;
+    min-height     : 0;
+
+    /* ── NEW: pins the footer to the bottom of the scrolling panel ── */
+    position       : sticky;
+    bottom         : 0;
+    z-index        : 40;
+    box-shadow     : 0 -3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.wcf-footer-status {
+    font-size  : 11.5px;
+    color      : #706e6b;
+    flex       : 1;
+    min-width  : 0;
+    overflow   : hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wcf-footer-actions {
+    display    : flex;
+    gap        : 8px;
+    flex-shrink: 0;
+    flex-wrap  : wrap;           /* ← ADDED: buttons wrap instead of overflowing the panel */
+}
+
+/* Make the buttons smaller */
+.wcf-draft-btn,
+.wcf-seal-btn {
+    --slds-c-button-sizing-height: 28px;
+    font-size: 12px !important;
+    padding  : 0 12px !important;
+    color: #ffffff;
+}
+
+/* ← ADDED: "Seal Validator Record" label must be WHITE like Save Draft.
+   The Experience Cloud theme overrides the brand button text color,
+   so we pin it explicitly via SLDS styling hooks (old + new token
+   names for compatibility), plus a color fallback on the host. */
+.wcf-seal-btn {
+    --slds-c-button-brand-text-color       : #ffffff;
+    --slds-c-button-brand-text-color-hover : #ffffff;
+    --slds-c-button-brand-text-color-active: #ffffff;
+    --sds-c-button-brand-text-color        : #ffffff;
+    --sds-c-button-brand-text-color-hover  : #ffffff;
+    --slds-c-button-text-color             : #ffffff;
+    --slds-c-button-text-color-hover       : #ffffff;
+    color: #ffffff;
+}
+/* ──────────────────────────────────────────
+   LOADING
+────────────────────────────────────────── */
+.wcf-vf-loading {
+    display         : flex;
+    justify-content : center;
+    align-items     : center;
+    padding         : 5rem;
+    min-height      : 300px;
+}
+
+/* ──────────────────────────────────────────
+   RESPONSIVE (viewport fallback — kept for mobile devices;
+   container queries at the bottom of this file handle the
+   split-pane divider case on desktop)
+────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .wcf-header      { padding: 0.6rem 1rem; gap: 0.75rem; }
+    .wcf-header-nav  { display: none; }
+    .wcf-context-bar { padding: 1rem 1rem 0.75rem; }
+    .wcf-vf-wrapper  { padding: 1rem 1rem 5rem; }
+    .wcf-vf-footer   { padding: 0.75rem 1rem; }
+    .wcf-vf-section  { padding: 1.25rem 1rem; }
+
+    .wcf-decision-cards  { grid-template-columns: 1fr; }
+    .wcf-picklist-binary { grid-template-columns: 1fr; }
+}
+
+.wcf-wc-warn {
+    color: #b45309;   /* amber */
+    font-weight: 500;
+}
+
+.wcf-wc-limit {
+    color: #dc2626;   /* red */
+    font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DRAFT RESUME BANNER  (appears at top of form when a Draft is loaded
+   or after every Save Draft click)
+═══════════════════════════════════════════════════════════════════ */
+
+.wcf-draft-banner {
+    display        : flex;
+    align-items    : center;
+    gap            : 1rem;
+    background     : #fff8e6;
+    border         : 1.5px solid #f4a623;
+    border-radius  : 8px;
+    padding        : 0.85rem 1.1rem;
+    margin         : 0.75rem 1.5rem 0;
+    box-shadow     : 0 1px 4px rgba(244, 166, 35, 0.15);
+    flex-wrap      : wrap;
+}
+
+.wcf-draft-banner-left {
+    display     : flex;
+    align-items : center;
+    gap         : 0.65rem;
+    flex        : 1 1 auto;
+    min-width   : 0;             /* ← ADDED */
+}
+
+.wcf-draft-icon {
+    font-size    : 1.35rem;
+    line-height  : 1;
+    flex-shrink  : 0;
+}
+
+.wcf-draft-banner-text {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.15rem;
+    min-width      : 0;          /* ← ADDED */
+}
+
+.wcf-draft-banner-title {
+    font-weight  : 600;
+    font-size    : 0.875rem;
+    color        : #7a4f00;
+    letter-spacing: 0.01em;
+}
+
+.wcf-draft-banner-sub {
+    font-size : 0.78rem;
+    color     : #9a6700;
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+/* Progress bar inside the banner */
+.wcf-draft-progress-bar-wrap {
+    flex        : 0 0 160px;
+    height      : 6px;
+    background  : #fce8b2;
+    border-radius : 99px;
+    overflow    : hidden;
+    align-self  : center;
+}
+
+.wcf-draft-progress-bar {
+    height        : 100%;
+    background    : #f4a623;
+    border-radius : 99px;
+    transition    : width 0.4s ease;
+    min-width     : 4px;
+}
+
+.wcf-draft-dismiss {
+    background   : none;
+    border       : none;
+    color        : #9a6700;
+    cursor       : pointer;
+    font-size    : 1rem;
+    line-height  : 1;
+    padding      : 0.2rem 0.3rem;
+    border-radius: 4px;
+    flex-shrink  : 0;
+    opacity      : 0.7;
+    transition   : opacity 0.15s;
+}
+
+.wcf-draft-dismiss:hover {
+    opacity      : 1;
+    background   : rgba(244, 166, 35, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER — left side with draft chip + status text
+═══════════════════════════════════════════════════════════════════ */
+
+/* Update the footer to use flex with space-between */
+.wcf-vf-footer {
+    display         : flex;
+    align-items     : center;
+    justify-content : space-between;
+    flex-wrap       : wrap;
+    gap             : 0.75rem;
+}
+
+.wcf-footer-left {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.25rem;
+    flex           : 1 1 auto;
+    min-width      : 0;          /* ← ADDED */
+}
+
+/* Draft chip in the footer */
+.wcf-draft-chip {
+    display      : inline-flex;
+    align-items  : center;
+    gap          : 0.4rem;
+    background   : #fff8e6;
+    border       : 1px solid #f4a623;
+    border-radius: 999px;
+    padding      : 0.2rem 0.75rem;
+    font-size    : 0.72rem;
+    font-weight  : 500;
+    color        : #7a4f00;
+    width        : fit-content;
+    max-width    : 100%;         /* ← ADDED */
+    flex-wrap    : wrap;         /* ← ADDED */
+}
+
+.wcf-draft-chip-dot {
+    width         : 6px;
+    height        : 6px;
+    border-radius : 50%;
+    background    : #f4a623;
+    flex-shrink   : 0;
+    animation     : wcf-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes wcf-pulse {
+    0%, 100% { opacity: 1;   transform: scale(1);    }
+    50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAVE DRAFT BUTTON — neutral style distinct from brand "Seal" button
+═══════════════════════════════════════════════════════════════════ */
+
+.wcf-draft-btn {
+    --slds-c-button-neutral-color-background: #fff;
+    --slds-c-button-neutral-color-border    : #f4a623;
+    --slds-c-button-neutral-text-color      : #7a4f00;
+}
+
+.wcf-draft-btn:hover:not([disabled]) {
+    --slds-c-button-neutral-color-background: #fff8e6;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS BAR STEPPED WIDTH CLASSES
+   Used by progressBarClass getter (wcf-pb-0 … wcf-pb-100).
+   Inline style binding is avoided because LWC's HTML linter
+   treats style={expr} as a CSS stylesheet and raises parse errors.
+═══════════════════════════════════════════════════════════════════ */
+.wcf-draft-progress-bar          { height: 100%; border-radius: 99px; background: #f4a623; transition: width 0.4s ease; min-width: 4px; }
+.wcf-draft-progress-bar.wcf-pb-0   { width: 2%;   }
+.wcf-draft-progress-bar.wcf-pb-10  { width: 10%;  }
+.wcf-draft-progress-bar.wcf-pb-20  { width: 20%;  }
+.wcf-draft-progress-bar.wcf-pb-30  { width: 30%;  }
+.wcf-draft-progress-bar.wcf-pb-40  { width: 40%;  }
+.wcf-draft-progress-bar.wcf-pb-50  { width: 50%;  }
+.wcf-draft-progress-bar.wcf-pb-60  { width: 60%;  }
+.wcf-draft-progress-bar.wcf-pb-70  { width: 70%;  }
+.wcf-draft-progress-bar.wcf-pb-80  { width: 80%;  }
+.wcf-draft-progress-bar.wcf-pb-90  { width: 90%;  }
+.wcf-draft-progress-bar.wcf-pb-100 { width: 100%; }
+
+/* ===== Preview Modal ===== */
+
+.slds-modal__container {
+    width: 90% !important;
+    max-width: 1000px !important;
+}
+
+.preview-container {
+    background: #f8f9fb;
+    max-height: 70vh;
+}
+
+.preview-section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.preview-section h3 {
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #16325c;
+}
+
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-item .label {
+    font-weight: 600;
+    color: #444;
+    min-width: 180px;
+}
+
+.preview-item span:last-child {
+    text-align: right;
+    color: #111827;
+    min-width: 0;                /* ← ADDED */
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.decision-card {
+    background: #fff7ed;
+    border-left: 5px solid #ea580c;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.decision-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #c2410c;
+    margin-bottom: 10px;
+}
+
+.decision-rationale {
+    color: #374151;
+    line-height: 1.6;
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.preview-notes {
+    min-height: 60px;
+    color: #374151;
+    line-height: 1.6;
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.slds-modal__header {
+    background: #ffffff;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.slds-modal__footer {
+    background: #ffffff;
+    border-top: 2px solid #e5e7eb;
+}
+.preview-subsection {
+    margin-top: 20px;
+}
+
+.preview-subsection h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #16325c;
+}
+
+.preview-tag {
+    display: inline-block;
+    background: #fff4ef;
+    border: 1px solid #ea580c;
+    color: #c2410c;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   QUESTION NUMBER PILL GRID  (Return section)
+═══════════════════════════════════════════════════════════════════ */
+
+.wcf-qnum-grid {
+    display               : grid;
+    grid-template-columns : repeat(10, 1fr);
+    gap                   : 0.45rem;
+    margin-bottom         : 1rem;
+}
+
+@media (max-width: 768px) {
+    .wcf-qnum-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.wcf-qnum-pill {
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    padding         : 0.45rem 0.25rem;
+    border          : 1.5px solid #d1cfc8;
+    border-radius   : 7px;
+    background      : #fff;
+    font-size       : 0.85rem;
+    font-weight     : 600;
+    color           : #444;
+    cursor          : pointer;
+    transition      : all 0.15s ease;
+    line-height     : 1;
+    text-align      : center;
+    min-width       : 0;         /* ← ADDED */
+}
+
+.wcf-qnum-pill:hover {
+    border-color : #1d4ed8;
+    background   : #eff6ff;
+    color        : #1d4ed8;
+}
+
+.wcf-qnum-pill-sel {
+    border-color : #1d4ed8 !important;
+    background   : #1d4ed8 !important;
+    color        : #ffffff !important;
+    box-shadow   : 0 2px 6px rgba(29,78,216,0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   QUESTION CARDS  (one per selected question number)
+═══════════════════════════════════════════════════════════════════ */
+
+.wcf-qcards-wrap {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.85rem;
+    margin-top     : 0.25rem;
+}
+
+.wcf-qcard {
+    border        : 1.5px solid #bfdbfe;
+    border-radius : 10px;
+    background    : #f0f7ff;
+    overflow      : hidden;
+    animation     : wcf-slide-in 0.18s ease;
+}
+
+.wcf-qcard-header {
+    display      : flex;
+    align-items  : center;
+    gap          : 0.65rem;
+    padding      : 0.6rem 0.9rem;
+    background   : #dbeafe;
+    border-bottom: 1px solid #bfdbfe;
+    flex-wrap    : wrap;         /* ← ADDED: Remove button drops below title when narrow */
+}
+
+.wcf-qcard-num {
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    width           : 28px;
+    height          : 28px;
+    border-radius   : 50%;
+    background      : #1d4ed8;
+    color           : #fff;
+    font-size       : 0.75rem;
+    font-weight     : 800;
+    flex-shrink     : 0;
+}
+
+.wcf-qcard-title {
+    font-size   : 0.875rem;
+    font-weight : 700;
+    color       : #1e3a8a;
+    flex        : 1;
+    min-width   : 0;             /* ← ADDED */
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.wcf-qcard-remove {
+    display       : flex;
+    align-items   : center;
+    gap           : 0.3rem;
+    padding       : 0.25rem 0.65rem;
+    background    : #fff;
+    border        : 1.5px solid #fca5a5;
+    border-radius : 999px;
+    color         : #dc2626;
+    font-size     : 0.73rem;
+    font-weight   : 700;
+    cursor        : pointer;
+    transition    : all 0.15s;
+    white-space   : nowrap;
+    flex-shrink   : 0;
+}
+
+.wcf-qcard-remove:hover {
+    background   : #fef2f2;
+    border-color : #dc2626;
+}
+
+.wcf-qcard-textarea {
+    display : block;
+    padding : 0.6rem 0.9rem 0.75rem;
+}
+
+/* Force the lightning-textarea inside the card to be transparent */
+.wcf-qcard-textarea .slds-form-element__control textarea,
+.wcf-qcard lightning-textarea .slds-textarea {
+    background    : #ffffff;
+    border-color  : #bfdbfe;
+    border-radius : 6px;
+}
+/* ═══════════════════════════════════════════════════════════════════
+   PREVIEW MODAL — Question Return Reason Cards
+═══════════════════════════════════════════════════════════════════ */
+
+/* Row of selected Q-number pills shown at the top of the subsection */
+.preview-qnum-pills {
+    display     : flex;
+    flex-wrap   : wrap;
+    gap         : 0.4rem;
+    margin-bottom : 1rem;
+}
+
+.preview-qnum-pill {
+    display         : inline-flex;
+    align-items     : center;
+    justify-content : center;
+    min-width       : 36px;
+    padding         : 0.25rem 0.65rem;
+    background      : #1d4ed8;
+    color           : #fff;
+    border-radius   : 6px;
+    font-size       : 0.78rem;
+    font-weight     : 700;
+    letter-spacing  : 0.02em;
+}
+
+/* Individual question card in preview */
+.preview-qcard {
+    border        : 1px solid #bfdbfe;
+    border-radius : 8px;
+    overflow      : hidden;
+    margin-bottom : 0.65rem;
+    background    : #ffffff;
+}
+
+.preview-qcard-header {
+    display      : flex;
+    align-items  : center;
+    gap          : 0.6rem;
+    padding      : 0.5rem 0.85rem;
+    background   : #dbeafe;
+    border-bottom: 1px solid #bfdbfe;
+}
+
+.preview-qcard-num {
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    width           : 26px;
+    height          : 26px;
+    border-radius   : 50%;
+    background      : #1d4ed8;
+    color           : #fff;
+    font-size       : 0.72rem;
+    font-weight     : 800;
+    flex-shrink     : 0;
+}
+
+.preview-qcard-label {
+    font-size   : 0.82rem;
+    font-weight : 700;
+    color       : #1e3a8a;
+}
+
+.preview-qcard-text {
+    padding     : 0.65rem 0.85rem;
+    font-size   : 0.875rem;
+    color       : #374151;
+    line-height : 1.6;
+    white-space : pre-wrap;
+    overflow-wrap: break-word;   /* ← ADDED */
+}
+
+.wcf-saving-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9001;
+    gap: 0.75rem;
+}
+
+.wcf-saving-overlay-modal {
+    position: absolute;
+    z-index: 10001; /* above SLDS modal (10000) */
+}
+
+.wcf-saving-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #c0392b; /* Wadhwani red, matches your rebrand */
+    margin-top: 2.25rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONTAINER-RESPONSIVE LAYOUT  (← ADDED)
+   Reacts to the PANEL's own width (split-pane divider), not the
+   browser viewport. This is what keeps the Validator Form readable
+   while the red divider is dragged — mirroring the approach already
+   proven on wcfFormPreview.
+═══════════════════════════════════════════════════════════════════ */
+
+/* Panel moderately narrow → tighten paddings, relax grids */
+@container (max-width: 820px) {
+    .wcf-context-bar  { padding: 1rem 1.25rem 0.85rem; }
+    .wcf-context-title{ font-size: 1.4rem; }
+    .wcf-vf-wrapper   { padding: 1.25rem 1.25rem 4rem; }
+    .wcf-vf-section   { padding: 1.4rem 1.25rem; }
+    .wcf-draft-banner { margin: 0.75rem 1rem 0; }
+
+    /* 3 decision cards → 2 + 1 would look uneven; go straight to stacked */
+    .wcf-decision-cards { grid-template-columns: 1fr; }
+
+    .wcf-qnum-grid { grid-template-columns: repeat(7, 1fr); }
+}
+
+/* Panel narrow (deep divider drag) → single-column everything */
+@container (max-width: 620px) {
+    .wcf-context-bar  { padding: 0.85rem 1rem 0.75rem; }
+    .wcf-context-title{ font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .wcf-context-meta { gap: 0.6rem 1.25rem; }
+    .wcf-vf-wrapper   { padding: 1rem 0.85rem 4rem; }
+    .wcf-vf-section   { padding: 1.1rem 0.9rem; margin-bottom: 1rem; }
+    .wcf-vf-sec-head  { gap: 0.7rem; margin-bottom: 1rem; }
+    .wcf-vf-sec-num   { width: 28px; height: 28px; font-size: 0.8rem; }
+    .wcf-vf-sec-title { font-size: 1rem; }
+
+    .wcf-picklist-binary { grid-template-columns: 1fr; }
+    .wcf-qnum-grid       { grid-template-columns: repeat(5, 1fr); }
+
+    /* Dependent wrappers lose some indent so content keeps usable width */
+    .wcf-dep-wrapper { padding-left: 0.75rem; }
+    .wcf-dep-nested  { padding-left: 0.7rem;  }
+
+    /* Draft banner: progress bar drops to its own full-width line */
+    .wcf-draft-progress-bar-wrap { flex: 1 1 100%; order: 3; }
+
+    /* Footer: status on top, buttons below it, full readable width */
+    .wcf-vf-footer      { flex-direction: column; align-items: stretch; }
+    .wcf-footer-status  { white-space: normal; overflow: visible; text-overflow: unset; }
+    .wcf-footer-actions { justify-content: flex-end; }
+}
+
+/* Panel very narrow → compact pills and stack footer buttons */
+@container (max-width: 440px) {
+    .wcf-qnum-grid      { grid-template-columns: repeat(4, 1fr); }
+    .wcf-confirm-pill   { padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+    .wcf-pick-opt       { padding: 0.5rem 0.75rem; font-size: 0.82rem; }
+    .wcf-meta-pill      { font-size: 0.72rem; padding: 0.15rem 0.6rem; }
+
+    .wcf-footer-actions { flex-direction: column; align-items: stretch; }
+    .wcf-footer-actions lightning-button { width: 100%; }
+}
+/* ═══════════════════════════════════════════════════════
+   REVIEWER RETURN NOTICE — same shape as the draft banner,
+   red/orange instead of amber to distinguish "needs decision"
+   from "you have unsaved progress"
+═══════════════════════════════════════════════════════ */
+.wcf-reviewer-return-banner {
+    background   : #fef2f2;
+    border-color : #f87171;
+    box-shadow   : 0 1px 4px rgba(248, 113, 113, 0.15);
+}
+.wcf-reviewer-return-banner .wcf-draft-banner-title {
+    color : #991b1b;
+}
+.wcf-reviewer-return-banner .wcf-draft-banner-sub {
+    color : #b91c1c;
+}
+.wcf-qcard-missing {
+    border: 1px solid #c23934;
+}

@@ -1,0 +1,141 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 24px;
+    background: #FFFFFF;
+    position: relative;
+}
+
+.navbar-logo { display: flex; align-items: center; flex: 0 0 auto; }
+.wcf-header__logo { display: inline-flex; }
+.navbar-logo img { max-height: 40px; display: block; }
+
+.navbar-nav { flex: 1 1 auto; display: flex; justify-content: left; }
+.navbar-nav ul { display: flex; align-items: center; gap: 4px; margin: 0; padding: 0; list-style: none; }
+
+.navbar-right { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; }
+
+/* ── Language selector ─────────────────────────────────────────── */
+.navbar-lang { display: flex; align-items: center; }
+.lang-selector { position: relative; display: flex; align-items: center; }
+.lang-globe-icon { display: flex; color: #767171; margin-right: 4px; }
+.lang-select {
+    appearance: none;
+    border: 1px solid #CBC5C5;
+    border-radius: 8px;
+    padding: 5px 22px 5px 8px;
+    font-size: 13px;
+    color: #414041;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+.lang-select:focus { outline: none; border-color: #F2672A; box-shadow: 0 0 0 3px rgba(242, 103, 42, 0.18); }
+.lang-chevron { position: absolute; right: 6px; pointer-events: none; color: #767171; }
+.lang-loading { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.lang-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(191, 32, 38, 0.25);
+    border-top-color: #BF2026;
+    border-radius: 50%;
+    animation: wcf-nav-spin 0.7s linear infinite;
+}
+@keyframes wcf-nav-spin { to { transform: rotate(360deg); } }
+
+/* ── Guest: Log in link ────────────────────────────────────────── */
+.login-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: 8px;
+    background: #BF2026;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+.login-link:hover { background: #F2672A; }
+
+/* ── Logged in: account chip + menu ───────────────────────────────*/
+.navbar-account { position: relative; }
+.account-wrap { position: relative; }
+
+.account-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #E3DEDE;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 4px 10px 4px 4px;
+    cursor: pointer;
+}
+.account-btn:hover { border-color: #F2672A; }
+.account-btn:focus-visible { outline: 2px solid #F2672A; outline-offset: 2px; }
+
+.account-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #BF2026;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    flex: 0 0 auto;
+}
+
+.account-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #414041;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-chevron { color: #767171; flex: 0 0 auto; }
+
+.account-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 140px;
+    background: #FFFFFF;
+    border: 1px solid #E3DEDE;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(65, 64, 65, 0.14);
+    padding: 6px;
+    z-index: 20;
+}
+
+.account-menu-item {
+    display: block;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #414041;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.account-menu-item + .account-menu-item {
+    border-top: 1px solid #E3DEDE;
+    margin-top: 4px;
+    padding-top: 8px;
+}
+
+.account-menu-item:hover { background: #FCEBEA; color: #BF2026; }
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+    .navbar { flex-wrap: wrap; padding: 8px 12px; }
+    .navbar-nav { order: 3; width: 100%; justify-content: flex-start; overflow-x: auto; }
+    .account-name { display: none; }
+}

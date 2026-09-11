@@ -6,7 +6,13 @@ public class Coe_ProposalApprovalControllerTest {
             Status = 'Draft',
             Category = 'Grant Application',
             ApplicationType = 'WIN Project Proposal',
-            Project_Title__c = 'Test Proposal'
+            Project_Title__c = 'Test Proposal',
+            // Populated so the "WIN Proposal Submission - Sent email Flow"
+            // (fired on Reject / Resubmit status transitions) can resolve
+            // recipientIds instead of failing with an empty list.
+            // Note: PI_User_Email__c is not directly writeable (formula/derived
+            // field) — only PI_Email__c can be set here.
+            PI_Email__c = UserInfo.getUserEmail()
         );
         insert app;
         return app;
@@ -76,7 +82,8 @@ public class Coe_ProposalApprovalControllerTest {
             Category = 'Grant Application',
             ApplicationType = 'WIN Project Proposal',
             Project_Title__c = 'Test Proposal',
-            Asked_for_Resubmission_by_WIN_Admin__c = true
+            Asked_for_Resubmission_by_WIN_Admin__c = true,
+            PI_Email__c = UserInfo.getUserEmail()
         );
         insert app;
 
@@ -168,7 +175,8 @@ public class Coe_ProposalApprovalControllerTest {
             Category = 'Grant Application',
             ApplicationType = 'WIN Project Proposal',
             Project_Title__c = 'Test Proposal',
-            Asked_for_Resubmission_by_WIN_Admin__c = true
+            Asked_for_Resubmission_by_WIN_Admin__c = true,
+            PI_Email__c = UserInfo.getUserEmail()
         );
         insert app;
 

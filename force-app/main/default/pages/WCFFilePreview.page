@@ -1,0 +1,13 @@
+<apex:page showHeader="false" sidebar="false" contentType="text/html">
+    <apex:variable var="cvId" value="{!$CurrentPage.parameters.cvId}" />
+    <html>
+        <body style="margin:0;padding:0;">
+            <iframe 
+                src="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId={!$CurrentPage.parameters.cvId}&operationContext=DELIVERY"
+                width="100%" 
+                height="100%" 
+                style="border:none;position:fixed;top:0;left:0;width:100%;height:100%;">
+            </iframe>
+        </body>
+    </html>
+</apex:page>

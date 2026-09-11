@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</activeVersionIdentifier>
+    <developerName>Proposal_AI_Feedback_Update_Prompt2</developerName>
+    <masterLabel>Proposal AI Feedback Update Prompt2</masterLabel>
+    <overridable>false</overridable>
+    <templateVersions>
+        <content>You are working as a grant reviewer for the Wadhwani Charitable Foundation, which funds organizations to implement (A) skilling and job placement programs, (B) job creation programs via entrepreneurship support, or (C) programs consisting of both (A) and (B).
+
+Analyze the following four questions and responses. 
+Do NOT focus on grammar, word count, or style. 
+Provide for each question:
+- rating on a 5-point scale [&quot;1 - Very poor&quot;, &quot;2 - Poor&quot;, &quot;3 - Fair&quot;, &quot;4 - Good&quot;, &quot;5 - Excellent&quot;],
+- strengths,
+- weaknesses,
+- and a summary (2–3 sentences).
+
+If the input response is in Spanish or Portuguese, return the results in the same language.
+
+Return strictly as a JSON object in this format:
+{
+&quot;JobCreationApproach&quot;: { &quot;rating&quot;: &quot;&quot;, &quot;strengths&quot;: &quot;&quot;, &quot;weaknesses&quot;: &quot;&quot;, &quot;summary&quot;: &quot;&quot; }
+}
+
+Questions and Responses:
+
+1. jobCreationApproach - Tell us about your job creation work in roughly 500 words. Cover: (i) your support model — the kinds of support you provide (capital, mentorship, business advisory, sector-specific technical assistance, market linkages, etc.); (ii) your theory of change — the journey from engagement through to jobs created and sustained; (iii) what&apos;s distinctive about your approach relative to peers. For your primary support model(s), please indicate (a) approximate annual jobs created/sustained in your most recent full year, and (b) the share of these jobs you estimate would have been created without your intervention (baseline) versus those attributable to your programme (incremental). Directional ranges are acceptable; precision will be tested at due diligence.
+ Response: {!$Input:jobCreationApproach}
+</content>
+        <fileDroppingStrategy>{&quot;dropFilesBy&quot;:&quot;LAST_MODIFIED_DATE&quot;,&quot;dropFileStartingWith&quot;:&quot;OLDEST&quot;}</fileDroppingStrategy>
+        <inputs>
+            <apiName>jobCreationApproach</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>jobCreationApproach</masterLabel>
+            <referenceName>Input:jobCreationApproach</referenceName>
+            <required>false</required>
+        </inputs>
+        <isCitationEnabled>false</isCitationEnabled>
+        <primaryModel>sfdc_ai__DefaultGPT5Mini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>aEotjA8EfYkMsb+aGRjPLwQaCmlnCGkeOr/dehuUmp0=_1</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

@@ -1,4 +1,32 @@
 public without sharing class ProposalReviewController {
+     private static final Set<String> DECIDED_STATUSES = new Set<String>{
+        'Approved - Level 1',
+        'Rejected - Level 1',
+        'Approved for Funding',
+        'Rejected for Funding',
+        'Shortlisted',
+        'Under Review - Level 2',
+        'Funded',
+        'Closed'
+    };
+
+    /* =====================================================
+       ENV-SPECIFIC FIELD RESOLUTION (Sandbox vs Production)
+       Sandbox: Reviewer__c   |   Production (Person Accounts): Reviewer__pc
+    ===================================================== */
+    private static String reviewerFieldApiName;
+
+    private static String getReviewerFieldApiName() {
+        if (reviewerFieldApiName == null) {
+            Map<String, Schema.SObjectField> acctFields =
+                Schema.SObjectType.Account.fields.getMap();
+
+            reviewerFieldApiName = acctFields.containsKey('reviewer__pc')
+                ? 'Reviewer__pc'
+                : 'Reviewer__c';
+        }
+        return reviewerFieldApiName;
+    }
 
     /* =====================================================
        WRAPPERS
@@ -73,18 +101,22 @@ public without sharing class ProposalReviewController {
 
         Map<Id, User> reviewerMap = new Map<Id, User>();
 
-        for (User u : [
-            SELECT Id, Name, ContactId, Contact.Name,
-                   Contact.Account.Reviewer__c
-            FROM User
-            WHERE Id IN :sharedUserIds
-            AND IsActive = true
-        ]) {
-            if (u.Contact != null &&
-                u.Contact.Account != null &&
-                u.Contact.Account.Reviewer__c == true) {
+        // Dynamic SOQL: reviewer flag field name differs between orgs
+        // (Reviewer__c in Sandbox, Reviewer__pc in Production/Person Accounts).
+        String reviewerField = 'Contact.Account.' + getReviewerFieldApiName();
 
-                reviewerMap.put(u.Id, u);
+        String userQuery =
+            'SELECT Id, Name, ContactId, Contact.Name, ' + reviewerField +
+            ' FROM User' +
+            ' WHERE Id IN :sharedUserIds' +
+            ' AND IsActive = true';
+
+        for (User u : Database.query(userQuery)) {
+            if (u.Contact != null && u.Contact.Account != null) {
+                Object reviewerVal = u.Contact.Account.get(getReviewerFieldApiName());
+                if (reviewerVal == true) {
+                    reviewerMap.put(u.Id, u);
+                }
             }
         }
 
@@ -96,7 +128,8 @@ public without sharing class ProposalReviewController {
         if (coeId != null) {
             proposalList = [
                 SELECT Id, Name, Status,
-                       Project_Title__c, Primary_Focus_Area__c
+                       Project_Title__c, Primary_Focus_Area__c,
+                       WIN_Level1_Decision_Label__c
                 FROM IndividualApplication
                 WHERE Id IN :proposalIds
                 AND RecordTypeId = :rtId
@@ -105,7 +138,8 @@ public without sharing class ProposalReviewController {
         } else {
             proposalList = [
                 SELECT Id, Name, Status,
-                       Project_Title__c, Primary_Focus_Area__c
+                       Project_Title__c, Primary_Focus_Area__c,
+                       WIN_Level1_Decision_Label__c
                 FROM IndividualApplication
                 WHERE Id IN :proposalIds
                 AND RecordTypeId = :rtId
@@ -146,19 +180,20 @@ public without sharing class ProposalReviewController {
 
                 IndividualApplication app = proposalMap.get(proposalId);
 
+                // The Level-1 decision label is stamped ONCE at approve/reject time
+                // and never overwritten afterwards, so it stays static even as
+                // Status__c keeps progressing through later stages.
+                Boolean hasLevel1Decision = String.isNotBlank(app.WIN_Level1_Decision_Label__c);
+
                 ProposalWrapper pw      = new ProposalWrapper();
                 pw.proposalId           = app.Id;
                 pw.proposalName         = app.Name;
                 pw.projectTitle         = app.Project_Title__c;
                 pw.primaryFocusArea     = app.Primary_Focus_Area__c;
                 pw.reviews              = new List<ReviewWrapper>();
-
-                pw.decisionTaken =
-                    app.Status == 'Approved - Level 1' ||
-                    app.Status == 'Rejected - Level 1';
-
-                pw.finalDecision  = app.Status;
-                pw.disableApprove = false;
+                pw.decisionTaken        = hasLevel1Decision;
+                pw.finalDecision        = hasLevel1Decision ? app.WIN_Level1_Decision_Label__c : null;
+                pw.disableApprove       = false;
 
                 resultMap.put(proposalId, pw);
             }
@@ -171,11 +206,24 @@ public without sharing class ProposalReviewController {
 
             String key = reviewerId + '-' + proposalId;
 
+            // This is the RAW stored API Name value from the picklist field.
+            // Renaming the picklist Label in Setup does NOT change what SOQL
+            // returns here -- SOQL always returns the API Name, not the Label.
             String recommendation = reviewMap.containsKey(key)
                 ? reviewMap.get(key).Final_recommendation_ExternalReviewer__c
                 : null;
 
-            rw.reviewStatus = recommendation;
+            // Map the raw API Name to the desired display label.
+            // Keep comparisons below against the ORIGINAL API Name values --
+            // only what gets shown on screen (reviewStatus) changes.
+            String displayRecommendation = recommendation;
+            if (recommendation == 'Recommended for Funding') {
+                displayRecommendation = 'Shortlisted';
+            } else if (recommendation == 'Not Recommended for Funding') {
+                displayRecommendation = 'Not Shortlisted';
+            }
+
+            rw.reviewStatus = displayRecommendation;
 
             if (recommendation == 'Recommended for Funding') {
                 rw.reviewStatusClass = 'status-recommended';
@@ -203,14 +251,15 @@ public without sharing class ProposalReviewController {
     ) {
 
         IndividualApplication app = [
-            SELECT Id, Status, Name, Project_Title__c, AccountId, Coe_Approver__c
+            SELECT Id, Status, Name, Project_Title__c, AccountId, Coe_Approver__c,
+                   WIN_Level1_Decision_Label__c
             FROM IndividualApplication
             WHERE Id = :proposalId
             LIMIT 1
         ];
 
-        if (app.Status == 'Approved - Level 1' ||
-            app.Status == 'Rejected - Level 1') {
+        // Guard: Level-1 decision is a one-time, permanent action
+        if (String.isNotBlank(app.WIN_Level1_Decision_Label__c)) {
             return;
         }
 
@@ -218,14 +267,16 @@ public without sharing class ProposalReviewController {
         String historyNamePrefix;
 
         if (actionType == 'approve') {
-            app.Status        = 'Approved - Level 1';
-            historyStatus     = 'Approved';
-            historyNamePrefix = 'Approved by ';
+            app.Status                        = 'Approved - Level 1';
+            app.WIN_Level1_Decision_Label__c  = 'Shortlisted for presentation';
+            historyStatus                     = 'Approved';
+            historyNamePrefix                 = 'Approved by ';
 
         } else if (actionType == 'reject') {
-            app.Status        = 'Rejected - Level 1';
-            historyStatus     = 'Rejected';
-            historyNamePrefix = 'Rejected by ';
+            app.Status                        = 'Rejected - Level 1';
+            app.WIN_Level1_Decision_Label__c  = 'Not shortlisted for presentation';
+            historyStatus                     = 'Rejected';
+            historyNamePrefix                 = 'Rejected by ';
         }
 
         // Store modal comments on the Proposal record
@@ -257,7 +308,7 @@ public without sharing class ProposalReviewController {
             }
         }
 
-        /* ================= EMAIL ================= */
+        /* ================= EMAIL ================= 
         if (actionType == 'approve') {
 
             List<Contact> coeAdmins = [
@@ -317,7 +368,7 @@ public without sharing class ProposalReviewController {
 
             } else {
                 System.debug('NO COE ADMIN FOUND OR EMAIL EMPTY');
-            }
-        }
+            } 
+        }*/
     }
 }

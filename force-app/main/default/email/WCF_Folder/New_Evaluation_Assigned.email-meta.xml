@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>New Evaluation Assigned</name>
+    <style>none</style>
+    <subject>{!Account.WCF_Organizational_Name__c} — new evaluation assigned to you</subject>
+    <textOnly>{{{org_name}}} — New evaluation assigned to you
+
+Hello {{{reviewer_first_name}}},
+
+You&apos;ve been assigned a new application to evaluate.
+
+Organization: {{{org_name}}}
+Assigned by: {{{pl_name}}}
+Due date: {{{sla_due_date}}} (10 working days)
+
+Open your evaluation:
+{{{review_link}}}
+
+Wadhwani Grants Platform
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

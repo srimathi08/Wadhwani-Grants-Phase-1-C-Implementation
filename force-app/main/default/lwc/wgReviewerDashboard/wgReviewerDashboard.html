@@ -1,0 +1,194 @@
+<template>
+    <div class="rd-page">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header page-header-reviewer">
+            <div class="greeting-block">
+                <div class="greeting-meta">REVIEWER PORTAL</div>
+                <h1 class="greeting-title">{greeting}, <span class="accent">Reviewer</span></h1>
+                <p class="greeting-sub">{todayDate}</p>
+            </div>
+        </div>
+
+        <!-- KPI TILES (5 across) -->
+<!-- KPI TILES (5 across) -->
+<div class="kpi-row kpi-row-5">
+
+    <div class="kpi-card" onclick={handleReviewerTileClick} data-filter="all">
+        <div class="kpi-header">
+            <span class="kpi-label">Total Assigned</span>
+            <span class="kpi-dot kpi-dot-blue"></span>
+        </div>
+        <div class="kpi-count">{reviewerTotal}</div>
+        <div class="kpi-sub">All proposals assigned to you</div>
+    </div>
+
+    <div class="kpi-card" onclick={handleReviewerTileClick} data-filter="reviewed">
+        <div class="kpi-header">
+            <span class="kpi-label">Reviewed</span>
+            <span class="kpi-dot kpi-dot-green"></span>
+        </div>
+        <div class="kpi-count">{reviewerReviewed}</div>
+        <div class="kpi-sub">Submitted review forms</div>
+    </div>
+
+    <div class="kpi-card" onclick={handleReviewerTileClick} data-filter="inProgress">
+        <div class="kpi-header">
+            <span class="kpi-label">In Progress</span>
+            <span class="kpi-dot kpi-dot-amber"></span>
+        </div>
+        <div class="kpi-count">{reviewerInProgress}</div>
+        <div class="kpi-sub">Reviews started but not submitted</div>
+    </div>
+
+    <div class="kpi-card" onclick={handleReviewerTileClick} data-filter="notStarted">
+        <div class="kpi-header">
+            <span class="kpi-label">Not Started</span>
+            <span class="kpi-dot kpi-dot-grey"></span>
+        </div>
+        <div class="kpi-count">{reviewerNotStarted}</div>
+        <div class="kpi-sub">Awaiting your first action</div>
+    </div>
+
+    <div class="kpi-card kpi-card-returned"
+         onclick={handleReviewerTileClick}
+         data-filter="returnedByApprover">
+        <div class="kpi-header">
+            <span class="kpi-label">Returned by Approver</span>
+            <span class="kpi-dot kpi-dot-navy"></span>
+        </div>
+        <div class="kpi-count">{reviewerReturnedByApprover}</div>
+        <div class="kpi-sub">Awaiting your Approve / Return decision</div>
+    </div>
+
+    <div class="kpi-card kpi-card-accepted"
+     onclick={handleReviewerTileClick}
+     data-filter="acceptedApplications">
+    <div class="kpi-header">
+        <span class="kpi-label">Accepted Applications</span>
+        <span class="kpi-dot kpi-dot-green"></span>
+    </div>
+    <div class="kpi-count">{reviewerAcceptedCount}</div>
+    <div class="kpi-sub">Approver-accepted, ready for compliance docs</div>
+</div>
+
+</div>
+
+
+
+        <!-- DUE SOON PREVIEW TABLE -->
+        <div class="queue-preview-section">
+            <div class="qp-header">
+                <div>
+                    <div class="qp-title">Due Soon — Reviewer Queue</div>
+                    <div class="qp-sub">Proposals assigned to you, nearest due date first</div>
+                </div>
+                <div class="qp-link" onclick={handleViewAllReviewerQueue}>
+                    View all in Queue →
+                </div>
+            </div>
+
+            <div class="workspace-card workspace-card-full">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>APPLICATION ID</th>
+                            <th>ACCOUNT</th>
+                            <th>TRACK</th>
+                            <th>DUE DATE</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={reviewerPreviewRows} for:item="row">
+                            <tr key={row.id}>
+                                <td>{row.rowNum}</td>
+                                <td class="cell-id">{row.appId}</td>
+                                <td>{row.account}</td>
+                                <td>{row.track}</td>
+                                <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
+                                <td><span class={row.statusClass}>{row.status}</span></td>
+                                <td>
+                                    <button class="preview-action-btn preview-action-review"
+                                            data-id={row.appRecordId}
+                                            data-appname={row.appId}
+                                            data-review-id={row.reviewId}
+                                            data-action={row.reviewAction}
+                                            data-headquarters={row.headquarters}
+                                            data-track={row.track}
+                                            onclick={handleReviewerRowAction}>
+                                        {row.action}
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template if:true={noReviewerPreviewRows}>
+                            <tr>
+                                <td colspan="7" class="preview-empty">
+                                    No proposals assigned for review
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="queue-preview-section">
+    <div class="qp-header">
+        <div>
+            <div class="qp-title">Accepted Applications</div>
+            <div class="qp-sub">Approver has accepted — request compliance documents</div>
+        </div>
+    </div>
+
+    <div class="workspace-card workspace-card-full">
+        <table class="preview-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>APPLICATION</th>
+                    <th>ORGANIZATION</th>
+                    <th>APPROVER COMMENT</th>
+                    <th>DECISION DATE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={acceptedApplicationRows} for:item="row">
+                    <tr key={row.id}>
+                        <td>{row.rowNum}</td>
+                        <td class="cell-id">{row.appName}</td>
+                        <td>{row.organizationName}</td>
+                        <td>{row.approverComment}</td>
+                        <td>{row.decisionDateFormatted}</td>
+                        <td>
+                            <button class="preview-action-btn preview-action-review"
+                                    data-id={row.applicationId}
+                                    data-appname={row.appName}
+                                    onclick={handleCreateComplianceRequest}>
+                                 Request Compliance
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+                <template if:true={noAcceptedApplicationRows}>
+                    <tr>
+                        <td colspan="6" class="preview-empty">
+                            No accepted applications awaiting compliance documents
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+            <div class="preview-footer" onclick={handleViewAllReviewerQueue}>
+                View full queue →
+            </div>
+        </div>
+
+    </div>
+</template>

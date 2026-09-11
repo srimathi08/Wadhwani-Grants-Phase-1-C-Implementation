@@ -1,148 +1,180 @@
-/* 🌈 Gradient background for the lightning-card */
+/* ============================================================
+   Card shell — clean, flat, professional (no gradient text)
+   ============================================================ */
 lightning-card {
-    --slds-c-card-color-background: linear-gradient(135deg, #f9fcff, #eef6ff);
-    --slds-c-card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    --slds-c-card-border-radius: 12px;
+    --slds-c-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --slds-c-card-border-radius: 10px;
     padding: 0.5rem 1rem;
 }
 
-/* Optional — subtle inner container gradient (for even smoother look) */
-lightning-card .slds-card__body {
-    background: linear-gradient(135deg, #ffffff, #f4f9ff);
-    border-radius: 12px;
-}
-
-/* Optional — style the title to match your theme */
 lightning-card .slds-card__header-title {
     font-weight: 700;
-    color: #004b7c;
-    background: linear-gradient(90deg, #2196f3, #9c27b0);
-    background-clip: text;
-    -webkit-background-clip: text; /* Safari & Chrome */
-    color: transparent;
-    -webkit-text-fill-color: transparent; /* Safari fix */
+    color: #1e293b;
+    letter-spacing: 0.2px;
 }
 
-
-
-
+/* ============================================================
+   Stepper layout
+   ============================================================ */
 .path-container {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin: 1.5rem 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin: 1.75rem 0.5rem 1rem;
     overflow-x: auto;
+    gap: 4px;
 }
 
-/* Each status block */
 .path-item {
     position: relative;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 96px;
+    padding-top: 2px;
+}
+
+/* --- Circular step marker --- */
+.step-marker {
+    position: relative;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 160px;
-    height: 50px;
-    border-radius: 25px;
-    font-weight: 600;
-    text-align: center;
-    color: #444;
-    background: #f4f6f9;
-    box-sizing: border-box;
-    padding: 0 1rem;
-    transition: all 0.3s ease;
-    margin-right: 15px;
-    z-index: 1;
+    font-size: 13px;
+    font-weight: 700;
+    background: #ffffff;
+    border: 2px solid #d7dde5;
+    color: #94a3b8;
+    transition: all 0.2s ease;
 }
 
-/* ✅ Connector line */
-.path-item:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    right: -15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 3px;
-    background-color: #d9d9d9;
-    border-radius: 2px;
-    z-index: 0;
-}
-
-/* ✅ Connector colors */
-.path-item.completed:not(:last-child)::after {
-    background-color: #4caf50;
-}
-.path-item.approved-outline:not(:last-child)::after,
-.path-item.active:not(:last-child)::after {
-    background-color: #2196f3;
-}
-.path-item.resubmit-outline:not(:last-child)::after {
-    background-color: #fbc02d;
-}
-.path-item.rejected-outline:not(:last-child)::after {
-    background-color: #d32f2f;
-}
-
-/* 🌿 Completed – soft mint gradient */
-.path-item.completed {
-    background: linear-gradient(135deg, #b2f1df, #c8fff0);
-    color: #066b5b;
-    box-shadow: 0 0 8px rgba(0, 128, 96, 0.2);
-}
-
-/* 💙 Approved / Active – light sky gradient */
-.path-item.approved-outline,
-.path-item.active {
-    background: linear-gradient(135deg, #8ec5fc, #e0c3fc);
-    color: #004b7c;
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
-}
-
-/* ❤️ Rejected – pinkish gradient */
-.path-item.rejected-outline {
-    background: linear-gradient(135deg, #ff9a9e, #f6416c);
-    color: #fff;
-    border: 2px solid #ff4d4d;
-    box-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
-}
-
-/* 💛 Resubmission – golden pastel gradient */
-.path-item.resubmit-outline {
-    background: linear-gradient(135deg, #fff176, #ffd54f);
-    color: #000;
-    border: 2px solid #fbc02d;
-    box-shadow: 0 0 10px rgba(253, 216, 53, 0.4);
-}
-
-/* ⚪ Upcoming – neutral gradient */
-.path-item.upcoming {
-    background: linear-gradient(135deg, #f1f1f1, #e8eaed);
-    color: #666;
-}
-
-/* ✅ Tick icon */
 .tick-icon {
     font-size: 14px;
-    color: #4a148c;
-    margin-right: 6px;
+    color: #ffffff;
 }
 
-/* ✅ Remove connector on last */
-.path-item:last-child::after {
-    display: none;
+/* --- Label under each marker --- */
+.step-label {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #64748b;
+    text-align: center;
+    max-width: 108px;
 }
 
-/* ✅ Responsive */
+/* --- Connector line between markers ---
+   Equal-width flex items mean center-to-center distance == item width,
+   so left:50% + width:100% lands exactly on the next marker's center. */
+.connector-default,
+.connector-green,
+.connector-blue,
+.connector-yellow,
+.connector-red {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    z-index: 1;
+    background-color: #e2e8f0;
+}
+
+.connector-green  { background-color: #22c55e; }
+.connector-blue   { background-color: #3b82f6; }
+.connector-yellow { background-color: #f59e0b; }
+.connector-red    { background-color: #ef4444; }
+
+/* ============================================================
+   State variants
+   ============================================================ */
+
+/* Completed step */
+.path-item.completed .step-marker {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+.path-item.completed .step-label {
+    color: #166534;
+}
+
+/* Current step — neutral in-progress (e.g. "Submitted", "Under Review") */
+.path-item.active .step-marker {
+    background: #ffffff;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+.path-item.active .step-label {
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+/* Current step — approved / recommended / funded outcome */
+.path-item.approved-outline .step-marker {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+.path-item.approved-outline .step-label {
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+/* Current step — rejected / not recommended outcome */
+.path-item.rejected-outline .step-marker {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+.path-item.rejected-outline .step-label {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+/* Current step — resubmission / revision requested */
+.path-item.resubmit-outline .step-marker {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+}
+.path-item.resubmit-outline .step-label {
+    color: #b45309;
+    font-weight: 700;
+}
+
+/* Upcoming / not yet reached */
+.path-item.upcoming .step-marker {
+    background: #ffffff;
+    border-color: #d7dde5;
+    color: #94a3b8;
+}
+.path-item.upcoming .step-label {
+    color: #94a3b8;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
 @media (max-width: 768px) {
     .path-container {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 8px;
     }
     .path-item {
-        margin-right: 0;
-    }
-    .path-item::after {
-        display: none;
+        min-width: 88px;
     }
 }

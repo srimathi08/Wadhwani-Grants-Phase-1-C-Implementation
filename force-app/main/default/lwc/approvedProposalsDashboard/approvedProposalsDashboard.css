@@ -1,4 +1,9 @@
 /* =========================================================
+   WADHWANI BRAND COLORS
+   Primary Accent: #F05A28 (warm orange)
+========================================================= */
+
+/* =========================================================
    SUMMARY CARDS
 ========================================================= */
 
@@ -33,10 +38,10 @@
     margin: 0;
 }
 
-.card1 { background: linear-gradient(135deg,#43a047,#66bb6a); }
-.card2 { background: linear-gradient(135deg,#e53935,#ef5350); }
-.card3 { background: linear-gradient(135deg,#fb8c00,#ffb74d); }
-.card4 { background: linear-gradient(135deg,#1e88e5,#64b5f6); }
+.card1 { background: linear-gradient(135deg,#F05A28,#FF8F5C); }
+.card2 { background: linear-gradient(135deg,#2E7D32,#66BB6A); }
+.card3 { background: linear-gradient(135deg,#C62828,#EF5350); }
+.card4 { background: linear-gradient(135deg,#1565C0,#42A5F5); }
 
 /* =========================================================
    TABLE WRAPPER
@@ -60,6 +65,7 @@
     border-spacing: 0 12px;
     background: transparent;
     table-layout: fixed;
+    overflow-x: hidden;
 }
 
 .slds-table thead th {
@@ -70,6 +76,7 @@
     padding: .75rem .75rem;
     border: none;
     text-transform: uppercase;
+    letter-spacing: .04em;
 }
 
 /* =========================================================
@@ -123,20 +130,20 @@
 ========================================================= */
 
 .slds-table th:nth-child(1),
-.slds-table td:nth-child(1){width:14%;}
+.slds-table td:nth-child(1){width:13%;}
 
 .slds-table th:nth-child(2),
-.slds-table td:nth-child(2){width:22%;}
+.slds-table td:nth-child(2){width:24%;}
 
 .slds-table th:nth-child(3),
-.slds-table td:nth-child(3){width:28%;}
+.slds-table td:nth-child(3){width:24%;}
 
 .slds-table th:nth-child(4),
 .slds-table td:nth-child(4){width:18%;}
 
 .slds-table th:nth-child(5),
 .slds-table td:nth-child(5){
-    width:18%;
+    width:21%;
     text-align:center;
 }
 
@@ -145,8 +152,8 @@
 ========================================================= */
 
 .app-link {
-    color: #1d4ed8;
-    font-weight: 600;
+    color: #F05A28;
+    font-weight: 700;
     text-decoration: none;
 }
 
@@ -159,47 +166,74 @@
 ========================================================= */
 
 .status-pill {
-    background: #eef2ff;
-    color: #4338ca;
+    background: #FFF1EC;
+    color: #F05A28;
     padding: 6px 14px;
     border-radius: 999px;
     font-size: .7rem;
     font-weight: 700;
     display: inline-block;
+    white-space: nowrap;
 }
 
 /* =========================================================
-   ACTION COLUMN (AUTO-FIT CONTENT)
+   ACTION COLUMN — FIXED WIDTH, NO PAGE OVERFLOW
 ========================================================= */
 
 .action-col {
-    min-width: 320px;
-    width: 320px;
+    min-width: unset;
+    width: 100%;
     text-align: center;
 }
 
 .action-col lightning-combobox {
     width: 100%;
+    max-width: 190px;
+    margin: 0 auto;
 }
 
 lightning-combobox {
-    --slds-c-input-radius-border: 18px;
+    --slds-c-input-radius-border: 8px;
+    --slds-c-input-color-border-focus: #F05A28;
+    --slds-c-input-shadow-focus: 0 0 0 1px #F05A28;
     position: relative;
     z-index: 1000;
 }
 
 /* =========================================================
-   DROPDOWN EXPANSION FIX
+   DROPDOWN — FIXED WIDTH, WRAP TEXT, NO HORIZONTAL SCROLL
 ========================================================= */
 
 .slds-dropdown {
-    min-width: max-content !important;
-    width: max-content !important;
+    min-width: 220px !important;
+    width: 220px !important;
+    max-width: 220px !important;
     overflow-x: hidden !important;
+    white-space: normal !important;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
 }
 
-.slds-dropdown__item span {
-    white-space: nowrap;
+.slds-dropdown__item {
+    white-space: normal !important;
+}
+
+.slds-dropdown__item span,
+.slds-dropdown__item a {
+    white-space: normal !important;
+    word-break: break-word;
+    display: block;
+    padding: 6px 4px;
+    line-height: 1.3;
+}
+
+.slds-dropdown__item:hover,
+.slds-dropdown__item.slds-has-focus {
+    background-color: #FFF1EC !important;
+}
+
+.slds-dropdown__item.slds-is-selected .slds-icon {
+    fill: #F05A28 !important;
 }
 
 /* Prevent parents from clipping dropdown */
@@ -226,6 +260,15 @@ lightning-card * {
     color: #475569;
 }
 
+.pagination lightning-button button {
+    border-color: #F05A28 !important;
+    color: #F05A28 !important;
+}
+
+.pagination lightning-button button:hover {
+    background-color: #FFF1EC !important;
+}
+
 /* =========================================================
    MODAL
 ========================================================= */
@@ -235,10 +278,19 @@ lightning-card * {
     border-radius: 14px;
 }
 
+.slds-modal__header {
+    border-bottom: 1px solid #f1f1f1;
+}
+
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+.modal-footer lightning-button[variant="brand"] button {
+    background-color: #F05A28 !important;
+    border-color: #F05A28 !important;
 }
 
 /* =========================================================
@@ -266,9 +318,8 @@ lightning-card * {
         padding: .6rem;
     }
 
-    .action-col {
-        min-width: 260px;
-        width: 260px;
+    .action-col lightning-combobox {
+        max-width: 150px;
     }
 
     .pagination {
@@ -276,27 +327,21 @@ lightning-card * {
         gap: 6px;
     }
 }
-/* =========================================
-   WRAP PROJECT TITLE (COLUMN 2)
-========================================= */
 
-.slds-table tbody td:nth-child(2) {
-    white-space: normal;      /* allow wrapping */
-    line-height: 1.4;
-}
-/* =========================================
-   FORCE WRAP PROJECT TITLE
-========================================= */
+/* =========================================================
+   PROJECT TITLE WRAP (COLUMN 2)
+========================================================= */
 
 .slds-table tbody td:nth-child(2) {
     white-space: normal !important;
     word-break: break-word;
     line-height: 1.4;
 }
-/* =========================================
-   SHIFT STATUS HEADER SLIGHTLY RIGHT
-========================================= */
+
+/* =========================================================
+   STATUS HEADER ALIGNMENT
+========================================================= */
 
 .slds-table thead th:nth-child(3) {
-    padding-left: 2.5rem;
+    padding-left: 1.5rem;
 }

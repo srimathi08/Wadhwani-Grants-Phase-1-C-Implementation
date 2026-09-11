@@ -46,12 +46,12 @@
     <tr>
         <td>
             Average cost per placement<br>
-            Calculate this as total organizational expense / # learner placements.
+            Manually entered by the applicant.
         </td>
-        <td>{outcomeData.Avg_Cost_per_Placement_CFY__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Placement_FY_1__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Placement_FY_2__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Placement_FY_3__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Placement_CFY__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Placement_FY_1__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Placement_FY_2__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Placement_FY_3__c}</td>
     </tr>
      <tr>
         <td>
@@ -158,36 +158,36 @@
     <tr>
         <td>
             Total average cost per job created<br>
-            Calculate this as organizational annual expense / total # of jobs created.
+            Manually entered by the applicant.
         </td>
-        <td>{outcomeData.Avg_Cost_per_Job_CFY__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Job_FY_1__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Job_FY_2__c}</td>
-        <td>{outcomeData.Avg_Cost_per_Job_FY_3__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Job_CFY__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Job_FY_1__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Job_FY_2__c}</td>
+        <td>{outcomeData.Manual_Avg_Cost_per_Job_FY_3__c}</td>
     </tr>
      <tr>
         <td>
             Job creation verification via 3rd party<br>
             Answer Y/N. If Y, then describe briefly and include evidence as an attachment.<br>
-            1. X3rd_Party_Placement_Verification_CFY__c (yes or no picklist)<br>
-            2. X3rd_Party_Verification_Description_CFY__c<br>
-            3. File Upload (if X3rd_Party_Placement_Verification_CFY__c = 'yes')
+            1. Job_Verification_3rd_Party_CFY__c (yes or no picklist)<br>
+            2. X3rd_party_verification_details_CFY__c<br>
+            3. File Upload (if Job_Verification_3rd_Party_CFY__c = 'yes')
         </td>
         <td>
-            {outcomeData.X3rd_Party_Placement_Verification_CFY__c}<br>
-            {outcomeData.X3rd_Party_Verification_Description_CFY__c}
+            {outcomeData.Job_Verification_3rd_Party_CFY__c}<br>
+            {outcomeData.X3rd_party_verification_details_CFY__c}
         </td>
         <td>
-            {outcomeData.X3rd_Party_Placement_Verification_FY_1__c}<br>
-            {outcomeData.X3rd_Party_Verification_Description_FY1__c}
+            {outcomeData.Job_Verification_3rd_Party_FY1__c}<br>
+            {outcomeData.X3rd_party_verification_details_FY1__c}
         </td>
         <td>
-             {outcomeData.X3rd_Party_Placement_Verification_FY_2__c}<br>
-             {outcomeData.X3rd_Party_Verification_Description_FY2__c}
+             {outcomeData.Job_Verification_3rd_Party_FY2__c}<br>
+             {outcomeData.X3rd_party_verification_details_FY2__c}
         </td>
         <td>
-             {outcomeData.X3rd_Party_Placement_Verification_FY_3__c}<br>
-             {outcomeData.X3rd_Party_Verification_Description_FY3__c}
+             {outcomeData.Job_Verification_3rd_Party_FY3__c}<br>
+             {outcomeData.X3rd_party_verification_details_FY3__c}
         </td>
     </tr>
                     </tbody>

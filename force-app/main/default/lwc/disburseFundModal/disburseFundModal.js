@@ -28,7 +28,7 @@ export default class DisburseFundModal extends LightningElement {
     @track AwardedDate;
     @track comments;
     @track fundingType;
-
+    @api readOnly = false;
     @track trancheHistory = [];
     @track fundingOptions = [];
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sent to applicant when Sec 1.2 Final Decision = Flag</description>
+    <encodingKey>UTF-8</encodingKey>
+    <letterhead>WCF</letterhead>
+    <name>Application Review – Flagged Decision</name>
+    <style>formalLetter</style>
+    <subject>Important Update Regarding Your Application – {!IndividualApplication__c.Name}</subject>
+    <textOnly>Dear {!IndividualApplication__c.Account__r.Name},
+
+Thank you for submitting your application to WCF Grant Management.
+
+APPLICATION DETAILS
+------------------------------------
+Application ID        : {!IndividualApplication__c.Name}
+Review Decision       : {!IndividualApplication__c.Decision_Final_Decision_from_Sec_1_2__c}
+Flagging Rationale    : {!IndividualApplication__c.Flag_rationale_Flagging_Criteria__c}
+------------------------------------
+
+Your application has been flagged for additional review. This is NOT a final decision. 
+Our team will follow up if further information is required.
+
+For any queries, please contact us at [SupportEmail].
+
+Yours sincerely,
+WCF Grant Management Team</textOnly>
+    <type>html</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

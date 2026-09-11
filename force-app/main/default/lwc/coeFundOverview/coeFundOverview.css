@@ -20,6 +20,21 @@
     font-size: 14px;
 }
 
+
+/* new */
+.budget-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+    margin-bottom: 14px;
+}
+
+@media (max-width: 640px) {
+    .budget-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 /* ======================================================
    SUMMARY GRID – SINGLE SOURCE OF TRUTH
 ====================================================== */
@@ -501,4 +516,55 @@ textarea:focus {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
+}
+
+/* ======================================================
+   REQUEST FUND – CTA (OWN ROW)
+====================================================== */
+
+.stat-card.get-fund {
+    grid-column: 1 / -1;
+    background: transparent;
+    box-shadow: none;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fund-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.request-btn {
+    margin-top: 14px;
+    background: linear-gradient(135deg,#8f1d1d,#741414);
+    color: #ffffff;
+    border: none;
+    padding: 12px 48px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: .4px;
+    transition: all .25s ease;
+}
+
+.request-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(143,29,29,.45);
+}
+
+.generate-doc-btn {
+    background: #ffffff;
+    color: #8f1d1d;
+    border: 2px solid #8f1d1d;
+}
+
+.generate-doc-btn:hover {
+    background: #fef2f2;
+    box-shadow: 0 10px 22px rgba(143,29,29,.18);
 }

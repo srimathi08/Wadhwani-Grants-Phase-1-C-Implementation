@@ -31,7 +31,10 @@ public class translatedOutcomeDataTableController {
         X3rd_Party_Placement_Verification_FY_2__c, X3rd_Party_Placement_Verification_FY_3__c, X3rd_Party_Verification_Description_CFY__c, X3rd_Party_Verification_Description_FY1__c,
         X3rd_Party_Verification_Description_FY2__c, X3rd_Party_Verification_Description_FY3__c, X3rd_party_verification_details_CFY__c, X3rd_party_verification_details_FY1__c,
         X3rd_party_verification_details_FY2__c, X3rd_party_verification_details_FY3__c, Projected_Learner_Placements_CFY__c, Projected_Learner_Placements_FY_1__c,
-        Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_3__c    
+        Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_3__c,
+        // ---- Manual Avg Cost per Job / Placement fields ----
+        Manual_Avg_Cost_per_Job_CFY__c, Manual_Avg_Cost_per_Job_FY_1__c, Manual_Avg_Cost_per_Job_FY_2__c, Manual_Avg_Cost_per_Job_FY_3__c,
+        Manual_Avg_Cost_per_Placement_CFY__c, Manual_Avg_Cost_per_Placement_FY_1__c, Manual_Avg_Cost_per_Placement_FY_2__c, Manual_Avg_Cost_per_Placement_FY_3__c
         FROM Translated_Outcome_Data__c
         WHERE Translated_Proposal__c = :translatedProposalId LIMIT 1
             ];

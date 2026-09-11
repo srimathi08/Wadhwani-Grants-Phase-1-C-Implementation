@@ -1,0 +1,79 @@
+/* Wrapper */
+.city-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Dropdown container */
+.dropdown {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 240px;
+    overflow-y: auto;
+    margin-top: 2px;
+}
+
+/* Each dropdown item */
+.dropdown-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #f3f2f2;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f8ff;
+}
+
+/* City name - bold */
+.city-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1c1c1c;
+}
+
+/* State, Country - small grey */
+.city-detail {
+    font-size: 0.75rem;
+    color: #706e6b;
+    margin-top: 2px;
+}
+
+/* Loading spinner box */
+.loading-box {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* No results */
+.no-results {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin-top: 2px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

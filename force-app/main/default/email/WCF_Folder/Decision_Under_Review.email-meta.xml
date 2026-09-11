@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Decision Under Review</name>
+    <style>none</style>
+    <subject>[{!Account.WCF_Organizational_Name__c] Wadhwani Grants application — decision under review</subject>
+    <textOnly>[{{{org_name}}}] Wadhwani Grants application — decision under review
+
+Hello {{{contact_first_name}}},
+
+I&apos;m writing with a brief update on your application.
+
+The decision you recently received is currently under internal review while we confirm a few details on our side.
+
+This is a routine process and doesn&apos;t require any action from you.
+
+I&apos;ll follow up personally with a confirmed outcome as soon as our review is complete.
+
+Thank you for your patience.
+
+Warm regards,
+{{{pl_name}}}
+Wadhwani Grants
+
+Questions? [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
+
+Notification preferences:
+{{{preferences_url}}}</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

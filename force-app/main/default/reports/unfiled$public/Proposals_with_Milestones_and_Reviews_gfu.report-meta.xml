@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <block>
+        <blockInfo>
+            <blockId>B0</blockId>
+            <joinTable>IndividualApplication</joinTable>
+        </blockInfo>
+        <columns>
+            <field>IndividualApplication.Milestones__r$Name</field>
+        </columns>
+        <currency>USD</currency>
+        <format>Summary</format>
+        <name>Proposals with Milestones block 1</name>
+        <params>
+            <name>co</name>
+            <value>1</value>
+        </params>
+        <reportType>Proposals_with_Milestones__c</reportType>
+        <scope>organization</scope>
+        <showGrandTotal>true</showGrandTotal>
+        <showSubTotals>true</showSubTotals>
+        <timeFrameFilter>
+            <dateColumn>IndividualApplication$AppliedDate</dateColumn>
+            <interval>INTERVAL_CUSTOM</interval>
+        </timeFrameFilter>
+    </block>
+    <block>
+        <blockInfo>
+            <blockId>B1</blockId>
+            <joinTable>IndividualApplication</joinTable>
+        </blockInfo>
+        <columns>
+            <field>IndividualApplication.ApplicationReview$Name</field>
+        </columns>
+        <currency>USD</currency>
+        <format>Summary</format>
+        <name>Proposals with Reviews block 1</name>
+        <params>
+            <name>co</name>
+            <value>1</value>
+        </params>
+        <reportType>Proposals_with_Reviews__c</reportType>
+        <scope>organization</scope>
+        <showGrandTotal>true</showGrandTotal>
+        <showSubTotals>true</showSubTotals>
+        <timeFrameFilter>
+            <dateColumn>IndividualApplication$AppliedDate</dateColumn>
+            <interval>INTERVAL_CUSTOM</interval>
+        </timeFrameFilter>
+    </block>
+    <blockInfo>
+        <blockId xsi:nil="true"/>
+        <joinTable>IndividualApplication</joinTable>
+    </blockInfo>
+    <format>MultiBlock</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>IndividualApplication$Name</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Proposals with Milestones and Reviews</name>
+    <params>
+        <name>lsk</name>
+        <value>1</value>
+    </params>
+    <reportType>Proposals_with_Milestones__c</reportType>
+    <showDetails>true</showDetails>
+</Report>

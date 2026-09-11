@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Validation Due Soon</name>
+    <style>none</style>
+    <subject>{!Account.WCF_Organizational_Name__c} — validation due soon</subject>
+    <textOnly>Subject: {{{org_name}}} — Validation due soon
+
+Hello {{{validator_first_name}}},
+
+A quick reminder that validation for {{{org_name}}} is due soon.
+
+Organization: {{{org_name}}}
+Due Date: {{{sla_due_date}}}
+Time Remaining: {{{days_remaining}}}
+
+Please complete the validation at your earliest convenience using the link below:
+{{{validation_link}}}
+
+Wadhwani Grants Platform
+
+Questions? Reply to:
+[grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

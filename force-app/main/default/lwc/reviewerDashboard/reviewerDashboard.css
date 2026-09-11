@@ -201,10 +201,10 @@
 /* ===== Metrics Grid ===== */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(5, 1fr); /* 👈 KEY CHANGE */
+    gap: 1rem;
 }
+
 
 /* ===== Metric Cards ===== */
 .metric-card {
@@ -477,4 +477,14 @@
     .metric-value {
         font-size: 1.75rem;
     }
+}
+/* Rejected metric tile */
+.icon-red {
+    background-color: #fdecea;
+}
+
+.metric-error {
+    color: #000 !important;
+    font-size: 28px;
+    font-weight: 600;
 }
