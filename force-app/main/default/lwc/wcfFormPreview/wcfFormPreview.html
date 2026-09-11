@@ -82,6 +82,14 @@
                                 <div class="rv-info-label">Leader Tenure</div>
                                 <div class="rv-info-value">{leaderTenure}</div>
                             </div>
+                            <template if:true={hasCustomQuestionsQ2}>
+                                <template for:each={customQuestionsQ2} for:item="cq">
+                                    <div key={cq.key} class="rv-info-cell">
+                                        <div class="rv-info-label">{cq.label}</div>
+                                        <div class="rv-info-value">{cq.displayValue}</div>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -110,6 +118,14 @@
                                 <div class="rv-info-label">Phone Number</div>
                                 <div class="rv-info-value">{phoneDisplay}</div>
                             </div>
+                            <template if:true={hasCustomQuestionsQ3}>
+                                <template for:each={customQuestionsQ3} for:item="cq">
+                                    <div key={cq.key} class="rv-info-cell">
+                                        <div class="rv-info-label">{cq.label}</div>
+                                        <div class="rv-info-value">{cq.displayValue}</div>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -146,6 +162,14 @@
                                 <div class="rv-info-label">Incorporation Date</div>
                                 <div class="rv-info-value">{incorporationDate}</div>
                             </div>
+                            <template if:true={hasCustomQuestionsQ4}>
+                                <template for:each={customQuestionsQ4} for:item="cq">
+                                    <div key={cq.key} class="rv-info-cell">
+                                        <div class="rv-info-label">{cq.label}</div>
+                                        <div class="rv-info-value">{cq.displayValue}</div>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
                         <template if:true={legalDescription}>
                             <div class="rv-rich-box" style="margin-top: 10px;">
@@ -180,6 +204,14 @@
                                 <div class="rv-info-label">Willing to Pursue ED</div>
                                 <div class="rv-info-value">{openToEquivalencyDetermination}</div>
                             </div>
+                            <template if:true={hasCustomQuestionsQ5}>
+                                <template for:each={customQuestionsQ5} for:item="cq">
+                                    <div key={cq.key} class="rv-info-cell">
+                                        <div class="rv-info-label">{cq.label}</div>
+                                        <div class="rv-info-value">{cq.displayValue}</div>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -190,7 +222,19 @@
                         <span class="rv-q-num">{qNum.Q6}</span>
                         <span class="rv-lbl-text">Fiscal Year End Date</span>
                     </div>
-                    <div class="rv-val rv-val-bold">{fiscalYearEnd}</div>
+                    <div class="rv-val">
+                        <div class="rv-val-bold">{fiscalYearEnd}</div>
+                        <template if:true={hasCustomQuestionsQ6}>
+                            <div class="rv-info-grid" style="margin-top: 8px;">
+                                <template for:each={customQuestionsQ6} for:item="cq">
+                                    <div key={cq.key} class="rv-info-cell">
+                                        <div class="rv-info-label">{cq.label}</div>
+                                        <div class="rv-info-value">{cq.displayValue}</div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- Q7: Top 3 Most Prominent Funders -->

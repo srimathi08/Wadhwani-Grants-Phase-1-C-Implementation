@@ -738,9 +738,9 @@ public without sharing class WCFValidatorController {
 
         Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
         try {
-            for (RFI_Question__mdt q : [SELECT Target_Field__c, Target_Object__c, Is_Active__c FROM RFI_Question__mdt WHERE Is_Active__c = true]) {
-                if (String.isNotBlank(q.Target_Field__c) && (String.isBlank(q.Target_Object__c) || q.Target_Object__c.equalsIgnoreCase('IndividualApplication'))) {
-                    String cleanFld = q.Target_Field__c.trim();
+            for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
+                if (String.isNotBlank(q.Field_API_Name__c) && (String.isBlank(q.Target_Object__c) || q.Target_Object__c.equalsIgnoreCase('IndividualApplication'))) {
+                    String cleanFld = q.Field_API_Name__c.trim();
                     if (appFieldMap.containsKey(cleanFld.toLowerCase())) {
                         fieldNames.add(appFieldMap.get(cleanFld.toLowerCase()).getDescribe().getName());
                     }

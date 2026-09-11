@@ -226,21 +226,17 @@ export default class WcfDynamicForm extends LightningElement {
         });
     }
 
-    _getCustomQuestionsForSection(sectionCode, baseNumberPrefix) {
+    _getCustomQuestions(filterFn, basePrefix) {
         if (!this.metadataQuestions || !this.metadataQuestions.length) return [];
-        const custom = this.metadataQuestions.filter(q => q.isCustom && (
-            q.sectionCode === sectionCode ||
-            (sectionCode === 'SEC_JOB_FULFILLMENT' && q.sectionCode === 'SEC_WHAT_YOU_DO') ||
-            (sectionCode === 'SEC_WHY_WADHWANI' && q.sectionCode === 'SEC_WHY_WCF')
-        ));
-        return custom.map((q, idx) => {
+        const filtered = this.metadataQuestions.filter(q => q.isCustom && filterFn(q));
+        return filtered.map((q, idx) => {
             const val = this.formValues[q.targetField] !== undefined ? this.formValues[q.targetField] : '';
             const dt = (q.displayType || 'Text').toLowerCase();
-            const keyVal = q.developerName || q.questionCode || q.id || `cq-${sectionCode}-${idx}`;
+            const keyVal = q.key || q.targetField || `cq-${idx}`;
             return {
                 ...q,
                 key: keyVal,
-                displayNumber: `${baseNumberPrefix}.${idx + 1}`,
+                displayNumber: basePrefix ? `${basePrefix}.${idx + 1}` : `${idx + 1}`,
                 value: val,
                 isText: dt === 'text' || dt === 'string' || dt === 'phone' || dt === 'email',
                 isTextArea: dt === 'textarea' || dt === 'richtext',
@@ -248,41 +244,135 @@ export default class WcfDynamicForm extends LightningElement {
                 isDate: dt === 'date' || dt === 'datetime',
                 isCheckbox: dt === 'checkbox' || dt === 'boolean',
                 isPicklist: dt === 'picklist' && q.picklistOptions && q.picklistOptions.length > 0,
-                options: q.picklistOptions || []
+                options: q.picklistOptions || [],
+                wrapperClass: (dt === 'textarea' || dt === 'richtext') ? 'modern-field full-width' : 'modern-field'
             };
         });
     }
 
+    // Sub-section 2: Organizational Identifying Information (e.g. Q2_VOLUNTEER_COUNT, Annual_Volunteer_Count__c)
+    get customQuestionsQ2() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
+        ) && (
+            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
+            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
+        ), '2');
+    }
+    get hasCustomQuestionsQ2() {
+        return this.customQuestionsQ2 && this.customQuestionsQ2.length > 0;
+    }
+
+    // Sub-section 3: Submitter Contact Information
+    get customQuestionsQ3() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q3' || q.sectionCode === 'Q3'
+        ) && q.key && q.key.toUpperCase().startsWith('Q3_'), '3');
+    }
+    get hasCustomQuestionsQ3() {
+        return this.customQuestionsQ3 && this.customQuestionsQ3.length > 0;
+    }
+
+    // Sub-section 4: Legal & Governance Structure
+    get customQuestionsQ4() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q4' || q.sectionCode === 'Q4'
+        ) && q.key && q.key.toUpperCase().startsWith('Q4_'), '4');
+    }
+    get hasCustomQuestionsQ4() {
+        return this.customQuestionsQ4 && this.customQuestionsQ4.length > 0;
+    }
+
+    // Sub-section 5: Legal & Tax Compliance
+    get customQuestionsQ5() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q5' || q.sectionCode === 'Q5'
+        ) && q.key && q.key.toUpperCase().startsWith('Q5_'), '5');
+    }
+    get hasCustomQuestionsQ5() {
+        return this.customQuestionsQ5 && this.customQuestionsQ5.length > 0;
+    }
+
+    // Sub-section 6: Fiscal Year
+    get customQuestionsQ6() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q6' || q.sectionCode === 'Q6'
+        ) && q.key && q.key.toUpperCase().startsWith('Q6_'), '6');
+    }
+    get hasCustomQuestionsQ6() {
+        return this.customQuestionsQ6 && this.customQuestionsQ6.length > 0;
+    }
+
+    // Sub-section 7: Top Funders
+    get customQuestionsQ7() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q7' || q.sectionCode === 'Q7'
+        ) && q.key && q.key.toUpperCase().startsWith('Q7_'), '7');
+    }
+    get hasCustomQuestionsQ7() {
+        return this.customQuestionsQ7 && this.customQuestionsQ7.length > 0;
+    }
+
+    // Sub-section 8: References
+    get customQuestionsQ8() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q8' || q.sectionCode === 'Q8'
+        ) && q.key && q.key.toUpperCase().startsWith('Q8_'), '8');
+    }
+    get hasCustomQuestionsQ8() {
+        return this.customQuestionsQ8 && this.customQuestionsQ8.length > 0;
+    }
+
+    // General Custom Questions for Tab 1 (About Org) - remaining ones
     get customQuestionsAboutOrg() {
-        return this._getCustomQuestionsForSection('SEC_ABOUT_ORG', 'Q2');
+        const renderedKeys = new Set([
+            ...this.customQuestionsQ2.map(x => x.key),
+            ...this.customQuestionsQ3.map(x => x.key),
+            ...this.customQuestionsQ4.map(x => x.key),
+            ...this.customQuestionsQ5.map(x => x.key),
+            ...this.customQuestionsQ6.map(x => x.key),
+            ...this.customQuestionsQ7.map(x => x.key),
+            ...this.customQuestionsQ8.map(x => x.key)
+        ]);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'ABOUT_ORG'
+        ) && !renderedKeys.has(q.key), '10');
     }
     get hasCustomQuestionsAboutOrg() {
         return this.customQuestionsAboutOrg && this.customQuestionsAboutOrg.length > 0;
     }
 
     get customQuestionsJobFulfillment() {
-        return this._getCustomQuestionsForSection('SEC_JOB_FULFILLMENT', `Q${this.qNum?.Q14 || '14'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_JOB_FULFILLMENT' || q.sectionCode === 'SEC_WHAT_YOU_DO' || q.sectionCode === 'JOB_FULFILLMENT'
+        ), `Q${this.qNum?.Q14 || '14'}`);
     }
     get hasCustomQuestionsJobFulfillment() {
         return this.customQuestionsJobFulfillment && this.customQuestionsJobFulfillment.length > 0;
     }
 
     get customQuestionsJobCreation() {
-        return this._getCustomQuestionsForSection('SEC_JOB_CREATION', `Q${this.qNum?.Q18 || '18'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_JOB_CREATION' || q.sectionCode === 'JOB_CREATION'
+        ), `Q${this.qNum?.Q18 || '18'}`);
     }
     get hasCustomQuestionsJobCreation() {
         return this.customQuestionsJobCreation && this.customQuestionsJobCreation.length > 0;
     }
 
     get customQuestionsLivelihood() {
-        return this._getCustomQuestionsForSection('SEC_LIVELIHOOD', `Q${this.qNum?.Q23 || '23'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_LIVELIHOOD' || q.sectionCode === 'LIVELIHOOD'
+        ), `Q${this.qNum?.Q23 || '23'}`);
     }
     get hasCustomQuestionsLivelihood() {
         return this.customQuestionsLivelihood && this.customQuestionsLivelihood.length > 0;
     }
 
     get customQuestionsWhyWadhwani() {
-        return this._getCustomQuestionsForSection('SEC_WHY_WADHWANI', `Q${this.qNum?.Q28 || '28'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_WHY_WADHWANI' || q.sectionCode === 'SEC_WHY_WCF' || q.sectionCode === 'WHY_WADHWANI'
+        ), `Q${this.qNum?.Q28 || '28'}`);
     }
     get hasCustomQuestionsWhyWadhwani() {
         return this.customQuestionsWhyWadhwani && this.customQuestionsWhyWadhwani.length > 0;
@@ -412,22 +502,6 @@ export default class WcfDynamicForm extends LightningElement {
             const plain = this.stripHtml(val).trim();
             const words = plain ? plain.split(/\s+/).filter(w => w.length > 0).length : 0;
             this._updateWordCountForField(f, words);
-        });
-    }
-
-    loadMetadata() {
-        getFormMetadata({
-            languageCode: this.selectedLanguage,
-            fiscalMonth: this.formValues.Fiscal_Month__c || '03',
-            fiscalDay: this.formValues.Fiscal_Day__c || '31'
-        })
-        .then(result => {
-            if (result) {
-                this.fiscalYears = result.fiscalYears || {};
-            }
-        })
-        .catch(err => {
-            console.error('Error fetching metadata', err);
         });
     }
 
@@ -1074,19 +1148,54 @@ export default class WcfDynamicForm extends LightningElement {
         labelValue('Leader Name', form.Leader_Name__c, 'Q2');
         labelValue('Leader Title', form.Leader_Title__c, 'Q2');
         labelValue('Leader Tenure', form.Leader_Tenure__c ? `${form.Leader_Tenure__c} years` : '', 'Q2');
+        if (this.hasCustomQuestionsQ2) {
+            this.customQuestionsQ2.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
         labelValue('Submitter Name', form.Submitter_Name__c, 'Q3');
         labelValue('Title', form.Job_Title__c, 'Q3');
         labelValue('Work Email', form.Work_Email_ID__c, 'Q3');
         labelValue('Phone number', form.Phone__c, 'Q3');
+        if (this.hasCustomQuestionsQ3) {
+            this.customQuestionsQ3.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
         labelValue('Legal Type', form.Legal_Type__c, 'Q4');
         labelValue('Registration Jurisdiction', form.Registration_Jurisdiction__c, 'Q4');
         labelValue('Incorporation Date', this.formattedIncorporationDate, 'Q4');
         labelValue('Brief Description', form.Legal_Structure__c, 'Q4');
+        if (this.hasCustomQuestionsQ4) {
+            this.customQuestionsQ4.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
         labelValue('501(c)(3) Status in US', form.Has_501c3_Status__c, 'Q5');
         labelValue('Equivalency Determination (ED)', form.Has_Equivalency_Determination__c, 'Q5');
         labelValue('FCRA Registered (India)', form.Is_FCRA_Registered__c, 'Q5');
         labelValue('Willing to Pursue ED', form.Willing_to_Pursue_ED__c, 'Q5');
+        if (this.hasCustomQuestionsQ5) {
+            this.customQuestionsQ5.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
         labelValue('Fiscal Year End Date', this.formattedFiscalYearEndReview, 'Q6');
+        if (this.hasCustomQuestionsQ6) {
+            this.customQuestionsQ6.forEach(cq => {
+                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
+                    labelValue(cq.label, String(cq.value), cq.displayNumber);
+                }
+            });
+        }
 
         if (form.Funder_1_Name__c) {
             labelValue('Funder 1', `${form.Funder_1_Name__c} - ${val$(form.Funder_1_Amount__c)} (${val(form.Funder_1_Type__c)})`, 'Q7');

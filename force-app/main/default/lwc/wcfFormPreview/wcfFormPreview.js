@@ -178,58 +178,127 @@ export default class WcfFormPreview extends LightningElement {
         }
     }
 
-    _getCustomQuestionsForSection(sectionCode, baseNumberPrefix) {
+    _getCustomQuestions(filterFn, basePrefix) {
         if (!this.metadataQuestions || !this.metadataQuestions.length || !this._app) return [];
-        const custom = this.metadataQuestions.filter(q => q.isCustom && (
-            q.sectionCode === sectionCode ||
-            (sectionCode === 'SEC_JOB_FULFILLMENT' && q.sectionCode === 'SEC_WHAT_YOU_DO') ||
-            (sectionCode === 'SEC_WHY_WADHWANI' && q.sectionCode === 'SEC_WHY_WCF')
-        ));
-        return custom.map((q, idx) => {
+        const filtered = this.metadataQuestions.filter(q => q.isCustom && filterFn(q));
+        return filtered.map((q, idx) => {
             let val = this._app[q.targetField];
             if (val === undefined || val === null || val === '') {
                 val = '—';
             } else if (typeof val === 'boolean') {
                 val = val ? 'Yes' : 'No';
             }
+            const keyVal = q.key || q.targetField || `preview-cq-${idx}`;
             return {
                 ...q,
-                displayNumber: `${baseNumberPrefix}.${idx + 1}`,
+                key: keyVal,
+                displayNumber: basePrefix ? `${basePrefix}.${idx + 1}` : `${idx + 1}`,
                 displayValue: String(val)
             };
         });
     }
 
+    // Section 2: Organizational Identifying Information (e.g. Q2_VOLUNTEER_COUNT)
+    get customQuestionsQ2() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
+        ) && (
+            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
+            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
+        ), '2');
+    }
+    get hasCustomQuestionsQ2() {
+        return this.customQuestionsQ2 && this.customQuestionsQ2.length > 0;
+    }
+
+    // Section 3: Submitter Contact Information
+    get customQuestionsQ3() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q3' || q.sectionCode === 'Q3'
+        ) && q.key && q.key.toUpperCase().startsWith('Q3_'), '3');
+    }
+    get hasCustomQuestionsQ3() {
+        return this.customQuestionsQ3 && this.customQuestionsQ3.length > 0;
+    }
+
+    // Section 4: Legal & Governance Structure
+    get customQuestionsQ4() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q4' || q.sectionCode === 'Q4'
+        ) && q.key && q.key.toUpperCase().startsWith('Q4_'), '4');
+    }
+    get hasCustomQuestionsQ4() {
+        return this.customQuestionsQ4 && this.customQuestionsQ4.length > 0;
+    }
+
+    // Section 5: Legal & Tax Compliance
+    get customQuestionsQ5() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q5' || q.sectionCode === 'Q5'
+        ) && q.key && q.key.toUpperCase().startsWith('Q5_'), '5');
+    }
+    get hasCustomQuestionsQ5() {
+        return this.customQuestionsQ5 && this.customQuestionsQ5.length > 0;
+    }
+
+    // Section 6: Fiscal Year
+    get customQuestionsQ6() {
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q6' || q.sectionCode === 'Q6'
+        ) && q.key && q.key.toUpperCase().startsWith('Q6_'), '6');
+    }
+    get hasCustomQuestionsQ6() {
+        return this.customQuestionsQ6 && this.customQuestionsQ6.length > 0;
+    }
+
+    // General Custom Questions for Tab 1 (About Org) - remaining ones
     get customQuestionsAboutOrg() {
-        return this._getCustomQuestionsForSection('SEC_ABOUT_ORG', 'Q2');
+        const renderedKeys = new Set([
+            ...this.customQuestionsQ2.map(x => x.key),
+            ...this.customQuestionsQ3.map(x => x.key),
+            ...this.customQuestionsQ4.map(x => x.key),
+            ...this.customQuestionsQ5.map(x => x.key),
+            ...this.customQuestionsQ6.map(x => x.key)
+        ]);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'ABOUT_ORG'
+        ) && !renderedKeys.has(q.key), '10');
     }
     get hasCustomQuestionsAboutOrg() {
         return this.customQuestionsAboutOrg && this.customQuestionsAboutOrg.length > 0;
     }
 
     get customQuestionsJobFulfillment() {
-        return this._getCustomQuestionsForSection('SEC_JOB_FULFILLMENT', `Q${this.qNum?.Q14 || '14'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_JOB_FULFILLMENT' || q.sectionCode === 'SEC_WHAT_YOU_DO' || q.sectionCode === 'JOB_FULFILLMENT'
+        ), `Q${this.qNum?.Q14 || '14'}`);
     }
     get hasCustomQuestionsJobFulfillment() {
         return this.customQuestionsJobFulfillment && this.customQuestionsJobFulfillment.length > 0;
     }
 
     get customQuestionsJobCreation() {
-        return this._getCustomQuestionsForSection('SEC_JOB_CREATION', `Q${this.qNum?.Q18 || '18'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_JOB_CREATION' || q.sectionCode === 'JOB_CREATION'
+        ), `Q${this.qNum?.Q18 || '18'}`);
     }
     get hasCustomQuestionsJobCreation() {
         return this.customQuestionsJobCreation && this.customQuestionsJobCreation.length > 0;
     }
 
     get customQuestionsLivelihood() {
-        return this._getCustomQuestionsForSection('SEC_LIVELIHOOD', `Q${this.qNum?.Q23 || '23'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_LIVELIHOOD' || q.sectionCode === 'LIVELIHOOD'
+        ), `Q${this.qNum?.Q23 || '23'}`);
     }
     get hasCustomQuestionsLivelihood() {
         return this.customQuestionsLivelihood && this.customQuestionsLivelihood.length > 0;
     }
 
     get customQuestionsWhyWadhwani() {
-        return this._getCustomQuestionsForSection('SEC_WHY_WADHWANI', `Q${this.qNum?.Q28 || '28'}`);
+        return this._getCustomQuestions(q => (
+            q.sectionCode === 'SEC_WHY_WADHWANI' || q.sectionCode === 'SEC_WHY_WCF' || q.sectionCode === 'WHY_WADHWANI'
+        ), `Q${this.qNum?.Q28 || '28'}`);
     }
     get hasCustomQuestionsWhyWadhwani() {
         return this.customQuestionsWhyWadhwani && this.customQuestionsWhyWadhwani.length > 0;

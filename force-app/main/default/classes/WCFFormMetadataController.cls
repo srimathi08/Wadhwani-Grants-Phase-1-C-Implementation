@@ -234,7 +234,9 @@ public with sharing class WCFFormMetadataController {
                     if (String.isBlank(q.label)) {
                         q.label = dfr.getLabel();
                     }
-                    q.helpText = dfr.getInlineHelpText();
+                    if (String.isBlank(q.helpText)) {
+                        q.helpText = dfr.getInlineHelpText();
+                    }
                     q.isRequired = !dfr.isNillable();
 
                     // Detect Display Type if blank or Auto
@@ -263,6 +265,10 @@ public with sharing class WCFFormMetadataController {
                     }
                 } else {
                     q.displayType = String.isNotBlank(r.Display_Type__c) ? r.Display_Type__c : 'Text';
+                }
+
+                if (String.isBlank(q.label)) {
+                    q.label = r.DeveloperName;
                 }
 
                 questions.add(q);
