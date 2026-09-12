@@ -26,9 +26,60 @@ const MONTH_NAMES = {
     '12': 'December', '12': 'December', 'december': 'December', 'dec': 'December'
 };
 
+function getFieldValue(obj, fieldName) {
+    if (!obj || !fieldName) return undefined;
+    const cleanField = String(fieldName).trim();
+    if (obj[cleanField] !== undefined && obj[cleanField] !== null && obj[cleanField] !== '') {
+        return obj[cleanField];
+    }
+    const lower = cleanField.toLowerCase();
+    if (obj[lower] !== undefined && obj[lower] !== null && obj[lower] !== '') {
+        return obj[lower];
+    }
+    const noSuffix = lower.endsWith('__c') ? lower.slice(0, -3) : lower;
+    if (obj[noSuffix] !== undefined && obj[noSuffix] !== null && obj[noSuffix] !== '') {
+        return obj[noSuffix];
+    }
+
+    try {
+        const keys = Object.keys(obj);
+        for (const key of keys) {
+            const kLower = key.toLowerCase();
+            const kNoSuffix = kLower.endsWith('__c') ? kLower.slice(0, -3) : kLower;
+            if (kLower === lower || kNoSuffix === noSuffix) {
+                if (obj[key] !== undefined && obj[key] !== null && obj[key] !== '') {
+                    return obj[key];
+                }
+            }
+        }
+    } catch (e) {}
+
+    for (const key in obj) {
+        const kLower = key.toLowerCase();
+        const kNoSuffix = kLower.endsWith('__c') ? kLower.slice(0, -3) : kLower;
+        if (kLower === lower || kNoSuffix === noSuffix) {
+            if (obj[key] !== undefined && obj[key] !== null && obj[key] !== '') {
+                return obj[key];
+            }
+        }
+    }
+    return undefined;
+}
+
 export default class WcfFormPreview extends LightningElement {
 
-    @api recordId;
+    _recordId;
+    @api
+    get recordId() {
+        return this._recordId;
+    }
+    set recordId(val) {
+        this._recordId = val;
+        if (val) {
+            this._loadPreviewData();
+        }
+    }
+
     @api hideAutoComputed = false;
     WCF_Logo = WCF_LOGO;
 
@@ -62,12 +113,12 @@ export default class WcfFormPreview extends LightningElement {
         this.isLoading = true;
         try {
             const data = await getWCFFullPreviewData({ applicationId: this.recordId });
-            this.isLoading = false;
             if (data) {
-                this._app     = data.application;
-                this._hist    = data.historical;
-                this._fiscal  = data.fiscal;
-                this._outcome = data.outcome;
+                this._app     = data.applicationData ? { ...data.applicationData } : (data.application ? { ...data.application } : null);
+                this._hist    = data.historicalData ? { ...data.historicalData } : (data.historical ? { ...data.historical } : null);
+                this._fiscal  = data.fiscalData ? { ...data.fiscalData } : (data.fiscal ? { ...data.fiscal } : null);
+                this._outcome = data.outcomeData ? { ...data.outcomeData } : (data.outcome ? { ...data.outcome } : null);
+                await this._loadMetadata();
 
                 if (data.skillingDomains?.length > 0) {
                     this._skillingDomains = data.skillingDomains.map((r, i) => ({
@@ -111,9 +162,10 @@ export default class WcfFormPreview extends LightningElement {
                 console.error('WcfFormPreview load error: no data returned');
             }
         } catch (error) {
-            this.isLoading = false;
             this._app = null;
             console.error('WcfFormPreview load error:', error);
+        } finally {
+            this.isLoading = false;
         }
     }
 
@@ -150,16 +202,15 @@ export default class WcfFormPreview extends LightningElement {
 
     // ── Lifecycle Callbacks ──────────────────────────────────────────────────
     @track metadataQuestions = [];
+    @track _metaVersion = 0;
 
     connectedCallback() {
         this._loadPdfLibraries();
         this._loadPreviewData();
-        this._loadMetadata();
     }
 
     @api
     refreshPreview() {
-        this._loadMetadata();
         return this._loadPreviewData();
     }
 
@@ -171,7 +222,8 @@ export default class WcfFormPreview extends LightningElement {
                 fiscalDay: this._app?.Fiscal_Day__c || '31'
             });
             if (meta && meta.questions) {
-                this.metadataQuestions = meta.questions;
+                this.metadataQuestions = [...meta.questions];
+                this._metaVersion++;
             }
         } catch (err) {
             console.warn('WcfFormPreview metadata load warning:', err);
@@ -179,21 +231,38 @@ export default class WcfFormPreview extends LightningElement {
     }
 
     _getCustomQuestions(filterFn, basePrefix) {
+        // Read _metaVersion to establish reactive dependency
+        const _ = this._metaVersion;
         if (!this.metadataQuestions || !this.metadataQuestions.length || !this._app) return [];
         const filtered = this.metadataQuestions.filter(q => q.isCustom && filterFn(q));
         return filtered.map((q, idx) => {
-            let val = this._app[q.targetField];
+            let val = undefined;
+            const targetSources = [this._app, this._hist, this._fiscal, this._outcome].filter(Boolean);
+            
+            for (const src of targetSources) {
+                if (q.targetField) {
+                    val = getFieldValue(src, q.targetField);
+                    if (val !== undefined && val !== null && val !== '') break;
+                }
+                if (q.key) {
+                    val = getFieldValue(src, q.key);
+                    if (val !== undefined && val !== null && val !== '') break;
+                }
+            }
+
+            const dt = (q.displayType || 'Text').toLowerCase();
+            let displayVal = val;
             if (val === undefined || val === null || val === '') {
-                val = '—';
-            } else if (typeof val === 'boolean') {
-                val = val ? 'Yes' : 'No';
+                displayVal = '—';
+            } else if (typeof val === 'boolean' || dt === 'checkbox' || dt === 'boolean') {
+                displayVal = (val === true || val === 'true') ? 'Yes' : 'No';
             }
             const keyVal = q.key || q.targetField || `preview-cq-${idx}`;
             return {
                 ...q,
                 key: keyVal,
                 displayNumber: basePrefix ? `${basePrefix}.${idx + 1}` : `${idx + 1}`,
-                displayValue: String(val)
+                displayValue: String(displayVal)
             };
         });
     }
@@ -1447,7 +1516,8 @@ export default class WcfFormPreview extends LightningElement {
                 { label: 'Primary Service Regions', value: this.primaryServiceRegions },
                 { label: 'Leader Name', value: this.leaderName },
                 { label: 'Leader Title', value: this.leaderTitle },
-                { label: 'Leader Tenure', value: this.leaderTenure }
+                { label: 'Leader Tenure', value: this.leaderTenure },
+                ...(this.customQuestionsQ2 || []).map(cq => ({ label: cq.label, value: cq.displayValue }))
             ], 2);
 
             // Q3: Submitter Contact Information
@@ -1455,7 +1525,8 @@ export default class WcfFormPreview extends LightningElement {
                 { label: 'Name', value: this.piName },
                 { label: 'Title', value: this.piDesignation },
                 { label: 'Email Address', value: this.piEmail },
-                { label: 'Phone Number', value: this.phoneDisplay }
+                { label: 'Phone Number', value: this.phoneDisplay },
+                ...(this.customQuestionsQ3 || []).map(cq => ({ label: cq.label, value: cq.displayValue }))
             ], 2);
 
             // Q4: Legal Structure
@@ -1464,7 +1535,8 @@ export default class WcfFormPreview extends LightningElement {
                 ...(this.showLegalTypeOther ? [{ label: 'Legal Type — Specified', value: this.legalTypeOtherSpecified }] : []),
                 { label: 'Registration Jurisdiction', value: this.registrationJurisdiction },
                 ...(this.showRegistrationJurisdictionOther ? [{ label: 'Registration Jurisdiction — Specified', value: this.registrationJurisdictionOtherSpecified }] : []),
-                { label: 'Incorporation Date', value: this.incorporationDate }
+                { label: 'Incorporation Date', value: this.incorporationDate },
+                ...(this.customQuestionsQ4 || []).map(cq => ({ label: cq.label, value: cq.displayValue }))
             ], 3);
             if (this.legalDescription) richBoxUnder('Brief Description of Legal Structure', this.legalDescription);
 
@@ -1473,11 +1545,17 @@ export default class WcfFormPreview extends LightningElement {
                 { label: '501(c)(3) Status in US', value: this.has501c3 },
                 { label: 'Equivalency Determination (ED)', value: this.hasEquivalencyDetermination },
                 { label: 'FCRA Registered (India)', value: this.isFcraRegistered },
-                { label: 'Willing to Pursue ED', value: this.openToEquivalencyDetermination }
+                { label: 'Willing to Pursue ED', value: this.openToEquivalencyDetermination },
+                ...(this.customQuestionsQ5 || []).map(cq => ({ label: cq.label, value: cq.displayValue }))
             ], 2);
 
             // Q6: Fiscal Year End Date
             simpleQRow(q.Q6, 'Fiscal Year End Date', this.fiscalYearEnd, true);
+            if (this.hasCustomQuestionsQ6) {
+                this.customQuestionsQ6.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue);
+                });
+            }
 
             // Q7: Top 3 Most Prominent Funders
             if (this.hasFunders) {

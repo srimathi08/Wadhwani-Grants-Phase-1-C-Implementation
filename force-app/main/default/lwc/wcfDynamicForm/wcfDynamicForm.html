@@ -2648,6 +2648,14 @@
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Leader Tenure</div>
                                     <div class="rv-val">{formValues.Leader_Tenure__c}</div>
                                 </div>
+                                <template if:true={hasCustomQuestionsQ2}>
+                                    <template for:each={customQuestionsQ2} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Submitter Name</div>
                                     <div class="rv-val">{formValues.Submitter_Name__c}</div>
@@ -2664,6 +2672,14 @@
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Phone number</div>
                                     <div class="rv-val">{formValues.Phone__c}</div>
                                 </div>
+                                <template if:true={hasCustomQuestionsQ3}>
+                                    <template for:each={customQuestionsQ3} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>Legal Type</div>
                                     <div class="rv-val">{formValues.Legal_Type__c}</div>
@@ -2682,6 +2698,14 @@
                                         <lightning-formatted-rich-text value={formValues.Legal_Structure__c}></lightning-formatted-rich-text>
                                     </div>
                                 </div>
+                                <template if:true={hasCustomQuestionsQ4}>
+                                    <template for:each={customQuestionsQ4} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>501(c)(3) Status in US</div>
                                     <div class="rv-val">{formValues.Has_501c3_Status__c}</div>
@@ -2698,10 +2722,26 @@
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>Willing to Pursue ED</div>
                                     <div class="rv-val">{formValues.Willing_to_Pursue_ED__c}</div>
                                 </div>
+                                <template if:true={hasCustomQuestionsQ5}>
+                                    <template for:each={customQuestionsQ5} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q6}</span>Fiscal Year End Date</div>
                                     <div class="rv-val">{formattedFiscalYearEndReview}</div>
                                 </div>
+                                <template if:true={hasCustomQuestionsQ6}>
+                                    <template for:each={customQuestionsQ6} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                                 <template if:true={formValues.Funder_1_Name__c}>
                                     <div class="rv-row">
                                         <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 1</div>
@@ -2833,6 +2873,14 @@
                                         </div>
                                     </div>
                                 </template>
+                                <template if:true={hasCustomQuestionsAboutOrg}>
+                                    <template for:each={customQuestionsAboutOrg} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
+                                </template>
                             </div>
 
                             <!-- 2. JOB FULFILLMENT (Q11 - Q14) -->
@@ -2956,6 +3004,14 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <template if:true={hasCustomQuestionsJobFulfillment}>
+                                        <template for:each={customQuestionsJobFulfillment} for:item="cq">
+                                            <div key={cq.key} class="rv-row">
+                                                <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                                <div class="rv-val">{cq.displayValue}</div>
+                                            </div>
+                                        </template>
+                                    </template>
                                 </div>
                             </template>
 
@@ -3088,6 +3144,14 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <template if:true={hasCustomQuestionsJobCreation}>
+                                        <template for:each={customQuestionsJobCreation} for:item="cq">
+                                            <div key={cq.key} class="rv-row">
+                                                <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                                <div class="rv-val">{cq.displayValue}</div>
+                                            </div>
+                                        </template>
+                                    </template>
                                 </div>
                             </template>
 
@@ -3243,6 +3307,14 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <template if:true={hasCustomQuestionsLivelihood}>
+                                        <template for:each={customQuestionsLivelihood} for:item="cq">
+                                            <div key={cq.key} class="rv-row">
+                                                <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                                <div class="rv-val">{cq.displayValue}</div>
+                                            </div>
+                                        </template>
+                                    </template>
                                 </div>
                             </template>
 
@@ -3320,6 +3392,14 @@
                                             </template>
                                         </div>
                                     </div>
+                                </template>
+                                <template if:true={hasCustomQuestionsWhyWadhwani}>
+                                    <template for:each={customQuestionsWhyWadhwani} for:item="cq">
+                                        <div key={cq.key} class="rv-row">
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{cq.displayNumber}</span>{cq.label}</div>
+                                            <div class="rv-val">{cq.displayValue}</div>
+                                        </div>
+                                    </template>
                                 </template>
                             </div>
 

@@ -14,7 +14,7 @@
                     <template if:true={hasOutcomeType}>
                         <div class="sep">·</div>
                         <div>
-                            <strong>Outcome:</strong>&nbsp;
+                            <strong>Track:</strong>&nbsp;
                             <span class="track-badge">
                                 <span class="dot"></span>
                                 {outcomeDisplayLabel}
@@ -25,7 +25,7 @@
                 <div class="savebar">
                     <div class={saveStateClass}>{saveStateText}</div>
                     <div class="step-meta">
-                        <span class="stepnum">Step {currentStepDisplay} of 9 · {currentStepTitle}</span>
+                        <span class="stepnum">Step {currentStepDisplay} of {totalStepsDisplay} · {currentStepTitle}</span>
                         <div class="progress">
                             <template for:each={progressDots} for:item="dot">
                                 <span
@@ -44,410 +44,489 @@
             <!-- Step Body -->
             <div class="body">
 
-                <!-- ===== DIMENSION STEPS (0–5) ===== -->
-                <template if:true={isDimStep}>
-                    <div class="step-intro">
-                        <div class="dim-head">
-                            <div class="dim-num serif">{currentDim.id}</div>
-                            <div class="dim-title">
-                                <h3 class="serif">{currentDim.title}</h3>
-                                <p class="lede">{currentDim.lede}</p>
-                            </div>
-                        </div>
-                        <div class="dim-tools">
-                            <button class={rubricBtnClass} type="button" onclick={toggleRubric}>
-                                {rubricBtnLabel} <span class="chev">▾</span>
-                            </button>
-                            <span class="qcount">{currentDim.questionCount} sub-questions</span>
-                        </div>
-                        <div class={rubricClass}>
-                            <h4>What each rating means · {currentDim.title}</h4>
-                            <div class="rubric-grid">
-                                <template for:each={currentDim.rubricCols} for:item="col">
-                                    <div key={col.lvl} class={col.cls}>
-                                        <div class="lvl">{col.lvl} <span class="n">{col.n}</span></div>
-                                        <p>{col.text}</p>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
+                <!-- Loading State -->
+                <template if:true={isLoadingMetadata}>
+                    <div class="metadata-loading" style="text-align: center; padding: 40px;">
+                        <lightning-spinner alternative-text="Loading review questions..." size="medium"></lightning-spinner>
+                        <p style="margin-top: 16px; color: var(--wg-ink-soft);">Loading Reviewer Rubric & Questions from Custom Metadata…</p>
                     </div>
+                </template>
 
-                    <template for:each={currentQuestions} for:item="q">
-                        <div key={q.id} class={q.cardClass}>
-                            <div class="subq-top">
-                                <div class="subq-q">
-                                    <div class="qtext">{q.text}</div>
-                                    <template if:true={q.hint}>
-                                        <div class="qhint">{q.hint}</div>
-                                    </template>
+                <!-- ===== CATEGORY / DIMENSION STEPS (0–6) ===== -->
+                <template if:false={isLoadingMetadata}>
+                    <template if:true={isDimStep}>
+                        <div class="step-intro">
+                            <div class="dim-head">
+                                <div class="dim-num serif">{currentDim.categoryNumber}</div>
+                                <div class="dim-title">
+                                    <h3 class="serif">{currentDim.title}</h3>
+                                    <p class="lede">{currentDim.lede}</p>
                                 </div>
-                                <template if:true={q.showTag}>
-                                    <span class={q.tagClass}>{q.tagLabel}</span>
-                                </template>
                             </div>
-                            <div class="rating-row">
-                                <span class="rating-label">Rating <span class="req">*</span></span>
-                                <div class="segmented" role="radiogroup">
-                                    <template for:each={q.ratingBtns} for:item="rb">
-                                        <button
-                                            key={rb.n}
-                                            type="button"
-                                            class={rb.cls}
-                                            data-qid={q.id}
-                                            data-rate={rb.n}
-                                            onclick={handleRating}
-                                        >
-                                            <span class="num">{rb.n}</span>
-                                            {rb.label}
-                                        </button>
+                            <div class="dim-tools">
+                                <button class={rubricBtnClass} type="button" onclick={toggleRubric}>
+                                    {rubricBtnLabel} <span class="chev">▾</span>
+                                </button>
+                                <span class="qcount">{currentDim.questionCount} question(s) in this category</span>
+                            </div>
+                            <div class={rubricClass}>
+                                <h4>General Scoring Philosophy · Category {currentDim.categoryNumber}: {currentDim.title}</h4>
+                                <div class="rubric-grid">
+                                    <template for:each={currentDim.rubricCols} for:item="col">
+                                        <div key={col.n} class={col.cls}>
+                                            <div class="lvl"><span class="n">{col.n}</span> {col.label}</div>
+                                            <p>{col.text}</p>
+                                        </div>
                                     </template>
                                 </div>
                             </div>
-                            <div class={q.commentClass}>
-                                <div class="clab">
-                                    <span class="l">
-                                        Comment
-                                        <template if:true={q.commentRequired}>
-                                            <span class="req"> *</span>
+                        </div>
+
+                        <!-- Questions in this Category -->
+                        <template for:each={currentQuestions} for:item="q">
+                            <div key={q.questionId} class={q.cardClass}>
+                                <div class="subq-top">
+                                    <div class="subq-q">
+                                        <div class="qtext">
+                                            <span class="qnum-badge">{q.questionId}</span>
+                                            {q.questionText}
+                                        </div>
+
+                                        <!-- Track-specific guidance badges & text -->
+                                        <template if:true={q.trackAware}>
+                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 8px 12px; background: #faf8f5; border-left: 3px solid #E8622A; border-radius: 4px;">
+                                                <div style="font-size: 0.78rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
+                                                    🎯 Track-Specific Review Guidance ({outcomeDisplayLabel}):
+                                                </div>
+                                                <div style="font-size: 0.85rem; color: #444; line-height: 1.4;">
+                                                    {q.resolvedDescription}
+                                                </div>
+                                            </div>
                                         </template>
-                                    </span>
-                                    <span class="help">{q.commentHelp}</span>
+                                        <template if:false={q.trackAware}>
+                                            <template if:true={q.resolvedDescription}>
+                                                <div class="qhint" style="margin-top: 4px; font-size: 0.82rem; color: #666;">
+                                                    {q.resolvedDescription}
+                                                </div>
+                                            </template>
+                                        </template>
+                                    </div>
+
+                                    <template if:true={q.showTag}>
+                                        <span class={q.tagClass}>{q.tagLabel}</span>
+                                    </template>
                                 </div>
-                                <div class="textarea-wrap">
-                                    <textarea
-                                        class={q.commentTextareaClass}
-                                        data-qid={q.id}
-                                        placeholder={q.commentPlaceholder}
-                                        rows="3"
-                                        oninput={handleCommentInput}
-                                        onkeydown={handleCommentKeyDown}
-                                        onpaste={handleCommentPaste}
-                                    >{q.commentValue}</textarea>
-                                    <div class={q.wordCountClass}>{q.wordCountDisplay}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
 
-                </template>
-
-                <!-- ===== STEP 7: Strengths & Weaknesses ===== -->
-                <template if:true={isSwStep}>
-                    <div class="step-intro">
-                        <div class="dim-head">
-                            <div class="dim-num serif">7</div>
-                            <div class="dim-title">
-                                <h3 class="serif">Strengths and weaknesses</h3>
-                                <p class="lede">Capture your top three strengths and your top three weaknesses or concerns at the proposal level — these are not per-dimension. Order matters: the first item should be the most material. At least one entry is required in each block.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="sw-indent">
-                        <div class="sw-block">
-                            <h4 class="serif">Up to 3 strengths · ranked</h4>
-                            <p class="sub">First entry is the most material strength. Each entry: 1–2 sentences.</p>
-                            <template for:each={strengthRows} for:item="row">
-                                <div key={row.idx} class="ranked-row">
-                                    <div class="rank serif">{row.num}</div>
-                                    <lightning-input
-                                        type="text"
-                                        name={row.strengthField}
-                                        value={row.strengthValue}
-                                        placeholder={row.sPlaceholder}
-                                        onchange={handleSwChange}
-                                        data-kind="strength"
-                                        data-idx={row.idx}
-                                    ></lightning-input>
-                                    <span class="req-mark">{row.reqMark}</span>
-                                </div>
-                            </template>
-                        </div>
-                        <div class="sw-block">
-                            <h4 class="serif">Up to 3 weaknesses · ranked</h4>
-                            <p class="sub">First entry is the most material concern. Each entry: 1–2 sentences.</p>
-                            <template for:each={weaknessRows} for:item="row">
-                                <div key={row.idx} class="ranked-row">
-                                    <div class="rank serif">{row.num}</div>
-                                    <lightning-input
-                                        type="text"
-                                        name={row.weaknessField}
-                                        value={row.weaknessValue}
-                                        placeholder={row.wPlaceholder}
-                                        onchange={handleSwChange}
-                                        data-kind="weakness"
-                                        data-idx={row.idx}
-                                    ></lightning-input>
-                                    <span class="req-mark">{row.reqMark}</span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                </template>
-
-                <!-- ===== STEP 8: Final Recommendation ===== -->
-                <template if:true={isRecStep}>
-                    <div class="step-intro">
-                        <div class="dim-head">
-                            <div class="dim-num serif">8</div>
-                            <div class="dim-title">
-                                <h3 class="serif">Final Recommendation</h3>
-                                <p class="lede">Based on your evaluation across the six dimensions, do you recommend this applicant proceed to Stage 5 (Committee Decision)? Your recommendation is your independent view; the Approver will reconcile across all reviewers before deciding.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="finalrec">
-                        <div class="yesno-row">
-                            <span class="ynl">Recommendation <span class="req">*</span></span>
-                            <div class="yesno yesno-4">
-                                <button type="button" class={recStronglyRecommendClass} data-rec="Strongly Recommend" onclick={handleRecChoice}>
-                                    ✓ Strongly recommend
-                                </button>
-                                <button type="button" class={recRecommendClass} data-rec="Recommend" onclick={handleRecChoice}>
-                                    ✓ Recommend
-                                </button>
-                                <button type="button" class={recReservationsClass} data-rec="Recommend with Reservations" onclick={handleRecChoice}>
-                                    ~ Recommend with reservations
-                                </button>
-                                <button type="button" class={recDoNotRecommendClass} data-rec="Do Not Recommend" onclick={handleRecChoice}>
-                                    ✕ Do not recommend
-                                </button>
-                            </div>
-                        </div>
-
-                        <template if:true={showCeoRecommendationYes}>
-                            <div class="path yes">
-                                <div class="pathlab good">↳ Recommendation Strength</div>
-                                <div class="subform-row">
-                                    <span class="l">How strongly do you recommend FOR consideration of this proposal? <span class="req">*</span></span>
-                                    <div class="segmented yes-seg" role="radiogroup">
-                                        <template for:each={recStrengthBtns} for:item="rb">
-                                            <button key={rb.n} type="button" class={rb.yesSelCls} data-recstr={rb.n} onclick={handleRecStrength}>
-                                                <span class="num">{rb.n}</span>{rb.label}
+                                <!-- Rating Row (1 to 5 Buttons) -->
+                                <div class="rating-row">
+                                    <span class="rating-label">Rating <span class="req">*</span></span>
+                                    <div class="segmented" role="radiogroup">
+                                        <template for:each={q.ratingBtns} for:item="rb">
+                                            <button
+                                                key={rb.n}
+                                                type="button"
+                                                class={rb.cls}
+                                                data-qid={q.questionId}
+                                                data-rate={rb.n}
+                                                title={rb.ladderAnchor}
+                                                onclick={handleRating}
+                                            >
+                                                <span class="num">{rb.n}</span>
+                                                {rb.label}
                                             </button>
                                         </template>
                                     </div>
                                 </div>
-                                <div class="subform-row">
-                                    <span class="l">Recommendation strength comments <span class="req">*</span></span>
-                                    <div class="textarea-wrap">
-                                        <textarea
-                                            class="lwc-textarea"
-                                            data-field="Recommendation_Strength_Comments__c"
-                                            placeholder="Why this recommendation strength?"
-                                            rows="3"
-                                            oninput={handleRecCommentInput}
-                                            onkeydown={handleRecCommentKeyDown}
-                                            onpaste={handleRecCommentPaste}
-                                        >{reviewData.Recommendation_Strength_Comments__c}</textarea>
-                                        <div class={recYesWordCountClass}>{recYesWordCountDisplay}</div>
+
+                                <!-- Selected Rating Ladder Anchor Badge -->
+                                <template if:true={q.selectedLadderText}>
+                                    <div class="selected-ladder-badge" style="margin: 6px 0 10px 0; padding: 6px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 0.83rem; color: #166534; display: flex; align-items: center; gap: 6px;">
+                                        <span style="font-weight: 700;">Level {q.selectedRating}:</span>
+                                        <span>{q.selectedLadderText}</span>
                                     </div>
-                                </div>
-                            </div>
-                        </template>
+                                </template>
 
-                        <template if:true={showCeoRecommendationNo}>
-                            <div class="path no">
-                                <div class="pathlab danger">↳ Do Not Recommend</div>
-
-                                <!-- ===== Rejection Reason(s) ===== -->
-                                <div class="subform-row">
-                                    <span class="l">Rejection reason(s) <span class="req">*</span></span>
-                                    <div class="checkbox-grid" role="group">
-                                        <template for:each={rejectionReasonRows} for:item="r">
-                                            <label key={r.value} class="checkbox-row">
-                                                <input
-                                                    type="checkbox"
-                                                    data-value={r.value}
-                                                    checked={r.checked}
-                                                    onchange={handleRejectionReasonToggle}
-                                                />
-                                                <span>{r.label}</span>
-                                            </label>
-                                        </template>
-                                    </div>
-                                </div>
-
-                                <!-- ===== Rejection Comment ===== -->
-                                <!-- Per build spec 3.2/3.3: when "Other" is selected, the reason -->
-                                <!-- is written inside this comment itself — no separate note field. -->
-                                <div class="subform-row">
-                                    <span class="l">
-                                        Rejection comment <span class="req">*</span>
-                                        <template if:true={showRejectionOther}>
-                                            <span class="help"> — describe the "Other" reason here</span>
-                                        </template>
-                                    </span>
-                                    <div class="textarea-wrap">
-                                        <textarea
-                                            class="lwc-textarea"
-                                            placeholder="Explain the basis for rejection…"
-                                            rows="3"
-                                            oninput={handleRejectionCommentInput}
-                                            onkeydown={handleRejectionCommentKeyDown}
-                                            onpaste={handleRejectionCommentPaste}
-                                        >{reviewData.Rejection_Comment__c}</textarea>
-                                        <div class={rejectionCommentWordCountClass}>{rejectionCommentWordCountDisplay}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template if:false={hasRecChoice}>
-                            <div class="rec-placeholder">Select a recommendation option above to continue.</div>
-                        </template>
-                    </div>
-
-                    <!-- ===== Supporting Documents upload (Rec step) ===== -->
-                    <div class="upload-section upload-section-rec">
-                        <div class="upload-header">
-                            <span class="upload-title">Supporting Documents</span>
-                            <span class="upload-sub">Optional — attach any files to support your recommendation</span>
-                        </div>
-                        <template if:true={reviewRecordId}>
-                            <lightning-file-upload
-                                label="Attach files"
-                                name="supportingDocs"
-                                accept={acceptedFormats}
-                                record-id={reviewRecordId}
-                                multiple
-                                onuploadfinished={handleUploadFinished}
-                            ></lightning-file-upload>
-                            <template if:true={uploadedFiles.length}>
-                                <div class="uploaded-list">
-                                    <template for:each={uploadedFiles} for:item="f">
-                                        <div key={f.documentId} class="uploaded-file">
-                                            <span class="file-icon">📎</span>
-                                            <span class="file-name">{f.name}</span>
-                                            <button
-                                                class="file-delete-btn"
-                                                type="button"
-                                                title="Remove file"
-                                                data-docid={f.documentId}
-                                                onclick={handleDeleteFile}
-                                            >✕</button>
+                                <!-- Question-Specific 5-Point Ladder Accordion -->
+                                <div class="q-ladder-toggle-wrap" style="margin-bottom: 12px;">
+                                    <button class="q-ladder-toggle-btn" type="button" data-qid={q.questionId} onclick={handleToggleQuestionLadder}
+                                            style="background: none; border: none; padding: 0; font-size: 0.78rem; color: #E8622A; cursor: pointer; text-decoration: underline; font-weight: 600;">
+                                        {q.ladderToggleLabel}
+                                    </button>
+                                    <template if:true={q.showLadder}>
+                                        <div class="q-ladder-drawer" style="margin-top: 8px; padding: 10px 14px; background: #fffaf7; border: 1px dashed #fcd5c1; border-radius: 6px;">
+                                            <div style="font-size: 0.75rem; font-weight: 700; color: #c94e1c; text-transform: uppercase; margin-bottom: 6px;">
+                                                5-Point Rating Ladder for Question {q.questionId}:
+                                            </div>
+                                            <template for:each={q.ladderItems} for:item="lItem">
+                                                <div key={lItem.level} style="font-size: 0.8rem; margin-bottom: 4px; color: #333; display: flex; gap: 8px;">
+                                                    <span style="font-weight: 700; color: #E8622A; min-width: 55px;">Level {lItem.level}:</span>
+                                                    <span>{lItem.text}</span>
+                                                </div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
-                            </template>
-                        </template>
-                        <template if:false={reviewRecordId}>
-                            <div class="upload-hint">
-                                <span>Save a draft first to enable file upload.</span>
-                                <button class="btn btn-secondary btn-sm" type="button" onclick={handleSaveDraft}>Save draft now</button>
-                            </div>
-                        </template>
-                    </div>
 
-                </template>
-
-                <!-- ===== STEP 9: Review & Submit ===== -->
-                <template if:true={isReviewStep}>
-                    <div class="step-intro">
-                        <div class="dim-head">
-                            <div class="dim-num serif">9</div>
-                            <div class="dim-title">
-                                <h3 class="serif">Review &amp; submit</h3>
-                                <p class="lede">A summary of your evaluation. Use the progress bar above to jump back to any step and revise. When you submit, this evaluation is sealed and visible to the Approver alongside the other reviewers' evaluations.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="review-summary">
-                        <template for:each={reviewSummaryDims} for:item="dim">
-                            <div key={dim.id} class="review-dim">
-                                <div class="head">
-                                    <div class="name">
-                                        <span class="num serif">{dim.id}</span>
-                                        <span class="ttl serif">{dim.title}</span>
+                                <!-- Comment Textarea -->
+                                <div class={q.commentClass}>
+                                    <div class="clab">
+                                        <span class="l">
+                                            Reviewer Justification / Comment
+                                            <template if:true={q.commentRequired}>
+                                                <span class="req"> *</span>
+                                            </template>
+                                        </span>
+                                        <span class="help">{q.commentHelp}</span>
                                     </div>
-                                    <div class="mean serif"><span class="lab">Mean</span>{dim.mean}</div>
+                                    <div class="textarea-wrap">
+                                        <textarea
+                                            class={q.commentTextareaClass}
+                                            data-qid={q.questionId}
+                                            placeholder={q.commentPlaceholder}
+                                            rows="3"
+                                            oninput={handleCommentInput}
+                                            onkeydown={handleCommentKeyDown}
+                                            onpaste={handleCommentPaste}
+                                        >{q.commentValue}</textarea>
+                                        <div class={q.wordCountClass}>{q.wordCountDisplay}</div>
+                                    </div>
                                 </div>
-                                <template for:each={dim.qs} for:item="rq">
-                                    <div key={rq.id} class="review-q">
-                                        <div class="qx">{rq.text}</div>
-                                        <div class="rx">
-                                            <span class={rq.pipCls}>{rq.ratingLabel}</span>&nbsp;<span>{rq.ratingNum}</span>
-                                        </div>
-                                        <template if:true={rq.hasComment}>
-                                            <div class="review-q-comment">{rq.comment}</div>
-                                        </template>
+                            </div>
+                        </template>
+
+                    </template>
+
+                    <!-- ===== STEP 7: Strengths & Weaknesses ===== -->
+                    <template if:true={isSwStep}>
+                        <div class="step-intro">
+                            <div class="dim-head">
+                                <div class="dim-num serif">8</div>
+                                <div class="dim-title">
+                                    <h3 class="serif">Strengths and Weaknesses</h3>
+                                    <p class="lede">Capture your top three strengths and your top three weaknesses or concerns at the proposal level across all 7 categories. Order matters: the first entry should be the most material. At least one entry is required in each block (max 200 words each).</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sw-indent">
+                            <div class="sw-block">
+                                <h4 class="serif">Top 3 Strengths · Ranked</h4>
+                                <p class="sub">First entry is the most material strength. Each entry: 1–2 concise sentences.</p>
+                                <template for:each={strengthRows} for:item="row">
+                                    <div key={row.idx} class="ranked-row">
+                                        <div class="rank serif">{row.num}</div>
+                                        <lightning-input
+                                            type="text"
+                                            name={row.strengthField}
+                                            value={row.strengthValue}
+                                            placeholder={row.sPlaceholder}
+                                            onchange={handleSwChange}
+                                            data-kind="strength"
+                                            data-idx={row.idx}
+                                        ></lightning-input>
+                                        <span class="req-mark">{row.reqMark}</span>
                                     </div>
                                 </template>
                             </div>
-                        </template>
-                        <div class="review-other">
-                            <h5 class="serif">Strengths</h5>
-                            <ul>
-                                <template for:each={reviewStrengths} for:item="s">
-                                    <li key={s}>{s}</li>
+                            <div class="sw-block">
+                                <h4 class="serif">Top 3 Weaknesses · Ranked</h4>
+                                <p class="sub">First entry is the most material concern. Each entry: 1–2 concise sentences.</p>
+                                <template for:each={weaknessRows} for:item="row">
+                                    <div key={row.idx} class="ranked-row">
+                                        <div class="rank serif">{row.num}</div>
+                                        <lightning-input
+                                            type="text"
+                                            name={row.weaknessField}
+                                            value={row.weaknessValue}
+                                            placeholder={row.wPlaceholder}
+                                            onchange={handleSwChange}
+                                            data-kind="weakness"
+                                            data-idx={row.idx}
+                                        ></lightning-input>
+                                        <span class="req-mark">{row.reqMark}</span>
+                                    </div>
                                 </template>
-                            </ul>
+                            </div>
                         </div>
-                        <div class="review-other">
-                            <h5 class="serif">Weaknesses</h5>
-                            <ul>
-                                <template for:each={reviewWeaknesses} for:item="w">
-                                    <li key={w}>{w}</li>
-                                </template>
-                            </ul>
+                    </template>
+
+                    <!-- ===== STEP 8: Final Recommendation ===== -->
+                    <template if:true={isRecStep}>
+                        <div class="step-intro">
+                            <div class="dim-head">
+                                <div class="dim-num serif">9</div>
+                                <div class="dim-title">
+                                    <h3 class="serif">Final Recommendation</h3>
+                                    <p class="lede">Based on your evaluation across all 7 categories (Institutional Credibility, Operational Maturity, Outcome Track Record, Alignment with WCF Priorities, Absorptive Capacity, Measurement Readiness, and Use of WCF Funds), provide your independent recommendation.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="review-rec">
-                            <h5 class="serif">Final recommendation</h5>
-                            <div class="recvalue-row">
-                                <span class={recValueClass}>{recValueIcon} {recChoiceDisplayLabel}</span>
-                                <template if:true={recStrengthLabel}>
-                                    <span class="strength">Strength: {recStrengthLabel}</span>
-                                </template>
+                        <div class="finalrec">
+                            <div class="yesno-row">
+                                <span class="ynl">Recommendation <span class="req">*</span></span>
+                                <div class="yesno yesno-4">
+                                    <button type="button" class={recStronglyRecommendClass} data-rec="Strongly Recommend" onclick={handleRecChoice}>
+                                        ✓ Strongly recommend
+                                    </button>
+                                    <button type="button" class={recRecommendClass} data-rec="Recommend" onclick={handleRecChoice}>
+                                        ✓ Recommend
+                                    </button>
+                                    <button type="button" class={recReservationsClass} data-rec="Recommend with Reservations" onclick={handleRecChoice}>
+                                        ~ Recommend with reservations
+                                    </button>
+                                    <button type="button" class={recDoNotRecommendClass} data-rec="Do Not Recommend" onclick={handleRecChoice}>
+                                        ✕ Do not recommend
+                                    </button>
+                                </div>
                             </div>
 
                             <template if:true={showCeoRecommendationYes}>
-                                <template if:true={reviewData.Recommendation_Strength_Comments__c}>
-                                    <div class="review-q-comment">{reviewData.Recommendation_Strength_Comments__c}</div>
-                                </template>
+                                <div class="path yes">
+                                    <div class="pathlab good">↳ Recommendation Strength</div>
+                                    <div class="subform-row">
+                                        <span class="l">How strongly do you recommend FOR consideration of this proposal? <span class="req">*</span></span>
+                                        <div class="segmented yes-seg" role="radiogroup">
+                                            <template for:each={recStrengthBtns} for:item="rb">
+                                                <button key={rb.n} type="button" class={rb.yesSelCls} data-recstr={rb.n} onclick={handleRecStrength}>
+                                                    <span class="num">{rb.n}</span>{rb.label}
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="subform-row">
+                                        <span class="l">Recommendation strength comments <span class="req">*</span></span>
+                                        <div class="textarea-wrap">
+                                            <textarea
+                                                class="lwc-textarea"
+                                                data-field="Recommendation_Strength_Comments__c"
+                                                placeholder="Explain why you recommend this proposal with this degree of conviction…"
+                                                rows="3"
+                                                oninput={handleRecCommentInput}
+                                                onkeydown={handleRecCommentKeyDown}
+                                                onpaste={handleRecCommentPaste}
+                                            >{reviewData.Recommendation_Strength_Comments__c}</textarea>
+                                            <div class={recYesWordCountClass}>{recYesWordCountDisplay}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </template>
 
                             <template if:true={showCeoRecommendationNo}>
-                                <!-- ===== Rejection reasons + comment preview ===== -->
-                                <template if:true={reviewRejectionReasonLabels.length}>
-                                    <div class="review-q-comment">
-                                        <strong>Rejection reasons:</strong>
-                                        <ul>
-                                            <template for:each={reviewRejectionReasonLabels} for:item="rr">
-                                                <li key={rr}>{rr}</li>
+                                <div class="path no">
+                                    <div class="pathlab danger">↳ Do Not Recommend</div>
+
+                                    <!-- Rejection Reasons -->
+                                    <div class="subform-row">
+                                        <span class="l">Rejection reason(s) <span class="req">*</span></span>
+                                        <div class="checkbox-grid" role="group">
+                                            <template for:each={rejectionReasonRows} for:item="r">
+                                                <label key={r.value} class="checkbox-row">
+                                                    <input
+                                                        type="checkbox"
+                                                        data-value={r.value}
+                                                        checked={r.checked}
+                                                        onchange={handleRejectionReasonToggle}
+                                                    />
+                                                    <span>{r.label}</span>
+                                                </label>
                                             </template>
-                                        </ul>
+                                        </div>
                                     </div>
-                                </template>
-                                <template if:true={reviewData.Rejection_Comment__c}>
-                                    <div class="review-q-comment">{reviewData.Rejection_Comment__c}</div>
-                                </template>
+
+                                    <!-- Rejection Comment -->
+                                    <div class="subform-row">
+                                        <span class="l">
+                                            Rejection comment <span class="req">*</span>
+                                            <template if:true={showRejectionOther}>
+                                                <span class="help"> — describe the "Other" reason here</span>
+                                            </template>
+                                        </span>
+                                        <div class="textarea-wrap">
+                                            <textarea
+                                                class="lwc-textarea"
+                                                placeholder="Explain the detailed basis for rejection…"
+                                                rows="3"
+                                                oninput={handleRejectionCommentInput}
+                                                onkeydown={handleRejectionCommentKeyDown}
+                                                onpaste={handleRejectionCommentPaste}
+                                            >{reviewData.Rejection_Comment__c}</textarea>
+                                            <div class={rejectionCommentWordCountClass}>{rejectionCommentWordCountDisplay}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:false={hasRecChoice}>
+                                <div class="rec-placeholder">Select a recommendation option above to continue.</div>
                             </template>
                         </div>
 
-                        <!-- ===== Uploaded files summary in Review step ===== -->
-                        <template if:true={uploadedFiles.length}>
-                            <div class="review-other">
-                                <h5 class="serif">Attached Documents</h5>
-                                <div class="uploaded-list uploaded-list-review">
-                                    <template for:each={uploadedFiles} for:item="f">
-                                        <div key={f.documentId} class="uploaded-file">
-                                            <span class="file-icon">📎</span>
-                                            <span class="file-name">{f.name}</span>
-                                            <button
-                                                class="file-delete-btn"
-                                                type="button"
-                                                title="Remove file"
-                                                data-docid={f.documentId}
-                                                onclick={handleDeleteFile}
-                                            >✕</button>
+                        <!-- Supporting Documents upload -->
+                        <div class="upload-section upload-section-rec">
+                            <div class="upload-header">
+                                <span class="upload-title">Supporting Documents</span>
+                                <span class="upload-sub">Optional — attach any notes, spreadsheets, or memos to support your review</span>
+                            </div>
+                            <template if:true={reviewRecordId}>
+                                <lightning-file-upload
+                                    label="Attach files"
+                                    name="supportingDocs"
+                                    accept={acceptedFormats}
+                                    record-id={reviewRecordId}
+                                    multiple
+                                    onuploadfinished={handleUploadFinished}
+                                ></lightning-file-upload>
+                                <template if:true={uploadedFiles.length}>
+                                    <div class="uploaded-list">
+                                        <template for:each={uploadedFiles} for:item="f">
+                                            <div key={f.documentId} class="uploaded-file">
+                                                <span class="file-icon">📎</span>
+                                                <span class="file-name">{f.name}</span>
+                                                <button
+                                                    class="file-delete-btn"
+                                                    type="button"
+                                                    title="Remove file"
+                                                    data-docid={f.documentId}
+                                                    onclick={handleDeleteFile}
+                                                >✕</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </template>
+                            <template if:false={reviewRecordId}>
+                                <div class="upload-hint">
+                                    <span>Save a draft first to enable file upload.</span>
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick={handleSaveDraft}>Save draft now</button>
+                                </div>
+                            </template>
+                        </div>
+
+                    </template>
+
+                    <!-- ===== STEP 9: Review & Submit Summary ===== -->
+                    <template if:true={isReviewStep}>
+                        <div class="step-intro">
+                            <div class="dim-head">
+                                <div class="dim-num serif">10</div>
+                                <div class="dim-title">
+                                    <h3 class="serif">Review &amp; Submit</h3>
+                                    <p class="lede">Comprehensive summary of your 7-category evaluation. Use the progress bar above to jump back to any category. When submitted, this evaluation will be sealed and forwarded to the Approver.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overall Score Card Banner -->
+                        <div class="overall-score-banner" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, #fff4ef 0%, #ffffff 100%); border: 1.5px solid #E8622A; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.82rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px;">Arithmetic Mean across All 7 Categories</div>
+                                <div style="font-size: 1.3rem; font-weight: 800; color: #1a1a1a;">Overall Review Score</div>
+                            </div>
+                            <div style="display: flex; align-items: baseline; gap: 6px;">
+                                <span style="font-size: 2.2rem; font-weight: 800; color: #E8622A;">{overallCalculatedScore}</span>
+                                <span style="font-size: 1rem; color: #777; font-weight: 600;">/ 5.0</span>
+                            </div>
+                        </div>
+
+                        <!-- 7 Categories Breakdown -->
+                        <div class="review-summary">
+                            <template for:each={reviewSummaryDims} for:item="dim">
+                                <div key={dim.id} class="review-dim">
+                                    <div class="head">
+                                        <div class="name">
+                                            <span class="num serif">{dim.id}</span>
+                                            <span class="ttl serif">{dim.title}</span>
+                                        </div>
+                                        <div class="mean serif"><span class="lab">Category Mean</span>{dim.mean}</div>
+                                    </div>
+                                    <template for:each={dim.qs} for:item="rq">
+                                        <div key={rq.id} class="review-q">
+                                            <div class="qx">
+                                                <span style="font-weight: 700; color: #E8622A; margin-right: 4px;">{rq.id}</span>
+                                                {rq.text}
+                                            </div>
+                                            <div class="rx">
+                                                <span class={rq.pipCls}>{rq.ratingLabel}</span>&nbsp;<span>{rq.ratingNum}</span>
+                                            </div>
+                                            <template if:true={rq.ladderText}>
+                                                <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
+                                                    ↳ <em>{rq.ladderText}</em>
+                                                </div>
+                                            </template>
+                                            <template if:true={rq.hasComment}>
+                                                <div class="review-q-comment">{rq.comment}</div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
-                            </div>
-                        </template>
+                            </template>
 
-                    </div>
+                            <div class="review-other">
+                                <h5 class="serif">Top 3 Strengths</h5>
+                                <ul>
+                                    <template for:each={reviewStrengths} for:item="s">
+                                        <li key={s}>{s}</li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <div class="review-other">
+                                <h5 class="serif">Top 3 Weaknesses</h5>
+                                <ul>
+                                    <template for:each={reviewWeaknesses} for:item="w">
+                                        <li key={w}>{w}</li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <div class="review-rec">
+                                <h5 class="serif">Final Recommendation</h5>
+                                <div class="recvalue-row">
+                                    <span class={recValueClass}>{recValueIcon} {recChoiceDisplayLabel}</span>
+                                    <template if:true={recStrengthLabel}>
+                                        <span class="strength">Strength: {recStrengthLabel}</span>
+                                    </template>
+                                </div>
+
+                                <template if:true={showCeoRecommendationYes}>
+                                    <template if:true={reviewData.Recommendation_Strength_Comments__c}>
+                                        <div class="review-q-comment">{reviewData.Recommendation_Strength_Comments__c}</div>
+                                    </template>
+                                </template>
+
+                                <template if:true={showCeoRecommendationNo}>
+                                    <template if:true={reviewRejectionReasonLabels.length}>
+                                        <div class="review-q-comment">
+                                            <strong>Rejection reasons:</strong>
+                                            <ul>
+                                                <template for:each={reviewRejectionReasonLabels} for:item="rr">
+                                                    <li key={rr}>{rr}</li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                    <template if:true={reviewData.Rejection_Comment__c}>
+                                        <div class="review-q-comment">{reviewData.Rejection_Comment__c}</div>
+                                    </template>
+                                </template>
+                            </div>
+
+                            <!-- Uploaded files summary in Review step -->
+                            <template if:true={uploadedFiles.length}>
+                                <div class="review-other">
+                                    <h5 class="serif">Attached Documents</h5>
+                                    <div class="uploaded-list uploaded-list-review">
+                                        <template for:each={uploadedFiles} for:item="f">
+                                            <div key={f.documentId} class="uploaded-file">
+                                                <span class="file-icon">📎</span>
+                                                <span class="file-name">{f.name}</span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
                 </template>
 
             </div><!-- /body -->
@@ -465,7 +544,7 @@
                     <button class="btn btn-secondary" type="button" onclick={prevStep} disabled={isPrevDisabled}>← Previous</button>
                 </div>
                 <div class="right">
-                    <span class="step-here">Step {currentStepDisplay} of 9</span>
+                    <span class="step-here">Step {currentStepDisplay} of {totalStepsDisplay}</span>
                     <button class="btn btn-secondary" type="button" onclick={handleSaveDraft}>Save draft</button>
                     <button class={nextBtnClass} type="button" onclick={nextStep}>{nextBtnLabel}</button>
                 </div>
@@ -474,15 +553,13 @@
         </div>
     </template>
 
-    <!-- Submitted Success — shown right after a fresh submit AND after a
-         refresh when the reviewer already submitted. One consistent screen,
-         one Back to Dashboard button. -->
+    <!-- Submitted Success Screen -->
     <template if:true={submitted}>
         <div class="form-wrap">
             <div class="done-state">
                 <div class="done-icon">✓</div>
-                <h3 class="serif">Evaluation submitted</h3>
-                <p>Your evaluation of <strong>{institutionName}</strong> has been sealed and is now visible to the Approver. You'll be notified when all reviewers have submitted and the Approver opens the aggregate view.</p>
+                <h3 class="serif">Evaluation Submitted</h3>
+                <p>Your evaluation of <strong>{institutionName}</strong> across all 7 categories has been sealed and submitted to the Approver.</p>
                 <button class="btn btn-secondary" type="button" onclick={handleBackToDashboard}>
                     Back to Dashboard
                 </button>

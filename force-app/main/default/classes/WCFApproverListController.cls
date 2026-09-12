@@ -34,6 +34,7 @@ public without sharing class WCFApproverListController {
     }
 
     private static final Set<String> ALLOWED_RT_NAMES = new Set<String>{
+        'Wadhwani_Grants',
         'WCF_Job_Creation_Proposals',
         'WCF_Job_Fulfillment_Job_Creation_Proposals',
         'WCF_Job_Fulfillment_Proposals'

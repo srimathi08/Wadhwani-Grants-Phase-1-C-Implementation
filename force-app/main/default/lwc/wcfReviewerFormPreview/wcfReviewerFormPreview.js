@@ -1,101 +1,63 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import getReviewData from '@salesforce/apex/WCFApproverListController.getReviewData';
+import getReviewerFormV5Metadata from '@salesforce/apex/WCFReviewerMetadataController.getReviewerFormV5Metadata';
 
 const RATING_LABEL = { 5: 'Very strong', 4: 'Strong', 3: 'Adequate', 2: 'Weak', 1: 'Very weak' };
 
-const OUTCOME_JF   = 'WCF_Job_Fulfillment';
-const OUTCOME_JC   = 'WCF_Job_Creation_Review';
-const OUTCOME_BOTH = 'WCF_Job_Fulfillment_Job_Creation';
-
-// Mirrors DIMS definition from the reviewer form — same questions, same fields
-const DIMS = [
-    {
-        id: 1, title: 'Institutional credibility',
-        questions: [
-            { id: '1.1', tag: 'all', ratingField: 'D1_Governance_Rating__c',          commentField: 'D1_Governance_Comment__c',          text: 'Legal structure, registration, board & governance' },
-            { id: '1.2', tag: 'all', ratingField: 'D1_Leadership_Rating__c',           commentField: 'D1_Leadership_Comment__c',           text: 'Leadership domain experience & tenure' },
-            { id: '1.3', tag: 'all', ratingField: 'D1_FinancialRecords_Rating__c',     commentField: 'D1_FinancialRecords_Comment__c',     text: 'Completeness & credibility of financial records' },
-            { id: '1.4', tag: 'all', ratingField: 'D1_SustainabilityVision_Rating__c', commentField: 'D1_SustainabilityVision_Comment__c', text: 'Vision & plan for sustainability' }
-        ]
-    },
-    {
-        id: 2, title: 'Operational maturity',
-        questions: [
-            { id: '2.1jf', tag: 'jf',  ratingField: 'D2_ProgramAlignment_Rating__c',   commentField: 'D2_ProgramAlignment_Comment__c',   text: 'Theory of change & primary methods (JF)' },
-            { id: '2.1jc', tag: 'jc',  ratingField: 'D2_JC_SupportModel_Rating__c',    commentField: 'D2_JC_SupportModel_Comment__c',    text: 'Support model coherence (JC)' },
-            { id: '2.2jf', tag: 'jf',  ratingField: 'D2_JF_Distinctiveness_Rating__c', commentField: 'D2_JF_Distinctiveness_Comment__c', text: 'Distinctiveness vs typical skilling NGOs (JF)' },
-            { id: '2.2jc', tag: 'jc',  ratingField: 'D2_JC_Distinctiveness_Rating__c', commentField: 'D2_JC_Distinctiveness_Comment__c', text: 'Distinctiveness vs typical MSME-support NGOs (JC)' },
-            { id: '2.3',   tag: 'all', ratingField: 'D2_OperationalDepth_Rating__c',   commentField: 'D2_OperationalDepth_Comment__c',   text: 'Operational depth consistency' }
-        ]
-    },
-    {
-        id: 3, title: 'Outcome track record',
-        questions: [
-            { id: '3.1jf', tag: 'jf',  ratingField: 'D3_JF_ScaleRecord_Rating__c',      commentField: 'D3_JF_ScaleRecord_Comment__c',      text: '3-year enrolment / placement record (JF)' },
-            { id: '3.1jc', tag: 'jc',  ratingField: 'D3_JC_ScaleRecord_Rating__c',      commentField: 'D3_JC_ScaleRecord_Comment__c',      text: '3-year businesses / jobs created record (JC)' },
-            { id: '3.2jf', tag: 'jf',  ratingField: 'D3_JF_ConversionRate_Rating__c',   commentField: 'D3_JF_ConversionRate_Comment__c',   text: 'Enrolment-to-placement conversion rate (JF)' },
-            { id: '3.2jc', tag: 'jc',  ratingField: 'D3_JC_ConversionRate_Rating__c',   commentField: 'D3_JC_ConversionRate_Comment__c',   text: 'MSME support to job creation conversion (JC)' },
-            { id: '3.3jf', tag: 'jf',  ratingField: 'D3_JF_CostPerPlacement_Rating__c', commentField: 'D3_JF_CostPerPlacement_Comment__c', text: 'Cost per placement vs $30 benchmark (JF)' },
-            { id: '3.3jc', tag: 'jc',  ratingField: 'D3_JC_CostPerJob_Rating__c',       commentField: 'D3_JC_CostPerJob_Comment__c',       text: 'Cost per job vs $75 benchmark (JC)' },
-            { id: '3.4',   tag: 'all', ratingField: 'D3_ValidationEvidence_Rating__c',  commentField: 'D3_ValidationEvidence_Comment__c',  text: 'Third-party validation & long-term outcomes' }
-        ]
-    },
-    {
-        id: 4, title: 'Alignment with Wadhwani Grants priorities',
-        questions: [
-            { id: '4.1', tag: 'all', ratingField: 'D4_MandateFit_Rating__c',  commentField: 'D4_MandateFit_Comment__c',  text: 'Advances family-sustaining job outcomes' },
-            { id: '4.2', tag: 'all', ratingField: 'D4_Geography_Rating__c',   commentField: 'D4_Geography_Comment__c',   text: 'Geography in Wadhwani Grants priority clusters' },
-            { id: '4.3', tag: 'all', ratingField: 'D4_GenieAI_Rating__c',     commentField: 'D4_GenieAI_Comment__c',     text: 'Org sits inside missing-middle budget window' }
-        ]
-    },
-    {
-        id: 5, title: 'Absorptive capacity',
-        questions: [
-            { id: '5.1', tag: 'all', ratingField: 'D5_FinancialStability_Rating__c',   commentField: 'D5_FinancialStability_Comment__c',   text: '3-year financial trajectory stability' },
-            { id: '5.2', tag: 'all', ratingField: 'D5_IncrementEstimate_Rating__c',    commentField: 'D5_IncrementEstimate_Comment__c',    text: 'Wadhwani Grants absorbable within 12 months' },
-            { id: '5.3', tag: 'all', ratingField: 'D5_OperatingInfra_Rating__c',       commentField: 'D5_OperatingInfra_Comment__c',       text: 'Operating infrastructure capability' }
-        ]
-    },
-    {
-        id: 6, title: 'Measurement readiness',
-        questions: [
-            { id: '6.1', tag: 'all', ratingField: 'D6_MEFunction_Rating__c',            commentField: 'D6_MEFunction_Comment__c',            text: 'M&E function — people, systems, processes' },
-            { id: '6.2', tag: 'all', ratingField: 'D6_ExternalVerification_Rating__c',  commentField: 'D6_ExternalVerification_Comment__c',  text: 'External verification of outcomes' },
-            { id: '6.3', tag: 'all', ratingField: 'D6_LongitudinalTracking_Rating__c',  commentField: 'D6_LongitudinalTracking_Comment__c',  text: 'Longitudinal outcome tracking' }
-        ]
-    }
-];
-
-function filterQsByTrack(questions, track) {
-    return questions.filter(q => {
-        if (q.tag === 'all') return true;
-        if (track === OUTCOME_JF)   return q.tag === 'jf';
-        if (track === OUTCOME_JC)   return q.tag === 'jc';
-        if (track === OUTCOME_BOTH) return q.tag === 'jf' || q.tag === 'jc';
-        return true;
-    });
-}
+const QUESTION_FIELD_MAP = {
+    '1.1': { rating: 'D1_Governance_Rating__c', comment: 'D1_Governance_Comment__c' },
+    '1.2': { rating: 'D1_Leadership_Rating__c', comment: 'D1_Leadership_Comment__c' },
+    '1.3': { rating: 'D1_FinancialRecords_Rating__c', comment: 'D1_FinancialRecords_Comment__c' },
+    '1.4': { rating: 'D1_SustainabilityVision_Rating__c', comment: 'D1_SustainabilityVision_Comment__c' },
+    '2.1': { rating: 'D2_ProgramAlignment_Rating__c', comment: 'D2_ProgramAlignment_Comment__c' },
+    '2.2': { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' },
+    '2.3': { rating: 'D2_OperationalDepth_Rating__c', comment: 'D2_OperationalDepth_Comment__c' },
+    '3.1': { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' },
+    '3.2': { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' },
+    '3.3': { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' },
+    '3.4': { rating: 'D3_ValidationEvidence_Rating__c', comment: 'D3_ValidationEvidence_Comment__c' },
+    '4.1': { rating: 'D4_MandateFit_Rating__c', comment: 'D4_MandateFit_Comment__c' },
+    '4.2': { rating: 'D4_Geography_Rating__c', comment: 'D4_Geography_Comment__c' },
+    '4.3': { rating: 'D4_GenieAI_Rating__c', comment: 'D4_GenieAI_Comment__c' },
+    '5.1': { rating: 'D5_FinancialStability_Rating__c', comment: 'D5_FinancialStability_Comment__c' },
+    '5.2': { rating: 'D5_IncrementEstimate_Rating__c', comment: 'D5_IncrementEstimate_Comment__c' },
+    '5.3': { rating: 'D5_OperatingInfra_Rating__c', comment: 'D5_OperatingInfra_Comment__c' },
+    '6.1': { rating: 'D6_MEFunction_Rating__c', comment: 'D6_MEFunction_Comment__c' },
+    '6.2': { rating: 'D6_ExternalVerification_Rating__c', comment: 'D6_ExternalVerification_Comment__c' },
+    '6.3': { rating: 'D6_LongitudinalTracking_Rating__c', comment: 'D6_LongitudinalTracking_Comment__c' },
+    '7.1': { rating: 'D5_RationaleCredibility_Rating__c', comment: 'D5_Rationale_Credibility_Comment__c' },
+    '7.2': { rating: 'D2_JC_SupportModel_Rating__c', comment: 'D2_JC_SupportModel_Comment__c' }
+};
 
 export default class WcfReviewerFormPreview extends LightningElement {
 
     @api reviewId;
-    @api outcomeDeveloperName = OUTCOME_BOTH;
+    @api outcomeDeveloperName;
 
     @track reviewRecord = null;
+    @track categories = [];
     @track isLoading    = true;
 
     connectedCallback() {
-        if (this.reviewId) {
-            this.loadReview();
-        }
+        this.loadData();
     }
 
-    async loadReview() {
+    async loadData() {
         this.isLoading = true;
         try {
-            this.reviewRecord = await getReviewData({ reviewId: this.reviewId });
+            const [metaRes, reviewRes] = await Promise.all([
+                getReviewerFormV5Metadata({ trackName: this.outcomeDeveloperName }),
+                this.reviewId ? getReviewData({ reviewId: this.reviewId }) : null
+            ]);
+
+            if (metaRes && metaRes.success && metaRes.categories) {
+                this.categories = metaRes.categories;
+            }
+            if (reviewRes) {
+                this.reviewRecord = reviewRes;
+            }
         } catch (e) {
-            console.error('Error loading review data:', e);
+            console.error('Error loading review preview:', e);
         } finally {
             this.isLoading = false;
         }
@@ -128,32 +90,91 @@ export default class WcfReviewerFormPreview extends LightningElement {
     get recComments() {
         return this.reviewRecord?.Recommendation_Strength_Comments__c
             || this.reviewRecord?.Non_Recommendation_Strength_Comments__c
+            || this.reviewRecord?.Rejection_Comment__c
             || null;
+    }
+
+    get overallScoreDisplay() {
+        if (this.reviewRecord?.Overall_Review_Score__c != null) {
+            return Number(this.reviewRecord.Overall_Review_Score__c).toFixed(2);
+        }
+        if (!this.dimensionSummary || !this.dimensionSummary.length) return '—';
+        const validMeans = this.dimensionSummary
+            .map(d => parseFloat(d.mean))
+            .filter(v => !isNaN(v));
+        if (!validMeans.length) return '—';
+        return (validMeans.reduce((s, v) => s + v, 0) / validMeans.length).toFixed(2);
     }
 
     get dimensionSummary() {
         if (!this.reviewRecord) return [];
         const r = this.reviewRecord;
-        return DIMS.map(dim => {
-            const qs = filterQsByTrack(dim.questions, this.outcomeDeveloperName);
-            const vals = qs.map(q => parseFloat(r[q.ratingField])).filter(v => !isNaN(v));
-            const mean = vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1) : '—';
+
+        // Parse structured JSON answers if available
+        let jsonAnswersMap = {};
+        if (r.Decision_Rationale__c) {
+            try {
+                const parsed = JSON.parse(r.Decision_Rationale__c);
+                if (Array.isArray(parsed)) {
+                    parsed.forEach(item => {
+                        if (item.questionId) {
+                            jsonAnswersMap[item.questionId] = item;
+                        }
+                    });
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        return (this.categories || []).map(cat => {
+            const qs = cat.questions || [];
+            const vals = [];
+
+            const questionList = qs.map(q => {
+                const qId = q.questionId;
+                const jsonItem = jsonAnswersMap[qId];
+                const fieldInfo = QUESTION_FIELD_MAP[qId];
+
+                let rating = null;
+                let comment = null;
+                let ladderText = '';
+
+                if (jsonItem) {
+                    rating = jsonItem.rating != null ? parseInt(jsonItem.rating, 10) : null;
+                    comment = jsonItem.comment || null;
+                    ladderText = jsonItem.ladderLevelText || '';
+                } else if (fieldInfo) {
+                    rating = r[fieldInfo.rating] != null ? parseInt(r[fieldInfo.rating], 10) : null;
+                    comment = r[fieldInfo.comment] || null;
+                    const ladderArr = q.ladder || [];
+                    ladderText = rating != null && ladderArr[rating - 1] ? ladderArr[rating - 1] : '';
+                }
+
+                if (rating != null && !isNaN(rating)) {
+                    vals.push(rating);
+                }
+
+                const pipClass = rating != null ? `pip pip-r${rating}` : 'pip pip-empty';
+
+                return {
+                    id:          qId,
+                    text:        q.questionText,
+                    rating:      rating != null ? rating : '—',
+                    ratingLabel: rating != null ? (RATING_LABEL[rating] || rating) : 'Not rated',
+                    ladderText,
+                    comment,
+                    pipClass
+                };
+            });
+
+            const mean = vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2) : '—';
+
             return {
-                id: dim.id,
-                title: dim.title,
+                id: cat.categoryNumber,
+                title: cat.title,
                 mean,
-                questions: qs.map(q => {
-                    const rating = r[q.ratingField] != null ? parseInt(r[q.ratingField], 10) : null;
-                    const pipClass = rating != null ? `pip pip-r${rating}` : 'pip pip-empty';
-                    return {
-                        id:          q.id,
-                        text:        q.text,
-                        rating:      rating != null ? rating : '—',
-                        ratingLabel: rating != null ? (RATING_LABEL[rating] || rating) : 'Not rated',
-                        comment:     r[q.commentField] || null,
-                        pipClass
-                    };
-                })
+                questions: questionList
             };
         });
     }

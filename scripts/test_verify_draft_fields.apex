@@ -1,0 +1,10 @@
+WCFFormEngineController.DynamicDraftWrapper draft = WCFFormEngineController.getDynamicDraft('0iTe10000000w7FEAQ');
+System.debug(LoggingLevel.ERROR, 'DRAFT_SUCCESS: ' + draft.isSuccess);
+System.debug(LoggingLevel.ERROR, 'DRAFT_SUBMITTER_NAME: ' + draft.formValues.get('Submitter_Name__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_JOB_TITLE: ' + draft.formValues.get('Job_Title__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_SUBMITTED_NOTES_FIELD: ' + draft.formValues.get('Submitted_notes__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_SUBMITTED_NOTES_KEY: ' + draft.formValues.get('Q3_Submitted_notes'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_INCORP_DATE: ' + draft.formValues.get('Incorporation_Date__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_501C3: ' + draft.formValues.get('Has_501c3_Status__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_ED: ' + draft.formValues.get('Has_Equivalency_Determination__c'));
+System.debug(LoggingLevel.ERROR, 'DRAFT_FCRA: ' + draft.formValues.get('Is_FCRA_Registered__c'));

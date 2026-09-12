@@ -1,8 +1,8 @@
 <template>
     <template if:true={isLoading}>
-        <div class="preview-loading">
+        <div class="preview-loading" style="padding: 30px; text-align: center;">
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
-            <p>Loading reviewer scores…</p>
+            <p style="margin-top: 12px; color: #555;">Loading reviewer scores…</p>
         </div>
     </template>
 
@@ -19,12 +19,23 @@
                         <span class={recClass}>{recIcon} {recommendation}</span>
                         <template if:true={recStrengthLabel}>
                             <span class="meta-sep">·</span>
-                            <span class="strength-label">Strength: {recStrengthLabel} ({recStrengthNum})</span>
+                            <span class="strength-label">Conviction: {recStrengthLabel} ({recStrengthNum})</span>
                         </template>
                     </div>
                 </div>
 
-                <!-- 6 Dimensions -->
+                <!-- Overall Score Banner -->
+                <div style="margin: 12px 0 20px 0; padding: 14px 18px; background: #fff4ef; border: 1px solid #E8622A; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #E8622A; text-transform: uppercase;">Overall Review Score (Arithmetic Mean)</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #1a1a1a;">All 7 Categories Evaluated</div>
+                    </div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #E8622A;">
+                        {overallScoreDisplay} <span style="font-size: 0.9rem; color: #666; font-weight: 600;">/ 5.0</span>
+                    </div>
+                </div>
+
+                <!-- 7 Categories -->
                 <template for:each={dimensionSummary} for:item="dim">
                     <div key={dim.id} class="dim-block">
                         <div class="dim-header">
@@ -36,9 +47,17 @@
                         </div>
                         <template for:each={dim.questions} for:item="q">
                             <div key={q.id} class="q-row">
-                                <div class="q-text">{q.text}</div>
+                                <div class="q-text">
+                                    <span style="font-weight: 700; color: #E8622A; margin-right: 4px;">{q.id}</span>
+                                    {q.text}
+                                </div>
                                 <div class="q-right">
                                     <span class={q.pipClass}>{q.ratingLabel} ({q.rating})</span>
+                                    <template if:true={q.ladderText}>
+                                        <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
+                                            ↳ <em>{q.ladderText}</em>
+                                        </div>
+                                    </template>
                                     <template if:true={q.comment}>
                                         <div class="q-comment">{q.comment}</div>
                                     </template>
@@ -51,7 +70,7 @@
                 <!-- Strengths & Weaknesses -->
                 <div class="sw-block">
                     <div class="sw-section">
-                        <h5 class="sw-title">Strengths</h5>
+                        <h5 class="sw-title">Top 3 Strengths</h5>
                         <template for:each={strengthList} for:item="s">
                             <div key={s.idx} class="sw-item">
                                 <span class="sw-num">{s.num}</span>
@@ -63,7 +82,7 @@
                         </template>
                     </div>
                     <div class="sw-section">
-                        <h5 class="sw-title">Weaknesses</h5>
+                        <h5 class="sw-title">Top 3 Weaknesses</h5>
                         <template for:each={weaknessList} for:item="w">
                             <div key={w.idx} class="sw-item">
                                 <span class="sw-num">{w.num}</span>
@@ -91,8 +110,8 @@
         </template>
 
         <template if:false={hasData}>
-            <div class="preview-empty">
-                <p>No reviewer data found for this application.</p>
+            <div class="preview-empty" style="padding: 24px; text-align: center; color: #777;">
+                <p>No reviewer evaluation record found for this application.</p>
             </div>
         </template>
     </template>

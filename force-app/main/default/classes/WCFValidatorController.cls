@@ -703,9 +703,13 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public Outcomes_Data__c outcome;
         @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;
         @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;
+        @AuraEnabled public Map<String, Object> applicationData;
+        @AuraEnabled public Map<String, Object> historicalData;
+        @AuraEnabled public Map<String, Object> fiscalData;
+        @AuraEnabled public Map<String, Object> outcomeData;
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static WCFPreviewWrapper getWCFFullPreviewData(Id applicationId) {
         WCFPreviewWrapper wrapper = new WCFPreviewWrapper();
 
@@ -752,6 +756,9 @@ public without sharing class WCFValidatorController {
 
         String soql = 'SELECT ' + String.join(new List<String>(fieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :applicationId WITH SYSTEM_MODE LIMIT 1';
         wrapper.application = Database.query(soql);
+        if (wrapper.application != null) {
+            wrapper.applicationData = wrapper.application.getPopulatedFieldsAsMap();
+        }
 
         List<Historical_Data__c> hists = [
             SELECT Id, CY1_Balance_Start_CFY_1__c, CY2_Balance_Start_CFY_2__c,
@@ -762,6 +769,9 @@ public without sharing class WCFValidatorController {
             FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
         ];
         wrapper.historical = hists.isEmpty() ? null : hists[0];
+        if (wrapper.historical != null) {
+            wrapper.historicalData = wrapper.historical.getPopulatedFieldsAsMap();
+        }
 
         List<Current_fiscal_year_data__c> fiscals = [
             SELECT Id, Revenue_Budget__c, Revenue_Projection__c, Revenue_Variance__c,
@@ -772,6 +782,9 @@ public without sharing class WCFValidatorController {
             FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
         ];
         wrapper.fiscal = fiscals.isEmpty() ? null : fiscals[0];
+        if (wrapper.fiscal != null) {
+            wrapper.fiscalData = wrapper.fiscal.getPopulatedFieldsAsMap();
+        }
 
         List<Outcomes_Data__c> outcomes = [
             SELECT Id,
@@ -810,6 +823,9 @@ public without sharing class WCFValidatorController {
             FROM Outcomes_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
         ];
         wrapper.outcome = outcomes.isEmpty() ? null : outcomes[0];
+        if (wrapper.outcome != null) {
+            wrapper.outcomeData = wrapper.outcome.getPopulatedFieldsAsMap();
+        }
 
         try {
             wrapper.skillingDomains = [

@@ -295,64 +295,65 @@ public without sharing class WCFFormEngineController {
 
             // Populate formValues map from Application
             Map<String, Object> fv = new Map<String, Object>();
-            String appOrgName = app.Organization_Name__c;
+            Map<String, Object> popMap = app.getPopulatedFieldsAsMap();
+            for (String fld : popMap.keySet()) {
+                Object val = popMap.get(fld);
+                if (val != null) {
+                    if (val instanceof Date) {
+                        fv.put(fld, String.valueOf((Date)val));
+                    } else if (val instanceof DateTime) {
+                        fv.put(fld, String.valueOf((DateTime)val));
+                    } else {
+                        fv.put(fld, String.valueOf(val));
+                    }
+                }
+            }
+
+            String appOrgName = (String) fv.get('Organization_Name__c');
             if (String.isBlank(appOrgName) || (currentUser.Account != null && currentUser.Account.IsPersonAccount && appOrgName == currentUser.Account.Name && String.isNotBlank(defaultOrgName))) {
                 appOrgName = defaultOrgName;
             }
-            fv.put('Organization_Name__c', appOrgName != null ? appOrgName : '');
-            fv.put('Headquarters_City_and_Country__c', app.Headquarters_City_and_Country__c != null ? app.Headquarters_City_and_Country__c : '');
-            fv.put('Primary_Service_Regions__c', app.Primary_Service_Regions__c != null ? app.Primary_Service_Regions__c : '');
-            fv.put('Leader_Name__c', app.Leader_Name__c != null ? app.Leader_Name__c : '');
-            fv.put('Leader_Title__c', app.Leader_Title__c != null ? app.Leader_Title__c : '');
-            fv.put('Leader_Tenure__c', app.Leader_Tenure__c != null ? String.valueOf(app.Leader_Tenure__c) : '');
-            fv.put('Submitter_Name__c', String.isNotBlank(app.Submitter_Name__c) ? app.Submitter_Name__c : defaultSubName);
-            fv.put('Job_Title__c', String.isNotBlank(app.Job_Title__c) ? app.Job_Title__c : defaultSubTitle);
-            fv.put('Work_Email_ID__c', String.isNotBlank(app.Work_Email_ID__c) ? app.Work_Email_ID__c : defaultSubEmail);
-            fv.put('Phone__c', String.isNotBlank(app.Phone__c) ? app.Phone__c : defaultSubPhone);
-            fv.put('WG_Phone_Country_Code__c', app.WG_Phone_Country_Code__c);
-            fv.put('Legal_Type__c', app.Legal_Type__c);
-            fv.put('Legal_Type_Other__c', app.Legal_Type_Other__c);
-            fv.put('Registration_Jurisdiction__c', app.Registration_Jurisdiction__c);
-            fv.put('Registration_Jurisdiction_Other__c', app.Registration_Jurisdiction_Other__c);
-            fv.put('Legal_Structure__c', app.Legal_Structure__c);
-            fv.put('Current_fiscal_year_s_end_date__c', app.Current_fiscal_year_s_end_date__c);
-            fv.put('Funder_1_Name__c', app.Funder_1_Name__c);
-            fv.put('Funder_1_Amount__c', app.Funder_1_Amount__c != null ? String.valueOf(app.Funder_1_Amount__c) : '');
-            fv.put('Funder_1_Period_Start__c', app.Funder_1_Period_Start__c != null ? String.valueOf(app.Funder_1_Period_Start__c) : '');
-            fv.put('Funder_1_Period_End__c', app.Funder_1_Period_End__c != null ? String.valueOf(app.Funder_1_Period_End__c) : '');
-            fv.put('Funder_1_Type__c', app.Funder_1_Type__c);
-            fv.put('Funder_2_Name__c', app.Funder_2_Name__c);
-            fv.put('Funder_2_Amount__c', app.Funder_2_Amount__c != null ? String.valueOf(app.Funder_2_Amount__c) : '');
-            fv.put('Funder_2_Period_Start__c', app.Funder_2_Period_Start__c != null ? String.valueOf(app.Funder_2_Period_Start__c) : '');
-            fv.put('Funder_2_Period_End__c', app.Funder_2_Period_End__c != null ? String.valueOf(app.Funder_2_Period_End__c) : '');
-            fv.put('Funder_2_Type__c', app.Funder_2_Type__c);
-            fv.put('Funder_3_Name__c', app.Funder_3_Name__c);
-            fv.put('Funder_3_Amount__c', app.Funder_3_Amount__c != null ? String.valueOf(app.Funder_3_Amount__c) : '');
-            fv.put('Funder_3_Period_Start__c', app.Funder_3_Period_Start__c != null ? String.valueOf(app.Funder_3_Period_Start__c) : '');
-            fv.put('Funder_3_Period_End__c', app.Funder_3_Period_End__c != null ? String.valueOf(app.Funder_3_Period_End__c) : '');
-            fv.put('Funder_3_Type__c', app.Funder_3_Type__c);
-            fv.put('Reference_1_Name__c', app.Reference_1_Name__c);
-            fv.put('Reference_1_Role__c', app.Reference_1_Role__c);
-            fv.put('Reference_1_Email__c', app.Reference_1_Email__c);
-            fv.put('Reference_2_Name__c', app.Reference_2_Name__c);
-            fv.put('Reference_2_Role__c', app.Reference_2_Role__c);
-            fv.put('Reference_2_Email__c', app.Reference_2_Email__c);
-            fv.put('Skilling_Approach__c', app.Skilling_Approach__c);
-            fv.put('Job_Creation_Approach__c', app.Job_Creation_Approach__c);
-            fv.put('Organizational_Sustainability__c', app.Organizational_Sustainability__c);
-            fv.put('Use_of_Additional_Funding__c', app.Use_of_Additional_Funding__c);
-            fv.put('GenieAI_Interest_Level__c', app.GenieAI_Interest_Level__c);
-            fv.put('Operational_Synergies_with_WOF__c', app.Operational_Synergies_with_WOF__c);
-            fv.put('Attesting_User_Name__c', app.Attesting_User_Name__c);
-            fv.put('Attesting_User_Title__c', app.Attesting_User_Title__c);
+            if (String.isNotBlank(appOrgName)) fv.put('Organization_Name__c', appOrgName);
 
-            fv.put('Incorporation_Date__c', '');
-            fv.put('Has_501c3_Status__c', '');
-            fv.put('Has_Equivalency_Determination__c', '');
-            fv.put('Is_FCRA_Registered__c', '');
-            fv.put('Willing_to_Pursue_ED__c', '');
-            fv.put('Fiscal_Month__c', '03');
-            fv.put('Fiscal_Day__c', '31');
+            // Alias mappings between schema fields & UI keys
+            if (fv.containsKey('Do_you_have_a_US_501_c_3_organization__c') && !fv.containsKey('Has_501c3_Status__c')) {
+                fv.put('Has_501c3_Status__c', fv.get('Do_you_have_a_US_501_c_3_organization__c'));
+            } else if (fv.containsKey('Has_501c3_Status__c') && !fv.containsKey('Do_you_have_a_US_501_c_3_organization__c')) {
+                fv.put('Do_you_have_a_US_501_c_3_organization__c', fv.get('Has_501c3_Status__c'));
+            }
+
+            if (fv.containsKey('Have_you_cleared_Equivalency_Determinat__c') && !fv.containsKey('Has_Equivalency_Determination__c')) {
+                fv.put('Has_Equivalency_Determination__c', fv.get('Have_you_cleared_Equivalency_Determinat__c'));
+            } else if (fv.containsKey('Has_Equivalency_Determination__c') && !fv.containsKey('Have_you_cleared_Equivalency_Determinat__c')) {
+                fv.put('Have_you_cleared_Equivalency_Determinat__c', fv.get('Has_Equivalency_Determination__c'));
+            }
+
+            if (fv.containsKey('Are_you_FCRA_exempted_compliant__c') && !fv.containsKey('Is_FCRA_Registered__c')) {
+                fv.put('Is_FCRA_Registered__c', fv.get('Are_you_FCRA_exempted_compliant__c'));
+            } else if (fv.containsKey('Is_FCRA_Registered__c') && !fv.containsKey('Are_you_FCRA_exempted_compliant__c')) {
+                fv.put('Are_you_FCRA_exempted_compliant__c', fv.get('Is_FCRA_Registered__c'));
+            }
+
+            if (fv.containsKey('If_none_of_the_above_apply_would_you__c') && !fv.containsKey('Willing_to_Pursue_ED__c')) {
+                fv.put('Willing_to_Pursue_ED__c', fv.get('If_none_of_the_above_apply_would_you__c'));
+            } else if (fv.containsKey('Willing_to_Pursue_ED__c') && !fv.containsKey('If_none_of_the_above_apply_would_you__c')) {
+                fv.put('If_none_of_the_above_apply_would_you__c', fv.get('Willing_to_Pursue_ED__c'));
+            }
+
+            if (!fv.containsKey('Fiscal_Month__c') || String.isBlank(String.valueOf(fv.get('Fiscal_Month__c')))) {
+                fv.put('Fiscal_Month__c', '03');
+            }
+            if (!fv.containsKey('Fiscal_Day__c') || String.isBlank(String.valueOf(fv.get('Fiscal_Day__c')))) {
+                fv.put('Fiscal_Day__c', '31');
+            }
+
+            // Map custom questions by question code key as well
+            for (RFI_Question__mdt q : [SELECT Question_Code__c, DeveloperName, Field_API_Name__c FROM RFI_Question__mdt]) {
+                String qKey = String.isNotBlank(q.Question_Code__c) ? q.Question_Code__c : q.DeveloperName;
+                if (String.isNotBlank(q.Field_API_Name__c) && fv.containsKey(q.Field_API_Name__c)) {
+                    fv.put(qKey, fv.get(q.Field_API_Name__c));
+                }
+            }
 
             // Fallback for blank submitter/org fields on existing draft
             if (String.isBlank((String)fv.get('Submitter_Name__c'))) {
@@ -624,23 +625,24 @@ public without sharing class WCFFormEngineController {
             }
         }
 
-        // Determine appropriate RecordType
+        // Determine appropriate RecordType - all proposals must be stored under Wadhwani Grants
         String formattedTracks = formatMultiSelectFundingArea(selectedTracks);
         RecordType wgRt = null;
         Map<String, RecordType> rtsByDevName = new Map<String, RecordType>();
         for (RecordType rt : [
-            SELECT Id, DeveloperName FROM RecordType 
+            SELECT Id, DeveloperName, Name FROM RecordType 
             WHERE SObjectType = 'IndividualApplication'
         ]) {
-            rtsByDevName.put(rt.DeveloperName, rt);
+            rtsByDevName.put(rt.DeveloperName.toLowerCase(), rt);
+            rtsByDevName.put(rt.Name.toLowerCase(), rt);
         }
 
-        if (formattedTracks == 'Both Job Fulfillment and Job Creation' && rtsByDevName.containsKey('WCF_Job_Fulfillment_Job_Creation_Proposals')) {
-            wgRt = rtsByDevName.get('WCF_Job_Fulfillment_Job_Creation_Proposals');
-        } else if (formattedTracks == 'Job Creation Only' && rtsByDevName.containsKey('WCF_Job_Creation_Proposals')) {
-            wgRt = rtsByDevName.get('WCF_Job_Creation_Proposals');
-        } else if (rtsByDevName.containsKey('WCF_Job_Fulfillment_Proposals')) {
-            wgRt = rtsByDevName.get('WCF_Job_Fulfillment_Proposals');
+        if (rtsByDevName.containsKey('wadhwani_grants')) {
+            wgRt = rtsByDevName.get('wadhwani_grants');
+        } else if (rtsByDevName.containsKey('wadhwani grants')) {
+            wgRt = rtsByDevName.get('wadhwani grants');
+        } else if (rtsByDevName.containsKey('wcf_project_proposal')) {
+            wgRt = rtsByDevName.get('wcf_project_proposal');
         } else if (!rtsByDevName.isEmpty()) {
             wgRt = rtsByDevName.values()[0];
         }
@@ -894,20 +896,24 @@ public without sharing class WCFFormEngineController {
             hist.Id = existingHist[0].Id;
         }
         for (String f : valuesMap.keySet()) {
+            if (f.equalsIgnoreCase('id') || f.equalsIgnoreCase('proposal__c') || f.equalsIgnoreCase('status__c')) continue;
             if (histFields.containsKey(f.toLowerCase())) {
-                hasHistData = true;
                 Object val = valuesMap.get(f);
                 if (val == null) continue;
                 String strVal = String.valueOf(val);
                 if (String.isBlank(strVal)) continue;
                 try {
-                    Schema.DisplayType type = histFields.get(f.toLowerCase()).getDescribe().getType();
+                    Schema.DescribeFieldResult dfr = histFields.get(f.toLowerCase()).getDescribe();
+                    Schema.DisplayType type = dfr.getType();
                     if (type == Schema.DisplayType.CURRENCY || type == Schema.DisplayType.DOUBLE || type == Schema.DisplayType.PERCENT) {
-                        hist.put(histFields.get(f.toLowerCase()).getDescribe().getName(), Decimal.valueOf(strVal));
+                        hist.put(dfr.getName(), Decimal.valueOf(strVal.replaceAll('[^0-9.-]', '')));
+                        hasHistData = true;
                     } else if (type == Schema.DisplayType.INTEGER) {
-                        hist.put(histFields.get(f.toLowerCase()).getDescribe().getName(), Integer.valueOf(strVal));
+                        hist.put(dfr.getName(), Integer.valueOf(strVal.replaceAll('[^0-9-]', '')));
+                        hasHistData = true;
                     } else {
-                        hist.put(histFields.get(f.toLowerCase()).getDescribe().getName(), strVal);
+                        hist.put(dfr.getName(), strVal);
+                        hasHistData = true;
                     }
                 } catch (Exception e) {
                     System.debug('Hist field error ' + f + ': ' + e.getMessage());
@@ -958,20 +964,24 @@ public without sharing class WCFFormEngineController {
             fiscal.Id = existingFiscal[0].Id;
         }
         for (String f : valuesMap.keySet()) {
+            if (f.equalsIgnoreCase('id') || f.equalsIgnoreCase('proposal__c') || f.equalsIgnoreCase('status__c')) continue;
             if (fiscalFields.containsKey(f.toLowerCase())) {
-                hasFiscalData = true;
                 Object val = valuesMap.get(f);
                 if (val == null) continue;
                 String strVal = String.valueOf(val);
                 if (String.isBlank(strVal)) continue;
                 try {
-                    Schema.DisplayType type = fiscalFields.get(f.toLowerCase()).getDescribe().getType();
+                    Schema.DescribeFieldResult dfr = fiscalFields.get(f.toLowerCase()).getDescribe();
+                    Schema.DisplayType type = dfr.getType();
                     if (type == Schema.DisplayType.CURRENCY || type == Schema.DisplayType.DOUBLE || type == Schema.DisplayType.PERCENT) {
-                        fiscal.put(fiscalFields.get(f.toLowerCase()).getDescribe().getName(), Decimal.valueOf(strVal));
+                        fiscal.put(dfr.getName(), Decimal.valueOf(strVal.replaceAll('[^0-9.-]', '')));
+                        hasFiscalData = true;
                     } else if (type == Schema.DisplayType.INTEGER) {
-                        fiscal.put(fiscalFields.get(f.toLowerCase()).getDescribe().getName(), Integer.valueOf(strVal));
+                        fiscal.put(dfr.getName(), Integer.valueOf(strVal.replaceAll('[^0-9-]', '')));
+                        hasFiscalData = true;
                     } else {
-                        fiscal.put(fiscalFields.get(f.toLowerCase()).getDescribe().getName(), strVal);
+                        fiscal.put(dfr.getName(), strVal);
+                        hasFiscalData = true;
                     }
                 } catch (Exception e) {
                     System.debug('Fiscal field error ' + f + ': ' + e.getMessage());
@@ -1010,8 +1020,8 @@ public without sharing class WCFFormEngineController {
             out.Id = existingOut[0].Id;
         }
         for (String f : valuesMap.keySet()) {
+            if (f.equalsIgnoreCase('id') || f.equalsIgnoreCase('proposal__c') || f.equalsIgnoreCase('status__c')) continue;
             if (outFields.containsKey(f.toLowerCase())) {
-                hasOutcomeData = true;
                 Object val = valuesMap.get(f);
                 if (val == null) continue;
                 String strVal = String.valueOf(val);
@@ -1020,16 +1030,20 @@ public without sharing class WCFFormEngineController {
                     Schema.DescribeFieldResult dfr = outFields.get(f.toLowerCase()).getDescribe();
                     Schema.DisplayType type = dfr.getType();
                     if (type == Schema.DisplayType.CURRENCY || type == Schema.DisplayType.DOUBLE || type == Schema.DisplayType.PERCENT || type == Schema.DisplayType.INTEGER) {
-                        out.put(dfr.getName(), Decimal.valueOf(strVal));
+                        out.put(dfr.getName(), Decimal.valueOf(strVal.replaceAll('[^0-9.-]', '')));
+                        hasOutcomeData = true;
                     } else if (type == Schema.DisplayType.BOOLEAN) {
                         out.put(dfr.getName(), Boolean.valueOf(strVal));
+                        hasOutcomeData = true;
                     } else if (type == Schema.DisplayType.PICKLIST) {
                         String cleanVal = sanitizePicklistValue(dfr, strVal);
                         if (cleanVal != null) {
                             out.put(dfr.getName(), cleanVal);
+                            hasOutcomeData = true;
                         }
                     } else {
                         out.put(dfr.getName(), strVal);
+                        hasOutcomeData = true;
                     }
                 } catch (Exception e) {
                     System.debug('Outcome field error ' + f + ': ' + e.getMessage());

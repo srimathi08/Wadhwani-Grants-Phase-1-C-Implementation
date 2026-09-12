@@ -22,7 +22,20 @@ function calculateEndingBalance(startBalance, revenue, expense) {
 }
 
 export default class WcfDynamicForm extends LightningElement {
-    @api recordId;
+    _recordId;
+    _hasLoadedDraft = false;
+    @api
+    get recordId() {
+        return this._recordId;
+    }
+    set recordId(val) {
+        const oldVal = this._recordId;
+        this._recordId = val;
+        if (val && val !== oldVal && this.isConnected && !this._hasLoadedDraft) {
+            this._hasLoadedDraft = true;
+            this.loadDraftData();
+        }
+    }
     @api selectedLanguage = 'en_US';
 
     winLogoUrl = WIN_LOGO; // Set logo URL from static resource
@@ -226,25 +239,109 @@ export default class WcfDynamicForm extends LightningElement {
         });
     }
 
+    loadDraftData() {
+        this.isLoading = true;
+        getDynamicDraft({ recordId: this.recordId })
+            .then(result => {
+                if (result && result.isSuccess) {
+                    if (result.recordId) {
+                        this._recordId = result.recordId;
+                    }
+                    if (result.selectedTracks && result.selectedTracks.length > 0) {
+                        this.selectedTracks = result.selectedTracks;
+                    }
+                    if (result.activeTabId) {
+                        this.activeTabId = result.activeTabId;
+                        this.currentScreen = 'screen2';
+                    }
+                    if (result.formValues) {
+                        this.formValues = {
+                            ...this.formValues,
+                            ...result.formValues
+                        };
+                        if (result.formValues.Headquarters_City_and_Country__c) {
+                            this.hqSearchKey = result.formValues.Headquarters_City_and_Country__c;
+                        }
+                    }
+                    if (result.skillingDomains && result.skillingDomains.length > 0) {
+                        this.skillingDomainRows = result.skillingDomains;
+                    }
+                    if (result.businessSectors && result.businessSectors.length > 0) {
+                        this.businessSectorRows = result.businessSectors;
+                    }
+                    if (result.livelihoodPrograms && result.livelihoodPrograms.length > 0) {
+                        this.livelihoodProgramRows = result.livelihoodPrograms;
+                    }
+                    if (result.communities && result.communities.length > 0) {
+                        this.communityRows = result.communities;
+                    }
+                    if (result.documents && result.documents.length > 0) {
+                        this.docRows = result.documents;
+                    }
+                    if (result.q24Files && result.q24Files.length > 0) {
+                        this.q24UploadedFiles = result.q24Files;
+                    }
+                    if (result.q28Files && result.q28Files.length > 0) {
+                        this.q28UploadedFiles = result.q28Files;
+                    }
+                    this.loadMetadata();
+                }
+            })
+            .catch(err => {
+                console.error('Error loading dynamic draft:', err);
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
+    }
+
     _getCustomQuestions(filterFn, basePrefix) {
         if (!this.metadataQuestions || !this.metadataQuestions.length) return [];
         const filtered = this.metadataQuestions.filter(q => q.isCustom && filterFn(q));
         return filtered.map((q, idx) => {
-            const val = this.formValues[q.targetField] !== undefined ? this.formValues[q.targetField] : '';
+            let val = undefined;
+            if (q.targetField) {
+                val = this.formValues[q.targetField];
+                if (val === undefined) {
+                    const targetLower = q.targetField.toLowerCase();
+                    const matchedKey = Object.keys(this.formValues).find(k => k.toLowerCase() === targetLower);
+                    if (matchedKey) {
+                        val = this.formValues[matchedKey];
+                    }
+                }
+            }
+            if (val === undefined && q.key) {
+                val = this.formValues[q.key];
+            }
             const dt = (q.displayType || 'Text').toLowerCase();
+            let displayVal = val;
+            if (val === undefined || val === null || val === '') {
+                displayVal = '—';
+            } else if (typeof val === 'boolean' || dt === 'checkbox' || dt === 'boolean') {
+                displayVal = (val === true || val === 'true') ? 'Yes' : 'No';
+            }
+            const rawOpts = q.options || q.picklistOptions || [];
+            const options = rawOpts.map(opt => {
+                if (typeof opt === 'string') {
+                    const cleanOpt = opt.trim();
+                    return { label: cleanOpt, value: cleanOpt };
+                }
+                return opt;
+            });
             const keyVal = q.key || q.targetField || `cq-${idx}`;
             return {
                 ...q,
                 key: keyVal,
                 displayNumber: basePrefix ? `${basePrefix}.${idx + 1}` : `${idx + 1}`,
-                value: val,
+                value: val !== undefined ? val : '',
+                displayValue: String(displayVal),
                 isText: dt === 'text' || dt === 'string' || dt === 'phone' || dt === 'email',
                 isTextArea: dt === 'textarea' || dt === 'richtext',
                 isNumber: dt === 'number' || dt === 'currency' || dt === 'percent',
                 isDate: dt === 'date' || dt === 'datetime',
                 isCheckbox: dt === 'checkbox' || dt === 'boolean',
-                isPicklist: dt === 'picklist' && q.picklistOptions && q.picklistOptions.length > 0,
-                options: q.picklistOptions || [],
+                isPicklist: (dt === 'picklist' || dt === 'combobox') && options.length > 0,
+                options: options,
                 wrapperClass: (dt === 'textarea' || dt === 'richtext') ? 'modern-field full-width' : 'modern-field'
             };
         });
@@ -1438,9 +1535,6 @@ export default class WcfDynamicForm extends LightningElement {
             return;
         }
 
-        // Auto-save draft on moving to the next tab
-        this.handleSaveDraft(false);
-
         const tabs = this.dynamicTabs;
         const index = tabs.findIndex(t => t.id === this.activeTabId);
         if (index !== -1 && index < tabs.length - 1) {
@@ -1456,6 +1550,9 @@ export default class WcfDynamicForm extends LightningElement {
             this.activeTabId = nextTab.id;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Auto-save draft on moving to the next tab in background
+        this.handleSaveDraft(false);
     }
 
     handlePrevTab() {
@@ -1489,10 +1586,12 @@ export default class WcfDynamicForm extends LightningElement {
             if (words.length > 0) {
                 this._clearFieldError(key);
             }
-        } else if (event.detail?.value !== undefined) {
-            val = event.detail.value;
+        } else if (event.detail?.checked !== undefined) {
+            val = event.detail.checked;
         } else if (event.target?.type === 'checkbox') {
             val = event.target.checked;
+        } else if (event.detail?.value !== undefined) {
+            val = event.detail.value;
         } else {
             val = event.target?.value ?? '';
         }
@@ -1501,6 +1600,15 @@ export default class WcfDynamicForm extends LightningElement {
             ...this.formValues,
             [key]: val
         };
+
+        const fldAttr = event.currentTarget?.dataset?.field || event.target?.dataset?.field;
+        if (fldAttr && fldAttr !== key) {
+            this.formValues[fldAttr] = val;
+        }
+        const idAttr = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
+        if (idAttr && idAttr !== key) {
+            this.formValues[idAttr] = val;
+        }
 
         if (key === 'GenieAI_Interest_Level__c' && (val === 'Not at this time' || !val)) {
             this.formValues = {
@@ -4759,7 +4867,7 @@ export default class WcfDynamicForm extends LightningElement {
         })
         .then(result => {
             if (result && result.isSuccess) {
-                this.recordId = result.recordId;
+                this._recordId = result.recordId;
                 this.isDirty = false;
                 if (showToast) {
                     this.dispatchEvent(new ShowToastEvent({

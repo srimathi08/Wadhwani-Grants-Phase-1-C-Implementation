@@ -14,6 +14,7 @@ public without sharing class WcfProposalDashboardController {
 
         try {
             Set<String> wcfRecordTypeNames = new Set<String>{
+                'Wadhwani_Grants',
                 'WCF_Job_Creation_Proposals',
                 'WCF_Job_Fulfillment_Job_Creation_Proposals',
                 'WCF_Job_Fulfillment_Proposals'

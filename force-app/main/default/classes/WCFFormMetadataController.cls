@@ -3,7 +3,7 @@
  * (Tracks, Sections, Questions, Dependency Rules, Validation Rules, and Translations)
  * localized for the applicant's selected language.
  */
-public with sharing class WCFFormMetadataController {
+public without sharing class WCFFormMetadataController {
 
     public class TrackWrapper {
         @AuraEnabled public String code;
@@ -72,7 +72,7 @@ public with sharing class WCFFormMetadataController {
      * @param fiscalDay Organization fiscal day string e.g. "31"
      * @return FormMetadataPayload payload containing tracks, sections, questions, rules, translations
      */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static FormMetadataPayload getFormMetadata(String languageCode, String fiscalMonth, String fiscalDay) {
         if (String.isBlank(languageCode)) {
             languageCode = 'en_US';
