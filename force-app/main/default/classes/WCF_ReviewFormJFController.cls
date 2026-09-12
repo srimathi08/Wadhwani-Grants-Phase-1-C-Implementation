@@ -491,4 +491,9 @@ public without sharing class WCF_ReviewFormJFController {
         }
         return result;
     }
+
+    @AuraEnabled(cacheable=false)
+    public static Map<String, Object> getReviewerFormV5Metadata(String trackName) {
+        return WCFReviewerMetadataController.getReviewerFormV5Metadata(trackName);
+    }
 }
