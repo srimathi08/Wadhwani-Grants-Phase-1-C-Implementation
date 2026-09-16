@@ -16,6 +16,7 @@ public without sharing class WCFProposalListController {
                     Headquarters_City_and_Country__c,
                     Submitter_Name__c,
                     Organizational_Area_s_for_Funding_Inves__c,
+                    Organizational_Area_s_for_Funding_Inves1__c,
                     Status,
                     Assigned_reviewers__c,
                     CreatedDate,

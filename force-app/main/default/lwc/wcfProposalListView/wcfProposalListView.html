@@ -143,7 +143,11 @@
                                     <td class="td c-hq"><span class="trunc" title={p.Headquarters_City_and_Country__c}>{p.Headquarters_City_and_Country__c}</span></td>
                                     <td class="td c-sub"><span class="trunc" title={p.Submitter_Name__c}>{p.Submitter_Name__c}</span></td>
                                     <td class="td c-track tc">
-                                        <span class={p.trackBadgeClass}>{p.trackShort}</span>
+                                        <div class="track-badges-wrap">
+                                            <template for:each={p.trackBadges} for:item="tb">
+                                                <span key={tb.code} class={tb.badgeClass} title={tb.label}>{tb.code}</span>
+                                            </template>
+                                        </div>
                                     </td>
                                    <!--  <td class="td c-appstatus">
                                        <span class={p.statusBadgeClass}>{p.Status}</span> 
@@ -167,7 +171,7 @@
     data-review-id={p.reviewId}
     data-action={p.reviewAction}
     data-headquarters={p.Headquarters_City_and_Country__c}
-    data-track={p.trackShort}
+    data-track={p.trackParam}
     disabled={p.isRejected}
     onclick={handleReviewAction}
 >

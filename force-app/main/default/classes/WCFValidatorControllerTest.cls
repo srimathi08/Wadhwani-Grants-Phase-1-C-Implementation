@@ -203,11 +203,11 @@ private class WCFValidatorControllerTest {
             insert outcomeJF;
 
             List<Integer> populatedJF = WCFValidatorController.getPopulatedQuestionNumbers(appJF.Id);
-            System.assert(populatedJF.contains(8));
-            System.assert(populatedJF.contains(9));
-            System.assert(populatedJF.contains(15));
-            System.assert(populatedJF.contains(16));
-            System.assert(populatedJF.contains(20));
+            System.assertNotEquals(null, populatedJF);
+            System.assert(populatedJF.contains(1));
+            System.assert(populatedJF.contains(11));
+            System.assert(populatedJF.contains(12));
+            System.assert(populatedJF.contains(15)); // Q24 is continuous number 15 on JF only
 
             IndividualApplication appBoth = WCF_TestDataFactory.createApplication(data.account.Id, data.contact.Id, 'Draft', false);
             appBoth.Organizational_Area_s_for_Funding_Inves__c = 'Both Job Fulfillment and Job Creation';
@@ -220,7 +220,10 @@ private class WCFValidatorControllerTest {
             insert appBoth;
 
             List<Integer> populatedBoth = WCFValidatorController.getPopulatedQuestionNumbers(appBoth.Id);
-            System.assert(populatedBoth.contains(20));
+            System.assertNotEquals(null, populatedBoth);
+            System.assert(populatedBoth.contains(1));
+            System.assert(populatedBoth.contains(11));
+            System.assert(populatedBoth.contains(19)); // Q24 is continuous number 19 on JF+JC
         }
     }
 
@@ -238,6 +241,18 @@ private class WCFValidatorControllerTest {
             System.assert(false, 'Should throw exception on empty JSON');
         } catch (AuraHandledException e) {
             System.assertNotEquals(null, e);
+        }
+    }
+
+    @IsTest
+    static void testValidatorFormMetadata() {
+        User sysAdmin = getSysAdmin();
+        System.runAs(sysAdmin) {
+            WCFValidatorController.ValidatorFormMetadataPayload payload = WCFValidatorController.getValidatorFormMetadata('Job Creation Only');
+            System.assertNotEquals(null, payload);
+            System.assertEquals(true, payload.success);
+            System.assertNotEquals(null, payload.sections);
+            System.assert(payload.sections.size() > 0);
         }
     }
 }

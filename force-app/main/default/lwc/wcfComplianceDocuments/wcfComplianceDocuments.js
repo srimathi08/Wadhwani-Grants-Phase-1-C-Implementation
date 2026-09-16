@@ -66,6 +66,29 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     connectedCallback() {
         this.loadData();
         this.loadOrgOptions();
+        this._checkUrlParams();
+    }
+
+    renderedCallback() {
+        this._syncOrgSelect();
+    }
+
+    _checkUrlParams() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const orgId = params.get('orgId') || params.get('organisationId');
+            if (orgId) {
+                this.form = { ...this.form, organisationId: orgId };
+                this.fetchLinkedApplication(orgId);
+            }
+        } catch (e) { }
+    }
+
+    get formattedOrgOptions() {
+        return (this.orgOptions || []).map(o => ({
+            ...o,
+            selected: o.value === this.form.organisationId
+        }));
     }
 
     async loadData() {
@@ -88,10 +111,10 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     async loadOrgOptions() {
         try {
             const opts = await getOrganisationOptions();
-            this.orgOptions = (opts || []).map(o => ({ ...o, selected: false }));
+            this.orgOptions = (opts || []).map(o => ({ ...o, selected: o.value === this.form.organisationId }));
         } catch (e) {
-           console.error('loadOrgOptions error:', JSON.stringify(e));
-        this.formError = e.body?.message || 'Could not load organisations.';
+            console.error('loadOrgOptions error:', JSON.stringify(e));
+            this.formError = e.body?.message || 'Could not load organisations.';
         }
     }
 
@@ -379,35 +402,41 @@ _displayDate(iso) {
         this.form      = { ...DEFAULT_FORM, documentTypes: [] };
         this.formError = null;
         this.showModal = true;
-        this.loadOrgOptions();   // add this
-        this._syncOrgSelect();
+        this.loadOrgOptions();
     }
 
-   handleEdit(event) {
-    const id  = event.currentTarget.dataset.id;
-    const row = this.rows.find(r => r.recordId === id);
-    if (!row) return;
+    handleEdit(event) {
+        const id  = event.currentTarget.dataset.id;
+        const row = this.rows.find(r => r.recordId === id);
+        if (!row) return;
 
-    this.form = {
-        recordId:        row.recordId,
-        organisationId:  row.orgId || '',
-        applicationId:   row.applicationId || '',
-        applicationName: row.applicationName || '',
-        geography:       row.geography !== '—' ? row.geography : '',
-        documentTypes:   [...(row.documents || [])],
-        requestedDate:   row.requestedDateIso || '',
-        dueDate:         row.dueDateIso || '',
-        priority:        row.priority !== '—' ? row.priority : 'Normal',
-        notes:           row.notes || ''
-    };
-    this.formError = null;
-    this.showModal = true;
-    this._syncOrgSelect();
+        // Ensure the edited record's organization is in the dropdown options
+        if (row.orgId && row.orgName && row.orgName !== '—') {
+            const exists = this.orgOptions.some(o => o.value === row.orgId);
+            if (!exists) {
+                this.orgOptions = [...this.orgOptions, { value: row.orgId, label: row.orgName, selected: true }];
+            }
+        }
 
-    if (row.orgId && !row.applicationId) {
-        this.fetchLinkedApplication(row.orgId);
+        this.form = {
+            recordId:        row.recordId,
+            organisationId:  row.orgId || '',
+            applicationId:   row.applicationId || '',
+            applicationName: row.applicationName || '',
+            geography:       row.geography !== '—' ? row.geography : '',
+            documentTypes:   [...(row.documents || [])],
+            requestedDate:   row.requestedDateIso || '',
+            dueDate:         row.dueDateIso || '',
+            priority:        row.priority !== '—' ? row.priority : 'Normal',
+            notes:           row.notes || ''
+        };
+        this.formError = null;
+        this.showModal = true;
+
+        if (row.orgId && !row.applicationId) {
+            this.fetchLinkedApplication(row.orgId);
+        }
     }
-}
 
     closeModal()          { this.showModal = false; }
     handleBackdropClick() { this.showModal = false; }

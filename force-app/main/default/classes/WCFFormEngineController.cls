@@ -44,30 +44,60 @@ public without sharing class WCFFormEngineController {
     }
 
     /**
+     * @description Formats selected track codes into single-select picklist value for
+     * Organizational_Area_s_for_Funding_Inves__c on IndividualApplication.
+     * Allowed picklist values: 'Job Fulfillment Only', 'Job Creation Only', 'Both Job Fulfillment and Job Creation', 'Livelihood Upliftment'.
+     */
+    public static String formatSingleSelectFundingArea(List<String> tracksInput) {
+        if (tracksInput == null || tracksInput.isEmpty()) {
+            return 'Job Fulfillment Only';
+        }
+        Boolean hasJF = false;
+        Boolean hasJC = false;
+        Boolean hasLU = false;
+        for (String trk : tracksInput) {
+            if (String.isBlank(trk)) continue;
+            String tUpper = trk.trim().toUpperCase();
+            if (tUpper.contains('LIVELIHOOD')) hasLU = true;
+            if (tUpper.contains('FULFILLMENT') || tUpper.contains('FULFILMENT')) hasJF = true;
+            if (tUpper.contains('CREATION')) hasJC = true;
+            if (tUpper.contains('BOTH')) { hasJF = true; hasJC = true; }
+        }
+        if (hasLU && !hasJF && !hasJC) {
+            return 'Livelihood Upliftment';
+        } else if (hasJF && hasJC) {
+            return 'Both Job Fulfillment and Job Creation';
+        } else if (hasJC) {
+            return 'Job Creation Only';
+        } else if (hasLU) {
+            return 'Livelihood Upliftment';
+        } else {
+            return 'Job Fulfillment Only';
+        }
+    }
+
+    /**
      * @description Formats selected track codes into semicolon-separated string for multi-select picklist
      * Organizational_Area_s_for_Funding_Inves1__c on IndividualApplication.
      * Allowed picklist values: 'Job Fulfillment', 'Job Creation', 'Livelihood'.
      */
     public static String formatMultiSelectFundingArea(List<String> tracksInput) {
         if (tracksInput == null || tracksInput.isEmpty()) {
-            return 'Job Fulfillment Only';
+            return 'Job Fulfillment';
         }
-        Boolean hasJF = false;
-        Boolean hasJC = false;
+        Set<String> selected = new Set<String>();
         for (String trk : tracksInput) {
             if (String.isBlank(trk)) continue;
             String tUpper = trk.trim().toUpperCase();
-            if (tUpper.contains('FULFILLMENT') || tUpper.contains('LIVELIHOOD')) hasJF = true;
-            if (tUpper.contains('CREATION')) hasJC = true;
-            if (tUpper.contains('BOTH')) { hasJF = true; hasJC = true; }
+            if (tUpper.contains('LIVELIHOOD')) selected.add('Livelihood');
+            if (tUpper.contains('FULFILLMENT') || tUpper.contains('FULFILMENT')) selected.add('Job Fulfillment');
+            if (tUpper.contains('CREATION')) selected.add('Job Creation');
+            if (tUpper.contains('BOTH')) { selected.add('Job Fulfillment'); selected.add('Job Creation'); }
         }
-        if (hasJF && hasJC) {
-            return 'Both Job Fulfillment and Job Creation';
-        } else if (hasJC) {
-            return 'Job Creation Only';
-        } else {
-            return 'Job Fulfillment Only';
+        if (selected.isEmpty()) {
+            selected.add('Job Fulfillment');
         }
+        return String.join(new List<String>(selected), ';');
     }
 
     /**
@@ -243,7 +273,8 @@ public without sharing class WCFFormEngineController {
             // 1. Build dynamic SOQL query for IndividualApplication including all fields from RFI_Question__mdt
             Set<String> fieldNames = new Set<String>{
                 'Id', 'Status', 'RecordTypeId', 'AccountId', 'OwnerId', 'Category', 'Last_Page__c',
-                'Organizational_Area_s_for_Funding_Inves__c', 'ContactId', 'Principal_Investigator_PI__c', 'PI__c',
+                'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c',
+                'ContactId', 'Principal_Investigator_PI__c', 'PI__c',
                 'Organization_Name__c', 'Headquarters_City_and_Country__c', 'Primary_Service_Regions__c',
                 'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c',
                 'Submitter_Name__c', 'Job_Title__c', 'Work_Email_ID__c', 'Phone__c', 'WG_Phone_Country_Code__c',
@@ -254,8 +285,8 @@ public without sharing class WCFFormEngineController {
                 'Funder_3_Name__c', 'Funder_3_Amount__c', 'Funder_3_Period_Start__c', 'Funder_3_Period_End__c', 'Funder_3_Type__c',
                 'Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c',
                 'Reference_2_Name__c', 'Reference_2_Role__c', 'Reference_2_Email__c',
-                'Skilling_Approach__c', 'Job_Creation_Approach__c',
-                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c',
+                'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c',
+                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c', 'Use_of_Additional_Funding_JC__c',
                 'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
                 'Attesting_User_Name__c', 'Attesting_User_Title__c'
             };
@@ -269,7 +300,15 @@ public without sharing class WCFFormEngineController {
                 }
             }
 
-            String soql = 'SELECT ' + String.join(new List<String>(fieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :appId WITH SYSTEM_MODE LIMIT 1';
+            // Filter only valid accessible fields
+            List<String> validQueryFields = new List<String>();
+            for (String fn : fieldNames) {
+                if (appFieldMap.containsKey(fn.toLowerCase()) || fn.equalsIgnoreCase('Id') || fn.equalsIgnoreCase('Status') || fn.equalsIgnoreCase('RecordTypeId') || fn.equalsIgnoreCase('AccountId') || fn.equalsIgnoreCase('OwnerId') || fn.equalsIgnoreCase('Category') || fn.equalsIgnoreCase('Last_Page__c')) {
+                    validQueryFields.add(fn);
+                }
+            }
+
+            String soql = 'SELECT ' + String.join(validQueryFields, ', ') + ' FROM IndividualApplication WHERE Id = :appId WITH SYSTEM_MODE LIMIT 1';
             IndividualApplication app = Database.query(soql);
 
             wrapper.recordId = app.Id;
@@ -284,14 +323,22 @@ public without sharing class WCFFormEngineController {
             else if (app.Last_Page__c == 7) wrapper.activeTabId = 'tabReviewSubmit';
             else wrapper.activeTabId = 'tabAboutOrg';
 
-            // Selected Tracks
+            // Selected Tracks - parse from single and multi-select fields
+            Set<String> trkSet = new Set<String>();
             String tracksStr = app.Organizational_Area_s_for_Funding_Inves__c;
-            if (String.isNotBlank(tracksStr)) {
-                String tUpper = tracksStr.toUpperCase();
-                if (tUpper.contains('FULFILLMENT')) wrapper.selectedTracks.add('JOB_FULFILLMENT');
-                if (tUpper.contains('CREATION')) wrapper.selectedTracks.add('JOB_CREATION');
-                if (tUpper.contains('LIVELIHOOD')) wrapper.selectedTracks.add('LIVELIHOOD');
+            String multiTracksStr = '';
+            if (appFieldMap.containsKey('organizational_area_s_for_funding_inves1__c')) {
+                Object val1 = app.get('Organizational_Area_s_for_Funding_Inves1__c');
+                if (val1 != null) multiTracksStr = String.valueOf(val1);
             }
+            String combined = (tracksStr != null ? tracksStr : '') + ';' + multiTracksStr;
+            if (String.isNotBlank(combined)) {
+                String cUpper = combined.toUpperCase();
+                if (cUpper.contains('LIVELIHOOD')) trkSet.add('LIVELIHOOD');
+                if (cUpper.contains('FULFILLMENT') || cUpper.contains('FULFILMENT')) trkSet.add('JOB_FULFILLMENT');
+                if (cUpper.contains('CREATION')) trkSet.add('JOB_CREATION');
+            }
+            wrapper.selectedTracks = new List<String>(trkSet);
 
             // Populate formValues map from Application
             Map<String, Object> fv = new Map<String, Object>();
@@ -626,7 +673,8 @@ public without sharing class WCFFormEngineController {
         }
 
         // Determine appropriate RecordType - all proposals must be stored under Wadhwani Grants
-        String formattedTracks = formatMultiSelectFundingArea(selectedTracks);
+        String singleSelectFundingArea = formatSingleSelectFundingArea(selectedTracks);
+        String multiSelectFundingArea  = formatMultiSelectFundingArea(selectedTracks);
         RecordType wgRt = null;
         Map<String, RecordType> rtsByDevName = new Map<String, RecordType>();
         for (RecordType rt : [
@@ -661,10 +709,10 @@ public without sharing class WCFFormEngineController {
             Set<String> updateFieldNames = new Set<String>{
                 'Id', 'RecordTypeId', 'AccountId', 'Category', 'Status', 'OwnerId', 'Initial_Submission_Date__c', 'Last_Resubmission_Date__c', 'Last_Page__c',
                 'Organization_Name__c', 'ContactId', 'Principal_Investigator_PI__c', 'PI__c', 'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c',
-                'Draft_Email_Sent__c', 'Skilling_Approach__c', 'Job_Creation_Approach__c',
-                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c',
+                'Draft_Email_Sent__c', 'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c',
+                'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c', 'Use_of_Additional_Funding_JC__c',
                 'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
-                'Leader_Tenure__c', 'Organizational_Area_s_for_Funding_Inves__c'
+                'Leader_Tenure__c', 'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c'
             };
             for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
                 if (String.isNotBlank(q.Field_API_Name__c) && (q.Target_Object__c == 'IndividualApplication' || String.isBlank(q.Target_Object__c))) {
@@ -673,7 +721,13 @@ public without sharing class WCFFormEngineController {
                     }
                 }
             }
-            String updateSoql = 'SELECT ' + String.join(new List<String>(updateFieldNames), ', ') + ' FROM IndividualApplication WHERE Id = :recordId WITH SYSTEM_MODE LIMIT 1';
+            List<String> validUpdateFields = new List<String>();
+            for (String ufn : updateFieldNames) {
+                if (appFields.containsKey(ufn.toLowerCase()) || ufn.equalsIgnoreCase('Id') || ufn.equalsIgnoreCase('RecordTypeId') || ufn.equalsIgnoreCase('AccountId') || ufn.equalsIgnoreCase('Category') || ufn.equalsIgnoreCase('Status') || ufn.equalsIgnoreCase('OwnerId') || ufn.equalsIgnoreCase('Initial_Submission_Date__c') || ufn.equalsIgnoreCase('Last_Resubmission_Date__c') || ufn.equalsIgnoreCase('Last_Page__c')) {
+                    validUpdateFields.add(ufn);
+                }
+            }
+            String updateSoql = 'SELECT ' + String.join(validUpdateFields, ', ') + ' FROM IndividualApplication WHERE Id = :recordId WITH SYSTEM_MODE LIMIT 1';
             app = Database.query(updateSoql);
         }
 
@@ -686,9 +740,15 @@ public without sharing class WCFFormEngineController {
             app.RecordTypeId = wgRt.Id;
         }
 
-        // Set Main Multiselect Picklist Field for Funding Area Tracks
-        if (String.isNotBlank(formattedTracks)) {
-            app.Organizational_Area_s_for_Funding_Inves__c = formattedTracks;
+        // Set Main Picklist and Multi-select Picklist Fields for Funding Area Tracks
+        if (String.isNotBlank(singleSelectFundingArea)) {
+            app.Organizational_Area_s_for_Funding_Inves__c = singleSelectFundingArea;
+        }
+        if (appFields.containsKey('organizational_area_s_for_funding_inves1__c') && String.isNotBlank(multiSelectFundingArea)) {
+            app.put('Organizational_Area_s_for_Funding_Inves1__c', multiSelectFundingArea);
+        }
+        if (appFields.containsKey('selected_funding_tracks__c') && String.isNotBlank(multiSelectFundingArea)) {
+            app.put('Selected_Funding_Tracks__c', multiSelectFundingArea.replace(';', ', '));
         }
 
         // Parse Payload Map
@@ -760,7 +820,7 @@ public without sharing class WCFFormEngineController {
 
         // Map valuesMap into IndividualApplication fields
         for (String f : valuesMap.keySet()) {
-            if (f == 'Id' || f == 'RecordTypeId' || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves__c') || !appFields.containsKey(f.toLowerCase())) continue;
+            if (f == 'Id' || f == 'RecordTypeId' || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves__c') || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves1__c') || f.equalsIgnoreCase('Selected_Funding_Tracks__c') || !appFields.containsKey(f.toLowerCase())) continue;
             Object val = valuesMap.get(f);
             if (val == null) continue;
             try {

@@ -365,9 +365,7 @@
     font-size: 13px;
 }
 
-/* ── Pill base (recommendation / track / status share one shape) ── */
 .rec-pill,
-.track-pill,
 .status-pill {
     display: inline-flex;
     align-items: center;
@@ -385,16 +383,32 @@
     box-sizing: border-box;
 }
 
+.track-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: var(--wcf-radius-pill);
+    border: 1px solid transparent;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
 /* ── Recommendation pills ─────────────────────────────────────── */
 .rec-yes  { background: var(--wcf-success-soft); color: #1F6B44; border-color: #A7DFC1; }
 .rec-no   { background: var(--wcf-error-soft);   color: #B91C1C; border-color: #FECACA; }
 .rec-none { background: var(--wcf-draft-soft);   color: #4B5563; border-color: #E5E7EB; }
 
 /* ── Track pills ──────────────────────────────────────────────── */
-/* Track is a category, not a status — kept neutral so it doesn't
-   compete with the status column for attention. */
 .track-jf   { background: var(--wcf-info-soft);  color: #1D4ED8; border-color: #BFDBFE; }
-.track-jc   { background: var(--wcf-draft-soft); color: #374151; border-color: #E5E7EB; }
+.track-jc   { background: #fef3c7;               color: #92400e; border-color: #fde68a; }
+.track-lu   { background: #e0f2fe;               color: #0369a1; border-color: #bae6fd; }
 .track-both { background: var(--wcf-surface-alt); color: var(--wcf-navy); border-color: #D6DAE1; }
 
 /* ── Status pills ─────────────────────────────────────────────── */

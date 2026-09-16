@@ -14,8 +14,8 @@
                     <label class="form-label">Organisation <span class="req">*</span></label>
                     <select class="form-select" data-field="organisationId" onchange={handleFieldChange}>
                         <option value="">— Select Organisation —</option>
-                        <template for:each={orgOptions} for:item="o">
-                            <option key={o.value} value={o.value}>{o.label}</option>
+                        <template for:each={formattedOrgOptions} for:item="o">
+                            <option key={o.value} value={o.value} selected={o.selected}>{o.label}</option>
                         </template>
                     </select>
                 </div>

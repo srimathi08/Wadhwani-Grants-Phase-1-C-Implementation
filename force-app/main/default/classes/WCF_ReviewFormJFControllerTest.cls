@@ -83,7 +83,9 @@ private class WCF_ReviewFormJFControllerTest {
                 ApplicationId = app.Id,
                 Recommend_for_CEO_review__c = WCF_TestDataFactory.pickValue('ApplicationReview', 'Recommend_for_CEO_review__c', 'Recommend')
             );
-            WCF_ReviewFormJFController.saveApplicationReview(JSON.serialize(submitReview));
+            WCF_ReviewFormJFController.ReviewSubmitResult submitRes = WCF_ReviewFormJFController.saveApplicationReview(JSON.serialize(submitReview));
+            System.assertNotEquals(null, submitRes);
+            System.assertEquals(true, submitRes.isSuccess);
 
             // Test hasAlreadyReviewed (True state)
             System.assertEquals(true, WCF_ReviewFormJFController.hasAlreadyReviewed(app.Id));
@@ -149,15 +151,11 @@ private class WCF_ReviewFormJFControllerTest {
                 System.assert(false);
             } catch (AuraHandledException e) {}
 
-            try {
-                WCF_ReviewFormJFController.saveApplicationReview(null);
-                System.assert(false);
-            } catch (AuraHandledException e) {}
+            WCF_ReviewFormJFController.ReviewSubmitResult res1 = WCF_ReviewFormJFController.saveApplicationReview(null);
+            System.assertEquals(false, res1.isSuccess);
 
-            try {
-                WCF_ReviewFormJFController.saveApplicationReview('{"Status":"Submitted"}');
-                System.assert(false);
-            } catch (AuraHandledException e) {}
+            WCF_ReviewFormJFController.ReviewSubmitResult res2 = WCF_ReviewFormJFController.saveApplicationReview('{"Status":"Submitted"}');
+            System.assertEquals(false, res2.isSuccess);
 
             try {
                 WCF_ReviewFormJFController.getIndividualApplication(null);

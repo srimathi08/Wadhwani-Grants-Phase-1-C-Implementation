@@ -8,6 +8,7 @@ public without sharing class WCFApproverListController {
         @AuraEnabled public String  submitterName;
         @AuraEnabled public String  applicationStatus;
         @AuraEnabled public String  track;
+        @AuraEnabled public String  trackLabel;
         @AuraEnabled public String  reviewId;
         @AuraEnabled public String  reviewName;
         @AuraEnabled public String  reviewStatus;
@@ -76,6 +77,7 @@ public without sharing class WCFApproverListController {
                    Headquarters_City_and_Country__c,
                    Submitter_Name__c,
                    Organizational_Area_s_for_Funding_Inves__c,
+                   Organizational_Area_s_for_Funding_Inves1__c,
                    Status,
                    RecordTypeId
             FROM IndividualApplication
@@ -117,12 +119,11 @@ public without sharing class WCFApproverListController {
             item.submitterName     = app.Submitter_Name__c;
             item.applicationStatus = app.Status;
 
-            String trackRaw = app.Organizational_Area_s_for_Funding_Inves__c != null
-                  ? app.Organizational_Area_s_for_Funding_Inves__c : '';
-            if      (trackRaw.toLowerCase().contains('both'))        item.track = 'Both';
-            else if (trackRaw.toLowerCase().contains('fulfillment')) item.track = 'JF';
-            else if (trackRaw.toLowerCase().contains('creation'))    item.track = 'JC';
-            else                                                     item.track = trackRaw;
+            String rawTrack = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
+                ? app.Organizational_Area_s_for_Funding_Inves1__c
+                : (app.Organizational_Area_s_for_Funding_Inves__c != null ? app.Organizational_Area_s_for_Funding_Inves__c : '');
+            item.track      = WCF_ReviewFormJFController.resolveTrackCodes(rawTrack);
+            item.trackLabel = WCF_ReviewFormJFController.formatTrackLabel(rawTrack);
 
             item.reviewId       = ar.Id;
             item.reviewName     = ar.Name;
@@ -187,11 +188,28 @@ public static String saveDecision(
     }
 
     List<ApplicationDecision> existing = [
-        SELECT Id FROM ApplicationDecision
+        SELECT Id, RecordTypeId FROM ApplicationDecision
         WHERE ApplicationId = :applicationId
         WITH SYSTEM_MODE
         LIMIT 1
     ];
+
+    Id wgApproverRtId;
+    try {
+        wgApproverRtId = RecordTypeHelper.applicationDecisionWgApproverId();
+    } catch (Exception e) {
+        try {
+            RecordType rt = [
+                SELECT Id FROM RecordType
+                WHERE SObjectType = 'ApplicationDecision'
+                AND DeveloperName = 'WG_Approver'
+                LIMIT 1
+            ];
+            wgApproverRtId = rt.Id;
+        } catch (Exception ex) {
+            // Ignore
+        }
+    }
 
     ApplicationDecision ad;
     if (!existing.isEmpty()) {
@@ -199,6 +217,10 @@ public static String saveDecision(
     } else {
         ad = new ApplicationDecision();
         ad.ApplicationId = applicationId;
+    }
+
+    if (wgApproverRtId != null) {
+        ad.RecordTypeId = wgApproverRtId;
     }
 
     // ── Pull the Reviewer's recommendation — only needed for the Accept branch ──
@@ -396,6 +418,9 @@ public static DecisionWrapper getExistingDecision(Id applicationId) {
                    D6_MEFunction_Rating__c,             D6_MEFunction_Comment__c,
                    D6_ExternalVerification_Rating__c,  D6_ExternalVerification_Comment__c,
                    D6_LongitudinalTracking_Rating__c,  D6_LongitudinalTracking_Comment__c,
+                   Decision_Rationale__c,
+                   Overall_Review_Score__c,
+                   Rejection_Comment__c,
                    ReviewedById
             FROM ApplicationReview
             WHERE Id = :reviewId
@@ -494,6 +519,7 @@ public static ApproverSummary getApproverSummary() {
     return summary;
 }
         private static final Set<String> REVIEW_RT_NAMES = new Set<String>{
+    'WG_Reviewer',
     'WCF_Job_Creation_Review',
     'WCF_Job_Fulfillment',
     'WCF_Job_Fulfillment_Job_Creation'

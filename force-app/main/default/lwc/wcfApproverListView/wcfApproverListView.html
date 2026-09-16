@@ -92,7 +92,11 @@
                                         <span class="trunc" title={row.headquarters}>{row.headquarters}</span>
                                     </td>
                                     <td class="td c-track tc">
-                                        <span class={row.trackBadgeClass}>{row.track}</span>
+                                        <div style="display: inline-flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                                            <template for:each={row.trackBadges} for:item="tb">
+                                                <span key={tb.code} class={tb.badgeClass}>{tb.code}</span>
+                                            </template>
+                                        </div>
                                     </td>
                                     <!--<td class="td c-appstatus">
                                         <span class={row.reviewStatusClass}>Review Submitted</span>
@@ -114,6 +118,8 @@
                                             data-id={row.applicationId}
                                             data-appname={row.applicationName}
                                             data-review-id={row.reviewId}
+                                            data-track={row.track}
+                                            data-track-label={row.trackLabel}
                                             onclick={handleStartApprove}
                                         >
                                             <lightning-icon icon-name={row.actionIcon} size="xx-small" class="btn-icon"></lightning-icon>

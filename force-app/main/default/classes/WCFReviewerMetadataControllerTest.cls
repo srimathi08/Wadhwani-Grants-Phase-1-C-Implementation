@@ -10,6 +10,7 @@ private class WCFReviewerMetadataControllerTest {
         Map<String, Object> resJF = WCFReviewerMetadataController.getReviewerFormV5Metadata('Job Fulfillment Only');
         Map<String, Object> resJC = WCFReviewerMetadataController.getReviewerFormV5Metadata('Job Creation Only');
         Map<String, Object> resLU = WCFReviewerMetadataController.getReviewerFormV5Metadata('Livelihood Upliftment');
+        Map<String, Object> resMulti = WCFReviewerMetadataController.getReviewerFormV5Metadata('Job Creation;Livelihood');
         Map<String, Object> resAll = WCFReviewerMetadataController.getReviewerFormV5Metadata(null);
         Test.stopTest();
 
@@ -18,5 +19,7 @@ private class WCFReviewerMetadataControllerTest {
         System.assertEquals('JF', resJF.get('normalizedTrack'), 'Should normalize to JF');
         System.assertEquals('JC', resJC.get('normalizedTrack'), 'Should normalize to JC');
         System.assertEquals('LU', resLU.get('normalizedTrack'), 'Should normalize to LU');
+        System.assertEquals('JC,LU', resMulti.get('normalizedTrack'), 'Should normalize to JC,LU');
+        System.assertEquals('ALL', resAll.get('normalizedTrack'), 'Should normalize to ALL');
     }
 }

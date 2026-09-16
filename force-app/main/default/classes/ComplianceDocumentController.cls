@@ -84,6 +84,9 @@ public without sharing class ComplianceDocumentController {
                    Organisation__r.WCF_Organizational_Name__c,
                    IndividualApplication__c,
                    IndividualApplication__r.Name,
+                   IndividualApplication__r.AccountId,
+                   IndividualApplication__r.Account.Name,
+                   IndividualApplication__r.Account.WCF_Organizational_Name__c,
                    Document_Types__c,
                    Requested_Date__c,
                    Due_Date__c,
@@ -92,19 +95,32 @@ public without sharing class ComplianceDocumentController {
                    Geography__c,
                    Notes__c
             FROM WCF_Compliance_Document__c
-              WITH SYSTEM_MODE
+            WITH SYSTEM_MODE
             ORDER BY Due_Date__c ASC NULLS LAST, Name ASC
         ]) {
             ComplianceRowDTO dto = new ComplianceRowDTO();
 
             dto.requestId       = rec.Name;
             dto.recordId        = rec.Id;
-            dto.orgName         = rec.Organisation__r != null
-                                ? (String.isNotBlank(rec.Organisation__r.WCF_Organizational_Name__c)
-                                    ? rec.Organisation__r.WCF_Organizational_Name__c
-                                    : rec.Organisation__r.Name)
-                                : '—';
-            dto.orgId           = rec.Organisation__c;
+
+            String orgName = '—';
+            String orgId = rec.Organisation__c != null ? String.valueOf(rec.Organisation__c) : '';
+
+            if (rec.Organisation__r != null) {
+                orgName = String.isNotBlank(rec.Organisation__r.WCF_Organizational_Name__c)
+                    ? rec.Organisation__r.WCF_Organizational_Name__c
+                    : rec.Organisation__r.Name;
+            } else if (rec.IndividualApplication__r != null && rec.IndividualApplication__r.Account != null) {
+                orgName = String.isNotBlank(rec.IndividualApplication__r.Account.WCF_Organizational_Name__c)
+                    ? rec.IndividualApplication__r.Account.WCF_Organizational_Name__c
+                    : rec.IndividualApplication__r.Account.Name;
+                if (String.isBlank(orgId) && rec.IndividualApplication__r.AccountId != null) {
+                    orgId = String.valueOf(rec.IndividualApplication__r.AccountId);
+                }
+            }
+
+            dto.orgName         = orgName;
+            dto.orgId           = orgId;
             dto.applicationId   = rec.IndividualApplication__c;
             dto.applicationName = rec.IndividualApplication__r != null
                                 ? rec.IndividualApplication__r.Name
@@ -136,17 +152,24 @@ public without sharing class ComplianceDocumentController {
             SELECT Id, Name, AccountId, Status
             FROM IndividualApplication
             WHERE AccountId = :organisationId
-              AND Status = 'Recommend for Fund'
-             WITH SYSTEM_MODE
+            WITH SYSTEM_MODE
             ORDER BY LastModifiedDate DESC
-            LIMIT 1
+            LIMIT 10
         ];
 
         if (apps.isEmpty()) return null;
 
+        IndividualApplication chosenApp = apps[0];
+        for (IndividualApplication app : apps) {
+            if (app.Status == 'Recommend for Fund' || app.Status == 'Approved') {
+                chosenApp = app;
+                break;
+            }
+        }
+
         ApplicationLinkDTO dto = new ApplicationLinkDTO();
-        dto.recordId        = apps[0].Id;
-        dto.applicationName = apps[0].Name;
+        dto.recordId        = chosenApp.Id;
+        dto.applicationName = chosenApp.Name;
         return dto;
     }
 
@@ -168,14 +191,28 @@ public without sharing class ComplianceDocumentController {
             ? new WCF_Compliance_Document__c()
             : new WCF_Compliance_Document__c(Id = recordId);
 
-        rec.Organisation__c          = organisationId;
-        rec.IndividualApplication__c = String.isNotBlank(applicationId)
-                                     ? applicationId : null;
+        rec.Organisation__c          = String.isNotBlank(organisationId) ? organisationId : null;
+        rec.IndividualApplication__c = String.isNotBlank(applicationId) ? applicationId : null;
+        
+        // Auto-link organisation from application if missing
+        if (rec.Organisation__c == null && rec.IndividualApplication__c != null) {
+            List<IndividualApplication> linkedApps = [
+                SELECT AccountId FROM IndividualApplication 
+                WHERE Id = :rec.IndividualApplication__c 
+                WITH SYSTEM_MODE LIMIT 1
+            ];
+            if (!linkedApps.isEmpty() && linkedApps[0].AccountId != null) {
+                rec.Organisation__c = linkedApps[0].AccountId;
+            }
+        }
+
         rec.Document_Types__c        = documentTypes;
         rec.Requested_Date__c        = parseDate(requestedDate);
         rec.Due_Date__c              = parseDate(dueDate);
         rec.Priority__c              = priority;
-        rec.Status__c                = 'Pending Submission';
+        if (String.isBlank(recordId) && String.isBlank(rec.Status__c)) {
+            rec.Status__c            = 'Pending Submission';
+        }
         rec.Geography__c             = geography;
         rec.Notes__c                 = notes;
 
@@ -193,42 +230,43 @@ public without sharing class ComplianceDocumentController {
 
     // ─── Organisation Dropdown ──────────────────────────────────────────────
 
- @AuraEnabled(cacheable=true)
-public static List<Map<String, String>> getOrganisationOptions() {
-    List<Map<String, String>> opts = new List<Map<String, String>>();
+    @AuraEnabled(cacheable=false)
+    public static List<Map<String, String>> getOrganisationOptions() {
+        List<Map<String, String>> opts = new List<Map<String, String>>();
 
-    Set<Id> appsWithDocs = new Set<Id>();
-    for (WCF_Compliance_Document__c doc : [
-        SELECT IndividualApplication__c 
-        FROM WCF_Compliance_Document__c 
-        WHERE IndividualApplication__c != null
-        WITH SECURITY_ENFORCED
-    ]) {
-        appsWithDocs.add(doc.IndividualApplication__c);
+        Set<Id> appsWithDocs = new Set<Id>();
+        for (WCF_Compliance_Document__c doc : [
+            SELECT IndividualApplication__c 
+            FROM WCF_Compliance_Document__c 
+            WHERE IndividualApplication__c != null
+            WITH SYSTEM_MODE
+        ]) {
+            appsWithDocs.add(doc.IndividualApplication__c);
+        }
+
+        for (Account a : [
+            SELECT Id, Name, WCF_Organizational_Name__c
+            FROM Account
+            WHERE Id IN (
+                SELECT AccountId 
+                FROM IndividualApplication 
+                WHERE Status IN ('Recommend for Fund', 'Approved')
+                  AND Id NOT IN :appsWithDocs
+            )
+            WITH SYSTEM_MODE
+            ORDER BY Name ASC
+        ]) {
+            String label = String.isNotBlank(a.WCF_Organizational_Name__c)
+                ? a.WCF_Organizational_Name__c
+                : a.Name;
+            opts.add(new Map<String, String>{
+                'value' => a.Id,
+                'label' => label
+            });
+        }
+
+        return opts;
     }
-
-    for (Account a : [
-        SELECT Id, Name, WCF_Organizational_Name__c
-        FROM Account
-        WHERE Id IN (
-            SELECT AccountId 
-            FROM IndividualApplication 
-            WHERE Status = 'Recommend for Fund'
-              AND Id NOT IN :appsWithDocs
-        )
-        WITH SECURITY_ENFORCED
-        ORDER BY Name ASC
-    ]) {
-        opts.add(new Map<String, String>{
-            'value' => a.Id,
-            'label' => String.isNotBlank(a.WCF_Organizational_Name__c)
-                       ? a.WCF_Organizational_Name__c
-                       : a.Name
-        });
-    }
-
-    return opts;
-}
 
     // ─── Document Review Details & Decisions ────────────────────────────────
 

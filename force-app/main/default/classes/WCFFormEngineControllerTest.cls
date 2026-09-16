@@ -169,4 +169,21 @@ private class WCFFormEngineControllerTest {
         System.assertEquals(true, draft.isSuccess);
         System.assertEquals(app.Id, draft.recordId);
     }
+
+    @IsTest
+    static void testLivelihoodTrackFlow() {
+        List<String> luTracks = new List<String>{ 'LIVELIHOOD' };
+        String payload = '{"Organization_Name__c":"Livelihood Org","Work_Email_ID__c":"lu@example.com","Submitter_Name__c":"LU Submitter"}';
+        
+        Test.startTest();
+        WCFFormEngineController.SaveResult result = WCFFormEngineController.saveDynamicDraft(null, luTracks, payload);
+        Test.stopTest();
+        
+        System.assertEquals(true, result.isSuccess);
+        IndividualApplication app = [SELECT Id, Organizational_Area_s_for_Funding_Inves__c FROM IndividualApplication WHERE Id = :result.recordId];
+        System.assertEquals('Livelihood Upliftment', app.Organizational_Area_s_for_Funding_Inves__c);
+
+        WCFFormEngineController.DynamicDraftWrapper draft = WCFFormEngineController.getDynamicDraft(app.Id);
+        System.assertEquals(true, draft.selectedTracks.contains('LIVELIHOOD'));
+    }
 }

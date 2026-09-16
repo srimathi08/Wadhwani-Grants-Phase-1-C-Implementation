@@ -31,14 +31,38 @@ const QUESTION_FIELD_MAP = {
 
 export default class WcfReviewerFormPreview extends LightningElement {
 
-    @api reviewId;
-    @api outcomeDeveloperName;
+    _reviewId;
+    _outcomeDeveloperName = 'JF';
+    _connected = false;
+
+    @api
+    get reviewId() {
+        return this._reviewId;
+    }
+    set reviewId(val) {
+        this._reviewId = val;
+        if (this._connected && val) {
+            this.loadData();
+        }
+    }
+
+    @api
+    get outcomeDeveloperName() {
+        return this._outcomeDeveloperName;
+    }
+    set outcomeDeveloperName(val) {
+        this._outcomeDeveloperName = val || 'JF';
+        if (this._connected) {
+            this.loadData();
+        }
+    }
 
     @track reviewRecord = null;
     @track categories = [];
-    @track isLoading    = true;
+    @track isLoading  = true;
 
     connectedCallback() {
+        this._connected = true;
         this.loadData();
     }
 
@@ -46,8 +70,8 @@ export default class WcfReviewerFormPreview extends LightningElement {
         this.isLoading = true;
         try {
             const [metaRes, reviewRes] = await Promise.all([
-                getReviewerFormV5Metadata({ trackName: this.outcomeDeveloperName }),
-                this.reviewId ? getReviewData({ reviewId: this.reviewId }) : null
+                getReviewerFormV5Metadata({ trackName: this._outcomeDeveloperName }),
+                this._reviewId ? getReviewData({ reviewId: this._reviewId }) : null
             ]);
 
             if (metaRes && metaRes.success && metaRes.categories) {

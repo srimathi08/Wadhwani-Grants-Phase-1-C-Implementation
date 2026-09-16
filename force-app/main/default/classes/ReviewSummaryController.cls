@@ -86,7 +86,8 @@ public with sharing class ReviewSummaryController {
         // ("Not Started") are still included, not just ones that already
         // have an ApplicationReview row.
         List<IndividualApplication> apps = [
-            SELECT Id, Name, Account.Name, RecordType.Name, Headquarters_City_and_Country__c,Status
+            SELECT Id, Name, Account.Name, RecordType.Name, Headquarters_City_and_Country__c, Status,
+                   Organizational_Area_s_for_Funding_Inves__c, Organizational_Area_s_for_Funding_Inves1__c
             FROM IndividualApplication
            WHERE Status IN (
         'Under Review',
@@ -224,6 +225,10 @@ if (ia.Status == 'Reviewer Rejected') {
 
 item.dueDate      = dueDate != null ? String.valueOf(dueDate) : null;
 item.headquarters = ia.Headquarters_City_and_Country__c;
+String rawTrack   = String.isNotBlank(ia.Organizational_Area_s_for_Funding_Inves1__c)
+    ? ia.Organizational_Area_s_for_Funding_Inves1__c
+    : ia.Organizational_Area_s_for_Funding_Inves__c;
+item.track        = WCF_ReviewFormJFController.resolveTrackCodes(rawTrack);
             result.add(item);
             count++;
         }
@@ -239,6 +244,7 @@ item.headquarters = ia.Headquarters_City_and_Country__c;
         @AuraEnabled public String status;
         @AuraEnabled public String dueDate;
         @AuraEnabled public String headquarters; // ADD THIS
-         @AuraEnabled public Boolean isRejected;
+        @AuraEnabled public Boolean isRejected;
+        @AuraEnabled public String track;
     }
 }

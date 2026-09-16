@@ -26,6 +26,7 @@ public with sharing class RecordTypeHelper {
 
     // ── ApplicationReview ──
     public static final Set<String> APPLICATION_REVIEW_TYPES = new Set<String>{
+        'WG_Reviewer',
         'WCF_Job_Creation_Review',
         'WCF_Job_Fulfillment',
         'WCF_Job_Fulfillment_Job_Creation',
@@ -34,6 +35,7 @@ public with sharing class RecordTypeHelper {
 
     // Subset used by the reviewer-side (non-validator) flows
     public static final Set<String> APPLICATION_REVIEW_REVIEWER_TYPES = new Set<String>{
+        'WG_Reviewer',
         'WCF_Job_Creation_Review',
         'WCF_Job_Fulfillment',
         'WCF_Job_Fulfillment_Job_Creation'
@@ -41,6 +43,7 @@ public with sharing class RecordTypeHelper {
 
     // ── ApplicationDecision ──
     public static final Set<String> APPLICATION_DECISION_TYPES = new Set<String>{
+        'WG_Approver',
         'Approver'   //WF_Approver
     };
 
@@ -95,12 +98,20 @@ public with sharing class RecordTypeHelper {
         return getRecordTypeIds('ApplicationReview', APPLICATION_REVIEW_REVIEWER_TYPES);
     }
 
+    public static Id applicationReviewWgReviewerId() {
+        return getRecordTypeId('ApplicationReview', 'WG_Reviewer');
+    }
+
     public static Id applicationReviewValidatorId() {
         return getRecordTypeId('ApplicationReview', 'WCF_Validator');
     }
 
     public static Set<Id> applicationDecisionAllowedIds() {
         return getRecordTypeIds('ApplicationDecision', APPLICATION_DECISION_TYPES);
+    }
+
+    public static Id applicationDecisionWgApproverId() {
+        return getRecordTypeId('ApplicationDecision', 'WG_Approver');
     }
 
     public class RecordTypeHelperException extends Exception {}

@@ -60,6 +60,8 @@
 }
 .comp-overall-badge--complete   { background-color: #d4f4e2; color: #04844b; }
 .comp-overall-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
+.comp-overall-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
+.comp-overall-badge--pending    { background-color: #ecebea; color: #514f4d; }
 .comp-overall-badge--refresh    { background-color: #fdecea; color: #c23934; }
 .comp-overall-badge--rejected   { background-color: #fdecea; color: #c23934; }
 .comp-overall-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
@@ -105,6 +107,7 @@
     white-space: nowrap;
 }
 .comp-badge--pending    { background-color: #ecebea; color: #514f4d; }
+.comp-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
 .comp-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
 .comp-badge--active     { background-color: #d4f4e2; color: #04844b; }
 .comp-badge--returned   { background-color: #fdecea; color: #c23934; }
@@ -235,4 +238,46 @@
 .footer-note {
     font-weight: 500;
     margin-top: 0.5rem !important;
+}
+
+/* Bottom Action Footer (Save Draft & Submit) */
+.comp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.25rem;
+    margin: 1.25rem 0 0 0;
+    border-top: 1px solid #dddbda;
+    background-color: #fbfbfb;
+    border-radius: 0 0 4px 4px;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.comp-footer-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.comp-footer-count {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #181818;
+}
+
+.comp-footer-hint {
+    font-size: 0.8rem;
+    color: #706e6b;
+}
+
+.comp-footer-hint--ready {
+    color: #04844b;
+    font-weight: 600;
+}
+
+.comp-footer-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }

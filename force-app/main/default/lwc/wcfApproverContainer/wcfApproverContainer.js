@@ -13,7 +13,9 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     @track applicationId        = null;
     @track reviewId             = null;
     @track appName              = '';
-    @track outcomeDeveloperName = 'WCF_Job_Fulfillment_Job_Creation';
+    @track track                = '';
+    @track trackLabel           = '';
+    @track outcomeDeveloperName = 'JF';
 
     @track comment          = '';
     @track pendingDecision  = null;
@@ -36,13 +38,13 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     @track leftPaneWidth  = 50; // percent
 
     // ── NEW tracked state ──
-@track isBackFromReviewer = false;
-@track priorReturnComment = '';
-@track priorReturnDate    = null;
-@track reviewerComment = '';
-@track rejectionReasonOptions = [];
-@track selectedReasons = [];   // array of picklist values
-@track priorRejectionReasons = '';
+    @track isBackFromReviewer = false;
+    @track priorReturnComment = '';
+    @track priorReturnDate    = null;
+    @track reviewerComment = '';
+    @track rejectionReasonOptions = [];
+    @track selectedReasons = [];   // array of picklist values
+    @track priorRejectionReasons = '';
 
     constructor() {
         super();
@@ -73,6 +75,9 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
         this.applicationId = pageRef.state?.applicationId || null;
         this.reviewId      = pageRef.state?.reviewId      || null;
         this.appName       = pageRef.state?.appName       || '';
+        this.track         = pageRef.state?.track         || 'JF';
+        this.trackLabel    = pageRef.state?.trackLabel    || '';
+        this.outcomeDeveloperName = this.track;
 
         if (this.applicationId) {
             await this._loadExistingDecision();
@@ -114,15 +119,28 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
         } catch(e) {
             console.error('Could not load existing decision', e);
         }
-try {
-    this.rejectionReasonOptions = await getApproverRejectionReasonOptions();
-} catch (e) {
-    console.error('Could not load rejection reasons', e);
-}
+        try {
+            this.rejectionReasonOptions = await getApproverRejectionReasonOptions();
+        } catch (e) {
+            console.error('Could not load rejection reasons', e);
+        }
+    }
+
+    get trackBadges() {
+        if (!this.track) return [];
+        return this.track.split(',').map(t => {
+            const code = t.trim();
+            let badgeClass = 'track-badge';
+            if (code === 'JF') badgeClass += ' track-jf';
+            else if (code === 'JC') badgeClass += ' track-jc';
+            else if (code === 'LU') badgeClass += ' track-lu';
+            else if (code === 'Both') badgeClass += ' track-both';
+            return { code, badgeClass };
+        });
     }
 
     // ── NEW getter for the date display ──
-get priorReturnDateFormatted() {
+    get priorReturnDateFormatted() {
     if (!this.priorReturnDate) return '';
     return new Date(this.priorReturnDate).toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric'

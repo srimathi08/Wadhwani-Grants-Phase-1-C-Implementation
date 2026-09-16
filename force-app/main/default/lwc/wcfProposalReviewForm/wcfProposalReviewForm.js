@@ -16,6 +16,7 @@ const RATING_LABEL = { 5: 'Very strong', 4: 'Strong', 3: 'Adequate', 2: 'Weak', 
 
 const OUTCOME_JF   = 'WCF_Job_Fulfillment';
 const OUTCOME_JC   = 'WCF_Job_Creation_Review';
+const OUTCOME_LU   = 'WCF_Livelihood_Upliftment';
 const OUTCOME_BOTH = 'WCF_Job_Fulfillment_Job_Creation';
 
 const REC_STRONGLY   = 'Strongly Recommend';
@@ -49,245 +50,63 @@ const ALWAYS_ALLOWED_KEYS = new Set([
     'Enter'
 ]);
 
-// Map of question IDs to ApplicationReview physical fields for backwards compatibility
-const QUESTION_FIELD_MAP = {
-    '1.1': { rating: 'D1_Governance_Rating__c', comment: 'D1_Governance_Comment__c' },
-    '1.2': { rating: 'D1_Leadership_Rating__c', comment: 'D1_Leadership_Comment__c' },
-    '1.3': { rating: 'D1_FinancialRecords_Rating__c', comment: 'D1_FinancialRecords_Comment__c' },
-    '1.4': { rating: 'D1_SustainabilityVision_Rating__c', comment: 'D1_SustainabilityVision_Comment__c' },
-    '2.1': { rating: 'D2_ProgramAlignment_Rating__c', comment: 'D2_ProgramAlignment_Comment__c' },
-    '2.2': { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' },
-    '2.3': { rating: 'D2_OperationalDepth_Rating__c', comment: 'D2_OperationalDepth_Comment__c' },
-    '3.1': { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' },
-    '3.2': { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' },
-    '3.3': { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' },
-    '3.4': { rating: 'D3_ValidationEvidence_Rating__c', comment: 'D3_ValidationEvidence_Comment__c' },
-    '4.1': { rating: 'D4_MandateFit_Rating__c', comment: 'D4_MandateFit_Comment__c' },
-    '4.2': { rating: 'D4_Geography_Rating__c', comment: 'D4_Geography_Comment__c' },
-    '4.3': { rating: 'D4_GenieAI_Rating__c', comment: 'D4_GenieAI_Comment__c' },
-    '5.1': { rating: 'D5_FinancialStability_Rating__c', comment: 'D5_FinancialStability_Comment__c' },
-    '5.2': { rating: 'D5_IncrementEstimate_Rating__c', comment: 'D5_IncrementEstimate_Comment__c' },
-    '5.3': { rating: 'D5_OperatingInfra_Rating__c', comment: 'D5_OperatingInfra_Comment__c' },
-    '6.1': { rating: 'D6_MEFunction_Rating__c', comment: 'D6_MEFunction_Comment__c' },
-    '6.2': { rating: 'D6_ExternalVerification_Rating__c', comment: 'D6_ExternalVerification_Comment__c' },
-    '6.3': { rating: 'D6_LongitudinalTracking_Rating__c', comment: 'D6_LongitudinalTracking_Comment__c' },
-    '7.1': { rating: 'D5_RationaleCredibility_Rating__c', comment: 'D5_Rationale_Credibility_Comment__c' },
-    '7.2': { rating: 'D2_JC_SupportModel_Rating__c', comment: 'D2_JC_SupportModel_Comment__c' }
-};
+/**
+ * Dynamic physical field mapping resolver based on question ID and active track.
+ * Newly created custom metadata questions without a physical field mapping
+ * will automatically and seamlessly store in Decision_Rationale__c JSON.
+ */
+function resolvePhysicalFields(qId, track) {
+    const normTrack = (track || '').toUpperCase();
+    const isJC = normTrack.includes('CREATION') || normTrack === 'JC';
+    const isLU = normTrack.includes('LIVELIHOOD') || normTrack.includes('UPLIFTMENT') || normTrack === 'LU';
 
-// Initial built-in 7 Categories & 22 Questions to ensure instant non-empty rendering
-const FALLBACK_CATEGORIES = [
-    {
-        categoryNumber: 1,
-        title: 'Institutional Credibility',
-        lede: 'Evaluate the founding governance, leadership integrity, financial stewardship, and strategic sustainability vision.',
-        sequence: 1,
-        questions: [
-            {
-                questionId: '1.1',
-                questionText: 'How credible, experienced, and actively involved is the governing board and senior leadership team?',
-                trackAware: false,
-                resolvedDescription: 'Assess board governance, meeting frequency, leadership background, and organizational oversight.',
-                ladder: ['1  Weak governance, no independent board', '2  Occasional board meetings, limited oversight', '3  Regular meetings, standard governance structure', '4  Active and experienced board with strong oversight', '5  Exemplary governance with distinguished independent board']
-            },
-            {
-                questionId: '1.2',
-                questionText: 'Does the organization demonstrate transparent leadership succession, accountability, and key personnel stability?',
-                trackAware: false,
-                resolvedDescription: 'Assess management stability, low turnover in senior roles, and clear accountability structures.',
-                ladder: ['1  High turnover, lack of accountability', '2  Frequent leadership changes with some disruption', '3  Stable leadership with adequate succession awareness', '4  Strong, stable leadership team with clear succession plan', '5  Exceptional leadership stability, culture of excellence and accountability']
-            },
-            {
-                questionId: '1.3',
-                questionText: 'Are statutory audits, compliance filings, and financial records up-to-date and free of major adverse audit remarks?',
-                trackAware: false,
-                resolvedDescription: 'Check statutory audit history, FCRA/12A/80G filings, and unqualified audit reports.',
-                ladder: ['1  Adverse audit remarks or severe non-compliance', '2  Delayed filings or unresolved minor remarks', '3  Compliant with standard filings and clear audit reports', '4  Consistently clean audits with strong internal controls', '5  Flawless multi-year audit history with top-tier accounting standards']
-            },
-            {
-                questionId: '1.4',
-                questionText: 'Does the organization possess a coherent long-term sustainability vision beyond grant reliance?',
-                trackAware: false,
-                resolvedDescription: 'Evaluate diversification of funding, revenue models, government co-funding, and donor retention.',
-                ladder: ['1  100% dependent on short-term single grants', '2  Limited funding diversity with high vulnerability', '3  Moderate donor diversification and basic sustainability vision', '4  Strong multi-channel funding model with high donor retention', '5  Highly sustainable with robust multi-year partnerships and diverse revenue streams']
-            }
-        ]
-    },
-    {
-        categoryNumber: 2,
-        title: 'Operational Maturity',
-        lede: 'Evaluate the operational depth, field delivery mechanics, standardized processes, and distinctiveness.',
-        sequence: 2,
-        questions: [
-            {
-                questionId: '2.1',
-                questionText: 'How mature and standardized are the organization\'s operating processes and curriculum/delivery models?',
-                trackAware: true,
-                resolvedDescription: 'Evaluate standard operating procedures, training modules, quality assurance, and operational guidelines.',
-                ladder: ['1  Ad-hoc, undocumented processes', '2  Partially documented with uneven execution across centers', '3  Standardized operating procedures implemented in most locations', '4  Well-documented, rigorously tested delivery models with continuous improvement', '5  Gold-standard operating model, ISO/industry benchmarked and digitally enabled']
-            },
-            {
-                questionId: '2.2',
-                questionText: 'What is the distinctiveness and competitive advantage of the organization\'s intervention approach?',
-                trackAware: true,
-                resolvedDescription: 'Assess unique value proposition, employer partnerships, pedagogical innovation, or specialized support mechanics.',
-                ladder: ['1  Generic model with no clear differentiation', '2  Minor differentiation with limited competitive advantage', '3  Demonstrated value proposition recognized by local stakeholders', '4  Distinctive model with proprietary methodology and high employer traction', '5  Pioneering, best-in-class innovation that sets new standards in the sector']
-            },
-            {
-                questionId: '2.3',
-                questionText: 'How robust is the organization\'s operational footprint, physical/digital delivery infrastructure, and field team capability?',
-                trackAware: false,
-                resolvedDescription: 'Review center infrastructure, trainer-to-trainee ratios, tech platform adoption, and field staffing.',
-                ladder: ['1  Inadequate infrastructure, under-resourced field staff', '2  Basic facilities with noticeable constraints', '3  Adequate infrastructure meeting standard delivery needs', '4  High-quality infrastructure with well-trained, competent field personnel', '5  State-of-the-art hybrid infrastructure with exceptional field capacity and high digital enablement']
-            }
-        ]
-    },
-    {
-        categoryNumber: 3,
-        title: 'Outcome Track Record',
-        lede: 'Assess past execution track record, verified placement/creation scale, retention rates, and unit economics.',
-        sequence: 3,
-        questions: [
-            {
-                questionId: '3.1',
-                questionText: 'What is the historical track record of candidate placement or enterprise creation over the last 2–3 fiscal years?',
-                trackAware: true,
-                resolvedDescription: 'Examine verified placement/enterprise numbers against targets across recent years.',
-                ladder: ['1  Track record < 50% of stated targets or unverified', '2  Moderate delivery with significant target shortfalls (50–70%)', '3  Consistent delivery meeting 70–85% of stated targets', '4  Strong delivery achieving 85–100% of targets with verified proof', '5  Outstanding track record exceeding targets (>100%) with robust third-party verification']
-            },
-            {
-                questionId: '3.2',
-                questionText: 'What is the verified retention or survival rate at 3/6 months post-placement or venture launch?',
-                trackAware: true,
-                resolvedDescription: 'Evaluate post-placement retention tracking (offer letters, salary slips, provident fund records) or enterprise survival.',
-                ladder: ['1  Retention rate < 40% or not tracked', '2  Retention rate 40–55% with informal tracking', '3  Retention rate 55–70% backed by basic documentation', '4  Retention rate 70–85% systematically tracked and verified', '5  Exceptional retention rate >85% with comprehensive longitudinal documentation']
-            },
-            {
-                questionId: '3.3',
-                questionText: 'Are the unit economics and cost per placement/creation benchmarked efficiently relative to sector norms?',
-                trackAware: true,
-                resolvedDescription: 'Analyze cost per beneficiary, cost per placement, and budgetary efficiency relative to geographic norms.',
-                ladder: ['1  Significantly inflated unit cost without justification', '2  Higher than average unit costs with limited efficiency', '3  Unit cost within reasonable sector benchmarks', '4  Highly cost-effective model with strong unit economics', '5  Industry benchmark in efficiency and high return on grant capital']
-            },
-            {
-                questionId: '3.4',
-                questionText: 'What depth of empirical validation evidence (offer letters, salary slips, PF records) is provided?',
-                trackAware: false,
-                resolvedDescription: 'Review documentation rigor supporting reported outcomes.',
-                ladder: ['1  No documentary evidence provided', '2  Self-reported spreadsheets without primary proofs', '3  Sample proof of documentation (10–25% verified)', '4  Comprehensive documentation provided for majority of cohort (>60%)', '5  100% auditable proof including salary credits, bank statements, or official PF data']
-            }
-        ]
-    },
-    {
-        categoryNumber: 4,
-        title: 'Alignment with WCF Priorities',
-        lede: 'Examine alignment with WCF mandate, geographic clusters, marginalized group inclusion, and technology readiness.',
-        sequence: 4,
-        questions: [
-            {
-                questionId: '4.1',
-                questionText: 'How tightly does the proposed program align with WCF\'s core mandate of wage employment and sustainable livelihoods?',
-                trackAware: false,
-                resolvedDescription: 'Check whether program objectives directly advance formal wage jobs, high-growth employment, or sustainable income enhancement.',
-                ladder: ['1  Misaligned with core WCF grant objectives', '2  Peripheral alignment with indirect outcome link', '3  Direct alignment with standard WCF outcome expectations', '4  Strong, tightly integrated alignment across all target outcomes', '5  Perfect alignment serving as an ideal flagship model for WCF priorities']
-            },
-            {
-                questionId: '4.2',
-                questionText: 'Does the program target priority geographic regions, underserved clusters, or marginalized beneficiary groups?',
-                trackAware: false,
-                resolvedDescription: 'Review focus on Tier 2/3 cities, aspirational districts, women, PwD, and economically disadvantaged youth.',
-                ladder: ['1  No specific focus on underserved groups or priority areas', '2  Marginal representation of vulnerable populations (<20%)', '3  Adequate representation in line with standard demographics (20–40%)', '4  High representation (>50%) of marginalized groups / Tier 2/3 clusters', '5  Deep focus on most vulnerable segments (>75%) in high-priority underserved clusters']
-            },
-            {
-                questionId: '4.3',
-                questionText: 'How prepared is the applicant to adopt and integrate WCF digital tools (e.g. Genie AI, digital LMS, tracking portals)?',
-                trackAware: false,
-                resolvedDescription: 'Assess tech appetite, existing digital systems, staff digital literacy, and readiness for AI/portal integration.',
-                ladder: ['1  Resistant to tech adoption, purely manual operations', '2  Low tech capability with high friction to system integration', '3  Standard tech infrastructure, willing and capable of tool adoption', '4  Strong digital adoption with eager leadership and tech-savvy staff', '5  Advanced digital ecosystem, fully ready for seamless AI and platform integration']
-            }
-        ]
-    },
-    {
-        categoryNumber: 5,
-        title: 'Absorptive Capacity',
-        lede: 'Assess financial health, realistic growth velocity, operational scaling feasibility, and risk mitigation.',
-        sequence: 5,
-        questions: [
-            {
-                questionId: '5.1',
-                questionText: 'Is the organization financially resilient with healthy operating reserves and manageable liabilities?',
-                trackAware: false,
-                resolvedDescription: 'Examine reserve months, debt-to-asset ratio, annual revenue stability, and co-funding commitments.',
-                ladder: ['1  High financial distress, severe working capital deficit', '2  Low reserves (< 2 months) and high funding volatility', '3  Healthy operating reserves (3–6 months) and balanced liabilities', '4  Strong financial position with 6–12 months operating runway', '5  Extremely sound financial footing with substantial reserves and diversified cashflows']
-            },
-            {
-                questionId: '5.2',
-                questionText: 'Is the proposed incremental scale realistic relative to the organization\'s historical growth trajectory?',
-                trackAware: false,
-                resolvedDescription: 'Assess requested grant volume and beneficiary increment (e.g. < 2x historical capacity vs 5x unrealistic surge).',
-                ladder: ['1  Unrealistic surge (>5x historical capacity) without infrastructure', '2  Aggressive targets with high risk of operational bottlenecks', '3  Realistic scale (1.5x–2x) within feasible expansion capacity', '4  Well-calibrated, phased expansion plan with clear milestone markers', '5  Prudently paced expansion with pre-existing ready capacity and proven scale mechanics']
-            },
-            {
-                questionId: '5.3',
-                questionText: 'Does the organization have the management infrastructure to absorb and deploy the requested budget effectively?',
-                trackAware: false,
-                resolvedDescription: 'Review project management capacity, finance team size, HR recruitment speed, and monitoring resources.',
-                ladder: ['1  Severe management deficit, inability to manage grant budget', '2  Constrained management bandwidth requiring significant external support', '3  Adequate team and systems to handle proposed grant size', '4  Robust project management office with dedicated program managers', '5  Enterprise-grade grant management capacity and proven multi-crore execution systems']
-            }
-        ]
-    },
-    {
-        categoryNumber: 6,
-        title: 'Measurement Readiness',
-        lede: 'Review monitoring and evaluation (M&E) systems, data integrity protocols, external audit readiness, and longitudinal tracking.',
-        sequence: 6,
-        questions: [
-            {
-                questionId: '6.1',
-                questionText: 'How robust, digitized, and audit-ready are the organization\'s internal M&E data collection systems?',
-                trackAware: false,
-                resolvedDescription: 'Evaluate MIS software, real-time attendance, digital beneficiary tracking, and verification workflows.',
-                ladder: ['1  No dedicated M&E system, manual error-prone records', '2  Basic spreadsheets with periodic manual checks', '3  Functional MIS with standard data validation checks', '4  Advanced digital M&E system with real-time dashboards and audit trails', '5  Cutting-edge automated M&E system with API integration and tamper-proof verification']
-            },
-            {
-                questionId: '6.2',
-                questionText: 'Has the organization successfully undergone external impact evaluations or third-party verification audits?',
-                trackAware: false,
-                resolvedDescription: 'Check past evaluations by external agencies, government monitoring reports, or independent reviews.',
-                ladder: ['1  No external evaluation or audit experience', '2  Informal donor feedback without rigorous external study', '3  At least one third-party evaluation with positive findings', '4  Multiple rigorous independent evaluations confirming high outcome fidelity', '5  Routinely audited by leading global/national evaluation bodies with stellar findings']
-            },
-            {
-                questionId: '6.3',
-                questionText: 'Is there an established process for longitudinal tracking of beneficiary career progression and income growth?',
-                trackAware: false,
-                resolvedDescription: 'Assess mechanism to track candidates at 6, 12, and 24 months post-program.',
-                ladder: ['1  No post-program tracking mechanism', '2  Informal, sporadic contact with alumni', '3  Standard 6-month tracking protocol with reasonable response rates', '4  Systematic 12-month longitudinal tracking with verified wage progression data', '5  Comprehensive multi-year alumni tracking ecosystem with strong community engagement']
-            }
-        ]
-    },
-    {
-        categoryNumber: 7,
-        title: 'Use of WCF Funds & Support Model',
-        lede: 'Evaluate budget line-item justification, capital allocation efficiency, non-financial support needs, and co-funding leverage.',
-        sequence: 7,
-        questions: [
-            {
-                questionId: '7.1',
-                questionText: 'How credible, justified, and transparent is the itemized budget allocation for the requested WCF funds?',
-                trackAware: false,
-                resolvedDescription: 'Review direct vs indirect cost ratio, salary benchmarks, capital expenditure, and compliance with WCF cost caps.',
-                ladder: ['1  Vague, unjustified budget lines with excessive administrative overhead', '2  High overheads or unconvincing line items requiring major revisions', '3  Reasonable budget allocation with standard overheads (<15%)', '4  Highly transparent, value-optimized budget with strong direct cost orientation', '5  Meticulously costed budget with maximum direct beneficiary impact and zero waste']
-            },
-            {
-                questionId: '7.2',
-                questionText: 'How effectively will the organization leverage WCF\'s non-financial support (mentorship, tech, networks) and co-funding?',
-                trackAware: false,
-                resolvedDescription: 'Assess clear strategy to utilize WCF strategic inputs, employer connects, and catalytic co-investor funding.',
-                ladder: ['1  Interest only in financial grant, indifferent to advisory/network support', '2  Limited plan to leverage non-financial support', '3  Clear understanding and receptivity to WCF advisory and network inputs', '4  Proactive strategy to leverage WCF ecosystem, tech tools, and co-funders', '5  Strategic partnership vision maximizing catalytic multiplier effects and co-investment']
-            }
-        ]
+    if (qId === '1.1') return { rating: 'D1_Governance_Rating__c', comment: 'D1_Governance_Comment__c' };
+    if (qId === '1.2') return { rating: 'D1_Leadership_Rating__c', comment: 'D1_Leadership_Comment__c' };
+    if (qId === '1.3') return { rating: 'D1_FinancialRecords_Rating__c', comment: 'D1_FinancialRecords_Comment__c' };
+    if (qId === '1.4') return { rating: 'D1_SustainabilityVision_Rating__c', comment: 'D1_SustainabilityVision_Comment__c' };
+
+    if (qId === '2.1') return { rating: 'D2_ProgramAlignment_Rating__c', comment: 'D2_ProgramAlignment_Comment__c' };
+    if (qId === '2.2') {
+        if (isLU) return { rating: 'D2_LU_Distinctiveness_Rating__c', comment: 'D2_LU_Distinctiveness_Comment__c' };
+        if (isJC) return { rating: 'D2_JC_Distinctiveness_Rating__c', comment: 'D2_JC_Distinctiveness_Comment__c' };
+        return { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' };
     }
-];
+    if (qId === '2.3') return { rating: 'D2_OperationalDepth_Rating__c', comment: 'D2_OperationalDepth_Comment__c' };
+
+    if (qId === '3.1') {
+        if (isLU) return { rating: 'D3_LU_ScaleRecord_Rating__c', comment: 'D3_LU_ScaleRecord_Comment__c' };
+        if (isJC) return { rating: 'D3_JC_ScaleRecord_Rating__c', comment: 'D3_JC_ScaleRecord_Comment__c' };
+        return { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' };
+    }
+    if (qId === '3.2') {
+        if (isLU) return { rating: 'D3_LU_ConversionRate_Rating__c', comment: 'D3_LU_ConversionRate_Comment__c' };
+        if (isJC) return { rating: 'D3_JC_ConversionRate_Rating__c', comment: 'D3_JC_ConversionRate_Comment__c' };
+        return { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' };
+    }
+    if (qId === '3.3') {
+        if (isLU) return { rating: 'D3_LU_CostPerOutcome_Rating__c', comment: 'D3_LU_CostPerOutcome_Comment__c' };
+        if (isJC) return { rating: 'D3_JC_CostPerJob_Rating__c', comment: 'D3_JC_CostPerJob_Comment__c' };
+        return { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' };
+    }
+    if (qId === '3.4') return { rating: 'D3_ValidationEvidence_Rating__c', comment: 'D3_ValidationEvidence_Comment__c' };
+
+    if (qId === '4.1') return { rating: 'D4_MandateFit_Rating__c', comment: 'D4_MandateFit_Comment__c' };
+    if (qId === '4.2') return { rating: 'D4_Geography_Rating__c', comment: 'D4_Geography_Comment__c' };
+    if (qId === '4.3') return { rating: 'D4_GenieAI_Rating__c', comment: 'D4_GenieAI_Comment__c' };
+
+    if (qId === '5.1') return { rating: 'D5_FinancialStability_Rating__c', comment: 'D5_FinancialStability_Comment__c' };
+    if (qId === '5.2') return { rating: 'D5_IncrementEstimate_Rating__c', comment: 'D5_IncrementEstimate_Comment__c' };
+    if (qId === '5.3') return { rating: 'D5_OperatingInfra_Rating__c', comment: 'D5_OperatingInfra_Comment__c' };
+
+    if (qId === '6.1') return { rating: 'D6_MEFunction_Rating__c', comment: 'D6_MEFunction_Comment__c' };
+    if (qId === '6.2') return { rating: 'D6_ExternalVerification_Rating__c', comment: 'D6_ExternalVerification_Comment__c' };
+    if (qId === '6.3') return { rating: 'D6_LongitudinalTracking_Rating__c', comment: 'D6_LongitudinalTracking_Comment__c' };
+
+    if (qId === '7.1') return { rating: 'D5_RationaleCredibility_Rating__c', comment: 'D5_Rationale_Credibility_Comment__c' };
+    if (qId === '7.2') return { rating: 'D2_JC_SupportModel_Rating__c', comment: 'D2_JC_SupportModel_Comment__c' };
+
+    return null;
+}
 
 export default class WcfProposalReviewForm extends NavigationMixin(LightningElement) {
 
@@ -303,8 +122,8 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     @track outcomeDeveloperName = OUTCOME_BOTH;
     @track outcomeDisplayLabel  = '';
 
-    @track isLoadingMetadata = false;
-    @track categories = FALLBACK_CATEGORIES;
+    @track isLoadingMetadata = true;
+    @track categories = [];
     @track openLadders = {};
 
     @track currentStep     = 0;
@@ -381,7 +200,8 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     loadFormMetadata() {
-        const trackParam = this._incomingTrack || this.outcomeDisplayLabel || null;
+        this.isLoadingMetadata = true;
+        const trackParam = this._incomingTrack || this.outcomeDisplayLabel || this.outcomeDeveloperName || null;
         getReviewerFormV5Metadata({ trackName: trackParam })
             .then(res => {
                 if (res && res.success && res.categories && res.categories.length > 0) {
@@ -390,7 +210,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 this.isLoadingMetadata = false;
             })
             .catch(err => {
-                console.error('Error loading reviewer form metadata (using fallback):', err);
+                console.error('Error loading reviewer form metadata:', err);
                 this.isLoadingMetadata = false;
             });
     }
@@ -433,18 +253,22 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             .then(review => {
                 if (!review) return;
 
-                // Restore ratings and comments from physical fields
-                Object.keys(QUESTION_FIELD_MAP).forEach(qId => {
-                    const fields = QUESTION_FIELD_MAP[qId];
-                    if (review[fields.rating] != null) {
-                        this.ratings = { ...this.ratings, [qId]: parseInt(review[fields.rating], 10) };
-                    }
-                    if (review[fields.comment]) {
-                        this.comments = { ...this.comments, [qId]: review[fields.comment] };
+                // 1. Restore ratings and comments from physical fields
+                const activeTrack = this.outcomeDeveloperName || this._incomingTrack || '';
+                const allQuestions = (this.categories || []).flatMap(c => c.questions || []);
+                allQuestions.forEach(q => {
+                    const mapping = resolvePhysicalFields(q.questionId, activeTrack);
+                    if (mapping) {
+                        if (review[mapping.rating] != null && review[mapping.rating] !== '') {
+                            this.ratings = { ...this.ratings, [q.questionId]: parseInt(review[mapping.rating], 10) };
+                        }
+                        if (review[mapping.comment]) {
+                            this.comments = { ...this.comments, [q.questionId]: review[mapping.comment] };
+                        }
                     }
                 });
 
-                // Also check if structured JSON answers exist in Decision_Rationale__c
+                // 2. Also check if structured JSON answers exist in Decision_Rationale__c
                 if (review.Decision_Rationale__c) {
                     try {
                         const parsed = JSON.parse(review.Decision_Rationale__c);
@@ -505,11 +329,11 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     get totalCategoryCount() {
-        return (this.categories && this.categories.length > 0) ? this.categories.length : 7;
+        return (this.categories && this.categories.length > 0) ? this.categories.length : 0;
     }
 
     get totalStepsDisplay() {
-        // 7 Categories + Strengths/Weaknesses + Recommendation + Review = 10 steps
+        // Dynamic categories count + Strengths/Weaknesses + Recommendation + Review
         return this.totalCategoryCount + 3;
     }
 
@@ -526,7 +350,25 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         return titles[this.currentStep] || '';
     }
 
-    get hasOutcomeType() { return !!this.outcomeDisplayLabel; }
+    get headerTrackBadges() {
+        const raw = this.outcomeDisplayLabel || this.outcomeDeveloperName || this._incomingTrack || '';
+        const lower = raw.toLowerCase();
+        const hasJF = lower.includes('fulfillment') || lower.includes('fulfilment') || lower.includes('jf') || lower.includes('both');
+        const hasJC = lower.includes('creation') || lower.includes('jc') || lower.includes('both');
+        const hasLU = lower.includes('livelihood') || lower.includes('upliftment') || lower.includes('lu');
+
+        const badges = [];
+        if (hasJF) badges.push({ label: 'Job Fulfillment', badgeClass: 'track-badge track-jf' });
+        if (hasJC) badges.push({ label: 'Job Creation', badgeClass: 'track-badge track-jc' });
+        if (hasLU) badges.push({ label: 'Livelihood Upliftment', badgeClass: 'track-badge track-lu' });
+
+        if (badges.length === 0 && raw) {
+            badges.push({ label: raw, badgeClass: 'track-badge' });
+        }
+        return badges;
+    }
+
+    get hasOutcomeType() { return this.headerTrackBadges.length > 0; }
     get currentStepDisplay() { return this.currentStep + 1; }
 
     get isDimStep() {
@@ -684,65 +526,145 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     get isRecPositive() { return POSITIVE_REC_CHOICES.has(this.recChoice); }
     get isRecNegative() { return this.recChoice === REC_DO_NOT; }
-    get isRecChosen()   { return this.recChoice !== null; }
+    get isRecChosen()   { return this.recChoice !== null && this.recChoice !== undefined; }
+    get hasRecChoice()   { return this.isRecChosen; }
 
-    get recOptions() {
-        return [
-            { value: REC_STRONGLY, label: 'Strongly Recommend', desc: 'Outstanding proposal, top-tier institutional capacity, highly verified outcomes' },
-            { value: REC_RECOMMEND, label: 'Recommend', desc: 'Solid proposal meeting all evaluation criteria with manageable risks' },
-            { value: REC_RESERVE, label: 'Recommend with Reservations', desc: 'Recommend funding subject to specific conditions or closer milestone monitoring' },
-            { value: REC_DO_NOT, label: 'Do Not Recommend', desc: 'Significant deficiencies, mandate misalignment, or critical operational concerns' }
-        ].map(opt => ({
-            ...opt,
-            cls: this.recChoice === opt.value ? 'rec-card rec-card-selected' : 'rec-card'
-        }));
+    get recStronglyRecommendClass() {
+        return this.recChoice === REC_STRONGLY ? 'yn rec-sel' : 'yn';
+    }
+    get recRecommendClass() {
+        return this.recChoice === REC_RECOMMEND ? 'yn rec-sel' : 'yn';
+    }
+    get recReservationsClass() {
+        return this.recChoice === REC_RESERVE ? 'yn rec-sel' : 'yn';
+    }
+    get recDoNotRecommendClass() {
+        return this.recChoice === REC_DO_NOT ? 'yn rec-sel-no' : 'yn';
     }
 
-    get strengthRatingBtns() {
+    get showCeoRecommendationYes() {
+        return POSITIVE_REC_CHOICES.has(this.recChoice);
+    }
+    get showCeoRecommendationNo() {
+        return this.recChoice === REC_DO_NOT;
+    }
+
+    get recStrengthBtns() {
         return [5, 4, 3, 2, 1].map(n => ({
             n,
             label: RATING_LABEL[n],
-            cls: this.recStrength === n ? 'seg-sel' : ''
+            yesSelCls: this.recStrength === n ? 'seg-sel' : ''
         }));
     }
 
-    get dimensionSummary() {
+    get recYesWordCountDisplay() {
+        const wc = countWords(this.reviewData.Recommendation_Strength_Comments__c);
+        return `${wc} / ${MAX_WORDS}`;
+    }
+    get recYesWordCountClass() {
+        const wc = countWords(this.reviewData.Recommendation_Strength_Comments__c);
+        return wc >= MAX_WORDS ? 'wc-counter wc-limit' : wc >= MAX_WORDS - 20 ? 'wc-counter wc-near' : 'wc-counter';
+    }
+
+    get rejectionReasonRows() {
+        const defaultOpts = [
+            { label: 'Weak Institutional Credibility & Governance', value: 'Weak Institutional Credibility & Governance' },
+            { label: 'Insufficient Operational Scale & Team Maturity', value: 'Insufficient Operational Scale & Team Maturity' },
+            { label: 'Unverified / Poor Historical Outcome Metrics', value: 'Unverified / Poor Historical Outcome Metrics' },
+            { label: 'Misaligned with WCF Core Strategic Priorities', value: 'Misaligned with WCF Core Strategic Priorities' },
+            { label: 'Lack of Absorptive & Financial Capacity', value: 'Lack of Absorptive & Financial Capacity' },
+            { label: 'Inadequate M&E / Measurement Systems', value: 'Inadequate M&E / Measurement Systems' },
+            { label: 'Unjustified Budget Allocation / Cost Structure', value: 'Unjustified Budget Allocation / Cost Structure' },
+            { label: 'Other', value: 'Other' }
+        ];
+        const opts = (this.rejectionReasonOptions && this.rejectionReasonOptions.length > 0)
+            ? this.rejectionReasonOptions
+            : defaultOpts;
+
+        return opts.map(opt => ({
+            ...opt,
+            checked: this.rejectionReasons.includes(opt.value)
+        }));
+    }
+
+    get showRejectionOther() {
+        return this.rejectionReasons.includes('Other');
+    }
+
+    get rejectionCommentWordCountDisplay() {
+        const wc = countWords(this.reviewData.Rejection_Comment__c);
+        return `${wc} / ${MAX_WORDS}`;
+    }
+    get rejectionCommentWordCountClass() {
+        const wc = countWords(this.reviewData.Rejection_Comment__c);
+        return wc >= MAX_WORDS ? 'wc-counter wc-limit' : wc >= MAX_WORDS - 20 ? 'wc-counter wc-near' : 'wc-counter';
+    }
+
+    // Review Step Getters
+    get overallCalculatedScore() {
+        const validRatings = Object.values(this.ratings).filter(r => r != null && !isNaN(r));
+        if (!validRatings.length) return '—';
+        return (validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length).toFixed(2);
+    }
+
+    get reviewSummaryDims() {
         return (this.categories || []).map(cat => {
             const qs = cat.questions || [];
-            const vals = qs.map(q => this.ratings[q.questionId]).filter(v => v != null);
-            const mean = vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(2) : '—';
+            const catRatings = qs.map(q => this.ratings[q.questionId]).filter(r => r != null);
+            const mean = catRatings.length ? (catRatings.reduce((s, r) => s + r, 0) / catRatings.length).toFixed(2) : '—';
             return {
                 id: cat.categoryNumber,
                 title: cat.title,
                 mean,
-                questions: qs.map(q => {
+                qs: qs.map(q => {
                     const r = this.ratings[q.questionId];
                     const ladderArr = q.ladder || [];
-                    const ladderText = r != null && ladderArr[r - 1] ? ladderArr[r - 1] : '';
                     return {
                         id: q.questionId,
                         text: q.questionText,
-                        rating: r != null ? r : '—',
-                        ratingLabel: r != null ? (RATING_LABEL[r] || r) : 'Not rated',
-                        ladderText,
-                        comment: this.comments[q.questionId] || null,
-                        pipClass: r != null ? `pip pip-r${r}` : 'pip pip-empty'
+                        pipCls: r != null ? `pip pip-r${r}` : 'pip pip-empty',
+                        ratingLabel: r != null ? (RATING_LABEL[r] || `Level ${r}`) : 'Not rated',
+                        ratingNum: r != null ? `(${r}/5)` : '',
+                        ladderText: r != null && ladderArr[r - 1] ? ladderArr[r - 1] : '',
+                        hasComment: !!(this.comments[q.questionId] && this.comments[q.questionId].trim()),
+                        comment: this.comments[q.questionId] || ''
                     };
                 })
             };
         });
     }
 
-    get overallScoreDisplay() {
-        const validMeans = this.dimensionSummary
-            .map(d => parseFloat(d.mean))
-            .filter(v => !isNaN(v));
-        if (!validMeans.length) return '—';
-        return (validMeans.reduce((s, v) => s + v, 0) / validMeans.length).toFixed(2);
+    get reviewStrengths() {
+        return this.strengths.filter(s => s && s.trim());
+    }
+
+    get reviewWeaknesses() {
+        return this.weaknesses.filter(w => w && w.trim());
+    }
+
+    get recValueClass() {
+        return this.recChoice === REC_DO_NOT ? 'recval recval-no' : 'recval recval-yes';
+    }
+
+    get recValueIcon() {
+        return this.recChoice === REC_DO_NOT ? '✕' : '✓';
+    }
+
+    get recChoiceDisplayLabel() {
+        return this.recChoice || 'No Decision Selected';
+    }
+
+    get recStrengthLabel() {
+        return this.recStrength ? `${this.recStrength} - ${RATING_LABEL[this.recStrength] || ''}` : '';
+    }
+
+    get reviewRejectionReasonLabels() {
+        return this.rejectionReasons;
     }
 
     get isAllCompleted() {
         const allQuestions = (this.categories || []).flatMap(c => c.questions || []);
+        if (allQuestions.length === 0) return false;
         const unrated = allQuestions.filter(q => this.ratings[q.questionId] == null);
         const uncommented = allQuestions.filter(q => {
             const r = this.ratings[q.questionId];
@@ -754,32 +676,22 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         return unrated.length === 0 && uncommented.length === 0 && hasS && hasW && hasRec;
     }
 
-    get missingItemsList() {
-        const list = [];
-        (this.categories || []).forEach(c => {
-            (c.questions || []).forEach(q => {
-                if (this.ratings[q.questionId] == null) {
-                    list.push(`Category ${c.categoryNumber} - Q${q.questionId}: Rating missing`);
-                } else if (!(this.comments[q.questionId] || '').trim()) {
-                    list.push(`Category ${c.categoryNumber} - Q${q.questionId}: Justification comment missing`);
-                }
-            });
-        });
-        if (!(this.strengths[0] || '').trim()) list.push('Top Strength #1 missing');
-        if (!(this.weaknesses[0] || '').trim()) list.push('Top Weakness #1 missing');
-        if (!this.recChoice) list.push('Final recommendation missing');
-        return list;
-    }
-
     toggleRubric() {
         this.rubricOpen = !this.rubricOpen;
     }
 
-    handleRatingClick(event) {
+    // Rating Selection Handler
+    handleRating(event) {
         const qId = event.currentTarget.dataset.qid;
-        const val = parseInt(event.currentTarget.dataset.val, 10);
-        this.ratings = { ...this.ratings, [qId]: val };
-        this.autoSave();
+        const val = parseInt(event.currentTarget.dataset.rate || event.currentTarget.dataset.val, 10);
+        if (qId && !isNaN(val)) {
+            this.ratings = { ...this.ratings, [qId]: val };
+            this.validationError = '';
+            this.autoSave();
+        }
+    }
+    handleRatingClick(event) {
+        this.handleRating(event);
     }
 
     handleCommentInput(event) {
@@ -842,19 +754,111 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         this.autoSave();
     }
 
+    handleRecChoice(event) {
+        this.recChoice = event.currentTarget.dataset.rec || event.currentTarget.dataset.val;
+        this.validationError = '';
+        this.autoSave();
+    }
     handleRecCardClick(event) {
-        this.recChoice = event.currentTarget.dataset.val;
-        this.autoSave();
+        this.handleRecChoice(event);
     }
 
+    handleRecStrength(event) {
+        this.recStrength = parseInt(event.currentTarget.dataset.recstr || event.currentTarget.dataset.val, 10);
+        this.validationError = '';
+        this.autoSave();
+    }
     handleRecStrengthClick(event) {
-        this.recStrength = parseInt(event.currentTarget.dataset.val, 10);
-        this.autoSave();
+        this.handleRecStrength(event);
     }
 
+    handleRecCommentInput(event) {
+        let text = event.target.value;
+        if (countWords(text) > MAX_WORDS) {
+            text = truncateToWordLimit(text, MAX_WORDS);
+            event.target.value = text;
+        }
+        this.reviewData = { ...this.reviewData, Recommendation_Strength_Comments__c: text };
+        this.autoSave();
+    }
+    handleRecCommentKeyDown(event) {
+        if (ALWAYS_ALLOWED_KEYS.has(event.key) || event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+        const text = event.target.value;
+        const selStart = event.target.selectionStart;
+        const selEnd   = event.target.selectionEnd;
+        const hasSelection = selStart !== selEnd;
+        if (!hasSelection && countWords(text) >= MAX_WORDS && (event.key === ' ' || event.key.length === 1)) {
+            event.preventDefault();
+        }
+    }
+    handleRecCommentPaste(event) {
+        const pasted = (event.clipboardData || window.clipboardData).getData('text');
+        const current = event.target.value;
+        const selStart = event.target.selectionStart;
+        const selEnd   = event.target.selectionEnd;
+        const combined = current.slice(0, selStart) + pasted + current.slice(selEnd);
+        if (countWords(combined) > MAX_WORDS) {
+            event.preventDefault();
+            const truncated = truncateToWordLimit(combined, MAX_WORDS);
+            event.target.value = truncated;
+            this.reviewData = { ...this.reviewData, Recommendation_Strength_Comments__c: truncated };
+            this.autoSave();
+        }
+    }
+
+    handleRejectionReasonToggle(event) {
+        const val = event.currentTarget.dataset.value || event.target.dataset.value;
+        const checked = event.target.checked;
+        if (checked) {
+            if (!this.rejectionReasons.includes(val)) {
+                this.rejectionReasons = [...this.rejectionReasons, val];
+            }
+        } else {
+            this.rejectionReasons = this.rejectionReasons.filter(v => v !== val);
+        }
+        this.autoSave();
+    }
     handleRejectionReasonChange(event) {
         this.rejectionReasons = event.detail.value;
         this.autoSave();
+    }
+
+    handleRejectionCommentInput(event) {
+        let text = event.target.value;
+        if (countWords(text) > MAX_WORDS) {
+            text = truncateToWordLimit(text, MAX_WORDS);
+            event.target.value = text;
+        }
+        this.reviewData = { ...this.reviewData, Rejection_Comment__c: text };
+        this.autoSave();
+    }
+    handleRejectionCommentKeyDown(event) {
+        if (ALWAYS_ALLOWED_KEYS.has(event.key) || event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+        const text = event.target.value;
+        const selStart = event.target.selectionStart;
+        const selEnd   = event.target.selectionEnd;
+        const hasSelection = selStart !== selEnd;
+        if (!hasSelection && countWords(text) >= MAX_WORDS && (event.key === ' ' || event.key.length === 1)) {
+            event.preventDefault();
+        }
+    }
+    handleRejectionCommentPaste(event) {
+        const pasted = (event.clipboardData || window.clipboardData).getData('text');
+        const current = event.target.value;
+        const selStart = event.target.selectionStart;
+        const selEnd   = event.target.selectionEnd;
+        const combined = current.slice(0, selStart) + pasted + current.slice(selEnd);
+        if (countWords(combined) > MAX_WORDS) {
+            event.preventDefault();
+            const truncated = truncateToWordLimit(combined, MAX_WORDS);
+            event.target.value = truncated;
+            this.reviewData = { ...this.reviewData, Rejection_Comment__c: truncated };
+            this.autoSave();
+        }
     }
 
     handleProgressClick(event) {
@@ -866,21 +870,27 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
     }
 
-    handlePrev() {
+    // Previous button handler
+    prevStep() {
         if (this.currentStep > 0) {
             this.currentStep -= 1;
             this.validationError = '';
+            this.rubricOpen = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
+    handlePrev() {
+        this.prevStep();
+    }
 
-    handleNext() {
+    // Next / Submit button handler
+    nextStep() {
         this.validationError = '';
 
-        // Validate Category Step
+        // Validate Dynamic Category Step (0 to totalCategoryCount - 1)
         if (this.isDimStep) {
             const cat = this.categories[this.currentStep];
-            const qs = cat.questions || [];
+            const qs = (cat && cat.questions) ? cat.questions : [];
             for (let q of qs) {
                 const r = this.ratings[q.questionId];
                 if (r == null) {
@@ -907,22 +917,71 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             }
         }
 
-        // Validate Recommendation Step
+        // Validate Final Recommendation Step
         if (this.isRecStep) {
             if (!this.recChoice) {
                 this.validationError = 'Please select a final recommendation decision.';
                 return;
             }
+            if (this.showCeoRecommendationYes) {
+                if (this.recStrength == null) {
+                    this.validationError = 'Please select a recommendation strength level (1 to 5).';
+                    return;
+                }
+                if (!(this.reviewData.Recommendation_Strength_Comments__c || '').trim()) {
+                    this.validationError = 'Please provide recommendation strength comments.';
+                    return;
+                }
+            }
+            if (this.showCeoRecommendationNo) {
+                if (!this.rejectionReasons || this.rejectionReasons.length === 0) {
+                    this.validationError = 'Please select at least one rejection reason.';
+                    return;
+                }
+                if (!(this.reviewData.Rejection_Comment__c || '').trim()) {
+                    this.validationError = 'Please provide a detailed rejection comment.';
+                    return;
+                }
+            }
         }
 
+        // Submit Step
         if (this.isReviewStep) {
             this.handleSubmit();
             return;
         }
 
+        // Advance to next step
         this.currentStep += 1;
         this.rubricOpen = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    handleNext() {
+        this.nextStep();
+    }
+
+    // Manual Save Draft button handler
+    handleSaveDraft() {
+        if (!this._applicationId) return;
+        this.saveStateText  = 'Saving…';
+        this.saveStateClass = 'save-saving';
+
+        const payload = this.buildReviewPayload(false);
+        saveDraftReview({ reviewDataJson: JSON.stringify(payload) })
+            .then(saved => {
+                if (saved && saved.Id) {
+                    this.reviewData.Id = saved.Id;
+                }
+                this.saveStateText  = 'Saved · just now';
+                this.saveStateClass = 'save-idle';
+                this.showToast('Success', 'Draft saved successfully.', 'success');
+            })
+            .catch(err => {
+                console.error('Draft manual save error:', err);
+                this.saveStateText  = 'Save error';
+                this.saveStateClass = 'save-error';
+                this.showToast('Error', 'Failed to save draft.', 'error');
+            });
     }
 
     handleUploadFinished(event) {
@@ -961,8 +1020,18 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         });
     }
 
+    handleBackToDashboard() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: '/reviewersite/s/wcf-reviewer-application-list?role=reviewer'
+            }
+        });
+    }
+
     // Build structured payload for saving
     buildReviewPayload(isFinalSubmit) {
+        const activeTrack = this.outcomeDeveloperName || this._incomingTrack || '';
         const payload = {
             ...this.reviewData,
             ApplicationId: this._applicationId,
@@ -974,23 +1043,26 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             Rejection_Reasons__c: this.rejectionReasons.join(';')
         };
 
-        // Populate physical fields for standard reporting
-        Object.keys(QUESTION_FIELD_MAP).forEach(qId => {
-            const mapping = QUESTION_FIELD_MAP[qId];
-            if (this.ratings[qId] != null) {
-                payload[mapping.rating] = String(this.ratings[qId]);
-            }
-            if (this.comments[qId] != null) {
-                payload[mapping.comment] = this.comments[qId];
-            }
-        });
-
-        // Pack full structured answers in Decision_Rationale__c
+        // Populate physical fields dynamically based on active track
         const structuredAnswers = [];
         (this.categories || []).forEach(cat => {
             (cat.questions || []).forEach(q => {
                 const ladderArr = q.ladder || [];
                 const r = this.ratings[q.questionId];
+                const c = this.comments[q.questionId] || '';
+
+                // Map physical fields if available
+                const mapping = resolvePhysicalFields(q.questionId, activeTrack);
+                if (mapping) {
+                    if (r != null) {
+                        payload[mapping.rating] = String(r);
+                    }
+                    if (c) {
+                        payload[mapping.comment] = c;
+                    }
+                }
+
+                // Append full structured answer to JSON array
                 structuredAnswers.push({
                     questionId: q.questionId,
                     categoryNumber: cat.categoryNumber,
@@ -998,10 +1070,12 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                     questionText: q.questionText,
                     rating: r != null ? r : null,
                     ladderLevelText: r != null && ladderArr[r - 1] ? ladderArr[r - 1] : '',
-                    comment: this.comments[q.questionId] || ''
+                    comment: c
                 });
             });
         });
+
+        // Pack full structured answers in Decision_Rationale__c for zero-loss persistence
         payload.Decision_Rationale__c = JSON.stringify(structuredAnswers);
 
         return payload;
@@ -1040,7 +1114,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const payload = this.buildReviewPayload(true);
         saveApplicationReview({ reviewDataJson: JSON.stringify(payload) })
             .then(res => {
-                if (res && res.success) {
+                if (res && res.isSuccess) {
                     this.showToast('Success', 'Evaluation submitted successfully!', 'success');
                     this.showForm = false;
                     this.submitted = true;

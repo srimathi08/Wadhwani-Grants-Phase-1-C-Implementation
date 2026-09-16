@@ -92,9 +92,10 @@ public without sharing class WCFFormMetadataController {
     private static List<TrackWrapper> getTracks(String languageCode) {
         List<TrackWrapper> tracks = new List<TrackWrapper>();
         List<RFI_Track__mdt> records = [
-            SELECT DeveloperName, Track_Code__c, Is_Active__c
+            SELECT MasterLabel, DeveloperName, Track_Code__c, Sequence__c, Is_Active__c
             FROM RFI_Track__mdt
             WHERE Is_Active__c = true
+            ORDER BY Sequence__c ASC NULLS LAST, DeveloperName ASC
         ];
         
         if (!records.isEmpty()) {
@@ -102,9 +103,9 @@ public without sharing class WCFFormMetadataController {
             for (RFI_Track__mdt r : records) {
                 TrackWrapper t = new TrackWrapper();
                 t.code = String.isNotBlank(r.Track_Code__c) ? r.Track_Code__c : r.DeveloperName;
-                t.label = t.code;
-                t.description = t.code;
-                t.sequence = seq++;
+                t.label = String.isNotBlank(r.MasterLabel) ? r.MasterLabel : t.code;
+                t.description = t.label;
+                t.sequence = r.Sequence__c != null ? Integer.valueOf(r.Sequence__c) : seq++;
                 t.isActive = r.Is_Active__c;
                 tracks.add(t);
             }
@@ -114,7 +115,7 @@ public without sharing class WCFFormMetadataController {
         // Default tracks fallback
         TrackWrapper t1 = new TrackWrapper();
         t1.code = 'JOB_FULFILLMENT';
-        t1.label = 'Job Fulfillment / Placement';
+        t1.label = 'Job Fulfillment';
         t1.description = 'Skilling, training, and direct placement into wage employment.';
         t1.sequence = 1;
         t1.isActive = true;
@@ -122,7 +123,7 @@ public without sharing class WCFFormMetadataController {
         
         TrackWrapper t2 = new TrackWrapper();
         t2.code = 'JOB_CREATION';
-        t2.label = 'Job Creation / Entrepreneurship';
+        t2.label = 'Job Creation';
         t2.description = 'Supporting business creation, self-employment, and micro-enterprises.';
         t2.sequence = 2;
         t2.isActive = true;
@@ -130,7 +131,7 @@ public without sharing class WCFFormMetadataController {
         
         TrackWrapper t3 = new TrackWrapper();
         t3.code = 'LIVELIHOOD';
-        t3.label = 'Livelihoods Augmentation';
+        t3.label = 'Livelihood upliftment';
         t3.description = 'Increasing household income for micro-entrepreneurs and artisans.';
         t3.sequence = 3;
         t3.isActive = true;
@@ -141,6 +142,28 @@ public without sharing class WCFFormMetadataController {
 
     private static List<SectionWrapper> getSections(String languageCode) {
         List<SectionWrapper> sections = new List<SectionWrapper>();
+        List<RFI_Section__mdt> records = [
+            SELECT MasterLabel, DeveloperName, Section_Code__c, Track_Code__c, Sequence__c
+            FROM RFI_Section__mdt
+            ORDER BY Sequence__c ASC NULLS LAST, DeveloperName ASC
+        ];
+        
+        if (!records.isEmpty()) {
+            Integer seq = 1;
+            for (RFI_Section__mdt r : records) {
+                SectionWrapper s = new SectionWrapper();
+                s.code = String.isNotBlank(r.Section_Code__c) ? r.Section_Code__c : r.DeveloperName;
+                s.title = String.isNotBlank(r.MasterLabel) ? r.MasterLabel : s.code;
+                s.description = s.title;
+                s.sequence = r.Sequence__c != null ? Integer.valueOf(r.Sequence__c) : seq++;
+                s.applicableTracks = new List<String>();
+                if (String.isNotBlank(r.Track_Code__c)) {
+                    s.applicableTracks.add(r.Track_Code__c);
+                }
+                sections.add(s);
+            }
+            return sections;
+        }
         
         SectionWrapper s1 = new SectionWrapper();
         s1.code = 'SEC_ABOUT_ORG';
@@ -207,9 +230,9 @@ public without sharing class WCFFormMetadataController {
 
         List<RFI_Question__mdt> records = [
             SELECT DeveloperName, Question_Code__c, Section_Code__c, Field_API_Name__c,
-                   Target_Object__c, Display_Type__c, Label__c
+                   Target_Object__c, Display_Type__c, Label__c, Sequence__c
             FROM RFI_Question__mdt
-            ORDER BY DeveloperName ASC
+            ORDER BY Sequence__c ASC NULLS LAST, DeveloperName ASC
         ];
         
         if (!records.isEmpty()) {
@@ -218,7 +241,7 @@ public without sharing class WCFFormMetadataController {
                 QuestionWrapper q = new QuestionWrapper();
                 q.key = String.isNotBlank(r.Question_Code__c) ? r.Question_Code__c : r.DeveloperName;
                 q.sectionCode = String.isNotBlank(r.Section_Code__c) ? r.Section_Code__c : 'SEC_ABOUT_ORG';
-                q.sequence = seq++;
+                q.sequence = r.Sequence__c != null ? Integer.valueOf(r.Sequence__c) : seq++;
                 q.targetObject = String.isNotBlank(r.Target_Object__c) ? r.Target_Object__c : 'IndividualApplication';
                 q.targetField = r.Field_API_Name__c;
                 q.label = r.Label__c;

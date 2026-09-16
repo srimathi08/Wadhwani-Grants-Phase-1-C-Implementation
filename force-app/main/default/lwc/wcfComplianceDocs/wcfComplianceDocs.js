@@ -6,6 +6,7 @@ import getOrCreateComplianceRecord from '@salesforce/apex/WCFComplianceControlle
 import deleteComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteComplianceDocumentFile';
 import saveAdHocComplianceDocument from '@salesforce/apex/WCFComplianceController.saveAdHocComplianceDocument';
 import deleteAdHocComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteAdHocComplianceDocumentFile';
+import submitComplianceDocuments from '@salesforce/apex/WCFComplianceController.submitComplianceDocuments';
 
 // ─────────────────────────────────────────────────────────────────────────
 // BRD B.4 — Compliance upload is triggered when Grant Committee approves
@@ -26,25 +27,29 @@ import deleteAdHocComplianceDocumentFile from '@salesforce/apex/WCFComplianceCon
 // ─────────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
-    'Not Started':      { badgeClass: 'comp-badge comp-badge--pending',    label: 'NOT STARTED',      canUpload: true,  showReplace: false },
-    'Pending Review':   { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',   canUpload: false, showReplace: true  },
-    'Validated':        { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',        canUpload: false, showReplace: true  },
-    'Returned':         { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',    canUpload: true,  showReplace: false },
-    'Flagged':          { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',     canUpload: false, showReplace: true  },
-    'Refresh Required': { badgeClass: 'comp-badge comp-badge--expired',    label: 'REFRESH REQUIRED', canUpload: true,  showReplace: false },
-    'Pending Submission': { badgeClass: 'comp-badge comp-badge--returned', label: 'DOCUMENT REQUESTED', canUpload: true, showReplace: false },
-'Rejected':  { badgeClass: 'comp-badge comp-badge--rejected',  label: 'REJECTED',  canUpload: false, showReplace: false },
-    'Suspended': { badgeClass: 'comp-badge comp-badge--suspended', label: 'SUSPENDED', canUpload: false, showReplace: false }
+    'Not Started':        { badgeClass: 'comp-badge comp-badge--pending',    label: 'NOT STARTED',        canUpload: true,  showReplace: false },
+    'Draft':              { badgeClass: 'comp-badge comp-badge--draft',      label: 'DRAFT SAVED',        canUpload: true,  showReplace: true  },
+    'Pending Review':     { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',     canUpload: false, showReplace: true  },
+    'Validated':          { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: true  },
+    'Returned':           { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',      canUpload: true,  showReplace: false },
+    'Flagged':            { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',       canUpload: false, showReplace: true  },
+    'Refresh Required':   { badgeClass: 'comp-badge comp-badge--expired',    label: 'REFRESH REQUIRED',   canUpload: true,  showReplace: false },
+    'Pending Submission': { badgeClass: 'comp-badge comp-badge--returned',   label: 'DOCUMENT REQUESTED', canUpload: true,  showReplace: false },
+    'Rejected':           { badgeClass: 'comp-badge comp-badge--rejected',   label: 'REJECTED',           canUpload: false, showReplace: false },
+    'Suspended':          { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false }
 };
 
 const OVERALL_STATUS_BADGE_CLASS = {
-    'Complete'        : 'comp-overall-badge comp-overall-badge--complete',
-    'Refresh Required': 'comp-overall-badge comp-overall-badge--refresh',
-    'In Progress'     : 'comp-overall-badge comp-overall-badge--inprogress',
-    'Validated'       : 'comp-overall-badge comp-overall-badge--complete',
-    'Rejected'        : 'comp-overall-badge comp-overall-badge--rejected',
-    'Suspended'       : 'comp-overall-badge comp-overall-badge--suspended',
-    'Returned'        : 'comp-overall-badge comp-overall-badge--returned'
+    'Complete'          : 'comp-overall-badge comp-overall-badge--complete',
+    'Submitted'         : 'comp-overall-badge comp-overall-badge--inprogress',
+    'Draft'             : 'comp-overall-badge comp-overall-badge--draft',
+    'Refresh Required'  : 'comp-overall-badge comp-overall-badge--refresh',
+    'In Progress'       : 'comp-overall-badge comp-overall-badge--inprogress',
+    'Pending Submission': 'comp-overall-badge comp-overall-badge--pending',
+    'Validated'         : 'comp-overall-badge comp-overall-badge--complete',
+    'Rejected'          : 'comp-overall-badge comp-overall-badge--rejected',
+    'Suspended'         : 'comp-overall-badge comp-overall-badge--suspended',
+    'Returned'          : 'comp-overall-badge comp-overall-badge--returned'
 };
 
 const EXPIRY_WARNING_DAYS = 30;
@@ -52,11 +57,13 @@ const EXPIRY_WARNING_DAYS = 30;
 export default class WcfComplianceDocs extends LightningElement {
 
     // Passed in from wcfApplicantDashboard — the IndividualApplication Id.
-    // Used ONLY for Apex calls (getComplianceChecklist, saveComplianceDocument).
+    // Used ONLY for Apex calls (getComplianceChecklist, saveComplianceDocument, submitComplianceDocuments).
     // Never passed directly to lightning-file-upload.
     @api recordId;
 
     @track isLoading       = true;
+    @track isSubmitting    = false;
+    @track isSubmitted     = false;
     @track loadError;
     @track geography;
     @track checklistItems  = [];
@@ -65,6 +72,7 @@ export default class WcfComplianceDocs extends LightningElement {
     @track complianceReviewerNotes;
     @track totalRequired   = 0;
     @track totalValidated  = 0;
+    @track totalUploaded   = 0;
     @track uploadingDocType;
 
     expiryDateByType = {};
@@ -85,24 +93,25 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     loadChecklist() {
-
-            if (!this.recordId) {
-        console.warn('wcfComplianceDocs: recordId not set, skipping loadChecklist');
-        this.isLoading = false;
-        return Promise.resolve();
-    }
+        if (!this.recordId) {
+            console.warn('wcfComplianceDocs: recordId not set, skipping loadChecklist');
+            this.isLoading = false;
+            return Promise.resolve();
+        }
         this.isLoading  = true;
         this.loadError  = undefined;
 
         return getComplianceChecklist({ applicationId: this.recordId })
             .then(result => {
-                this.geography      = result.geography;
-                this.totalRequired  = result.totalRequired;
-                this.totalValidated = result.totalValidated;
-                this.overallStatus  = result.overallStatus;
-                this.complianceStatus = result.complianceStatus;
+                this.geography               = result.geography;
+                this.totalRequired           = result.totalRequired;
+                this.totalValidated          = result.totalValidated;
+                this.totalUploaded           = result.totalUploaded || 0;
+                this.isSubmitted             = !!result.isSubmitted;
+                this.overallStatus           = result.overallStatus;
+                this.complianceStatus        = result.complianceStatus;
                 this.complianceReviewerNotes = result.reviewerNotes;
-                this.checklistItems = (result.items || []).map(item => this.decorateItem(item));
+                this.checklistItems          = (result.items || []).map(item => this.decorateItem(item));
                 this.notifyParent();
             })
             .catch(error => {
@@ -125,14 +134,16 @@ export default class WcfComplianceDocs extends LightningElement {
     decorateItem(raw) {
         const config  = STATUS_CONFIG[raw.status] || STATUS_CONFIG['Not Started'];
         const hasFile = !!raw.contentDocumentId;
+        const isDraft = raw.status === 'Draft';
 
         return {
             ...raw,
             badgeClass  : config.badgeClass,
             statusLabel : config.label,
             canUpload   : config.canUpload,
-            showReplace : config.showReplace && hasFile,
+            showReplace : (config.showReplace || isDraft) && hasFile,
             hasFile,
+            isDraft,
             // uploadRecordId — the WCF_Compliance_Document__c Id used as
             // record-id on lightning-file-upload. If the record already exists
             // (raw.recordId is set by Apex), use it immediately.
@@ -143,8 +154,8 @@ export default class WcfComplianceDocs extends LightningElement {
             downloadUrl         : hasFile ? `${this.sitePrefix}/sfc/servlet.shepherd/document/download/${raw.contentDocumentId}` : null,
             isReturned          : raw.status === 'Returned',
             isRefreshRequired   : raw.status === 'Refresh Required',
-            isRejected  : raw.status === 'Rejected',
-            isSuspended : raw.status === 'Suspended',
+            isRejected          : raw.status === 'Rejected',
+            isSuspended         : raw.status === 'Suspended',
             isExpiringSoon      : this.computeExpiryWarning(raw.expiryDate, raw.status),
             expiryDateFormatted : this.formatDate(raw.expiryDate),
             submittedDateFormatted: this.formatDate(raw.submittedDate),
@@ -207,7 +218,10 @@ export default class WcfComplianceDocs extends LightningElement {
             if (this.checklistItems.some(item => item.status === 'Returned')) return 'ACTION NEEDED';
         }
 
-        return this.overallStatus === 'Complete' ? 'COMPLETE' : this.overallStatus.toUpperCase();
+        if (this.overallStatus === 'Draft') return 'DRAFT';
+        if (this.overallStatus === 'Submitted') return 'SUBMITTED';
+        if (this.overallStatus === 'Complete') return 'COMPLETE';
+        return this.overallStatus ? this.overallStatus.toUpperCase() : 'IN PROGRESS';
     }
 
     get progressSummaryLabel() {
@@ -216,6 +230,22 @@ export default class WcfComplianceDocs extends LightningElement {
 
     get hasItems() {
         return this.checklistItems && this.checklistItems.length > 0;
+    }
+
+    get allDocumentsUploaded() {
+        return this.totalRequired > 0 && this.totalUploaded >= this.totalRequired;
+    }
+
+    get isSubmitDisabled() {
+        return !this.allDocumentsUploaded || this.isSubmitting || this.isLoading || this.isSubmitted;
+    }
+
+    get showActionFooter() {
+        return this.hasItems && !this.isSubmitted && this.complianceStatus !== 'Validated';
+    }
+
+    get uploadProgressText() {
+        return `${this.totalUploaded} of ${this.totalRequired} documents uploaded`;
     }
 
     get showPassedBanner() {
@@ -243,11 +273,6 @@ export default class WcfComplianceDocs extends LightningElement {
         this.expiryDateByType[docType] = event.target.value;
     }
 
-    // ── Pre-create the shell WCF_Compliance_Document__c record ───────────
-    // Called when canUpload=true but uploadRecordId is null (i.e. "Not
-    // Started" rows where no record exists yet).
-    // Once the record is created, uploadRecordId is set on the item and
-    // the lightning-file-upload renders with a valid record-id.
     handlePrepareUpload(event) {
         const docType = event.target.dataset.doctype;
 
@@ -276,67 +301,102 @@ export default class WcfComplianceDocs extends LightningElement {
             });
     }
 
-handleUploadFinished(event) {
-    const docType    = event.target.dataset.doctype;
-    const recordHint = event.target.dataset.recordId;
-    const files      = event.detail.files;
-    if (!files || files.length === 0) return;
+    handleUploadFinished(event) {
+        const docType    = event.target.dataset.doctype;
+        const recordHint = event.target.dataset.recordId;
+        const files      = event.detail.files;
+        if (!files || files.length === 0) return;
 
-    const file = files[0];
-    this.uploadingDocType = docType;
+        const file = files[0];
+        this.uploadingDocType = docType;
 
-    this.checklistItems = this.checklistItems.map(i =>
-        i.documentType === docType ? { ...i, isUploadingThis: true } : i
-    );
+        this.checklistItems = this.checklistItems.map(i =>
+            i.documentType === docType ? { ...i, isUploadingThis: true } : i
+        );
 
-    // Route to correct Apex method based on whether this is an ad hoc row
-    const item        = this.checklistItems.find(i => i.documentType === docType);
-    const isAdHoc     = !!(item && item.adHocParentId);
+        // Route to correct Apex method based on whether this is an ad hoc row
+        const item        = this.checklistItems.find(i => i.documentType === docType);
+        const isAdHoc     = !!(item && item.adHocParentId);
 
-    const savePromise = isAdHoc
-        ? saveAdHocComplianceDocument({
-              adHocRecordId    : item.adHocParentId,
-              documentLabel    : docType,
-              contentDocumentId: file.documentId,
-              fileName         : file.name,
-              issueDate        : null,
-              expiryDate       : this.expiryDateByType[docType] || null
-          })
-        : saveComplianceDocument({
-              applicationId    : this.recordId,
-              documentType     : docType,
-              contentDocumentId: file.documentId,
-              fileName         : file.name,
-              issueDate        : null,
-              expiryDate       : this.expiryDateByType[docType] || null,
-              existingRecordId : recordHint || null
-          });
+        const savePromise = isAdHoc
+            ? saveAdHocComplianceDocument({
+                  adHocRecordId    : item.adHocParentId,
+                  documentLabel    : docType,
+                  contentDocumentId: file.documentId,
+                  fileName         : file.name,
+                  issueDate        : null,
+                  expiryDate       : this.expiryDateByType[docType] || null
+              })
+            : saveComplianceDocument({
+                  applicationId    : this.recordId,
+                  documentType     : docType,
+                  contentDocumentId: file.documentId,
+                  fileName         : file.name,
+                  issueDate        : null,
+                  expiryDate       : this.expiryDateByType[docType] || null,
+                  existingRecordId : recordHint || null
+              });
 
-    savePromise
-        .then(() => {
+        savePromise
+            .then(() => {
+                this.showToast(
+                    'Document Saved as Draft',
+                    `${file.name} was saved as draft. Click 'Submit Compliance Documents' when all required documents are ready.`,
+                    'success'
+                );
+                return this.loadChecklist();
+            })
+            .catch(error => {
+                console.error('Upload error full:', JSON.stringify(error));
+                console.error('Upload error body:', error?.body?.message);
+                console.error('Upload error body output:', JSON.stringify(error?.body?.output));
+                this.showToast('Upload failed', this.extractErrorMessage(error), 'error');
+                return this.loadChecklist();
+            })
+            .finally(() => {
+                this.uploadingDocType = undefined;
+                this.checklistItems = this.checklistItems.map(i =>
+                    i.documentType === docType ? { ...i, isUploadingThis: false } : i
+                );
+                this.cleanupStaleModal();
+            });
+    }
+
+    handleSaveDraft() {
+        this.showToast(
+            'Draft Saved',
+            'Your uploaded compliance documents are saved as drafts. You can return anytime to continue or submit.',
+            'info'
+        );
+    }
+
+    handleSubmit() {
+        if (!this.allDocumentsUploaded) {
             this.showToast(
-                'Document submitted',
-                `${file.name} was uploaded and is awaiting compliance review.`,
-                'success'
+                'Incomplete Submission',
+                `Please upload all ${this.totalRequired} required documents before submitting.`,
+                'warning'
             );
-            return this.loadChecklist();
-        })
-        .catch(error => {
-    // Log the full error to identify root cause
-    console.error('Upload error full:', JSON.stringify(error));
-    console.error('Upload error body:', error?.body?.message);
-    console.error('Upload error body output:', JSON.stringify(error?.body?.output));
-    this.showToast('Upload failed', this.extractErrorMessage(error), 'error');
-    return this.loadChecklist();
-})
-        .finally(() => {
-            this.uploadingDocType = undefined;
-            this.checklistItems = this.checklistItems.map(i =>
-                i.documentType === docType ? { ...i, isUploadingThis: false } : i
-            );
-            this.cleanupStaleModal();
-        });
-}
+            return;
+        }
+
+        this.isSubmitting = true;
+        submitComplianceDocuments({ applicationId: this.recordId })
+            .then(() => {
+                this.showToast(
+                    'Documents Submitted',
+                    'All compliance documents have been successfully submitted for review.',
+                    'success'
+                );
+                return this.loadChecklist();
+            })
+            .catch(error => {
+                this.showToast('Submission Failed', this.extractErrorMessage(error), 'error');
+            })
+            .finally(() => {
+                this.isSubmitting = false;
+            });
+    }
 
     handleReplaceClick(event) {
         const docType = event.target.dataset.doctype;

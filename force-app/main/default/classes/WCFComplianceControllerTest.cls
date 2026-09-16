@@ -143,11 +143,11 @@ private class WCFComplianceControllerTest {
         Id cdId2 = makeLinkedFile(complianceId);
 
         System.runAs(u) {
-            // Save document with valid dates
+            // Save document with valid dates (saves as Draft)
             WCFComplianceController.ComplianceChecklistItem item = WCFComplianceController.saveComplianceDocument(
                 app.Id, docType, cdId, 'test.pdf', '2026-01-01', '2027-01-01', complianceId);
             System.assertNotEquals(null, item);
-            System.assertEquals('Pending Review', item.status);
+            System.assertEquals('Draft', item.status);
 
             // Test checklist retrieval
             WCFComplianceController.ComplianceChecklistResult checklist =
@@ -197,11 +197,11 @@ private class WCFComplianceControllerTest {
                 WCFComplianceController.getComplianceChecklist(app.Id);
             System.assertNotEquals(null, checklist);
 
-            // Save ad hoc document with valid dates
+            // Save ad hoc document with valid dates (saves as Draft)
             WCFComplianceController.ComplianceChecklistItem item = WCFComplianceController.saveAdHocComplianceDocument(
                 adHocDoc.Id, primaryType, cdId, 'test_adhoc1.pdf', '2026-01-01', '2027-01-01');
             System.assertNotEquals(null, item);
-            System.assertEquals('Pending Review', item.status);
+            System.assertEquals('Draft', item.status);
 
             // Save ad hoc document with invalid dates (for coverage of Date parsing exceptions)
             WCFComplianceController.saveAdHocComplianceDocument(
@@ -336,6 +336,50 @@ private class WCFComplianceControllerTest {
         }
     }
 
+    @isTest
+    static void testSubmitComplianceDocuments() {
+        User u = getPortalUser();
+        if (u == null) return;
+        IndividualApplication app = getApp();
+        String docType = getValidDocumentType();
+
+        // Create compliance doc record
+        WCF_Compliance_Document__c doc = new WCF_Compliance_Document__c(
+            IndividualApplication__c = app.Id,
+            Document_Type__c         = docType,
+            Status__c                = 'Pending Submission'
+        );
+        insert doc;
+
+        System.runAs(u) {
+            Test.startTest();
+
+            // 1. Trying to submit without file uploaded should throw exception
+            try {
+                WCFComplianceController.submitComplianceDocuments(app.Id);
+                System.assert(false, 'Expected AuraHandledException for missing files');
+            } catch (AuraHandledException e) {
+                System.assertNotEquals(null, e.getMessage());
+            }
+
+            Test.stopTest();
+        }
+
+        // 2. Upload file and test successful submission
+        Id cdId = makeLinkedFile(doc.Id);
+        System.runAs(u) {
+            WCFComplianceController.saveComplianceDocument(
+                app.Id, docType, cdId, 'final_test.pdf', '2026-01-01', '2027-01-01', doc.Id);
+
+            WCFComplianceController.submitComplianceDocuments(app.Id);
+
+            WCFComplianceController.ComplianceChecklistResult checklist =
+                WCFComplianceController.getComplianceChecklist(app.Id);
+            System.assertEquals(true, checklist.isSubmitted);
+            System.assertEquals('Submitted', checklist.overallStatus);
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────
     // Validation / error branches (no community user needed)
     // ─────────────────────────────────────────────────────────────────
@@ -369,6 +413,11 @@ private class WCFComplianceControllerTest {
 
         try {
             WCFComplianceController.deleteAdHocComplianceDocumentFile(null, 'Some Type');
+            System.assert(false, 'Expected AuraHandledException');
+        } catch (AuraHandledException e) { System.assertNotEquals(null, e.getMessage()); }
+
+        try {
+            WCFComplianceController.submitComplianceDocuments(null);
             System.assert(false, 'Expected AuraHandledException');
         } catch (AuraHandledException e) { System.assertNotEquals(null, e.getMessage()); }
 

@@ -115,10 +115,16 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
         const hasDecision = !!row.existingDecision && !isClearedReturn;
         const isReady      = !!row.reviewId;
 
-            let trackPillClass = 'track-pill';
-            if      (row.track === 'Both') trackPillClass += ' track-both';
-            else if (row.track === 'JF')   trackPillClass += ' track-jf';
-            else if (row.track === 'JC')   trackPillClass += ' track-jc';
+            // Track badges
+            const trackBadges = (row.track || '').split(',').filter(Boolean).map(code => {
+                const trimmed = code.trim();
+                let pillClass = 'track-pill';
+                if      (trimmed === 'Both') pillClass += ' track-both';
+                else if (trimmed === 'JF')   pillClass += ' track-jf';
+                else if (trimmed === 'JC')   pillClass += ' track-jc';
+                else if (trimmed === 'LU')   pillClass += ' track-lu';
+                return { code: trimmed, pillClass };
+            });
 
             const rec = row.recommendation || '';
             let recPillClass = 'rec-pill';
@@ -153,7 +159,7 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
                 ...row,
                 hasDecision,
                 isReady,
-                trackPillClass,
+                trackBadges,
                 recPillClass,
                 statusPillClass,
                 decisionLabel,
@@ -219,12 +225,14 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
     handlePreviewApprove(event) {
         const applicationId = event.currentTarget.dataset.id;
         const appName       = event.currentTarget.dataset.appname;
-        const reviewId       = event.currentTarget.dataset.reviewId;
+        const reviewId      = event.currentTarget.dataset.reviewId;
+        const track         = event.currentTarget.dataset.track;
+        const trackLabel    = event.currentTarget.dataset.trackLabel;
         if (!applicationId) return;
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
-                url: this._siteUrl('approvercontainer', { applicationId, appName, reviewId })
+                url: this._siteUrl('approvercontainer', { applicationId, appName, reviewId, track, trackLabel })
             }
         });
     }

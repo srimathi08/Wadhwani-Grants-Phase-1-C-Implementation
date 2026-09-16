@@ -50,6 +50,9 @@ private class RecordTypeHelperTest {
             RecordTypeHelper.APPLICATION_DECISION_TYPES.size(), ids.size(),
             'Should resolve one RecordTypeId per allowed ApplicationDecision type'
         );
+
+        Id wgApproverId = RecordTypeHelper.applicationDecisionWgApproverId();
+        System.assertNotEquals(null, wgApproverId, 'WG Approver RecordTypeId should resolve');
     }
 
     @isTest

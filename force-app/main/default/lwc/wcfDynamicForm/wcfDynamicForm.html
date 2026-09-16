@@ -31,8 +31,8 @@
                         <h1 class="rfi-page-title">Wadhwani Grants – Request for Information (RFI)</h1>
                     </div>
 
-                    <!-- BLOCK 1: TRACK SELECTION, SECTION 1 -->
-                    <div class="block-divider-label">BLOCK 1 · TRACK SELECTION, SECTION 1</div>
+                    <!-- SECTION 1: TRACK SELECTION -->
+                    <div class="block-divider-label">SECTION 1 · TRACK SELECTION</div>
 
                     <div class="rfi-card-box">
                         <div class="modern-subsection-header">
@@ -65,8 +65,8 @@
                         </div>
                     </div>
 
-                    <!-- BLOCK 2: SECTION 2 AND SECTION 3 INTRO TEXT -->
-                    <div class="block-divider-label">BLOCK 2 · SECTION 2 AND SECTION 3 INTRO TEXT</div>
+                    <!-- APPLICATION OVERVIEW: SECTIONS 2 AND 3 -->
+                    <div class="block-divider-label">APPLICATION OVERVIEW · SECTIONS 2 & 3</div>
 
                     <div class="rfi-card-box">
                         <div class="intro-section-item">
@@ -88,8 +88,8 @@
                         </div>
                     </div>
 
-                    <!-- BLOCK 3: FAQ, WHAT THE THREE TRACKS MEAN -->
-                    <div data-id="faq-section" class="block-divider-label faq-section-target">BLOCK 3 · FAQ, WHAT THE THREE TRACKS MEAN</div>
+                    <!-- FAQ: WHAT THE THREE TRACKS MEAN -->
+                    <div data-id="faq-section" class="block-divider-label faq-section-target">FREQUENTLY ASKED QUESTIONS · WHAT THE TRACKS MEAN</div>
 
                     <div class="rfi-card-box faq-card-box">
                         <!-- FAQ 1: Job Fulfillment -->
@@ -2302,6 +2302,46 @@
 
                         </template>
 
+                        <!-- ════════════════════════════════════════════════════════════
+                             DYNAMIC CUSTOM TRACK TAB(S) (METADATA-DRIVEN)
+                        ═════════════════════════════════════════════════════════════ -->
+                        <template if:true={activeCustomTrackTab}>
+                            <template if:true={activeCustomTrackTab.hasQuestions}>
+                                <template for:each={activeCustomTrackTab.questions} for:item="cq">
+                                    <div key={cq.key} class="modern-subsection-card">
+                                        <div class="modern-subsection-header">
+                                            <div class="modern-subsection-number">{cq.displayNumber}</div>
+                                            <div>
+                                                <div class="modern-subsection-title">{cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template></div>
+                                                <template if:true={cq.helpText}><div class="modern-subsection-description">{cq.helpText}</div></template>
+                                            </div>
+                                        </div>
+                                        <div class="modern-form-grid">
+                                            <div class="modern-field full-width">
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+                        </template>
 
                         <!-- ════════════════════════════════════════════════════════════
                              TAB 5: WHY WADHWANI GRANTS (Q24 - Q28 & ATTESTATION)

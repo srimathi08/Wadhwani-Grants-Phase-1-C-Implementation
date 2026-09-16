@@ -63,7 +63,8 @@ public without sharing class WCFReviewerMetadataController {
                 ORDER BY Category_Number__c ASC, Sequence__c ASC NULLS LAST
             ];
 
-            // Normalize track key
+            // Resolve active tracks set
+            Set<String> activeTracks = resolveActiveTracks(trackName);
             String normalizedTrack = normalizeTrackName(trackName);
 
             // Group questions by Category Number
@@ -109,21 +110,21 @@ public without sharing class WCFReviewerMetadataController {
                 // Build track descriptions list for display
                 qw.trackDescriptions = new List<TrackDescriptionItem>();
                 if (qw.trackAware) {
-                    if (String.isNotBlank(q.Description_Job_Fulfillment__c) && (normalizedTrack == 'JF' || normalizedTrack == 'ALL' || String.isBlank(normalizedTrack))) {
+                    if (String.isNotBlank(q.Description_Job_Fulfillment__c) && (activeTracks.contains('JF') || activeTracks.contains('ALL'))) {
                         TrackDescriptionItem tItem = new TrackDescriptionItem();
                         tItem.trackKey = 'JF';
                         tItem.trackLabel = 'Job Fulfillment';
                         tItem.text = q.Description_Job_Fulfillment__c;
                         qw.trackDescriptions.add(tItem);
                     }
-                    if (String.isNotBlank(q.Description_Job_Creation__c) && (normalizedTrack == 'JC' || normalizedTrack == 'ALL' || String.isBlank(normalizedTrack))) {
+                    if (String.isNotBlank(q.Description_Job_Creation__c) && (activeTracks.contains('JC') || activeTracks.contains('ALL'))) {
                         TrackDescriptionItem tItem = new TrackDescriptionItem();
                         tItem.trackKey = 'JC';
                         tItem.trackLabel = 'Job Creation';
                         tItem.text = q.Description_Job_Creation__c;
                         qw.trackDescriptions.add(tItem);
                     }
-                    if (String.isNotBlank(q.Description_Livelihood_Upliftment__c) && (normalizedTrack == 'LU' || normalizedTrack == 'ALL' || String.isBlank(normalizedTrack))) {
+                    if (String.isNotBlank(q.Description_Livelihood_Upliftment__c) && (activeTracks.contains('LU') || activeTracks.contains('ALL'))) {
                         TrackDescriptionItem tItem = new TrackDescriptionItem();
                         tItem.trackKey = 'LU';
                         tItem.trackLabel = 'Livelihood Upliftment';
@@ -135,12 +136,12 @@ public without sharing class WCFReviewerMetadataController {
                 // Resolve primary description
                 if (!qw.trackAware) {
                     qw.resolvedDescription = q.Description_Common__c;
-                } else if (normalizedTrack == 'JF' && String.isNotBlank(q.Description_Job_Fulfillment__c)) {
-                    qw.resolvedDescription = q.Description_Job_Fulfillment__c;
-                } else if (normalizedTrack == 'JC' && String.isNotBlank(q.Description_Job_Creation__c)) {
-                    qw.resolvedDescription = q.Description_Job_Creation__c;
-                } else if (normalizedTrack == 'LU' && String.isNotBlank(q.Description_Livelihood_Upliftment__c)) {
-                    qw.resolvedDescription = q.Description_Livelihood_Upliftment__c;
+                } else if (!qw.trackDescriptions.isEmpty()) {
+                    List<String> descList = new List<String>();
+                    for (TrackDescriptionItem item : qw.trackDescriptions) {
+                        descList.add(item.trackLabel + ': ' + item.text);
+                    }
+                    qw.resolvedDescription = String.join(descList, '\n');
                 } else {
                     qw.resolvedDescription = q.Description_Common__c;
                 }
@@ -168,6 +169,7 @@ public without sharing class WCFReviewerMetadataController {
             result.put('totalQuestions', totalQCount);
             result.put('trackName', trackName);
             result.put('normalizedTrack', normalizedTrack);
+            result.put('activeTracks', new List<String>(activeTracks));
         } catch (Exception ex) {
             result.put('success', false);
             result.put('errorMessage', ex.getMessage());
@@ -177,22 +179,50 @@ public without sharing class WCFReviewerMetadataController {
     }
 
     /**
-     * @description Normalizes raw track string into JF, JC, LU or ALL
+     * @description Resolves set of active track codes: JF, JC, LU
      */
-    private static String normalizeTrackName(String trackName) {
-        if (String.isBlank(trackName)) {
+    public static Set<String> resolveActiveTracks(String trackName) {
+        Set<String> tracks = new Set<String>();
+        if (String.isBlank(trackName) || trackName.equalsIgnoreCase('ALL')) {
+            tracks.add('JF');
+            tracks.add('JC');
+            tracks.add('LU');
+            return tracks;
+        }
+
+        String lower = trackName.toLowerCase();
+        if (lower.contains('fulfillment') || lower.contains('fulfilment') || lower.contains('jf')) {
+            tracks.add('JF');
+        }
+        if (lower.contains('creation') || lower.contains('jc')) {
+            tracks.add('JC');
+        }
+        if (lower.contains('livelihood') || lower.contains('upliftment') || lower.contains('lu')) {
+            tracks.add('LU');
+        }
+        if (lower.contains('both')) {
+            tracks.add('JF');
+            tracks.add('JC');
+        }
+
+        if (tracks.isEmpty()) {
+            tracks.add('JF');
+            tracks.add('JC');
+            tracks.add('LU');
+        }
+        return tracks;
+    }
+
+    /**
+     * @description Normalizes raw track string into single code, combo code, or ALL
+     */
+    public static String normalizeTrackName(String trackName) {
+        Set<String> active = resolveActiveTracks(trackName);
+        if (active.size() >= 3) {
             return 'ALL';
         }
-        String lower = trackName.toLowerCase();
-        if (lower.contains('fulfillment')) {
-            return 'JF';
-        }
-        if (lower.contains('creation')) {
-            return 'JC';
-        }
-        if (lower.contains('livelihood') || lower.contains('upliftment')) {
-            return 'LU';
-        }
-        return 'ALL';
+        List<String> listTracks = new List<String>(active);
+        listTracks.sort();
+        return String.join(listTracks, ',');
     }
 }

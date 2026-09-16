@@ -9,7 +9,12 @@
             </button>
             <div class="brand-rule"></div>
             <div>
-                <h2 class="appr-title">Approver Decision</h2>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h2 class="appr-title">Approver Decision</h2>
+                    <template for:each={trackBadges} for:item="b">
+                        <span key={b.code} class={b.badgeClass}>{b.code}</span>
+                    </template>
+                </div>
                 <span class="appr-sub">{appName} &mdash; Review {reviewId}</span>
             </div>
         </div>

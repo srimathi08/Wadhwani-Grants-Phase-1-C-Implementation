@@ -7,26 +7,13 @@
 
     <template if:false={isLoading}>
 
-        <!-- ══════════════════════════════════════
-             HEADER — Wadhwani logo + App metadata
-        ══════════════════════════════════════ 
-        <div class="wcf-header">
-            <div class="wcf-header-brand">
-                <img src={wadhwaniLogoUrl}
-                     alt="Wadhwani Foundation"
-                     class="wcf-header-logo"
-                     onerror={handleLogoError} />
-                <span class="wcf-header-org">Wadhwani Foundation</span>
+        <!-- ══ SAVING OVERLAY ══════════════════════════════════ -->
+        <template if:true={isSaving}>
+            <div class="wcf-saving-overlay">
+                <lightning-spinner alternative-text={savingLabel} size="medium" variant="brand"></lightning-spinner>
+                <p class="wcf-saving-text">{savingLabel}</p>
             </div>
-        </div> -->
-
-            <!-- ══ SAVING OVERLAY ══════════════════════════════════ -->
-    <template if:true={isSaving}>
-        <div class="wcf-saving-overlay">
-            <lightning-spinner alternative-text={savingLabel} size="medium" variant="brand"></lightning-spinner>
-            <p class="wcf-saving-text">{savingLabel}</p>
-        </div>
-    </template>
+        </template>
 
         <!-- ══════════════════════════════════════
              APP CONTEXT BAR
@@ -39,9 +26,9 @@
                     <span class="wcf-meta-val">{applicantName}</span>
                 </div>
                 <div class="wcf-meta-item">
-        <span class="wcf-meta-label">Due Date</span>
-        <span class="wcf-meta-val">{dueDate}</span>
-    </div>
+                    <span class="wcf-meta-label">Due Date</span>
+                    <span class="wcf-meta-val">{dueDate}</span>
+                </div>
                 <template if:true={mandateTrack}>
                     <div class="wcf-meta-pill">{mandateTrack}</div>
                 </template>
@@ -49,34 +36,32 @@
         </div>
 
         <!-- ══════════════════════════════════════
-     REVIEWER RETURN NOTICE — shown only when the
-     Reviewer sent this application back for revalidation
-══════════════════════════════════════ -->
-<template if:true={isReturnedByReviewer}>
-    <div class="wcf-draft-banner wcf-reviewer-return-banner">
-        <div class="wcf-draft-banner-left">
-            <span class="wcf-draft-icon">&#8617;</span>
-            <div class="wcf-draft-banner-text">
-                <span class="wcf-draft-banner-title">Returned by Reviewer — action required</span>
-                <span class="wcf-draft-banner-sub">
-                    <template if:true={reviewerReturnComment}>
-                        {reviewerReturnComment}
-                    </template>
-                    <template if:false={reviewerReturnComment}>
-                        No comment was provided.
-                    </template>
-                    <template if:true={reviewerReturnDateFormatted}>
-                        &nbsp;·&nbsp; {reviewerReturnDateFormatted}
-                    </template>
-                </span>
+             REVIEWER RETURN NOTICE
+        ══════════════════════════════════════ -->
+        <template if:true={isReturnedByReviewer}>
+            <div class="wcf-draft-banner wcf-reviewer-return-banner">
+                <div class="wcf-draft-banner-left">
+                    <span class="wcf-draft-icon">&#8617;</span>
+                    <div class="wcf-draft-banner-text">
+                        <span class="wcf-draft-banner-title">Returned by Reviewer — action required</span>
+                        <span class="wcf-draft-banner-sub">
+                            <template if:true={reviewerReturnComment}>
+                                {reviewerReturnComment}
+                            </template>
+                            <template if:false={reviewerReturnComment}>
+                                No comment was provided.
+                            </template>
+                            <template if:true={reviewerReturnDateFormatted}>
+                                &nbsp;·&nbsp; {reviewerReturnDateFormatted}
+                            </template>
+                        </span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</template>
+        </template>
 
         <!-- ══════════════════════════════════════
              DRAFT RESUME BANNER
-             Shown when an existing Draft record is loaded
         ══════════════════════════════════════ -->
         <template if:true={showDraftBanner}>
             <div class="wcf-draft-banner">
@@ -101,205 +86,158 @@
         ══════════════════════════════════════ -->
         <div class="wcf-vf-wrapper">
 
-            <!-- SECTION 1: Completeness Check -->
+            <!-- SECTION 1: Completeness Check (Dynamic Metadata Driven) -->
             <div class="wcf-vf-section">
                 <div class="wcf-vf-sec-head">
-                    <div class="wcf-vf-sec-num">1</div>
+                    <div class="wcf-vf-sec-num">{section1.sectionNumber}</div>
                     <div class="wcf-vf-sec-info">
-                        <h3 class="wcf-vf-sec-title">Completeness check</h3>
-                        <p class="wcf-vf-sec-lede">Auto-derived from the submitted Application. Confirm each check, and note any substantive content gap the platform cannot detect.</p>
+                        <h3 class="wcf-vf-sec-title">{section1.title}</h3>
+                        <p class="wcf-vf-sec-lede">{section1.lede}</p>
                     </div>
                 </div>
 
-                <!-- S1.1 -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Mandatory fields: populated <span class="wcf-req">*</span></div>
-                    </div>
-                    <div class={s1_1_stateClass}>
-                        <div class="wcf-auto-icon">{s1_1_icon}</div>
-                        <div>{s1_1_message}</div>
-                    </div>
-                    <div class="wcf-confirm-row">
-                        <template for:each={s1_1Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s1_1_confirm"
-                                 data-val={opt.val}
-                                 onclick={handleConfirmPill}>
-                                {opt.label}
+                <template for:each={section1.questions} for:item="q">
+                    <template if:true={q.showQuestion}>
+                        <div key={q.key} class={q.containerClass}>
+                            <div class="wcf-vf-field-top">
+                                <div class="wcf-vf-field-q">
+                                    {q.questionText}
+                                    <template if:true={q.isRequired}><span class="wcf-req"> *</span></template>
+                                    <template if:false={q.isRequired}><span class="wcf-opt"> (Optional)</span></template>
+                                </div>
                             </div>
-                        </template>
-                    </div>
-                </div>
+                            <template if:true={q.hintText}>
+                                <p class="wcf-hint">{q.hintText}</p>
+                            </template>
 
-                <!-- S1.2 -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Verification reports: uploaded where claimed <span class="wcf-req">*</span></div>
-                    </div>
-                    <div class={s1_2_stateClass}>
-                        <div class="wcf-auto-icon">
-                            <template if:true={hasAttachments}>✓</template>
-                            <template if:false={hasAttachments}>⚠</template>
-                        </div>
-                        <div>{attachmentSummary}</div>
-                    </div>
-                    <div class="wcf-confirm-row">
-                        <template for:each={s1_2Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s1_2_confirm"
-                                 data-val={opt.val}
-                                 onclick={handleConfirmPill}>
-                                {opt.label}
-                            </div>
-                        </template>
-                    </div>
-                </div>
+                            <!-- Auto indicator for S1.1, S1.2, S1.3 -->
+                            <template if:true={q.autoIndicator.show}>
+                                <div class={q.autoIndicator.stateClass}>
+                                    <div class="wcf-auto-icon">{q.autoIndicator.icon}</div>
+                                    <div>{q.autoIndicator.message}</div>
+                                </div>
+                            </template>
 
-                
-<!-- S1.3 -->
-<div class="wcf-vf-field">
-    <div class="wcf-vf-field-top">
-        <div class="wcf-vf-field-q">
-            Attestation: signed and timestamped 
-            <span class="wcf-req">*</span>
-        </div>
-    </div>
-    <div class={s1_3_stateClass}>
-        <div class="wcf-auto-icon">✓</div>
-        <div>{s1_3_message}</div>
-    </div>
-    <div class="wcf-confirm-row">
-        <template for:each={s1_3Options} for:item="opt">
-            <div key={opt.val}
-                 class={opt.cls}
-                 data-field="s1_3_confirm"
-                 data-val={opt.val}
-                 onclick={handleConfirmPill}>
-                {opt.label}
-            </div>
-        </template>
-    </div>
-</div>
-                <!-- S1.4 Optional content gap -->
-                <div class="wcf-vf-field wcf-vf-field-optional">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Substantive content gap <span class="wcf-opt">(Optional)</span></div>
-                    </div>
-                    <p class="wcf-hint">Note any field that is technically populated but effectively empty — placeholder text, single-word responses to narrative questions, etc.</p>
-                    <lightning-textarea
-                        name="s1_4_text"
-                        value={formState.s1_4_text}
-                        max-length="1400"
-                        placeholder="e.g., 'Q14 Sustainability Plan is populated but reads as boilerplate; needs substantive content.'"
-                        onchange={handleTextChange}
-                        data-field="s1_4_text"
-                        class="wcf-textarea">
-                    </lightning-textarea>
-                    <div class={wcClass_s1_4}>{wordCount_s1_4} / 200 words · Optional</div>
-                </div>
-            </div>
-
-            <!-- SECTION 2: First-Pass Eligibility -->
-            <div class="wcf-vf-section">
-                <div class="wcf-vf-sec-head">
-                    <div class="wcf-vf-sec-num">2</div>
-                    <div class="wcf-vf-sec-info">
-                        <h3 class="wcf-vf-sec-title">First-pass eligibility</h3>
-                        <p class="wcf-vf-sec-lede">Your judgement on geography, mandate fit, and any blocking concern. None of these gate progression.</p>
-                    </div>
-                </div>
-
-                <!-- S2.1 Geography -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Geography: Does the applicant's primary geography fall within WCF's active operating clusters? <span class="wcf-req">*</span></div>
-                    </div>
-                    <p class="wcf-hint">Active clusters: India, Latin America (Brazil / Mexico), Southeast Asia (Indonesia / Philippines). MENA = monitor only.</p>
-                    <div class="wcf-picklist">
-                        <template for:each={s2_1Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s2_1"
-                                 data-val={opt.val}
-                                 onclick={handlePicklist}>
-                                <span class="wcf-pick-dot"></span>{opt.label}
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- S2.2 Mandate fit -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Mandate fit: Does the applicant's work fall credibly within Job Fulfillment, Job Creation, or both, at first read? <span class="wcf-req">*</span></div>
-                    </div>
-                    <div class="wcf-picklist">
-                        <template for:each={s2_2Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s2_2"
-                                 data-val={opt.val}
-                                 onclick={handlePicklist}>
-                                <span class="wcf-pick-dot"></span>{opt.label}
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- S2.3 Blocking concern -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Blocking concern: Did your first-pass review surface any concern that could materially affect Reviewer evaluation? <span class="wcf-req">*</span></div>
-                    </div>
-                    <p class="wcf-hint">Examples: sanctions / watchlist hit; contradicting outcome data; institutional credibility concerns. Most applicants: No.</p>
-                    <div class="wcf-picklist wcf-picklist-binary">
-                        <template for:each={s2_3Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s2_3"
-                                 data-val={opt.val}
-                                 onclick={handlePicklist}>
-                                <span class="wcf-pick-radio"></span>
-                                <div class="wcf-pick-text">
-                                    <span class="wcf-pick-main">{opt.label}</span>
-                                    <template if:true={opt.sublabel}>
-                                        <span class="wcf-pick-sub">{opt.sublabel}</span>
+                            <!-- Confirm Pills -->
+                            <template if:true={q.isConfirmPill}>
+                                <div class="wcf-confirm-row">
+                                    <template for:each={q.options} for:item="opt">
+                                        <div key={opt.val}
+                                             class={opt.cls}
+                                             data-field={q.key}
+                                             data-val={opt.val}
+                                             onclick={handleConfirmPill}>
+                                            {opt.label}
+                                        </div>
                                     </template>
+                                </div>
+                            </template>
+
+                            <!-- TextArea -->
+                            <template if:true={q.isTextArea}>
+                                <lightning-textarea
+                                    name={q.key}
+                                    value={q.value}
+                                    max-length="1400"
+                                    placeholder={q.placeholder}
+                                    onchange={handleTextChange}
+                                    data-field={q.key}
+                                    class="wcf-textarea">
+                                </lightning-textarea>
+                                <div class={q.wcClass}>{q.wordCount} / {q.wordLimit} words · {q.requiredLabel}</div>
+                            </template>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <!-- SECTION 2: First-Pass Eligibility (Dynamic Metadata Driven) -->
+            <div class="wcf-vf-section">
+                <div class="wcf-vf-sec-head">
+                    <div class="wcf-vf-sec-num">{section2.sectionNumber}</div>
+                    <div class="wcf-vf-sec-info">
+                        <h3 class="wcf-vf-sec-title">{section2.title}</h3>
+                        <p class="wcf-vf-sec-lede">{section2.lede}</p>
+                    </div>
+                </div>
+
+                <template for:each={section2.questions} for:item="q">
+                    <template if:true={q.showQuestion}>
+                        <!-- Normal Question or Conditional Follow-on Box -->
+                        <template if:true={q.isTextArea}>
+                            <div key={q.key} class="wcf-dep-wrapper">
+                                <div class="wcf-dep-banner"></div>
+                                <div class="wcf-cond-inner">
+                                    <div class="wcf-cond-label">{q.questionText} <span class="wcf-req">*</span></div>
+                                    <lightning-textarea
+                                        name={q.key}
+                                        value={q.value}
+                                        max-length="2400"
+                                        placeholder={q.placeholder}
+                                        onchange={handleTextChange}
+                                        data-field={q.key}>
+                                    </lightning-textarea>
+                                    <div class={q.wcClass}>{q.wordCount} / {q.wordLimit} words · Required</div>
                                 </div>
                             </div>
                         </template>
-                    </div>
 
-                    <template if:true={showS2_3_text}>
-                        <div class="wcf-dep-wrapper">
-                            <div class="wcf-dep-banner"></div>
-                            <div class="wcf-cond-inner">
-                                <div class="wcf-cond-label">Describe the blocking concern <span class="wcf-req">*</span></div>
-                                <lightning-textarea
-                                    name="s2_3_text"
-                                    value={formState.s2_3_text}
-                                    max-length="2400"
-                                    placeholder="Describe in 1–3 sentences. e.g., 'Watchlist hit on founder name; awaiting compliance clearance.'"
-                                    onchange={handleTextChange}
-                                    data-field="s2_3_text">
-                                </lightning-textarea>
-                                <div class={wcClass_s2_3}>{wordCount_s2_3} / 300 words · Required</div>
+                        <template if:false={q.isTextArea}>
+                            <div key={q.key} class={q.containerClass}>
+                                <div class="wcf-vf-field-top">
+                                    <div class="wcf-vf-field-q">{q.questionText} <span class="wcf-req">*</span></div>
+                                </div>
+                                <template if:true={q.hintText}>
+                                    <p class="wcf-hint">{q.hintText}</p>
+                                </template>
+
+                                <!-- Picklist Card Options -->
+                                <template if:true={q.isPicklistCard}>
+                                    <div class="wcf-picklist">
+                                        <template for:each={q.options} for:item="opt">
+                                            <div key={opt.val}
+                                                 class={opt.cls}
+                                                 data-field={q.key}
+                                                 data-val={opt.val}
+                                                 onclick={handlePicklist}>
+                                                <span class="wcf-pick-dot"></span>{opt.label}
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <!-- Binary Radio Options -->
+                                <template if:true={q.isBinaryRadio}>
+                                    <div class="wcf-picklist wcf-picklist-binary">
+                                        <template for:each={q.options} for:item="opt">
+                                            <div key={opt.val}
+                                                 class={opt.cls}
+                                                 data-field={q.key}
+                                                 data-val={opt.val}
+                                                 onclick={handlePicklist}>
+                                                <span class="wcf-pick-radio"></span>
+                                                <div class="wcf-pick-text">
+                                                    <span class="wcf-pick-main">{opt.label}</span>
+                                                    <template if:true={opt.sublabel}>
+                                                        <span class="wcf-pick-sub">{opt.sublabel}</span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
-                        </div>
+                        </template>
                     </template>
-                </div>
+                </template>
             </div>
 
-            <!-- SECTION 3: Decision -->
+            <!-- SECTION 3: Decision & Return (Preserved Workflow) -->
             <div class="wcf-vf-section">
                 <div class="wcf-vf-sec-head">
                     <div class="wcf-vf-sec-num">3</div>
                     <div class="wcf-vf-sec-info">
                         <h3 class="wcf-vf-sec-title">Decision</h3>
-                       <!-- <p class="wcf-vf-sec-lede">Pass advances to Reviewers. Return triggers the Submission Revision Pattern. Flag advances to Reviewers with a structured concern attached.</p>  -->
                     </div>
                 </div>
 
@@ -317,7 +255,6 @@
                                  onclick={handlePicklist}>
                                 <div class="wcf-dec-label">
                                     {opt.label}
-                                    <!-- <span class={opt.badgeCls}>{opt.badgeText}</span>-->
                                 </div>
                                 <div class="wcf-dec-desc">{opt.desc}</div>
                             </div>
@@ -389,168 +326,146 @@
                     </div>
                 </template>
 
-<!-- RETURN section -->
-<template if:true={showReturnSection}>
-    <div class="wcf-dep-wrapper">
-        <div class="wcf-dep-banner wcf-dep-banner-return"></div>
+                <!-- RETURN section -->
+                <template if:true={showReturnSection}>
+                    <div class="wcf-dep-wrapper">
+                        <div class="wcf-dep-banner wcf-dep-banner-return"></div>
 
-        <!-- Existing field-level checklist 
-        <div class="wcf-vf-field wcf-vf-field-optional">
-            <div class="wcf-vf-field-top">
-                <div class="wcf-vf-field-q">Field-level checklist for the Partner <span class="wcf-opt">(Optional)</span></div>
-            </div>
-            <p class="wcf-hint">Optional but strongly recommended on Return. Reference fields by RFI question number and short name (e.g., "Q4 Legal Structure — Brief description; Q14 Sustainability Plan"). Surfaces verbatim in the Partner-side banner on the returned Application.</p>
-            <lightning-textarea
-                name="s3_5"
-                value={formState.s3_5}
-                max-length="2400"
-                placeholder="e.g., 'Q14 Sustainability Plan needs substantive content; current text is boilerplate. Q15.v3 Verification report needs re-upload; uploaded file is unreadable.'"
-                onchange={handleTextChange}
-                data-field="s3_5">
-            </lightning-textarea>
-            <div class={wcClass_s3_5}>{wordCount_s3_5} / 300 words · Optional</div>
-        </div> -->
+                        <!-- Question Number Selector -->
+                        <div class="wcf-vf-field">
+                            <div class="wcf-vf-field-top">
+                                <div class="wcf-vf-field-q">
+                                    Select Question Number(s): Which questions need a return reason?
+                                    <span class="wcf-req">*</span>
+                                </div>
+                            </div>
+                            <p class="wcf-hint">
+                                Click one or more numbers to open a return-reason field for each.
+                                Click a selected number again (or use the ✕ on its card) to remove it.
+                            </p>
 
-        <!-- ── Question Number Selector ── -->
-        <div class="wcf-vf-field">
-            <div class="wcf-vf-field-top">
-                <div class="wcf-vf-field-q">
-                    Select Question Number(s): Which questions need a return reason?
-                    <span class="wcf-req">*</span>
-                </div>
-            </div>
-            <p class="wcf-hint">
-                Click one or more numbers to open a return-reason field for each.
-                Click a selected number again (or use the ✕ on its card) to remove it.
-            </p>
+                            <!-- Dynamic question number grid -->
+                            <div class="wcf-qnum-grid">
+                                <template for:each={questionNumberOptions} for:item="opt">
+                                    <button key={opt.val}
+                                            class={opt.cls}
+                                            data-val={opt.val}
+                                            onclick={handleQuestionNumberToggle}
+                                            type="button">
+                                        {opt.label}
+                                    </button>
+                                </template>
+                            </div>
 
-            <!-- 10-per-row pill grid -->
-            <div class="wcf-qnum-grid">
-                <template for:each={questionNumberOptions} for:item="opt">
-                    <button key={opt.val}
-                            class={opt.cls}
-                            data-val={opt.val}
-                            onclick={handleQuestionNumberToggle}
-                            type="button">
-                        {opt.label}
-                    </button>
+                            <!-- Open question cards -->
+                            <template if:true={hasOpenQuestions}>
+                                <div class="wcf-qcards-wrap">
+                                    <template for:each={openQuestionCards} for:item="card">
+                                        <div key={card.key} class={card.cls}>
+                                            <div class="wcf-qcard-header">
+                                                <span class="wcf-qcard-num">Q{card.num}</span>
+                                                <span class="wcf-qcard-title">{card.label}</span>
+                                                <button class="wcf-qcard-remove"
+                                                        data-num={card.num}
+                                                        onclick={handleRemoveQuestionCard}
+                                                        title="Remove this question"
+                                                        type="button">
+                                                    ✕ Remove
+                                                </button>
+                                            </div>
+
+                                            <lightning-textarea
+                                                name={card.field}
+                                                value={card.value}
+                                                max-length="2400"
+                                                label=""
+                                                placeholder="Describe the return reason for this question in 1–3 sentences."
+                                                data-num={card.num}
+                                                onchange={handleQuestionCardTextChange}
+                                                class="wcf-qcard-textarea">
+                                            </lightning-textarea>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </template>
             </div>
 
-            <!-- ── Open question cards ── -->
-            <template if:true={hasOpenQuestions}>
-                <div class="wcf-qcards-wrap">
-                    <template for:each={openQuestionCards} for:item="card">
-                        <div key={card.key} class={card.cls}>
-
-                            <!-- Card header -->
-                            <div class="wcf-qcard-header">
-                                <span class="wcf-qcard-num">Q{card.num}</span>
-                                <span class="wcf-qcard-title">{card.label}</span>
-                                <!-- Remove button -->
-                                <button class="wcf-qcard-remove"
-                                        data-num={card.num}
-                                        onclick={handleRemoveQuestionCard}
-                                        title="Remove this question"
-                                        type="button">
-                                    ✕ Remove
-                                </button>
-                            </div>
-
-                            <!-- Textarea -->
-                            <lightning-textarea
-                                name={card.field}
-                                value={card.value}
-                                max-length="2400"
-                                label=""
-                                placeholder="Describe the return reason for this question in 1–3 sentences."
-                                data-num={card.num}
-                                onchange={handleQuestionCardTextChange}
-                                class="wcf-qcard-textarea">
-                            </lightning-textarea>
-
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-    </div>
-</template>
-            </div>
-
-            <!-- SECTION 4: Application Tags -->
+            <!-- SECTION 4: Application Tags (Dynamic Metadata Driven) -->
             <div class="wcf-vf-section">
                 <div class="wcf-vf-sec-head">
-                    <div class="wcf-vf-sec-num">4</div>
+                    <div class="wcf-vf-sec-num">{section4.sectionNumber}</div>
                     <div class="wcf-vf-sec-info">
-                        <h3 class="wcf-vf-sec-title">Application tags</h3>
-                        <p class="wcf-vf-sec-lede">Two structured tags, always mandatory regardless of decision. Stored on the Application entity.</p>
+                        <h3 class="wcf-vf-sec-title">{section4.title}</h3>
+                        <p class="wcf-vf-sec-lede">{section4.lede}</p>
                     </div>
                 </div>
 
-                <!-- S4.1 Source Channel -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Source Channel: How did this Application reach WCF? <span class="wcf-req">*</span></div>
-                    </div>
-                    <div class="wcf-picklist">
-                        <template for:each={s4_1Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s4_1"
-                                 data-val={opt.val}
-                                 onclick={handlePicklist}>
-                                <span class="wcf-pick-dot"></span>{opt.label}
+                <template for:each={section4.questions} for:item="q">
+                    <div key={q.key} class={q.containerClass}>
+                        <div class="wcf-vf-field-top">
+                            <div class="wcf-vf-field-q">{q.questionText} <span class="wcf-req">*</span></div>
+                        </div>
+                        <template if:true={q.isWrapPicklist}>
+                            <div class="wcf-picklist wcf-picklist-wrap">
+                                <template for:each={q.options} for:item="opt">
+                                    <div key={opt.val}
+                                         class={opt.cls}
+                                         data-field={q.key}
+                                         data-val={opt.val}
+                                         onclick={handlePicklist}>
+                                        <span class="wcf-pick-dot"></span>{opt.label}
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <template if:false={q.isWrapPicklist}>
+                            <div class="wcf-picklist">
+                                <template for:each={q.options} for:item="opt">
+                                    <div key={opt.val}
+                                         class={opt.cls}
+                                         data-field={q.key}
+                                         data-val={opt.val}
+                                         onclick={handlePicklist}>
+                                        <span class="wcf-pick-dot"></span>{opt.label}
+                                    </div>
+                                </template>
                             </div>
                         </template>
                     </div>
-                </div>
-
-                <!-- S4.2 Budget Range -->
-                <div class="wcf-vf-field">
-                    <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Budget Range: Which band does the applicant's most recent annual operating budget fall into? <span class="wcf-req">*</span></div>
-                    </div>
-                    <div class="wcf-picklist wcf-picklist-wrap">
-                        <template for:each={s4_2Options} for:item="opt">
-                            <div key={opt.val}
-                                 class={opt.cls}
-                                 data-field="s4_2"
-                                 data-val={opt.val}
-                                 onclick={handlePicklist}>
-                                <span class="wcf-pick-dot"></span>{opt.label}
-                            </div>
-                        </template>
-                    </div>
-                </div>
+                </template>
             </div>
 
-            <!-- SECTION 5: Notes for Reviewers -->
+            <!-- SECTION 5: Notes for Reviewers (Dynamic Metadata Driven) -->
             <template if:true={showNotesSection}>
                 <div class="wcf-vf-section">
                     <div class="wcf-dep-banner wcf-dep-banner-notes" style="margin-bottom: 1rem;"></div>
                     <div class="wcf-vf-sec-head">
-                        <div class="wcf-vf-sec-num">5</div>
-                         <div class="wcf-vf-sec-info">
-                            <h3 class="wcf-vf-sec-title">Notes for Reviewers <span class="wcf-req">*</span></h3>
-                            <p class="wcf-vf-sec-lede">Free-form hand-off. Examples: sourcing-channel context; prior conversations the applicant referenced; relationships with current donees; useful background on the founder or leadership team.</p>
+                        <div class="wcf-vf-sec-num">{section5.sectionNumber}</div>
+                        <div class="wcf-vf-sec-info">
+                            <h3 class="wcf-vf-sec-title">{section5.title} <span class="wcf-req">*</span></h3>
+                            <p class="wcf-vf-sec-lede">{section5.lede}</p>
                         </div>
                     </div>
-                    <div class="wcf-vf-field wcf-vf-field-optional">
-                        <div class="wcf-vf-field-top">
-                        <div class="wcf-vf-field-q">Notes for Reviewers <span class="wcf-req">*</span></div>
-                    </div>
-                        <lightning-textarea
-                            name="s5_1"
-                            value={formState.s5_1}
-                            max-length="4000"
-                            rows="4"
-                            placeholder="e.g., 'Nominated by WEN partner [name] in March; warm intro through [contact].'"
-                            onchange={handleTextChange}
-                            data-field="s5_1">
-                        </lightning-textarea>
-                        <div class={wcClass_s5_1}>{wordCount_s5_1} / 500 words · Required</div>
-                    </div>
+                    <template for:each={section5.questions} for:item="q">
+                        <div key={q.key} class="wcf-vf-field wcf-vf-field-optional">
+                            <div class="wcf-vf-field-top">
+                                <div class="wcf-vf-field-q">{q.questionText} <span class="wcf-req">*</span></div>
+                            </div>
+                            <lightning-textarea
+                                name={q.key}
+                                value={q.value}
+                                max-length="4000"
+                                rows="4"
+                                placeholder={q.placeholder}
+                                onchange={handleTextChange}
+                                data-field={q.key}>
+                            </lightning-textarea>
+                            <div class={q.wcClass}>{q.wordCount} / {q.wordLimit} words · Required</div>
+                        </div>
+                    </template>
                 </div>
             </template>
 
@@ -559,7 +474,6 @@
             ══════════════════════════════════════ -->
             <div class="wcf-vf-footer">
                 <div class="wcf-footer-left">
-                    <!-- Draft status chip -->
                     <template if:true={isDraftSaved}>
                         <div class="wcf-draft-chip">
                             <span class="wcf-draft-chip-dot"></span>
@@ -569,7 +483,6 @@
                     <div class="wcf-footer-status">{footerStatus}</div>
                 </div>
                 <div class="wcf-footer-actions">
-                    <!-- Save Draft — always enabled, no validation required -->
                     <lightning-button
                         label={saveDraftLabel}
                         onclick={handleSaveDraft}
@@ -588,224 +501,171 @@
 
         </div>
 
- 
-
-         <!-- PREVIEW MODAL START -->
+        <!-- ══════════════════════════════════════
+             PREVIEW MODAL
+        ══════════════════════════════════════ -->
         <template if:true={showPreview}>
             <section class="preview-modal">
-                <h3>✅ Completeness Check</h3>
-            <section
-                role="dialog"
-                tabindex="-1"
-                class="slds-modal slds-fade-in-open">
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container slds-modal_large">
 
-                <div class="slds-modal__container slds-modal_large">
+                        <template if:true={isSaving}>
+                            <div class="wcf-saving-overlay wcf-saving-overlay-modal">
+                                <lightning-spinner alternative-text="Sealing record..." size="medium" variant="brand"></lightning-spinner>
+                                <p class="wcf-saving-text">Sealing record…</p>
+                            </div>
+                        </template>
 
-                     <template if:true={isSaving}>
-        <div class="wcf-saving-overlay wcf-saving-overlay-modal">
-            <lightning-spinner alternative-text="Sealing record..." size="medium" variant="brand"></lightning-spinner>
-            <p class="wcf-saving-text">Sealing record…</p>
-        </div>
-    </template>
+                        <header class="slds-modal__header">
+                            <h2 class="slds-text-heading_medium">
+                                Confirm your decision
+                            </h2>
+                        </header>
 
-                    <header class="slds-modal__header">
-                        <h2 class="slds-text-heading_medium">
-                           Confirm your decision
-                        </h2>
-                    </header>
+                        <div class="slds-modal__content slds-p-around_medium preview-container">
 
-<div class="slds-modal__content slds-p-around_medium preview-container">
+                            <!-- Completeness Check -->
+                            <div class="preview-section">
+                                <h3>✅ Completeness Check</h3>
+                                <div class="preview-item">
+                                    <span class="label">Mandatory Fields</span>
+                                    <span>{formState.s1_1_confirm}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Verification Reports</span>
+                                    <span>{formState.s1_2_confirm}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Attestation</span>
+                                    <span>{formState.s1_3_confirm}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Content Gap</span>
+                                    <span>{formState.s1_4_text}</span>
+                                </div>
+                            </div>
 
-    <!-- Completeness Check -->
-    <div class="preview-section">
-        <h3>✅ Completeness Check</h3>
+                            <!-- Eligibility -->
+                            <div class="preview-section">
+                                <h3>🌍 Eligibility Assessment</h3>
+                                <div class="preview-item">
+                                    <span class="label">Geography</span>
+                                    <span>{formState.s2_1}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Mandate Fit</span>
+                                    <span>{formState.s2_2}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Blocking Concern</span>
+                                    <span>{formState.s2_3}</span>
+                                </div>
+                                <template if:true={showS2_3_text}>
+                                    <div class="preview-item">
+                                        <span class="label">Concern Details</span>
+                                        <span>{formState.s2_3_text}</span>
+                                    </div>
+                                </template>
+                            </div>
 
-        <div class="preview-item">
-            <span class="label">Mandatory Fields</span>
-            <span>{formState.s1_1_confirm}</span>
-        </div>
+                            <!-- Decision -->
+                            <div class="preview-section decision-section">
+                                <h3>📋 Decision</h3>
+                                <div class="decision-card">
+                                    <div class="decision-title">
+                                        {formState.s3_1}
+                                    </div>
+                                    <div class="decision-rationale">
+                                        {formState.s3_2}
+                                    </div>
+                                </div>
 
-        <div class="preview-item">
-            <span class="label">Verification Reports</span>
-            <span>{formState.s1_2_confirm}</span>
-        </div>
+                                <template if:true={showReturnSection}>
+                                    <template if:true={hasPreviewQuestions}>
+                                        <div class="preview-subsection">
+                                            <h4>Return Reasons by Question</h4>
+                                            <div class="preview-qnum-pills">
+                                                <template for:each={previewQuestionCards} for:item="card">
+                                                    <span key={card.key} class="preview-qnum-pill">
+                                                        Q{card.num}
+                                                    </span>
+                                                </template>
+                                            </div>
 
-        <div class="preview-item">
-            <span class="label">Attestation</span>
-            <span>{formState.s1_3_confirm}</span>
-        </div>
+                                            <template for:each={previewQuestionCards} for:item="card">
+                                                <div key={card.key} class="preview-qcard">
+                                                    <div class="preview-qcard-header">
+                                                        <span class="preview-qcard-num">Q{card.num}</span>
+                                                        <span class="preview-qcard-label">{card.label} — Return Reason</span>
+                                                    </div>
+                                                    <div class="preview-qcard-text">{card.text}</div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
 
-        <div class="preview-item">
-            <span class="label">Content Gap</span>
-            <span>{formState.s1_4_text}</span>
-        </div>
-    </div>
+                                <template if:true={showFlagSection}>
+                                    <div class="preview-subsection">
+                                        <h4>Flag Reasons</h4>
+                                        <template for:each={selectedFlagReasons} for:item="reason">
+                                            <span key={reason} class="preview-tag">
+                                                {reason}
+                                            </span>
+                                        </template>
+                                    </div>
+                                    <template if:true={showFlagOther}>
+                                        <div class="preview-subsection">
+                                            <h4>Other Concern</h4>
+                                            <div class="preview-notes">
+                                                {formState.s3_4}
+                                            </div>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
 
-    <!-- Eligibility -->
-    <div class="preview-section">
-        <h3>🌍 Eligibility Assessment</h3>
+                            <!-- Tags -->
+                            <div class="preview-section">
+                                <h3>🏷 Application Tags</h3>
+                                <div class="preview-item">
+                                    <span class="label">Source Channel</span>
+                                    <span>{formState.s4_1}</span>
+                                </div>
+                                <div class="preview-item">
+                                    <span class="label">Budget Range</span>
+                                    <span>{formState.s4_2}</span>
+                                </div>
+                            </div>
 
-        <div class="preview-item">
-            <span class="label">Geography</span>
-            <span>{formState.s2_1}</span>
-        </div>
+                            <!-- Notes -->
+                            <div class="preview-section">
+                                <h3>📝 Notes</h3>
+                                <div class="preview-notes">
+                                    {formState.s5_1}
+                                </div>
+                            </div>
 
-        <div class="preview-item">
-            <span class="label">Mandate Fit</span>
-            <span>{formState.s2_2}</span>
-        </div>
+                        </div>
 
-        <div class="preview-item">
-            <span class="label">Blocking Concern</span>
-            <span>{formState.s2_3}</span>
-        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="Back to Edit"
+                                onclick={handleClosePreview}
+                                disabled={isSaving}>
+                            </lightning-button>
+                            <lightning-button
+                                label={sealButtonLabel}
+                                variant="brand"
+                                onclick={handleFinalSeal}
+                                disabled={isSaving}>
+                            </lightning-button>
+                        </footer>
 
-        <template if:true={showS2_3_text}>
-            <div class="preview-item">
-                <span class="label">Concern Details</span>
-                <span>{formState.s2_3_text}</span>
-            </div>
-        </template>
-    </div>
-
-   <!-- Decision -->
-<div class="preview-section decision-section">
-    <h3>📋 Decision</h3>
-
-    <div class="decision-card">
-        <div class="decision-title">
-            {formState.s3_1}
-        </div>
-
-        <div class="decision-rationale">
-            {formState.s3_2}
-        </div>
-    </div>
-
-    <template if:true={showReturnSection}>
-
-    <!-- Field-level checklist -->
-    <div class="preview-subsection">
-        <h4>Field-level Checklist for Partner</h4>
-        <div class="preview-notes">
-            {formState.s3_5}
-        </div>
-    </div>
-
-    <!-- Selected question numbers + return reasons -->
-    <template if:true={hasPreviewQuestions}>
-        <div class="preview-subsection">
-            <h4>Return Reasons by Question</h4>
-
-            <!-- Selected question number pills -->
-            <div class="preview-qnum-pills">
-                <template for:each={previewQuestionCards} for:item="card">
-                    <span key={card.key} class="preview-qnum-pill">
-                        Q{card.num}
-                    </span>
-                </template>
-            </div>
-
-            <!-- One card per question -->
-            <template for:each={previewQuestionCards} for:item="card">
-                <div key={card.key} class="preview-qcard">
-                    <div class="preview-qcard-header">
-                        <span class="preview-qcard-num">Q{card.num}</span>
-                        <span class="preview-qcard-label">{card.label} — Return Reason</span>
                     </div>
-                    <div class="preview-qcard-text">{card.text}</div>
-                </div>
-            </template>
-
-        </div>
-    </template>
-
-</template>
-
-    <!-- Flag Reasons -->
-    <template if:true={showFlagSection}>
-
-        <div class="preview-subsection">
-
-            <h4>Flag Reasons</h4>
-
-            <template for:each={selectedFlagReasons} for:item="reason">
-
-                <span
-                    key={reason}
-                    class="preview-tag">
-
-                    {reason}
-
-                </span>
-
-            </template>
-
-        </div>
-
-        <template if:true={showFlagOther}>
-            <div class="preview-subsection">
-                <h4>Other Concern</h4>
-
-                <div class="preview-notes">
-                    {formState.s3_4}
-                </div>
-            </div>
-        </template>
-
-    </template>
-
-</div>
-
-    <!-- Tags -->
-    <div class="preview-section">
-        <h3>🏷 Application Tags</h3>
-
-        <div class="preview-item">
-            <span class="label">Source Channel</span>
-            <span>{formState.s4_1}</span>
-        </div>
-
-        <div class="preview-item">
-            <span class="label">Budget Range</span>
-            <span>{formState.s4_2}</span>
-        </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="preview-section">
-        <h3>📝 Notes</h3>
-
-        <div class="preview-notes">
-            {formState.s5_1}
-        </div>
-    </div>
-
-</div>
-
-                  <footer class="slds-modal__footer">
-
-    <lightning-button
-        label="Back to Edit"
-        onclick={handleClosePreview}
-        disabled={isSaving}>
-    </lightning-button>
-
-    <lightning-button
-        label={sealButtonLabel}
-        variant="brand"
-        onclick={handleFinalSeal}
-        disabled={isSaving}>
-    </lightning-button>
-
-</footer>
-
-                </div>
-            </section>
-
-            <div class="slds-backdrop slds-backdrop_open"></div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
             </section>
         </template>
-        <!-- PREVIEW MODAL END -->
     </template>
 </template>

@@ -136,6 +136,15 @@ private class WCFApproverListControllerTest {
             WCFApproverListController.saveDecision(app.Id, review.Id, 'Decline', 'Declined comment', null);
             System.assertNotEquals(null, WCFApproverListController.getExistingDecision(app.Id));
 
+            // Verify RecordType is WG_Approver
+            ApplicationDecision createdDec = [
+                SELECT Id, RecordTypeId, RecordType.DeveloperName
+                FROM ApplicationDecision
+                WHERE ApplicationId = :app.Id
+                LIMIT 1
+            ];
+            System.assertEquals('WG_Approver', createdDec.RecordType.DeveloperName, 'RecordType should be WG_Approver');
+
             // Test Revoke Decision (within 7 days)
             WCFApproverListController.revokeDecision(app.Id);
 

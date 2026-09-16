@@ -5,7 +5,7 @@
         <label>Proposal AI Feedback Update Prompt2</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>0hfe1000000AAu9NotFound</actionName>
+        <actionName>Proposal_AI_Feedback_Update_Prompt2</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Get_Current_Status_Before_Update</targetReference>
@@ -14,10 +14,11 @@
         <inputParameters>
             <name>Input:jobCreationApproach</name>
             <value>
-                <elementReference>Get_Proposal_Record_6_Fields.Job_Creation_Approach__c</elementReference>
+                <elementReference>Safe_Job_Creation_Approach</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
+        <nameSegment>Proposal_AI_Feedback_Update_Prompt2</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -56,7 +57,7 @@
         <label>Send the values to Prompt</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>0hfe10000001hanNotFound</actionName>
+        <actionName>Proposal_AI_Feedback_Update_Prompt</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Check_whether_job_creation_value_is_present</targetReference>
@@ -65,13 +66,13 @@
         <inputParameters>
             <name>Input:orgSustainabilityResponse</name>
             <value>
-                <elementReference>Get_Proposal_Record_6_Fields.Organizational_Sustainability__c</elementReference>
+                <elementReference>Safe_Org_Sustainability</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
             <name>Input:skillingApproach</name>
             <value>
-                <elementReference>Get_Proposal_Record_6_Fields.Skilling_Approach__c</elementReference>
+                <elementReference>Safe_Skilling_Approach</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -84,15 +85,16 @@
         <inputParameters>
             <name>Input:legalStructureResponse</name>
             <value>
-                <elementReference>Get_Proposal_Record_6_Fields.Legal_Structure__c</elementReference>
+                <elementReference>Safe_Legal_Structure</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
             <name>Input:useOfFundsResponse</name>
             <value>
-                <elementReference>Get_Proposal_Record_6_Fields.Use_of_Additional_Funding__c</elementReference>
+                <elementReference>Safe_Use_of_Funds</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>Proposal_AI_Feedback_Update_Prompt</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -265,6 +267,31 @@
         </rules>
     </decisions>
     <environments>Default</environments>
+    <formulas>
+        <name>Safe_Job_Creation_Approach</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Job_Creation_Approach__c}, &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <name>Safe_Legal_Structure</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Legal_Structure__c}, &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <name>Safe_Org_Sustainability</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Organizational_Sustainability__c}, &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <name>Safe_Skilling_Approach</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Skilling_Approach__c}, &quot;&quot;)</expression>
+    </formulas>
+    <formulas>
+        <name>Safe_Use_of_Funds</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Use_of_Additional_Funding__c}, &quot;&quot;)</expression>
+    </formulas>
     <interviewLabel>AI Feedback Update in Proposal {!$Flow.CurrentDateTime}</interviewLabel>
     <label>AI Feedback Update in Proposal</label>
     <processMetadataValues>
@@ -335,6 +362,7 @@
         <queriedFields>Use_of_Additional_Funding__c</queriedFields>
         <queriedFields>Job_Creation_Approach__c</queriedFields>
         <queriedFields>Skilling_Approach__c</queriedFields>
+        <queriedFields>Livelihood_Approach__c</queriedFields>
         <queriedFields>Revenue_Explanation__c</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>

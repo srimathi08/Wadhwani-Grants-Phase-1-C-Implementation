@@ -58,7 +58,13 @@
                                 <td>{row.rowNum}</td>
                                 <td class="cell-id">{row.applicationName}</td>
                                 <td>{row.organizationName}</td>
-                                <td><span class={row.trackPillClass}>{row.track}</span></td>
+                                <td>
+                                    <div style="display: inline-flex; gap: 4px; flex-wrap: wrap;">
+                                        <template for:each={row.trackBadges} for:item="tb">
+                                            <span key={tb.code} class={tb.pillClass}>{tb.code}</span>
+                                        </template>
+                                    </div>
+                                </td>
                                 <td><span class={row.recPillClass}>{row.recommendation}</span></td>
                                 <td><span class={row.statusPillClass}>{row.decisionLabel}</span></td>
                                 <td>
@@ -68,6 +74,8 @@
                                                 data-id={row.applicationId}
                                                 data-appname={row.applicationName}
                                                 data-review-id={row.reviewId}
+                                                data-track={row.track}
+                                                data-track-label={row.trackLabel}
                                                 onclick={handlePreviewApprove}>
                                             View Decision
                                         </button>
@@ -79,6 +87,8 @@
                                                     data-id={row.applicationId}
                                                     data-appname={row.applicationName}
                                                     data-review-id={row.reviewId}
+                                                    data-track={row.track}
+                                                    data-track-label={row.trackLabel}
                                                     onclick={handlePreviewApprove}>
                                                 Start Approve
                                             </button>

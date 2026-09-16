@@ -168,6 +168,39 @@
                     </template>
                 </div>
             </template>
+
+            <!-- ── Draft & Submission Footer ── -->
+            <template if:true={showActionFooter}>
+                <div class="comp-footer">
+                    <div class="comp-footer-status">
+                        <span class="comp-footer-count">{uploadProgressText}</span>
+                        <template if:false={allDocumentsUploaded}>
+                            <span class="comp-footer-hint">Upload all required documents to enable submission for compliance review.</span>
+                        </template>
+                        <template if:true={allDocumentsUploaded}>
+                            <span class="comp-footer-hint comp-footer-hint--ready">All required documents uploaded. Ready to submit for review.</span>
+                        </template>
+                    </div>
+                    <div class="comp-footer-actions">
+                        <lightning-button
+                            label="Save Draft"
+                            icon-name="utility:save"
+                            variant="neutral"
+                            onclick={handleSaveDraft}
+                            class="comp-btn-draft">
+                        </lightning-button>
+                        <lightning-button
+                            label="Submit Compliance Documents"
+                            icon-name="utility:send"
+                            variant="brand"
+                            onclick={handleSubmit}
+                            disabled={isSubmitDisabled}
+                            class="comp-btn-submit">
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
         </template>
     </template>
 

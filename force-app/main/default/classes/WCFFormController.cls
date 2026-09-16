@@ -50,7 +50,8 @@ public without sharing class WCFFormController {
                 AI_Feedback__c rec = [SELECT Id, Submitter_Name__c, Legal_Structure_FR__c, Organizational_Sustainability_FR__c,
                                       Use_of_Additional_Funding_FR__c, Operational_Synergies_with_WOF_FR__c, Operational_Synergies_with_WOF__c,
                                       Use_of_Additional_Funding__c, Operational_Synergies_with_WOF_JC__c, Operational_Synergies_with_WOF_JC_FR__c,
-                                      Operational_Synergies_with_WOF_Both__c, Operational_Synergies_with_WOF_Both_FR__c,Job_Creation_Approach_FR__c, Skilling_Approach_FR__c,Revenue_Explanation_FR__c,Job_Creation_Approach__c, Skilling_Approach__c,Revenue_Explanation__c
+                                      Operational_Synergies_with_WOF_Both__c, Operational_Synergies_with_WOF_Both_FR__c,Job_Creation_Approach_FR__c, Skilling_Approach_FR__c,Revenue_Explanation_FR__c,Job_Creation_Approach__c, Skilling_Approach__c,Revenue_Explanation__c,
+                                      Livelihood_Approach__c, Livelihood_Approach_FR__c
                                       FROM AI_Feedback__c      
                                       WHERE Submitter_Name__c = :submitterName LIMIT 1];
                 						
@@ -69,6 +70,7 @@ public without sharing class WCFFormController {
                 data.put('Operational_Synergies_with_WOF_Both_FR__c', rec.Operational_Synergies_with_WOF_Both_FR__c);
                 data.put('Job_Creation_Approach_FR__c', rec.Job_Creation_Approach_FR__c);
                 data.put('Skilling_Approach_FR__c', rec.Skilling_Approach_FR__c);
+                data.put('Livelihood_Approach_FR__c', rec.Livelihood_Approach_FR__c);
                 data.put('Revenue_Explanation_FR__c', rec.Revenue_Explanation_FR__c);
                 return data;
             }

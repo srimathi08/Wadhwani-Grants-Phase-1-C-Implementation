@@ -378,6 +378,113 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public String mandateTrack;
         @AuraEnabled public String orgArea;
         @AuraEnabled public String geography;
+        @AuraEnabled public List<String> populatedQuestionKeys;
+    }
+
+    public static List<String> calculatePopulatedQuestionKeys(IndividualApplication app, Id applicationId) {
+        String orgArea = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
+            ? app.Organizational_Area_s_for_Funding_Inves1__c.toLowerCase()
+            : (String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves__c)
+                ? app.Organizational_Area_s_for_Funding_Inves__c.toLowerCase()
+                : '');
+        Boolean isBoth = orgArea.contains('both');
+        Boolean hasJF  = isBoth || orgArea.contains('fulfil');
+        Boolean hasJC  = isBoth || orgArea.contains('creation');
+        Boolean hasLU  = orgArea.contains('livelihood');
+
+        Boolean hasFunders = String.isNotBlank(app.Funder_1_Name__c) || String.isNotBlank(app.Funder_2_Name__c) || String.isNotBlank(app.Funder_3_Name__c);
+        Boolean hasReferences = String.isNotBlank(app.Reference_1_Name__c) || String.isNotBlank(app.Reference_2_Name__c);
+
+        List<String> popKeys = new List<String>{ 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6' };
+        if (hasFunders) popKeys.add('Q7');
+        if (hasReferences) popKeys.add('Q8');
+        popKeys.add('Q9');
+        popKeys.add('Q10');
+
+        if (hasJF) {
+            popKeys.add('Q11');
+            Boolean hasSkillingDomains = [SELECT count() FROM WCF_Skilling_Domain__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0;
+            if (hasSkillingDomains) popKeys.add('Q12');
+            popKeys.add('Q13');
+            popKeys.add('Q14');
+        }
+
+        if (hasJC) {
+            popKeys.add('Q15');
+            Boolean hasBusinessSectors = String.isNotBlank(app.Business_Sectors_JSON__c) || ([SELECT count() FROM WCF_Business_Sector__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+            if (hasBusinessSectors) popKeys.add('Q16');
+            popKeys.add('Q17');
+            popKeys.add('Q18');
+        }
+
+        if (hasLU) {
+            popKeys.add('Q19');
+            popKeys.add('Q20');
+            popKeys.add('Q21');
+            popKeys.add('Q22');
+            popKeys.add('Q23');
+        }
+
+        popKeys.add('Q24');
+        popKeys.add('Q25');
+        popKeys.add('Q26');
+
+        Boolean hasGenie = String.isNotBlank(app.GenieAI_Interest_Level__c)
+            || (hasJF && !hasJC && String.isNotBlank(app.Operational_Synergies_with_WOF__c))
+            || (hasJC && !hasJF && String.isNotBlank(app.Operational_Synergies_with_WOF_JC__c))
+            || (isBoth && String.isNotBlank(app.Operational_Synergies_with_WOF_Both__c));
+        if (hasGenie) popKeys.add('Q27');
+        popKeys.add('Q28');
+
+        return popKeys;
+    }
+
+    public static Map<String, Integer> calculateQuestionNumberMap(String orgArea) {
+        String oa = orgArea != null ? orgArea.toLowerCase() : '';
+        Boolean isBoth = oa.contains('both');
+        Boolean hasJF  = isBoth || oa.contains('fulfil');
+        Boolean hasJC  = isBoth || oa.contains('creation');
+        Boolean hasLU  = oa.contains('livelihood');
+
+        Integer currentNum = 1;
+        Map<String, Integer> qNumMap = new Map<String, Integer>();
+        qNumMap.put('Q1', currentNum++);
+        qNumMap.put('Q2', currentNum++);
+        qNumMap.put('Q3', currentNum++);
+        qNumMap.put('Q4', currentNum++);
+        qNumMap.put('Q5', currentNum++);
+        qNumMap.put('Q6', currentNum++);
+        qNumMap.put('Q7', currentNum++);
+        qNumMap.put('Q8', currentNum++);
+        qNumMap.put('Q9', currentNum++);
+        qNumMap.put('Q10', currentNum++);
+
+        if (hasJF) {
+            qNumMap.put('Q11', currentNum++);
+            qNumMap.put('Q12', currentNum++);
+            qNumMap.put('Q13', currentNum++);
+            qNumMap.put('Q14', currentNum++);
+        }
+        if (hasJC) {
+            qNumMap.put('Q15', currentNum++);
+            qNumMap.put('Q16', currentNum++);
+            qNumMap.put('Q17', currentNum++);
+            qNumMap.put('Q18', currentNum++);
+        }
+        if (hasLU) {
+            qNumMap.put('Q19', currentNum++);
+            qNumMap.put('Q20', currentNum++);
+            qNumMap.put('Q21', currentNum++);
+            qNumMap.put('Q22', currentNum++);
+            qNumMap.put('Q23', currentNum++);
+        }
+        qNumMap.put('Q24', currentNum++);
+        qNumMap.put('Q25', currentNum++);
+        qNumMap.put('Q26', currentNum++);
+        qNumMap.put('Q27', currentNum++);
+        qNumMap.put('Q28', currentNum++);
+
+        return qNumMap;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -391,7 +498,14 @@ public without sharing class WCFValidatorController {
             SELECT Id, Name, Due_Date__c, Status, Primary_Focus_Area__c,
                    Sub_Focus_Area__c, Organizational_Area_s_for_Funding_Inves__c, Organizational_Area_s_for_Funding_Inves1__c,
                    Attesting_User_Name__c, Attesting_User_Title__c, 
-                   Initial_Submission_Date__c
+                   Initial_Submission_Date__c,
+                   Funder_1_Name__c, Funder_2_Name__c, Funder_3_Name__c,
+                   Reference_1_Name__c, Reference_2_Name__c,
+                   Skilling_Approach__c, Job_Creation_Approach__c, Livelihood_Approach__c,
+                   Business_Sectors_JSON__c,
+                   Organizational_Sustainability__c, Use_of_Additional_Funding__c, Use_of_Additional_Funding_JC__c,
+                   GenieAI_Interest_Level__c, Operational_Synergies_with_WOF__c,
+                   Operational_Synergies_with_WOF_JC__c, Operational_Synergies_with_WOF_Both__c
             FROM IndividualApplication 
             WHERE Id = :applicationId 
             WITH SYSTEM_MODE
@@ -413,6 +527,7 @@ public without sharing class WCFValidatorController {
             wrapper.orgArea         = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
                                          ? app.Organizational_Area_s_for_Funding_Inves1__c
                                          : app.Organizational_Area_s_for_Funding_Inves__c;
+            wrapper.populatedQuestionKeys = calculatePopulatedQuestionKeys(app, applicationId);
         }
 
         Id validatorRecordTypeId = getWCFValidatorRecordTypeId();
@@ -715,7 +830,7 @@ public without sharing class WCFValidatorController {
 
         Set<String> fieldNames = new Set<String>{
             'Id', 'Name', 'Status', 'AppliedDate', 'Funding_Year__c', 'RecordType.Name',
-            'Organizational_Area_s_for_Funding_Inves__c', 'Organization_Name__c',
+            'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c', 'Organization_Name__c',
             'Headquarters_City_and_Country__c', 'Primary_Service_Regions__c',
             'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c', 'Submitter_Name__c', 'Job_Title__c',
             'WG_Phone_Country_Code__c', 'Phone_Country_Code__c',
@@ -1099,10 +1214,9 @@ public without sharing class WCFValidatorController {
 
     @AuraEnabled(cacheable=false)
     public static List<Integer> getPopulatedQuestionNumbers(Id applicationId) {
-        List<Integer> populated = new List<Integer>();
-
         IndividualApplication app = [
             SELECT
+                Id,
                 Organizational_Area_s_for_Funding_Inves__c,
                 Organizational_Area_s_for_Funding_Inves1__c,
                 Organization_Name__c,
@@ -1110,13 +1224,18 @@ public without sharing class WCFValidatorController {
                 Legal_Type__c,
                 Current_fiscal_year_s_end_date__c,
                 Funder_1_Name__c,
+                Funder_2_Name__c,
+                Funder_3_Name__c,
                 Reference_1_Name__c,
+                Reference_2_Name__c,
                 Skilling_Approach__c,
                 Job_Creation_Approach__c,
                 Livelihood_Approach__c,
                 Business_Sectors_JSON__c,
                 Organizational_Sustainability__c,
                 Use_of_Additional_Funding__c,
+                Use_of_Additional_Funding_JC__c,
+                GenieAI_Interest_Level__c,
                 Operational_Synergies_with_WOF__c,
                 Operational_Synergies_with_WOF_JC__c,
                 Operational_Synergies_with_WOF_Both__c
@@ -1126,114 +1245,19 @@ public without sharing class WCFValidatorController {
             LIMIT 1
         ];
 
-        String orgArea = app.Organizational_Area_s_for_Funding_Inves1__c != null
-                         ? app.Organizational_Area_s_for_Funding_Inves1__c.toLowerCase()
-                         : (app.Organizational_Area_s_for_Funding_Inves__c != null
-                            ? app.Organizational_Area_s_for_Funding_Inves__c.toLowerCase()
-                            : '');
+        String orgArea = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
+            ? app.Organizational_Area_s_for_Funding_Inves1__c
+            : app.Organizational_Area_s_for_Funding_Inves__c;
 
-        Boolean isBoth = orgArea.contains('both');
-        Boolean hasJF  = isBoth || orgArea.contains('fulfil');
-        Boolean hasJC  = isBoth || orgArea.contains('creation');
+        List<String> popKeys = calculatePopulatedQuestionKeys(app, applicationId);
+        Map<String, Integer> qNumMap = calculateQuestionNumberMap(orgArea);
 
-        // Q1
-        if (String.isNotBlank(orgArea)) populated.add(1);
-        // Q2
-        if (String.isNotBlank(app.Organization_Name__c)) populated.add(2);
-        // Q3
-        if (String.isNotBlank(app.Submitter_Name__c)) populated.add(3);
-        // Q4
-        if (String.isNotBlank(app.Legal_Type__c)) populated.add(4);
-        // Q5
-        if (app.Current_fiscal_year_s_end_date__c != null) populated.add(5);
-        // Q6
-        if (String.isNotBlank(app.Funder_1_Name__c)) populated.add(6);
-        // Q7
-        if (String.isNotBlank(app.Reference_1_Name__c)) populated.add(7);
-
-        // Q8 — JF only
-        if (hasJF && String.isNotBlank(app.Skilling_Approach__c)) populated.add(8);
-
-        // Q9 — JF only, check WCF_Skilling_Domain__c child records
-        if (hasJF) {
-            List<WCF_Skilling_Domain__c> sds = [
-                SELECT Id FROM WCF_Skilling_Domain__c
-                WHERE Proposal__c = :applicationId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            if (!sds.isEmpty()) populated.add(9);
-        }
-
-        // Q10 — JC only
-        if (hasJC && String.isNotBlank(app.Job_Creation_Approach__c)) populated.add(10);
-
-        // Q11 — JC only, check WCF_Business_Sector__c child records
-        if (hasJC) {
-            List<WCF_Business_Sector__c> bss = [
-                SELECT Id FROM WCF_Business_Sector__c
-                WHERE Proposal__c = :applicationId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            if (!bss.isEmpty()) populated.add(11);
-        }
-
-        // Q12 — historical financial data
-        List<Historical_Data__c> hists = [
-            SELECT Id FROM Historical_Data__c
-            WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
-        ];
-        if (!hists.isEmpty()) populated.add(12);
-
-        // Q13 — current fiscal year data
-        List<Current_fiscal_year_data__c> fiscals = [
-            SELECT Id FROM Current_fiscal_year_data__c
-            WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
-        ];
-        if (!fiscals.isEmpty()) populated.add(13);
-
-        // Q14
-        if (String.isNotBlank(app.Organizational_Sustainability__c)) populated.add(14);
-
-        // Q15 / Q16 — JF only
-        if (hasJF) {
-            List<Outcomes_Data__c> outcomes = [
-                SELECT Projected_Learner_Enrollments_FY_1__c,
-                       Projected_Learner_Enrollments_CFY__c
-                FROM Outcomes_Data__c
-                WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
-            ];
-            if (!outcomes.isEmpty()) {
-                if (outcomes[0].Projected_Learner_Enrollments_FY_1__c != null) populated.add(15);
-                if (outcomes[0].Projected_Learner_Enrollments_CFY__c  != null) populated.add(16);
+        List<Integer> populated = new List<Integer>();
+        for (String k : popKeys) {
+            if (qNumMap.containsKey(k)) {
+                populated.add(qNumMap.get(k));
             }
         }
-
-        // Q17 / Q18 — JC only
-        if (hasJC) {
-            List<Outcomes_Data__c> outcomes = [
-                SELECT Projected_New_Businesses_FY_1__c,
-                       Projected_New_Businesses_CFY__c
-                FROM Outcomes_Data__c
-                WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
-            ];
-            if (!outcomes.isEmpty()) {
-                if (outcomes[0].Projected_New_Businesses_FY_1__c != null) populated.add(17);
-                if (outcomes[0].Projected_New_Businesses_CFY__c  != null) populated.add(18);
-            }
-        }
-
-        // Q19
-        if (String.isNotBlank(app.Use_of_Additional_Funding__c)) populated.add(19);
-
-        // Q20
-        Boolean hasQ20 = false;
-        if (isBoth  && String.isNotBlank(app.Operational_Synergies_with_WOF_Both__c)) hasQ20 = true;
-        if (hasJF && !hasJC && String.isNotBlank(app.Operational_Synergies_with_WOF__c))    hasQ20 = true;
-        if (hasJC && !hasJF && String.isNotBlank(app.Operational_Synergies_with_WOF_JC__c)) hasQ20 = true;
-        if (hasQ20) populated.add(20);
-
         return populated;
     }
 
@@ -1265,5 +1289,156 @@ public without sharing class WCFValidatorController {
     public class ReviewerReturnInfo {
         @AuraEnabled public String   comment;
         @AuraEnabled public DateTime lastModified;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DYNAMIC VALIDATOR METADATA WRAPPERS & METHODS
+    // ─────────────────────────────────────────────────────────────
+    public class ValidatorOptionWrapper {
+        @AuraEnabled public String label { get; set; }
+        @AuraEnabled public String value { get; set; }
+        @AuraEnabled public String sublabel { get; set; }
+        public ValidatorOptionWrapper() {}
+        public ValidatorOptionWrapper(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
+        public ValidatorOptionWrapper(String label, String value, String sublabel) {
+            this.label = label;
+            this.value = value;
+            this.sublabel = sublabel;
+        }
+    }
+
+    public class ValidatorQuestionWrapper {
+        @AuraEnabled public String key { get; set; }
+        @AuraEnabled public String sectionCode { get; set; }
+        @AuraEnabled public Integer sectionNumber { get; set; }
+        @AuraEnabled public String label { get; set; }
+        @AuraEnabled public String questionText { get; set; }
+        @AuraEnabled public String hintText { get; set; }
+        @AuraEnabled public String displayType { get; set; }
+        @AuraEnabled public String targetField { get; set; }
+        @AuraEnabled public Boolean isRequired { get; set; }
+        @AuraEnabled public Integer wordLimit { get; set; }
+        @AuraEnabled public Integer sequence { get; set; }
+        @AuraEnabled public String conditionalParentKey { get; set; }
+        @AuraEnabled public String conditionalParentValue { get; set; }
+        @AuraEnabled public List<ValidatorOptionWrapper> options { get; set; }
+    }
+
+    public class ValidatorSectionWrapper {
+        @AuraEnabled public String code { get; set; }
+        @AuraEnabled public Integer sectionNumber { get; set; }
+        @AuraEnabled public String title { get; set; }
+        @AuraEnabled public String lede { get; set; }
+        @AuraEnabled public Integer sequence { get; set; }
+        @AuraEnabled public List<ValidatorQuestionWrapper> questions { get; set; }
+    }
+
+    public class ValidatorFormMetadataPayload {
+        @AuraEnabled public Boolean success { get; set; }
+        @AuraEnabled public String errorMessage { get; set; }
+        @AuraEnabled public List<ValidatorSectionWrapper> sections { get; set; }
+        @AuraEnabled public List<String> requiredFields { get; set; }
+        @AuraEnabled public Map<String, Integer> wordLimits { get; set; }
+    }
+
+    @AuraEnabled(cacheable=false)
+    public static ValidatorFormMetadataPayload getValidatorFormMetadata(String trackName) {
+        ValidatorFormMetadataPayload payload = new ValidatorFormMetadataPayload();
+        payload.success = true;
+        payload.sections = new List<ValidatorSectionWrapper>();
+        payload.requiredFields = new List<String>();
+        payload.wordLimits = new Map<String, Integer>();
+
+        try {
+            List<Validator_Section__mdt> sectionRecords = [
+                SELECT DeveloperName, MasterLabel, Section_Number__c, Title__c, Lede__c, Sequence__c, Is_Active__c
+                FROM Validator_Section__mdt
+                WHERE Is_Active__c = true
+                ORDER BY Sequence__c ASC NULLS LAST
+            ];
+
+            List<Validator_Question__mdt> questionRecords = [
+                SELECT DeveloperName, MasterLabel, Section_Code__c, Section_Number__c, Question_Key__c,
+                       Question_Text__c, Hint_Text__c, Display_Type__c, Target_Field_API_Name__c,
+                       Is_Required__c, Word_Limit__c, Sequence__c, Applicable_Tracks__c,
+                       Conditional_Parent_Key__c, Conditional_Parent_Value__c, Is_Active__c
+                FROM Validator_Question__mdt
+                WHERE Is_Active__c = true
+                ORDER BY Section_Number__c ASC, Sequence__c ASC NULLS LAST
+            ];
+
+            Map<String, Schema.SObjectField> arFieldMap = Schema.SObjectType.ApplicationReview.fields.getMap();
+            Map<String, List<ValidatorQuestionWrapper>> questionsBySection = new Map<String, List<ValidatorQuestionWrapper>>();
+
+            for (Validator_Question__mdt q : questionRecords) {
+                String secCode = String.isNotBlank(q.Section_Code__c) ? q.Section_Code__c : 'SEC_' + Integer.valueOf(q.Section_Number__c);
+                if (!questionsBySection.containsKey(secCode)) {
+                    questionsBySection.put(secCode, new List<ValidatorQuestionWrapper>());
+                }
+
+                ValidatorQuestionWrapper qw = new ValidatorQuestionWrapper();
+                qw.key = q.Question_Key__c;
+                qw.sectionCode = secCode;
+                qw.sectionNumber = q.Section_Number__c != null ? Integer.valueOf(q.Section_Number__c) : 1;
+                qw.label = q.MasterLabel;
+                qw.questionText = q.Question_Text__c;
+                qw.hintText = q.Hint_Text__c;
+                qw.displayType = q.Display_Type__c;
+                qw.targetField = q.Target_Field_API_Name__c;
+                qw.isRequired = q.Is_Required__c == true;
+                qw.wordLimit = q.Word_Limit__c != null ? Integer.valueOf(q.Word_Limit__c) : 0;
+                qw.sequence = q.Sequence__c != null ? Integer.valueOf(q.Sequence__c) : 1;
+                qw.conditionalParentKey = q.Conditional_Parent_Key__c;
+                qw.conditionalParentValue = q.Conditional_Parent_Value__c;
+                qw.options = new List<ValidatorOptionWrapper>();
+
+                if (qw.isRequired && String.isNotBlank(qw.key)) {
+                    payload.requiredFields.add(qw.key);
+                }
+                if (qw.wordLimit > 0 && String.isNotBlank(qw.key)) {
+                    payload.wordLimits.put(qw.key, qw.wordLimit);
+                }
+
+                // Resolve options based on Display Type and Target Field
+                if (qw.displayType == 'ConfirmPill') {
+                    qw.options.add(new ValidatorOptionWrapper('Confirmed correct', 'Confirmed correct'));
+                    qw.options.add(new ValidatorOptionWrapper('Auto-derived state appears wrong', 'Auto-derived state appears wrong'));
+                } else if (qw.displayType == 'BinaryRadio') {
+                    qw.options.add(new ValidatorOptionWrapper('No', 'No'));
+                    qw.options.add(new ValidatorOptionWrapper('Yes', 'Yes', 'specify in follow-on field'));
+                } else if (String.isNotBlank(qw.targetField) && arFieldMap.containsKey(qw.targetField.toLowerCase())) {
+                    Schema.DescribeFieldResult dfr = arFieldMap.get(qw.targetField.toLowerCase()).getDescribe();
+                    if (dfr.getType() == Schema.DisplayType.PICKLIST || dfr.getType() == Schema.DisplayType.MULTIPICKLIST) {
+                        for (Schema.PicklistEntry pe : dfr.getPicklistValues()) {
+                            if (pe.isActive()) {
+                                qw.options.add(new ValidatorOptionWrapper(pe.getLabel(), pe.getValue()));
+                            }
+                        }
+                    }
+                }
+
+                questionsBySection.get(secCode).add(qw);
+            }
+
+            for (Validator_Section__mdt sec : sectionRecords) {
+                ValidatorSectionWrapper sw = new ValidatorSectionWrapper();
+                sw.code = sec.DeveloperName;
+                sw.sectionNumber = sec.Section_Number__c != null ? Integer.valueOf(sec.Section_Number__c) : 1;
+                sw.title = sec.Title__c;
+                sw.lede = sec.Lede__c;
+                sw.sequence = sec.Sequence__c != null ? Integer.valueOf(sec.Sequence__c) : 1;
+                sw.questions = questionsBySection.containsKey(sec.DeveloperName) ? questionsBySection.get(sec.DeveloperName) : new List<ValidatorQuestionWrapper>();
+                payload.sections.add(sw);
+            }
+
+        } catch (Exception ex) {
+            payload.success = false;
+            payload.errorMessage = ex.getMessage() + ' | ' + ex.getStackTraceString();
+        }
+
+        return payload;
     }
 }

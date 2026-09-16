@@ -163,11 +163,16 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
         const start = (this.currentPage - 1) * this.pageSize;
         return this.filteredItems.slice(start, start + this.pageSize).map((row, idx) => {
 
-            // Track badge
-            let trackBadgeClass = 'track-badge';
-            if      (row.track === 'Both') trackBadgeClass += ' track-both';
-            else if (row.track === 'JF')   trackBadgeClass += ' track-jf';
-            else if (row.track === 'JC')   trackBadgeClass += ' track-jc';
+            // Track badges
+            const trackBadges = (row.track || '').split(',').filter(Boolean).map(code => {
+                const trimmed = code.trim();
+                let badgeClass = 'track-badge';
+                if      (trimmed === 'Both') badgeClass += ' track-both';
+                else if (trimmed === 'JF')   badgeClass += ' track-jf';
+                else if (trimmed === 'JC')   badgeClass += ' track-jc';
+                else if (trimmed === 'LU')   badgeClass += ' track-lu';
+                return { code: trimmed, badgeClass };
+            });
 
             // Review status badge
             const reviewStatusClass = 'status-badge status-recommended';
@@ -226,11 +231,11 @@ if (isBackFromReviewer) {
                 ...row,
                 sno: start + idx + 1,
                 rowClass: idx % 2 === 0 ? 'table-row row-even' : 'table-row row-odd',
-                trackBadgeClass,
+                trackBadges,
                 reviewStatusClass,
                 recBadgeClass,
                 decisionBadgeClass,
-                 decisionLabel, 
+                decisionLabel, 
                 actionLabel,
                 actionBtnClass,
                 actionIcon
@@ -250,10 +255,12 @@ if (isBackFromReviewer) {
         const applicationId = evt.currentTarget.dataset.id;
         const appName       = evt.currentTarget.dataset.appname;
         const reviewId      = evt.currentTarget.dataset.reviewId;
+        const track         = evt.currentTarget.dataset.track;
+        const trackLabel    = evt.currentTarget.dataset.trackLabel;
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
-                url: this._siteUrl('approvercontainer', { applicationId, appName, reviewId })
+                url: this._siteUrl('approvercontainer', { applicationId, appName, reviewId, track, trackLabel })
             }
         });
     }

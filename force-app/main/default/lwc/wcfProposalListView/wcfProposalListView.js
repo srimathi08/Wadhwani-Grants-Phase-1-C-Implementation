@@ -18,6 +18,7 @@ const TRACK_OPTIONS = [
     { label: 'All Tracks',                               value: '' },
     { label: 'Job Fulfillment Only',                     value: 'Job Fulfillment Only' },
     { label: 'Job Creation Only',                        value: 'Job Creation Only' },
+    { label: 'Livelihood Upliftment',                    value: 'Livelihood Upliftment' },
     { label: 'Both Job Fulfillment and Job Creation',    value: 'Both' }
 ];
 
@@ -206,11 +207,16 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
         // ── Track filter ─────────────────────────────────────────
         if (this.selectedTrack) {
-            const t = this.selectedTrack;
+            const t = this.selectedTrack.toLowerCase();
             result = result.filter(p => {
-                const track = p.Organizational_Area_s_for_Funding_Inves__c || '';
-                if (t === 'Both') return track.toLowerCase().includes('both');
-                return track === t;
+                const track1 = (p.Organizational_Area_s_for_Funding_Inves1__c || '').toLowerCase();
+                const trackLegacy = (p.Organizational_Area_s_for_Funding_Inves__c || '').toLowerCase();
+                const combined = track1 + ' ' + trackLegacy;
+                if (t === 'both') return combined.includes('both') || (combined.includes('creation') && combined.includes('fulfillment'));
+                if (t.includes('livelihood') || t.includes('upliftment') || t === 'lu') return combined.includes('livelihood') || combined.includes('upliftment') || combined.includes('lu');
+                if (t.includes('creation') || t === 'jc') return combined.includes('creation') || combined.includes('jc');
+                if (t.includes('fulfillment') || t.includes('fulfilment') || t === 'jf') return combined.includes('fulfillment') || combined.includes('fulfilment') || combined.includes('jf');
+                return combined.includes(t);
             });
         }
 
@@ -334,18 +340,25 @@ _parseDate(dateStr) {
             const reviewId     = reviewInfo.reviewId || null;
             const dueDate      = reviewInfo.dueDate || null;
 
-            // ── Track badge ──────────────────────────────────────
-            const track = p.Organizational_Area_s_for_Funding_Inves__c || '';
-            let trackShort, trackBadgeClass;
-            if (track.toLowerCase().includes('both')) {
-                trackShort = 'Both'; trackBadgeClass = 'track-badge track-both';
-            } else if (track.toLowerCase().includes('fulfillment')) {
-                trackShort = 'JF';   trackBadgeClass = 'track-badge track-jf';
-            } else if (track.toLowerCase().includes('creation')) {
-                trackShort = 'JC';   trackBadgeClass = 'track-badge track-jc';
-            } else {
-                trackShort = track;  trackBadgeClass = 'track-badge';
+            // ── Track badges (Multi-Track Aware) ─────────────────
+            const rawTrack = p.Organizational_Area_s_for_Funding_Inves1__c || p.Organizational_Area_s_for_Funding_Inves__c || '';
+            const rawLower = rawTrack.toLowerCase();
+            const hasJF = rawLower.includes('fulfillment') || rawLower.includes('fulfilment') || rawLower.includes('jf') || rawLower.includes('both');
+            const hasJC = rawLower.includes('creation') || rawLower.includes('jc') || rawLower.includes('both');
+            const hasLU = rawLower.includes('livelihood') || rawLower.includes('upliftment') || rawLower.includes('lu');
+
+            const trackBadges = [];
+            if (hasJF) trackBadges.push({ code: 'JF', label: 'Job Fulfillment', badgeClass: 'track-badge track-jf' });
+            if (hasJC) trackBadges.push({ code: 'JC', label: 'Job Creation', badgeClass: 'track-badge track-jc' });
+            if (hasLU) trackBadges.push({ code: 'LU', label: 'Livelihood Upliftment', badgeClass: 'track-badge track-lu' });
+
+            if (trackBadges.length === 0 && rawTrack) {
+                trackBadges.push({ code: rawTrack, label: rawTrack, badgeClass: 'track-badge' });
             }
+
+            const trackShort = trackBadges.map(b => b.code).join(', ');
+            const trackParam = trackBadges.map(b => b.code).join(',');
+            const trackBadgeClass = trackBadges.length > 0 ? trackBadges[0].badgeClass : 'track-badge';
 
             // ── Application Status badge ─────────────────────────
             const status = p.Status || '';
@@ -423,7 +436,10 @@ if (parsedDue && !isSubmitted) {
                 ...p,
                 sno: start + idx + 1,
                 rowClass: idx % 2 === 0 ? 'table-row row-even' : 'table-row row-odd',
-                trackShort, trackBadgeClass,
+                trackShort,
+                trackParam,
+                trackBadges,
+                trackBadgeClass,
                 statusBadgeClass,
                 reviewBadgeLabel, reviewBadgeClass,
                 formattedDate,

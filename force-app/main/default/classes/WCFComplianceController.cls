@@ -17,7 +17,7 @@ public without sharing class WCFComplianceController {
         @AuraEnabled public String expiryDate;
         @AuraEnabled public String returnReason;
         @AuraEnabled public String submittedDate;
-@AuraEnabled public Id adHocParentId;  // NEW
+        @AuraEnabled public Id adHocParentId;
     }
 
     public class ComplianceChecklistResult {
@@ -26,6 +26,8 @@ public without sharing class WCFComplianceController {
         @AuraEnabled public List<ComplianceChecklistItem> items;
         @AuraEnabled public Integer totalRequired;
         @AuraEnabled public Integer totalValidated;
+        @AuraEnabled public Integer totalUploaded;
+        @AuraEnabled public Boolean isSubmitted;
         @AuraEnabled public String  overallStatus;
         @AuraEnabled public String  complianceStatus;
         @AuraEnabled public String  reviewerNotes;
@@ -77,7 +79,7 @@ public without sharing class WCFComplianceController {
     // The record is created with Status__c = 'Not Started'. Once the
     // donee uploads a file, handleUploadFinished calls saveComplianceDocument
     // which upserts the same record with the file details and flips status
-    // to 'Pending Review'.
+    // to 'Draft'.
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static Id getOrCreateComplianceRecord(Id applicationId, String documentType) {
@@ -88,22 +90,22 @@ public without sharing class WCFComplianceController {
         validateOwnership(applicationId);
 
         // Check if a record already exists
-       List<WCF_Compliance_Document__c> existing = [
-    SELECT Id,
-           Document_Type__c,
-           ContentDocumentId__c,
-           File_Name__c,
-           Status__c,
-           Issue_Date__c,
-           Expiry_Date__c,
-           Uploaded_Date__c,
-           Reviewer_Notes__c
-    FROM   WCF_Compliance_Document__c
-    WHERE  IndividualApplication__c = :applicationId
-    AND    Document_Type__c         = :documentType
-    WITH   SYSTEM_MODE
-    LIMIT  1
-];
+        List<WCF_Compliance_Document__c> existing = [
+            SELECT Id,
+                   Document_Type__c,
+                   ContentDocumentId__c,
+                   File_Name__c,
+                   Status__c,
+                   Issue_Date__c,
+                   Expiry_Date__c,
+                   Uploaded_Date__c,
+                   Reviewer_Notes__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  IndividualApplication__c = :applicationId
+            AND    Document_Type__c         = :documentType
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
 
         if (!existing.isEmpty()) {
             return existing[0].Id;
@@ -136,34 +138,42 @@ public without sharing class WCFComplianceController {
         result.geography     = resolveGeography(app.Headquarters_City_and_Country__c);
         result.items         = new List<ComplianceChecklistItem>();
 
-        List<DocTypeTemplate> template = getTemplateForGeography(result.geography);
-Map<String, WCF_Compliance_Document__c> existingByType =
-    new Map<String, WCF_Compliance_Document__c>();
-List<WCF_Compliance_Document__c> adHocRequests = new List<WCF_Compliance_Document__c>();
+        Map<String, WCF_Compliance_Document__c> existingByType =
+            new Map<String, WCF_Compliance_Document__c>();
+        List<WCF_Compliance_Document__c> adHocRequests = new List<WCF_Compliance_Document__c>();
 
-for (WCF_Compliance_Document__c doc : [
-    SELECT Id,OwnerId, Document_Type__c, Document_Types__c, Status__c,
-           ContentDocumentId__c, File_Name__c, Issue_Date__c, Expiry_Date__c,
-           Reviewer_Notes__c, Uploaded_Date__c, Due_Date__c,Document_Status_JSON__c
-    FROM   WCF_Compliance_Document__c
-    WHERE  IndividualApplication__c = :applicationId
-    WITH   SYSTEM_MODE
-]) {
-    if (String.isNotBlank(doc.Document_Type__c)) {
-        existingByType.put(doc.Document_Type__c, doc);
-    } else if (String.isNotBlank(doc.Document_Types__c)) {
-        adHocRequests.add(doc); // reviewer-raised ad hoc request, not in any geo template
-    }
+        List<WCF_Compliance_Document__c> allDocs = [
+            SELECT Id, OwnerId, Document_Type__c, Document_Types__c, Status__c,
+                   ContentDocumentId__c, File_Name__c, Issue_Date__c, Expiry_Date__c,
+                   Reviewer_Notes__c, Uploaded_Date__c, Due_Date__c, Document_Status_JSON__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  IndividualApplication__c = :applicationId
+            WITH   SYSTEM_MODE
+            ORDER BY LastModifiedDate DESC
+        ];
 
-}
+        Boolean isSubmitted = false;
 
-        Integer totalRequired      = 0;
-        Integer totalValidated     = 0;
-        Boolean anyRefreshRequired = false;
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (String.isNotBlank(doc.Document_Type__c)) {
+                existingByType.put(doc.Document_Type__c, doc);
+            } else if (String.isNotBlank(doc.Document_Types__c)) {
+                adHocRequests.add(doc); // reviewer-raised ad hoc request
+            }
+
+            if (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
+                    || doc.Status__c == 'Under Review' || doc.Status__c == 'Received'
+                    || doc.Status__c == 'Pending Review') {
+                isSubmitted = true;
+            }
+        }
 
         // ── Pre-process ad-hoc requests into a map to prevent duplicates ───────
         Map<String, ComplianceChecklistItem> adHocItemsByLabel = new Map<String, ComplianceChecklistItem>();
         for (WCF_Compliance_Document__c doc : adHocRequests) {
+            Boolean docIsSubmitted = (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
+                || doc.Status__c == 'Under Review' || doc.Status__c == 'Received');
+
             for (String label : doc.Document_Types__c.split(';')) {
                 label = label.trim();
                 if (String.isBlank(label)) continue;
@@ -178,7 +188,8 @@ for (WCF_Compliance_Document__c doc : [
 
                 if (fulfilled != null) {
                     item.recordId          = fulfilled.Id;
-                    item.status            = fulfilled.Status__c;
+                    item.status            = (fulfilled.Status__c == 'Pending Submission' && String.isNotBlank(fulfilled.ContentDocumentId__c) && !isSubmitted)
+                                             ? 'Draft' : fulfilled.Status__c;
                     item.contentDocumentId = fulfilled.ContentDocumentId__c;
                     item.fileName          = fulfilled.File_Name__c;
                     item.returnReason      = fulfilled.Reviewer_Notes__c;
@@ -191,8 +202,17 @@ for (WCF_Compliance_Document__c doc : [
 
                     item.recordId          = doc.Id;
                     item.adHocParentId     = doc.Id;
-                    item.status            = (entry != null && String.isNotBlank(entry.status))
-                                             ? entry.status : 'Pending Submission';
+
+                    if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
+                        if (String.isNotBlank(entry.status)) {
+                            item.status = entry.status;
+                        } else {
+                            item.status = docIsSubmitted ? 'Pending Review' : 'Draft';
+                        }
+                    } else {
+                        item.status = 'Pending Submission';
+                    }
+
                     item.contentDocumentId = entry != null ? entry.contentDocumentId : null;
                     item.fileName          = entry != null ? entry.fileName          : null;
                     item.returnReason      = (entry != null && String.isNotBlank(entry.reviewerNotes))
@@ -215,12 +235,13 @@ for (WCF_Compliance_Document__c doc : [
             if (!adHocItemsByLabel.containsKey(label)) {
                 WCF_Compliance_Document__c doc = existingByType.get(label);
                 ComplianceChecklistItem item = new ComplianceChecklistItem();
-                item.documentType  = label;
-                item.documentLabel = label;
-                item.description   = 'Compliance Document.';
-                item.required      = true;
+                item.documentType      = label;
+                item.documentLabel     = label;
+                item.description       = 'Compliance Document.';
+                item.required          = true;
                 item.recordId          = doc.Id;
-                item.status            = doc.Status__c;
+                item.status            = (doc.Status__c == 'Pending Submission' && String.isNotBlank(doc.ContentDocumentId__c) && !isSubmitted)
+                                         ? 'Draft' : doc.Status__c;
                 item.contentDocumentId = doc.ContentDocumentId__c;
                 item.fileName          = doc.File_Name__c;
                 item.returnReason      = doc.Reviewer_Notes__c;
@@ -233,11 +254,19 @@ for (WCF_Compliance_Document__c doc : [
         }
 
         // ── Calculate progress and metrics ────────────────────────────────────
+        Integer totalRequired      = 0;
+        Integer totalValidated     = 0;
+        Integer totalUploaded      = 0;
+        Boolean anyRefreshRequired = false;
+
         for (ComplianceChecklistItem item : result.items) {
             if (item.required) {
                 totalRequired++;
                 if (item.status == 'Validated') {
                     totalValidated++;
+                }
+                if (String.isNotBlank(item.contentDocumentId)) {
+                    totalUploaded++;
                 }
             }
             if (item.status == 'Refresh Required') {
@@ -247,22 +276,24 @@ for (WCF_Compliance_Document__c doc : [
 
         result.totalRequired  = totalRequired;
         result.totalValidated = totalValidated;
-        result.overallStatus  = anyRefreshRequired
-            ? 'Refresh Required'
-            : (totalRequired > 0 && totalValidated >= totalRequired
-                ? 'Complete' : 'In Progress');
+        result.totalUploaded  = totalUploaded;
+        result.isSubmitted    = isSubmitted;
+
+        if (anyRefreshRequired) {
+            result.overallStatus = 'Refresh Required';
+        } else if (totalRequired > 0 && totalValidated >= totalRequired) {
+            result.overallStatus = 'Complete';
+        } else if (isSubmitted) {
+            result.overallStatus = 'Submitted';
+        } else if (totalUploaded > 0) {
+            result.overallStatus = 'Draft';
+        } else {
+            result.overallStatus = 'Pending Submission';
+        }
 
         // Calculate decision status and notes
         String compStatus = 'Pending';
         String reviewerNotes = '';
-
-        List<WCF_Compliance_Document__c> allDocs = [
-            SELECT Id, Status__c, Reviewer_Notes__c, Document_Type__c, Document_Types__c
-            FROM WCF_Compliance_Document__c
-            WHERE IndividualApplication__c = :applicationId
-            WITH SYSTEM_MODE
-            ORDER BY LastModifiedDate DESC
-        ];
 
         Boolean hasRejected = false;
         Boolean hasSuspended = false;
@@ -305,6 +336,10 @@ for (WCF_Compliance_Document__c doc : [
             reviewerNotes = returnedNotes;
         } else if (totalRequired > 0 && totalValidated >= totalRequired) {
             compStatus = 'Validated';
+        } else if (isSubmitted) {
+            compStatus = 'Submitted';
+        } else if (totalUploaded > 0) {
+            compStatus = 'Draft';
         } else {
             compStatus = 'In Progress';
         }
@@ -315,118 +350,98 @@ for (WCF_Compliance_Document__c doc : [
         return result;
     }
 
-
-
     // ─────────────────────────────────────────────────────────────────
-    // WRITE — donee uploads or re-uploads a document
+    // WRITE — donee uploads or re-uploads a document (saves as Draft)
     // ─────────────────────────────────────────────────────────────────
-@AuraEnabled
-public static ComplianceChecklistItem saveComplianceDocument(
-    Id     applicationId,
-    String documentType,
-    String contentDocumentId,
-    String fileName,
-    String issueDate,
-    String expiryDate,
-    Id     existingRecordId   // NEW — optional
-) {
-    if (applicationId == null || String.isBlank(documentType)
-            || String.isBlank(contentDocumentId)) {
-        throw new AuraHandledException('Missing required upload details.');
-    }
+    @AuraEnabled
+    public static ComplianceChecklistItem saveComplianceDocument(
+        Id     applicationId,
+        String documentType,
+        String contentDocumentId,
+        String fileName,
+        String issueDate,
+        String expiryDate,
+        Id     existingRecordId
+    ) {
+        if (applicationId == null || String.isBlank(documentType)
+                || String.isBlank(contentDocumentId)) {
+            throw new AuraHandledException('Missing required upload details.');
+        }
 
-    validateOwnership(applicationId);
+        validateOwnership(applicationId);
 
-    WCF_Compliance_Document__c doc;
+        WCF_Compliance_Document__c doc;
 
-    // Prefer the exact record the LWC already knows about — avoids any
-    // text-matching mismatch between ad hoc multi-select labels and the
-    // singular Document_Type__c value. Only trust it if it's already
-    // dedicated to this exact type (not the shared ad hoc parent record,
-    // which has Document_Type__c blank and may bundle several types).
-if (existingRecordId != null) {
-    List<WCF_Compliance_Document__c> byId = [
-        SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
-               Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
-        FROM   WCF_Compliance_Document__c
-        WHERE  Id = :existingRecordId
-        WITH   SYSTEM_MODE LIMIT 1
-    ];
-    if (!byId.isEmpty()) {
-        // FIX: Accept the record if it matches the type OR if it's the
-        // ad hoc parent (Document_Type__c is blank — we'll set it now)
-        if (byId[0].Document_Type__c == documentType 
-                || String.isBlank(byId[0].Document_Type__c)) {
-            doc = byId[0];
-            // If this was the blank ad hoc parent, stamp the type on it
-            if (String.isBlank(doc.Document_Type__c)) {
-                doc.Document_Type__c = documentType;
+        if (existingRecordId != null) {
+            List<WCF_Compliance_Document__c> byId = [
+                SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
+                       Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
+                FROM   WCF_Compliance_Document__c
+                WHERE  Id = :existingRecordId
+                WITH   SYSTEM_MODE LIMIT 1
+            ];
+            if (!byId.isEmpty()) {
+                if (byId[0].Document_Type__c == documentType 
+                        || String.isBlank(byId[0].Document_Type__c)) {
+                    doc = byId[0];
+                    if (String.isBlank(doc.Document_Type__c)) {
+                        doc.Document_Type__c = documentType;
+                    }
+                }
             }
         }
-    }
-}
-    if (doc == null) {
-        List<WCF_Compliance_Document__c> existing = [
-            SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
-                   Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            AND    Document_Type__c         = :documentType
-            WITH   SYSTEM_MODE
-            LIMIT  1
-        ];
-        doc = existing.isEmpty()
-            ? new WCF_Compliance_Document__c(
-                  IndividualApplication__c = applicationId,
-                  Document_Type__c         = documentType)
-            : existing[0];
-    }
+        if (doc == null) {
+            List<WCF_Compliance_Document__c> existing = [
+                SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
+                       Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
+                FROM   WCF_Compliance_Document__c
+                WHERE  IndividualApplication__c = :applicationId
+                AND    Document_Type__c         = :documentType
+                WITH   SYSTEM_MODE
+                LIMIT  1
+            ];
+            doc = existing.isEmpty()
+                ? new WCF_Compliance_Document__c(
+                      IndividualApplication__c = applicationId,
+                      Document_Type__c         = documentType)
+                : existing[0];
+        }
 
-String previousContentDocumentId = doc.ContentDocumentId__c;
+        String previousContentDocumentId = doc.ContentDocumentId__c;
 
         doc.ContentDocumentId__c = contentDocumentId;
         doc.File_Name__c         = fileName;
-        doc.Status__c            = 'Pending Review';
+        // Keep as Pending Submission upon upload — only explicit submit flips to Pending Review
+        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review') {
+            doc.Status__c = 'Pending Submission';
+        }
         doc.Uploaded_Date__c     = DateTime.now();
         doc.Reviewer_Notes__c    = null; // clear on re-upload
 
-        // If this is a genuine replace (a different file than what was
-        // already stored), delete the old file so it doesn't linger as
-        // an orphaned duplicate in Notes & Attachments.
         if (String.isNotBlank(previousContentDocumentId)
                 && previousContentDocumentId != contentDocumentId) {
             try {
                 delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
-            } catch (Exception e) {
-                // Deletion failing shouldn't block the new upload from saving —
-                // surface it only if you want stricter cleanup guarantees.
-            }
+            } catch (Exception e) { }
         }  
 
-    if (String.isNotBlank(issueDate))  { try { doc.Issue_Date__c  = Date.valueOf(issueDate);  } catch (Exception e) {} }
-    if (String.isNotBlank(expiryDate)) { try { doc.Expiry_Date__c = Date.valueOf(expiryDate); } catch (Exception e) {} }
+        if (String.isNotBlank(issueDate))  { try { doc.Issue_Date__c  = Date.valueOf(issueDate);  } catch (Exception e) {} }
+        if (String.isNotBlank(expiryDate)) { try { doc.Expiry_Date__c = Date.valueOf(expiryDate); } catch (Exception e) {} }
 
-    upsert doc;
-    linkFileIfNeeded(doc.Id, contentDocumentId);
+        upsert doc;
+        linkFileIfNeeded(doc.Id, contentDocumentId);
 
-    ComplianceChecklistItem item = new ComplianceChecklistItem();
-    item.recordId          = doc.Id;
-    item.documentType      = doc.Document_Type__c;
-    item.status            = doc.Status__c;
-    item.contentDocumentId = doc.ContentDocumentId__c;
-    item.fileName          = doc.File_Name__c;
-    item.issueDate         = doc.Issue_Date__c   != null ? String.valueOf(doc.Issue_Date__c)        : null;
-    item.expiryDate        = doc.Expiry_Date__c  != null ? String.valueOf(doc.Expiry_Date__c)       : null;
-    item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date()) : null;
-    return item;
-}
-
-    // ─────────────────────────────────────────────────────────────────
-    // Helper — grant the applicant Edit access to a reviewer-owned
-    // ad hoc compliance request, so lightning-file-upload (which runs
-    // under the logged-in user's actual sharing access, not SYSTEM_MODE)
-    // can attach the file.
-    // ─────────────────────────────────────────────────────────────────
+        ComplianceChecklistItem item = new ComplianceChecklistItem();
+        item.recordId          = doc.Id;
+        item.documentType      = doc.Document_Type__c;
+        item.status            = (doc.Status__c == 'Pending Submission' || doc.Status__c == 'Not Started') ? 'Draft' : doc.Status__c;
+        item.contentDocumentId = doc.ContentDocumentId__c;
+        item.fileName          = doc.File_Name__c;
+        item.issueDate         = doc.Issue_Date__c   != null ? String.valueOf(doc.Issue_Date__c)        : null;
+        item.expiryDate        = doc.Expiry_Date__c  != null ? String.valueOf(doc.Expiry_Date__c)       : null;
+        item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date()) : null;
+        return item;
+    }
 
     // ─────────────────────────────────────────────────────────────────
     // Helper — link uploaded file to the compliance record
@@ -472,7 +487,8 @@ String previousContentDocumentId = doc.ContentDocumentId__c;
         }
         return app;
     }
-// ─────────────────────────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────────────────────────
     // WRITE — applicant removes a previously uploaded file without
     // immediately re-uploading. Resets the row back to "requested".
     // ─────────────────────────────────────────────────────────────────
@@ -483,7 +499,7 @@ String previousContentDocumentId = doc.ContentDocumentId__c;
         }
 
         List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, ContentDocumentId__c, IndividualApplication__c
+            SELECT Id, ContentDocumentId__c, IndividualApplication__c, Status__c
             FROM   WCF_Compliance_Document__c
             WHERE  Id = :recordId
             WITH   SYSTEM_MODE
@@ -509,15 +525,14 @@ String previousContentDocumentId = doc.ContentDocumentId__c;
         doc.Issue_Date__c        = null;
         doc.Expiry_Date__c       = null;
         doc.Uploaded_Date__c     = null;
-        doc.Status__c            = 'Pending Submission'; // back to "Document Requested"
+        doc.Status__c            = 'Pending Submission';
         update doc;
     }
-// ─────────────────────────────────────────────────────────────────
-    // WRITE — upload/replace a file for one document type WITHOUT
-    // creating a separate record. Everything is stored on the single
-    // ad hoc parent record (adHocRecordId), keyed by label inside the
-    // Document_Status_JSON__c map. The file itself is linked directly
-    // to that same parent record's Notes & Attachments.
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — upload/replace a file for one ad hoc document type.
+    // Saves the document in Draft state without flipping record status to
+    // Partially Submitted or Submitted for the Reviewer.
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static ComplianceChecklistItem saveAdHocComplianceDocument(
@@ -533,7 +548,7 @@ String previousContentDocumentId = doc.ContentDocumentId__c;
         }
 
         List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, IndividualApplication__c, Document_Status_JSON__c,Document_Types__c
+            SELECT Id, IndividualApplication__c, Document_Status_JSON__c, Document_Types__c, Status__c
             FROM   WCF_Compliance_Document__c
             WHERE  Id = :adHocRecordId
             WITH   SYSTEM_MODE
@@ -542,8 +557,7 @@ String previousContentDocumentId = doc.ContentDocumentId__c;
         if (docs.isEmpty()) {
             throw new AuraHandledException('Compliance request not found.');
         }
-System.debug('Current user: ' + UserInfo.getUserId());
-System.debug('adHocRecordId: ' + adHocRecordId);
+
         WCF_Compliance_Document__c doc = docs[0];
         validateOwnership(doc.IndividualApplication__c);
 
@@ -552,45 +566,49 @@ System.debug('adHocRecordId: ' + adHocRecordId);
         String previousContentDocumentId = entry != null ? entry.contentDocumentId : null;
 
         if (entry == null) entry = new DocStatusEntry();
-        entry.status        = 'Pending Review';
-        entry.contentDocumentId = contentDocumentId;
-        entry.fileName       = fileName;
-        entry.uploadedDate   = String.valueOf(Date.today());
-        entry.reviewerNotes  = null; // clear on re-upload
+        // Save as Draft — only explicit submit moves to Pending Review
+        entry.status             = 'Draft';
+        entry.contentDocumentId  = contentDocumentId;
+        entry.fileName           = fileName;
+        entry.uploadedDate       = String.valueOf(Date.today());
+        entry.reviewerNotes      = null; // clear on re-upload
         if (String.isNotBlank(issueDate))  entry.issueDate  = issueDate;
         if (String.isNotBlank(expiryDate)) entry.expiryDate = expiryDate;
 
         statusMap.put(documentLabel, entry);
         doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-        doc.Status__c = computeAdHocStatus(doc, statusMap);
+        
+        // Keep doc.Status__c in Pending Submission / Returned until explicit submit
+        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted') {
+            doc.Status__c = 'Pending Submission';
+        }
         update doc;
 
-        // Attach the file to the SAME parent record's Notes & Attachments
+        // Attach the file to the parent record's Notes & Attachments
         linkFileIfNeeded(doc.Id, contentDocumentId);
 
-        // Clean up the old file on replace
+        // Clean up old file on replace
         if (String.isNotBlank(previousContentDocumentId)
                 && previousContentDocumentId != contentDocumentId) {
             try {
                 delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
-            } catch (Exception e) { /* don't block the new upload */ }
+            } catch (Exception e) { }
         }
 
         ComplianceChecklistItem item = new ComplianceChecklistItem();
         item.recordId          = doc.Id;
         item.documentType      = documentLabel;
-        item.status             = entry.status;
-        item.contentDocumentId  = entry.contentDocumentId;
-        item.fileName           = entry.fileName;
-        item.issueDate          = entry.issueDate;
-        item.expiryDate         = entry.expiryDate;
-        item.submittedDate      = entry.uploadedDate;
+        item.status            = entry.status;
+        item.contentDocumentId = entry.contentDocumentId;
+        item.fileName          = entry.fileName;
+        item.issueDate         = entry.issueDate;
+        item.expiryDate        = entry.expiryDate;
+        item.submittedDate     = entry.uploadedDate;
         return item;
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // WRITE — applicant removes a file for one document type, without
-    // touching the other types' entries on the same parent record.
+    // WRITE — applicant removes an ad hoc document file.
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static void deleteAdHocComplianceDocumentFile(Id adHocRecordId, String documentLabel) {
@@ -598,7 +616,7 @@ System.debug('adHocRecordId: ' + adHocRecordId);
             throw new AuraHandledException('Missing document reference.');
         }
         List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, IndividualApplication__c, Document_Status_JSON__c,Document_Types__c
+            SELECT Id, IndividualApplication__c, Document_Status_JSON__c, Document_Types__c, Status__c
             FROM   WCF_Compliance_Document__c
             WHERE  Id = :adHocRecordId
             WITH   SYSTEM_MODE
@@ -619,53 +637,92 @@ System.debug('adHocRecordId: ' + adHocRecordId);
         }
         statusMap.remove(documentLabel);
         doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-        doc.Status__c = computeAdHocStatus(doc, statusMap);
         update doc;
     }
 
-
-private static Map<String, DocStatusEntry> parseStatusMap(String jsonStr) {
-    Map<String, DocStatusEntry> result = new Map<String, DocStatusEntry>();
-    if (String.isBlank(jsonStr)) return result;
-    try {
-        result = (Map<String, DocStatusEntry>) JSON.deserialize(jsonStr, Map<String, DocStatusEntry>.class);
-    } catch (Exception e) {
-        // corrupted/legacy JSON — start fresh rather than failing the whole page
-    }
-    return result;
-}
-    
     // ─────────────────────────────────────────────────────────────────
-// Helper — recompute the record-level Status__c for an ad hoc
-// compliance request based on how many of its required
-// Document_Types__c labels have an uploaded file in
-// Document_Status_JSON__c. This is what the Reviewer Dashboard's
-// getComplianceRows() reads, so this must be kept in sync on every
-// ad hoc upload/delete.
-// ─────────────────────────────────────────────────────────────────
-private static String computeAdHocStatus(WCF_Compliance_Document__c doc, Map<String, DocStatusEntry> statusMap) {
-    if (String.isBlank(doc.Document_Types__c)) {
-        return doc.Status__c; // not an ad hoc parent — leave untouched
-    }
+    // WRITE — Explicit Final Submit of all Compliance Documents
+    // Validates that all requested documents have been uploaded, sets
+    // internal statuses to Pending Review, and updates Status__c to Submitted.
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void submitComplianceDocuments(Id applicationId) {
+        if (applicationId == null) {
+            throw new AuraHandledException('Missing application ID.');
+        }
 
-    List<String> requiredLabels = new List<String>();
-    for (String s : doc.Document_Types__c.split(';')) {
-        if (String.isNotBlank(s)) requiredLabels.add(s.trim());
-    }
-    if (requiredLabels.isEmpty()) return doc.Status__c;
+        validateOwnership(applicationId);
 
-    Integer uploadedCount = 0;
-    for (String label : requiredLabels) {
-        DocStatusEntry entry = statusMap.get(label);
-        if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
-            uploadedCount++;
+        List<WCF_Compliance_Document__c> allDocs = [
+            SELECT Id, Document_Type__c, Document_Types__c, Status__c,
+                   ContentDocumentId__c, Document_Status_JSON__c, Uploaded_Date__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  IndividualApplication__c = :applicationId
+            WITH   SYSTEM_MODE
+        ];
+
+        if (allDocs.isEmpty()) {
+            throw new AuraHandledException('No compliance request found for this application.');
+        }
+
+        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
+        List<String> missingDocs = new List<String>();
+
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            // Case 1: Ad-hoc request with multiple Document_Types__c
+            if (String.isNotBlank(doc.Document_Types__c)) {
+                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+                List<String> requiredLabels = new List<String>();
+                for (String s : doc.Document_Types__c.split(';')) {
+                    if (String.isNotBlank(s)) requiredLabels.add(s.trim());
+                }
+
+                for (String label : requiredLabels) {
+                    DocStatusEntry entry = statusMap.get(label);
+                    if (entry == null || String.isBlank(entry.contentDocumentId)) {
+                        missingDocs.add(label);
+                    } else {
+                        // Flip draft item to Pending Review upon submit
+                        if (entry.status == 'Draft' || String.isBlank(entry.status) || entry.status == 'Pending Submission') {
+                            entry.status = 'Pending Review';
+                        }
+                    }
+                }
+
+                doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+                doc.Status__c = 'Submitted';
+                doc.Uploaded_Date__c = DateTime.now();
+                docsToUpdate.add(doc);
+            } 
+            // Case 2: Dedicated compliance document record
+            else if (String.isNotBlank(doc.Document_Type__c)) {
+                if (String.isBlank(doc.ContentDocumentId__c)) {
+                    missingDocs.add(doc.Document_Type__c);
+                } else {
+                    doc.Status__c = 'Pending Review';
+                    doc.Uploaded_Date__c = DateTime.now();
+                    docsToUpdate.add(doc);
+                }
+            }
+        }
+
+        if (!missingDocs.isEmpty()) {
+            throw new AuraHandledException('Please upload all required compliance documents before submitting. Missing: ' + String.join(missingDocs, ', '));
+        }
+
+        if (!docsToUpdate.isEmpty()) {
+            update docsToUpdate;
         }
     }
 
-    if (uploadedCount == 0)                    return 'Pending Submission';
-    if (uploadedCount < requiredLabels.size())  return 'Partially Submitted';
-    return 'Submitted';
-}
+    private static Map<String, DocStatusEntry> parseStatusMap(String jsonStr) {
+        Map<String, DocStatusEntry> result = new Map<String, DocStatusEntry>();
+        if (String.isBlank(jsonStr)) return result;
+        try {
+            result = (Map<String, DocStatusEntry>) JSON.deserialize(jsonStr, Map<String, DocStatusEntry>.class);
+        } catch (Exception e) { }
+        return result;
+    }
 
     public class DocStatusEntry {
         public String status;

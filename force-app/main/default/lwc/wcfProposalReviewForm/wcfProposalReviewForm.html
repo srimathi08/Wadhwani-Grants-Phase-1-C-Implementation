@@ -13,12 +13,14 @@
                     <div><strong>ID:</strong>&nbsp;{applicationName}</div>
                     <template if:true={hasOutcomeType}>
                         <div class="sep">·</div>
-                        <div>
+                        <div class="track-header-wrap" style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                             <strong>Track:</strong>&nbsp;
-                            <span class="track-badge">
-                                <span class="dot"></span>
-                                {outcomeDisplayLabel}
-                            </span>
+                            <template for:each={headerTrackBadges} for:item="tb">
+                                <span key={tb.label} class={tb.badgeClass}>
+                                    <span class="dot"></span>
+                                    {tb.label}
+                                </span>
+                            </template>
                         </div>
                     </template>
                 </div>
@@ -94,13 +96,21 @@
 
                                         <!-- Track-specific guidance badges & text -->
                                         <template if:true={q.trackAware}>
-                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 8px 12px; background: #faf8f5; border-left: 3px solid #E8622A; border-radius: 4px;">
-                                                <div style="font-size: 0.78rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
-                                                    🎯 Track-Specific Review Guidance ({outcomeDisplayLabel}):
+                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 10px 14px; background: #faf8f5; border-left: 3px solid #E8622A; border-radius: 6px; border: 1px solid #f2e9e1;">
+                                                <div style="font-size: 0.78rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                                                    🎯 Track-Specific Review Guidance:
                                                 </div>
-                                                <div style="font-size: 0.85rem; color: #444; line-height: 1.4;">
-                                                    {q.resolvedDescription}
-                                                </div>
+                                                <template for:each={q.trackDescriptions} for:item="td">
+                                                    <div key={td.trackKey} style="margin-bottom: 6px; font-size: 0.85rem; color: #334155; line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;">
+                                                        <span style="font-weight: 700; color: #1e293b; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 7px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap;">{td.trackLabel}</span>
+                                                        <span>{td.text}</span>
+                                                    </div>
+                                                </template>
+                                                <template if:false={q.trackDescriptions.length}>
+                                                    <div style="font-size: 0.85rem; color: #444; line-height: 1.4;">
+                                                        {q.resolvedDescription}
+                                                    </div>
+                                                </template>
                                             </div>
                                         </template>
                                         <template if:false={q.trackAware}>

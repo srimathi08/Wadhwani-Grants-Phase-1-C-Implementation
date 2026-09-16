@@ -55,6 +55,35 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <actionCalls>
+        <name>Livelihood_Approach_Action</name>
+        <label>Livelihood Approach Action</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>Grant_Field_Feedback_Template</actionName>
+        <actionType>generatePromptResponse</actionType>
+        <connector>
+            <targetReference>Livelihood_Approach_Update</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>Input:question</name>
+            <value>
+                <elementReference>$Label.CL_Your_Livelihood_Approach</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>Input:response</name>
+            <value>
+                <elementReference>$Record.Livelihood_Approach__c</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>Grant_Field_Feedback_Template</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
         <name>Job_Creation_Approach</name>
         <label>Job Creation Approach</label>
         <locationX>0</locationX>
@@ -450,6 +479,28 @@
             </connector>
             <label>Use of Additional Funding JC Changed?</label>
         </rules>
+        <rules>
+            <name>Livelihood_Approach_Changed</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record__Prior.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Livelihood_Approach__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Livelihood_Approach_Action</targetReference>
+            </connector>
+            <label>Livelihood Approach Changed?</label>
+        </rules>
     </decisions>
     <description>Get values from AI feedback object and call the prompt builder and update the AI feedback field with respone</description>
     <environments>Default</environments>
@@ -474,6 +525,19 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>Livelihood_Approach_Update</name>
+        <label>Livelihood Approach Update</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Livelihood_Approach_FR__c</field>
+            <value>
+                <elementReference>Livelihood_Approach_Action.promptResponse</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
     <recordUpdates>
         <name>Additional_Funding_JC_Update</name>
         <label>Additional Funding JC Update</label>

@@ -219,6 +219,8 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     @track metadataQuestions = [];
+    @track metadataTracks = [];
+    @track metadataSections = [];
 
     loadMetadata() {
         getFormMetadata({
@@ -229,6 +231,12 @@ export default class WcfDynamicForm extends LightningElement {
         .then(result => {
             if (result && result.questions) {
                 this.metadataQuestions = result.questions;
+            }
+            if (result && result.tracks) {
+                this.metadataTracks = result.tracks;
+            }
+            if (result && result.sections) {
+                this.metadataSections = result.sections;
             }
             if (result && result.fiscalYears) {
                 this.fiscalYears = result.fiscalYears;
@@ -658,14 +666,22 @@ export default class WcfDynamicForm extends LightningElement {
 
     // ── Track Choice Cards (2nd Image) ───────────────────────────────────
     get trackCards() {
-        const allTracks = [
-            { code: 'JOB_FULFILLMENT', label: 'Job Fulfillment' },
-            { code: 'JOB_CREATION', label: 'Job Creation' },
-            { code: 'LIVELIHOOD', label: 'Livelihood upliftment' }
-        ];
+        let allTracks = [];
+        if (this.metadataTracks && this.metadataTracks.length > 0) {
+            allTracks = this.metadataTracks.map(trk => ({
+                code: trk.code,
+                label: trk.label || trk.code
+            }));
+        } else {
+            allTracks = [
+                { code: 'JOB_FULFILLMENT', label: 'Job Fulfillment' },
+                { code: 'JOB_CREATION', label: 'Job Creation' },
+                { code: 'LIVELIHOOD', label: 'Livelihood upliftment' }
+            ];
+        }
 
         return allTracks.map(trk => {
-            const isSelected = this.selectedTracks.includes(trk.code);
+            const isSelected = (this.selectedTracks || []).includes(trk.code);
             return {
                 ...trk,
                 isSelected,
@@ -808,10 +824,33 @@ export default class WcfDynamicForm extends LightningElement {
             });
         }
 
+        // Dynamic Custom Track Tabs from Metadata
+        const standardTrackCodes = new Set(['JOB_FULFILLMENT', 'JOB_CREATION', 'LIVELIHOOD']);
+        const customSelectedTracks = trks.filter(t => !standardTrackCodes.has(t));
+        customSelectedTracks.forEach(ctCode => {
+            const matchedSection = (this.metadataSections || []).find(s => s.applicableTracks && s.applicableTracks.includes(ctCode));
+            const secTitle = matchedSection ? matchedSection.title : ctCode;
+            const tabKey = `tab_${ctCode.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            let currentSecNum = 2;
+            if (trks.includes('JOB_FULFILLMENT')) currentSecNum++;
+            if (trks.includes('JOB_CREATION')) currentSecNum++;
+            if (trks.includes('LIVELIHOOD')) currentSecNum++;
+
+            tabs.push({
+                id: tabKey,
+                stepNum: step++,
+                trackCode: ctCode,
+                mainTitle: `${currentSecNum}. ${secTitle}`,
+                qRange: '',
+                fullTitle: `TAB: ${secTitle.toUpperCase()}`
+            });
+        });
+
         let nextSecNum = 2;
         if (trks.includes('JOB_FULFILLMENT')) nextSecNum++;
         if (trks.includes('JOB_CREATION')) nextSecNum++;
         if (trks.includes('LIVELIHOOD')) nextSecNum++;
+        nextSecNum += customSelectedTracks.length;
 
         tabs.push({
             id: 'tabWhyWadhwani',
@@ -874,6 +913,22 @@ export default class WcfDynamicForm extends LightningElement {
     get isTabLivelihood() { return this.activeTabId === 'tabLivelihood'; }
     get isTabWhyWadhwani() { return this.activeTabId === 'tabWhyWadhwani'; }
     get isTabReviewSubmit() { return this.activeTabId === 'tabReviewSubmit'; }
+
+    get activeCustomTrackTab() {
+        const tab = (this.dynamicTabs || []).find(t => t.id === this.activeTabId && t.trackCode);
+        if (!tab) return null;
+        const trackCode = tab.trackCode;
+        const questions = this._getCustomQuestions(q => (
+            (q.applicableTracks && q.applicableTracks.includes(trackCode)) ||
+            (q.sectionCode && q.sectionCode.toUpperCase().includes(trackCode.toUpperCase()))
+        ), `${tab.stepNum}`);
+        return {
+            trackCode: trackCode,
+            title: tab.mainTitle,
+            questions: questions,
+            hasQuestions: questions && questions.length > 0
+        };
+    }
 
     get hasJobFulfillmentTrack() {
         return this.selectedTracks && this.selectedTracks.includes('JOB_FULFILLMENT');
@@ -4524,7 +4579,16 @@ export default class WcfDynamicForm extends LightningElement {
         }
 
         this.isAIModalOpen = true;
-        this.aiModalTitle = fieldApiName === 'Revenue_Explanation__c' ? 'AI Feedback – Explanation of Deviation' : 'AI Feedback – Legal Structure';
+        const titleMap = {
+            'Revenue_Explanation__c': 'AI Feedback – Explanation of Deviation',
+            'Livelihood_Approach__c': 'AI Feedback – Your Livelihood Upliftment Approach',
+            'Job_Creation_Approach__c': 'AI Feedback – Your Job Creation Approach',
+            'Skilling_Approach__c': 'AI Feedback – Your Skilling Approach',
+            'Organizational_Sustainability__c': 'AI Feedback – Organizational Sustainability',
+            'Use_of_Additional_Funding__c': 'AI Feedback – Use of Additional Funds',
+            'Operational_Synergies_with_WOF__c': 'AI Feedback – Operational Synergies with GenieAI'
+        };
+        this.aiModalTitle = titleMap[fieldApiName] || 'AI Feedback – Legal Structure';
         this.isAiLoading = true;
         this.aiResponse = '';
 
@@ -4554,6 +4618,7 @@ export default class WcfDynamicForm extends LightningElement {
                     'Revenue_Explanation__c': 'Revenue_Explanation_FR__c',
                     'Skilling_Approach__c': 'Skilling_Approach_FR__c',
                     'Job_Creation_Approach__c': 'Job_Creation_Approach_FR__c',
+                    'Livelihood_Approach__c': 'Livelihood_Approach_FR__c',
                     'Operational_Synergies_with_WOF__c': 'Operational_Synergies_with_WOF_FR__c',
                     'Organizational_Sustainability__c': 'Organizational_Sustainability_FR__c',
                     'Use_of_Additional_Funding__c': 'Use_of_Additional_Funding_FR__c'
