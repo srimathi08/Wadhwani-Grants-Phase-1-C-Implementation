@@ -599,7 +599,47 @@ public without sharing class WCFFormEngineController {
                 wrapper.businessSectors.add(sMap);
             }
 
-            // 7. ContentDocumentLink files
+            // 7. WCF_Livelihood_Program__c
+            List<WCF_Livelihood_Program__c> lProgs = [
+                SELECT Id, Program_Name__c, Support_Type_Provided__c, Duration_Man_Hours__c, Annual_Enrollment__c
+                FROM WCF_Livelihood_Program__c 
+                WHERE Proposal__c = :appId 
+                WITH SYSTEM_MODE 
+                ORDER BY CreatedDate ASC
+            ];
+            Integer lpIdx = 1;
+            for (WCF_Livelihood_Program__c lp : lProgs) {
+                Map<String, Object> lpMap = new Map<String, Object>();
+                lpMap.put('id', lpIdx++);
+                lpMap.put('name', lp.Program_Name__c);
+                lpMap.put('supportType', lp.Support_Type_Provided__c);
+                lpMap.put('manHours', lp.Duration_Man_Hours__c != null ? String.valueOf(lp.Duration_Man_Hours__c) : '');
+                lpMap.put('enrollment', lp.Annual_Enrollment__c != null ? String.valueOf(lp.Annual_Enrollment__c) : '');
+                wrapper.livelihoodPrograms.add(lpMap);
+            }
+
+            // 8. WCF_Community__c
+            List<WCF_Community__c> comms = [
+                SELECT Id, State__c, District_Area__c, Households_FY3__c, Households_FY2__c, Households_FY1__c, Households_Projected__c
+                FROM WCF_Community__c 
+                WHERE Proposal__c = :appId 
+                WITH SYSTEM_MODE 
+                ORDER BY CreatedDate ASC
+            ];
+            Integer cIdx = 1;
+            for (WCF_Community__c c : comms) {
+                Map<String, Object> cMap = new Map<String, Object>();
+                cMap.put('id', cIdx++);
+                cMap.put('state', c.State__c);
+                cMap.put('district', c.District_Area__c);
+                cMap.put('fy3', c.Households_FY3__c != null ? String.valueOf(c.Households_FY3__c) : '');
+                cMap.put('fy2', c.Households_FY2__c != null ? String.valueOf(c.Households_FY2__c) : '');
+                cMap.put('fy1', c.Households_FY1__c != null ? String.valueOf(c.Households_FY1__c) : '');
+                cMap.put('proj', c.Households_Projected__c != null ? String.valueOf(c.Households_Projected__c) : '');
+                wrapper.communities.add(cMap);
+            }
+
+            // 9. ContentDocumentLink files
             List<ContentDocumentLink> cdls = [
                 SELECT ContentDocumentId,
                        ContentDocument.LatestPublishedVersion.Title,
@@ -1294,7 +1334,62 @@ public without sharing class WCFFormEngineController {
             }
         }
 
-        // 6. Link Uploaded Files (Q24 & Q28) to IndividualApplication (Proposal)
+        // 6. WCF_Livelihood_Program__c
+        if (valuesMap.containsKey('livelihoodPrograms') && valuesMap.get('livelihoodPrograms') != null) {
+            List<Object> livelihoodPrograms = (List<Object>) valuesMap.get('livelihoodPrograms');
+            if (!livelihoodPrograms.isEmpty()) {
+                List<WCF_Livelihood_Program__c> lpRows = new List<WCF_Livelihood_Program__c>();
+                for (Object item : livelihoodPrograms) {
+                    Map<String, Object> row = (Map<String, Object>) item;
+                    String progName = (String) row.get('name');
+                    if (String.isBlank(progName)) continue;
+                    WCF_Livelihood_Program__c lp = new WCF_Livelihood_Program__c(Proposal__c = appId, Program_Name__c = progName);
+                    if (row.get('supportType') != null && String.isNotBlank(String.valueOf(row.get('supportType'))))
+                        lp.Support_Type_Provided__c = String.valueOf(row.get('supportType'));
+                    if (row.get('manHours') != null && String.isNotBlank(String.valueOf(row.get('manHours'))))
+                        lp.Duration_Man_Hours__c = Decimal.valueOf(String.valueOf(row.get('manHours')));
+                    if (row.get('enrollment') != null && String.isNotBlank(String.valueOf(row.get('enrollment'))))
+                        lp.Annual_Enrollment__c = Decimal.valueOf(String.valueOf(row.get('enrollment')));
+                    lpRows.add(lp);
+                }
+                if (!lpRows.isEmpty()) {
+                    delete [SELECT Id FROM WCF_Livelihood_Program__c WHERE Proposal__c = :appId];
+                    insert lpRows;
+                }
+            }
+        }
+
+        // 7. WCF_Community__c
+        if (valuesMap.containsKey('communities') && valuesMap.get('communities') != null) {
+            List<Object> communities = (List<Object>) valuesMap.get('communities');
+            if (!communities.isEmpty()) {
+                List<WCF_Community__c> commRows = new List<WCF_Community__c>();
+                for (Object item : communities) {
+                    Map<String, Object> row = (Map<String, Object>) item;
+                    String state = (String) row.get('state');
+                    String district = (String) row.get('district');
+                    if (String.isBlank(state) && String.isBlank(district)) continue;
+                    WCF_Community__c c = new WCF_Community__c(Proposal__c = appId);
+                    if (String.isNotBlank(state)) c.State__c = state;
+                    if (String.isNotBlank(district)) c.District_Area__c = district;
+                    if (row.get('fy3') != null && String.isNotBlank(String.valueOf(row.get('fy3'))))
+                        c.Households_FY3__c = Decimal.valueOf(String.valueOf(row.get('fy3')));
+                    if (row.get('fy2') != null && String.isNotBlank(String.valueOf(row.get('fy2'))))
+                        c.Households_FY2__c = Decimal.valueOf(String.valueOf(row.get('fy2')));
+                    if (row.get('fy1') != null && String.isNotBlank(String.valueOf(row.get('fy1'))))
+                        c.Households_FY1__c = Decimal.valueOf(String.valueOf(row.get('fy1')));
+                    if (row.get('proj') != null && String.isNotBlank(String.valueOf(row.get('proj'))))
+                        c.Households_Projected__c = Decimal.valueOf(String.valueOf(row.get('proj')));
+                    commRows.add(c);
+                }
+                if (!commRows.isEmpty()) {
+                    delete [SELECT Id FROM WCF_Community__c WHERE Proposal__c = :appId];
+                    insert commRows;
+                }
+            }
+        }
+
+        // 8. Link Uploaded Files (Q24 & Q28) to IndividualApplication (Proposal)
         Set<String> docIdsToLink = new Set<String>();
         List<Id> q24Ids = new List<Id>();
         List<Id> q28Ids = new List<Id>();

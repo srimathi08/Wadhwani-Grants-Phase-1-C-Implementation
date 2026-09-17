@@ -231,8 +231,10 @@ public without sharing class WCFFormController {
                 @AuraEnabled public Id outcomeId;
                 @AuraEnabled public Id fiscalId;
                 @AuraEnabled public Id historicId;
-                 @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;  // ✅ ADD
-            @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;  // ✅ ADD
+                 @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;
+                 @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;
+                 @AuraEnabled public List<WCF_Livelihood_Program__c> livelihoodPrograms;
+                 @AuraEnabled public List<WCF_Community__c> communities;
             }
             
             // Helper to validate SF Id
@@ -583,10 +585,24 @@ if (String.isNotBlank(skillingDomainsJson)) {
             ORDER BY CreatedDate ASC
         ];
         
-     response.businessSectors = [
+        response.businessSectors = [
             SELECT Id, Sector_c__c, Business_Sector_Other__c, Support_Begin_Date__c,
                    Support_Types__c, Support_Type_Other__c , Yearly_Enrolment__c
             FROM WCF_Business_Sector__c
+            WHERE Proposal__c = :app.Id
+            ORDER BY CreatedDate ASC
+        ];
+
+        response.livelihoodPrograms = [
+            SELECT Id, Program_Name__c, Support_Type_Provided__c, Duration_Man_Hours__c, Annual_Enrollment__c
+            FROM WCF_Livelihood_Program__c
+            WHERE Proposal__c = :app.Id
+            ORDER BY CreatedDate ASC
+        ];
+
+        response.communities = [
+            SELECT Id, State__c, District_Area__c, Households_FY3__c, Households_FY2__c, Households_FY1__c, Households_Projected__c
+            FROM WCF_Community__c
             WHERE Proposal__c = :app.Id
             ORDER BY CreatedDate ASC
         ];
@@ -974,9 +990,11 @@ if (!sectorRows.isEmpty()) {
                 @AuraEnabled public Historical_Data__c historical;
                 @AuraEnabled public Current_fiscal_year_data__c fiscal;
                 @AuraEnabled public Outcomes_Data__c outcome;
-                 @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;    // ← ADD
-            @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;    // ← ADD
-                @AuraEnabled public Map<String, List<Map<String, String>>> uploadedFilesByCell; // new line
+                 @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;
+                 @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;
+                 @AuraEnabled public List<WCF_Livelihood_Program__c> livelihoodPrograms;
+                 @AuraEnabled public List<WCF_Community__c> communities;
+                 @AuraEnabled public Map<String, List<Map<String, String>>> uploadedFilesByCell;
             
             }
             @AuraEnabled
@@ -1119,11 +1137,26 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
         ];
         
         // Related child: Business Sectors
-      // Related child: Business Sectors
         wrapper.businessSectors = [
             SELECT Id, Sector_c__c, Business_Sector_Other__c, Support_Begin_Date__c,
                    Support_Types__c, Support_Type_Other__c, Yearly_Enrolment__c
             FROM WCF_Business_Sector__c
+            WHERE Proposal__c = :recordId
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate ASC
+        ];
+
+        wrapper.livelihoodPrograms = [
+            SELECT Id, Program_Name__c, Support_Type_Provided__c, Duration_Man_Hours__c, Annual_Enrollment__c
+            FROM WCF_Livelihood_Program__c
+            WHERE Proposal__c = :recordId
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate ASC
+        ];
+
+        wrapper.communities = [
+            SELECT Id, State__c, District_Area__c, Households_FY3__c, Households_FY2__c, Households_FY1__c, Households_Projected__c
+            FROM WCF_Community__c
             WHERE Proposal__c = :recordId
             WITH SYSTEM_MODE
             ORDER BY CreatedDate ASC

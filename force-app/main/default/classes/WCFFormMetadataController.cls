@@ -62,6 +62,7 @@ public without sharing class WCFFormMetadataController {
         @AuraEnabled public List<QuestionWrapper> questions;
         @AuraEnabled public List<RuleWrapper> dependencyRules;
         @AuraEnabled public Map<String, String> translations;
+        @AuraEnabled public Map<String, String> labelMap;
         @AuraEnabled public WCFFormFiscalYearUtil.FiscalYearInfo fiscalYears;
     }
 
@@ -70,7 +71,7 @@ public without sharing class WCFFormMetadataController {
      * @param languageCode Language code e.g. "en_US", "es", "pt_BR"
      * @param fiscalMonth Organization fiscal month string e.g. "03"
      * @param fiscalDay Organization fiscal day string e.g. "31"
-     * @return FormMetadataPayload payload containing tracks, sections, questions, rules, translations
+     * @return FormMetadataPayload payload containing tracks, sections, questions, rules, translations, labelMap
      */
     @AuraEnabled
     public static FormMetadataPayload getFormMetadata(String languageCode, String fiscalMonth, String fiscalDay) {
@@ -85,6 +86,25 @@ public without sharing class WCFFormMetadataController {
         payload.dependencyRules = getDependencyRules();
         payload.translations = getTranslations(languageCode);
         payload.fiscalYears = WCFFormFiscalYearUtil.calculateFiscalYears(fiscalMonth, fiscalDay);
+        
+        Map<String, String> lblMap = new Map<String, String>();
+        if (payload.sections != null) {
+            for (SectionWrapper s : payload.sections) {
+                if (String.isNotBlank(s.code)) lblMap.put(s.code, s.title);
+            }
+        }
+        if (payload.tracks != null) {
+            for (TrackWrapper t : payload.tracks) {
+                if (String.isNotBlank(t.code)) lblMap.put(t.code, t.label);
+            }
+        }
+        if (payload.questions != null) {
+            for (QuestionWrapper q : payload.questions) {
+                if (String.isNotBlank(q.key)) lblMap.put(q.key, q.label);
+                if (String.isNotBlank(q.targetField)) lblMap.put(q.targetField, q.label);
+            }
+        }
+        payload.labelMap = lblMap;
         
         return payload;
     }
@@ -229,7 +249,7 @@ public without sharing class WCFFormMetadataController {
         Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
 
         List<RFI_Question__mdt> records = [
-            SELECT DeveloperName, Question_Code__c, Section_Code__c, Field_API_Name__c,
+            SELECT DeveloperName, MasterLabel, Question_Code__c, Section_Code__c, Field_API_Name__c,
                    Target_Object__c, Display_Type__c, Label__c, Sequence__c
             FROM RFI_Question__mdt
             ORDER BY Sequence__c ASC NULLS LAST, DeveloperName ASC
@@ -244,7 +264,7 @@ public without sharing class WCFFormMetadataController {
                 q.sequence = r.Sequence__c != null ? Integer.valueOf(r.Sequence__c) : seq++;
                 q.targetObject = String.isNotBlank(r.Target_Object__c) ? r.Target_Object__c : 'IndividualApplication';
                 q.targetField = r.Field_API_Name__c;
-                q.label = r.Label__c;
+                q.label = String.isNotBlank(r.Label__c) ? r.Label__c : (String.isNotBlank(r.MasterLabel) ? r.MasterLabel : null);
                 q.isRequired = false;
                 q.applicableTracks = new List<String>();
                 q.picklistOptions = new List<PicklistOption>();

@@ -1082,6 +1082,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     box-shadow: 0 0 3px #0176d3;
 }
 
+.wcf-native-input:disabled,
+.wcf-native-input[readonly] {
+    background-color: #f3f3f3 !important;
+    color: #181818 !important;
+    cursor: not-allowed !important;
+    border-color: #dddbda !important;
+}
+
 .phone-error-msg { color: #c23934; font-size: 12px; margin-top: 4px; }
 
 .computed-cell {

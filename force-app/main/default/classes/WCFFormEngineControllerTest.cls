@@ -173,7 +173,9 @@ private class WCFFormEngineControllerTest {
     @IsTest
     static void testLivelihoodTrackFlow() {
         List<String> luTracks = new List<String>{ 'LIVELIHOOD' };
-        String payload = '{"Organization_Name__c":"Livelihood Org","Work_Email_ID__c":"lu@example.com","Submitter_Name__c":"LU Submitter"}';
+        String payload = '{"Organization_Name__c":"Livelihood Org","Work_Email_ID__c":"lu@example.com","Submitter_Name__c":"LU Submitter",' +
+            '"livelihoodPrograms":[{"id":1,"name":"Test Program 1","supportType":"Mentorship","manHours":"40","enrollment":"100"}],' +
+            '"communities":[{"id":1,"state":"Maharashtra","district":"Pune","fy3":"50","fy2":"75","fy1":"100","proj":"150"}]}';
         
         Test.startTest();
         WCFFormEngineController.SaveResult result = WCFFormEngineController.saveDynamicDraft(null, luTracks, payload);
@@ -183,7 +185,19 @@ private class WCFFormEngineControllerTest {
         IndividualApplication app = [SELECT Id, Organizational_Area_s_for_Funding_Inves__c FROM IndividualApplication WHERE Id = :result.recordId];
         System.assertEquals('Livelihood Upliftment', app.Organizational_Area_s_for_Funding_Inves__c);
 
+        List<WCF_Livelihood_Program__c> lpList = [SELECT Id, Program_Name__c, Support_Type_Provided__c, Duration_Man_Hours__c, Annual_Enrollment__c FROM WCF_Livelihood_Program__c WHERE Proposal__c = :app.Id];
+        System.assertEquals(1, lpList.size());
+        System.assertEquals('Test Program 1', lpList[0].Program_Name__c);
+
+        List<WCF_Community__c> commList = [SELECT Id, State__c, District_Area__c, Households_FY3__c FROM WCF_Community__c WHERE Proposal__c = :app.Id];
+        System.assertEquals(1, commList.size());
+        System.assertEquals('Maharashtra', commList[0].State__c);
+
         WCFFormEngineController.DynamicDraftWrapper draft = WCFFormEngineController.getDynamicDraft(app.Id);
         System.assertEquals(true, draft.selectedTracks.contains('LIVELIHOOD'));
+        System.assertEquals(1, draft.livelihoodPrograms.size());
+        System.assertEquals('Test Program 1', draft.livelihoodPrograms[0].get('name'));
+        System.assertEquals(1, draft.communities.size());
+        System.assertEquals('Maharashtra', draft.communities[0].get('state'));
     }
 }

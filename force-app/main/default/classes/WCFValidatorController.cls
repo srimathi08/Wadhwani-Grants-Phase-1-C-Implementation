@@ -818,6 +818,8 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public Outcomes_Data__c outcome;
         @AuraEnabled public List<WCF_Skilling_Domain__c> skillingDomains;
         @AuraEnabled public List<WCF_Business_Sector__c> businessSectors;
+        @AuraEnabled public List<WCF_Livelihood_Program__c> livelihoodPrograms;
+        @AuraEnabled public List<WCF_Community__c> communities;
         @AuraEnabled public Map<String, Object> applicationData;
         @AuraEnabled public Map<String, Object> historicalData;
         @AuraEnabled public Map<String, Object> fiscalData;
@@ -968,6 +970,32 @@ public without sharing class WCFValidatorController {
         } catch (Exception e) {
             wrapper.businessSectors = new List<WCF_Business_Sector__c>();
             System.debug('businessSectors query failed: ' + e.getMessage());
+        }
+
+        try {
+            wrapper.livelihoodPrograms = [
+                SELECT Id, Program_Name__c, Support_Type_Provided__c, Duration_Man_Hours__c, Annual_Enrollment__c
+                FROM WCF_Livelihood_Program__c
+                WHERE Proposal__c = :applicationId
+                WITH SYSTEM_MODE
+                ORDER BY CreatedDate ASC
+            ];
+        } catch (Exception e) {
+            wrapper.livelihoodPrograms = new List<WCF_Livelihood_Program__c>();
+            System.debug('livelihoodPrograms query failed: ' + e.getMessage());
+        }
+
+        try {
+            wrapper.communities = [
+                SELECT Id, State__c, District_Area__c, Households_FY3__c, Households_FY2__c, Households_FY1__c, Households_Projected__c
+                FROM WCF_Community__c
+                WHERE Proposal__c = :applicationId
+                WITH SYSTEM_MODE
+                ORDER BY CreatedDate ASC
+            ];
+        } catch (Exception e) {
+            wrapper.communities = new List<WCF_Community__c>();
+            System.debug('communities query failed: ' + e.getMessage());
         }
 
         return wrapper;

@@ -38,8 +38,8 @@
                         <div class="modern-subsection-header">
                             <div class="modern-subsection-number">{qNum.Q1}</div>
                             <div>
-                                <h2 class="q-title">Which of these does your work cover? <span class="required">*</span></h2>
-                                <p class="q-subtitle">Select all that apply. Your answer sets which questions you get later in the form.</p>
+                                <h2 class="q-title">{labels.TRACK_SELECTION_TITLE} <span class="required">*</span></h2>
+                                <p class="q-subtitle">{labels.TRACK_SELECTION_SUBTITLE}</p>
                             </div>
                         </div>
 
@@ -66,19 +66,19 @@
                     </div>
 
                     <!-- APPLICATION OVERVIEW: SECTIONS 2 AND 3 -->
-                    <div class="block-divider-label">APPLICATION OVERVIEW · SECTIONS 2 & 3</div>
+                    <div class="block-divider-label">{labels.OVERVIEW_TITLE}</div>
 
                     <div class="rfi-card-box">
                         <div class="intro-section-item">
-                            <span class="section-tag">SECTION 2</span>
-                            <h3 class="section-heading">What You Do</h3>
-                            <p class="section-desc">Tell us about your work: your top programs, your approach, and what makes it different.</p>
+                            <span class="section-tag">{labels.OVERVIEW_SEC2_TAG}</span>
+                            <h3 class="section-heading">{labels.OVERVIEW_SEC2_HEADING}</h3>
+                            <p class="section-desc">{labels.OVERVIEW_SEC2_DESC}</p>
                         </div>
 
                         <div class="intro-section-item" style="margin-top: 16px;">
-                            <span class="section-tag">SECTION 3</span>
-                            <h3 class="section-heading">What You've Delivered</h3>
-                            <p class="section-desc">Tell us what you've achieved: your results for the last three years, plus your estimate for this year.</p>
+                            <span class="section-tag">{labels.OVERVIEW_SEC3_TAG}</span>
+                            <h3 class="section-heading">{labels.OVERVIEW_SEC3_HEADING}</h3>
+                            <p class="section-desc">{labels.OVERVIEW_SEC3_DESC}</p>
                         </div>
 
                         <!-- Orange Callout Box -->
@@ -89,14 +89,14 @@
                     </div>
 
                     <!-- FAQ: WHAT THE THREE TRACKS MEAN -->
-                    <div data-id="faq-section" class="block-divider-label faq-section-target">FREQUENTLY ASKED QUESTIONS · WHAT THE TRACKS MEAN</div>
+                    <div data-id="faq-section" class="block-divider-label faq-section-target">{labels.FAQ_SECTION_TITLE}</div>
 
                     <div class="rfi-card-box faq-card-box">
                         <!-- FAQ 1: Job Fulfillment -->
                         <div class="faq-item">
                             <div class="faq-header clickable" data-faq="jobFulfillment" onclick={toggleFaq}>
                                 <span class="faq-symbol">{faqJobFulfillmentSymbol}</span>
-                                <h3 class="faq-question-text">Job Fulfillment (Skilling and Placement)</h3>
+                                <h3 class="faq-question-text">{labels.FAQ_JF_TITLE}</h3>
                             </div>
                             <template if:true={isFaqJobFulfillmentOpen}>
                                 <div class="faq-content-body">
@@ -112,7 +112,7 @@
                         <div class="faq-item">
                             <div class="faq-header clickable" data-faq="jobCreation" onclick={toggleFaq}>
                                 <span class="faq-symbol">{faqJobCreationSymbol}</span>
-                                <h3 class="faq-question-text">Job Creation (SME / Enterprise Support)</h3>
+                                <h3 class="faq-question-text">{labels.FAQ_JC_TITLE}</h3>
                             </div>
                             <template if:true={isFaqJobCreationOpen}>
                                 <div class="faq-content-body">
@@ -128,7 +128,7 @@
                         <div class="faq-item">
                             <div class="faq-header clickable" data-faq="livelihood" onclick={toggleFaq}>
                                 <span class="faq-symbol">{faqLivelihoodSymbol}</span>
-                                <h3 class="faq-question-text">Livelihood Upliftment</h3>
+                                <h3 class="faq-question-text">{labels.FAQ_LIV_TITLE}</h3>
                             </div>
                             <template if:true={isFaqLivelihoodOpen}>
                                 <div class="faq-content-body">
@@ -194,39 +194,42 @@
                         ═════════════════════════════════════════════════════════════ -->
                         <template if:true={isTabAboutOrg}>
 
-                            <!-- Q2: Organizational Identifying Info -->
+                            <!-- ════════════════════════════════════════════════════════════
+                                 SECTION 2 — ORGANIZATIONAL IDENTIFYING INFORMATION
+                            ═════════════════════════════════════════════════════════════ -->
                             <div class="modern-subsection-card">
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q2}</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Organizational Identifying Information
+                                            {labels.SEC2_TITLE}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-subsection-description">
-                                            A few details so we know who we're talking to.
+                                            {labels.SEC2_DESC}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="modern-form-grid">
-                                    <!-- Organization Name -->
+                                    <!-- Organisation Name -->
                                     <div class="modern-field">
                                         <lightning-input
-                                            label="Organizational Name"
+                                            label={labels.Q2_ORG_NAME}
                                             value={formValues.Organization_Name__c}
                                             data-id="Organization_Name__c"
                                             data-key="Organization_Name__c"
+                                            disabled
                                             required
                                             onchange={handleInputChange}>
                                         </lightning-input>
                                     </div>
 
-                                    <!-- Headquarters City and Country Search -->
+                                    <!-- Headquarters City and Country (Autocomplete) -->
                                     <div class="modern-field">
                                         <div class="hq-city-search-wrapper">
                                             <lightning-input
-                                                label="Headquarters City and Country"
+                                                label={labels.Q2_HQ_LOCATION}
                                                 value={formValues.Headquarters_City_and_Country__c}
                                                 data-id="Headquarters_City_and_Country__c"
                                                 data-key="Headquarters_City_and_Country__c"
@@ -268,13 +271,14 @@
                                         </div>
                                     </div>
 
-                                    <!-- Primary Service Regions -->
+                                    <!-- Primary Service Regions (Full Width) -->
                                     <div class="modern-field full-width">
-                                        <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                            Primary Service Regions <span class="required">*</span>
+                                        <div class="field-helper" style="font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 4px;">
+                                            {labels.Q2_PRIMARY_REGIONS}
+                                            <span class="required">*</span>
                                         </div>
                                         <lightning-input
-                                            label="Where do you operate? List all states / provinces / regions."
+                                            label="Where do you operate? List all states, provinces, or regions in priority order."
                                             value={formValues.Primary_Service_Regions__c}
                                             data-id="Primary_Service_Regions__c"
                                             data-key="Primary_Service_Regions__c"
@@ -286,7 +290,7 @@
                                     <!-- Leader Name -->
                                     <div class="modern-field">
                                         <lightning-input
-                                            label="Leader Name"
+                                            label={labels.Q2_LEADER_NAME}
                                             value={formValues.Leader_Name__c}
                                             data-id="Leader_Name__c"
                                             data-key="Leader_Name__c"
@@ -298,7 +302,7 @@
                                     <!-- Leader Title -->
                                     <div class="modern-field">
                                         <lightning-input
-                                            label="Leader Title"
+                                            label={labels.Q2_LEADER_TITLE}
                                             value={formValues.Leader_Title__c}
                                             data-id="Leader_Title__c"
                                             data-key="Leader_Title__c"
@@ -307,9 +311,9 @@
                                         </lightning-input>
                                     </div>
 
-                                    <!-- Leader Tenure -->
+                                    <!-- Leader Tenure (Optional) -->
                                     <div class="modern-field optional-field">
-                                        <div class="subsection-title" style="font-size: 0.75rem; color: #706e6b; margin-bottom: 2px;">Leader Tenure (Optional)</div>
+                                        <div class="subsection-title" style="font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">{labels.Q2_LEADER_TENURE}</div>
                                         <lightning-input
                                             type="number"
                                             label="Number of years your current named leader has held their role. Round to the nearest year."
@@ -323,33 +327,27 @@
                                         </lightning-input>
                                     </div>
 
-                                    <!-- Custom Questions for Section 2 (e.g. Q2_VOLUNTEER_COUNT) -->
+                                    <!-- Dynamic Custom Questions in Q2 -->
                                     <template if:true={hasCustomQuestionsQ2}>
                                         <template for:each={customQuestionsQ2} for:item="cq">
                                             <div key={cq.key} class={cq.wrapperClass}>
-                                                <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                                    {cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template>
-                                                </div>
-                                                <template if:true={cq.helpText}>
-                                                    <div style="font-size: 0.75rem; color: #706e6b; margin-bottom: 4px;">{cq.helpText}</div>
-                                                </template>
                                                 <template if:true={cq.isText}>
-                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isTextArea}>
-                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-textarea>
                                                 </template>
                                                 <template if:true={cq.isNumber}>
-                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isDate}>
-                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isPicklist}>
-                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —"></lightning-combobox>
                                                 </template>
                                                 <template if:true={cq.isCheckbox}>
-                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
                                                 </template>
                                             </div>
                                         </template>
@@ -357,17 +355,19 @@
                                 </div>
                             </div>
 
-                            <!-- Q3: Submitter Contact Information -->
+                            <!-- ════════════════════════════════════════════════════════════
+                                 SECTION 3 — SUBMITTER CONTACT INFORMATION
+                            ═════════════════════════════════════════════════════════════ -->
                             <div class="modern-subsection-card">
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q3}</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Submitter Contact Information
+                                            {labels.SEC3_TITLE}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-subsection-description">
-                                            Who is filling out this form? You'll be the initial point of contact for your organisation.
+                                            {labels.SEC3_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -376,19 +376,20 @@
                                     <!-- Submitter Name -->
                                     <div class="modern-field">
                                         <lightning-input
-                                            label="Name"
+                                            label={labels.Q3_SUBMITTER_NAME}
                                             value={formValues.Submitter_Name__c}
                                             data-id="Submitter_Name__c"
                                             data-key="Submitter_Name__c"
+                                            disabled
                                             required
                                             onchange={handleInputChange}>
                                         </lightning-input>
                                     </div>
 
-                                    <!-- Submitter Job Title -->
+                                    <!-- Job Title -->
                                     <div class="modern-field">
                                         <lightning-input
-                                            label="Title"
+                                            label={labels.Q3_JOB_TITLE}
                                             value={formValues.Job_Title__c}
                                             data-id="Job_Title__c"
                                             data-key="Job_Title__c"
@@ -397,15 +398,15 @@
                                         </lightning-input>
                                     </div>
 
-                                    <!-- Phone Number -->
+                                    <!-- Phone (ITI Input) -->
                                     <div class="modern-field">
                                         <div class="slds-form-element">
                                             <label class="slds-form-element__label" for="phoneNumberInput">
                                                 <abbr class="slds-required" title="required">*</abbr>
-                                                Phone number
+                                                {labels.Q3_PHONE}
                                             </label>
                                             <div class="slds-form-element__control">
-                                                <div class={phoneFieldWrapperClass}>
+                                                <div class={phoneFieldWrapperClass} style="pointer-events: none; background-color: #f3f3f3; cursor: not-allowed;">
                                                     <input
                                                         id="phoneNumberInput"
                                                         data-id="phone"
@@ -416,56 +417,62 @@
                                                         placeholder="e.g. 9876543210"
                                                         value={formValues.Phone__c}
                                                         oninput={handlePhoneNumberInput}
+                                                        disabled
+                                                        readonly
                                                         required />
                                                 </div>
                                             </div>
                                         </div>
-
                                         <template if:true={phoneNumberError}>
                                             <p class="phone-error-msg">{phoneNumberError}</p>
                                         </template>
                                     </div>
 
-                                    <!-- Work Email Address -->
+                                    <!-- Work Email -->
                                     <div class="modern-field">
-                                        <lightning-input
-                                            type="email"
-                                            label="Email Address"
-                                            value={formValues.Work_Email_ID__c}
-                                            data-id="Work_Email_ID__c"
-                                            data-key="Work_Email_ID__c"
-                                            onchange={handleInputChange}
-                                            required>
-                                        </lightning-input>
+                                        <div class="slds-form-element">
+                                            <label class="slds-form-element__label" for="workEmailInput">
+                                                <abbr class="slds-required" title="required">*</abbr>
+                                                {labels.Q3_WORK_EMAIL}
+                                            </label>
+                                            <div class="slds-form-element__control">
+                                                <input
+                                                    id="workEmailInput"
+                                                    data-id="Work_Email_ID__c"
+                                                    data-key="Work_Email_ID__c"
+                                                    type="email"
+                                                    class="wcf-native-input"
+                                                    style="background-color: #f3f3f3; cursor: not-allowed;"
+                                                    value={formValues.Work_Email_ID__c}
+                                                    disabled
+                                                    readonly
+                                                    required
+                                                    oninput={handleInputChange} />
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Custom Questions for Section 3 -->
+                                    <!-- Dynamic Custom Questions in Q3 -->
                                     <template if:true={hasCustomQuestionsQ3}>
                                         <template for:each={customQuestionsQ3} for:item="cq">
                                             <div key={cq.key} class={cq.wrapperClass}>
-                                                <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                                    {cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template>
-                                                </div>
-                                                <template if:true={cq.helpText}>
-                                                    <div style="font-size: 0.75rem; color: #706e6b; margin-bottom: 4px;">{cq.helpText}</div>
-                                                </template>
                                                 <template if:true={cq.isText}>
-                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isTextArea}>
-                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-textarea>
                                                 </template>
                                                 <template if:true={cq.isNumber}>
-                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isDate}>
-                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isPicklist}>
-                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —"></lightning-combobox>
                                                 </template>
                                                 <template if:true={cq.isCheckbox}>
-                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
                                                 </template>
                                             </div>
                                         </template>
@@ -473,17 +480,19 @@
                                 </div>
                             </div>
 
-                            <!-- Q4: Legal Structure -->
+                            <!-- ════════════════════════════════════════════════════════════
+                                 SECTION 4 — LEGAL STRUCTURE
+                            ═════════════════════════════════════════════════════════════ -->
                             <div class="modern-subsection-card">
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q4}</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Legal Structure
+                                            {labels.SEC4_TITLE}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-subsection-description">
-                                            Tell us how your organisation is legally constituted and where it's registered.
+                                            {labels.SEC4_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -492,7 +501,7 @@
                                     <!-- Legal Type -->
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="Type"
+                                            label={labels.Q4_LEGAL_TYPE}
                                             value={formValues.Legal_Type__c}
                                             options={legalTypeOptions}
                                             data-id="Legal_Type__c"
@@ -520,7 +529,7 @@
                                     <!-- Registration Jurisdiction -->
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="Registration Jurisdiction"
+                                            label={labels.Q4_JURISDICTION}
                                             value={formValues.Registration_Jurisdiction__c}
                                             options={countryOptions}
                                             data-id="Registration_Jurisdiction__c"
@@ -547,8 +556,9 @@
 
                                     <!-- Incorporation Date -->
                                     <div class="modern-field">
-                                        <label class="modern-field-label">
-                                            Incorporation Date <span class="required">*</span>
+                                        <label class="date-field-label" style="display: block; font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 4px;">
+                                            {labels.Q4_INCORP_DATE}
+                                            <span class="required">*</span>
                                         </label>
                                         <div class="date-field-wrapper">
                                             <input type="date"
@@ -556,24 +566,51 @@
                                                    value={formValues.Incorporation_Date__c}
                                                    data-id="Incorporation_Date__c"
                                                    data-key="Incorporation_Date__c"
-                                                   min="1800-01-01"
+                                                   min="1900-01-01"
                                                    max={todayDateString}
                                                    onkeydown={handleDateKeyDown}
                                                    onclick={handleDateClick}
-                                                   onchange={handleInputChange} />
+                                                   onchange={handleInputChange}
+                                                   required />
                                             <span class="date-overlay-text">{formattedIncorporationDate}</span>
                                         </div>
                                     </div>
+
+                                    <!-- Dynamic Custom Questions in Q4 Grid -->
+                                    <template if:true={hasCustomQuestionsQ4}>
+                                        <template for:each={customQuestionsQ4} for:item="cq">
+                                            <div key={cq.key} class={cq.wrapperClass}>
+                                                <template if:true={cq.isText}>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isTextArea}>
+                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-textarea>
+                                                </template>
+                                                <template if:true={cq.isNumber}>
+                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isDate}>
+                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
+                                                </template>
+                                                <template if:true={cq.isPicklist}>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —"></lightning-combobox>
+                                                </template>
+                                                <template if:true={cq.isCheckbox}>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </template>
                                 </div>
 
-                                <!-- Brief Description Rich Text Box -->
+                                <!-- Brief Description Rich Text Box (Governance) -->
                                 <div class="modern-richtext-wrapper" style="margin-top: 24px;">
                                     <div class="modern-richtext-label">
-                                        Brief Description
+                                        {labels.Q4_GOVERNANCE_DESC}
                                         <span class="required">*</span>
                                     </div>
                                     <div class="modern-richtext-helper">
-                                        Briefly describe your governance and operational structure — board, leadership, key affiliations (&lt;100 words).
+                                        {labels.Q4_GOVERNANCE_HELPER}
                                     </div>
 
                                     <!-- Toolbar -->
@@ -589,6 +626,7 @@
                                         class="modern-richtext-area"
                                         contenteditable="true"
                                         data-field="Legal_Structure__c"
+                                        data-id="Legal_Structure__c"
                                         onclick={setActiveField}
                                         oninput={handleInputChange}
                                         onpaste={handlePaste}
@@ -615,51 +653,21 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Custom Questions for Section 4 -->
-                                <template if:true={hasCustomQuestionsQ4}>
-                                    <template for:each={customQuestionsQ4} for:item="cq">
-                                        <div key={cq.key} class={cq.wrapperClass} style="margin-top: 16px;">
-                                            <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                                {cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template>
-                                            </div>
-                                            <template if:true={cq.helpText}>
-                                                <div style="font-size: 0.75rem; color: #706e6b; margin-bottom: 4px;">{cq.helpText}</div>
-                                            </template>
-                                            <template if:true={cq.isText}>
-                                                <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                            </template>
-                                            <template if:true={cq.isTextArea}>
-                                                <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
-                                            </template>
-                                            <template if:true={cq.isNumber}>
-                                                <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                            </template>
-                                            <template if:true={cq.isDate}>
-                                                <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
-                                            </template>
-                                            <template if:true={cq.isPicklist}>
-                                                <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
-                                            </template>
-                                            <template if:true={cq.isCheckbox}>
-                                                <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
-                                            </template>
-                                        </div>
-                                    </template>
-                                </template>
                             </div>
 
-                            <!-- Q5: Legal and Tax Compliance -->
+                            <!-- ════════════════════════════════════════════════════════════
+                                 SECTION 5 — LEGAL AND TAX COMPLIANCE
+                            ═════════════════════════════════════════════════════════════ -->
                             <div class="modern-subsection-card">
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q5}</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Legal and Tax Compliance
+                                            {labels.SEC5_TITLE}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-subsection-description">
-                                            Wadhwani Grants disburses from a US entity, so cross-border grants require certain compliance credentials. Tell us what your organization holds today. If you hold none yet, the last question simply asks whether you would be open to pursuing an Equivalency Determination (ED), a process Wadhwani Grants supports for selected partners. This is for our compliance planning; it does not affect how we read the rest of your application.
+                                            {labels.SEC5_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -667,7 +675,7 @@
                                 <div class="modern-form-grid" style="grid-template-columns: 1fr 1fr;">
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="Do you have 501(c)(3) status in the US?"
+                                            label={labels.Q5_US_501C3}
                                             value={formValues.Has_501c3_Status__c}
                                             options={yesNoOptions}
                                             data-id="Has_501c3_Status__c"
@@ -678,7 +686,7 @@
                                     </div>
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="Do you have an Equivalency Determination (ED) in place?"
+                                            label={labels.Q5_ED_STATUS}
                                             value={formValues.Has_Equivalency_Determination__c}
                                             options={yesNoOptions}
                                             data-id="Has_Equivalency_Determination__c"
@@ -689,7 +697,7 @@
                                     </div>
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="If you operate in India, are you FCRA-registered?"
+                                            label={labels.Q5_FCRA_STATUS}
                                             value={formValues.Is_FCRA_Registered__c}
                                             options={yesNoNotApplicableOptions}
                                             data-id="Is_FCRA_Registered__c"
@@ -700,7 +708,7 @@
                                     </div>
                                     <div class="modern-field">
                                         <lightning-combobox
-                                            label="If none of the above apply, would you be willing to pursue ED certification if selected?"
+                                            label={labels.Q5_WILLING_ED}
                                             value={formValues.Willing_to_Pursue_ED__c}
                                             options={yesNoOptions}
                                             data-id="Willing_to_Pursue_ED__c"
@@ -710,33 +718,18 @@
                                         </lightning-combobox>
                                     </div>
 
-                                    <!-- Custom Questions for Section 5 -->
+                                    <!-- Dynamic Custom Questions in Q5 -->
                                     <template if:true={hasCustomQuestionsQ5}>
                                         <template for:each={customQuestionsQ5} for:item="cq">
                                             <div key={cq.key} class={cq.wrapperClass}>
-                                                <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                                    {cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template>
-                                                </div>
-                                                <template if:true={cq.helpText}>
-                                                    <div style="font-size: 0.75rem; color: #706e6b; margin-bottom: 4px;">{cq.helpText}</div>
-                                                </template>
                                                 <template if:true={cq.isText}>
-                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                                </template>
-                                                <template if:true={cq.isTextArea}>
-                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
-                                                </template>
-                                                <template if:true={cq.isNumber}>
-                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                                </template>
-                                                <template if:true={cq.isDate}>
-                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isPicklist}>
-                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —"></lightning-combobox>
                                                 </template>
                                                 <template if:true={cq.isCheckbox}>
-                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
                                                 </template>
                                             </div>
                                         </template>
@@ -744,72 +737,53 @@
                                 </div>
                             </div>
 
-                            <!-- Q6: Fiscal Year End Date -->
+                            <!-- ════════════════════════════════════════════════════════════
+                                 SECTION 6 — FISCAL YEAR END DATE
+                            ═════════════════════════════════════════════════════════════ -->
                             <div class="modern-subsection-card">
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q6}</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Fiscal Year End Date
+                                            {labels.SEC6_TITLE}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-subsection-description">
-                                            When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)
+                                            {labels.SEC6_DESC}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="modern-form-grid" style="grid-template-columns: 1fr 1fr; max-width: 400px;">
-                                    <div class="modern-field">
-                                        <lightning-combobox
-                                            label="Month"
-                                            value={formValues.Fiscal_Month__c}
-                                            options={fiscalMonthOptions}
-                                            data-id="Fiscal_Month__c"
-                                            data-key="Fiscal_Month__c"
-                                            onchange={handleFiscalMonthChange}
-                                            required>
-                                        </lightning-combobox>
-                                    </div>
-                                    <div class="modern-field">
-                                        <lightning-combobox
-                                            label="Day"
-                                            value={formValues.Fiscal_Day__c}
-                                            options={fiscalDayOptions}
-                                            data-id="Fiscal_Day__c"
-                                            data-key="Fiscal_Day__c"
-                                            onchange={handleFiscalDayChange}
-                                            required>
-                                        </lightning-combobox>
-                                    </div>
+                                    <lightning-combobox
+                                        label={labels.Q6_FISCAL_MONTH}
+                                        value={formValues.Fiscal_Month__c}
+                                        options={fiscalMonthOptions}
+                                        data-id="Fiscal_Month__c"
+                                        data-key="Fiscal_Month__c"
+                                        onchange={handleFiscalMonthChange}
+                                        required>
+                                    </lightning-combobox>
 
-                                    <!-- Custom Questions for Section 6 -->
+                                    <lightning-combobox
+                                        label={labels.Q6_FISCAL_DAY}
+                                        value={formValues.Fiscal_Day__c}
+                                        options={fiscalDayOptions}
+                                        data-id="Fiscal_Day__c"
+                                        data-key="Fiscal_Day__c"
+                                        onchange={handleFiscalDayChange}
+                                        required>
+                                    </lightning-combobox>
+
+                                    <!-- Dynamic Custom Questions in Q6 -->
                                     <template if:true={hasCustomQuestionsQ6}>
                                         <template for:each={customQuestionsQ6} for:item="cq">
                                             <div key={cq.key} class={cq.wrapperClass}>
-                                                <div class="field-helper" style="font-size: 0.75rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">
-                                                    {cq.label} <template if:true={cq.isRequired}><span class="required">*</span></template>
-                                                </div>
-                                                <template if:true={cq.helpText}>
-                                                    <div style="font-size: 0.75rem; color: #706e6b; margin-bottom: 4px;">{cq.helpText}</div>
-                                                </template>
                                                 <template if:true={cq.isText}>
-                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                                </template>
-                                                <template if:true={cq.isTextArea}>
-                                                    <lightning-textarea label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-textarea>
-                                                </template>
-                                                <template if:true={cq.isNumber}>
-                                                    <lightning-input type="number" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder={cq.placeholder} variant="label-hidden"></lightning-input>
-                                                </template>
-                                                <template if:true={cq.isDate}>
-                                                    <lightning-input type="date" label={cq.label} value={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} variant="label-hidden"></lightning-input>
+                                                    <lightning-input label={cq.label} value={cq.value} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-input>
                                                 </template>
                                                 <template if:true={cq.isPicklist}>
-                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired} placeholder="— Select —" variant="label-hidden"></lightning-combobox>
-                                                </template>
-                                                <template if:true={cq.isCheckbox}>
-                                                    <lightning-input type="checkbox" label={cq.label} checked={cq.value} data-field={cq.targetField} data-id={cq.targetField} data-key={cq.targetField} onchange={handleInputChange}></lightning-input>
+                                                    <lightning-combobox label={cq.label} value={cq.value} options={cq.options} data-field={cq.targetField} data-key={cq.targetField} onchange={handleInputChange} required={cq.isRequired}></lightning-combobox>
                                                 </template>
                                             </div>
                                         </template>
@@ -823,11 +797,11 @@
                                     <div class="mockup-optional-number">{qNum.Q7}</div>
                                     <div class="mockup-optional-header-content">
                                         <div class="mockup-optional-title-row">
-                                            <div class="mockup-optional-title">Top 3 Most Prominent Funders</div>
+                                            <div class="mockup-optional-title">{labels.Q7_TOP_FUNDERS}</div>
                                             <div class="mockup-optional-pill">Optional</div>
                                         </div>
                                         <div class="mockup-optional-description">
-                                            Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.
+                                            {labels.Q7_TOP_FUNDERS_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -1059,11 +1033,11 @@
                                     <div class="mockup-optional-number">{qNum.Q8}</div>
                                     <div class="mockup-optional-header-content">
                                         <div class="mockup-optional-title-row">
-                                            <div class="mockup-optional-title">References for Outreach</div>
+                                            <div class="mockup-optional-title">{labels.Q8_REFERENCES}</div>
                                             <div class="mockup-optional-pill">Optional</div>
                                         </div>
                                         <div class="mockup-optional-description">
-                                            Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.
+                                            {labels.Q8_REFERENCES_DESC}
                                         </div>
                                         <div style="font-size: 0.82rem; color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 4px; padding: 6px 10px; margin-top: 8px;">
                                             <strong>Consent:</strong> these contacts may be approached by Wadhwani Grants during evaluation.
@@ -1154,9 +1128,9 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q9}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Historical Financial Data</div>
+                                        <div class="modern-subsection-title">{labels.Q9_HIST_FINANCIALS}</div>
                                         <div class="modern-subsection-description">
-                                            Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.
+                                            {labels.Q9_HIST_FINANCIALS_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -1164,7 +1138,7 @@
                                 <div class="table-container">
                                     <table class="rfi-data-table">
                                         <thead>
-                                            <tr>
+                                             <tr>
                                                 <th>Item</th>
                                                 <th>{fiscalYears.fy3Label}</th>
                                                 <th>{fiscalYears.fy2Label}</th>
@@ -1225,9 +1199,9 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q10}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Current Fiscal Year Data</div>
+                                        <div class="modern-subsection-title">{labels.Q10_CURRENT_FY}</div>
                                         <div class="modern-subsection-description">
-                                            Your current fiscal year budget, latest projection, and explanation of any deviation.
+                                            {labels.Q10_CURRENT_FY_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -1284,11 +1258,11 @@
                                 <template if:true={isDeviationExplanationRequired}>
                                     <div class="modern-richtext-wrapper" style="margin-top: 24px;">
                                         <div class="modern-richtext-label">
-                                            Explanation of deviation
+                                            {labels.Q10_EXPLANATION_LABEL}
                                             <span class="required">*</span>
                                         </div>
                                         <div class="modern-richtext-helper">
-                                            Required if total deviation is non-zero (combined revenue + expense; &lt;200 words).
+                                            {labels.Q10_EXPLANATION_DESC}
                                         </div>
 
                                         <!-- Toolbar -->
@@ -1383,8 +1357,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q11}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Your Skilling Approach <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">Tell us about your skilling work in roughly 500 words. If you run named programs, walk us through your top three (names, what they teach, who they serve). Cover your theory of change, the journey from learner enrollment to placement, and what makes your approach different from others.</div>
+                                        <div class="modern-subsection-title">{labels.Q11_SKILLING_APPROACH} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q11_SKILLING_APPROACH_DESC}</div>
                                     </div>
                                 </div>
                                 <div class="modern-richtext-wrapper">
@@ -1435,8 +1409,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q12}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Skilling Domains Offered</div>
-                                        <div class="modern-subsection-description">List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.</div>
+                                        <div class="modern-subsection-title">{labels.Q12_SKILLING_DOMAINS}</div>
+                                        <div class="modern-subsection-description">{labels.Q12_SKILLING_DOMAINS_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1518,8 +1492,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q13}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)</div>
-                                        <div class="modern-subsection-description">Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.</div>
+                                        <div class="modern-subsection-title">{labels.Q13_JF_HIST_OUTCOMES}</div>
+                                        <div class="modern-subsection-description">{labels.Q13_JF_HIST_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1574,8 +1548,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q14}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Job Fulfillment Outcomes — Current FY Projections</div>
-                                        <div class="modern-subsection-description">Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren't verifiable at submission.</div>
+                                        <div class="modern-subsection-title">{labels.Q14_JF_PROJ_OUTCOMES}</div>
+                                        <div class="modern-subsection-description">{labels.Q14_JF_PROJ_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1665,8 +1639,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q15}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Your Job Creation Approach <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">Tell us about your job creation work in roughly 500 words. Cover (i) your support model (capital, mentorship, business advisory, sector-specific TA, market linkages, etc.); (ii) your theory of change, the journey from engagement through to jobs created and sustained; (iii) what makes your approach different from others.</div>
+                                        <div class="modern-subsection-title">{labels.Q15_JOB_CREATION_APPROACH} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q15_JOB_CREATION_APPROACH_DESC}</div>
                                     </div>
                                 </div>
                                 <div class="modern-richtext-wrapper">
@@ -1717,8 +1691,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q16}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Business Sectors Served <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.</div>
+                                        <div class="modern-subsection-title">{labels.Q16_BUSINESS_SECTORS} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q16_BUSINESS_SECTORS_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1832,8 +1806,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q17}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Job Creation Outcomes — Last 3 Fiscal Years (Actuals)</div>
-                                        <div class="modern-subsection-description">Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.</div>
+                                        <div class="modern-subsection-title">{labels.Q17_JC_HIST_OUTCOMES}</div>
+                                        <div class="modern-subsection-description">{labels.Q17_JC_HIST_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1891,8 +1865,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q18}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Job Creation Outcomes — Current FY Projections</div>
-                                        <div class="modern-subsection-description">Enter projected business and job-creation numbers for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.</div>
+                                        <div class="modern-subsection-title">{labels.Q18_JC_PROJ_OUTCOMES}</div>
+                                        <div class="modern-subsection-description">{labels.Q18_JC_PROJ_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
 
@@ -1983,8 +1957,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q19}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Your Livelihood Upliftment Approach <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">Tell us about this work in roughly 500 words. Cover (i) who the beneficiary is and how they come to you; (ii) Describe your intervention either to help start a new business (and sustain it) or in helping grow their existing business towards helping them get family-sustaining incomes; (iii) the support that continues after any initial training, such as mentoring, market access, credit linkage or aggregation; (iv) what makes your approach different.</div>
+                                        <div class="modern-subsection-title">{labels.Q19_LIVELIHOOD_APPROACH} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q19_LIVELIHOOD_APPROACH_DESC}</div>
                                     </div>
                                 </div>
                                 <div class="modern-richtext-wrapper">
@@ -2035,8 +2009,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q20}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Your Key Programs / Initiatives</div>
-                                        <div class="modern-subsection-description">Tell us about your flagship programs and the type of interventions you offer. For each program / initative provide a view on what are the different interventions, how many man-hours do you spend with each beneficiary and how many beneficiaries typically enroll each year for each program.</div>
+                                        <div class="modern-subsection-title">{labels.Q20_LIVELIHOOD_PROGRAMS}</div>
+                                        <div class="modern-subsection-description">{labels.Q20_LIVELIHOOD_PROGRAMS_DESC}</div>
                                     </div>
                                 </div>
 
@@ -2094,8 +2068,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q21}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Communities that you work in</div>
-                                        <div class="modern-subsection-description">Tell us where this program runs and how many households it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.</div>
+                                        <div class="modern-subsection-title">{labels.Q21_COMMUNITIES_SERVED}</div>
+                                        <div class="modern-subsection-description">{labels.Q21_COMMUNITIES_SERVED_DESC}</div>
                                     </div>
                                 </div>
 
@@ -2153,7 +2127,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q22}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Livelihood Outcomes (Actuals)</div>
+                                        <div class="modern-subsection-title">{labels.Q22_LIVELIHOOD_ACTUALS}</div>
                                         <div class="modern-subsection-description" style="line-height: 1.5; color: #4a4a4a;">
                                             <p style="margin-bottom: 8px;">A household counts as an outcome when both of these are true:</p>
                                             <ol style="margin-left: 20px; margin-bottom: 8px; list-style-type: decimal;">
@@ -2225,8 +2199,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q23}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Livelihood Outcomes, Current FY Projections</div>
-                                        <div class="modern-subsection-description">Projected figures for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.</div>
+                                        <div class="modern-subsection-title">{labels.Q23_LIVELIHOOD_PROJ}</div>
+                                        <div class="modern-subsection-description">{labels.Q23_LIVELIHOOD_PROJ_DESC}</div>
                                     </div>
                                 </div>
 
@@ -2353,8 +2327,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q24}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Independent Verification of Your Outcomes <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">This applies to every applicant, whichever track you completed. If a third party has independently verified or evaluated the outcomes you reported, sharing the report strengthens your application; it is not required. If not, we will discuss verification together at the next stage.</div>
+                                        <div class="modern-subsection-title">{labels.Q24_INDEPENDENT_VERIFICATION} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q24_INDEPENDENT_VERIFICATION_DESC}</div>
                                     </div>
                                 </div>
 
@@ -2406,8 +2380,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q25}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Sustainability Plan <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">How is your organization positioned to sustain its work over time? In about 100 words cover: (1) funding mix, main revenue sources; (2) programmatic resilience, dependence on any single program or contract; (3) funder concentration, reliance on one funder and how you manage that risk. A plain-language picture is all we need.</div>
+                                        <div class="modern-subsection-title">{labels.Q25_SUSTAINABILITY_PLAN} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q25_SUSTAINABILITY_PLAN_DESC}</div>
                                     </div>
                                 </div>
                                 <div class="modern-richtext-wrapper">
@@ -2458,8 +2432,8 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q26}</div>
                                     <div>
-                                        <div class="modern-subsection-title">Direction for Additional Funding <span class="required">*</span></div>
-                                        <div class="modern-subsection-description">Then, in words. If you were given a grant of USD 1 million a year, what would you do with it? In about 200 words, tell us how you would deploy it to scale your impact: program expansion, geographic scaling, new offerings, capacity-building, technology investment, and so on. Treat the figure as approximate; scale it to your own situation. We will work out specifics together at the next stage, so no detailed budget or M&E plan is needed here.</div>
+                                        <div class="modern-subsection-title">{labels.Q26_ADDITIONAL_FUNDING} <span class="required">*</span></div>
+                                        <div class="modern-subsection-description">{labels.Q26_ADDITIONAL_FUNDING_DESC}</div>
                                     </div>
                                 </div>
                                 <div class="modern-richtext-wrapper">
@@ -2511,11 +2485,11 @@
                                     <div class="mockup-optional-number">{qNum.Q27}</div>
                                     <div class="mockup-optional-header-content">
                                         <div class="mockup-optional-title-row">
-                                            <div class="mockup-optional-title">Operational Synergies — GenieAI</div>
+                                            <div class="mockup-optional-title">{labels.Q27_GENIE_AI}</div>
                                             <div class="mockup-optional-pill">Optional</div>
                                         </div>
                                         <div class="mockup-optional-description">
-                                            GenieAI is Wadhwani Foundation's AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying — we want your honest signal. If you're open to exploring synergy, tell us how it could fit. If not, that's a complete and acceptable answer.
+                                            {labels.Q27_GENIE_AI_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -2557,11 +2531,11 @@
                                     <div class="mockup-optional-number">{qNum.Q28}</div>
                                     <div class="mockup-optional-header-content">
                                         <div class="mockup-optional-title-row">
-                                            <div class="mockup-optional-title">Supporting Documents</div>
+                                            <div class="mockup-optional-title">{labels.Q28_SUPPORTING_DOCS}</div>
                                             <div class="mockup-optional-pill">Optional</div>
                                         </div>
                                         <div class="mockup-optional-description">
-                                            If there's anything else you'd like to share in support of your application, you may upload it here.
+                                            {labels.Q28_SUPPORTING_DOCS_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -2646,10 +2620,10 @@
                                     <div class="modern-subsection-number">✓</div>
                                     <div>
                                         <div class="modern-subsection-title">
-                                            Review &amp; Submit
+                                            {labels.REVIEW_SUBMIT_TITLE}
                                         </div>
                                         <div class="modern-subsection-description">
-                                            Take a final look at what you've entered. Go back to any previous section to make edits before submitting.
+                                            {labels.REVIEW_SUBMIT_DESC}
                                         </div>
                                     </div>
                                 </div>
@@ -2658,34 +2632,34 @@
                             <!-- 1. ABOUT YOUR ORGANISATION (Q1 - Q10) -->
                             <div class="rv-section">
                                 <div class="rv-section-head">
-                                    <span>ABOUT YOUR ORGANISATION</span>
+                                    <span>{labels.REVIEW_SEC_ABOUT_ORG}</span>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q1}</span>Selected Track</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q1}</span>{labels.Q1_SELECTED_TRACKS}</div>
                                     <div class="rv-val">{selectedTrackLabelsDisplay}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Organizational Name</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_ORG_NAME}</div>
                                     <div class="rv-val">{formValues.Organization_Name__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Headquarters City and Country</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_HQ_LOCATION}</div>
                                     <div class="rv-val">{formValues.Headquarters_City_and_Country__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Primary Service Regions</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_PRIMARY_REGIONS}</div>
                                     <div class="rv-val">{formValues.Primary_Service_Regions__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Leader Name</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_LEADER_NAME}</div>
                                     <div class="rv-val">{formValues.Leader_Name__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Leader Title</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_LEADER_TITLE}</div>
                                     <div class="rv-val">{formValues.Leader_Title__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>Leader Tenure</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_LEADER_TENURE}</div>
                                     <div class="rv-val">{formValues.Leader_Tenure__c}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ2}>
@@ -2697,19 +2671,19 @@
                                     </template>
                                 </template>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Submitter Name</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_SUBMITTER_NAME}</div>
                                     <div class="rv-val">{formValues.Submitter_Name__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Title</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_JOB_TITLE}</div>
                                     <div class="rv-val">{formValues.Job_Title__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Work Email</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_WORK_EMAIL}</div>
                                     <div class="rv-val">{formValues.Work_Email_ID__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>Phone number</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_PHONE}</div>
                                     <div class="rv-val">{formValues.Phone__c}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ3}>
@@ -2721,19 +2695,19 @@
                                     </template>
                                 </template>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>Legal Type</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_LEGAL_TYPE}</div>
                                     <div class="rv-val">{formValues.Legal_Type__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>Registration Jurisdiction</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_JURISDICTION}</div>
                                     <div class="rv-val">{formValues.Registration_Jurisdiction__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>Incorporation Date</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_INCORP_DATE}</div>
                                     <div class="rv-val">{formattedIncorporationDate}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>Brief Description</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_GOVERNANCE_DESC}</div>
                                     <div class="rv-val">
                                         <lightning-formatted-rich-text value={formValues.Legal_Structure__c}></lightning-formatted-rich-text>
                                     </div>
@@ -2747,19 +2721,19 @@
                                     </template>
                                 </template>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>501(c)(3) Status in US</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_US_501C3}</div>
                                     <div class="rv-val">{formValues.Has_501c3_Status__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>Equivalency Determination (ED)</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_ED_STATUS}</div>
                                     <div class="rv-val">{formValues.Has_Equivalency_Determination__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>FCRA Registered (India)</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_FCRA_STATUS}</div>
                                     <div class="rv-val">{formValues.Is_FCRA_Registered__c}</div>
                                 </div>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>Willing to Pursue ED</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_WILLING_ED}</div>
                                     <div class="rv-val">{formValues.Willing_to_Pursue_ED__c}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ5}>
@@ -2771,7 +2745,7 @@
                                     </template>
                                 </template>
                                 <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q6}</span>Fiscal Year End Date</div>
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q6}</span>{labels.Q6_FISCAL_DATE}</div>
                                     <div class="rv-val">{formattedFiscalYearEndReview}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ6}>
@@ -2815,7 +2789,7 @@
 
                                 <!-- Q9 Historical Financial Data Table -->
                                 <div class="rv-sub-head" style="margin-top: 20px;">
-                                    <span class="rv-q-num">Q{qNum.Q9}</span>HISTORICAL FINANCIAL DATA (THREE PRIOR FISCAL YEARS)
+                                    <span class="rv-q-num">Q{qNum.Q9}</span>{labels.Q9_HIST_FINANCIALS}
                                 </div>
                                 <div class="rv-table-scroll">
                                     <table class="rv-table">
@@ -2864,7 +2838,7 @@
 
                                 <!-- Q10 Current Fiscal Year Data Table -->
                                 <div class="rv-sub-head" style="margin-top: 20px;">
-                                    <span class="rv-q-num">Q{qNum.Q10}</span>CURRENT FISCAL YEAR DATA
+                                    <span class="rv-q-num">Q{qNum.Q10}</span>{labels.Q10_CURRENT_FY}
                                 </div>
                                 <div class="rv-table-scroll">
                                     <table class="rv-table">
@@ -2907,7 +2881,7 @@
 
                                 <template if:true={isDeviationExplanationRequired}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q10}</span>Explanation of Deviation</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q10}</span>{labels.Q10_EXPLANATION_LABEL}</div>
                                         <div class="rv-val">
                                             <lightning-formatted-rich-text value={formValues.Revenue_Explanation__c}></lightning-formatted-rich-text>
                                         </div>
@@ -2927,11 +2901,11 @@
                             <template if:true={hasJobFulfillmentTrack}>
                                 <div class="rv-section">
                                     <div class="rv-section-head">
-                                        <span>JOB FULFILLMENT</span>
+                                        <span>{labels.REVIEW_SEC_JOB_FULFILLMENT}</span>
                                     </div>
                                     <template if:true={formValues.Skilling_Approach__c}>
                                         <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q11}</span>Your Skilling Approach</div>
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q11}</span>{labels.Q11_SKILLING_APPROACH}</div>
                                             <div class="rv-val">
                                                 <lightning-formatted-rich-text value={formValues.Skilling_Approach__c}></lightning-formatted-rich-text>
                                             </div>
@@ -2941,7 +2915,7 @@
                                     <!-- Q12 Skilling Domains Table -->
                                     <template if:true={hasSkillingDomainsForReview}>
                                         <div class="rv-sub-head" style="margin-top: 20px;">
-                                            <span class="rv-q-num">Q{qNum.Q12}</span>SKILLING DOMAINS OFFERED
+                                            <span class="rv-q-num">Q{qNum.Q12}</span>{labels.Q12_SKILLING_DOMAINS}
                                         </div>
                                         <div class="rv-table-scroll">
                                             <table class="rv-table">
@@ -2971,7 +2945,7 @@
 
                                     <!-- Q13 Job Fulfillment Outcomes (Actuals) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q13}</span>JOB FULFILLMENT OUTCOMES — LAST 3 FISCAL YEARS (ACTUALS)
+                                        <span class="rv-q-num">Q{qNum.Q13}</span>{labels.Q13_JF_HIST_OUTCOMES}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3014,7 +2988,7 @@
 
                                     <!-- Q14 Job Fulfillment Outcomes (Projections) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q14}</span>JOB FULFILLMENT OUTCOMES — CURRENT FY PROJECTIONS
+                                        <span class="rv-q-num">Q{qNum.Q14}</span>{labels.Q14_JF_PROJ_OUTCOMES}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3059,11 +3033,11 @@
                             <template if:true={hasJobCreationTrack}>
                                 <div class="rv-section">
                                     <div class="rv-section-head">
-                                        <span>JOB CREATION</span>
+                                        <span>{labels.REVIEW_SEC_JOB_CREATION}</span>
                                     </div>
                                     <template if:true={formValues.Job_Creation_Approach__c}>
                                         <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q15}</span>Your Job Creation Approach</div>
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q15}</span>{labels.Q15_JOB_CREATION_APPROACH}</div>
                                             <div class="rv-val">
                                                 <lightning-formatted-rich-text value={formValues.Job_Creation_Approach__c}></lightning-formatted-rich-text>
                                             </div>
@@ -3073,7 +3047,7 @@
                                     <!-- Q16 Business Sectors Served Table -->
                                     <template if:true={hasBusinessSectorsForReview}>
                                         <div class="rv-sub-head" style="margin-top: 20px;">
-                                            <span class="rv-q-num">Q{qNum.Q16}</span>BUSINESS SECTORS SERVED
+                                            <span class="rv-q-num">Q{qNum.Q16}</span>{labels.Q16_BUSINESS_SECTORS}
                                         </div>
                                         <div class="rv-table-scroll">
                                             <table class="rv-table">
@@ -3101,7 +3075,7 @@
 
                                     <!-- Q17 Job Creation Outcomes (Actuals) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q17}</span>JOB CREATION OUTCOMES — LAST 3 FISCAL YEARS (ACTUALS)
+                                        <span class="rv-q-num">Q{qNum.Q17}</span>{labels.Q17_JC_HIST_OUTCOMES}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3150,7 +3124,7 @@
 
                                     <!-- Q18 Job Creation Outcomes (Projections) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q18}</span>JOB CREATION OUTCOMES — CURRENT FY PROJECTIONS
+                                        <span class="rv-q-num">Q{qNum.Q18}</span>{labels.Q18_JC_PROJ_OUTCOMES}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3199,11 +3173,11 @@
                             <template if:true={hasLivelihoodTrack}>
                                 <div class="rv-section">
                                     <div class="rv-section-head">
-                                        <span>LIVELIHOOD UPLIFTMENT</span>
+                                        <span>{labels.REVIEW_SEC_LIVELIHOOD}</span>
                                     </div>
                                     <template if:true={formValues.Livelihood_Approach__c}>
                                         <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q19}</span>Your Livelihood Upliftment Approach</div>
+                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q19}</span>{labels.Q19_LIVELIHOOD_APPROACH}</div>
                                             <div class="rv-val">
                                                 <lightning-formatted-rich-text value={formValues.Livelihood_Approach__c}></lightning-formatted-rich-text>
                                             </div>
@@ -3213,7 +3187,7 @@
                                     <!-- Q20 Key Programs / Initiatives Table -->
                                     <template if:true={hasLivelihoodProgramsForReview}>
                                         <div class="rv-sub-head" style="margin-top: 20px;">
-                                            <span class="rv-q-num">Q{qNum.Q20}</span>KEY PROGRAMS / INITIATIVES
+                                            <span class="rv-q-num">Q{qNum.Q20}</span>{labels.Q20_LIVELIHOOD_PROGRAMS}
                                         </div>
                                         <div class="rv-table-scroll">
                                             <table class="rv-table">
@@ -3242,7 +3216,7 @@
                                     <!-- Q21 Communities Worked In Table -->
                                     <template if:true={hasCommunityRowsForReview}>
                                         <div class="rv-sub-head" style="margin-top: 20px;">
-                                            <span class="rv-q-num">Q{qNum.Q21}</span>COMMUNITIES WORKED IN
+                                            <span class="rv-q-num">Q{qNum.Q21}</span>{labels.Q21_COMMUNITIES_SERVED}
                                         </div>
                                         <div class="rv-table-scroll">
                                             <table class="rv-table">
@@ -3274,7 +3248,7 @@
 
                                     <!-- Q22 Livelihood Outcomes (Actuals) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q22}</span>LIVELIHOOD OUTCOMES (ACTUALS)
+                                        <span class="rv-q-num">Q{qNum.Q22}</span>{labels.Q22_LIVELIHOOD_ACTUALS}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3317,7 +3291,7 @@
 
                                     <!-- Q23 Livelihood Outcomes (Projections) -->
                                     <div class="rv-sub-head" style="margin-top: 20px;">
-                                        <span class="rv-q-num">Q{qNum.Q23}</span>LIVELIHOOD OUTCOMES (PROJECTIONS)
+                                        <span class="rv-q-num">Q{qNum.Q23}</span>{labels.Q23_LIVELIHOOD_PROJ}
                                     </div>
                                     <div class="rv-table-scroll">
                                         <table class="rv-table">
@@ -3361,12 +3335,12 @@
                             <!-- 5. WHY WADHWANI GRANTS (Q24 - Q28) -->
                             <div class="rv-section">
                                 <div class="rv-section-head">
-                                    <span>WHY WADHWANI GRANTS</span>
+                                    <span>{labels.REVIEW_SEC_WHY_WADHWANI}</span>
                                 </div>
 
                                 <template if:true={formValues.Q24_VERIFIED}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>Outcomes Verified by Third Party</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>{labels.Q24_INDEPENDENT_VERIFICATION}</div>
                                         <div class="rv-val">{formValues.Q24_VERIFIED}</div>
                                     </div>
                                 </template>
@@ -3391,7 +3365,7 @@
 
                                 <template if:true={formValues.Organizational_Sustainability__c}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q25}</span>Organizational Sustainability</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q25}</span>{labels.Q25_SUSTAINABILITY_PLAN}</div>
                                         <div class="rv-val">
                                             <lightning-formatted-rich-text value={formValues.Organizational_Sustainability__c}></lightning-formatted-rich-text>
                                         </div>
@@ -3400,7 +3374,7 @@
 
                                 <template if:true={formValues.Use_of_Additional_Funding__c}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q26}</span>Desired Use of Additional Funding / Investment</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q26}</span>{labels.Q26_ADDITIONAL_FUNDING}</div>
                                         <div class="rv-val">
                                             <lightning-formatted-rich-text value={formValues.Use_of_Additional_Funding__c}></lightning-formatted-rich-text>
                                         </div>
@@ -3409,14 +3383,14 @@
 
                                 <template if:true={formValues.GenieAI_Interest_Level__c}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>Operational Synergies - Interest Level</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Interest Level</div>
                                         <div class="rv-val">{formValues.GenieAI_Interest_Level__c}</div>
                                     </div>
                                 </template>
 
                                 <template if:true={formValues.GenieAI_Synergies_Description__c}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>Operational Synergies - Description</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Description</div>
                                         <div class="rv-val">
                                             <lightning-formatted-rich-text value={formValues.GenieAI_Synergies_Description__c}></lightning-formatted-rich-text>
                                         </div>
@@ -3425,7 +3399,7 @@
 
                                 <template if:true={q28UploadedFiles.length}>
                                     <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q28}</span>Supporting Documents</div>
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q28}</span>{labels.Q28_SUPPORTING_DOCS}</div>
                                         <div class="rv-val">
                                             <template for:each={q28UploadedFiles} for:item="file">
                                                 <div key={file.documentId}>📎 {file.name}</div>

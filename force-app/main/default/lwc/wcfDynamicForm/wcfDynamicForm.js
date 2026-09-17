@@ -21,6 +21,11 @@ function calculateEndingBalance(startBalance, revenue, expense) {
     return start + rev - exp;
 }
 
+function cleanTitle(str) {
+    if (!str || typeof str !== 'string') return '';
+    return str.replace(/^(\*?\s*Q\d+\s*:\s*|\*?\s*\d+\.\s*|\*\s*)/i, '').trim();
+}
+
 export default class WcfDynamicForm extends LightningElement {
     _recordId;
     _hasLoadedDraft = false;
@@ -96,10 +101,10 @@ export default class WcfDynamicForm extends LightningElement {
         { id: 1, sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', enterprises: '', jobs: '', displayWhenBegan: '' }
     ];
     @track livelihoodProgramRows = [
-        { id: 1, name: '', yearStarted: '', households: '', interventionType: '' }
+        { id: 1, name: '', supportType: '', manHours: '', enrollment: '' }
     ];
     @track communityRows = [
-        { id: 1, state: '', district: '', communities: '' }
+        { id: 1, state: '', district: '', fy3: '', fy2: '', fy1: '', proj: '' }
     ];
     @track docRows = [];
     @track q24UploadedFiles = [];
@@ -221,6 +226,7 @@ export default class WcfDynamicForm extends LightningElement {
     @track metadataQuestions = [];
     @track metadataTracks = [];
     @track metadataSections = [];
+    @track labelMap = {};
 
     loadMetadata() {
         getFormMetadata({
@@ -241,10 +247,171 @@ export default class WcfDynamicForm extends LightningElement {
             if (result && result.fiscalYears) {
                 this.fiscalYears = result.fiscalYears;
             }
+            if (result && result.labelMap) {
+                this.labelMap = result.labelMap;
+            }
         })
         .catch(err => {
             console.warn('Metadata load warning:', err);
         });
+    }
+
+    getQuestionLabel(key, defaultVal) {
+        let raw = defaultVal;
+        if (this.labelMap && this.labelMap[key]) {
+            raw = this.labelMap[key];
+        } else if (this.metadataQuestions && this.metadataQuestions.length) {
+            const found = this.metadataQuestions.find(q => q.key === key || q.targetField === key);
+            if (found && found.label) raw = found.label;
+        }
+        return cleanTitle(raw);
+    }
+
+    getSectionTitle(code, defaultVal) {
+        let raw = defaultVal;
+        if (this.labelMap && this.labelMap[code]) {
+            raw = this.labelMap[code];
+        } else if (this.metadataSections && this.metadataSections.length) {
+            const found = this.metadataSections.find(s => s.code === code);
+            if (found && found.title) raw = found.title;
+        }
+        return cleanTitle(raw);
+    }
+
+
+    get labels() {
+        return {
+            // Screen 1 & Track Selection
+            TRACK_SELECTION_TITLE: this.getQuestionLabel('TRACK_SELECTION_TITLE', 'Which of these does your work cover?'),
+            TRACK_SELECTION_SUBTITLE: this.getQuestionLabel('TRACK_SELECTION_SUBTITLE', 'Select all that apply. Your answer sets which questions you get later in the form.'),
+            
+            // Overview & FAQ
+            OVERVIEW_TITLE: this.getQuestionLabel('OVERVIEW_TITLE', 'APPLICATION OVERVIEW · SECTIONS 2 & 3'),
+            OVERVIEW_SEC2_TAG: 'SECTION 2',
+            OVERVIEW_SEC2_HEADING: this.getQuestionLabel('OVERVIEW_SEC2_HEADING', 'What You Do'),
+            OVERVIEW_SEC2_DESC: this.getQuestionLabel('OVERVIEW_SEC2_DESC', 'Tell us about your work: your top programs, your approach, and what makes it different.'),
+            OVERVIEW_SEC3_TAG: 'SECTION 3',
+            OVERVIEW_SEC3_HEADING: this.getQuestionLabel('OVERVIEW_SEC3_HEADING', 'What You\'ve Delivered'),
+            OVERVIEW_SEC3_DESC: this.getQuestionLabel('OVERVIEW_SEC3_DESC', 'Tell us what you\'ve achieved: your results for the last three years, plus your estimate for this year.'),
+            FAQ_SECTION_TITLE: this.getQuestionLabel('FAQ_SECTION_TITLE', 'FREQUENTLY ASKED QUESTIONS · WHAT THE TRACKS MEAN'),
+            FAQ_JF_TITLE: this.getQuestionLabel('FAQ_JF_TITLE', 'Job Fulfillment (Skilling and Placement)'),
+            FAQ_JC_TITLE: this.getQuestionLabel('FAQ_JC_TITLE', 'Job Creation (SME / Enterprise Support)'),
+            FAQ_LIV_TITLE: this.getQuestionLabel('FAQ_LIV_TITLE', 'Livelihood Upliftment'),
+
+            // Section Titles & Subtitles
+            SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', '1. About Your Organization'),
+            SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', '2. What You Do'),
+            SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', '3. Job Creation'),
+            SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', '4. Livelihood Upliftment'),
+            SEC_OUTCOMES: this.getSectionTitle('SEC_OUTCOMES', '3. What You Have Delivered'),
+            SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', '4. Why Wadhwani Grants'),
+            SEC_REVIEW_SUBMIT: this.getSectionTitle('SEC_REVIEW_SUBMIT', '5. Review and Submit'),
+
+            // Section Cards (Q2 - Q6)
+            SEC2_TITLE: this.getQuestionLabel('SEC2_TITLE', 'Organizational Identifying Information'),
+            SEC2_DESC: this.getQuestionLabel('SEC2_DESC', 'A few details so we know who we\'re talking to.'),
+            SEC3_TITLE: this.getQuestionLabel('SEC3_TITLE', 'Submitter Contact Information'),
+            SEC3_DESC: this.getQuestionLabel('SEC3_DESC', 'Who is filling out this form? You\'ll be the initial point of contact for your organisation.'),
+            SEC4_TITLE: this.getQuestionLabel('SEC4_TITLE', 'Legal Structure'),
+            SEC4_DESC: this.getQuestionLabel('SEC4_DESC', 'Tell us how your organisation is legally constituted and where it\'s registered.'),
+            SEC5_TITLE: this.getQuestionLabel('SEC5_TITLE', 'Legal and Tax Compliance'),
+            SEC5_DESC: this.getQuestionLabel('SEC5_DESC', 'Wadhwani Grants disburses from a US entity, so cross-border grants require certain compliance credentials. Tell us what your organization holds today. If you hold none yet, the last question simply asks whether you would be open to pursuing an Equivalency Determination (ED), a process Wadhwani Grants supports for selected partners. This is for our compliance planning; it does not affect how we read the rest of your application.'),
+            SEC6_TITLE: this.getQuestionLabel('SEC6_TITLE', 'Fiscal Year End Date'),
+            SEC6_DESC: this.getQuestionLabel('SEC6_DESC', 'When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)'),
+
+            // Tab 1 / Category 1 Flat Questions
+            Q1_SELECTED_TRACKS: this.getQuestionLabel('Q1_SELECTED_TRACKS', 'Selected Track'),
+            Q2_ORG_NAME: this.getQuestionLabel('Q2_ORG_NAME', 'Organizational Name'),
+            Q2_HQ_LOCATION: this.getQuestionLabel('Q2_HQ_LOCATION', 'Headquarters City and Country'),
+            Q2_PRIMARY_REGIONS: this.getQuestionLabel('Q2_PRIMARY_REGIONS', 'Primary Service Regions'),
+            Q2_LEADER_NAME: this.getQuestionLabel('Q2_LEADER_NAME', 'Leader Name'),
+            Q2_LEADER_TITLE: this.getQuestionLabel('Q2_LEADER_TITLE', 'Leader Title'),
+            Q2_LEADER_TENURE: this.getQuestionLabel('Q2_LEADER_TENURE', 'Leader Tenure (Optional)'),
+            
+            Q3_SUBMITTER_NAME: this.getQuestionLabel('Q3_SUBMITTER_NAME', 'Submitter Name'),
+            Q3_JOB_TITLE: this.getQuestionLabel('Q3_JOB_TITLE', 'Job Title'),
+            Q3_WORK_EMAIL: this.getQuestionLabel('Q3_WORK_EMAIL', 'Work Email'),
+            Q3_PHONE: this.getQuestionLabel('Q3_PHONE', 'Phone Number'),
+
+            Q4_LEGAL_TYPE: this.getQuestionLabel('Q4_LEGAL_TYPE', 'Legal Structure'),
+            Q4_JURISDICTION: this.getQuestionLabel('Q4_JURISDICTION', 'Registration Jurisdiction'),
+            Q4_INCORP_DATE: this.getQuestionLabel('Q4_INCORP_DATE', 'Incorporation Date'),
+            Q4_GOVERNANCE_DESC: this.getQuestionLabel('Q4_GOVERNANCE_DESC', 'Describe your governance structure and key governing bodies.'),
+            Q4_GOVERNANCE_HELPER: this.getQuestionLabel('Q4_GOVERNANCE_HELPER', 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).'),
+
+            Q5_US_501C3: this.getQuestionLabel('Q5_US_501C3', 'Do you have 501(c)(3) status or equivalent US tax-exempt determination?'),
+            Q5_ED_STATUS: this.getQuestionLabel('Q5_ED_STATUS', 'Do you currently hold an active Equivalency Determination (ED) certificate?'),
+            Q5_FCRA_STATUS: this.getQuestionLabel('Q5_FCRA_STATUS', 'Do you have a valid FCRA registration?'),
+            Q5_WILLING_ED: this.getQuestionLabel('Q5_WILLING_ED', 'Are you willing to pursue an Equivalency Determination (ED) if selected?'),
+
+            Q6_FISCAL_MONTH: this.getQuestionLabel('Q6_FISCAL_MONTH', 'Fiscal Year End Month'),
+            Q6_FISCAL_DAY: this.getQuestionLabel('Q6_FISCAL_DAY', 'Fiscal Year End Day'),
+            Q6_FISCAL_DATE: this.getQuestionLabel('Q6_FISCAL_DATE', 'Fiscal Year End Date'),
+
+            Q7_TOP_FUNDERS: this.getQuestionLabel('Q7_TOP_FUNDERS', 'Top 3 Prominent Funders'),
+            Q7_TOP_FUNDERS_DESC: this.getQuestionLabel('Q7_TOP_FUNDERS_DESC', 'Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.'),
+            Q8_REFERENCES: this.getQuestionLabel('Q8_REFERENCES', 'Reference Contacts for Outreach'),
+            Q8_REFERENCES_DESC: this.getQuestionLabel('Q8_REFERENCES_DESC', 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.'),
+
+            // Financials & Outcomes (Q9 & Q10)
+            Q9_HIST_FINANCIALS: this.getQuestionLabel('Q9_HIST_FINANCIALS', 'Historical Financial Performance'),
+            Q9_HIST_FINANCIALS_DESC: this.getQuestionLabel('Q9_HIST_FINANCIALS_DESC', 'Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.'),
+            Q10_CURRENT_FY: this.getQuestionLabel('Q10_CURRENT_FY', 'Current Fiscal Year Budget & Projections'),
+            Q10_CURRENT_FY_DESC: this.getQuestionLabel('Q10_CURRENT_FY_DESC', 'Your current fiscal year budget, latest projection, and explanation of any deviation.'),
+            Q10_EXPLANATION_LABEL: this.getQuestionLabel('Q10_EXPLANATION_LABEL', 'Explanation of deviation'),
+            Q10_EXPLANATION_DESC: this.getQuestionLabel('Q10_EXPLANATION_DESC', 'Required if total deviation is non-zero (combined revenue + expense; <200 words).'),
+
+            // Track Questions
+            Q11_SKILLING_APPROACH: this.getQuestionLabel('Q11_SKILLING_APPROACH', 'Your Skilling Approach'),
+            Q11_SKILLING_APPROACH_DESC: this.getQuestionLabel('Q11_SKILLING_APPROACH_DESC', 'Tell us about your skilling work in roughly 500 words. If you run named programs, walk us through your top three (names, what they teach, who they serve). Cover your theory of change, the journey from learner enrollment to placement, and what makes your approach different from others.'),
+            Q12_SKILLING_DOMAINS: this.getQuestionLabel('Q12_SKILLING_DOMAINS', 'Skilling Domains Offered'),
+            Q12_SKILLING_DOMAINS_DESC: this.getQuestionLabel('Q12_SKILLING_DOMAINS_DESC', 'List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.'),
+            Q13_JF_HIST_OUTCOMES: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES', 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)'),
+            Q13_JF_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES_DESC', 'Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.'),
+            Q14_JF_PROJ_OUTCOMES: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES', 'Job Fulfillment Outcomes — Current FY Projections'),
+            Q14_JF_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES_DESC', 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren\'t verifiable at submission.'),
+
+            Q15_JOB_CREATION_APPROACH: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH', 'Your Job Creation Approach'),
+            Q15_JOB_CREATION_APPROACH_DESC: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH_DESC', 'Tell us about your job creation work in roughly 500 words. Cover (i) your support model (capital, mentorship, business advisory, sector-specific TA, market linkages, etc.); (ii) your theory of change, the journey from engagement through to jobs created and sustained; (iii) what makes your approach different from others.'),
+            Q16_BUSINESS_SECTORS: this.getQuestionLabel('Q16_BUSINESS_SECTORS', 'Business Sectors Served'),
+            Q16_BUSINESS_SECTORS_DESC: this.getQuestionLabel('Q16_BUSINESS_SECTORS_DESC', 'List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.'),
+            Q17_JC_HIST_OUTCOMES: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES', 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)'),
+            Q17_JC_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES_DESC', 'Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.'),
+            Q18_JC_PROJ_OUTCOMES: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES', 'Job Creation Outcomes — Current FY Projections'),
+            Q18_JC_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES_DESC', 'Enter projected business and job-creation numbers for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.'),
+
+            Q19_LIVELIHOOD_APPROACH: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH', 'Your Livelihood Upliftment Approach'),
+            Q19_LIVELIHOOD_APPROACH_DESC: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH_DESC', 'Tell us about this work in roughly 500 words. Cover (i) who the beneficiary is and how they come to you; (ii) Describe your intervention either to help start a new business (and sustain it) or in helping grow their existing business towards helping them get family-sustaining incomes; (iii) the support that continues after any initial training, such as mentoring, market access, credit linkage or aggregation; (iv) what makes your approach different.'),
+            Q20_LIVELIHOOD_PROGRAMS: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS', 'Your Key Programs / Initiatives'),
+            Q20_LIVELIHOOD_PROGRAMS_DESC: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS_DESC', 'Tell us about your flagship programs and the type of interventions you offer. For each program / initative provide a view on what are the different interventions, how many man-hours do you spend with each beneficiary and how many beneficiaries typically enroll each year for each program.'),
+            Q21_COMMUNITIES_SERVED: this.getQuestionLabel('Q21_COMMUNITIES_SERVED', 'Communities that you work in'),
+            Q21_COMMUNITIES_SERVED_DESC: this.getQuestionLabel('Q21_COMMUNITIES_SERVED_DESC', 'Tell us where this program runs and how many households it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.'),
+            Q22_LIVELIHOOD_ACTUALS: this.getQuestionLabel('Q22_LIVELIHOOD_ACTUALS', 'Livelihood Outcomes (Actuals)'),
+            Q23_LIVELIHOOD_PROJ: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ', 'Livelihood Outcomes, Current FY Projections'),
+            Q23_LIVELIHOOD_PROJ_DESC: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ_DESC', 'Projected figures for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.'),
+
+            // Section 4 & Category 1 Questions (Q24, Q25, Q26, Q27, Q28)
+            Q24_INDEPENDENT_VERIFICATION: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION', 'Independent Verification of Your Outcomes'),
+            Q24_INDEPENDENT_VERIFICATION_DESC: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION_DESC', 'This applies to every applicant, whichever track you completed. If a third party has independently verified or evaluated the outcomes you reported, sharing the report strengthens your application; it is not required. If not, we will discuss verification together at the next stage.'),
+            Q24_OPERATIONAL_SYNERGIES: this.getQuestionLabel('Q24_OPERATIONAL_SYNERGIES', 'Operational Synergies'),
+            Q25_SUSTAINABILITY_PLAN: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN', 'Sustainability Plan'),
+            Q25_SUSTAINABILITY_PLAN_DESC: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN_DESC', 'How is your organization positioned to sustain its work over time? In about 100 words cover: (1) funding mix, main revenue sources; (2) programmatic resilience, dependence on any single program or contract; (3) funder concentration, reliance on one funder and how you manage that risk. A plain-language picture is all we need.'),
+            Q26_ADDITIONAL_FUNDING: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING', 'Direction for Additional Funding'),
+            Q26_ADDITIONAL_FUNDING_DESC: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING_DESC', 'Then, in words. If you were given a grant of USD 1 million a year, what would you do with it? In about 200 words, tell us how you would deploy it to scale your impact: program expansion, geographic scaling, new offerings, capacity-building, technology investment, and so on. Treat the figure as approximate; scale it to your own situation. We will work out specifics together at the next stage, so no detailed budget or M&E plan is needed here.'),
+            Q27_GENIE_AI: this.getQuestionLabel('Q27_GENIE_AI', 'Operational Synergies with GenieAI (Optional)'),
+            Q27_GENIE_AI_DESC: this.getQuestionLabel('Q27_GENIE_AI_DESC', 'GenieAI is Wadhwani Foundation\'s AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying — we want your honest signal. If you\'re open to exploring synergy, tell us how it could fit. If not, that\'s a complete and acceptable answer.'),
+            Q28_SUPPORTING_DOCS: this.getQuestionLabel('Q28_SUPPORTING_DOCS', 'Supporting Documents (Optional)'),
+            Q28_SUPPORTING_DOCS_DESC: this.getQuestionLabel('Q28_SUPPORTING_DOCS_DESC', 'If there\'s anything else you\'d like to share in support of your application, you may upload it here.'),
+
+            // Review & Submit
+            REVIEW_SUBMIT_TITLE: this.getQuestionLabel('REVIEW_SUBMIT_TITLE', 'Review & Submit'),
+            REVIEW_SUBMIT_DESC: this.getQuestionLabel('REVIEW_SUBMIT_DESC', 'Take a final look at what you\'ve entered. Go back to any previous section to make edits before submitting.'),
+            REVIEW_SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', 'ABOUT YOUR ORGANISATION'),
+            REVIEW_SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', 'JOB FULFILLMENT'),
+            REVIEW_SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', 'JOB CREATION'),
+            REVIEW_SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', 'LIVELIHOOD UPLIFTMENT'),
+            REVIEW_SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', 'WHY WADHWANI GRANTS')
+        };
     }
 
     loadDraftData() {
@@ -301,6 +468,190 @@ export default class WcfDynamicForm extends LightningElement {
             .finally(() => {
                 this.isLoading = false;
             });
+    }
+
+    _buildQuestionItem(q) {
+        const key = q.key || q.Question_Code__c || q.DeveloperName || q.targetField;
+        const targetField = q.targetField || q.Field_API_Name__c || key;
+        const label = this.getQuestionLabel(key, q.label || q.Label__c || q.MasterLabel || key);
+        const dt = (q.displayType || q.Display_Type__c || 'Text').toLowerCase();
+        
+        let val = this.formValues[targetField];
+        if (val === undefined && targetField) {
+            const targetLower = targetField.toLowerCase();
+            const matchedKey = Object.keys(this.formValues).find(k => k.toLowerCase() === targetLower);
+            if (matchedKey) val = this.formValues[matchedKey];
+        }
+        if (val === undefined) val = '';
+
+        let isRequired = q.isRequired !== undefined ? q.isRequired : true;
+        if (key === 'Q2_LEADER_TENURE' || targetField === 'Leader_Tenure__c') {
+            isRequired = false;
+        }
+
+        const isHqSearch = key === 'Q2_HQ_LOCATION' || targetField === 'Headquarters_City_and_Country__c';
+        const isPhoneInput = key === 'Q3_PHONE' || targetField === 'Phone__c' || dt === 'phone';
+        const isEmail = (key === 'Q3_WORK_EMAIL' || targetField === 'Work_Email_ID__c' || dt === 'email') && !isPhoneInput;
+        const isNumber = (key === 'Q2_LEADER_TENURE' || targetField === 'Leader_Tenure__c' || dt === 'number' || dt === 'currency' || dt === 'percent') && !isPhoneInput;
+        
+        const isLegalType = key === 'Q4_LEGAL_TYPE' || targetField === 'Legal_Type__c';
+        const isJurisdiction = key === 'Q4_JURISDICTION' || targetField === 'Registration_Jurisdiction__c';
+        const isIncorpDate = key === 'Q4_INCORP_DATE' || targetField === 'Incorporation_Date__c';
+        const isGovernanceRichText = key === 'Q4_GOVERNANCE_DESC' || targetField === 'Legal_Structure__c';
+        
+        const isCompliancePicklist = (key && key.startsWith('Q5_')) || (targetField && (targetField.includes('501c3') || targetField.includes('Equivalency') || targetField.includes('FCRA') || targetField.includes('Willing')));
+        const isFiscalMonth = key === 'Q6_FISCAL_MONTH' || targetField === 'Fiscal_Month__c';
+        const isFiscalDay = key === 'Q6_FISCAL_DAY' || targetField === 'Fiscal_Day__c';
+        
+        const isPicklist = (dt === 'picklist' || dt === 'combobox') && !isLegalType && !isJurisdiction && !isCompliancePicklist && !isFiscalMonth && !isFiscalDay;
+        const isDate = (dt === 'date' || dt === 'datetime') && !isIncorpDate;
+        const isTextArea = (dt === 'textarea' || dt === 'richtext') && !isGovernanceRichText;
+        const isCheckbox = (dt === 'checkbox' || dt === 'boolean');
+        const isText = !isHqSearch && !isPhoneInput && !isEmail && !isNumber && !isLegalType && !isJurisdiction && !isIncorpDate && !isGovernanceRichText && !isCompliancePicklist && !isFiscalMonth && !isFiscalDay && !isPicklist && !isDate && !isTextArea && !isCheckbox;
+
+        let options = [];
+        if (isLegalType) {
+            options = this.legalTypeOptions;
+        } else if (isJurisdiction) {
+            options = this.countryOptions;
+        } else if (key === 'Q5_FCRA_STATUS') {
+            options = this.yesNoNotApplicableOptions;
+        } else if (isCompliancePicklist) {
+            options = this.yesNoOptions;
+        } else if (isFiscalMonth) {
+            options = this.fiscalMonthOptions;
+        } else if (isFiscalDay) {
+            options = this.fiscalDayOptions;
+        } else if (q.options && q.options.length) {
+            options = q.options;
+        } else if (q.picklistOptions && q.picklistOptions.length) {
+            options = q.picklistOptions;
+        }
+
+        let wrapperClass = 'modern-field';
+        if (key === 'Q2_PRIMARY_REGIONS' || targetField === 'Primary_Service_Regions__c' || isTextArea) {
+            wrapperClass = 'modern-field full-width';
+        } else if (key === 'Q2_LEADER_TENURE' || targetField === 'Leader_Tenure__c') {
+            wrapperClass = 'modern-field optional-field';
+        }
+
+        let helpText = q.helpText;
+        if (!helpText && (key === 'Q4_GOVERNANCE_DESC' || targetField === 'Legal_Structure__c')) {
+            helpText = this.getQuestionLabel('Q4_GOVERNANCE_HELPER', 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).');
+        }
+
+        return {
+            key,
+            targetField,
+            label,
+            value: val,
+            isRequired,
+            helpText: helpText,
+            placeholder: q.placeholder || '',
+            wrapperClass,
+            isHqSearch,
+            isPhoneInput,
+            isEmail,
+            isNumber,
+            isLegalType,
+            isJurisdiction,
+            isIncorpDate,
+            isGovernanceRichText,
+            isCompliancePicklist,
+            isFiscalMonth,
+            isFiscalDay,
+            isPicklist,
+            isDate,
+            isTextArea,
+            isCheckbox,
+            isText,
+            options
+        };
+    }
+
+    _getSectionQuestionList(sectionCode, keyPrefix, defaults, extraFilterFn) {
+        let list = [];
+        if (this.metadataQuestions && this.metadataQuestions.length) {
+            const matched = this.metadataQuestions.filter(q => {
+                const qKey = q.key || q.Question_Code__c || q.DeveloperName || '';
+                const qSec = q.sectionCode || q.Section_Code__c || '';
+                const matchesKey = qKey && qKey.toUpperCase().startsWith(keyPrefix.toUpperCase());
+                const matchesSection = qSec === sectionCode || qSec.toUpperCase() === keyPrefix.toUpperCase();
+                const passes = matchesKey || matchesSection;
+                return passes && (extraFilterFn ? extraFilterFn(q) : true);
+            });
+            if (matched.length > 0) {
+                list = [...matched].sort((a, b) => (a.sequence || 99) - (b.sequence || 99));
+            }
+        }
+        if (!list.length && defaults) {
+            list = defaults;
+        }
+        return list.map(q => this._buildQuestionItem(q));
+    }
+
+    get q2Questions() {
+        const defaults = [
+            { key: 'Q2_ORG_NAME', targetField: 'Organization_Name__c', label: 'Organizational Name', displayType: 'Text', isRequired: true, sequence: 1 },
+            { key: 'Q2_HQ_LOCATION', targetField: 'Headquarters_City_and_Country__c', label: 'Headquarters City and Country', displayType: 'Text', isRequired: true, sequence: 2 },
+            { key: 'Q2_PRIMARY_REGIONS', targetField: 'Primary_Service_Regions__c', label: 'Primary Service Regions', displayType: 'Text', isRequired: true, sequence: 3 },
+            { key: 'Q2_LEADER_NAME', targetField: 'Leader_Name__c', label: 'Leader Name', displayType: 'Text', isRequired: true, sequence: 4 },
+            { key: 'Q2_LEADER_TITLE', targetField: 'Leader_Title__c', label: 'Leader Title', displayType: 'Text', isRequired: true, sequence: 5 },
+            { key: 'Q2_LEADER_TENURE', targetField: 'Leader_Tenure__c', label: 'Leader Tenure (Optional)', displayType: 'Number', isRequired: false, sequence: 6 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q2_', defaults);
+    }
+
+    get q3Questions() {
+        const defaults = [
+            { key: 'Q3_SUBMITTER_NAME', targetField: 'Submitter_Name__c', label: 'Submitter Name', displayType: 'Text', isRequired: true, sequence: 1 },
+            { key: 'Q3_JOB_TITLE', targetField: 'Job_Title__c', label: 'Job Title', displayType: 'Text', isRequired: true, sequence: 2 },
+            { key: 'Q3_PHONE', targetField: 'Phone__c', label: 'Phone Number', displayType: 'Phone', isRequired: true, sequence: 3 },
+            { key: 'Q3_WORK_EMAIL', targetField: 'Work_Email_ID__c', label: 'Work Email', displayType: 'Email', isRequired: true, sequence: 4 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q3_', defaults);
+    }
+
+    get q4Questions() {
+        const defaults = [
+            { key: 'Q4_LEGAL_TYPE', targetField: 'Legal_Type__c', label: 'Legal Structure', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q4_JURISDICTION', targetField: 'Registration_Jurisdiction__c', label: 'Registration Jurisdiction', displayType: 'Picklist', isRequired: true, sequence: 2 },
+            { key: 'Q4_INCORP_DATE', targetField: 'Incorporation_Date__c', label: 'Incorporation Date', displayType: 'Date', isRequired: true, sequence: 3 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q4_', defaults, q => {
+            const k = q.key || q.Question_Code__c || '';
+            const f = q.targetField || q.Field_API_Name__c || '';
+            return k !== 'Q4_GOVERNANCE_DESC' && f !== 'Legal_Structure__c';
+        });
+    }
+
+    get q4GovernanceQuestions() {
+        const defaults = [
+            { key: 'Q4_GOVERNANCE_DESC', targetField: 'Legal_Structure__c', label: 'Describe your governance structure and key governing bodies.', displayType: 'TextArea', isRequired: true, sequence: 4 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q4_GOVERNANCE', defaults, q => {
+            const k = q.key || q.Question_Code__c || '';
+            const f = q.targetField || q.Field_API_Name__c || '';
+            return k === 'Q4_GOVERNANCE_DESC' || f === 'Legal_Structure__c';
+        });
+    }
+
+    get q5Questions() {
+        const defaults = [
+            { key: 'Q5_US_501C3', targetField: 'Has_501c3_Status__c', label: 'Do you have 501(c)(3) status in the US?', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q5_ED_STATUS', targetField: 'Has_Equivalency_Determination__c', label: 'Do you have an Equivalency Determination (ED) in place?', displayType: 'Picklist', isRequired: true, sequence: 2 },
+            { key: 'Q5_FCRA_STATUS', targetField: 'Is_FCRA_Registered__c', label: 'If you operate in India, are you FCRA-registered?', displayType: 'Picklist', isRequired: true, sequence: 3 },
+            { key: 'Q5_WILLING_ED', targetField: 'Willing_to_Pursue_ED__c', label: 'If none of the above apply, would you be willing to pursue ED certification if selected?', displayType: 'Picklist', isRequired: true, sequence: 4 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q5_', defaults);
+    }
+
+    get q6Questions() {
+        const defaults = [
+            { key: 'Q6_FISCAL_MONTH', targetField: 'Fiscal_Month__c', label: 'Month', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q6_FISCAL_DAY', targetField: 'Fiscal_Day__c', label: 'Day', displayType: 'Picklist', isRequired: true, sequence: 2 }
+        ];
+        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q6_', defaults);
     }
 
     _getCustomQuestions(filterFn, basePrefix) {
@@ -778,49 +1129,51 @@ export default class WcfDynamicForm extends LightningElement {
     get dynamicTabs() {
         const tabs = [];
         let step = 1;
-        const q = this.qNum;
         const trks = this.selectedTracks || [];
 
+        const aboutOrgTitle = this.getSectionTitle('SEC_ABOUT_ORG', 'About Your Organization');
+        const step1 = step++;
         tabs.push({
             id: 'tabAboutOrg',
-            stepNum: step++,
-            mainTitle: '1. About Your Org',
-            qRange: `(Q1-Q${q.Q10})`,
-            fullTitle: 'TAB: ABOUT YOUR ORGANISATION'
+            stepNum: step1,
+            mainTitle: `${aboutOrgTitle}`,
+            qRange: '',
+            fullTitle: `${aboutOrgTitle.toUpperCase()}`
         });
 
         if (trks.includes('JOB_FULFILLMENT')) {
+            const jfTitle = this.getSectionTitle('SEC_JOB_FULFILLMENT', 'Job Fulfillment');
+            const stepJF = step++;
             tabs.push({
                 id: 'tabJobFulfillment',
-                stepNum: step++,
-                mainTitle: '2. Job Fulfillment',
-                qRange: `(Q${q.Q11}-Q${q.Q14})`,
-                fullTitle: 'TAB: JOB FULFILLMENT'
+                stepNum: stepJF,
+                mainTitle: `${jfTitle}`,
+                qRange: '',
+                fullTitle: `${jfTitle.toUpperCase()}`
             });
         }
 
         if (trks.includes('JOB_CREATION')) {
-            let jcSecNum = 2;
-            if (trks.includes('JOB_FULFILLMENT')) jcSecNum = 3;
+            const jcTitle = this.getSectionTitle('SEC_JOB_CREATION', 'Job Creation');
+            const stepJC = step++;
             tabs.push({
                 id: 'tabJobCreation',
-                stepNum: step++,
-                mainTitle: `${jcSecNum}. Job Creation`,
-                qRange: `(Q${q.Q15}-Q${q.Q18})`,
-                fullTitle: 'TAB: JOB CREATION'
+                stepNum: stepJC,
+                mainTitle: `${jcTitle}`,
+                qRange: '',
+                fullTitle: `${jcTitle.toUpperCase()}`
             });
         }
 
         if (trks.includes('LIVELIHOOD')) {
-            let livSecNum = 2;
-            if (trks.includes('JOB_FULFILLMENT')) livSecNum++;
-            if (trks.includes('JOB_CREATION')) livSecNum++;
+            const livTitle = this.getSectionTitle('SEC_LIVELIHOOD', 'Livelihood Upliftment');
+            const stepLiv = step++;
             tabs.push({
                 id: 'tabLivelihood',
-                stepNum: step++,
-                mainTitle: `${livSecNum}. Livelihood`,
-                qRange: `(Q${q.Q19}-Q${q.Q23})`,
-                fullTitle: 'TAB: LIVELIHOOD UPLIFTMENT'
+                stepNum: stepLiv,
+                mainTitle: `${livTitle}`,
+                qRange: '',
+                fullTitle: `${livTitle.toUpperCase()}`
             });
         }
 
@@ -829,43 +1182,38 @@ export default class WcfDynamicForm extends LightningElement {
         const customSelectedTracks = trks.filter(t => !standardTrackCodes.has(t));
         customSelectedTracks.forEach(ctCode => {
             const matchedSection = (this.metadataSections || []).find(s => s.applicableTracks && s.applicableTracks.includes(ctCode));
-            const secTitle = matchedSection ? matchedSection.title : ctCode;
+            const secTitle = cleanTitle(matchedSection ? matchedSection.title : ctCode);
             const tabKey = `tab_${ctCode.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-            let currentSecNum = 2;
-            if (trks.includes('JOB_FULFILLMENT')) currentSecNum++;
-            if (trks.includes('JOB_CREATION')) currentSecNum++;
-            if (trks.includes('LIVELIHOOD')) currentSecNum++;
+            const stepCustom = step++;
 
             tabs.push({
                 id: tabKey,
-                stepNum: step++,
+                stepNum: stepCustom,
                 trackCode: ctCode,
-                mainTitle: `${currentSecNum}. ${secTitle}`,
+                mainTitle: `${secTitle}`,
                 qRange: '',
-                fullTitle: `TAB: ${secTitle.toUpperCase()}`
+                fullTitle: `${secTitle.toUpperCase()}`
             });
         });
 
-        let nextSecNum = 2;
-        if (trks.includes('JOB_FULFILLMENT')) nextSecNum++;
-        if (trks.includes('JOB_CREATION')) nextSecNum++;
-        if (trks.includes('LIVELIHOOD')) nextSecNum++;
-        nextSecNum += customSelectedTracks.length;
-
+        const whyTitle = this.getSectionTitle('SEC_WHY_WADHWANI', 'Why Wadhwani Grants');
+        const stepWhy = step++;
         tabs.push({
             id: 'tabWhyWadhwani',
-            stepNum: step++,
-            mainTitle: `${nextSecNum}. Why Wadhwani Grants`,
-            qRange: `(Q${q.Q24}-Q${q.Q28})`,
-            fullTitle: 'TAB: WHY WADHWANI GRANTS'
+            stepNum: stepWhy,
+            mainTitle: `${whyTitle}`,
+            qRange: '',
+            fullTitle: `${whyTitle.toUpperCase()}`
         });
 
+        const revTitle = this.getSectionTitle('SEC_REVIEW_SUBMIT', 'Review & Submit');
+        const stepRev = step++;
         tabs.push({
             id: 'tabReviewSubmit',
-            stepNum: step++,
-            mainTitle: `${nextSecNum + 1}. Review & Submit`,
+            stepNum: stepRev,
+            mainTitle: `${revTitle}`,
             qRange: '',
-            fullTitle: 'TAB: REVIEW & SUBMIT'
+            fullTitle: `${revTitle.toUpperCase()}`
         });
 
         const total = tabs.length;
@@ -904,7 +1252,7 @@ export default class WcfDynamicForm extends LightningElement {
 
     get currentTabSubTitle() {
         const current = this.dynamicTabs.find(t => t.id === this.activeTabId);
-        return current ? current.fullTitle : 'TAB: ABOUT YOUR ORGANISATION';
+        return current ? current.fullTitle : 'ABOUT YOUR ORGANIZATION';
     }
 
     get isTabAboutOrg() { return this.activeTabId === 'tabAboutOrg'; }
@@ -1016,7 +1364,14 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     get livelihoodProgramsForReview() {
-        return (this.livelihoodProgramRows || []).filter(r => r && r.name && r.name.trim() !== '');
+        return (this.livelihoodProgramRows || [])
+            .filter(r => r && r.name && r.name.trim() !== '')
+            .map(r => ({
+                ...r,
+                supportType: r.supportType || '—',
+                manHours: (r.manHours !== null && r.manHours !== undefined && r.manHours !== '') ? r.manHours : '—',
+                enrollment: (r.enrollment !== null && r.enrollment !== undefined && r.enrollment !== '') ? r.enrollment : '—'
+            }));
     }
 
     get hasLivelihoodProgramsForReview() {
@@ -1024,7 +1379,17 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     get communityRowsForReview() {
-        return (this.communityRows || []).filter(r => r && (r.state || r.district));
+        return (this.communityRows || [])
+            .filter(r => r && (r.state || r.district))
+            .map(r => ({
+                ...r,
+                state: r.state || '—',
+                district: r.district || '—',
+                fy3: (r.fy3 !== null && r.fy3 !== undefined && r.fy3 !== '') ? r.fy3 : '—',
+                fy2: (r.fy2 !== null && r.fy2 !== undefined && r.fy2 !== '') ? r.fy2 : '—',
+                fy1: (r.fy1 !== null && r.fy1 !== undefined && r.fy1 !== '') ? r.fy1 : '—',
+                proj: (r.proj !== null && r.proj !== undefined && r.proj !== '') ? r.proj : '—'
+            }));
     }
 
     get hasCommunityRowsForReview() {
