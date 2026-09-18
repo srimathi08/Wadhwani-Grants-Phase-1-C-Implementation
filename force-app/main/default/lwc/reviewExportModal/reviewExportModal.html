@@ -1,0 +1,33 @@
+<template>
+    <lightning-card title="Export Review" icon-name="standard:document">
+        <div class="slds-p-around_medium">
+
+            <p class="slds-m-bottom_medium">Select a format to export this review:</p>
+
+            <lightning-radio-group
+                name="exportFormat"
+                label="Format"
+                options={formatOptions}
+                value={selectedFormat}
+                onchange={handleFormatChange}
+                type="radio">
+            </lightning-radio-group>
+
+            <template if:true={isLoading}>
+                <div class="slds-p-top_medium slds-text-align_center">
+                    <lightning-spinner alternative-text="Preparing export" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <div class="slds-p-top_medium slds-text-align_right">
+                <lightning-button
+                    variant="brand"
+                    label="Export"
+                    onclick={handleExport}
+                    disabled={isLoading}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

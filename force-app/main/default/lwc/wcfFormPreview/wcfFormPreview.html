@@ -1038,7 +1038,7 @@
             <section role="dialog" class="slds-modal slds-fade-in-open office-preview-modal">
                 <div class="slds-modal__container" style="max-width: 90%; width: 1000px;">
                     <header class="slds-modal__header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
-                        <h2 class="slds-text-heading_medium" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e1e1e; text-align: left; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 {officePreviewTitle}</h2>
+                        <h2 class="slds-text-heading_medium" style="margin: 0; font-size: 1.1rem; font-weight: var(--wg-weight-bold); color: var(--wg-gray); text-align: left; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 {officePreviewTitle}</h2>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <lightning-button label="Download File" variant="neutral" icon-name="utility:download" onclick={handleDownloadCurrentOfficeDoc}></lightning-button>
                             <button class="slds-button slds-button_icon slds-modal__close" onclick={closeOfficePreview} title="Close">
@@ -1046,7 +1046,7 @@
                             </button>
                         </div>
                     </header>
-                    <div class="slds-modal__content slds-p-around_medium" style="max-height: 75vh; overflow: auto; background: #ffffff;">
+                    <div class="slds-modal__content slds-p-around_medium" style="max-height: 75vh; overflow: auto; background: var(--wg-white);">
                         <div data-id="office-preview-body" lwc:dom="manual" class="office-preview-body"></div>
                     </div>
                 </div>

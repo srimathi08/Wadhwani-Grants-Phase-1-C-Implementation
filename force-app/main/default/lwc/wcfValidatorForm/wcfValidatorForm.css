@@ -1,10 +1,94 @@
-/* ═══════════════════════════════════════════════════════
-   WCF VALIDATOR FORM — CSS  (Full-width + badge fix)
+@import "c/commonStyleTheme";
 
-   UPDATED: Container-query based responsiveness so the
-   form stays readable at ANY split-pane divider width —
-   layout reacts to the PANEL width, not the viewport.
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   WCF VALIDATOR FORM — CSS  (Full-width + badge fix)
+   Rebranded to the Wadhwani token system (commonStyleTheme).
+
+   WIRING / MAPPING NOTES (read before touching colors below):
+
+   • Primary brand hue in this file is ORANGE (#E8622A, 24 occurrences)
+     rather than the red seen in most sibling components → mapped to
+     var(--wg-orange). Its 0.3-alpha box-shadow on .wcf-vf-sec-num was
+     recalculated from wg-orange's own rgb (242,103,42) rather than the
+     original hex's rgb, per the batch's "recalc translucent overlays
+     to the new token's actual rgb" rule.
+   • Warm neutral borders (#e5e1d8, #f1f1f1, #e5e7eb, #e0e0e0) → var(--wg-border).
+     Form-control resting borders (#e2ddd5 / #d8d4cc / #d1cfc8 / #c8c4bc,
+     used on pills/checkboxes/radios/decision cards) → var(--wg-input-border),
+     kept as a separate bucket from the structural borders above because
+     they represent interactive-control chrome, not layout dividers.
+   • Near-black text (#1a1a1a, #111827, #444) → var(--wg-gray). Mid-gray
+     text (#999, #6b6b6b, #555, #706e6b, #777, #bbb, #aaa, #333, #374151)
+     → var(--wg-text-muted).
+   • This file has THREE originally-distinct amber/gold palettes (the
+     auto-state amber, the S3.1 "Return" decision badge amber, and the
+     Draft Resume Banner gold) plus the Save-Draft button's own amber
+     hooks — all consolidated onto the single var(--wg-warning) family,
+     matching the precedent set by wcfReviewerContainer's two-gold
+     consolidation. The Flag-checklist amber "Suggested by S2" tag and
+     .wcf-check-suggested also join this family.
+   • LEFTOVER HUE #1 — the Flag decision badge/selected-state pair
+     (.wcf-dec-badge-flag / .wcf-dec-sel-flag) was pink (#fce7f3 family)
+     with no brand token. Blue/info was ruled out because it's already
+     claimed by the Return-workflow family below (qnum pills, question
+     cards, dep-banner-return) and both would otherwise render side by
+     side in the same decision-cards grid. Reassigned instead to the
+     var(--wg-error) family — "Flag" is semantically an escalation /
+     concern marker, closer to error than to any other claimed hue, and
+     it never appears on-screen at the same time as this file's other
+     red usages (the Return-branch question-remove buttons, the
+     word-count-limit text), which live in a different section.
+   • LEFTOVER HUE #2 — .wcf-dep-banner-other (purple, #6b21a8) is a
+     small uppercase label with no brand token and no strong semantic
+     fit; folded into var(--wg-gray) as a neutral "leftover", the same
+     treatment this batch has given navy elsewhere.
+   • .wcf-dep-banner-flag (amber/brown, #b45309) was, in the original
+     file, ALREADY a different color from the pink Flag decision badge
+     above it — the original author never unified these two "Flag"
+     touchpoints. That distinction is preserved rather than forced
+     together: this label stays in the warning family
+     (var(--wg-warning-text)) while the decision badge moves to error.
+   • The Return-workflow blue family (question-number pills, question
+     cards, preview question cards, .wcf-dep-banner-return) all map to
+     var(--wg-info) / var(--wg-info-bg) / var(--wg-info-text). Light-blue
+     tints that have no matching brand background token (#bfdbfe,
+     #dbeafe, #eff6ff, #f0f7ff and their box-shadow alpha) were
+     recalculated as rgba() over wg-info's own rgb (35,128,209).
+   • .wcf-saving-text's original comment literally reads "Wadhwani red,
+     matches your rebrand" — that is brand RED, not error-red, so it
+     maps to var(--wg-red) rather than var(--wg-error).
+   • .wcf-reviewer-return-banner (the "Returned by Reviewer" notice) is
+     a genuine alert state → full var(--wg-error) / var(--wg-error-bg)
+     family.
+   • The PREVIEW MODAL block (.preview-*, .decision-card, .decision-title,
+     .slds-modal__* overrides) is a visibly OLDER, second color palette
+     within this same file (navy #16325c, orange #ea580c/#c2410c, grays
+     #374151/#111827) distinct from the #E8622A used everywhere else.
+     Retokenized in place using the same navy→gray and orange→wg-orange
+     rules as the rest of the file, rather than treated as a separate
+     "leftover hue" case, since both palettes ultimately resolve to
+     tokens already in use here.
+   • BUTTON SQUARING: three real <button> elements exist in the markup
+     (.wcf-draft-dismiss, .wcf-qnum-pill / -sel, .wcf-qcard-remove) and
+     are squared with border-radius: 0 despite their pill/circular
+     resting shape, per the batch convention that only the HTML tag
+     (real <button> vs. a decorative <div>) decides squaring — badges,
+     pills and tags that are NOT real buttons keep their rounded shape.
+     .wcf-draft-btn / .wcf-seal-btn (lightning-button) and the two
+     unclassed lightning-button CTAs in the preview-modal footer are
+     squared via the --slds-c-button-radius-border SLDS hook, since
+     lightning-button renders its own internal shadow DOM that plain
+     CSS selectors cannot reach — same technique first used on
+     wcfFormPreview's .rv-download-btn.
+   • No pre-existing custom-toast infrastructure existed anywhere in
+     this component (verified via grep before starting), unlike
+     wcfReviewerContainer's half-built version — the full .wg-toast-banner
+     block below, and the matching JS/HTML, were built from scratch.
+
+   UPDATED: Container-query based responsiveness so the form stays
+   readable at ANY split-pane divider width — layout reacts to the
+   PANEL width, not the viewport.
+═══════════════════════════════════════════════════════════════════ */
 
 /* ── HOST: stretch component to fill the Experience Cloud region ── */
 :host {
@@ -12,9 +96,73 @@
     width          : 100%;
     max-width      : 100%;
     box-sizing     : border-box;
-    font-family    : 'Salesforce Sans', Arial, sans-serif;
+    font-family    : var(--wg-font-body), 'Salesforce Sans', Arial, sans-serif;
     container-type : inline-size;   /* ← ADDED: enables width-based container queries */
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   WG TOAST BANNER — replaces native ShowToastEvent (renders outside
+   the shadow tree and cannot be restyled). Built from scratch for
+   this component; reuses the shared .error-banner / .warning-banner /
+   .success-banner / .info-banner classes from commonStyleTheme.
+═══════════════════════════════════════════════════════════════════ */
+.wg-toast-banner {
+    position       : fixed;
+    top            : 20px;
+    left           : 50%;
+    transform      : translateX(-50%);
+    z-index        : 99998;
+    display        : flex;
+    align-items    : flex-start;
+    gap            : 0.6rem;
+    min-width      : 320px;
+    max-width      : 520px;
+    padding        : 0.85rem 1.1rem;
+    border-radius  : var(--wg-radius-md);
+    box-shadow     : 0 4px 16px rgba(65, 64, 65, 0.18);
+    animation      : wg-toast-slide-in 0.2s ease;
+}
+
+@keyframes wg-toast-slide-in {
+    from { opacity: 0; transform: translate(-50%, -10px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.wg-toast-banner-icon {
+    flex-shrink : 0;
+    font-size   : 1.1rem;
+    line-height : 1;
+}
+
+.wg-toast-banner-body {
+    flex      : 1;
+    min-width : 0;
+}
+
+.wg-toast-banner-title {
+    font-weight   : var(--wg-weight-bold);
+    font-size     : var(--wg-font-size-label);
+    margin-bottom : 0.15rem;
+}
+
+.wg-toast-banner-message {
+    font-size   : var(--wg-font-size-caption);
+    line-height : 1.4;
+    overflow-wrap: break-word;
+}
+
+.wg-toast-banner-close {
+    background    : none;
+    border        : none;
+    cursor        : pointer;
+    flex-shrink   : 0;
+    font-size     : 1rem;
+    line-height   : 1;
+    opacity       : 0.6;
+    padding       : 0.1rem;
+    border-radius : 0;   /* real <button> — squared */
+}
+.wg-toast-banner-close:hover { opacity: 1; }
 
 /* ──────────────────────────────────────────
    HEADER
@@ -24,8 +172,8 @@
     align-items    : center;
     gap            : 1.5rem;
     padding        : 0.75rem 2rem;
-    background     : #ffffff;
-    border-bottom  : 2px solid #e5e1d8;
+    background     : var(--wg-white);
+    border-bottom  : 2px solid var(--wg-border);
     position       : sticky;
     top            : 0;
     z-index        : 200;
@@ -47,9 +195,9 @@
 }
 
 .wcf-header-org {
-    font-size      : 1rem;
-    font-weight    : 700;
-    color          : #1a1a1a;
+    font-size      : var(--wg-font-size-sub-heading);
+    font-weight    : var(--wg-weight-bold);
+    color          : var(--wg-gray);
     letter-spacing : 0.01em;
 }
 
@@ -57,8 +205,8 @@
     display    : flex;
     gap        : 1.75rem;
     flex       : 1;
-    font-size  : 0.875rem;
-    color      : #6b6b6b;
+    font-size  : var(--wg-font-size-body);
+    color      : var(--wg-text-muted);
 }
 
 .wcf-header-nav span {
@@ -66,12 +214,12 @@
     padding-bottom : 3px;
     transition     : color 0.15s;
 }
-.wcf-header-nav span:hover { color: #E8622A; }
+.wcf-header-nav span:hover { color: var(--wg-orange); }
 
 .wcf-nav-active {
-    color         : #E8622A !important;
-    font-weight   : 700;
-    border-bottom : 2px solid #E8622A;
+    color         : var(--wg-orange) !important;
+    font-weight   : var(--wg-weight-bold);
+    border-bottom : 2px solid var(--wg-orange);
 }
 
 .wcf-header-user {
@@ -83,18 +231,18 @@
 }
 
 .wcf-header-role {
-    font-size : 0.8rem;
-    color     : #555;
+    font-size : var(--wg-font-size-caption);
+    color     : var(--wg-text-muted);
 }
 
 .wcf-header-avatar {
     width           : 34px;
     height          : 34px;
     border-radius   : 50%;
-    background      : #E8622A;
-    color           : #fff;
-    font-size       : 0.75rem;
-    font-weight     : 700;
+    background      : var(--wg-orange);
+    color           : var(--wg-white);
+    font-size       : var(--wg-font-size-caption);
+    font-weight     : var(--wg-weight-bold);
     display         : flex;
     align-items     : center;
     justify-content : center;
@@ -105,26 +253,28 @@
    CONTEXT / APP META BAR
 ────────────────────────────────────────── */
 .wcf-context-bar {
-    background    : #faf8f5;
-    border-bottom : 2px solid #e5e1d8;
+    background    : var(--wg-white);   /* was #faf8f5 — a near-white warm wash; mapped to white rather than
+                                           var(--wg-border) (used just below for the border-bottom) so the
+                                           border stays visible instead of blending into its own background */
+    border-bottom : 2px solid var(--wg-border);
     padding       : 1.25rem 2rem 1rem;
     width         : 100%;
     box-sizing    : border-box;
 }
 
 .wcf-context-stage {
-    font-size      : 0.7rem;
-    font-weight    : 700;
+    font-size      : var(--wg-font-size-caption);
+    font-weight    : var(--wg-weight-bold);
     letter-spacing : 0.1em;
-    color          : #999;
+    color          : var(--wg-text-muted);
     text-transform : uppercase;
     margin-bottom  : 0.2rem;
 }
 
 .wcf-context-title {
-    font-size      : 1.7rem;
+    font-size      : var(--wg-font-size-page-title);
     font-weight    : 800;
-    color          : #1a1a1a;
+    color          : var(--wg-gray);
     margin         : 0 0 0.75rem 0;
     letter-spacing : -0.01em;
 }
@@ -146,54 +296,54 @@
 }
 
 .wcf-meta-label {
-    font-size      : 0.72rem;
-    color          : #999;
-    font-weight    : 600;
+    font-size      : var(--wg-font-size-caption);
+    color          : var(--wg-text-muted);
+    font-weight    : var(--wg-weight-semibold);
     text-transform : uppercase;
     letter-spacing : 0.04em;
     white-space    : nowrap;     /* ← ADDED: "APPLICATION ID" never splits mid-label */
 }
 
 .wcf-meta-val {
-    font-size  : 0.875rem;
-    color      : #1a1a1a;
-    font-weight: 600;
+    font-size  : var(--wg-font-size-body);
+    color      : var(--wg-gray);
+    font-weight: var(--wg-weight-semibold);
     overflow-wrap: break-word;   /* ← ADDED */
     min-width  : 0;              /* ← ADDED */
 }
 
 .wcf-app-id {
-    font-family   : 'Courier New', monospace;
-    background    : #f0ece4;
+    font-family   : 'Courier New', monospace;   /* monospace left untouched, per convention */
+    background    : var(--wg-border);
     padding       : 0.1em 0.45em;
     border-radius : 4px;
     font-size     : 0.82rem;
-    color         : #444;
+    color         : var(--wg-gray);
 }
 
 .wcf-meta-pill {
-    background    : #fee8df;
-    border        : 1px solid #f4a07a;
-    border-radius : 999px;
+    background    : rgba(242, 103, 42, 0.12);   /* orange wash, recalculated from wg-orange's rgb */
+    border        : 1px solid var(--wg-orange);
+    border-radius : var(--wg-radius-pill);
     padding       : 0.2rem 0.8rem;
-    font-size     : 0.78rem;
-    color         : #9a3810;
-    font-weight   : 600;
+    font-size     : var(--wg-font-size-caption);
+    color         : var(--wg-orange-deep);
+    font-weight   : var(--wg-weight-semibold);
 }
 
 .wcf-context-autosave {
     display     : flex;
     align-items : center;
     gap         : 0.5rem;
-    font-size   : 0.78rem;
-    color       : #888;
+    font-size   : var(--wg-font-size-caption);
+    color       : var(--wg-text-muted);
 }
 
 .wcf-autosave-dot {
     width         : 8px;
     height        : 8px;
     border-radius : 50%;
-    background    : #22c55e;
+    background    : var(--wg-success);
     display       : inline-block;
     animation     : wcf-pulse 2s infinite;
 }
@@ -205,11 +355,11 @@
 
 .wcf-template-tag {
     margin-left    : auto;
-    font-size      : 0.7rem;
+    font-size      : var(--wg-font-size-caption);
     letter-spacing : 0.06em;
-    color          : #bbb;
+    color          : var(--wg-text-muted);
     text-transform : uppercase;
-    font-weight    : 600;
+    font-weight    : var(--wg-weight-semibold);
 }
 
 /* ──────────────────────────────────────────
@@ -221,19 +371,19 @@
     box-sizing : border-box;
     padding    : 1.75rem 2.5rem 5rem;
     margin     : 0;
-    background : #f5f3ef;
+    background : var(--wg-border);
 }
 
 /* ──────────────────────────────────────────
    SECTIONS
 ────────────────────────────────────────── */
 .wcf-vf-section {
-    background    : #ffffff;
-    border        : 1px solid #e5e1d8;
-    border-radius : 12px;
+    background    : var(--wg-white);
+    border        : 1px solid var(--wg-border);
+    border-radius : var(--wg-radius-card);
     padding       : 1.75rem 2rem;
     margin-bottom : 1.5rem;
-    box-shadow    : 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow    : 0 1px 4px rgba(0,0,0,0.04);   /* plain black overlay — left literal */
 }
 
 .wcf-vf-sec-head {
@@ -247,29 +397,29 @@
     width           : 34px;
     height          : 34px;
     border-radius   : 50%;
-    background      : #E8622A;
-    color           : #fff;
-    font-size       : 0.9rem;
+    background      : var(--wg-orange);
+    color           : var(--wg-white);
+    font-size       : var(--wg-font-size-sub-heading);
     font-weight     : 800;
     display         : flex;
     align-items     : center;
     justify-content : center;
     flex-shrink     : 0;
-    box-shadow      : 0 2px 6px rgba(232,98,42,0.3);
+    box-shadow      : 0 2px 6px rgba(242, 103, 42, 0.3);   /* recalculated from wg-orange's rgb */
 }
 
 .wcf-vf-sec-info { min-width: 0; }   /* ← ADDED: title/lede shrink inside flex row */
 
 .wcf-vf-sec-title {
-    font-size   : 1.15rem;
-    font-weight : 700;
-    color       : #1a1a1a;
+    font-size   : var(--wg-font-size-sub-heading);
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-gray);
     margin      : 0 0 0.3rem 0;
 }
 
 .wcf-vf-sec-lede {
-    font-size   : 0.82rem;
-    color       : #777;
+    font-size   : var(--wg-font-size-body);
+    color       : var(--wg-text-muted);
     margin      : 0;
     line-height : 1.55;
 }
@@ -278,7 +428,7 @@
    FIELD ROWS
 ────────────────────────────────────────── */
 .wcf-vf-field {
-    border-top  : 1px solid #f0ece4;
+    border-top  : 1px solid var(--wg-border);
     padding-top : 1.1rem;
     margin-top  : 1.1rem;
 }
@@ -297,9 +447,9 @@
 }
 
 .wcf-vf-field-q {
-    font-size   : 0.9rem;
-    font-weight : 600;
-    color       : #1a1a1a;
+    font-size   : var(--wg-font-size-body);
+    font-weight : var(--wg-weight-semibold);
+    color       : var(--wg-gray);
     line-height : 1.45;
     flex        : 1;
     min-width   : 0;             /* ← ADDED */
@@ -308,11 +458,11 @@
 
 .wcf-field-id {
     font-size      : 0.68rem;
-    background     : #f0ece4;
-    color          : #999;
+    background     : var(--wg-border);
+    color          : var(--wg-text-muted);
     border-radius  : 4px;
     padding        : 0.15em 0.5em;
-    font-weight    : 700;
+    font-weight    : var(--wg-weight-bold);
     white-space    : nowrap;
     flex-shrink    : 0;
     align-self     : flex-start;
@@ -320,19 +470,19 @@
 }
 
 .wcf-hint {
-    font-size   : 0.79rem;
-    color       : #999;
+    font-size   : var(--wg-font-size-body);
+    color       : var(--wg-text-muted);
     margin      : 0 0 0.6rem 0;
     line-height : 1.55;
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
-.wcf-req { color: #E8622A; font-weight: 700; }
-.wcf-opt { color: #aaa;    font-weight: 400; }
+.wcf-req { color: var(--wg-orange); font-weight: var(--wg-weight-bold); }
+.wcf-opt { color: var(--wg-text-muted); font-weight: var(--wg-weight-regular); }
 
 .wcf-char-count {
-    font-size  : 0.73rem;
-    color      : #bbb;
+    font-size  : var(--wg-font-size-caption);
+    color      : var(--wg-text-muted);
     margin-top : 0.3rem;
     text-align : right;
 }
@@ -344,9 +494,9 @@
     display       : flex;
     align-items   : center;
     gap           : 0.5rem;
-    font-size     : 0.82rem;
+    font-size     : var(--wg-font-size-body);
     padding       : 0.45rem 0.85rem;
-    border-radius : 6px;
+    border-radius : var(--wg-radius-sm);
     margin-bottom : 0.6rem;
 }
 .wcf-auto-state > div:last-child {
@@ -355,17 +505,18 @@
     white-space  : pre-line;
 }
 .wcf-auto-green {
-    background : #f0fdf4;
-    color      : #166534;
-    border     : 1px solid #bbf7d0;
+    background : var(--wg-success-bg);
+    color      : var(--wg-success);
+    border     : 1px solid var(--wg-success);
 }
-/* ← ADDED: amber state referenced by s1_2_stateClass but previously unstyled */
+/* ← ADDED (original author's comment, preserved): amber state referenced
+   by s1_2_stateClass but previously unstyled. Folded into the warning family. */
 .wcf-auto-amber {
-    background : #fffbeb;
-    color      : #92400e;
-    border     : 1px solid #fde68a;
+    background : var(--wg-warning-bg);
+    color      : var(--wg-warning-text);
+    border     : 1px solid var(--wg-warning);
 }
-.wcf-auto-icon { font-size: 0.9rem; font-weight: 700; flex-shrink: 0; }   /* ← ADDED flex-shrink */
+.wcf-auto-icon { font-size: 0.9rem; font-weight: var(--wg-weight-bold); flex-shrink: 0; }   /* ← ADDED flex-shrink */
 
 /* ──────────────────────────────────────────
    CONFIRM PILLS  (S1.x)
@@ -379,11 +530,11 @@
 
 .wcf-confirm-pill {
     padding       : 0.38rem 1.1rem;
-    border-radius : 999px;
-    border        : 1.5px solid #d1cfc8;
-    background    : #fff;
-    font-size     : 0.82rem;
-    color         : #555;
+    border-radius : var(--wg-radius-pill);
+    border        : 1.5px solid var(--wg-input-border);
+    background    : var(--wg-white);
+    font-size     : var(--wg-font-size-body);
+    color         : var(--wg-text-muted);
     cursor        : pointer;
     transition    : all 0.15s ease;
     user-select   : none;
@@ -391,15 +542,15 @@
     text-align    : center;      /* ← ADDED: looks right when pill text wraps to 2 lines */
 }
 .wcf-confirm-pill:hover {
-    border-color : #E8622A;
-    color        : #E8622A;
-    background   : #fff4ef;
+    border-color : var(--wg-orange);
+    color        : var(--wg-orange);
+    background   : rgba(242, 103, 42, 0.08);   /* recalculated selected/hover wash, see .wcf-pick-sel */
 }
 .wcf-confirm-pill-sel {
-    background   : #fff4ef;
-    border-color : #E8622A;
-    color        : #E8622A;
-    font-weight  : 700;
+    background   : rgba(242, 103, 42, 0.08);
+    border-color : var(--wg-orange);
+    color        : var(--wg-orange);
+    font-weight  : var(--wg-weight-bold);
 }
 
 /* ──────────────────────────────────────────
@@ -421,32 +572,36 @@
     align-items   : center;
     gap           : 0.55rem;
     padding       : 0.6rem 1rem;
-    border        : 1.5px solid #e2ddd5;
-    border-radius : 7px;
+    border        : 1.5px solid var(--wg-input-border);
+    border-radius : var(--wg-radius-sm);
     cursor        : pointer;
-    font-size     : 0.875rem;
-    color         : #333;
-    background    : #fff;
+    font-size     : var(--wg-font-size-body);
+    color         : var(--wg-gray);
+    background    : var(--wg-white);
     transition    : all 0.12s ease;
     font-weight   : 500;
     min-width     : 0;           /* ← ADDED */
     overflow-wrap : break-word;  /* ← ADDED */
 }
-.wcf-pick-opt:hover { border-color: #E8622A; background: #fef9f9; }
-.wcf-pick-sel       { border-color: #E8622A; background: #fff4ef; color: #E8622A; font-weight: 700; }
+/* NOTE: original hover wash (#fef9f9) was a subtler tint than the
+   selected wash (#fff4ef) used throughout this file — that two-tier
+   distinction is preserved here via two different alphas over
+   wg-orange's own rgb, rather than collapsing both to one value. */
+.wcf-pick-opt:hover { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
+.wcf-pick-sel       { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.08); color: var(--wg-orange); font-weight: var(--wg-weight-bold); }
 
 .wcf-pick-dot {
     width         : 13px;
     height        : 13px;
     border-radius : 50%;
-    border        : 2px solid #c8c4bc;
+    border        : 2px solid var(--wg-input-border);
     flex-shrink   : 0;
     transition    : all 0.12s;
 }
 .wcf-pick-sel .wcf-pick-dot {
-    border-color : #E8622A;
-    background   : #E8622A;
-    box-shadow   : 0 0 0 2px #fff, 0 0 0 4px #E8622A;
+    border-color : var(--wg-orange);
+    background   : var(--wg-orange);
+    box-shadow   : 0 0 0 2px var(--wg-white), 0 0 0 4px var(--wg-orange);
 }
 
 /* ──────────────────────────────────────────
@@ -463,33 +618,33 @@
     align-items   : flex-start;
     gap           : 0.65rem;
     padding       : 1rem 1.1rem;
-    border-radius : 8px;
-    border        : 1.5px solid #d8d4cc;
-    background    : #fff;
+    border-radius : var(--wg-radius-md);
+    border        : 1.5px solid var(--wg-input-border);
+    background    : var(--wg-white);
     cursor        : pointer;
     transition    : all 0.15s ease;
     min-width     : 0;           /* ← ADDED: card can shrink inside the grid */
 }
-.wcf-pick-binary:hover         { border-color: #E8622A; background: #fef9f9; }
-.wcf-pick-binary.wcf-pick-sel  { border-color: #E8622A; background: #fff4ef; }
+.wcf-pick-binary:hover         { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
+.wcf-pick-binary.wcf-pick-sel  { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.08); }
 
 .wcf-pick-radio {
     width         : 16px;
     height        : 16px;
     border-radius : 50%;
-    border        : 2px solid #d8d4cc;
+    border        : 2px solid var(--wg-input-border);
     flex-shrink   : 0;
     margin-top    : 2px;
     transition    : all 0.15s;
 }
 .wcf-pick-binary.wcf-pick-sel .wcf-pick-radio {
-    border-color : #E8622A;
-    box-shadow   : inset 0 0 0 3px #fff, inset 0 0 0 8px #E8622A;
+    border-color : var(--wg-orange);
+    box-shadow   : inset 0 0 0 3px var(--wg-white), inset 0 0 0 8px var(--wg-orange);
 }
 
 .wcf-pick-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }   /* ← ADDED min-width */
-.wcf-pick-main { font-size: 0.875rem; font-weight: 600; color: #1a1a1a; overflow-wrap: break-word; }   /* ← ADDED overflow-wrap */
-.wcf-pick-sub  { font-size: 0.78rem;  color: #999; font-style: italic; }
+.wcf-pick-main { font-size: var(--wg-font-size-body); font-weight: var(--wg-weight-semibold); color: var(--wg-gray); overflow-wrap: break-word; }   /* ← ADDED overflow-wrap */
+.wcf-pick-sub  { font-size: var(--wg-font-size-caption); color: var(--wg-text-muted); font-style: italic; }
 
 /* ══════════════════════════════════════════════════════
    DECISION CARDS  (S3.1)
@@ -506,11 +661,11 @@
 
 .wcf-dec-card {
     box-sizing     : border-box;
-    border         : 2px solid #e2ddd5;
-    border-radius  : 10px;
+    border         : 2px solid var(--wg-input-border);
+    border-radius  : var(--wg-radius-card);
     padding        : 1.1rem;
     cursor         : pointer;
-    background     : #fff;
+    background     : var(--wg-white);
     transition     : all 0.15s ease;
     display        : flex;
     flex-direction : column;
@@ -519,8 +674,8 @@
     overflow       : hidden;
 }
 .wcf-dec-card:hover {
-    border-color : #6b7280;
-    box-shadow   : 0 4px 12px rgba(0,0,0,0.08);
+    border-color : var(--wg-text-muted);
+    box-shadow   : 0 4px 12px rgba(0,0,0,0.08);   /* plain black overlay — left literal */
 }
 
 /* Card title row: label + badge stacked vertically so badge never
@@ -531,8 +686,8 @@
     align-items    : flex-start;
     gap            : 0.4rem;
     font-size      : 1rem;
-    font-weight    : 700;
-    color          : #1a1a1a;
+    font-weight    : var(--wg-weight-bold);
+    color          : var(--wg-gray);
     overflow-wrap  : break-word; /* ← ADDED */
 }
 
@@ -540,7 +695,7 @@
 .wcf-dec-badge {
     display        : inline-block;
     font-size      : 0.6rem;
-    font-weight    : 700;
+    font-weight    : var(--wg-weight-bold);
     letter-spacing : 0.04em;
     text-transform : uppercase;
     border-radius  : 4px;
@@ -550,30 +705,32 @@
     line-height    : 1.4;
     max-width      : 100%;       /* never wider than card */
 }
-.wcf-dec-badge-pass   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
-.wcf-dec-badge-return { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
-.wcf-dec-badge-flag   { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+.wcf-dec-badge-pass   { background: var(--wg-success-bg); color: var(--wg-success);      border: 1px solid var(--wg-success); }
+.wcf-dec-badge-return { background: var(--wg-warning-bg); color: var(--wg-warning-text); border: 1px solid var(--wg-warning); }
+/* LEFTOVER HUE — was pink (#fce7f3 family), no brand token; reassigned
+   to var(--wg-error): see the wiring notes at the top of this file. */
+.wcf-dec-badge-flag    { background: var(--wg-error-bg); color: var(--wg-error); border: 1px solid var(--wg-error); }
 
-.wcf-dec-desc { font-size: 0.8rem; color: #777; line-height: 1.5; }
+.wcf-dec-desc { font-size: var(--wg-font-size-body); color: var(--wg-text-muted); line-height: 1.5; }
 
-/* Selected states */
-.wcf-dec-sel-pass   { border-color: #059669 !important; background: #f0fdf4 !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.15); }
-.wcf-dec-sel-return { border-color: #d97706 !important; background: #fffbeb !important; box-shadow: 0 0 0 3px rgba(217,119,6,0.15); }
-.wcf-dec-sel-flag   { border-color: #db2777 !important; background: #fdf2f8 !important; box-shadow: 0 0 0 3px rgba(219,39,119,0.15); }
+/* Selected states — box-shadow alphas recalculated from each token's own rgb */
+.wcf-dec-sel-pass   { border-color: var(--wg-success) !important; background: var(--wg-success-bg) !important; box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15); }
+.wcf-dec-sel-return { border-color: var(--wg-warning) !important; background: var(--wg-warning-bg) !important; box-shadow: 0 0 0 3px rgba(246, 135, 32, 0.15); }
+.wcf-dec-sel-flag    { border-color: var(--wg-error)   !important; background: var(--wg-error-bg)   !important; box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.15); }
 
 /* ──────────────────────────────────────────
    DEPENDENT FIELD WRAPPERS
 ────────────────────────────────────────── */
 .wcf-dep-wrapper {
     margin-top   : 0.85rem;
-    border-left  : 3px solid #e5e1d8;
+    border-left  : 3px solid var(--wg-border);
     padding-left : 1.1rem;
     animation    : wcf-slide-in 0.2s ease;
 }
 
 .wcf-dep-nested {
     margin-top   : 0.75rem;
-    border-left  : 3px solid #fde68a;
+    border-left  : 3px solid var(--wg-warning);
     padding-left : 1rem;
     animation    : wcf-slide-in 0.2s ease;
 }
@@ -584,21 +741,27 @@
 }
 
 .wcf-dep-banner {
-    font-size      : 0.7rem;
-    font-weight    : 700;
+    font-size      : var(--wg-font-size-caption);
+    font-weight    : var(--wg-weight-bold);
     letter-spacing : 0.05em;
     text-transform : uppercase;
-    color          : #aaa;
+    color          : var(--wg-text-muted);
     margin-bottom  : 0.6rem;
     display        : flex;
     align-items    : center;
     gap            : 0.25rem;
 }
 
-.wcf-dep-banner-flag   { color: #b45309; }
-.wcf-dep-banner-return { color: #1d4ed8; }
-.wcf-dep-banner-other  { color: #6b21a8; }
-.wcf-dep-banner-notes  { color: #047857; }
+/* NOTE: the original file already used two different "Flag" colors —
+   this label stayed amber/brown while the decision badge above was
+   pink. That existing internal distinction is preserved rather than
+   unified; see wiring notes. */
+.wcf-dep-banner-flag   { color: var(--wg-warning-text); }
+.wcf-dep-banner-return { color: var(--wg-info); }
+/* LEFTOVER HUE — was purple (#6b21a8), no brand token; folded into
+   var(--wg-gray) as a neutral leftover, same treatment as navy elsewhere. */
+.wcf-dep-banner-other  { color: var(--wg-gray); }
+.wcf-dep-banner-notes  { color: var(--wg-success); }
 
 /* ──────────────────────────────────────────
    CHECKLIST  (S3.3)
@@ -614,37 +777,37 @@
     align-items   : center;
     gap           : 0.75rem;
     padding       : 0.75rem 1rem;
-    border        : 1.5px solid #e2ddd5;
-    border-radius : 7px;
-    background    : #fff;
+    border        : 1.5px solid var(--wg-input-border);
+    border-radius : var(--wg-radius-sm);
+    background    : var(--wg-white);
     cursor        : pointer;
-    font-size     : 0.875rem;
-    color         : #333;
+    font-size     : var(--wg-font-size-body);
+    color         : var(--wg-gray);
     transition    : all 0.15s;
     font-weight   : 500;
     flex-wrap     : wrap;        /* ← ADDED: "Suggested by S2" tag drops below when narrow */
 }
-.wcf-check-opt:hover  { border-color: #E8622A; background: #fef9f9; }
-.wcf-check-sel        { border-color: #E8622A !important; background: #fff4ef !important; }
-.wcf-check-suggested  { border-color: #d97706; border-style: dashed; background: #fffbeb; }
+.wcf-check-opt:hover  { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
+.wcf-check-sel        { border-color: var(--wg-orange) !important; background: rgba(242, 103, 42, 0.08) !important; }
+.wcf-check-suggested  { border-color: var(--wg-warning); border-style: dashed; background: var(--wg-warning-bg); }
 
 .wcf-checkbox {
     width         : 17px;
     height        : 17px;
     border-radius : 4px;
-    border        : 2px solid #d8d4cc;
+    border        : 2px solid var(--wg-input-border);
     flex-shrink   : 0;
     position      : relative;
     transition    : all 0.15s;
 }
-.wcf-check-sel .wcf-checkbox { background: #E8622A; border-color: #E8622A; }
+.wcf-check-sel .wcf-checkbox { background: var(--wg-orange); border-color: var(--wg-orange); }
 .wcf-check-sel .wcf-checkbox::after {
     content     : '✓';
     position    : absolute;
     top         : -2px;
     left        : 1px;
     font-size   : 11px;
-    color       : #fff;
+    color       : var(--wg-white);
     font-weight : 800;
 }
 
@@ -652,11 +815,11 @@
 
 .wcf-suggest-tag {
     font-size     : 0.68rem;
-    font-weight   : 700;
-    background    : #fef3c7;
-    color         : #92400e;
-    border        : 1px solid #fcd34d;
-    border-radius : 999px;
+    font-weight   : var(--wg-weight-bold);
+    background    : var(--wg-warning-bg);
+    color         : var(--wg-warning-text);
+    border        : 1px solid var(--wg-warning);
+    border-radius : var(--wg-radius-pill);
     padding       : 0.1em 0.55em;
     white-space   : nowrap;
 }
@@ -666,42 +829,42 @@
 ────────────────────────────────────────── */
 .wcf-cond-inner {
     padding       : 0.85rem 1rem;
-    background    : #fafafa;
-    border        : 1px solid #e5e1d8;
-    border-radius : 7px;
+    background    : var(--wg-white);   /* was #fafafa — near-white; kept distinct from the border below,
+                                           same reasoning as .wcf-context-bar above */
+    border        : 1px solid var(--wg-border);
+    border-radius : var(--wg-radius-sm);
     margin-top    : 0.6rem;
 }
 
 .wcf-cond-label {
-    font-size    : 0.82rem;
-    font-weight  : 700;
-    color        : #444;
+    font-size    : var(--wg-font-size-body);
+    font-weight  : var(--wg-weight-bold);
+    color        : var(--wg-gray);
     margin-bottom: 0.45rem;
 }
 
-/* ── Footer: compact strip ── */
 /* ── Footer: compact strip — now sticky to stay visible while scrolling ── */
 .wcf-vf-footer {
     display        : flex;
     align-items    : center;
     justify-content: space-between;
     padding        : 8px 16px;
-    background     : #fff;
-    border-top     : 1px solid #e0e0e0;
+    background     : var(--wg-white);
+    border-top     : 1px solid var(--wg-border);
     gap            : 10px;
     flex-shrink    : 0;
     min-height     : 0;
 
-    /* ── NEW: pins the footer to the bottom of the scrolling panel ── */
+    /* ── pins the footer to the bottom of the scrolling panel ── */
     position       : sticky;
     bottom         : 0;
     z-index        : 40;
-    box-shadow     : 0 -3px 10px rgba(0, 0, 0, 0.08);
+    box-shadow     : 0 -3px 10px rgba(0, 0, 0, 0.08);   /* plain black overlay — left literal */
 }
 
 .wcf-footer-status {
     font-size  : 11.5px;
-    color      : #706e6b;
+    color      : var(--wg-text-muted);
     flex       : 1;
     min-width  : 0;
     overflow   : hidden;
@@ -716,29 +879,50 @@
     flex-wrap  : wrap;           /* ← ADDED: buttons wrap instead of overflowing the panel */
 }
 
+/* Squared per the SLDS-hook convention: lightning-button renders its own
+   shadow DOM, so plain border-radius cannot reach it. */
+.slds-modal__footer lightning-button {
+    --slds-c-button-radius-border: 0;
+}
+
 /* Make the buttons smaller */
 .wcf-draft-btn,
 .wcf-seal-btn {
-    --slds-c-button-sizing-height: 28px;
+    --slds-c-button-sizing-height : 28px;
+    --slds-c-button-radius-border : 0;   /* real CTA — squared */
     font-size: 12px !important;
     padding  : 0 12px !important;
-    color: #ffffff;
+    color: var(--wg-white);
 }
 
-/* ← ADDED: "Seal Validator Record" label must be WHITE like Save Draft.
-   The Experience Cloud theme overrides the brand button text color,
-   so we pin it explicitly via SLDS styling hooks (old + new token
-   names for compatibility), plus a color fallback on the host. */
-.wcf-seal-btn {
-    --slds-c-button-brand-text-color       : #ffffff;
-    --slds-c-button-brand-text-color-hover : #ffffff;
-    --slds-c-button-brand-text-color-active: #ffffff;
-    --sds-c-button-brand-text-color        : #ffffff;
-    --sds-c-button-brand-text-color-hover  : #ffffff;
-    --slds-c-button-text-color             : #ffffff;
-    --slds-c-button-text-color-hover       : #ffffff;
-    color: #ffffff;
+/* Save Draft is deliberately neutral/gold-toned, distinct from the
+   brand-orange Seal button — consolidated onto the warning family
+   along with this file's other two amber palettes. */
+.wcf-draft-btn {
+    --slds-c-button-neutral-color-background: var(--wg-white);
+    --slds-c-button-neutral-color-border    : var(--wg-warning);
+    --slds-c-button-neutral-text-color      : var(--wg-warning-text);
 }
+
+.wcf-draft-btn:hover:not([disabled]) {
+    --slds-c-button-neutral-color-background: var(--wg-warning-bg);
+}
+
+/* "Seal" label must stay WHITE — the Experience Cloud theme overrides
+   the brand button text color, so it's pinned explicitly via SLDS
+   styling hooks (old + new token names for compatibility), plus a
+   color fallback on the host. */
+.wcf-seal-btn {
+    --slds-c-button-brand-text-color       : var(--wg-white);
+    --slds-c-button-brand-text-color-hover : var(--wg-white);
+    --slds-c-button-brand-text-color-active: var(--wg-white);
+    --sds-c-button-brand-text-color        : var(--wg-white);
+    --sds-c-button-brand-text-color-hover  : var(--wg-white);
+    --slds-c-button-text-color             : var(--wg-white);
+    --slds-c-button-text-color-hover       : var(--wg-white);
+    color: var(--wg-white);
+}
+
 /* ──────────────────────────────────────────
    LOADING
 ────────────────────────────────────────── */
@@ -768,30 +952,31 @@
 }
 
 .wcf-wc-warn {
-    color: #b45309;   /* amber */
+    color: var(--wg-warning-text);
     font-weight: 500;
 }
 
 .wcf-wc-limit {
-    color: #dc2626;   /* red */
-    font-weight: 600;
+    color: var(--wg-error);
+    font-weight: var(--wg-weight-semibold);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    DRAFT RESUME BANNER  (appears at top of form when a Draft is loaded
-   or after every Save Draft click)
+   or after every Save Draft click) — third amber/gold palette in this
+   file, consolidated onto var(--wg-warning) with the other two.
 ═══════════════════════════════════════════════════════════════════ */
 
 .wcf-draft-banner {
     display        : flex;
     align-items    : center;
     gap            : 1rem;
-    background     : #fff8e6;
-    border         : 1.5px solid #f4a623;
-    border-radius  : 8px;
+    background     : var(--wg-warning-bg);
+    border         : 1.5px solid var(--wg-warning);
+    border-radius  : var(--wg-radius-md);
     padding        : 0.85rem 1.1rem;
     margin         : 0.75rem 1.5rem 0;
-    box-shadow     : 0 1px 4px rgba(244, 166, 35, 0.15);
+    box-shadow     : 0 1px 4px rgba(246, 135, 32, 0.15);   /* recalculated from wg-warning's rgb */
     flex-wrap      : wrap;
 }
 
@@ -817,15 +1002,15 @@
 }
 
 .wcf-draft-banner-title {
-    font-weight  : 600;
-    font-size    : 0.875rem;
-    color        : #7a4f00;
+    font-weight  : var(--wg-weight-semibold);
+    font-size    : var(--wg-font-size-body);
+    color        : var(--wg-warning-text);
     letter-spacing: 0.01em;
 }
 
 .wcf-draft-banner-sub {
-    font-size : 0.78rem;
-    color     : #9a6700;
+    font-size : var(--wg-font-size-caption);
+    color     : var(--wg-warning-text);
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
@@ -833,16 +1018,16 @@
 .wcf-draft-progress-bar-wrap {
     flex        : 0 0 160px;
     height      : 6px;
-    background  : #fce8b2;
-    border-radius : 99px;
+    background  : var(--wg-warning-bg);
+    border-radius : var(--wg-radius-pill);
     overflow    : hidden;
     align-self  : center;
 }
 
 .wcf-draft-progress-bar {
     height        : 100%;
-    background    : #f4a623;
-    border-radius : 99px;
+    background    : var(--wg-warning);
+    border-radius : var(--wg-radius-pill);
     transition    : width 0.4s ease;
     min-width     : 4px;
 }
@@ -850,12 +1035,12 @@
 .wcf-draft-dismiss {
     background   : none;
     border       : none;
-    color        : #9a6700;
+    color        : var(--wg-warning-text);
     cursor       : pointer;
     font-size    : 1rem;
     line-height  : 1;
     padding      : 0.2rem 0.3rem;
-    border-radius: 4px;
+    border-radius: 0;   /* real <button> — squared */
     flex-shrink  : 0;
     opacity      : 0.7;
     transition   : opacity 0.15s;
@@ -863,95 +1048,13 @@
 
 .wcf-draft-dismiss:hover {
     opacity      : 1;
-    background   : rgba(244, 166, 35, 0.15);
+    background   : rgba(246, 135, 32, 0.15);   /* recalculated from wg-warning's rgb */
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   FOOTER — left side with draft chip + status text
-═══════════════════════════════════════════════════════════════════ */
-
-/* Update the footer to use flex with space-between */
-.wcf-vf-footer {
-    display         : flex;
-    align-items     : center;
-    justify-content : space-between;
-    flex-wrap       : wrap;
-    gap             : 0.75rem;
-}
-
-.wcf-footer-left {
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.25rem;
-    flex           : 1 1 auto;
-    min-width      : 0;          /* ← ADDED */
-}
-
-/* Draft chip in the footer */
-.wcf-draft-chip {
-    display      : inline-flex;
-    align-items  : center;
-    gap          : 0.4rem;
-    background   : #fff8e6;
-    border       : 1px solid #f4a623;
-    border-radius: 999px;
-    padding      : 0.2rem 0.75rem;
-    font-size    : 0.72rem;
-    font-weight  : 500;
-    color        : #7a4f00;
-    width        : fit-content;
-    max-width    : 100%;         /* ← ADDED */
-    flex-wrap    : wrap;         /* ← ADDED */
-}
-
-.wcf-draft-chip-dot {
-    width         : 6px;
-    height        : 6px;
-    border-radius : 50%;
-    background    : #f4a623;
-    flex-shrink   : 0;
-    animation     : wcf-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes wcf-pulse {
-    0%, 100% { opacity: 1;   transform: scale(1);    }
-    50%       { opacity: 0.5; transform: scale(0.85); }
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   SAVE DRAFT BUTTON — neutral style distinct from brand "Seal" button
-═══════════════════════════════════════════════════════════════════ */
-
-.wcf-draft-btn {
-    --slds-c-button-neutral-color-background: #fff;
-    --slds-c-button-neutral-color-border    : #f4a623;
-    --slds-c-button-neutral-text-color      : #7a4f00;
-}
-
-.wcf-draft-btn:hover:not([disabled]) {
-    --slds-c-button-neutral-color-background: #fff8e6;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   PROGRESS BAR STEPPED WIDTH CLASSES
-   Used by progressBarClass getter (wcf-pb-0 … wcf-pb-100).
-   Inline style binding is avoided because LWC's HTML linter
-   treats style={expr} as a CSS stylesheet and raises parse errors.
-═══════════════════════════════════════════════════════════════════ */
-.wcf-draft-progress-bar          { height: 100%; border-radius: 99px; background: #f4a623; transition: width 0.4s ease; min-width: 4px; }
-.wcf-draft-progress-bar.wcf-pb-0   { width: 2%;   }
-.wcf-draft-progress-bar.wcf-pb-10  { width: 10%;  }
-.wcf-draft-progress-bar.wcf-pb-20  { width: 20%;  }
-.wcf-draft-progress-bar.wcf-pb-30  { width: 30%;  }
-.wcf-draft-progress-bar.wcf-pb-40  { width: 40%;  }
-.wcf-draft-progress-bar.wcf-pb-50  { width: 50%;  }
-.wcf-draft-progress-bar.wcf-pb-60  { width: 60%;  }
-.wcf-draft-progress-bar.wcf-pb-70  { width: 70%;  }
-.wcf-draft-progress-bar.wcf-pb-80  { width: 80%;  }
-.wcf-draft-progress-bar.wcf-pb-90  { width: 90%;  }
-.wcf-draft-progress-bar.wcf-pb-100 { width: 100%; }
-
-/* ===== Preview Modal ===== */
+/* ===== Preview Modal =====
+   Second, older color palette (navy / #ea580c-orange / cool grays) —
+   retokenized in place onto the same brand tokens used above rather
+   than treated as its own leftover-hue case. */
 
 .slds-modal__container {
     width: 90% !important;
@@ -959,24 +1062,24 @@
 }
 
 .preview-container {
-    background: #f8f9fb;
+    background: var(--wg-border);
     max-height: 70vh;
 }
 
 .preview-section {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
     border-radius: 12px;
     padding: 18px;
     margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);   /* plain black overlay — left literal */
 }
 
 .preview-section h3 {
     margin-bottom: 16px;
-    font-size: 18px;
-    font-weight: 700;
-    color: #16325c;
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);   /* was navy #16325c — folded into gray, same as navy elsewhere in the batch */
 }
 
 .preview-item {
@@ -985,7 +1088,7 @@
     align-items: flex-start;
     gap: 20px;
     padding: 12px 0;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid var(--wg-border);
 }
 
 .preview-item:last-child {
@@ -993,80 +1096,83 @@
 }
 
 .preview-item .label {
-    font-weight: 600;
-    color: #444;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
     min-width: 180px;
 }
 
 .preview-item span:last-child {
     text-align: right;
-    color: #111827;
+    color: var(--wg-gray);
     min-width: 0;                /* ← ADDED */
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
 .decision-card {
-    background: #fff7ed;
-    border-left: 5px solid #ea580c;
+    background: rgba(242, 103, 42, 0.08);   /* orange wash, matches .wcf-pick-sel elsewhere in this file */
+    border-left: 5px solid var(--wg-orange);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: var(--wg-radius-md);
 }
 
 .decision-title {
     font-size: 22px;
-    font-weight: 700;
-    color: #c2410c;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-orange-deep);
     margin-bottom: 10px;
 }
 
 .decision-rationale {
-    color: #374151;
+    color: var(--wg-gray);
     line-height: 1.6;
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
 .preview-notes {
     min-height: 60px;
-    color: #374151;
+    color: var(--wg-gray);
     line-height: 1.6;
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
 .slds-modal__header {
-    background: #ffffff;
-    border-bottom: 2px solid #e5e7eb;
+    background: var(--wg-white);
+    border-bottom: 2px solid var(--wg-border);
 }
 
 .slds-modal__footer {
-    background: #ffffff;
-    border-top: 2px solid #e5e7eb;
+    background: var(--wg-white);
+    border-top: 2px solid var(--wg-border);
 }
 .preview-subsection {
     margin-top: 20px;
 }
 
 .preview-subsection h4 {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-bold);
     margin-bottom: 10px;
-    color: #16325c;
+    color: var(--wg-gray);   /* was navy #16325c — folded into gray */
 }
 
 .preview-tag {
     display: inline-block;
-    background: #fff4ef;
-    border: 1px solid #ea580c;
-    color: #c2410c;
+    background: rgba(242, 103, 42, 0.08);
+    border: 1px solid var(--wg-orange);
+    color: var(--wg-orange-deep);
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: var(--wg-radius-pill);
     margin-right: 8px;
     margin-bottom: 8px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   QUESTION NUMBER PILL GRID  (Return section)
+   QUESTION NUMBER PILL GRID  (Return section) — Return-workflow blue
+   family, mapped to var(--wg-info). Light-blue tints with no matching
+   brand background token were recalculated as rgba() over wg-info's
+   own rgb (35,128,209).
 ═══════════════════════════════════════════════════════════════════ */
 
 .wcf-qnum-grid {
@@ -1080,17 +1186,19 @@
     .wcf-qnum-grid { grid-template-columns: repeat(5, 1fr); }
 }
 
+/* Real <button> — squared, despite the pill resting shape, per the
+   batch's tag-based squaring convention. */
 .wcf-qnum-pill {
     display         : flex;
     align-items     : center;
     justify-content : center;
     padding         : 0.45rem 0.25rem;
-    border          : 1.5px solid #d1cfc8;
-    border-radius   : 7px;
-    background      : #fff;
+    border          : 1.5px solid var(--wg-input-border);
+    border-radius   : 0;
+    background      : var(--wg-white);
     font-size       : 0.85rem;
-    font-weight     : 600;
-    color           : #444;
+    font-weight     : var(--wg-weight-semibold);
+    color           : var(--wg-gray);
     cursor          : pointer;
     transition      : all 0.15s ease;
     line-height     : 1;
@@ -1099,16 +1207,16 @@
 }
 
 .wcf-qnum-pill:hover {
-    border-color : #1d4ed8;
-    background   : #eff6ff;
-    color        : #1d4ed8;
+    border-color : var(--wg-info);
+    background   : var(--wg-info-bg);
+    color        : var(--wg-info);
 }
 
 .wcf-qnum-pill-sel {
-    border-color : #1d4ed8 !important;
-    background   : #1d4ed8 !important;
-    color        : #ffffff !important;
-    box-shadow   : 0 2px 6px rgba(29,78,216,0.25);
+    border-color : var(--wg-info) !important;
+    background   : var(--wg-info) !important;
+    color        : var(--wg-white) !important;
+    box-shadow   : 0 2px 6px rgba(35, 128, 209, 0.25);   /* recalculated from wg-info's rgb */
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1123,9 +1231,9 @@
 }
 
 .wcf-qcard {
-    border        : 1.5px solid #bfdbfe;
-    border-radius : 10px;
-    background    : #f0f7ff;
+    border        : 1.5px solid rgba(35, 128, 209, 0.4);
+    border-radius : var(--wg-radius-card);
+    background    : var(--wg-info-bg);
     overflow      : hidden;
     animation     : wcf-slide-in 0.18s ease;
 }
@@ -1135,8 +1243,8 @@
     align-items  : center;
     gap          : 0.65rem;
     padding      : 0.6rem 0.9rem;
-    background   : #dbeafe;
-    border-bottom: 1px solid #bfdbfe;
+    background   : rgba(35, 128, 209, 0.15);
+    border-bottom: 1px solid rgba(35, 128, 209, 0.4);
     flex-wrap    : wrap;         /* ← ADDED: Remove button drops below title when narrow */
 }
 
@@ -1147,33 +1255,36 @@
     width           : 28px;
     height          : 28px;
     border-radius   : 50%;
-    background      : #1d4ed8;
-    color           : #fff;
+    background      : var(--wg-info);
+    color           : var(--wg-white);
     font-size       : 0.75rem;
     font-weight     : 800;
     flex-shrink     : 0;
 }
 
 .wcf-qcard-title {
-    font-size   : 0.875rem;
-    font-weight : 700;
-    color       : #1e3a8a;
+    font-size   : var(--wg-font-size-body);
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-info-text);
     flex        : 1;
     min-width   : 0;             /* ← ADDED */
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
+/* Real <button>, pill-shaped — squared per convention; this is the
+   "Remove" CTA on an open question card, and shares this file's error
+   family with .wcf-wc-limit / .wcf-reviewer-return-banner. */
 .wcf-qcard-remove {
     display       : flex;
     align-items   : center;
     gap           : 0.3rem;
     padding       : 0.25rem 0.65rem;
-    background    : #fff;
-    border        : 1.5px solid #fca5a5;
-    border-radius : 999px;
-    color         : #dc2626;
+    background    : var(--wg-white);
+    border        : 1.5px solid var(--wg-error);
+    border-radius : 0;
+    color         : var(--wg-error);
     font-size     : 0.73rem;
-    font-weight   : 700;
+    font-weight   : var(--wg-weight-bold);
     cursor        : pointer;
     transition    : all 0.15s;
     white-space   : nowrap;
@@ -1181,8 +1292,8 @@
 }
 
 .wcf-qcard-remove:hover {
-    background   : #fef2f2;
-    border-color : #dc2626;
+    background   : var(--wg-error-bg);
+    border-color : var(--wg-error);
 }
 
 .wcf-qcard-textarea {
@@ -1193,8 +1304,8 @@
 /* Force the lightning-textarea inside the card to be transparent */
 .wcf-qcard-textarea .slds-form-element__control textarea,
 .wcf-qcard lightning-textarea .slds-textarea {
-    background    : #ffffff;
-    border-color  : #bfdbfe;
+    background    : var(--wg-white);
+    border-color  : rgba(35, 128, 209, 0.4);
     border-radius : 6px;
 }
 /* ═══════════════════════════════════════════════════════════════════
@@ -1215,21 +1326,21 @@
     justify-content : center;
     min-width       : 36px;
     padding         : 0.25rem 0.65rem;
-    background      : #1d4ed8;
-    color           : #fff;
-    border-radius   : 6px;
+    background      : var(--wg-info);
+    color           : var(--wg-white);
+    border-radius   : var(--wg-radius-sm);
     font-size       : 0.78rem;
-    font-weight     : 700;
+    font-weight     : var(--wg-weight-bold);
     letter-spacing  : 0.02em;
 }
 
 /* Individual question card in preview */
 .preview-qcard {
-    border        : 1px solid #bfdbfe;
-    border-radius : 8px;
+    border        : 1px solid rgba(35, 128, 209, 0.4);
+    border-radius : var(--wg-radius-md);
     overflow      : hidden;
     margin-bottom : 0.65rem;
-    background    : #ffffff;
+    background    : var(--wg-white);
 }
 
 .preview-qcard-header {
@@ -1237,8 +1348,8 @@
     align-items  : center;
     gap          : 0.6rem;
     padding      : 0.5rem 0.85rem;
-    background   : #dbeafe;
-    border-bottom: 1px solid #bfdbfe;
+    background   : rgba(35, 128, 209, 0.15);
+    border-bottom: 1px solid rgba(35, 128, 209, 0.4);
 }
 
 .preview-qcard-num {
@@ -1248,8 +1359,8 @@
     width           : 26px;
     height          : 26px;
     border-radius   : 50%;
-    background      : #1d4ed8;
-    color           : #fff;
+    background      : var(--wg-info);
+    color           : var(--wg-white);
     font-size       : 0.72rem;
     font-weight     : 800;
     flex-shrink     : 0;
@@ -1257,14 +1368,14 @@
 
 .preview-qcard-label {
     font-size   : 0.82rem;
-    font-weight : 700;
-    color       : #1e3a8a;
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-info-text);
 }
 
 .preview-qcard-text {
     padding     : 0.65rem 0.85rem;
-    font-size   : 0.875rem;
-    color       : #374151;
+    font-size   : var(--wg-font-size-body);
+    color       : var(--wg-text-muted);
     line-height : 1.6;
     white-space : pre-wrap;
     overflow-wrap: break-word;   /* ← ADDED */
@@ -1273,7 +1384,7 @@
 .wcf-saving-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.75);   /* plain white overlay — left literal */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1288,14 +1399,14 @@
 }
 
 .wcf-saving-text {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #c0392b; /* Wadhwani red, matches your rebrand */
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-red); /* original comment: "Wadhwani red, matches your rebrand" — brand red, not error-red */
     margin-top: 2.25rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CONTAINER-RESPONSIVE LAYOUT  (← ADDED)
+   CONTAINER-RESPONSIVE LAYOUT
    Reacts to the PANEL's own width (split-pane divider), not the
    browser viewport. This is what keeps the Validator Form readable
    while the red divider is dragged — mirroring the approach already
@@ -1355,20 +1466,22 @@
 }
 /* ═══════════════════════════════════════════════════════
    REVIEWER RETURN NOTICE — same shape as the draft banner,
-   red/orange instead of amber to distinguish "needs decision"
-   from "you have unsaved progress"
+   error-red instead of amber to distinguish "needs decision"
+   from "you have unsaved progress". Genuine alert state, so
+   this gets the full var(--wg-error) family rather than a
+   leftover-hue substitution.
 ═══════════════════════════════════════════════════════ */
 .wcf-reviewer-return-banner {
-    background   : #fef2f2;
-    border-color : #f87171;
-    box-shadow   : 0 1px 4px rgba(248, 113, 113, 0.15);
+    background   : var(--wg-error-bg);
+    border-color : var(--wg-error);
+    box-shadow   : 0 1px 4px rgba(179, 38, 30, 0.15);   /* recalculated from wg-error's rgb */
 }
 .wcf-reviewer-return-banner .wcf-draft-banner-title {
-    color : #991b1b;
+    color : var(--wg-error);
 }
 .wcf-reviewer-return-banner .wcf-draft-banner-sub {
-    color : #b91c1c;
+    color : var(--wg-error);
 }
 .wcf-qcard-missing {
-    border: 1px solid #c23934;
+    border: 1px solid var(--wg-error);
 }

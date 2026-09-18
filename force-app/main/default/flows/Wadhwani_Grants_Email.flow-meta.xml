@@ -1,22 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>Copy_1_of_Mail_to_validator_on_Application_submit_to_queue</name>
-        <label>Copy 1 of Mail to validator on Application submit to queue</label>
+        <name>Copy_1_of_Email_to_Validator_on_Application_submission</name>
+        <label>Copy 1 of Email to Validator on Application submission</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>IndividualApplication.New_Application_Validator_Queue</actionName>
-        <actionType>emailAlert</actionType>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
-            <name>SObjectRowId</name>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>ValidatorEmailAddresses</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/New_Application_Validator_Queue</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>WCFValidatorContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
             <value>
                 <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
-        <nameSegment>IndividualApplication.New_Application_Validator_Queue</nameSegment>
+        <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
+        <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
         <name>Draft_Mail_to_Applicant</name>
@@ -26,7 +70,7 @@
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
-            <targetReference>Mark_Draft_Email_Sent</targetReference>
+            <targetReference>Mark_Draft_Email_Send</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -95,7 +139,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>$Record.Account.PersonEmail</elementReference>
+                    <elementReference>ValidatorEmailAddresses</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -130,7 +174,14 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <elementReference>WCFValidatorContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -139,8 +190,8 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>email_to_validator_on_Application_Submitted</name>
-        <label>email to validator on Application Submitted</label>
+        <name>Email_to_Validator_on_Application_submission</name>
+        <label>Email to Validator on Application submission</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -150,7 +201,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Validator_account.PersonEmail</elementReference>
+                    <elementReference>ValidatorEmailAddresses</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -185,7 +236,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Validator_account.PersonContactId</elementReference>
+                <elementReference>WCFValidatorContactId</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -251,6 +302,13 @@
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
         <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
         <versionString>3.0.1</versionString>
@@ -303,6 +361,13 @@
             <name>recipientId</name>
             <value>
                 <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -361,6 +426,13 @@
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
         <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
         <versionString>3.0.1</versionString>
@@ -373,7 +445,7 @@
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
-            <targetReference>Copy_1_of_Mail_to_validator_on_Application_submit_to_queue</targetReference>
+            <targetReference>resubmission_Round_assignment</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -416,6 +488,13 @@
             <name>recipientId</name>
             <value>
                 <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -477,48 +556,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>Proposal_Review.ApplicationId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Revoke_mail_to_applicant</name>
-        <label>Revoke mail to applicant</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>$Record.Account.PersonEmail</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Decision_Under_Review</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -534,7 +572,7 @@
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
-            <targetReference>to_validator_email_alert</targetReference>
+            <targetReference>Update_Submission_Round</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -642,12 +680,95 @@
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
         <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
         <versionString>3.0.1</versionString>
     </actionCalls>
-    <apiVersion>67.0</apiVersion>
+    <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Copy_1_of_getting_email_Ids</name>
+        <label>Copy 1 of getting email Ids</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>ValidatorEmailAddresses</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Copy_1_of_Loop_1.PersonEmail</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>HasWCFValidator</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>WCFValidatorContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Copy_1_of_Loop_1.PersonContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Copy_1_of_Loop_1</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>getting_email_Ids</name>
+        <label>getting email Ids</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>ValidatorEmailAddresses</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_1.PersonEmail</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>HasWCFValidator</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>WCFValidatorContactId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_1.PersonContactId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_1</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>resubmission_Round_assignment</name>
+        <label>resubmission Round assignment</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>NewSubmissionRound</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>SubmissionRoundPlusOne</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_Resubmission_round</targetReference>
+        </connector>
+    </assignments>
     <decisions>
         <name>Application_Status_change</name>
         <label>Application Status change</label>
@@ -702,7 +823,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Revision_Request_mail_to_applicant</targetReference>
+                <targetReference>Update_Due_Date</targetReference>
             </connector>
             <label>Revision Requested</label>
         </rules>
@@ -791,10 +912,57 @@
                     <stringValue>Revoke</stringValue>
                 </rightValue>
             </conditions>
-            <connector>
-                <targetReference>Revoke_mail_to_applicant</targetReference>
-            </connector>
             <label>Revoke</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_is_it_Validator_record</name>
+        <label>Copy 1 of is it Validator record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Copy_1_of_Loop_1</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Copy_1_of_Loop_1.WCFs_Validator__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_getting_email_Ids</targetReference>
+            </connector>
+            <label>Copy 1 of yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>is_it_Validator_record</name>
+        <label>is it Validator record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Loop_1</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Loop_1.WCFs_Validator__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>getting_email_Ids</targetReference>
+            </connector>
+            <label>yes</label>
         </rules>
     </decisions>
     <decisions>
@@ -829,22 +997,88 @@
             <name>when_status_is_Submitted</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Validator_account.WCFs_Validator__c</leftValueReference>
+                <leftValueReference>HasWCFValidator</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>email_to_validator_on_Application_Submitted</targetReference>
+                <targetReference>Email_to_Validator_on_Application_submission</targetReference>
             </connector>
             <label>when status is Submitted</label>
         </rules>
     </decisions>
+    <decisions>
+        <name>validator_email_alert_after_resubmission</name>
+        <label>validator email alert after resubmission</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>when_status_is_ReSubmitted</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>HasWCFValidator</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_Email_to_Validator_on_Application_submission</targetReference>
+            </connector>
+            <label>when status is ReSubmitted</label>
+        </rules>
+    </decisions>
     <description>Wcf related email</description>
     <environments>Default</environments>
+    <formulas>
+        <name>RevisionDueDate</name>
+        <dataType>Date</dataType>
+        <expression>TODAY() + 5</expression>
+    </formulas>
+    <formulas>
+        <name>SubmissionRoundPlusOne</name>
+        <dataType>Number</dataType>
+        <expression>BLANKVALUE({!$Record.Submission_Round__c}, 0) + 1</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <name>ValidatorName</name>
+        <dataType>String</dataType>
+        <expression>BLANKVALUE({!$Record.WG_Validator_Name__c}, BLANKVALUE({!Get_Proposal_Review.CreatedBy.Contact.Name}, {!Get_Proposal_Review.CreatedBy.Name}))</expression>
+    </formulas>
     <interviewLabel>WCF - Email {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Wadhwani Grants - Email</label>
+    <loops>
+        <name>Copy_1_of_Loop_1</name>
+        <label>Copy 1 of Loop 1</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Copy_1_of_Get_Validator_account</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Copy_1_of_is_it_Validator_record</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>status_equal_to_submitted</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <name>Loop_1</name>
+        <label>Loop 1</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Validator_account</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>is_it_Validator_record</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Get_Proposal_Review</targetReference>
+        </noMoreValuesConnector>
+    </loops>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -864,6 +1098,27 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Copy_1_of_Get_Validator_account</name>
+        <label>Copy 1 of Get Validator account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Copy_1_of_Loop_1</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WCFs_Validator__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <name>Get_Account_Details</name>
         <label>Get Account Details</label>
@@ -896,7 +1151,7 @@
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
-            <field>Id</field>
+            <field>ApplicationId</field>
             <operator>EqualTo</operator>
             <value>
                 <elementReference>$Record.Id</elementReference>
@@ -955,7 +1210,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>status_equal_to_submitted</targetReference>
+            <targetReference>Copy_1_of_Get_Validator_account</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -970,29 +1225,8 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <name>Get_Validator_account</name>
-        <label>Get Validator account</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Proposal_Review</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>WCFs_Validator__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Account</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <name>Proposal_Review</name>
-        <label>Proposal Review</label>
+        <name>Get_Proposal_Review</name>
+        <label>Get Proposal Review</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
@@ -1009,17 +1243,104 @@
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
         <object>ApplicationReview</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Validator_account</name>
+        <label>Get Validator account</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_1</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WCFs_Validator__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Account</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
-        <name>Mark_Draft_Email_Sent</name>
-        <label>Mark Draft Email Sent</label>
+        <name>Mark_Draft_Email_Send</name>
+        <label>Mark Draft Email Send</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <inputAssignments>
             <field>Draft_Email_Sent__c</field>
             <value>
                 <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_Due_Date</name>
+        <label>Update Due Date</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Return_Commends</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Due_Date__c</field>
+            <value>
+                <elementReference>RevisionDueDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record.Account</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_Resubmission_round</name>
+        <label>Update Resubmission round</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>validator_email_alert_after_resubmission</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Submission_Round__c</field>
+            <value>
+                <elementReference>NewSubmissionRound</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_Return_Commends</name>
+        <label>Update Return Commends and Validator, Reviewer name</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Revision_Request_mail_to_applicant</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Consalidated__c</field>
+            <value>
+                <elementReference>Get_Proposal_Review.Consolidated_Return_Comments__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_Submission_Round</name>
+        <label>Update Submission Round</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>to_validator_email_alert</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Submission_Round__c</field>
+            <value>
+                <numberValue>1.0</numberValue>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -1039,24 +1360,24 @@
             </value>
         </filters>
         <filters>
-            <field>Organizational_Area_s_for_Funding_Inves__c</field>
-            <operator>EqualTo</operator>
+            <field>Organizational_Area_s_for_Funding_Inves1__c</field>
+            <operator>Contains</operator>
             <value>
-                <stringValue>Job Fulfillment Only</stringValue>
+                <stringValue>Job Fulfillment</stringValue>
             </value>
         </filters>
         <filters>
-            <field>Organizational_Area_s_for_Funding_Inves__c</field>
-            <operator>EqualTo</operator>
+            <field>Organizational_Area_s_for_Funding_Inves1__c</field>
+            <operator>Contains</operator>
             <value>
-                <stringValue>Job Creation Only</stringValue>
+                <stringValue>Job Creation</stringValue>
             </value>
         </filters>
         <filters>
-            <field>Organizational_Area_s_for_Funding_Inves__c</field>
-            <operator>EqualTo</operator>
+            <field>Organizational_Area_s_for_Funding_Inves1__c</field>
+            <operator>Contains</operator>
             <value>
-                <stringValue>Both Job Fulfillment and Job Creation</stringValue>
+                <stringValue>Livelihood</stringValue>
             </value>
         </filters>
         <object>IndividualApplication</object>
@@ -1074,6 +1395,44 @@
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <runInMode>SystemModeWithoutSharing</runInMode>
     <status>Active</status>
+    <variables>
+        <name>HasWCFValidator</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
+    </variables>
+    <variables>
+        <name>NewSubmissionRound</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <name>ValidatorEmailAddresses</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>WCFValidatorContactId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>WCFValidatorContactIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
 </Flow>

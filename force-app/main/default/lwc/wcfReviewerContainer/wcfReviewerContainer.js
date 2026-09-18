@@ -1,6 +1,5 @@
 import { LightningElement, track, wire } from 'lwc';
     import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
-    import { ShowToastEvent } from 'lightning/platformShowToastEvent';
     import getValidatorFlagInfo  from '@salesforce/apex/WCFProposalListController.getValidatorFlagInfo';
     import getIndividualApplication from '@salesforce/apex/WCF_ReviewFormJFController.getIndividualApplication';
     import getApproverReturnInfo         from '@salesforce/apex/WCFProposalListController.getApproverReturnInfo';
@@ -248,11 +247,7 @@ import { LightningElement, track, wire } from 'lwc';
         async handleApproverReturnApprove() {
             if (this.isReturnActionBusy) return;
             if (!this.reviewerApproveComment?.trim()) {
-                this.dispatchEvent(new ShowToastEvent({
-                    title:   'Comment Required',
-                    message: 'Please add a note for the Approver before approving.',
-                    variant: 'error'
-                }));
+                this._showCustomToast('Comment Required', 'Please add a note for the Approver before approving.', 'error');
                 return;
             }
            this.isReturnToApproverBusy = true;
@@ -262,11 +257,7 @@ import { LightningElement, track, wire } from 'lwc';
                     action:          'Approve',
                     reviewerComment: this.reviewerApproveComment
                 });
-                this.dispatchEvent(new ShowToastEvent({
-                    title:   'Sent to Approver',
-                    message: 'Application has been sent back to the Approver for a final decision.',
-                    variant: 'success'
-                }));
+                this._showCustomToast('Sent to Approver', 'Application has been sent back to the Approver for a final decision.', 'success');
                 // eslint-disable-next-line @lwc/lwc/no-async-operation
                 setTimeout(() => {
                     this[NavigationMixin.Navigate]({
@@ -275,11 +266,7 @@ import { LightningElement, track, wire } from 'lwc';
                     });
                 }, 1500);
             } catch (e) {
-                this.dispatchEvent(new ShowToastEvent({
-                    title:   'Action failed',
-                    message: e.body?.message || e.message || 'Unknown error',
-                    variant: 'error'
-                }));
+                this._showCustomToast('Action failed', e.body?.message || e.message || 'Unknown error', 'error');
                 this.isReturnToApproverBusy = true;
             }
         }
@@ -297,11 +284,7 @@ import { LightningElement, track, wire } from 'lwc';
                 action:          'ReturnToValidator',
                 reviewerComment: this.reviewerReturnComment
             });
-            this.dispatchEvent(new ShowToastEvent({
-                title:   'Returned to Validator',
-                message: 'The application has been sent back to the Validator for revalidation.',
-                variant: 'success'
-            }));
+            this._showCustomToast('Returned to Validator', 'The application has been sent back to the Validator for revalidation.', 'success');
             // eslint-disable-next-line @lwc/lwc/no-async-operation
             setTimeout(() => {
                 this[NavigationMixin.Navigate]({
@@ -310,11 +293,7 @@ import { LightningElement, track, wire } from 'lwc';
                 });
             }, 1500);
         } catch (e) {
-            this.dispatchEvent(new ShowToastEvent({
-                title:   'Action failed',
-                message: e.body?.message || e.message || 'Unknown error',
-                variant: 'error'
-            }));
+            this._showCustomToast('Action failed', e.body?.message || e.message || 'Unknown error', 'error');
           this.isReturnToValidatorBusy = false;
         }
     }

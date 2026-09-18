@@ -1,10 +1,97 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   This file used its own two-color "navy + red" identity — #1B2A4A
+   (deep navy) and #C8391D (Wadhwani red/orange) — the same navy and
+   red hex values already seen (as part of a fuller navy+gold+red
+   trio) in wcfPortalHeader and wcfApproverContainer, but without a
+   gold accent here. Mapped identically to those files for cross-app
+   consistency: navy -> var(--wg-gray), red -> var(--wg-red) (an exact
+   match, so every red-bordered rule, gradient stop and rgba overlay
+   carries over directly).
+   Light "warm off-white tinted red" washes (#FDF6F4, #FEF2EF, #FDDDD7)
+   -> var(--wg-error-bg), the same pale-red-wash token this batch
+   reuses for that family of colors; :host's own page background
+   (#F7F3F2) and other ambiguous light-neutral washes (#f4f4f4,
+   #fafaf8, #FAF0EE, #EEF2F8, #B8C8E0, #E2D8D5, #F0E8E6, #F0E0DC,
+   #dddbda, #f1f5f9, #cbd5e1, #e2e8f0, #f8fafc) -> var(--wg-border), the
+   same "ambiguous light-neutral wash" call made throughout this batch
+   (:host's page background reads a shade grayer than the original
+   very-subtle off-white as a result — worth knowing, same caveat noted
+   for the dashboard files).
+   Dark neutral text/chrome (#181818, #3e3e3c, #2d2d4e, #525659,
+   #1e293b, #334155) -> var(--wg-gray); muted text (#706e6b, #6b7280)
+   -> var(--wg-text-muted).
+   Track tags (.rv-tag-jf/-jc/-both/-liv/-navy — this file's own
+   five-value spin on the recurring jf/jc/lu-or-both track-badge
+   concept): jf (already blue) -> var(--wg-info-bg)/var(--wg-info-text),
+   matching the established jf->info convention; jc (already amber)
+   -> var(--wg-warning-bg)/var(--wg-warning-text), matching jc->warning;
+   both was already this file's OWN green in the original design (not
+   a hue collision to resolve) -> var(--wg-success-bg)/var(--wg-success),
+   kept as-is; liv was purple, a hue with no brand token and the only
+   one of the five left uncolored by a direct brand match — reassigned
+   to the brand's dedicated orange accent (unused elsewhere in this
+   file, so no local collision) as a translucent rgba(242, 103, 42, 0.15)
+   wash over var(--wg-orange)'s own rgb, color: var(--wg-orange); navy
+   -> var(--wg-gray)/var(--wg-white), a plain non-colliding retokenize.
+   .rv-badge-green/-red/-grey is a SEPARATE status-badge family (not
+   part of the track tags) -> var(--wg-success), var(--wg-error),
+   var(--wg-text-muted)/var(--wg-border) respectively.
+   .rv-sub-answer/-purple (a two-way "answer highlight" variant, green
+   vs purple) -> green stays var(--wg-success); purple (no brand token)
+   reassigned to var(--wg-info) (blue) as the "leftover distinct hue"
+   for the same reason established throughout this batch.
+   .rv-cost-pill-manual ("Wadhwani red" pill) -> var(--wg-error-bg)/
+   var(--wg-red). .rv-cost-pill-formula (labeled "navy" in the original
+   comment but was actually the same blue as .rv-tag-jf) ->
+   var(--wg-info-bg)/var(--wg-info-text)/var(--wg-info), consistent
+   with the rest of the file's blue usage rather than the comment's
+   navy label.
+   .clickable-file's Salesforce-standard link blue (#0176d3) ->
+   var(--wg-info); its hover darken (#001a4e) -> var(--wg-info-text),
+   staying within the same blue family instead of jumping to gray.
+   Translucent red overlays built from the old red's rgb
+   (rgba(200, 57, 29, x)) were recalculated to var(--wg-red)'s actual
+   rgb (rgba(191, 32, 38, x)). Plain black/white overlay rgba values
+   (shadows, the attestation gradient's white text/icon translucency,
+   the modal backdrop) were left as literal, unrelated to the brand
+   palette.
+   .rv-download-btn overrides `lightning-button`'s SLDS design-token
+   hooks directly (`--slds-c-button-brand-*`) rather than plain CSS,
+   so its background/border hooks were retokenized the same way and a
+   `--slds-c-button-radius-border: 0` hook was added so this real CTA
+   squares like every other button in this batch. `.rv-modal-close`
+   and `.rv-page-btn` are defined in this stylesheet but not actually
+   referenced anywhere in the current template (the modal markup that
+   would have used them was superseded by the newer Office-preview
+   modal) — left in place and retokenized/squared for when/if they're
+   wired up, since removing unused CSS isn't this batch's scope.
+   font-family: 'Salesforce Sans' -> var(--wg-font-body) on :host;
+   var(--wg-font-heading) added to genuine titles (.rv-section-title,
+   .rv-action-toolbar-title, .rv-modal-title, .rv-attest-title,
+   .rv-table-subhead) rather than every small label/badge in this
+   dense data-preview panel, matching how sparingly heading font was
+   applied on wcfApplicationList's similarly dense table view.
+   Sizes: this file's badge/tag/label scale runs well below the
+   defined tiers (9.5–11.5px) — all bumped to the smallest available
+   tier, var(--wg-font-size-caption), with inline comments; 13.5px and
+   16px bumped to their nearest tier (label, sub-heading); 22px (the
+   modal-close "×" glyph and page-btn arrows) bumped to
+   var(--wg-font-size-section-heading), its nearest tier. Font-weights
+   500/800 (no exact tier) mapped to regular/bold respectively, the
+   same nearest-tier policy used throughout this batch. No
+   ShowToastEvent usage was found in wcfFormPreview.js, so no
+   toast-banner work was needed for this file.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ══════════════════════════════════════════════════════
    WCF FORM PREVIEW — wcfFormPreview.css
    Wadhwani Foundation brand refresh
-   Primary:  #C8391D  (Wadhwani red/orange)
-   Dark:     #1B2A4A  (deep navy)
-   Light bg: #FDF6F4  (warm off-white tinted red)
-   Border:   #E8DDD9
+   Primary:  var(--wg-red)  (Wadhwani red/orange)
+   Dark:     var(--wg-gray)  (deep navy, unified to brand gray)
+   Light bg: var(--wg-error-bg)  (warm off-white tinted red)
+   Border:   var(--wg-border)
 
    UPDATED: Container-query based responsiveness so the
    preview panel is readable at ANY divider width —
@@ -15,10 +102,10 @@
     display    : block;
     width      : 100%;
     box-sizing : border-box;
-    background : #F7F3F2;
-    font-family: 'Salesforce Sans', Arial, sans-serif;
-    font-size  : 13px;
-    color      : #181818;
+    background : var(--wg-border);
+    font-family: var(--wg-font-body);
+    font-size  : var(--wg-font-size-label);
+    color      : var(--wg-gray);
     container-type: inline-size;   /* ← ADDED: enables width-based container queries */
 }
 
@@ -37,22 +124,22 @@
     gap          : 8px;
     margin       : 20px;
     padding      : 12px 16px;
-    background   : #fdecea;
-    border       : 1px solid #f5c6cb;
-    border-radius: 6px;
-    color        : #b71c1c;
-    font-size    : 13px;
+    background   : var(--wg-error-bg);
+    border       : 1px solid var(--wg-error);
+    border-radius: var(--wg-radius-sm);
+    color        : var(--wg-error);
+    font-size    : var(--wg-font-size-label);
 }
 
 /* ══ SECTION CARDS ═══════════════════════════════════ */
 
 .rv-section {
-    background   : #ffffff;
-    border       : 1px solid #E2D8D5;
-    border-radius: 8px;
+    background   : var(--wg-white);
+    border       : 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-md);
     margin       : 14px 16px;
     overflow     : hidden;
-    box-shadow   : 0 1px 4px rgba(200,57,29,0.06);
+    box-shadow   : 0 1px 4px rgba(191, 32, 38, 0.06);
 }
 
 .rv-section-head {
@@ -60,8 +147,8 @@
     align-items  : center;
     gap          : 10px;
     padding      : 12px 18px;
-    background   : #1B2A4A;
-    border-bottom: 3px solid #C8391D;
+    background   : var(--wg-gray);
+    border-bottom: 3px solid var(--wg-red);
     flex-wrap    : wrap;           /* ← ADDED: step+title wrap gracefully when narrow */
 }
 .rv-action-toolbar {
@@ -74,16 +161,17 @@
     gap              : 12px;
     padding          : 12px 16px;
     margin           : 0 16px 14px;
-    background       : #ffffff;
-    border           : 1px solid #E2D8D5;
-    border-radius    : 8px;
-    box-shadow       : 0 1px 4px rgba(200,57,29,0.08);
+    background       : var(--wg-white);
+    border           : 1px solid var(--wg-border);
+    border-radius    : var(--wg-radius-md);
+    box-shadow       : 0 1px 4px rgba(191, 32, 38, 0.08);
 }
 
 .rv-action-toolbar-title {
-    font-size  : 13px;
-    font-weight: 700;
-    color      : #1B2A4A;
+    font-family: var(--wg-font-heading);
+    font-size  : var(--wg-font-size-label);
+    font-weight: var(--wg-weight-bold);
+    color      : var(--wg-gray);
     letter-spacing: 0.2px;
 }
 
@@ -98,9 +186,24 @@
     width  : 20px;
 }
 
+/* Label must stay WHITE — the Experience Cloud theme overrides the brand
+   button text color to a dark default, so it's pinned explicitly via SLDS
+   styling hooks (old + new token names for compatibility), the same fix
+   already applied to wcfValidatorForm's .wcf-seal-btn. Without this the
+   background/border tokens below apply correctly but the label renders in
+   the theme's dark default instead of white. */
 .rv-download-btn {
-    --slds-c-button-brand-color-background: #C8391D;
-    --slds-c-button-brand-color-border: #C8391D;
+    --slds-c-button-brand-color-background : var(--wg-red);
+    --slds-c-button-brand-color-border     : var(--wg-red);
+    --slds-c-button-radius-border          : 0;
+    --slds-c-button-brand-text-color       : var(--wg-white);
+    --slds-c-button-brand-text-color-hover : var(--wg-white);
+    --slds-c-button-brand-text-color-active: var(--wg-white);
+    --sds-c-button-brand-text-color        : var(--wg-white);
+    --sds-c-button-brand-text-color-hover  : var(--wg-white);
+    --slds-c-button-text-color             : var(--wg-white);
+    --slds-c-button-text-color-hover       : var(--wg-white);
+    color: var(--wg-white);
 }
 
 /* Narrow panel: drop the title, let the button take the row */
@@ -110,18 +213,19 @@
     .rv-action-toolbar-actions { flex: 1; justify-content: flex-end; }
 }
 .rv-section-step {
-    font-size     : 10px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: .1em;
     white-space   : nowrap;
 }
 
 .rv-section-title {
-    font-size  : 13.5px;
-    font-weight: 700;
-    color      : #ffffff;
+    font-family: var(--wg-font-heading);
+    font-size  : var(--wg-font-size-label); /* was 13.5px, nearest tier */
+    font-weight: var(--wg-weight-bold);
+    color      : var(--wg-white);
 }
 
 /* ══ ROW LAYOUT ══════════════════════════════════════ */
@@ -129,7 +233,7 @@
 .rv-row {
     display      : flex;
     gap          : 0;
-    border-bottom: 1px solid #F0E8E6;
+    border-bottom: 1px solid var(--wg-border);
     align-items  : stretch;
     min-height   : 48px;
 }
@@ -145,15 +249,15 @@
     width      : 240px;          /* ← CHANGED: was 220px — long labels fit on one line */
     min-width  : 240px;
     padding    : 12px 14px 12px 16px;
-    background : #FDF6F4;
-    border-right: 2px solid #F0E0DC;
+    background : var(--wg-error-bg);
+    border-right: 2px solid var(--wg-border);
     box-sizing : border-box;
 }
 
 .rv-lbl-text {
-    font-size  : 12.5px;
-    font-weight: 600;
-    color      : #3e3e3c;
+    font-size  : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    font-weight: var(--wg-weight-semibold);
+    color      : var(--wg-gray);
     line-height: 1.45;
     flex       : 1;
     min-width  : 0;               /* ← ADDED: flex item can shrink inside the label cell */
@@ -165,8 +269,8 @@
     flex      : 1;
     min-width : 0;
     padding   : 12px 16px;
-    font-size : 13px;
-    color     : #181818;
+    font-size : var(--wg-font-size-label);
+    color     : var(--wg-gray);
     line-height: 1.55;
     overflow-wrap: break-word;   /* ← CHANGED: was word-break:break-word (caused char-by-char breaking) */
     overflow-x   : auto;         /* ← ADDED: wide tables scroll within the row instead of clipping */
@@ -174,8 +278,8 @@
 }
 
 .rv-val-bold {
-    font-weight: 500;
-    color      : #1B2A4A;
+    font-weight: var(--wg-weight-regular);
+    color      : var(--wg-gray);
 }
 
 /* ══ QUESTION NUMBER BADGE ═══════════════════════════ */
@@ -188,10 +292,10 @@
     height         : 24px;
     min-width      : 24px;
     border-radius  : 50%;
-    background     : #C8391D;
-    color          : #ffffff;
-    font-size      : 11px;
-    font-weight    : 800;
+    background     : var(--wg-red);
+    color          : var(--wg-white);
+    font-size      : var(--wg-font-size-caption);
+    font-weight    : var(--wg-weight-bold); /* was 800, nearest tier */
     flex-shrink    : 0;
     margin-top     : 1px;
 }
@@ -200,21 +304,21 @@
 
 .rv-opt-tag {
     display      : inline-block;
-    font-size    : 10px;
-    font-weight  : 600;
+    font-size    : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight  : var(--wg-weight-semibold);
     padding      : 1px 6px;
-    background   : #f4f4f4;
-    border       : 1px solid #dddbda;
+    background   : var(--wg-border);
+    border       : 1px solid var(--wg-border);
     border-radius: 10px;
-    color        : #706e6b;
+    color        : var(--wg-text-muted);
     vertical-align: middle;
     margin-left  : 4px;
 }
 
 .rv-tag {
     display      : inline-block;
-    font-size    : 9.5px;
-    font-weight  : 700;
+    font-size    : var(--wg-font-size-caption); /* was 9.5px, bumped to smallest tier */
+    font-weight  : var(--wg-weight-bold);
     padding      : 1px 6px;
     border-radius: 3px;
     vertical-align: middle;
@@ -222,11 +326,14 @@
     letter-spacing: 0.2px;
     white-space  : nowrap;
 }
-.rv-tag-jf   { background: #dbeafe; color: #1e40af; }
-.rv-tag-jc   { background: #fef3c7; color: #92400e; }
-.rv-tag-both { background: #d1fae5; color: #065f46; }
-.rv-tag-liv  { background: #f3e8ff; color: #6b21a8; }
-.rv-tag-navy { background: #1B2A4A; color: #ffffff; }
+.rv-tag-jf   { background: var(--wg-info-bg); color: var(--wg-info-text); }
+.rv-tag-jc   { background: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.rv-tag-both { background: var(--wg-success-bg); color: var(--wg-success); }
+/* No brand purple token — reassigned to the brand's orange accent
+   (unused elsewhere in this file, so no local collision), matching
+   this batch's "leftover distinct hue" convention. */
+.rv-tag-liv  { background: rgba(242, 103, 42, 0.15); color: var(--wg-orange); }
+.rv-tag-navy { background: var(--wg-gray); color: var(--wg-white); }
 
 .rv-track-badge-list {
     display  : flex;
@@ -235,9 +342,10 @@
 }
 
 .rv-table-subhead {
-    font-size     : 11.5px;
-    font-weight   : 700;
-    color         : #1B2A4A;
+    font-family: var(--wg-font-heading);
+    font-size     : var(--wg-font-size-caption); /* was 11.5px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-gray);
     margin-bottom : 6px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -245,9 +353,9 @@
 
 .rv-empty-note {
     font-style : italic;
-    color      : #706e6b;
+    color      : var(--wg-text-muted);
     padding    : 6px 0;
-    font-size  : 12px;
+    font-size  : var(--wg-font-size-caption);
 }
 
 /* ══ INFO GRID ═══════════════════════════════════════ */
@@ -264,35 +372,35 @@
 }
 
 .rv-info-label {
-    font-size     : 10px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.4px;
     margin-bottom : 2px;
 }
 
 .rv-info-value {
-    font-size  : 13px;
-    font-weight: 500;
-    color      : #1B2A4A;
+    font-size  : var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color      : var(--wg-gray);
     overflow-wrap: break-word;   /* ← ADDED: long emails/urls wrap at word level, never mid-character */
 }
 
 /* ══ RICH TEXT BOX ════════════════════════════════════ */
 
 .rv-rich-box {
-    background   : #FDF6F4;
-    border-radius: 5px;
+    background   : var(--wg-error-bg);
+    border-radius: var(--wg-radius-sm);
     padding      : 10px 12px;
-    border-left  : 3px solid #C8391D;
+    border-left  : 3px solid var(--wg-red);
     margin-top   : 10px;
 }
 
 .rv-rich-label {
-    font-size     : 10px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.4px;
     margin-bottom : 5px;
@@ -301,23 +409,23 @@
 /* ══ FUNDER BLOCKS ═══════════════════════════════════ */
 
 .rv-funder-block {
-    border       : 1px solid #E2D8D5;
-    border-radius: 6px;
+    border       : 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
     padding      : 11px 14px;
     margin-bottom: 8px;
-    background   : #fafaf8;
+    background   : var(--wg-border);
 }
 .rv-funder-block:last-child { margin-bottom: 0; }
 
 .rv-funder-header {
-    font-size     : 10.5px;
-    font-weight   : 800;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10.5px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold); /* was 800, nearest tier */
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: .06em;
     margin-bottom : 9px;
     padding-bottom: 6px;
-    border-bottom : 1px solid #E2D8D5;
+    border-bottom : 1px solid var(--wg-border);
 }
 
 .rv-funder-grid {
@@ -334,17 +442,17 @@
 }
 
 .rv-funder-label {
-    font-size     : 10px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
 .rv-funder-value {
-    font-size  : 13px;
-    font-weight: 500;
-    color      : #1B2A4A;
+    font-size  : var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color      : var(--wg-gray);
     overflow-wrap: break-word;   /* ← ADDED */
 }
 
@@ -354,40 +462,40 @@
     width          : 100%;
     min-width      : 420px;      /* ← ADDED: below this, .rv-val scrolls instead of crushing cells */
     border-collapse: collapse;
-    font-size      : 12.5px;
+    font-size      : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
 }
 
 .rv-table th {
-    background    : #1B2A4A;
-    color         : #ffffff;
+    background    : var(--wg-gray);
+    color         : var(--wg-white);
     padding       : 8px 11px;
-    font-size     : 11px;
-    font-weight   : 700;
+    font-size     : var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
     text-align    : left;
     white-space   : nowrap;
     letter-spacing: 0.2px;
 }
 
 .rv-table th:first-child {
-    border-left: 3px solid #C8391D;
+    border-left: 3px solid var(--wg-red);
 }
 
 .rv-table td {
     padding       : 8px 11px;
-    border-bottom : 1px solid #F0E8E6;
-    color         : #3e3e3c;
+    border-bottom : 1px solid var(--wg-border);
+    color         : var(--wg-gray);
     vertical-align: top;
     word-break    : normal;      /* ← ADDED: never break table cell words mid-character */
     overflow-wrap : normal;      /* ← ADDED */
 }
 .rv-table td:first-child {
-    font-weight : 600;
-    color       : #1B2A4A;
+    font-weight : var(--wg-weight-semibold);
+    color       : var(--wg-gray);
     border-left : 3px solid transparent;
 }
 .rv-table tbody tr:last-child td { border-bottom: none; }
-.rv-table tbody tr:nth-child(even) td { background: #FDF6F4; }
-.rv-table tbody tr:hover td { background: #FAF0EE; }
+.rv-table tbody tr:nth-child(even) td { background: var(--wg-error-bg); }
+.rv-table tbody tr:hover td { background: var(--wg-border); }
 
 /* ══ AVG COST DUAL ROWS ══════════════════════════════ */
 
@@ -395,27 +503,27 @@
 
 /* Manual row — Wadhwani red tint */
 .rv-cost-row-manual td {
-    background    : #FEF2EF !important;
-    border-bottom : 1px dashed #C8391D !important;
+    background    : var(--wg-error-bg) !important;
+    border-bottom : 1px dashed var(--wg-red) !important;
     padding-top   : 7px;
     padding-bottom: 7px;
 }
-.rv-cost-row-manual td:first-child { color: #C8391D; }
+.rv-cost-row-manual td:first-child { color: var(--wg-red); }
 
 /* Formula row — navy tint */
 .rv-cost-row-formula td {
-    background    : #EEF2F8 !important;
-    border-bottom : 1px solid #B8C8E0 !important;
+    background    : var(--wg-border) !important;
+    border-bottom : 1px solid var(--wg-border) !important;
     padding-top   : 7px;
     padding-bottom: 7px;
     font-style    : italic;
 }
-.rv-cost-row-formula td:first-child { color: #1B2A4A; }
+.rv-cost-row-formula td:first-child { color: var(--wg-gray); }
 
 .rv-cost-field-label {
     display      : block;
-    font-size    : 12.5px;
-    font-weight  : 600;
+    font-size    : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    font-weight  : var(--wg-weight-semibold);
     line-height  : 1.3;
     margin-bottom: 4px;
 }
@@ -424,8 +532,8 @@
     display       : inline-flex;
     align-items   : center;
     gap           : 4px;
-    font-size     : 9.5px;
-    font-weight   : 700;
+    font-size     : var(--wg-font-size-caption); /* was 9.5px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
     padding       : 2px 7px;
     border-radius : 10px;
     text-transform: uppercase;
@@ -443,38 +551,39 @@
 
 /* Manual pill — Wadhwani red */
 .rv-cost-pill-manual {
-    background: #FDDDD7;
-    color     : #C8391D;
-    border    : 1px solid #C8391D;
+    background: var(--wg-error-bg);
+    color     : var(--wg-red);
+    border    : 1px solid var(--wg-red);
 }
-.rv-cost-pill-manual .rv-cost-pill-dot { background: #C8391D; }
+.rv-cost-pill-manual .rv-cost-pill-dot { background: var(--wg-red); }
 
-/* Formula pill — navy */
+/* Formula pill — matches .rv-tag-jf's blue rather than the "navy"
+   label in the original comment, since the color used was always blue */
 .rv-cost-pill-formula {
-    background: #dbeafe;
-    color     : #1e40af;
-    border    : 1px solid #93c5fd;
+    background: var(--wg-info-bg);
+    color     : var(--wg-info-text);
+    border    : 1px solid var(--wg-info);
 }
-.rv-cost-pill-formula .rv-cost-pill-dot { background: #3b82f6; }
+.rv-cost-pill-formula .rv-cost-pill-dot { background: var(--wg-info); }
 
 /* ══ BADGES ══════════════════════════════════════════ */
 
 .rv-badge {
     display      : inline-block;
     padding      : 3px 11px;
-    border-radius: 4px;
-    font-size    : 12px;
-    font-weight  : 700;
+    border-radius: var(--wg-radius-sm);
+    font-size    : var(--wg-font-size-caption);
+    font-weight  : var(--wg-weight-bold);
 }
-.rv-badge-green { background: #d1fae5; color: #065f46; }
-.rv-badge-red   { background: #fee2e2; color: #991b1b; }
-.rv-badge-grey  { background: #f3f4f6; color: #6b7280; }
+.rv-badge-green { background: var(--wg-success-bg); color: var(--wg-success); }
+.rv-badge-red   { background: var(--wg-error-bg);   color: var(--wg-error); }
+.rv-badge-grey  { background: var(--wg-border);     color: var(--wg-text-muted); }
 
 /* ══ SUB-QUESTION ════════════════════════════════════ */
 
 .rv-sub-question {
     margin-top   : 14px;
-    border-top   : 1px dashed #E2D8D5;
+    border-top   : 1px dashed var(--wg-border);
     padding-top  : 12px;
 }
 
@@ -482,9 +591,9 @@
     display      : flex;
     align-items  : center;
     gap          : 8px;
-    font-size    : 12px;
-    font-weight  : 600;
-    color        : #3e3e3c;
+    font-size    : var(--wg-font-size-caption);
+    font-weight  : var(--wg-weight-semibold);
+    color        : var(--wg-gray);
     margin-bottom: 8px;
     flex-wrap    : wrap;         /* ← ADDED */
 }
@@ -494,10 +603,10 @@
     align-items    : center;
     justify-content: center;
     padding        : 1px 7px;
-    background     : #C8391D;
-    color          : #ffffff;
-    font-size      : 10px;
-    font-weight    : 800;
+    background     : var(--wg-red);
+    color          : var(--wg-white);
+    font-size      : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight    : var(--wg-weight-bold); /* was 800, nearest tier */
     border-radius  : 3px;
     white-space    : nowrap;
 }
@@ -508,30 +617,33 @@
 
 .rv-sub-answer {
     margin-top   : 10px;
-    background   : #f0fdf4;
-    border-radius: 6px;
+    background   : var(--wg-success-bg);
+    border-radius: var(--wg-radius-sm);
     padding      : 10px 14px;
-    border-left  : 3px solid #10b981;
+    border-left  : 3px solid var(--wg-success);
 }
 
+/* No brand purple token — reassigned to var(--wg-info) as the
+   "leftover distinct hue" for this two-way (green/purple) variant,
+   same policy as .rv-tag-liv above. */
 .rv-sub-answer-purple {
-    background : #f5f0ff;
-    border-left: 3px solid #7c3aed;
+    background : var(--wg-info-bg);
+    border-left: 3px solid var(--wg-info);
 }
 
 .rv-sub-answer-header {
-    font-size     : 10.5px;
-    font-weight   : 800;
-    color         : #065f46;
+    font-size     : var(--wg-font-size-caption); /* was 10.5px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold); /* was 800, nearest tier */
+    color         : var(--wg-success);
     text-transform: uppercase;
     letter-spacing: .8px;
     margin-bottom : 5px;
 }
-.rv-sub-answer-purple .rv-sub-answer-header { color: #7c3aed; }
+.rv-sub-answer-purple .rv-sub-answer-header { color: var(--wg-info); }
 
 .rv-sub-answer-body {
-    font-size  : 13px;
-    color      : #2d2d4e;
+    font-size  : var(--wg-font-size-label);
+    color      : var(--wg-gray);
     line-height: 1.6;
 }
 
@@ -543,16 +655,16 @@
     gap          : 10px;
     margin-top   : 10px;
     padding      : 8px 12px;
-    background   : #FDF6F4;
-    border       : 1px solid #E2D8D5;
-    border-radius: 5px;
+    background   : var(--wg-error-bg);
+    border       : 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
     flex-wrap    : wrap;
 }
 
 .rv-doc-label {
-    font-size     : 10.5px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 10.5px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     white-space   : nowrap;
@@ -561,8 +673,8 @@
 .rv-doc-name {
     flex      : 1 1 150px;       /* ← CHANGED: minimum basis so name never squeezes to 1 char per line */
     min-width : 140px;           /* ← ADDED: below this it wraps to its own full-width line */
-    font-size : 12.5px;
-    color     : #1B2A4A;
+    font-size : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    color     : var(--wg-gray);
     overflow-wrap: anywhere;     /* ← CHANGED: was word-break:break-all (caused vertical letter stack) */
 }
 
@@ -576,9 +688,9 @@
     flex-wrap    : wrap;         /* ← ADDED */
 }
 .rv-genie-label {
-    font-size     : 11px;
-    font-weight   : 700;
-    color         : #C8391D;
+    font-size     : var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.4px;
 }
@@ -586,7 +698,7 @@
 /* ══ ATTESTATION ═════════════════════════════════════ */
 
 .rv-attestation {
-    background   : linear-gradient(135deg, #C8391D 0%, #1B2A4A 100%) !important;
+    background   : linear-gradient(135deg, var(--wg-red) 0%, var(--wg-gray) 100%) !important;
     border       : none !important;
     margin-bottom: 24px !important;
 }
@@ -605,16 +717,17 @@
     display        : flex;
     align-items    : center;
     justify-content: center;
-    font-size      : 16px;
-    color          : #fff;
-    font-weight    : 700;
+    font-size      : var(--wg-font-size-sub-heading); /* was 16px, nearest tier */
+    color          : var(--wg-white);
+    font-weight    : var(--wg-weight-bold);
     flex-shrink    : 0;
 }
 .rv-attest-content { flex: 1; min-width: 0; }   /* ← ADDED min-width:0 */
 .rv-attest-title {
-    font-size    : 14px;
-    font-weight  : 700;
-    color        : #fff;
+    font-family: var(--wg-font-heading);
+    font-size    : var(--wg-font-size-body);
+    font-weight  : var(--wg-weight-bold);
+    color        : var(--wg-white);
     margin-bottom: 12px;
 }
 .rv-attest-grid {
@@ -623,17 +736,17 @@
     gap                  : 10px 20px;
 }
 .rv-attest-cell-label {
-    font-size     : 10px;
-    font-weight   : 700;
+    font-size     : var(--wg-font-size-caption); /* was 10px, bumped to smallest tier */
+    font-weight   : var(--wg-weight-bold);
     color         : rgba(255,255,255,0.6);
     text-transform: uppercase;
     letter-spacing: 0.4px;
     margin-bottom : 3px;
 }
 .rv-attest-cell-value {
-    font-size  : 13px;
-    font-weight: 600;
-    color      : #fff;
+    font-size  : var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color      : var(--wg-white);
     overflow-wrap: break-word;   /* ← ADDED */
 }
 .rv-attest-date { font-style: italic; color: rgba(255,255,255,0.75) !important; }
@@ -654,8 +767,8 @@
 }
 .rv-modal-container {
     position      : relative;
-    background    : #fff;
-    border-radius : 10px;
+    background    : var(--wg-white);
+    border-radius : var(--wg-radius-card);
     width         : 82vw;
     height        : 88vh;
     display       : flex;
@@ -669,15 +782,16 @@
     align-items    : center;
     justify-content: space-between;
     padding        : 12px 20px;
-    background     : #1B2A4A;
-    color          : #fff;
+    background     : var(--wg-gray);
+    color          : var(--wg-white);
     flex-shrink    : 0;
     min-height     : 48px;
-    border-bottom  : 3px solid #C8391D;
+    border-bottom  : 3px solid var(--wg-red);
 }
 .rv-modal-title {
-    font-size    : 14px;
-    font-weight  : 600;
+    font-family: var(--wg-font-heading);
+    font-size    : var(--wg-font-size-body);
+    font-weight  : var(--wg-weight-semibold);
     white-space  : nowrap;
     overflow     : hidden;
     text-overflow: ellipsis;
@@ -687,21 +801,21 @@
 .rv-modal-close {
     background   : transparent;
     border       : none;
-    color        : #fff;
-    font-size    : 22px;
+    color        : var(--wg-white);
+    font-size    : var(--wg-font-size-section-heading); /* was 22px, nearest tier */
     cursor       : pointer;
     line-height  : 1;
     padding      : 2px 6px;
-    border-radius: 4px;
+    border-radius: 0;
 }
-.rv-modal-close:hover { background: rgba(200,57,29,0.4); }
+.rv-modal-close:hover { background: rgba(191, 32, 38, 0.4); }
 
 .rv-modal-body {
     flex      : 1;
     overflow  : hidden;
     display   : flex;
     align-items: stretch;
-    background: #525659;
+    background: var(--wg-gray);
 }
 .rv-modal-iframe {
     width     : 100%;
@@ -709,22 +823,22 @@
     border    : none;
     flex      : 1;
     display   : block;
-    background: #fff;
+    background: var(--wg-white);
 }
 
 .rv-page-btn {
     background   : rgba(255,255,255,0.2);
     border       : none;
-    color        : #fff;
-    font-size    : 22px;
+    color        : var(--wg-white);
+    font-size    : var(--wg-font-size-section-heading); /* was 22px, nearest tier */
     width        : 32px;
     height       : 32px;
-    border-radius: 4px;
+    border-radius: 0;
     cursor       : pointer;
     line-height  : 1;
 }
 .rv-page-btn:disabled { opacity: 0.3; cursor: default; }
-.rv-page-info { font-size: 13px; color: #fff; white-space: nowrap; }
+.rv-page-info { font-size: var(--wg-font-size-label); color: var(--wg-white); white-space: nowrap; }
 
 /* ══════════════════════════════════════════════════════
    CONTAINER-RESPONSIVE LAYOUT
@@ -750,7 +864,7 @@
         width        : 100%;
         min-width    : 100%;
         border-right : none;
-        border-bottom: 2px solid #F0E0DC;
+        border-bottom: 2px solid var(--wg-border);
         padding      : 10px 16px;
     }
 
@@ -766,8 +880,8 @@
 /* Panel very narrow → compact everything further */
 @container (max-width: 420px) {
     .rv-attest-grid { grid-template-columns: 1fr; }
-    .rv-cost-pill   { font-size: 8.5px; padding: 2px 5px; }
-    .rv-table       { min-width: 360px; font-size: 11.5px; }
+    .rv-cost-pill   { font-size: var(--wg-font-size-caption); padding: 2px 5px; }
+    .rv-table       { min-width: 360px; font-size: var(--wg-font-size-caption); }
     .rv-table th,
     .rv-table td    { padding: 6px 8px; }
     .rv-section     { margin: 8px 4px; }
@@ -782,22 +896,22 @@
     .rv-attest-grid { grid-template-columns: 1fr 1fr; }
     .rv-funder-grid { grid-template-columns: 1fr; }
     .rv-section     { margin: 10px 6px; }
-    .rv-cost-pill   { font-size: 8.5px; padding: 2px 5px; }
+    .rv-cost-pill   { font-size: var(--wg-font-size-caption); padding: 2px 5px; }
 }
 
 .clickable-file {
     cursor: pointer;
-    color: #0176d3;
+    color: var(--wg-info);
     text-decoration: underline;
 }
 .clickable-file:hover {
-    color: #001a4e;
+    color: var(--wg-info-text);
 }
 /* wcfFormPreview.css */
 .office-preview-body {
     max-height: 70vh;
     overflow: auto;
-    font-size: 13px;
+    font-size: var(--wg-font-size-label);
     line-height: 1.5;
     padding: 8px;
 }
@@ -805,28 +919,28 @@
     border-collapse: collapse;
     width: 100%;
     margin-bottom: 16px;
-    font-size: 12.5px;
-    background: #ffffff;
+    font-size: var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    background: var(--wg-white);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .office-preview-body table th {
-    background-color: #f1f5f9;
-    color: #1e293b;
-    font-weight: 700;
-    border: 1px solid #cbd5e1;
+    background-color: var(--wg-border);
+    color: var(--wg-gray);
+    font-weight: var(--wg-weight-bold);
+    border: 1px solid var(--wg-border);
     padding: 8px 12px;
     text-align: left;
 }
 .office-preview-body table td {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--wg-border);
     padding: 6px 10px;
-    color: #334155;
+    color: var(--wg-gray);
 }
 .office-preview-body table tr:nth-child(even) {
-    background-color: #f8fafc;
+    background-color: var(--wg-border);
 }
 .office-preview-body table tr:hover {
-    background-color: #f1f5f9;
+    background-color: var(--wg-border);
 }
 .office-preview-body img {
     max-width: 100%;

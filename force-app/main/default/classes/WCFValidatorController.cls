@@ -684,8 +684,6 @@ public without sharing class WCFValidatorController {
                 if (arFields.containsKey(fName)) review.put(fName, txt);
             }
 
-            upsert as system review;
-
             if (status == 'Validated' && appId != null) {
                 IndividualApplication app = new IndividualApplication(Id = appId);
 
@@ -694,6 +692,7 @@ public without sharing class WCFValidatorController {
                 } else if (decision == 'Return') {
                     app.Status = 'Revision Requested';
                 }
+                app.WG_Validator_Name__c = UserInfo.getName();
 
                 update as system app;
             } else if (status == 'Draft' && appId != null) {
@@ -705,10 +704,14 @@ public without sharing class WCFValidatorController {
                 };
                 if (entryStatuses.contains(currentApp.Status)) {
                     update as system new IndividualApplication(
-                        Id = appId, Status = 'Under Validation'
+                        Id = appId,
+                        Status = 'Under Validation',
+                        WG_Validator_Name__c = UserInfo.getName()
                     );
                 }
             }
+
+            upsert as system review;
 
             return review.Id;
 

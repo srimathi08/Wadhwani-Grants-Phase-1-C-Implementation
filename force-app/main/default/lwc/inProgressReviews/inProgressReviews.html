@@ -1,0 +1,32 @@
+<template>
+    <lightning-card title="In Progress Reviews" icon-name="utility:edit">
+
+        <!-- Data Table -->
+        <lightning-datatable
+            key-field="reviewId"
+            data={data}
+            columns={columns}
+            hide-checkbox-column
+            wrap-text-max-lines="3"
+            onrowaction={handleRowAction}>
+        </lightning-datatable>
+
+        <!-- Error Message -->
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-p-around_medium">
+                Unable to load in-progress reviews.
+            </div>
+        </template>
+
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="small">
+                </lightning-spinner>
+            </div>
+        </template>
+
+    </lightning-card>
+</template>

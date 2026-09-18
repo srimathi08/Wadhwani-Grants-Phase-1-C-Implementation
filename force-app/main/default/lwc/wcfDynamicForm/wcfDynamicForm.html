@@ -1,5 +1,53 @@
 <template>
-    <div class="slds-p-around_medium centered-form-container">
+    <div class="slds-p-around_medium centered-form-container wg-full-width">
+
+        <!-- ══ IN-COMPONENT TOAST BANNER (replaces native ShowToastEvent) ══
+             Reuses commonStyleTheme's .error-banner/.warning-banner/
+             .success-banner/.info-banner styling so notifications match
+             brand tokens; the native SLDS toast this replaces couldn't be
+             restyled since it renders outside this component's shadow
+             tree. Driven by showBanner()/closeBanner() in the .js. -->
+        <template if:true={bannerVisible}>
+            <div class={bannerClass} role="alert" aria-live="assertive">
+                <template if:true={isBannerError}>
+                    <svg class="error-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <line x1="12" y1="8" x2="12" y2="13"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </template>
+                <template if:true={isBannerWarning}>
+                    <svg class="warning-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3 L22 20 L2 20 Z"></path>
+                        <line x1="12" y1="9" x2="12" y2="14"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </template>
+                <template if:true={isBannerSuccess}>
+                    <svg class="success-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <polyline points="8 12.5 11 15.5 16 9"></polyline>
+                    </svg>
+                </template>
+                <template if:true={isBannerInfo}>
+                    <svg class="info-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <line x1="12" y1="11" x2="12" y2="16"></line>
+                        <line x1="12" y1="7.5" x2="12.01" y2="7.5"></line>
+                    </svg>
+                </template>
+                <div class="wg-toast-body">
+                    <span class="wg-toast-title">{bannerTitle}</span>
+                    <span>{bannerMessage}</span>
+                </div>
+                <button type="button" class="wg-toast-close" onclick={closeBanner} aria-label="Dismiss notification">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                        <line x1="6" y1="18" x2="18" y2="6"></line>
+                    </svg>
+                </button>
+            </div>
+        </template>
 
         <!-- ══ LOADING OVERLAY ══ -->
         <template if:true={isLoading}>
@@ -57,7 +105,7 @@
                         <!-- Blue Info Callout -->
                         <div class="blue-info-callout">
                             <span class="info-icon">ⓘ</span>
-                            <span>Not sure which of these fit your work? <a href="javascript:void(0);" onclick={scrollToFaq} style="color: #003f73; font-weight: 600; text-decoration: underline; cursor: pointer;">Read what each track means.</a></span>
+                            <span>Not sure which of these fit your work? <a href="javascript:void(0);" onclick={scrollToFaq} style="color: var(--wg-info-text); font-weight: 600; text-decoration: underline; cursor: pointer;">Read what each track means.</a></span>
                         </div>
 
                         <div class="next-btn-row">
@@ -180,7 +228,7 @@
 
                     <!-- Action Bar -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <span class="section-step" style="font-weight: 700; color: #990000; letter-spacing: 0.05em; font-size: 0.85rem;">{currentTabSubTitle}</span>
+                        <span class="section-step" style="font-weight: 700; color: var(--wg-red); letter-spacing: 0.05em; font-size: 0.85rem;">{currentTabSubTitle}</span>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn-secondary-outline" onclick={handleBackToTrackSelection}>Change Tracks</button>
                         </div>
@@ -239,7 +287,7 @@
                                                 autocomplete="off"
                                                 required>
                                             </lightning-input>
-                                            <p class="field-sub-instruction" style="font-size: 11px; color: #706e6b; margin-top: 2px;">
+                                            <p class="field-sub-instruction" style="font-size: 11px; color: var(--wg-text-muted); margin-top: 2px;">
                                                 e.g., "Chennai, India"
                                             </p>
 
@@ -273,7 +321,7 @@
 
                                     <!-- Primary Service Regions (Full Width) -->
                                     <div class="modern-field full-width">
-                                        <div class="field-helper" style="font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 4px;">
+                                        <div class="field-helper" style="font-size: 0.8125rem; font-weight: 600; color: var(--wg-text-muted); margin-bottom: 4px;">
                                             {labels.Q2_PRIMARY_REGIONS}
                                             <span class="required">*</span>
                                         </div>
@@ -313,7 +361,7 @@
 
                                     <!-- Leader Tenure (Optional) -->
                                     <div class="modern-field optional-field">
-                                        <div class="subsection-title" style="font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 2px;">{labels.Q2_LEADER_TENURE}</div>
+                                        <div class="subsection-title" style="font-size: 0.8125rem; font-weight: 600; color: var(--wg-text-muted); margin-bottom: 2px;">{labels.Q2_LEADER_TENURE}</div>
                                         <lightning-input
                                             type="number"
                                             label="Number of years your current named leader has held their role. Round to the nearest year."
@@ -406,7 +454,7 @@
                                                 {labels.Q3_PHONE}
                                             </label>
                                             <div class="slds-form-element__control">
-                                                <div class={phoneFieldWrapperClass} style="pointer-events: none; background-color: #f3f3f3; cursor: not-allowed;">
+                                                <div class={phoneFieldWrapperClass} style="pointer-events: none; background-color: var(--wg-border); cursor: not-allowed;">
                                                     <input
                                                         id="phoneNumberInput"
                                                         data-id="phone"
@@ -442,7 +490,7 @@
                                                     data-key="Work_Email_ID__c"
                                                     type="email"
                                                     class="wcf-native-input"
-                                                    style="background-color: #f3f3f3; cursor: not-allowed;"
+                                                    style="background-color: var(--wg-border); cursor: not-allowed;"
                                                     value={formValues.Work_Email_ID__c}
                                                     disabled
                                                     readonly
@@ -556,7 +604,7 @@
 
                                     <!-- Incorporation Date -->
                                     <div class="modern-field">
-                                        <label class="date-field-label" style="display: block; font-size: 0.8125rem; font-weight: 600; color: #3e3e3c; margin-bottom: 4px;">
+                                        <label class="date-field-label" style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--wg-text-muted); margin-bottom: 4px;">
                                             {labels.Q4_INCORP_DATE}
                                             <span class="required">*</span>
                                         </label>
@@ -632,11 +680,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Legal_Structure__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Legal_Structure__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isLegalStructureOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {legalStructureError}
                                         </div>
                                     </template>
@@ -879,7 +927,7 @@
                                     <div class="mockup-inner-card" style="margin-top: 16px;">
                                         <div class="mockup-inner-top">
                                             <div class="mockup-inner-label">FUNDER 2</div>
-                                            <div class="mockup-remove" style="color: #c23934; cursor: pointer; font-weight: 600;" onclick={handleRemoveFunder2}>✕ Remove</div>
+                                            <div class="mockup-remove" style="color: var(--wg-error); cursor: pointer; font-weight: 600;" onclick={handleRemoveFunder2}>✕ Remove</div>
                                         </div>
                                         <div class="mockup-grid-two">
                                             <lightning-input
@@ -949,7 +997,7 @@
                                     <div class="mockup-inner-card" style="margin-top: 16px;">
                                         <div class="mockup-inner-top">
                                             <div class="mockup-inner-label">FUNDER 3</div>
-                                            <div class="mockup-remove" style="color: #c23934; cursor: pointer; font-weight: 600;" onclick={handleRemoveFunder3}>✕ Remove</div>
+                                            <div class="mockup-remove" style="color: var(--wg-error); cursor: pointer; font-weight: 600;" onclick={handleRemoveFunder3}>✕ Remove</div>
                                         </div>
                                         <div class="mockup-grid-two">
                                             <lightning-input
@@ -1023,7 +1071,7 @@
                                         disabled={isFunderLimitReached}>
                                         + Add funder
                                     </button>
-                                    <span style="font-size: 0.82rem; color: #666;">You may add up to 3 funders.</span>
+                                    <span style="font-size: 0.82rem; color: var(--wg-text-muted);">You may add up to 3 funders.</span>
                                 </div>
                             </div>
 
@@ -1039,7 +1087,7 @@
                                         <div class="mockup-optional-description">
                                             {labels.Q8_REFERENCES_DESC}
                                         </div>
-                                        <div style="font-size: 0.82rem; color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 4px; padding: 6px 10px; margin-top: 8px;">
+                                        <div style="font-size: 0.82rem; color: var(--wg-warning-text); background-color: var(--wg-warning-bg); border: 1px solid var(--wg-warning); border-radius: 4px; padding: 6px 10px; margin-top: 8px;">
                                             <strong>Consent:</strong> these contacts may be approached by Wadhwani Grants during evaluation.
                                         </div>
                                     </div>
@@ -1081,7 +1129,7 @@
                                     <div class="mockup-inner-card" style="margin-top: 16px;">
                                         <div class="mockup-inner-top">
                                             <div class="mockup-inner-label">REFERENCE 2</div>
-                                            <div class="mockup-remove" style="color: #c23934; cursor: pointer; font-weight: 600;" onclick={handleRemoveReference2}>✕ Remove</div>
+                                            <div class="mockup-remove" style="color: var(--wg-error); cursor: pointer; font-weight: 600;" onclick={handleRemoveReference2}>✕ Remove</div>
                                         </div>
                                         <div class="mockup-grid-three">
                                             <lightning-input
@@ -1119,7 +1167,7 @@
                                         disabled={isReferenceLimitReached}>
                                         + Add reference
                                     </button>
-                                    <span style="font-size: 0.82rem; color: #666;">You may add up to 2 references.</span>
+                                    <span style="font-size: 0.82rem; color: var(--wg-text-muted);">You may add up to 2 references.</span>
                                 </div>
                             </div>
 
@@ -1283,11 +1331,11 @@
                                             onpaste={handlePaste}
                                             onkeydown={handleKeyDown}>
                                         </div>
-                                        <p class="error-msg" data-error="Revenue_Explanation__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                        <p class="error-msg" data-error="Revenue_Explanation__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                         <!-- Footer with AI Feedback button & Word Counter -->
                                         <template if:true={isDeviationExplanationOverLimit}>
-                                            <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                            <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                                 ⚠️ {deviationExplanationError}
                                             </div>
                                         </template>
@@ -1381,11 +1429,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Skilling_Approach__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Skilling_Approach__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isSkillingApproachOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {skillingApproachError}
                                         </div>
                                     </template>
@@ -1663,11 +1711,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Job_Creation_Approach__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Job_Creation_Approach__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isJobCreationApproachOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {jobCreationApproachError}
                                         </div>
                                     </template>
@@ -1697,11 +1745,11 @@
                                 </div>
 
                                 <template for:each={businessSectorRowsIndexed} for:item="sec">
-                                    <div key={sec.id} class="domain-card sector-card" style="border: 1px dashed #d0c8e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #faf8ff;">
+                                    <div key={sec.id} class="domain-card sector-card" style="border: 1px dashed var(--wg-input-border); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #faf8ff;">
                                         <div class="domain-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                                            <span class="domain-card-label" style="font-weight: 700; color: #8A1C1C; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">SECTOR {sec.displayIdx}</span>
+                                            <span class="domain-card-label" style="font-weight: 700; color: var(--wg-red); font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">SECTOR {sec.displayIdx}</span>
                                             <template if:true={canRemoveSectorRow}>
-                                                <button type="button" class="domain-remove-btn" style="background: none; border: none; color: #c23934; font-weight: 600; cursor: pointer; font-size: 0.85rem;" data-id={sec.id} onclick={handleRemoveBusinessSectorRow}>
+                                                <button type="button" class="domain-remove-btn" style="background: none; border: none; color: var(--wg-error); font-weight: 600; cursor: pointer; font-size: 0.85rem;" data-id={sec.id} onclick={handleRemoveBusinessSectorRow}>
                                                     ✕ Remove
                                                 </button>
                                             </template>
@@ -1981,11 +2029,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Livelihood_Approach__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Livelihood_Approach__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isLivelihoodApproachOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {livelihoodApproachError}
                                         </div>
                                     </template>
@@ -2128,7 +2176,7 @@
                                     <div class="modern-subsection-number">{qNum.Q22}</div>
                                     <div>
                                         <div class="modern-subsection-title">{labels.Q22_LIVELIHOOD_ACTUALS}</div>
-                                        <div class="modern-subsection-description" style="line-height: 1.5; color: #4a4a4a;">
+                                        <div class="modern-subsection-description" style="line-height: 1.5; color: var(--wg-text-muted);">
                                             <p style="margin-bottom: 8px;">A household counts as an outcome when both of these are true:</p>
                                             <ol style="margin-left: 20px; margin-bottom: 8px; list-style-type: decimal;">
                                                 <li>Its yearly income is now Rs 1,00,000 or more.</li>
@@ -2352,7 +2400,7 @@
                                                     onuploadfinished={handleQ24UploadFinished}>
                                                 </lightning-file-upload>
                                             </div>
-                                            <p class="error-msg" data-error="q24Upload" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                            <p class="error-msg" data-error="q24Upload" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
                                             <template if:true={q24UploadedFiles.length}>
                                                 <div class="uploaded-files-list">
                                                     <template for:each={q24UploadedFiles} for:item="f">
@@ -2404,11 +2452,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Organizational_Sustainability__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Organizational_Sustainability__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isSustainabilityOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {sustainabilityError}
                                         </div>
                                     </template>
@@ -2456,11 +2504,11 @@
                                         onpaste={handlePaste}
                                         onkeydown={handleKeyDown}>
                                     </div>
-                                    <p class="error-msg" data-error="Use_of_Additional_Funding__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                    <p class="error-msg" data-error="Use_of_Additional_Funding__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
 
                                     <!-- Footer with AI Feedback button & Word Counter -->
                                     <template if:true={isUseOfFundingOverLimit}>
-                                        <div class="field-error-message" style="color: #c23934; font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
+                                        <div class="field-error-message" style="color: var(--wg-error); font-size: 0.8125rem; font-weight: 600; margin-top: 6px;">
                                             ⚠️ {useOfFundingError}
                                         </div>
                                     </template>
@@ -2495,12 +2543,12 @@
                                 </div>
 
                                 <div style="margin-top: 14px; margin-bottom: 16px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.85rem;">
-                                    <a href="https://www.youtube.com/watch?v=B8Glesyhvgw" target="_blank" rel="noopener noreferrer" style="color: #0176d3; text-decoration: underline; font-weight: 600;">GenieAI for Entrepreneurship – Overview Video</a>
-                                    <a href="https://www.youtube.com/watch?v=RwePgeR98oc" target="_blank" rel="noopener noreferrer" style="color: #0176d3; text-decoration: underline; font-weight: 600;">GenieAI Skilling Platform – Product Demo</a>
+                                    <a href="https://www.youtube.com/watch?v=B8Glesyhvgw" target="_blank" rel="noopener noreferrer" style="color: var(--wg-orange); text-decoration: underline; font-weight: 600;">GenieAI for Entrepreneurship – Overview Video</a>
+                                    <a href="https://www.youtube.com/watch?v=RwePgeR98oc" target="_blank" rel="noopener noreferrer" style="color: var(--wg-orange); text-decoration: underline; font-weight: 600;">GenieAI Skilling Platform – Product Demo</a>
                                 </div>
 
                                 <div class="modern-field" style="max-width: 400px; margin-top: 12px;">
-                                    <div style="font-size: 0.8125rem; color: #666; margin-bottom: 4px;">Interest level (Optional)</div>
+                                    <div style="font-size: 0.8125rem; color: var(--wg-text-muted); margin-bottom: 4px;">Interest level (Optional)</div>
                                     <lightning-combobox
                                         label="Interest Level"
                                         value={formValues.GenieAI_Interest_Level__c}
@@ -2520,7 +2568,7 @@
                                             data-id="Operational_Synergies_with_WOF__c"
                                             data-key="Operational_Synergies_with_WOF__c">
                                         </lightning-textarea>
-                                        <p class="error-msg" data-error="Operational_Synergies_with_WOF__c" style="display: none; color: #c23934; font-size: 12px; margin-top: 4px;"></p>
+                                        <p class="error-msg" data-error="Operational_Synergies_with_WOF__c" style="display: none; color: var(--wg-error); font-size: var(--wg-font-size-caption); margin-top: 4px;"></p>
                                     </div>
                                 </template>
                             </div>
@@ -3499,13 +3547,19 @@
                     <div class="form-footer-bar">
                         <div>
                             <template if:false={isFirstTab}>
-                                <button class="btn-secondary-grey" onclick={handlePrevTab}>← Previous Tab</button>
+                                <button class="btn-secondary-grey" onclick={handlePrevTab}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg>
+                                    Previous
+                                </button>
                             </template>
                         </div>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn-save-draft" onclick={handleSaveDraft}>Save Draft</button>
                             <template if:false={isLastTab}>
-                                <button class="btn-primary-red" onclick={handleNextTab}>Next Tab →</button>
+                                <button class="btn-primary-red btn-tab-next" onclick={handleNextTab}>
+                                    Next
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                                </button>
                             </template>
                         </div>
                     </div>
@@ -3515,16 +3569,16 @@
         <!-- ══ AI FEEDBACK MODAL ══ -->
         <template if:true={isAIModalOpen}>
             <section role="dialog" tabindex="-1" class="ai-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-                <div class="ai-modal-container" style="background: #fff; width: 90%; max-width: 550px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                    <div class="ai-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
-                        <h2 class="ai-modal-title" style="font-size: 1.15rem; font-weight: 700; color: #1e1e1e; margin: 0;">✨ {aiModalTitle}</h2>
-                        <button type="button" class="ai-close-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888;" onclick={closeAIModal}>✕</button>
+                <div class="ai-modal-container" style="background: var(--wg-white); width: 90%; max-width: 550px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <div class="ai-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--wg-border); padding-bottom: 12px;">
+                        <h2 class="ai-modal-title" style="font-size: 1.15rem; font-weight: 700; color: var(--wg-gray); margin: 0;">✨ {aiModalTitle}</h2>
+                        <button type="button" class="ai-close-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--wg-text-muted);" onclick={closeAIModal}>✕</button>
                     </div>
                     <div class="ai-modal-body" style="max-height: 400px; overflow-y: auto;">
                         <template if:true={isAiLoading}>
                             <div class="ai-loading-container" style="text-align: center; padding: 30px 0;">
                                 <lightning-spinner alternative-text="Generating AI Feedback" size="medium"></lightning-spinner>
-                                <p style="margin-top: 16px; font-size: 0.9rem; color: #666;">Generating AI feedback...</p>
+                                <p style="margin-top: 16px; font-size: 0.9rem; color: var(--wg-text-muted);">Generating AI feedback...</p>
                             </div>
                         </template>
                         <template if:false={isAiLoading}>
@@ -3532,10 +3586,10 @@
                                 <template if:true={formattedAiSections}>
                                     <template for:each={formattedAiSections} for:item="section">
                                         <div key={section.title} class="ai-section" style="margin-bottom: 16px;">
-                                            <div class="ai-section-title" style="font-weight: 700; font-size: 0.85rem; color: #706e6b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                                            <div class="ai-section-title" style="font-weight: 700; font-size: 0.85rem; color: var(--wg-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
                                                 {section.title}
                                             </div>
-                                            <ul class="ai-points" style="margin: 0; padding-left: 18px; color: #2d3748; font-size: 0.9rem; line-height: 1.5;">
+                                            <ul class="ai-points" style="margin: 0; padding-left: 18px; color: var(--wg-text-muted); font-size: 0.9rem; line-height: 1.5;">
                                                 <template for:each={section.points} for:item="point">
                                                     <li key={point} style="margin-bottom: 4px;">
                                                         <lightning-formatted-rich-text value={point}></lightning-formatted-rich-text>

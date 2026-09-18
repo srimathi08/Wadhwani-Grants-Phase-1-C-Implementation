@@ -1,3 +1,79 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   This file used its own navy/red identity (#1e3a5f navy, #c0392b red)
+   — a different exact hex than wcfPortalHeader/wcfApproverContainer's
+   navy+gold+red trio, but the same two semantic roles — mapped the
+   same way for cross-app consistency: navy -> var(--wg-gray), red ->
+   var(--wg-red). The darker hover shades (#163055 navy-hover, #a93226
+   red-hover, and the near-black #1a2130 used for body text) had no
+   dedicated darker-gray token to alias to, so navy-hover/#1a2130 both
+   fold into var(--wg-gray) (this batch's established fallback when no
+   separate "deep" variant exists) and red-hover uses var(--wg-red-deep).
+   Status colors: green (#065f46/#047857/#16a34a/#6ee7b7/#ecfdf5/
+   #d1fae5) -> var(--wg-success) family; amber/flag (#f59e0b/#d97706/
+   #92400e/#fffbeb/#fde68a) -> var(--wg-warning) family; blue
+   (#1a56c4/#e8f0fe/#c7d9fb, used for the RFI badge AND the Return
+   notice's highlighted section) -> var(--wg-info) family.
+   FIX (real bug found while recoloring, not caused by these edits):
+   this component already had a fully-built custom toast banner system
+   — `_showCustomToast()`, `.rc-toast` CSS, and the HTML markup for it
+   — but 5 of its 6 toast call sites still dispatched the native,
+   unstyled `ShowToastEvent` instead of calling `_showCustomToast()`
+   (only `handleReviewerReturnToValidator`'s validation check used it).
+   This meant most of this component's toasts were actually rendering
+   as plain Salesforce toasts outside the shadow tree, off-brand,
+   despite the on-brand banner already being wired up and working for
+   one code path. Converted the remaining 5 call sites
+   (handleApproverReturnApprove's two toasts and its catch, plus
+   handleReviewerReturnToValidator's success and catch) to
+   `_showCustomToast(title, message, variant)` and removed the now-
+   unused `ShowToastEvent` import — no CSS/HTML changes were needed
+   since the banner infrastructure already existed.
+   A separate, quieter "compact flag" variant (.rc-flag-notice--compact
+   and its pill/label/divider children) used its own warm-gold palette
+   (#fdfaf3/#ecdca8/#d9a441/#b6801f/#8a6116/#d3c093/#f7edd4/#7a5814/
+   #5c4a2a) rather than the main flag panel's brighter amber — both
+   represent the same "flagged" status, so all of it was consolidated
+   onto the var(--wg-warning) family rather than inventing a second
+   gold token.
+   Neutral surfaces/text (#f0f2f5, #e4e7ec, #dde1e8, #f8f9fb, #f7f8fa,
+   #f0f2f6, #b8bec9, #c8cdd6, #ced3da, #f9fafc, #4a5568, #6b7280,
+   #6b7585, #374151, #555, #a3aab5) -> var(--wg-border)/
+   var(--wg-text-muted)/var(--wg-gray) per this batch's usual ambiguous-
+   light-wash and muted-text conventions. The red-tinted hover states
+   on the drawer-close and reject buttons (#fee2e2/#fca5a5/#fef2f2) ->
+   var(--wg-error-bg)/var(--wg-error).
+   Translucent overlays built from the old palette's rgb were
+   recalculated to the new tokens' actual rgb: navy rgba(30, 58, 95, x)
+   -> rgba(65, 64, 65, x) (including the generic dark elevation shadow
+   rgba(20, 30, 50, x), which reads as navy-tinted); red
+   rgba(192, 57, 43, x) -> rgba(191, 32, 38, x); amber
+   rgba(245, 158, 11, x) -> rgba(246, 135, 32, x) (var(--wg-warning)'s
+   rgb); green rgba(6, 95, 70, x) -> rgba(46, 125, 50, x)
+   (var(--wg-success)'s rgb). Plain white/black overlays (the shimmer
+   sweep, the submission-view card shadow) were left as literal.
+   `.rc-back-btn`, `.rc-flag-btn`/-approve/-reject and
+   `.rc-submission-view > .btn-secondary` are defined in this
+   stylesheet but not referenced anywhere in the current template
+   (the same kind of dead-but-defined CSS found in wcfFormPreview) —
+   retokenized and squared like the rest of this file's real buttons
+   for when/if they're wired up, since removing unused CSS isn't this
+   batch's scope.
+   Real `<button>` elements (.rc-rfi-btn, .rc-pane-toggle-btn,
+   .rc-return-btn, .rc-drawer-close, .rc-toast-close, plus the unused
+   .rc-back-btn/.rc-flag-btn/.btn-secondary above) got border-radius: 0;
+   badges/pills (.rc-drawer-badge, .rc-flag-pill) stayed rounded.
+   font-family: 'Salesforce Sans' -> var(--wg-font-body) on .rc-shell;
+   var(--wg-font-heading) added to titles and real buttons. Sizes
+   bumped/rounded to the nearest tier (10.5px, 11px, 12.5px, 16px,
+   17px, 22px) with inline comments; the one rem-based size
+   (0.875rem, on .rc-flag-rationale-item) was left un-tokenized per
+   this batch's established rem exception. Font-weight 500 (no exact
+   tier) mapped to regular. No further ShowToastEvent cleanup was
+   needed beyond the fix above.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ═══════════════════════════════════════════════════════════
    WCF Reviewer Container  ·  wcfReviewerContainer.css
 
@@ -14,14 +90,26 @@
    while the drawer is open.
    ═══════════════════════════════════════════════════════════ */
 
+/* Real bug found and fixed (repo-wide audit): this file never styled
+   :host, so <c-wcf-reviewer-container> rendered with the browser's
+   default display:inline. This component is placed directly on an
+   Experience Cloud page region (not nested inside another LWC), where
+   an inline-level custom element doesn't reliably fill full width —
+   the exact "not covered full width" bug found and fixed on its
+   sibling wcfvalidatorcontainer, which had the identical missing
+   :host gap. Applied the same fix here pre-emptively. */
+:host {
+    display: block;
+    width: 100%;
+}
 
 /* ── Shell ──────────────────────────────────────────────────── */
 .rc-shell {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #f0f2f5;
-    font-family: 'Salesforce Sans', Arial, sans-serif;
+    background: var(--wg-border);
+    font-family: var(--wg-font-body);
 }
 
 
@@ -34,8 +122,8 @@
     gap: 12px;
     padding: 0 24px;
     height: 56px;
-    background: #ffffff;
-    border-bottom: 1px solid #e4e7ec;
+    background: var(--wg-white);
+    border-bottom: 1px solid var(--wg-border);
     flex-shrink: 0;
     position: sticky;
     top: 0;
@@ -52,11 +140,12 @@
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    border: 1px solid #dde1e8;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 400;
-    color: #4a5568;
+    border: 1px solid var(--wg-border);
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-text-muted);
     background: transparent;
     cursor: pointer;
     white-space: nowrap;
@@ -65,12 +154,12 @@
 }
 
 .rc-back-btn:hover {
-    background: #f7f8fa;
-    border-color: #b8bec9;
+    background: var(--wg-border);
+    border-color: var(--wg-border);
 }
 
 .rc-back-icon {
-    --lwc-colorTextIconDefault: #4a5568;
+    --lwc-colorTextIconDefault: var(--wg-text-muted);
 }
 
 
@@ -83,27 +172,28 @@
     padding: 0 18px;
     height: 36px;
     border: none;
-    border-radius: 10px;
-    background: #1e3a5f;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 500;
+    border-radius: 0;
+    background: var(--wg-gray);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
     transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.22);
+    box-shadow: 0 2px 8px rgba(65, 64, 65, 0.22);
 }
 
 .rc-rfi-btn:hover {
-    background: #163055;
+    background: var(--wg-gray);
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(30, 58, 95, 0.32);
+    box-shadow: 0 4px 14px rgba(65, 64, 65, 0.32);
 }
 
 .rc-rfi-btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(30, 58, 95, 0.2);
+    box-shadow: 0 1px 4px rgba(65, 64, 65, 0.2);
 }
 
 /* Subtle shimmer sweep on hover */
@@ -138,7 +228,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #c0392b;
+    background: var(--wg-red);
     flex-shrink: 0;
     animation: rc-pulse 2s ease-in-out infinite;
 }
@@ -149,7 +239,7 @@
 }
 
 .rc-rfi-icon {
-    --lwc-colorTextIconDefault: #ffffff;
+    --lwc-colorTextIconDefault: var(--wg-white);
 }
 
 .rc-rfi-btn-label {
@@ -157,7 +247,7 @@
 }
 
 .rc-rfi-btn-arrow {
-    font-size: 14px;
+    font-size: var(--wg-font-size-label);
     margin-left: 2px;
     opacity: 0.8;
     transition: transform 0.2s;
@@ -170,13 +260,13 @@
 
 /* Active / close state */
 .rc-rfi-btn--active {
-    background: #c0392b;
-    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.22);
+    background: var(--wg-red);
+    box-shadow: 0 2px 8px rgba(191, 32, 38, 0.22);
 }
 
 .rc-rfi-btn--active:hover {
-    background: #a93226;
-    box-shadow: 0 4px 14px rgba(192, 57, 43, 0.32);
+    background: var(--wg-red-deep);
+    box-shadow: 0 4px 14px rgba(191, 32, 38, 0.32);
 }
 
 
@@ -206,7 +296,7 @@
     flex-direction: column;
     min-width: 0;
     max-width: 100%;                /* never wider than the content area */
-    background: #ffffff;
+    background: var(--wg-white);
     transition: flex 0.3s ease;
 }
 
@@ -215,8 +305,8 @@
     flex: 0 0 55%;
     min-width: 320px;               /* sits safely below the drag floor */
     flex-shrink: 1 !important;      /* lets the panel shrink instead of overflowing */
-    border-radius: 0 12px 12px 0;   /* rounded only on its outer (right) edge */
-    box-shadow: 0 2px 16px rgba(20, 30, 50, 0.06);
+    border-radius: 0 var(--wg-radius-card) var(--wg-radius-card) 0;   /* rounded only on its outer (right) edge */
+    box-shadow: 0 2px 16px rgba(65, 64, 65, 0.06);
     overflow-x: hidden;             /* belt-and-braces clip */
 }
 
@@ -237,10 +327,10 @@
     flex-direction: column;
     max-width: calc(100% - 320px);  /* drawer can never crush the review panel
                                         below its 320px minimum */
-    background: #ffffff;
-    border-right: 1px solid #e4e7ec;   /* was border-left */
-    border-radius: 12px 0 0 12px;      /* rounded only on its outer (left) edge */
-    box-shadow: 0 2px 16px rgba(20, 30, 50, 0.06);
+    background: var(--wg-white);
+    border-right: 1px solid var(--wg-border);   /* was border-left */
+    border-radius: var(--wg-radius-card) 0 0 var(--wg-radius-card);      /* rounded only on its outer (left) edge */
+    box-shadow: 0 2px 16px rgba(65, 64, 65, 0.06);
     position: sticky;
     top: 56px;
     height: calc(100vh - 56px);
@@ -271,7 +361,7 @@
 
 .rc-resize-handle:hover,
 .rc-resize-handle:active {
-    background: rgba(30, 58, 95, 0.06);
+    background: rgba(65, 64, 65, 0.06);
 }
 
 /* Three-dot grip indicator */
@@ -281,8 +371,8 @@
     border-radius: 2px;
     background: repeating-linear-gradient(
         to bottom,
-        #c8cdd6 0px,
-        #c8cdd6 3px,
+        var(--wg-border) 0px,
+        var(--wg-border) 3px,
         transparent 3px,
         transparent 6px
     );
@@ -293,8 +383,8 @@
 .rc-resize-handle:hover .rc-resize-grip {
     background: repeating-linear-gradient(
         to bottom,
-        #1e3a5f 0px,
-        #1e3a5f 3px,
+        var(--wg-gray) 0px,
+        var(--wg-gray) 3px,
         transparent 3px,
         transparent 6px
     );
@@ -306,8 +396,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
-    border-bottom: 1px solid #e4e7ec;
-    background: #f8f9fb;
+    border-bottom: 1px solid var(--wg-border);
+    background: var(--wg-border);
     flex-shrink: 0;
     min-height: 50px;
 }
@@ -327,40 +417,41 @@
 }
 
 .rc-drawer-badge {
-    font-size: 11px;
-    font-weight: 500;
-    color: #1a56c4;
-    background: #e8f0fe;
-    border: 1px solid #c7d9fb;
-    border-radius: 20px;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-info-text);
+    background: var(--wg-info-bg);
+    border: 1px solid var(--wg-info);
+    border-radius: var(--wg-radius-badge);
     padding: 2px 10px;
 }
 
 .rc-drawer-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: #1a2130;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
 }
 
 .rc-drawer-close {
     width: 30px;
     height: 30px;
-    border: 1px solid #dde1e8;
-    border-radius: 7px;
+    border: 1px solid var(--wg-border);
+    border-radius: 0;
     background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4a5568;
+    color: var(--wg-text-muted);
     transition: background 0.15s, border-color 0.15s;
     flex-shrink: 0;
 }
 
 .rc-drawer-close:hover {
-    background: #fee2e2;
-    border-color: #fca5a5;
-    --lwc-colorTextIconDefault: #c0392b;
+    background: var(--wg-error-bg);
+    border-color: var(--wg-error);
+    --lwc-colorTextIconDefault: var(--wg-red);
 }
 
 /* Drawer scrollable body */
@@ -374,10 +465,10 @@
 .rc-drawer-body::-webkit-scrollbar { width: 5px; }
 .rc-drawer-body::-webkit-scrollbar-track { background: transparent; }
 .rc-drawer-body::-webkit-scrollbar-thumb {
-    background: #ced3da;
+    background: var(--wg-border);
     border-radius: 4px;
 }
-.rc-drawer-body::-webkit-scrollbar-thumb:hover { background: #a3aab5; }
+.rc-drawer-body::-webkit-scrollbar-thumb:hover { background: var(--wg-text-muted); }
 
 
 /* ════════════════════════════════════════════════════════════
@@ -391,17 +482,18 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    background: #f8f9fb;
-    border-bottom: 1px solid #e4e7ec;
+    background: var(--wg-border);
+    border-bottom: 1px solid var(--wg-border);
     padding: 12px 20px;
     min-height: 50px;
     flex-shrink: 0;
 }
 
 .rc-pane-label-text {
-    font-size: 13px;
-    font-weight: 500;
-    color: #1a2130;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -410,9 +502,9 @@
 .rc-pane-toggle-btn {
     width: 30px;
     height: 30px;
-    border: 1px solid #dde1e8;
-    border-radius: 7px;
-    background: #ffffff;
+    border: 1px solid var(--wg-border);
+    border-radius: 0;
+    background: var(--wg-white);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -422,8 +514,8 @@
 }
 
 .rc-pane-toggle-btn:hover {
-    background: #f0f2f6;
-    border-color: #1e3a5f;
+    background: var(--wg-border);
+    border-color: var(--wg-gray);
 }
 
 /* ── Rail-collapse modifier — shared by both the drawer and the
@@ -475,7 +567,7 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: #f0f2f5;
+    background: var(--wg-border);
     padding: 40px;
 }
 
@@ -484,24 +576,25 @@
     flex-direction: column;
     align-items: center;
     gap: 14px;
-    background: #ffffff;
-    border: 1px solid #e4e7ec;
-    border-radius: 14px;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
     padding: 40px 48px;
     text-align: center;
     max-width: 420px;
 }
 
 .rc-empty-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: #1a2130;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading); /* was 16px, nearest tier */
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
     margin: 0;
 }
 
 .rc-empty-msg {
-    font-size: 13px;
-    color: #6b7585;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
     line-height: 1.6;
     margin: 0;
     max-width: 320px;
@@ -519,7 +612,7 @@
         flex: unset;
         min-width: 0;
         width: 100%;
-        border-radius: 0 0 12px 12px;
+        border-radius: 0 0 var(--wg-radius-card) var(--wg-radius-card);
     }
 
     .rc-drawer {
@@ -530,7 +623,7 @@
         max-height: 60vh;
         border-right: none;
         border-top: none;
-        border-radius: 12px 12px 0 0;
+        border-radius: var(--wg-radius-card) var(--wg-radius-card) 0 0;
         animation: rc-drawer-up 0.28s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
 
@@ -561,12 +654,12 @@
    FLAG NOTICE PANEL
    ════════════════════════════════════════════════════════════ */
 .rc-flag-notice {
-    background    : #ffffff;
-    border        : 1.5px solid #f59e0b;
-    border-radius : 12px;
+    background    : var(--wg-white);
+    border        : 1.5px solid var(--wg-warning);
+    border-radius : var(--wg-radius-card);
     padding       : 28px 32px;
     margin-bottom : 24px;
-    box-shadow    : 0 4px 20px rgba(245, 158, 11, 0.12);
+    box-shadow    : 0 4px 20px rgba(246, 135, 32, 0.12);
 }
 
 .rc-flag-notice-header {
@@ -577,20 +670,21 @@
 }
 
 .rc-flag-icon {
-    --lwc-colorTextIconDefault: #d97706;
+    --lwc-colorTextIconDefault: var(--wg-warning);
     flex-shrink: 0;
 }
 
 .rc-flag-notice-title {
-    font-size   : 17px;
-    font-weight : 700;
-    color       : #92400e;
+    font-family : var(--wg-font-heading);
+    font-size   : var(--wg-font-size-sub-heading); /* was 17px, nearest tier */
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-warning-text);
     line-height : 1.3;
 }
 
 .rc-flag-notice-sub {
-    font-size     : 13px;
-    color         : #6b7280;
+    font-size     : var(--wg-font-size-label);
+    color         : var(--wg-text-muted);
     line-height   : 1.6;
     margin        : 0 0 24px 0;
     padding-left  : 36px;
@@ -598,9 +692,9 @@
 
 /* ── Flag sections (Decision Rationale / Flag Rationale) ── */
 .rc-flag-section {
-    background    : #fffbeb;
-    border        : 1px solid #fde68a;
-    border-radius : 8px;
+    background    : var(--wg-warning-bg);
+    border        : 1px solid var(--wg-warning);
+    border-radius : var(--wg-radius-md);
     padding       : 16px 20px;
     margin-bottom : 16px;
 }
@@ -613,22 +707,22 @@
     display       : flex;
     align-items   : center;
     gap           : 8px;
-    font-size     : 11px;
-    font-weight   : 700;
+    font-size     : var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
     letter-spacing: 1px;
     text-transform: uppercase;
-    color         : #92400e;
+    color         : var(--wg-warning-text);
     margin-bottom : 10px;
 }
 
 .rc-flag-label-icon {
-    --lwc-colorTextIconDefault: #d97706;
+    --lwc-colorTextIconDefault: var(--wg-warning);
     flex-shrink: 0;
 }
 
 .rc-flag-value {
-    font-size   : 14px;
-    color       : #1a2130;
+    font-size   : var(--wg-font-size-body);
+    color       : var(--wg-gray);
     line-height : 1.65;
     white-space : pre-wrap;
     overflow-wrap: break-word;
@@ -646,14 +740,14 @@
     align-items   : center;
     gap           : 8px;
     padding       : 10px 22px;
-    border-radius : 8px;
-    font-size     : 13px;
-    font-weight   : 600;
+    border-radius : 0;
+    font-family   : var(--wg-font-heading);
+    font-size     : var(--wg-font-size-label);
+    font-weight   : var(--wg-weight-semibold);
     cursor        : pointer;
     border        : none;
     transition    : background 0.18s, transform 0.12s, box-shadow 0.18s;
     white-space   : nowrap;
-    font-family   : inherit;
     line-height   : 1;
 }
 
@@ -663,28 +757,28 @@
 }
 
 .rc-flag-btn-approve {
-    background : #065f46;
-    color      : #ffffff;
-    box-shadow : 0 2px 8px rgba(6, 95, 70, 0.25);
+    background : var(--wg-success);
+    color      : var(--wg-white);
+    box-shadow : 0 2px 8px rgba(46, 125, 50, 0.25);
 }
 
 .rc-flag-btn-approve:hover:not(:disabled) {
-    background : #047857;
+    background : var(--wg-success-deep);
     transform  : translateY(-1px);
-    box-shadow : 0 4px 14px rgba(6, 95, 70, 0.32);
+    box-shadow : 0 4px 14px rgba(46, 125, 50, 0.32);
 }
 
 .rc-flag-btn-reject {
-    background : #ffffff;
-    color      : #c0392b;
-    border     : 1.5px solid #c0392b;
-    box-shadow : 0 2px 8px rgba(192, 57, 43, 0.10);
+    background : var(--wg-white);
+    color      : var(--wg-red);
+    border     : 1.5px solid var(--wg-red);
+    box-shadow : 0 2px 8px rgba(191, 32, 38, 0.10);
 }
 
 .rc-flag-btn-reject:hover:not(:disabled) {
-    background : #fef2f2;
+    background : var(--wg-error-bg);
     transform  : translateY(-1px);
-    box-shadow : 0 4px 14px rgba(192, 57, 43, 0.18);
+    box-shadow : 0 4px 14px rgba(191, 32, 38, 0.18);
 }
 
 .rc-flag-btn-icon {
@@ -699,15 +793,15 @@
     display       : flex;
     align-items   : flex-start;
     gap           : 14px;
-    background    : #ecfdf5;
-    border        : 1px solid #6ee7b7;
-    border-radius : 10px;
+    background    : var(--wg-success-bg);
+    border        : 1px solid var(--wg-success);
+    border-radius : var(--wg-radius-md);
     padding       : 16px 20px;
     margin-bottom : 24px;
 }
 
 .rc-approved-icon {
-    --lwc-colorTextIconDefault: #065f46;
+    --lwc-colorTextIconDefault: var(--wg-success);
     flex-shrink: 0;
     margin-top: 2px;
 }
@@ -721,14 +815,14 @@
 }
 
 .rc-approved-title {
-    font-size   : 13px;
-    font-weight : 700;
-    color       : #065f46;
+    font-size   : var(--wg-font-size-label);
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-success);
 }
 
 .rc-approved-sub {
-    font-size  : 12px;
-    color      : #374151;
+    font-size  : var(--wg-font-size-caption);
+    color      : var(--wg-gray);
     line-height: 1.5;
 }
 
@@ -736,18 +830,18 @@
     background  : transparent;
     border      : none;
     cursor      : pointer;
-    color       : #6b7280;
-    font-size   : 14px;
+    color       : var(--wg-text-muted);
+    font-size   : var(--wg-font-size-body);
     padding     : 2px 6px;
-    border-radius: 4px;
+    border-radius: 0;
     flex-shrink : 0;
     line-height : 1;
     transition  : background 0.15s, color 0.15s;
 }
 
 .rc-approved-dismiss:hover {
-    background : #d1fae5;
-    color      : #065f46;
+    background : var(--wg-success-bg);
+    color      : var(--wg-success);
 }
 /* Numbered flag rationale list */
 .rc-flag-rationale-list {
@@ -758,8 +852,8 @@
 
 .rc-flag-rationale-item {
     padding: 0.25rem 0;
-    font-size: 0.875rem;
-    color: var(--lwc-colorTextDefault, #3e3e3c);
+    font-size: 0.875rem; /* rem-based, left un-tokenized per this batch's convention */
+    color: var(--wg-gray);
     line-height: 1.5;
     overflow-wrap: break-word;
 }
@@ -767,7 +861,7 @@
 /* Slightly muted style for the Other detail text */
 .rc-flag-value--other {
     font-style: italic;
-    color: var(--lwc-colorTextWeak, #706e6b);
+    color: var(--wg-text-muted);
 }
 .rc-submitted-card {
     display: flex;
@@ -783,9 +877,9 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: #16a34a;
-    color: #fff;
-    font-size: 32px;
+    background: var(--wg-success);
+    color: var(--wg-white);
+    font-size: var(--wg-font-size-page-title); /* was 32px, nearest tier */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -793,14 +887,15 @@
 }
 
 .rc-submitted-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: #1e3a5f;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading); /* was 22px, nearest tier */
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
     margin: 0 0 10px;
 }
 
 .rc-submitted-msg {
-    color: #555;
+    color: var(--wg-text-muted);
     line-height: 1.5;
     margin: 0 0 28px;
 }
@@ -823,30 +918,30 @@
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    border: 1px solid #dde1e8;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 400;
-    color: #4a5568;
-    background: #ffffff;
+    border: 1px solid var(--wg-border);
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-text-muted);
+    background: var(--wg-white);
     cursor: pointer;
     margin-bottom: 16px;
     transition: background 0.15s, border-color 0.15s;
-    font-family: inherit;
 }
 
 .rc-submission-view > .btn-secondary:hover {
-    background: #f7f8fa;
-    border-color: #b8bec9;
+    background: var(--wg-border);
+    border-color: var(--wg-border);
 }
 
 /* Give the child preview component's host element the card look,
    without touching its internal CSS file */
 .rc-submission-view c-wcf-reviewer-form-preview {
     display: block;
-    background: #ffffff;
-    border: 1px solid #e4e7ec;
-    border-radius: 12px;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     overflow: hidden;
 }
@@ -856,12 +951,12 @@
    Flag panel so the two states are never visually confused
    ════════════════════════════════════════════════════════════ */
 .rc-return-notice {
-    background    : #ffffff;
-    border        : 1.5px solid #1e3a5f;
-    border-radius : 12px;
+    background    : var(--wg-white);
+    border        : 1.5px solid var(--wg-gray);
+    border-radius : var(--wg-radius-card);
     padding       : 28px 32px;
     margin-bottom : 24px;
-    box-shadow    : 0 4px 20px rgba(30, 58, 95, 0.12);
+    box-shadow    : 0 4px 20px rgba(65, 64, 65, 0.12);
 }
 
 .rc-return-notice-header {
@@ -872,29 +967,30 @@
 }
 
 .rc-return-icon {
-    --lwc-colorTextIconDefault: #1e3a5f;
+    --lwc-colorTextIconDefault: var(--wg-gray);
     flex-shrink: 0;
 }
 
 .rc-return-notice-title {
-    font-size   : 17px;
-    font-weight : 700;
-    color       : #1e3a5f;
+    font-family : var(--wg-font-heading);
+    font-size   : var(--wg-font-size-sub-heading); /* was 17px, nearest tier */
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-gray);
     line-height : 1.3;
 }
 
 .rc-return-notice-sub {
-    font-size     : 13px;
-    color         : #6b7280;
+    font-size     : var(--wg-font-size-label);
+    color         : var(--wg-text-muted);
     line-height   : 1.6;
     margin        : 0 0 24px 0;
     padding-left  : 36px;
 }
 
 .rc-return-section {
-    background    : #f0f4f9;
-    border        : 1px solid #c7d9fb;
-    border-radius : 8px;
+    background    : var(--wg-info-bg);
+    border        : 1px solid var(--wg-info);
+    border-radius : var(--wg-radius-md);
     padding       : 16px 20px;
     margin-bottom : 20px;
 }
@@ -903,22 +999,22 @@
     display       : flex;
     align-items   : center;
     gap           : 8px;
-    font-size     : 11px;
-    font-weight   : 700;
+    font-size     : var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
     letter-spacing: 1px;
     text-transform: uppercase;
-    color         : #1e3a5f;
+    color         : var(--wg-gray);
     margin-bottom : 10px;
 }
 
 .rc-return-label-icon {
-    --lwc-colorTextIconDefault: #1e3a5f;
+    --lwc-colorTextIconDefault: var(--wg-gray);
     flex-shrink: 0;
 }
 
 .rc-return-value {
-    font-size   : 14px;
-    color       : #1a2130;
+    font-size   : var(--wg-font-size-body);
+    color       : var(--wg-gray);
     line-height : 1.65;
     white-space : pre-wrap;
     overflow-wrap: break-word;
@@ -929,9 +1025,9 @@
 }
 
 .rc-return-comment-label {
-    font-size     : 11px;
-    font-weight   : 700;
-    color         : #1e3a5f;
+    font-size     : var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight   : var(--wg-weight-bold);
+    color         : var(--wg-gray);
     display       : block;
     margin-bottom : 6px;
     text-transform: uppercase;
@@ -939,8 +1035,8 @@
 }
 
 .rc-return-required {
-    color        : #c0392b;
-    font-weight  : 600;
+    color        : var(--wg-red);
+    font-weight  : var(--wg-weight-semibold);
     margin-left  : 6px;
     text-transform: none;
     letter-spacing: 0;
@@ -948,23 +1044,23 @@
 
 .rc-return-comment-box {
     width         : 100%;
-    border        : 1.5px solid #dde1e8;
-    border-radius : 8px;
+    border        : 1.5px solid var(--wg-border);
+    border-radius : var(--wg-radius-md);
     padding       : 10px 14px;
-    font-size     : 13px;
+    font-size     : var(--wg-font-size-label);
     resize        : vertical;
     outline       : none;
     font-family   : inherit;
-    color         : #1a2130;
-    background    : #f9fafc;
+    color         : var(--wg-gray);
+    background    : var(--wg-border);
     transition    : border-color 0.15s, box-shadow 0.15s;
     box-sizing    : border-box;
 }
 
 .rc-return-comment-box:focus {
-    border-color : #1e3a5f;
-    background   : #fff;
-    box-shadow   : 0 0 0 3px rgba(30, 58, 95, 0.08);
+    border-color : var(--wg-gray);
+    background   : var(--wg-white);
+    box-shadow   : 0 0 0 3px rgba(65, 64, 65, 0.08);
 }
 
 .rc-return-actions {
@@ -978,14 +1074,14 @@
     align-items   : center;
     gap           : 8px;
     padding       : 10px 22px;
-    border-radius : 8px;
-    font-size     : 13px;
-    font-weight   : 600;
+    border-radius : 0;
+    font-family   : var(--wg-font-heading);
+    font-size     : var(--wg-font-size-label);
+    font-weight   : var(--wg-weight-semibold);
     cursor        : pointer;
     border        : none;
     transition    : background 0.18s, transform 0.12s, box-shadow 0.18s;
     white-space   : nowrap;
-    font-family   : inherit;
     line-height   : 1;
 }
 
@@ -995,27 +1091,27 @@
 }
 
 .rc-return-btn-approve {
-    background : #065f46;
-    color      : #ffffff;
-    box-shadow : 0 2px 8px rgba(6, 95, 70, 0.25);
+    background : var(--wg-success);
+    color      : var(--wg-white);
+    box-shadow : 0 2px 8px rgba(46, 125, 50, 0.25);
 }
 
 .rc-return-btn-approve:hover:not(:disabled) {
-    background : #047857;
+    background : var(--wg-success-deep);
     transform  : translateY(-1px);
-    box-shadow : 0 4px 14px rgba(6, 95, 70, 0.32);
+    box-shadow : 0 4px 14px rgba(46, 125, 50, 0.32);
 }
 
 .rc-return-btn-toapplicant {
-    background : #1e3a5f;
-    color      : #ffffff;
-    box-shadow : 0 2px 8px rgba(30, 58, 95, 0.25);
+    background : var(--wg-gray);
+    color      : var(--wg-white);
+    box-shadow : 0 2px 8px rgba(65, 64, 65, 0.25);
 }
 
 .rc-return-btn-toapplicant:hover:not(:disabled) {
-    background : #163055;
+    background : var(--wg-gray);
     transform  : translateY(-1px);
-    box-shadow : 0 4px 14px rgba(30, 58, 95, 0.32);
+    box-shadow : 0 4px 14px rgba(65, 64, 65, 0.32);
 }
 
 .rc-return-btn-icon {
@@ -1038,15 +1134,15 @@
 }
 
 .rc-return-reason-item {
-    font-size: 13px;
-    color: #1a2130;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-gray);
     line-height: 1.6;
     margin-bottom: 4px;
     padding-left: 4px;
 }
 
 .rc-return-reason-item::marker {
-    color: #c0392b;
+    color: var(--wg-red);
 }
 /* ── COMPACT flag notice — single-line hint version ── */
 .rc-flag-notice--compact {
@@ -1054,10 +1150,10 @@
     flex-direction : column;
     gap            : 8px;
     padding        : 12px 16px;
-    background     : #fdfaf3;
-    border         : 1px solid #ecdca8;
-    border-left    : 3px solid #d9a441;
-    border-radius  : 8px;
+    background     : var(--wg-warning-bg);
+    border         : 1px solid var(--wg-warning);
+    border-left    : 3px solid var(--wg-warning);
+    border-radius  : var(--wg-radius-md);
     margin-bottom  : 16px;
     box-shadow     : none;
 }
@@ -1069,28 +1165,28 @@
 }
 
 .rc-flag-notice--compact .rc-flag-icon {
-    --lwc-colorTextIconDefault: #b6801f;
+    --lwc-colorTextIconDefault: var(--wg-warning-text);
     flex-shrink: 0;
 }
 
 .rc-flag-notice--compact .rc-flag-notice-title {
-    font-size   : 12.5px;
-    font-weight : 700;
-    color       : #8a6116;
+    font-size   : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    font-weight : var(--wg-weight-bold);
+    color       : var(--wg-warning-text);
     white-space : nowrap;
 }
 
 .rc-flag-divider {
-    color: #d3c093;
-    font-size: 12px;
+    color: var(--wg-warning);
+    font-size: var(--wg-font-size-caption);
 }
 
 .rc-flag-label-inline {
-    font-size      : 10.5px;
-    font-weight    : 700;
+    font-size      : var(--wg-font-size-caption); /* was 10.5px, bumped to nearest tier */
+    font-weight    : var(--wg-weight-bold);
     text-transform : uppercase;
     letter-spacing : 0.5px;
-    color          : #8a6116;
+    color          : var(--wg-warning-text);
     white-space    : nowrap;
 }
 
@@ -1102,13 +1198,13 @@
 }
 
 .rc-flag-pill {
-    background    : #f7edd4;
-    color         : #7a5814;
-    border        : 1px solid #ecdca8;
+    background    : var(--wg-warning-bg);
+    color         : var(--wg-warning-text);
+    border        : 1px solid var(--wg-warning);
     padding       : 2px 10px;
-    border-radius : 10px;
-    font-size     : 11px;
-    font-weight   : 500;
+    border-radius : var(--wg-radius-badge);
+    font-size     : var(--wg-font-size-caption);
+    font-weight   : var(--wg-weight-regular);
     white-space   : nowrap;
 }
 
@@ -1119,12 +1215,12 @@
     gap          : 8px;
     padding-left : 22px;
     padding-top  : 6px;
-    border-top   : 1px dashed #ecdca8;
+    border-top   : 1px dashed var(--wg-warning);
 }
 
 .rc-flag-other-inline {
-    color      : #5c4a2a;
-    font-size  : 12.5px;
+    color      : var(--wg-warning-text);
+    font-size  : var(--wg-font-size-caption); /* was 12.5px, nearest tier */
     font-style : italic;
 }
 /* ── Custom toast (replaces standard ShowToastEvent styling) ── */
@@ -1140,19 +1236,19 @@
     max-width: 480px;
     width: calc(100% - 40px);
     padding: 14px 16px;
-    border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0 8px 28px rgba(20, 30, 50, 0.18);
-    border-left: 4px solid #c0392b;
+    border-radius: var(--wg-radius-card);
+    background: var(--wg-white);
+    box-shadow: 0 8px 28px rgba(65, 64, 65, 0.18);
+    border-left: 4px solid var(--wg-red);
     animation: rc-toast-in 0.25s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 .rc-toast--success {
-    border-left-color: #065f46;
+    border-left-color: var(--wg-success);
 }
 
 .rc-toast--error {
-    border-left-color: #c0392b;
+    border-left-color: var(--wg-red);
 }
 
 .rc-toast-icon {
@@ -1161,11 +1257,11 @@
 }
 
 .rc-toast--success .rc-toast-icon {
-    --lwc-colorTextIconDefault: #065f46;
+    --lwc-colorTextIconDefault: var(--wg-success);
 }
 
 .rc-toast--error .rc-toast-icon {
-    --lwc-colorTextIconDefault: #c0392b;
+    --lwc-colorTextIconDefault: var(--wg-red);
 }
 
 .rc-toast-body {
@@ -1174,15 +1270,16 @@
 }
 
 .rc-toast-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #1a2130;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin-bottom: 2px;
 }
 
 .rc-toast-message {
-    font-size: 12.5px;
-    color: #4a5568;
+    font-size: var(--wg-font-size-caption); /* was 12.5px, nearest tier */
+    color: var(--wg-text-muted);
     line-height: 1.5;
 }
 
@@ -1190,9 +1287,9 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--wg-text-muted);
     padding: 2px;
-    border-radius: 4px;
+    border-radius: 0;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1201,10 +1298,28 @@
 }
 
 .rc-toast-close:hover {
-    background: #f0f2f6;
+    background: var(--wg-border);
 }
 
 @keyframes rc-toast-in {
     from { transform: translate(-50%, -12px); opacity: 0; }
     to   { transform: translate(-50%, 0);      opacity: 1; }
+}
+
+/* "Browse proposals" was a bare variant="brand" lightning-button with no
+   class — no square-shape treatment and no protection from the
+   Experience Cloud site theme's brand-button text-color override (dark
+   text on the theme's red brand background instead of white). Same fix
+   as wcfValidatorForm's "Seal" button / wcfFormPreview's "Download as
+   PDF" button. */
+.rc-browse-btn {
+    --slds-c-button-radius-border          : 0;
+    --slds-c-button-brand-text-color       : var(--wg-white);
+    --slds-c-button-brand-text-color-hover : var(--wg-white);
+    --slds-c-button-brand-text-color-active: var(--wg-white);
+    --sds-c-button-brand-text-color        : var(--wg-white);
+    --sds-c-button-brand-text-color-hover  : var(--wg-white);
+    --slds-c-button-text-color             : var(--wg-white);
+    --slds-c-button-text-color-hover       : var(--wg-white);
+    color: var(--wg-white);
 }

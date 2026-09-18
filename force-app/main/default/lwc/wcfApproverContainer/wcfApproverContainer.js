@@ -1,7 +1,6 @@
 import { LightningElement, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { CurrentPageReference } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import saveDecision   from '@salesforce/apex/WCFApproverListController.saveDecision';
 import revokeDecision from '@salesforce/apex/WCFApproverListController.revokeDecision';
 import getExistingDecision from '@salesforce/apex/WCFApproverListController.getExistingDecision';
@@ -46,6 +45,14 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     @track selectedReasons = [];   // array of picklist values
     @track priorRejectionReasons = '';
 
+    // ── In-shadow-DOM banner state (replaces native ShowToastEvent, which
+    //    cannot be restyled since it renders outside the shadow tree) ──
+    @track bannerVisible = false;
+    @track bannerVariant = 'info';
+    @track bannerTitle   = '';
+    @track bannerMessage = '';
+    _bannerTimeout;
+
     constructor() {
         super();
         this._boundMouseMove = this.handleResizerMouseMove.bind(this);
@@ -55,6 +62,39 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     disconnectedCallback() {
         window.removeEventListener('mousemove', this._boundMouseMove);
         window.removeEventListener('mouseup', this._boundMouseUp);
+        if (this._bannerTimeout) clearTimeout(this._bannerTimeout);
+    }
+
+    showBanner(variant, title, message, duration = 6000) {
+        if (this._bannerTimeout) clearTimeout(this._bannerTimeout);
+        this.bannerVariant = variant;
+        this.bannerTitle   = title;
+        this.bannerMessage = message;
+        this.bannerVisible = true;
+        this._bannerTimeout = setTimeout(() => {
+            this.bannerVisible = false;
+        }, duration);
+    }
+
+    closeBanner() {
+        if (this._bannerTimeout) clearTimeout(this._bannerTimeout);
+        this.bannerVisible = false;
+    }
+
+    get isBannerError() {
+        return this.bannerVariant === 'error';
+    }
+    get isBannerWarning() {
+        return this.bannerVariant === 'warning';
+    }
+    get isBannerSuccess() {
+        return this.bannerVariant === 'success';
+    }
+    get isBannerInfo() {
+        return this.bannerVariant === 'info';
+    }
+    get bannerClass() {
+        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
     }
 
     renderedCallback() {
@@ -280,21 +320,13 @@ handleCancelDecisionPanel() {
     // Shared by both Accept and Reject — the button in the decision panel calls this
 handleDecisionPanelContinue() {
     if (!this.comment?.trim()) {
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Comment Required',
-            message: this.pendingDecision === 'Accept'
-                ? 'Please add a comment to support this decision.'
-                : 'Please add a comment explaining why this application is being returned.',
-            variant: 'error'
-        }));
+        this.showBanner('error', 'Comment Required', this.pendingDecision === 'Accept'
+            ? 'Please add a comment to support this decision.'
+            : 'Please add a comment explaining why this application is being returned.');
         return;
     }
     if (this.pendingDecision === 'Return' && (!this.selectedReasons || this.selectedReasons.length === 0)) {
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Reason Required',
-            message: 'Please select at least one rejection reason.',
-            variant: 'error'
-        }));
+        this.showBanner('error', 'Reason Required', 'Please select at least one rejection reason.');
         return;
     }
     this.showModal = true;
@@ -308,19 +340,11 @@ handleDecisionPanelContinue() {
    async handleModalConfirm() {
     if ((this.pendingDecision === 'Accept' || this.pendingDecision === 'Conditionally Approve' || this.pendingDecision === 'Return')
         && !this.comment?.trim()) {
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Comment Required',
-            message: 'A comment is required for this decision.',
-            variant: 'error'
-        }));
+        this.showBanner('error', 'Comment Required', 'A comment is required for this decision.');
         return;
     }
     if (this.pendingDecision === 'Return' && (!this.selectedReasons || this.selectedReasons.length === 0)) {
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Reason Required',
-            message: 'Please select at least one rejection reason.',
-            variant: 'error'
-        }));
+        this.showBanner('error', 'Reason Required', 'Please select at least one rejection reason.');
         return;
     }
 
@@ -350,11 +374,7 @@ handleDecisionPanelContinue() {
             resultMessage = 'recommended for fund';
         }
 
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Decision Saved',
-            message: `Application has been ${resultMessage}.`,
-            variant: 'success'
-        }));
+        this.showBanner('success', 'Decision Saved', `Application has been ${resultMessage}.`);
 
         setTimeout(() => {
             this[NavigationMixin.Navigate]({
@@ -364,11 +384,7 @@ handleDecisionPanelContinue() {
         }, 1500);
 
     } catch (e) {
-        this.dispatchEvent(new ShowToastEvent({
-            title:   'Error',
-            message: e.body?.message || 'Failed to save decision.',
-            variant: 'error'
-        }));
+        this.showBanner('error', 'Error', e.body?.message || 'Failed to save decision.');
     } finally {
         this.isSubmitting = false;
     }
@@ -395,18 +411,10 @@ handleDecisionPanelContinue() {
             this.comment          = '';
             this.showRevokeModal  = false;
 
-            this.dispatchEvent(new ShowToastEvent({
-                title:   'Decision Revoked',
-                message: 'The decision has been revoked. You may now re-submit.',
-                variant: 'warning'
-            }));
+            this.showBanner('warning', 'Decision Revoked', 'The decision has been revoked. You may now re-submit.');
 
         } catch(e) {
-            this.dispatchEvent(new ShowToastEvent({
-                title:   'Error',
-                message: e.body?.message || 'Failed to revoke decision.',
-                variant: 'error'
-            }));
+            this.showBanner('error', 'Error', e.body?.message || 'Failed to revoke decision.');
         } finally {
             this.isRevoking = false;
         }

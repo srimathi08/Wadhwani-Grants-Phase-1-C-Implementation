@@ -1,0 +1,93 @@
+.custom-table-card {
+    background: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.table-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.custom-table th {
+    text-align: left;
+    font-weight: 600;
+    padding: 10px;
+    border-bottom: 1px solid #d8dde6;
+    background: #fafafa;
+}
+
+.custom-table td {
+    padding: 10px;
+    border-bottom: 1px solid #d8dde6;
+}
+
+.custom-table tr:hover {
+    background-color: #fef2f2; /* subtle red hover */
+}
+
+.link-red {
+    color: #c23934;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.link-red:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   ACTION BUTTON ALIGNMENT
+=============================== */
+.action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;              /* space between buttons */
+    white-space: nowrap;  /* prevent wrapping */
+}
+
+/* Make buttons visually consistent */
+.action-cell lightning-button {
+    --slds-c-button-radius-border: 4px;
+}
+
+/* Slightly reduce button height inside table */
+.action-cell .slds-button {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+/* ===============================
+   REVIEWER ACTION STATUS STYLES
+=============================== */
+.status-accepted {
+    color: #2e844a;          /* Salesforce success green */
+    font-weight: 600;
+}
+
+.status-rejected {
+    color: #c23934;          /* Salesforce error red */
+    font-weight: 600;
+}
+
+.status-pending {
+    color: #706e6b;          /* neutral gray */
+    font-weight: 500;
+}
+
+/* Optional: visually soften disabled buttons */
+.action-cell .slds-button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

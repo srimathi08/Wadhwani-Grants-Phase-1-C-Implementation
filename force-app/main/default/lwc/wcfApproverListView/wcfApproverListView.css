@@ -1,13 +1,102 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   This is a dense data table that leans on color to carry information
+   (four mutually-exclusive Track categories in one column, plus a
+   Decision column with four of its own states), so the usual
+   "map everything to the nearest token" pass would have visibly hurt
+   the table's readability if done naively — several of the original
+   hues (a second distinct blue, a purple) have no brand-token
+   equivalent at all. Mapped with column-level distinctness as the
+   priority instead of pure hue-closeness:
+     Track badges: jf -> info (bg/color/border var(--wg-info-bg)/
+     var(--wg-info-text)/var(--wg-info)); jc -> warning; lu (originally
+     a second, different blue, cyan-ish) -> success/green instead, so
+     it stays visually distinct from jf within the same column; both
+     -> error/red. Every original Track hue now maps to one of the
+     four "status-family" tokens, still four clearly different colors
+     side by side in that column.
+     Status / Rec / Decision approve-or-decline badges: a clean fit —
+     positive (recommended/yes/approve) -> success, negative (no/
+     decline) -> error, no simplification needed there.
+     Decision's two extra states, which aren't positive/negative at
+     all: "returned" (was a light navy-gray, #eef1f7/#1B2A4A, no brand
+     navy exists) -> a neutral var(--wg-border)/var(--wg-gray) pairing,
+     read as "administrative", not color-coded; "backfromreviewer" and
+     the matching btn-validate action (both were purple, #7c3aed — no
+     brand purple exists) -> var(--wg-info)/var(--wg-info-bg), the one
+     remaining distinct brand hue not already used elsewhere in the
+     Decision column. Blue now appears in both the Track and Decision
+     columns for two unrelated meanings (jf / backfromreviewer) — the
+     one real compromise here, accepted because the two never appear
+     in the same column together, same "reuse one token for different
+     UI roles in different contexts" pattern used throughout this
+     whole batch.
+     The maroon accent (#c0392b) used everywhere else — top bar rule/
+     title/border, summary row, id links, hover accents, active
+     pagination, .btn-start — was already a near-exact match and maps
+     straight to var(--wg-red).
+   Neutrals: #ffffff/#fff -> var(--wg-white); #374151/#3e3e3c (near-
+   black text) -> var(--wg-gray); #f5f6f8/#f7f8fa/#e2e5ea/#e9eaec/
+   #f0f1f3/#fafbfc/#f4f6f9/#c8d0da/#f0f0f0 (nine different light-
+   neutral washes/borders) all -> var(--wg-border); #8a94a6/#adb5bd/
+   #c4c9d4/#6b7280/#cbd0d8/#aaa/#d1d5db/#9ca3af (eight different
+   mid-gray shades for labels/placeholders/meta text) all ->
+   var(--wg-text-muted) — the same large-scale gray/neutral
+   consolidation used throughout this batch, more pronounced here
+   simply because this file had more of them to begin with.
+   translucent rgba(255,255,255,0.2)/(0.6) on the maroon summary bar
+   were left untouched — decorative white-on-color overlays, not
+   brand-token colors.
+   font-family: 'Salesforce Sans' -> var(--wg-font-body) once on
+   .shell (inherited); the two font-family: inherit buttons
+   (.action-btn, .pg-btn) -> var(--wg-font-heading) (button
+   convention); .search-input (a real text field, not a button) ->
+   var(--wg-font-body) explicitly instead of "inherit".
+   Sizes: this table's type scale is entirely rem-based and much
+   finer-grained than commonStyleTheme's six px tiers (a dozen+
+   distinct values from 0.69rem to 1.6rem, deliberately tuned for a
+   dense table). Forcing all of them onto six tiers would have
+   visibly flattened that hierarchy, so — same exception already used
+   for wcfApplicationFaqModal and wcfPortalHeader — none of the
+   rem font-sizes here were tokenized.
+   Buttons: .icon-btn / .action-btn / .pg-btn (all real clickable
+   controls) squared to border-radius: 0. .track-badge / .status-badge
+   / .rec-badge / .decision-badge are non-interactive tags, not
+   buttons, and keep their rounded shape — .track-badge's 20px was an
+   exact match for var(--wg-radius-badge); the others' 4px was bumped
+   to the nearest defined tier, var(--wg-radius-sm) (6px).
+   Real pre-existing bug found and fixed while recoloring:
+   .action-btn.btn-validate only set border-color, but .action-btn's
+   base rule sets border: none (a style, not just a color) — so the
+   button's border never actually rendered. Fixed to a full border
+   declaration; noted inline at the rule.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ══════════════════════════════════════════════════════════════
    Wadhwani Foundation — WCF Approver List View
    Brand palette: Maroon #c0392b · White · Gray scale
    Mirrors wcfProposalListView / wcfApplicationList visual style
 ══════════════════════════════════════════════════════════════ */
 
+/* Real bug found and fixed (repo-wide audit): this file never styled
+   :host, so <c-wcf-approver-list-view> rendered with the browser's
+   default display:inline. This component is placed directly on an
+   Experience Cloud page region, where an inline-level custom element
+   doesn't reliably fill full width — the same "not covered full width"
+   bug found and fixed on wcfvalidatorcontainer/wcfReviewerContainer,
+   which had the identical missing :host gap. Applied the same fix here
+   pre-emptively, since .shell below expects to fill the full page
+   (min-height: 100vh; width: 100%). */
+:host {
+    display: block;
+    width: 100%;
+}
+
 /* ── Page shell ─────────────────────────────────────────────── */
 .shell {
-    font-family: 'Salesforce Sans', -apple-system, Arial, sans-serif;
-    background: #f5f6f8;
+    font-family: var(--wg-font-body);
+    background: var(--wg-border);
     min-height: 100vh;
     width: 100%;
     box-sizing: border-box;
@@ -21,16 +110,16 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
-    background: #ffffff;
+    background: var(--wg-white);
     padding: 1.25rem 2rem;
-    border-bottom: 3px solid #c0392b;
+    border-bottom: 3px solid var(--wg-red);
     box-sizing: border-box;
 }
 .top-bar-left  { display: flex; align-items: center; gap: 1rem; }
-.brand-rule    { width: 5px; height: 44px; background: #c0392b; border-radius: 3px; flex-shrink: 0; }
+.brand-rule    { width: 5px; height: 44px; background: var(--wg-red); border-radius: 3px; flex-shrink: 0; }
 .top-bar-titles { display: flex; flex-direction: column; }
-.top-title     { font-size: 1.5rem; font-weight: 700; color: #c0392b; margin: 0 0 3px; letter-spacing: -0.02em; }
-.top-sub       { font-size: 0.8rem; color: #8a94a6; }
+.top-title     { font-size: 1.5rem; font-weight: var(--wg-weight-bold); color: var(--wg-red); margin: 0 0 3px; letter-spacing: -0.02em; }
+.top-sub       { font-size: 0.8rem; color: var(--wg-text-muted); }
 .top-bar-right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 
 /* ── Search ─────────────────────────────────────────────────── */
@@ -38,39 +127,39 @@
     display: flex;
     align-items: center;
     gap: 0.45rem;
-    background: #f7f8fa;
-    border: 1.5px solid #e2e5ea;
-    border-radius: 6px;
+    background: var(--wg-border);
+    border: 1.5px solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
     padding: 0.38rem 0.85rem;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 .search-wrap:focus-within {
-    border-color: #c0392b;
-    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
-    background: #fff;
+    border-color: var(--wg-red);
+    box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.1);
+    background: var(--wg-white);
 }
-.search-icon { --sds-c-icon-color-foreground-default: #adb5bd; }
+.search-icon { --sds-c-icon-color-foreground-default: var(--wg-text-muted); }
 .search-input {
     border: none; background: transparent; outline: none;
-    font-size: 0.85rem; color: #374151; width: 240px; font-family: inherit;
+    font-size: 0.85rem; color: var(--wg-gray); width: 240px; font-family: var(--wg-font-body);
 }
-.search-input::placeholder { color: #c4c9d4; }
+.search-input::placeholder { color: var(--wg-text-muted); }
 
 .icon-btn {
     display: flex; align-items: center; justify-content: center;
     width: 36px; height: 36px;
-    border: 1.5px solid #e2e5ea; border-radius: 6px;
-    background: #fff; cursor: pointer; color: #6b7280;
+    border: 1.5px solid var(--wg-border); border-radius: 0;
+    background: var(--wg-white); cursor: pointer; color: var(--wg-text-muted);
     transition: background 0.12s, color 0.12s, border-color 0.12s;
     flex-shrink: 0;
 }
-.icon-btn:hover { background: #f0f3f7; border-color: #c0392b; color: #c0392b; }
+.icon-btn:hover { background: var(--wg-border); border-color: var(--wg-red); color: var(--wg-red); }
 
 /* ══ SUMMARY ROW ════════════════════════════════════════════════ */
 .summary-row {
     display: flex;
     align-items: center;
-    background: #c0392b;
+    background: var(--wg-red);
     padding: 0.9rem 2rem;
     gap: 0;
 }
@@ -87,17 +176,17 @@
     margin: 0 2rem 0 0; flex-shrink: 0;
 }
 .summary-num {
-    font-size: 1.6rem; font-weight: 700;
-    color: #fff; line-height: 1; margin-bottom: 2px;
+    font-size: 1.6rem; font-weight: var(--wg-weight-bold);
+    color: var(--wg-white); line-height: 1; margin-bottom: 2px;
 }
 .summary-lbl {
     font-size: 0.72rem; color: rgba(255,255,255,0.6);
-    text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.07em; font-weight: var(--wg-weight-regular);
 }
 
 /* ══ TABLE WRAPPER ══════════════════════════════════════════════ */
 .table-wrap {
-    width: 100%; background: #fff;
+    width: 100%; background: var(--wg-white);
     overflow-x: auto; -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
 }
@@ -122,12 +211,12 @@
 /* ── Table head ─────────────────────────────────────────────── */
 .th {
     padding: 0.75rem 0.9rem;
-    background: #f7f8fa;
-    color: #6b7280;
-    font-size: 0.7rem; font-weight: 700;
+    background: var(--wg-border);
+    color: var(--wg-text-muted);
+    font-size: 0.7rem; font-weight: var(--wg-weight-bold);
     letter-spacing: 0.07em; text-transform: uppercase;
     white-space: nowrap; border: none;
-    border-bottom: 2px solid #e9eaec;
+    border-bottom: 2px solid var(--wg-border);
     text-align: left;
 }
 .th.tc { text-align: center; }
@@ -135,86 +224,86 @@
 /* ── Table rows ─────────────────────────────────────────────── */
 .td {
     padding: 0.85rem 0.9rem;
-    border-bottom: 1px solid #f0f1f3;
+    border-bottom: 1px solid var(--wg-border);
     vertical-align: middle;
-    color: #374151; font-size: 0.83rem;
+    color: var(--wg-gray); font-size: 0.83rem;
 }
 .td.tc       { text-align: center; }
 .td.c-action { text-align: center; padding: 0.6rem 0.75rem; }
-.td.c-sno    { text-align: center; color: #cbd0d8; font-size: 0.78rem; font-weight: 600; }
+.td.c-sno    { text-align: center; color: var(--wg-text-muted); font-size: 0.78rem; font-weight: var(--wg-weight-semibold); }
 
-.row-even { background: #ffffff; }
-.row-odd  { background: #fafbfc; }
+.row-even { background: var(--wg-white); }
+.row-odd  { background: var(--wg-border); }
 .tbl tbody tr:last-child .td { border-bottom: none; }
-.tbl tbody tr:hover .td { background: #f4f6f9 !important; transition: background 0.1s; }
-.tbl tbody tr:hover .c-sno { border-left: 3px solid #c0392b; }
+.tbl tbody tr:hover .td { background: var(--wg-border) !important; transition: background 0.1s; }
+.tbl tbody tr:hover .c-sno { border-left: 3px solid var(--wg-red); }
 
 /* ── App ID ─────────────────────────────────────────────────── */
-.id-link { color: #c0392b; font-weight: 700; font-size: 0.83rem; white-space: nowrap; }
+.id-link { color: var(--wg-red); font-weight: var(--wg-weight-bold); font-size: 0.83rem; white-space: nowrap; }
 
 .trunc {
     display: block; overflow: hidden;
     text-overflow: ellipsis; white-space: nowrap; max-width: 180px;
 }
-.no-decision { color: #cbd0d8; }
+.no-decision { color: var(--wg-text-muted); }
 
 /* ── Track badges ────────────────────────────────────────────── */
 .track-badge {
     display: inline-block; padding: 0.2rem 0.55rem;
-    border-radius: 20px; font-size: 0.69rem;
-    font-weight: 700; letter-spacing: 0.04em; white-space: nowrap;
+    border-radius: var(--wg-radius-badge); font-size: 0.69rem;
+    font-weight: var(--wg-weight-bold); letter-spacing: 0.04em; white-space: nowrap;
 }
-.track-jf   { background: #e8edf4; color: #1e3a8a; border: 1px solid #bfdbfe; }
-.track-jc   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.track-lu   { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-.track-both { background: #faeaea; color: #922b21; border: 1px solid #fecaca; }
+.track-jf   { background: var(--wg-info-bg); color: var(--wg-info-text); border: 1px solid var(--wg-info); }
+.track-jc   { background: var(--wg-warning-bg); color: var(--wg-warning-text); border: 1px solid var(--wg-warning); }
+.track-lu   { background: var(--wg-success-bg); color: var(--wg-success); border: 1px solid var(--wg-success); }
+.track-both { background: var(--wg-error-bg); color: var(--wg-error); border: 1px solid var(--wg-error); }
 
 /* ── Status badge ────────────────────────────────────────────── */
 .status-badge {
     display: inline-flex; align-items: center;
-    padding: 0.22rem 0.65rem; border-radius: 4px;
-    font-size: 0.71rem; font-weight: 600;
+    padding: 0.22rem 0.65rem; border-radius: var(--wg-radius-sm);
+    font-size: 0.71rem; font-weight: var(--wg-weight-semibold);
     white-space: nowrap; border: 1.5px solid transparent;
 }
-.status-recommended { background: #f0f7f2; color: #1e6e3c; border-color: #b8ddc5; }
+.status-recommended { background: var(--wg-success-bg); color: var(--wg-success); border-color: var(--wg-success); }
 
 /* ── Recommendation badge ────────────────────────────────────── */
 .rec-badge {
     display: inline-flex; align-items: center;
-    padding: 0.22rem 0.65rem; border-radius: 4px;
-    font-size: 0.71rem; font-weight: 600;
+    padding: 0.22rem 0.65rem; border-radius: var(--wg-radius-sm);
+    font-size: 0.71rem; font-weight: var(--wg-weight-semibold);
     white-space: nowrap; border: 1.5px solid transparent;
 }
-.rec-yes { background: #f0f7f2; color: #1e6e3c; border-color: #b8ddc5; }
-.rec-no  { background: #fdecea; color: #b71c1c; border-color: #f5c6cb; }
+.rec-yes { background: var(--wg-success-bg); color: var(--wg-success); border-color: var(--wg-success); }
+.rec-no  { background: var(--wg-error-bg); color: var(--wg-error); border-color: var(--wg-error); }
 
 /* ── Decision badge ──────────────────────────────────────────── */
 .decision-badge {
     display: inline-flex; align-items: center;
-    padding: 0.22rem 0.65rem; border-radius: 4px;
-    font-size: 0.71rem; font-weight: 600;
+    padding: 0.22rem 0.65rem; border-radius: var(--wg-radius-sm);
+    font-size: 0.71rem; font-weight: var(--wg-weight-semibold);
     white-space: nowrap; border: 1.5px solid transparent;
 }
-.dec-approve { background: #f0f7f2; color: #1e6e3c; border-color: #b8ddc5; }
-.dec-decline { background: #fdecea; color: #b71c1c; border-color: #f5c6cb; }
+.dec-approve { background: var(--wg-success-bg); color: var(--wg-success); border-color: var(--wg-success); }
+.dec-decline { background: var(--wg-error-bg); color: var(--wg-error); border-color: var(--wg-error); }
 
 /* ── Action buttons ──────────────────────────────────────────── */
 .action-btn {
     display: inline-flex; align-items: center; justify-content: center;
     gap: 0.25rem; padding: 0.42rem 0.9rem;
-    border: none; border-radius: 5px;
-    font-size: 0.74rem; font-weight: 600;
-    cursor: pointer; white-space: nowrap; font-family: inherit;
+    border: none; border-radius: 0;
+    font-size: 0.74rem; font-weight: var(--wg-weight-semibold);
+    cursor: pointer; white-space: nowrap; font-family: var(--wg-font-heading);
     transition: opacity 0.15s, transform 0.1s;
     letter-spacing: 0.01em;
 }
 .action-btn:hover  { opacity: 0.87; transform: translateY(-1px); }
 .action-btn:active { transform: translateY(0); }
 
-.btn-start    { background: #c0392b; color: #fff; }
-.btn-view     { background: transparent; color: #c0392b; border: 1.5px solid #c8d0da; }
-.btn-view:hover { background: #f0f3f7; border-color: #c0392b; opacity: 1; transform: none; }
-.btn-disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+.btn-start    { background: var(--wg-red); color: var(--wg-white); }
+.btn-view     { background: transparent; color: var(--wg-red); border: 1.5px solid var(--wg-border); }
+.btn-view:hover { background: var(--wg-border); border-color: var(--wg-red); opacity: 1; transform: none; }
+.btn-disabled { background: var(--wg-border); color: var(--wg-text-muted); cursor: not-allowed; }
 .btn-disabled:hover { opacity: 1; transform: none; }
 
 .btn-icon { pointer-events: none; flex-shrink: 0; }
@@ -224,46 +313,49 @@
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 0.6rem;
     padding: 0.9rem 2rem;
-    background: #fff; border-top: 1px solid #e9eaec;
+    background: var(--wg-white); border-top: 1px solid var(--wg-border);
 }
-.pg-info  { font-size: 0.8rem; color: #8a94a6; }
+.pg-info  { font-size: 0.8rem; color: var(--wg-text-muted); }
 .pg-controls { display: flex; gap: 0.25rem; align-items: center; }
 .pg-btn {
     min-width: 34px; height: 34px; padding: 0 0.5rem;
-    border: 1.5px solid #e2e5ea; background: #fff; color: #374151;
-    border-radius: 5px; font-size: 0.82rem; cursor: pointer;
+    border: 1.5px solid var(--wg-border); background: var(--wg-white); color: var(--wg-gray);
+    border-radius: 0; font-size: 0.82rem; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.1s, border-color 0.1s; font-family: inherit;
+    transition: background 0.1s, border-color 0.1s; font-family: var(--wg-font-heading);
 }
-.pg-btn:hover:not(:disabled) { background: #f0f3f7; border-color: #c0392b; color: #c0392b; }
+.pg-btn:hover:not(:disabled) { background: var(--wg-border); border-color: var(--wg-red); color: var(--wg-red); }
 .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.pg-btn-active { background: #c0392b !important; color: #fff !important; border-color: #c0392b !important; font-weight: 700; }
+.pg-btn-active { background: var(--wg-red) !important; color: var(--wg-white) !important; border-color: var(--wg-red) !important; font-weight: var(--wg-weight-bold); }
 .pg-size-row { display: flex; align-items: center; gap: 0.5rem; }
-.pg-size-lbl { font-size: 0.8rem; color: #8a94a6; }
+.pg-size-lbl { font-size: 0.8rem; color: var(--wg-text-muted); }
 .pg-size-combo { --slds-c-input-sizing-min-width: 76px; }
 
 /* ══ LOADING ════════════════════════════════════════════════════ */
 .loading-block {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 6rem 2rem; background: #fff;
+    padding: 6rem 2rem; background: var(--wg-white);
 }
-.loading-text { margin-top: 1rem; font-size: 0.85rem; color: #8a94a6; }
+.loading-text { margin-top: 1rem; font-size: 0.85rem; color: var(--wg-text-muted); }
 
 /* ══ EMPTY STATE ════════════════════════════════════════════════ */
-.empty-block { text-align: center; padding: 6rem 2rem; background: #fff; }
-.empty-icon  { --sds-c-icon-color-foreground-default: #d1d5db; margin-bottom: 1rem; }
-.empty-title { font-size: 1.05rem; font-weight: 600; color: #3e3e3c; margin: 0 0 0.4rem; }
-.empty-sub   { font-size: 0.85rem; color: #9ca3af; margin: 0; }
-.dec-returned         { background: #eef1f7; color: #1B2A4A; }
-.dec-backfromreviewer { background: #f3e8ff; color: #7c3aed; }
+.empty-block { text-align: center; padding: 6rem 2rem; background: var(--wg-white); }
+.empty-icon  { --sds-c-icon-color-foreground-default: var(--wg-text-muted); margin-bottom: 1rem; }
+.empty-title { font-size: 1.05rem; font-weight: var(--wg-weight-semibold); color: var(--wg-gray); margin: 0 0 0.4rem; }
+.empty-sub   { font-size: 0.85rem; color: var(--wg-text-muted); margin: 0; }
+.dec-returned         { background: var(--wg-border); color: var(--wg-gray); }
+.dec-backfromreviewer { background: var(--wg-info-bg); color: var(--wg-info); }
 .action-btn.btn-validate {
-    background: #fff;
-    color: #7c3aed;
-    border-color: #7c3aed;
+    /* Real pre-existing bug: .action-btn sets border: none (style, not
+       just color), so setting only border-color here never actually
+       drew a border — fixed to a full border declaration. */
+    background: var(--wg-white);
+    color: var(--wg-info);
+    border: 1.5px solid var(--wg-info);
 }
 
 .action-btn.btn-validate:hover {
-    background: #7c3aed;
-    color: #fff;
+    background: var(--wg-info);
+    color: var(--wg-white);
 }

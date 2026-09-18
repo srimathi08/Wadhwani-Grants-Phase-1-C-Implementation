@@ -1,0 +1,52 @@
+/* Make application links stand out */
+:host ::slotted(a),
+.slds-table a {
+    color: #0176d3; /* Salesforce link blue */
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.slds-table a:hover {
+    text-decoration: underline;
+}
+
+/* Row hover effect */
+.slds-table tbody tr:hover {
+    background-color: #f3f3f3;
+    cursor: pointer;
+}
+
+/* Status styling */
+.status-draft {
+    background-color: #fef3e2;
+    color: #8a4500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+/* Make Application Name look like a link in Experience Cloud */
+.app-link a {
+    color: #0176d3 !important;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.app-link a:hover {
+    text-decoration: underline;
+}
+
+/* Status pill */
+.status-draft {
+    background-color: #fef3e2;
+    color: #8a4500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+/* Row hover effect */
+.slds-table tbody tr:hover {
+    background-color: #f3f3f3;
+}

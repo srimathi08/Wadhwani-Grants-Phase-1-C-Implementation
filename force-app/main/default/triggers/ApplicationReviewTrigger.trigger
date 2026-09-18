@@ -221,14 +221,17 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
 
                 if (returnAppIds.contains(app.Id)) {
                     app.Status = 'Revision Requested';
+                    app.WG_Validator_Name__c = UserInfo.getName();
                 }
 
                 if (passAppIds.contains(app.Id)) {
                     app.Validated__c = true;
+                    app.WG_Validator_Name__c = UserInfo.getName();
                 }
 
                 if (flagAppIds.contains(app.Id)) {
                     app.Flagged__c = true;
+                    app.WG_Validator_Name__c = UserInfo.getName();
                 }
 
               

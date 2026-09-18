@@ -362,6 +362,33 @@ public without sharing class WCFFormEngineController {
             }
             if (String.isNotBlank(appOrgName)) fv.put('Organization_Name__c', appOrgName);
 
+            // Fetch Account Q5 compliance fields (Bug 10)
+            if (app.AccountId != null) {
+                List<Account> accList = [
+                    SELECT Id, Do_you_have_a_US_501_c_3_organization__c,
+                           Have_you_cleared_Equivalency_Determinat__c,
+                           Are_you_FCRA_exempted_compliant__c
+                    FROM Account
+                    WHERE Id = :app.AccountId
+                    LIMIT 1
+                ];
+                if (!accList.isEmpty()) {
+                    Account a = accList[0];
+                    if (String.isNotBlank(a.Do_you_have_a_US_501_c_3_organization__c) && (!fv.containsKey('Has_501c3_Status__c') || String.isBlank(String.valueOf(fv.get('Has_501c3_Status__c'))))) {
+                        fv.put('Has_501c3_Status__c', a.Do_you_have_a_US_501_c_3_organization__c);
+                        fv.put('Do_you_have_a_US_501_c_3_organization__c', a.Do_you_have_a_US_501_c_3_organization__c);
+                    }
+                    if (String.isNotBlank(a.Have_you_cleared_Equivalency_Determinat__c) && (!fv.containsKey('Has_Equivalency_Determination__c') || String.isBlank(String.valueOf(fv.get('Has_Equivalency_Determination__c'))))) {
+                        fv.put('Has_Equivalency_Determination__c', a.Have_you_cleared_Equivalency_Determinat__c);
+                        fv.put('Have_you_cleared_Equivalency_Determinat__c', a.Have_you_cleared_Equivalency_Determinat__c);
+                    }
+                    if (String.isNotBlank(a.Are_you_FCRA_exempted_compliant__c) && (!fv.containsKey('Is_FCRA_Registered__c') || String.isBlank(String.valueOf(fv.get('Is_FCRA_Registered__c'))))) {
+                        fv.put('Is_FCRA_Registered__c', a.Are_you_FCRA_exempted_compliant__c);
+                        fv.put('Are_you_FCRA_exempted_compliant__c', a.Are_you_FCRA_exempted_compliant__c);
+                    }
+                }
+            }
+
             // Alias mappings between schema fields & UI keys
             if (fv.containsKey('Do_you_have_a_US_501_c_3_organization__c') && !fv.containsKey('Has_501c3_Status__c')) {
                 fv.put('Has_501c3_Status__c', fv.get('Do_you_have_a_US_501_c_3_organization__c'));
@@ -381,12 +408,6 @@ public without sharing class WCFFormEngineController {
                 fv.put('Are_you_FCRA_exempted_compliant__c', fv.get('Is_FCRA_Registered__c'));
             }
 
-            if (fv.containsKey('If_none_of_the_above_apply_would_you__c') && !fv.containsKey('Willing_to_Pursue_ED__c')) {
-                fv.put('Willing_to_Pursue_ED__c', fv.get('If_none_of_the_above_apply_would_you__c'));
-            } else if (fv.containsKey('Willing_to_Pursue_ED__c') && !fv.containsKey('If_none_of_the_above_apply_would_you__c')) {
-                fv.put('If_none_of_the_above_apply_would_you__c', fv.get('Willing_to_Pursue_ED__c'));
-            }
-
             if (!fv.containsKey('Fiscal_Month__c') || String.isBlank(String.valueOf(fv.get('Fiscal_Month__c')))) {
                 fv.put('Fiscal_Month__c', '03');
             }
@@ -402,25 +423,21 @@ public without sharing class WCFFormEngineController {
                 }
             }
 
-            // Fallback for blank submitter/org fields on existing draft
-            if (String.isBlank((String)fv.get('Submitter_Name__c'))) {
-                String subName = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Name)) ? currentUser.Contact.Name : currentUser.Name;
-                if (String.isNotBlank(subName)) fv.put('Submitter_Name__c', subName);
+            // Always sync fresh submitter/org fields from current User/Contact (Bug 17)
+            if (String.isNotBlank(defaultSubName)) {
+                fv.put('Submitter_Name__c', defaultSubName);
             }
-            if (String.isBlank((String)fv.get('Work_Email_ID__c'))) {
-                String subEmail = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Email)) ? currentUser.Contact.Email : currentUser.Email;
-                if (String.isNotBlank(subEmail)) fv.put('Work_Email_ID__c', subEmail);
+            if (String.isNotBlank(defaultSubEmail)) {
+                fv.put('Work_Email_ID__c', defaultSubEmail);
             }
-            if (String.isBlank((String)fv.get('Phone__c'))) {
-                String subPhone = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Phone)) ? currentUser.Contact.Phone : (String.isNotBlank(currentUser.Phone) ? currentUser.Phone : currentUser.MobilePhone);
-                if (String.isNotBlank(subPhone)) fv.put('Phone__c', subPhone);
+            if (String.isNotBlank(defaultSubPhone)) {
+                fv.put('Phone__c', defaultSubPhone);
             }
-            if (String.isBlank((String)fv.get('Job_Title__c'))) {
-                String subTitle = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Title)) ? currentUser.Contact.Title : currentUser.Title;
-                if (String.isNotBlank(subTitle)) fv.put('Job_Title__c', subTitle);
+            if (String.isNotBlank(defaultSubTitle)) {
+                fv.put('Job_Title__c', defaultSubTitle);
             }
-            if (String.isBlank((String)fv.get('Organization_Name__c')) && currentUser.Account != null && String.isNotBlank(currentUser.Account.Name)) {
-                fv.put('Organization_Name__c', currentUser.Account.Name);
+            if (String.isNotBlank(defaultOrgName)) {
+                fv.put('Organization_Name__c', defaultOrgName);
             }
 
             // 2. Historical_Data__c
@@ -500,7 +517,7 @@ public without sharing class WCFFormEngineController {
                        Growing_Businesses_Supported_FY_3__c, Growing_Businesses_Supported_FY_2__c, Growing_Businesses_Supported_FY_1__c, Growing_Businesses_Supported_CFY__c,
                        Jobs_from_Growing_Businesses_FY_3__c, Jobs_from_Growing_Businesses_FY_2__c, Jobs_from_Growing_Businesses_FY_1__c, Jobs_from_Growing_Businesses_CFY__c,
                        Avg_Cost_per_Job_FY_3__c, Avg_Cost_per_Job_FY_2__c, Avg_Cost_per_Job_FY_1__c, Avg_Cost_per_Job_CFY__c,
-                       Job_Verification_3rd_Party_CFY__c
+                       Job_Verification_3rd_Party_CFY__c, Outcome_Tracking_Details_CFY__c
                 FROM Outcomes_Data__c 
                 WHERE Proposal__c = :appId 
                 WITH SYSTEM_MODE 
@@ -508,6 +525,18 @@ public without sharing class WCFFormEngineController {
             ];
             if (!outcomes.isEmpty()) {
                 Outcomes_Data__c o = outcomes[0];
+                if (String.isNotBlank(o.Outcome_Tracking_Details_CFY__c)) {
+                    try {
+                        Map<String, Object> extraMap = (Map<String, Object>) JSON.deserializeUntyped(o.Outcome_Tracking_Details_CFY__c);
+                        for (String k : extraMap.keySet()) {
+                            if (!fv.containsKey(k) || fv.get(k) == null || String.isBlank(String.valueOf(fv.get(k)))) {
+                                fv.put(k, extraMap.get(k));
+                            }
+                        }
+                    } catch (Exception jsonEx) {
+                        System.debug(LoggingLevel.WARN, 'Outcome JSON deserialization note: ' + jsonEx.getMessage());
+                    }
+                }
                 // Job Fulfillment aliases (Q13 & Q14)
                 fv.put('JF_ENROLL_FY3', o.Projected_Learner_Enrollments_FY_3__c != null ? String.valueOf(o.Projected_Learner_Enrollments_FY_3__c) : '');
                 fv.put('JF_PLACE_FY3', o.Projected_Learner_Placements_FY_3__c != null ? String.valueOf(o.Projected_Learner_Placements_FY_3__c) : '');
@@ -979,6 +1008,38 @@ public without sharing class WCFFormEngineController {
         }
         upsert app;
 
+        // Persist Q5 compliance fields to Account if applicable (Bug 10)
+        if (app.AccountId != null) {
+            try {
+                Account accToUpdate = new Account(Id = app.AccountId);
+                Boolean hasAccUpdate = false;
+                
+                String val501c3 = valuesMap.containsKey('Do_you_have_a_US_501_c_3_organization__c') ? String.valueOf(valuesMap.get('Do_you_have_a_US_501_c_3_organization__c')) : (valuesMap.containsKey('Has_501c3_Status__c') ? String.valueOf(valuesMap.get('Has_501c3_Status__c')) : null);
+                if (String.isNotBlank(val501c3)) {
+                    accToUpdate.Do_you_have_a_US_501_c_3_organization__c = val501c3;
+                    hasAccUpdate = true;
+                }
+                
+                String valED = valuesMap.containsKey('Have_you_cleared_Equivalency_Determinat__c') ? String.valueOf(valuesMap.get('Have_you_cleared_Equivalency_Determinat__c')) : (valuesMap.containsKey('Has_Equivalency_Determination__c') ? String.valueOf(valuesMap.get('Has_Equivalency_Determination__c')) : null);
+                if (String.isNotBlank(valED)) {
+                    accToUpdate.Have_you_cleared_Equivalency_Determinat__c = valED;
+                    hasAccUpdate = true;
+                }
+                
+                String valFCRA = valuesMap.containsKey('Are_you_FCRA_exempted_compliant__c') ? String.valueOf(valuesMap.get('Are_you_FCRA_exempted_compliant__c')) : (valuesMap.containsKey('Is_FCRA_Registered__c') ? String.valueOf(valuesMap.get('Is_FCRA_Registered__c')) : null);
+                if (String.isNotBlank(valFCRA)) {
+                    accToUpdate.Are_you_FCRA_exempted_compliant__c = valFCRA;
+                    hasAccUpdate = true;
+                }
+                
+                if (hasAccUpdate) {
+                    update as system accToUpdate;
+                }
+            } catch (Exception accEx) {
+                System.debug(LoggingLevel.WARN, 'Account Q5 update note: ' + accEx.getMessage());
+            }
+        }
+
         // Upsert Child Objects
         upsertChildObjects(app.Id, valuesMap, targetStatus);
 
@@ -1251,6 +1312,22 @@ public without sharing class WCFFormEngineController {
         if (valuesMap.containsKey('Q24_VERIFIED') && out.Job_Verification_3rd_Party_CFY__c == null) {
             out.Job_Verification_3rd_Party_CFY__c = String.valueOf(valuesMap.get('Q24_VERIFIED')); hasOutcomeData = true;
         }
+
+        // Serialize all Livelihood and dynamic outcome fields to Outcome_Tracking_Details_CFY__c JSON (Bug 10)
+        Map<String, Object> outcomeJsonMap = new Map<String, Object>();
+        for (String k : valuesMap.keySet()) {
+            if (k.startsWith('LIV_') || k.startsWith('Q24_') || k.startsWith('Q28_') || k.startsWith('Q20_') || k.startsWith('Q21_')) {
+                Object v = valuesMap.get(k);
+                if (v != null && String.isNotBlank(String.valueOf(v))) {
+                    outcomeJsonMap.put(k, v);
+                }
+            }
+        }
+        if (!outcomeJsonMap.isEmpty()) {
+            out.Outcome_Tracking_Details_CFY__c = JSON.serialize(outcomeJsonMap);
+            hasOutcomeData = true;
+        }
+
         if (hasOutcomeData) {
             upsert out;
         }

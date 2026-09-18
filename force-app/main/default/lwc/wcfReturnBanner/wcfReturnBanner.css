@@ -1,8 +1,43 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ──────────────────────────────────
+   This banner is a "return for revision" / action-required notice, so
+   it's semantically a warning banner — recolored to the --wg-warning
+   family throughout instead of its own separate hardcoded orange/tan
+   palette:
+     - #f68721 (the left accent border) was the exact one-digit typo of
+       the brand's --wg-warning (#F68720) already found and fixed twice
+       elsewhere in this codebase (wfGrantsSignup, wcfDynamicForm)
+     - #fffbf5 / #fdeee2 (shell + badge backgrounds) -> var(--wg-warning-bg)
+     - #f4cf9e (shell border) -> var(--wg-warning), reused at full
+       strength since there's no separate "light warning border" token
+     - #b3410a / #7a4200 (badge + Q-pill text) -> var(--wg-warning-text),
+       both very close to the brand's #8A4B00 warning-text value
+     - #333 / #222 (feedback + reason copy) -> var(--wg-gray)
+     - #993c1d ("View original submission" link) -> var(--wg-red), kept
+       brand red rather than warning-toned since every other clickable
+       action in this codebase (buttons, links) uses brand red
+   Fonts/sizes aligned to the brand type scale: the bold 15px feedback
+   line matches the sub-heading tier (15px, Barlow SemiBold) exactly;
+   the 13px list/pill/link copy matches the label tier (13px, Open
+   Sans); the 11px badge was bumped to the nearest defined tier, 12px
+   (caption). Radii tokenized: shell border-radius (6px) matches
+   --wg-radius-sm exactly; the badge's 999px pill was aligned to the
+   brand's own --wg-radius-badge (20px) — visually identical at this
+   badge's height, but now token-driven instead of a magic number.
+   .banner-view-original has no border-radius (text-only link, not a
+   shaped button), so the square-button convention doesn't apply here.
+   font-weight: 500 on that same link has no matching brand token
+   (scale only defines 400/600/700) and was left as a literal, same
+   call made for the two 500-weight cases already documented in
+   wcfDynamicForm.
+   ──────────────────────────────────────────────────────────────────── */
+
 .banner-shell {
-    background: #fffbf5;
-    border: 1px solid #f4cf9e;
-    border-left: 4px solid #f68721;
-    border-radius: 6px;
+    background: var(--wg-warning-bg);
+    border: 1px solid var(--wg-warning);
+    border-left: 4px solid var(--wg-warning);
+    border-radius: var(--wg-radius-sm);
     padding: 16px 18px;
     margin-top: 16px;
 }
@@ -10,21 +45,23 @@
 /* "Action required" — distinct-color badge per spec */
 .banner-badge {
     display: inline-block;
-    background: #fdeee2;
-    color: #b3410a;
-    font-size: 11px;
-    font-weight: 700;
+    background: var(--wg-warning-bg);
+    color: var(--wg-warning-text);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--wg-radius-badge);
     margin-bottom: 10px;
 }
 
 .banner-feedback {
-    font-size: 15px;
-    color: #333;
-    font-weight: 700;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    color: var(--wg-gray);
+    font-weight: var(--wg-weight-semibold);
     line-height: 1.6;
     margin: 0 0 12px 0;
 }
@@ -42,21 +79,24 @@
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    font-size: 13px;
-    color: #333;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
     line-height: 1.5;
 }
 
 .banner-q-pill {
     flex-shrink: 0;
-    font-weight: 700;
-    color: #7a4200;
-    font-size: 13px;
+    font-family: var(--wg-font-body);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-warning-text);
+    font-size: var(--wg-font-size-label);
 }
 
 .banner-reason {
     flex: 1;
-    color: #222;
+    color: var(--wg-gray);
 }
 
 .banner-view-original {
@@ -64,8 +104,9 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    color: #993c1d;
-    font-size: 13px;
+    color: var(--wg-red);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
     font-weight: 500;
 }
 

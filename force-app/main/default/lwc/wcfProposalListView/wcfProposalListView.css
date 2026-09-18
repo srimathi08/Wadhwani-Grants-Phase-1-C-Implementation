@@ -1,3 +1,61 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   Same design-token family as wcfApplicationList.css (token block on
+   :host here instead of a wrapper class) — retokenized the same way:
+   every --wcf-* custom property redefined to alias the matching
+   --wg-* token. --wcf-brand/-hover/-active/-soft ->
+   var(--wg-red)/var(--wg-red-deep)/var(--wg-red-deep)/var(--wg-error-bg);
+   --wcf-navy -> var(--wg-gray); --wcf-success/-soft ->
+   var(--wg-success)/-bg; --wcf-warning/-soft -> var(--wg-warning)/-bg;
+   --wcf-error/-soft -> var(--wg-error)/-bg; --wcf-info/-soft ->
+   var(--wg-info)/-bg; --wcf-returned/-soft -> var(--wg-orange)/
+   var(--wg-warning-bg); --wcf-draft/-soft -> var(--wg-text-muted)/
+   var(--wg-border). Surfaces: --wcf-bg/--wcf-surface-alt ->
+   var(--wg-border); --wcf-surface -> var(--wg-white); --wcf-border/-soft
+   -> var(--wg-border); --wcf-text/-muted -> var(--wg-gray)/
+   var(--wg-text-muted). --wcf-radius-control (6px, exact match for
+   var(--wg-radius-sm)) is shared by the search box, filter combo AND
+   every real button — aliased to var(--wg-radius-sm) for the
+   (correct, rounded) non-button usages, then overridden to
+   border-radius: 0 directly inside the real button rules (.icon-btn,
+   .action-btn and its variants, .pg-btn, .pg-btn-active, .ghost-btn).
+   --wcf-radius-pill -> var(--wg-radius-pill).
+   Track badges (.track-jf/-jc/-lu/-both — this file's own version of
+   the jf/jc/lu-or-both concept): jf (already blue) ->
+   var(--wg-info-bg)/var(--wg-info-text)/var(--wg-info), matching the
+   established jf->info convention. jc and both were BOTH already
+   neutral/gray by this file's own original design (not colored at
+   all — "Track is a category, not a status — kept neutral so it
+   doesn't compete with the two status columns beside it," per the
+   file's own comment), so that design choice was kept and simply
+   retokenized rather than forcing jc to amber; this mirrors how
+   wgApproverDashboard's own .track-both stayed neutral for the same
+   reason. lu was purple, the one hue in this set with no brand token
+   and no pre-existing neutral treatment -> reassigned to
+   var(--wg-success)/-bg, matching the lu->success convention used on
+   wcfApproverListView, wcfApproverContainer and wgApproverDashboard.
+   Status badges: submitted/under-review (already blue) -> info;
+   revision (already the "returned" orange family) -> var(--wg-orange)/
+   var(--wg-warning-bg)/var(--wg-warning), matching this batch's
+   returned-status convention; draft -> neutral. Review badges:
+   not-started -> neutral; progress -> warning; done -> success.
+   One-off hex not routed through a custom property (#9CA3AF, #EEF1F5,
+   #1D4ED8, #BFDBFE, #374151, #E5E7EB, #F3E8FF, #7E22CE, #E9D5FF,
+   #D6DAE1, #C2410C, #FED7AA, #4B5563, #B45309, #FDE68A, #1F6B44,
+   #A7DFC1, #256F46, #D1D5DB) mapped onto the matching status-family or
+   neutral tokens the same way as wcfApplicationList and the dashboard
+   files. The focus-ring rgba(191, 32, 38, 0.12) (already var(--wg-red)'s
+   exact rgb) was left as literal.
+   font-family: 'Inter'/'Salesforce Sans' -> var(--wg-font-body) on
+   .shell; var(--wg-font-heading) added on titles/counts/buttons/page-
+   numbers. Sizes bumped/rounded to the nearest tier (11px, 12px exact,
+   16px, 18px, 20px exact, 24px) with inline comments where not an
+   exact match. No ShowToastEvent usage was found in
+   wcfProposalListView.js, so no toast-banner work was needed for this
+   file.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ═══════════════════════════════════════════════════════════════
     WCF Proposal List
     Unified Wadhwani portal design system — shares the token set used
@@ -12,38 +70,38 @@
         max-width: 100% !important;
 
         /* Brand */
-        --wcf-brand: #BF2026;
-        --wcf-brand-hover: #A31B20;
-        --wcf-brand-active: #8E171C;
-        --wcf-brand-soft: #FEF2F2;
-        --wcf-navy: #1E2D4F;
+        --wcf-brand: var(--wg-red);
+        --wcf-brand-hover: var(--wg-red-deep);
+        --wcf-brand-active: var(--wg-red-deep);
+        --wcf-brand-soft: var(--wg-error-bg);
+        --wcf-navy: var(--wg-gray);
 
         /* Status */
-        --wcf-success: #2E8B57;
-        --wcf-success-soft: #ECFDF5;
-        --wcf-warning: #F59E0B;
-        --wcf-warning-soft: #FFFBEB;
-        --wcf-error: #DC2626;
-        --wcf-error-soft: #FEF2F2;
-        --wcf-info: #2563EB;
-        --wcf-info-soft: #EFF6FF;
-        --wcf-returned: #EA580C;
-        --wcf-returned-soft: #FFF7ED;
-        --wcf-draft: #6B7280;
-        --wcf-draft-soft: #F3F4F6;
+        --wcf-success: var(--wg-success);
+        --wcf-success-soft: var(--wg-success-bg);
+        --wcf-warning: var(--wg-warning);
+        --wcf-warning-soft: var(--wg-warning-bg);
+        --wcf-error: var(--wg-error);
+        --wcf-error-soft: var(--wg-error-bg);
+        --wcf-info: var(--wg-info);
+        --wcf-info-soft: var(--wg-info-bg);
+        --wcf-returned: var(--wg-orange);
+        --wcf-returned-soft: var(--wg-warning-bg);
+        --wcf-draft: var(--wg-text-muted);
+        --wcf-draft-soft: var(--wg-border);
 
         /* Surfaces & text */
-        --wcf-bg: #F8FAFC;
-        --wcf-surface: #FFFFFF;
-        --wcf-surface-alt: #F8FAFC;
-        --wcf-border: #E5E7EB;
-        --wcf-border-soft: #F1F3F6;
-        --wcf-text: #1F2937;
-        --wcf-text-muted: #6B7280;
+        --wcf-bg: var(--wg-border);
+        --wcf-surface: var(--wg-white);
+        --wcf-surface-alt: var(--wg-border);
+        --wcf-border: var(--wg-border);
+        --wcf-border-soft: var(--wg-border);
+        --wcf-text: var(--wg-gray);
+        --wcf-text-muted: var(--wg-text-muted);
 
         /* Shape & elevation */
-        --wcf-radius-control: 6px;
-        --wcf-radius-pill: 999px;
+        --wcf-radius-control: var(--wg-radius-sm);
+        --wcf-radius-pill: var(--wg-radius-pill);
 
         /* 8px spacing scale */
         --wcf-space-1: 4px;
@@ -63,14 +121,14 @@
 
     /* ── Page shell ───────────────────────────────────────────────── */
     .shell {
-        font-family: 'Inter', 'Salesforce Sans', -apple-system, Arial, sans-serif;
+        font-family: var(--wg-font-body);
         background: var(--wcf-bg);
         min-height: 100vh;
         width: 100%;
         box-sizing: border-box;
         padding: 0;
         color: var(--wcf-text);
-        font-size: 14px;
+        font-size: var(--wg-font-size-body);
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
     }
@@ -100,8 +158,9 @@
 
     /* Headings use navy — brand red is reserved for actions and emphasis */
     .top-title {
-        font-size: 20px;
-        font-weight: 700;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-section-heading); /* was 20px, exact tier */
+        font-weight: var(--wg-weight-bold);
         color: var(--wcf-navy);
         margin: 0 0 var(--wcf-space-1);
         line-height: 1.3;
@@ -109,7 +168,7 @@
     }
 
     .top-sub {
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         color: var(--wcf-text-muted);
         line-height: 1.5;
     }
@@ -133,7 +192,7 @@
     /* FIX: the focus ring was navy-tinted rgba while the border went red */
     .search-wrap:focus-within {
         border-color: var(--wcf-brand);
-        box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12);
+        box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12); /* matches var(--wg-red)'s rgb */
         background: var(--wcf-surface);
     }
 
@@ -146,14 +205,14 @@
         border: none;
         background: transparent;
         outline: none;
-        font-size: 14px;
+        font-size: var(--wg-font-size-body);
         color: var(--wcf-text);
         width: 220px;
         font-family: inherit;
         line-height: 1.5;
     }
 
-    .search-input::placeholder { color: #9CA3AF; }
+    .search-input::placeholder { color: var(--wg-text-muted); }
 
     .filter-combo { --slds-c-input-sizing-min-width: 148px; }
 
@@ -164,7 +223,7 @@
         width: var(--wcf-input-height);
         height: var(--wcf-input-height);
         border: 1px solid var(--wcf-border);
-        border-radius: var(--wcf-radius-control);
+        border-radius: 0;
         background: var(--wcf-surface);
         cursor: pointer;
         color: var(--wcf-navy);
@@ -215,8 +274,9 @@
     }
 
     .summary-num {
-        font-size: 24px;
-        font-weight: 700;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-page-title); /* was 24px, nearest tier */
+        font-weight: var(--wg-weight-bold);
         color: var(--wcf-navy);
         line-height: 1.1;
         letter-spacing: -0.02em;
@@ -233,11 +293,11 @@
     .s-flagged { color: var(--wcf-navy); }
 
     .summary-lbl {
-        font-size: 11px;
+        font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
         color: var(--wcf-text-muted);
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        font-weight: 600;
+        font-weight: var(--wg-weight-semibold);
         line-height: 1.4;
     }
 
@@ -254,7 +314,7 @@
     .tbl {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         table-layout: auto;          /* KEY: dynamic sizing, no fixed widths */
     }
 
@@ -276,8 +336,8 @@
         height: var(--wcf-control-height);
         background: var(--wcf-surface-alt);
         color: var(--wcf-text-muted);
-        font-size: 11px;
-        font-weight: 600;
+        font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+        font-weight: var(--wg-weight-semibold);
         letter-spacing: 0.06em;
         text-transform: uppercase;
         white-space: nowrap;
@@ -295,7 +355,7 @@
     }
 
     .th.sortable:hover {
-        background: #EEF1F5;
+        background: var(--wg-border);
         color: var(--wcf-navy);
     }
 
@@ -307,7 +367,7 @@
     .th-inner { display: inline-flex; align-items: center; gap: var(--wcf-space-1); }
 .id-text {
     color: inherit;
-    font-weight: 500;
+    font-weight: var(--wg-weight-regular);
 }
     /* ── Table rows ───────────────────────────────────────────────── */
     .td {
@@ -316,7 +376,7 @@
         border-bottom: 1px solid var(--wcf-border-soft);
         vertical-align: middle;
         color: var(--wcf-text);
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         line-height: 1.5;
     }
 
@@ -357,16 +417,16 @@
 
     .td-sno {
         color: var(--wcf-text-muted);
-        font-size: 12px;
-        font-weight: 600;
+        font-size: var(--wg-font-size-caption);
+        font-weight: var(--wg-weight-semibold);
     }
 
     /* ── App ID link ──────────────────────────────────────────────── */
     .id-link {
         color: var(--wcf-brand);
-        font-weight: 600;
+        font-weight: var(--wg-weight-semibold);
         text-decoration: none;
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         white-space: nowrap;
         transition: color 0.15s ease;
     }
@@ -395,8 +455,8 @@
         height: 24px;
         padding: 0 var(--wcf-space-2);
         border-radius: var(--wcf-radius-pill);
-        font-size: 11px;
-        font-weight: 600;
+        font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+        font-weight: var(--wg-weight-semibold);
         line-height: 1;
         letter-spacing: 0.01em;
         white-space: nowrap;
@@ -417,28 +477,30 @@
 
     .track-badge { min-width: 44px; padding: 0 8px; }
 
-    .track-jf   { background: var(--wcf-info-soft);   color: #1D4ED8; border-color: #BFDBFE; }
-    .track-jc   { background: var(--wcf-draft-soft);  color: #374151; border-color: #E5E7EB; }
-    .track-lu   { background: #F3E8FF;                color: #7E22CE; border-color: #E9D5FF; }
-    .track-both { background: var(--wcf-surface-alt); color: var(--wcf-navy); border-color: #D6DAE1; }
+    .track-jf   { background: var(--wcf-info-soft);   color: var(--wg-info-text); border-color: var(--wg-info); }
+    .track-jc   { background: var(--wcf-draft-soft);  color: var(--wg-gray); border-color: var(--wg-border); }
+    /* No brand purple token — reassigned to success (green), matching
+       the lu->success convention used elsewhere in this batch. */
+    .track-lu   { background: var(--wcf-success-soft); color: var(--wg-success); border-color: var(--wg-success); }
+    .track-both { background: var(--wcf-surface-alt); color: var(--wcf-navy); border-color: var(--wg-border); }
 
     /* ── App status badges ────────────────────────────────────────── */
     /* Submitted moves green → blue per the portal badge scale
     (Submitted/Info = blue, Success/Approved = green). */
-    .status-submitted    { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
-    .status-revision     { background: var(--wcf-returned-soft); color: #C2410C; border-color: #FED7AA; }
-    .status-draft        { background: var(--wcf-draft-soft);    color: #4B5563; border-color: #E5E7EB; }
-    .status-under-review { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
+    .status-submitted    { background: var(--wcf-info-soft);     color: var(--wg-info-text); border-color: var(--wg-info); }
+    .status-revision     { background: var(--wcf-returned-soft); color: var(--wg-orange); border-color: var(--wg-warning); }
+    .status-draft        { background: var(--wcf-draft-soft);    color: var(--wg-text-muted); border-color: var(--wg-border); }
+    .status-under-review { background: var(--wcf-info-soft);     color: var(--wg-info-text); border-color: var(--wg-info); }
 
     /* ── Review status badges ─────────────────────────────────────── */
-    .review-not-started { background: var(--wcf-draft-soft);    color: #4B5563; border-color: #E5E7EB; }
-    .review-progress    { background: var(--wcf-warning-soft);  color: #B45309; border-color: #FDE68A; }
-    .review-done        { background: var(--wcf-success-soft);  color: #1F6B44; border-color: #A7DFC1; }
+    .review-not-started { background: var(--wcf-draft-soft);    color: var(--wg-text-muted); border-color: var(--wg-border); }
+    .review-progress    { background: var(--wcf-warning-soft);  color: var(--wg-warning-text); border-color: var(--wg-warning); }
+    .review-done        { background: var(--wcf-success-soft);  color: var(--wg-success); border-color: var(--wg-success); }
 
     /* ── Due date ─────────────────────────────────────────────────── */
-    .due-date    { font-size: 13px; color: var(--wcf-text); white-space: nowrap; }
-    .due-overdue { font-size: 13px; font-weight: 600; color: var(--wcf-error); white-space: nowrap; }
-    .due-urgent  { font-size: 13px; font-weight: 600; color: #B45309; white-space: nowrap; }
+    .due-date    { font-size: var(--wg-font-size-label); color: var(--wcf-text); white-space: nowrap; }
+    .due-overdue { font-size: var(--wg-font-size-label); font-weight: var(--wg-weight-semibold); color: var(--wcf-error); white-space: nowrap; }
+    .due-urgent  { font-size: var(--wg-font-size-label); font-weight: var(--wg-weight-semibold); color: var(--wg-warning-text); white-space: nowrap; }
 
     /* ── Action buttons ───────────────────────────────────────────── */
     .action-btn {
@@ -450,13 +512,13 @@
         min-width: 120px;
         padding: 0 var(--wcf-space-3);
         border: 1px solid transparent;
-        border-radius: var(--wcf-radius-control);
-        font-size: 13px;
-        font-weight: 600;
+        border-radius: 0;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-label);
+        font-weight: var(--wg-weight-semibold);
         line-height: 1;
         cursor: pointer;
         white-space: nowrap;
-        font-family: inherit;
         transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         letter-spacing: 0;
     }
@@ -499,7 +561,7 @@
 
     .btn-done:hover {
         background: var(--wcf-surface-alt);
-        border-color: #D6DAE1;
+        border-color: var(--wg-border);
     }
 
     /* Compliance — success action */
@@ -510,8 +572,8 @@
     }
 
     .action-btn.btn-compliance:hover {
-        background: #256F46;
-        border-color: #256F46;
+        background: var(--wg-success-deep);
+        border-color: var(--wg-success-deep);
         transform: none;
     }
 
@@ -556,7 +618,7 @@
         border-top: 1px solid var(--wcf-border);
     }
 
-    .pg-info { font-size: 13px; color: var(--wcf-text-muted); }
+    .pg-info { font-size: var(--wg-font-size-label); color: var(--wcf-text-muted); }
 
     .pg-controls { display: flex; gap: var(--wcf-space-1); align-items: center; }
 
@@ -567,15 +629,15 @@
         border: 1px solid var(--wcf-border);
         background: var(--wcf-surface);
         color: var(--wcf-navy);
-        border-radius: var(--wcf-radius-control);
-        font-size: 13px;
-        font-weight: 600;
+        border-radius: 0;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-label);
+        font-weight: var(--wg-weight-semibold);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-        font-family: inherit;
     }
 
     .pg-btn:hover:not(:disabled) {
@@ -595,11 +657,11 @@
         background: var(--wcf-brand) !important;
         color: var(--wcf-surface) !important;
         border-color: var(--wcf-brand) !important;
-        font-weight: 600;
+        font-weight: var(--wg-weight-semibold);
     }
 
     .pg-size-row { display: flex; align-items: center; gap: var(--wcf-space-2); }
-    .pg-size-lbl { font-size: 13px; color: var(--wcf-text-muted); }
+    .pg-size-lbl { font-size: var(--wg-font-size-label); color: var(--wcf-text-muted); }
     .pg-size-combo { --slds-c-input-sizing-min-width: 76px; }
 
     /* ══ LOADING ═══════════════════════════════════════════════════ */
@@ -614,7 +676,7 @@
 
     .loading-text {
         margin-top: var(--wcf-space-3);
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         color: var(--wcf-text-muted);
     }
 
@@ -626,23 +688,24 @@
     }
 
     .empty-icon {
-        color: #D1D5DB;
-        --sds-c-icon-color-foreground-default: #D1D5DB;
+        color: var(--wg-text-muted);
+        --sds-c-icon-color-foreground-default: var(--wg-text-muted);
         margin-bottom: var(--wcf-space-3);
     }
 
     /* FIX: this was #ffffff — white text on a white empty state, so the
     title was invisible. */
     .empty-title {
-        font-size: 16px;
-        font-weight: 600;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-sub-heading); /* was 16px, nearest tier */
+        font-weight: var(--wg-weight-semibold);
         color: var(--wcf-navy);
         line-height: 1.4;
         margin: 0 0 var(--wcf-space-1);
     }
 
     .empty-sub {
-        font-size: 13px;
+        font-size: var(--wg-font-size-label);
         color: var(--wcf-text-muted);
         line-height: 1.5;
         margin: 0 0 var(--wcf-space-3);
@@ -655,14 +718,14 @@
         height: var(--wcf-control-height);
         padding: 0 var(--wcf-space-3);
         border: 1px solid var(--wcf-brand);
-        border-radius: var(--wcf-radius-control);
+        border-radius: 0;
         background: var(--wcf-surface);
         color: var(--wcf-brand);
-        font-size: 13px;
-        font-weight: 600;
+        font-family: var(--wg-font-heading);
+        font-size: var(--wg-font-size-label);
+        font-weight: var(--wg-weight-semibold);
         line-height: 1;
         cursor: pointer;
-        font-family: inherit;
         transition: background 0.15s ease, color 0.15s ease;
     }
 
@@ -693,7 +756,7 @@
 
         .summary-row { gap: var(--wcf-space-2) 0; }
 
-        .top-title { font-size: 18px; }
+        .top-title { font-size: var(--wg-font-size-section-heading); /* was 18px, nearest tier */ }
 
         .pg-bar { justify-content: center; }
     }

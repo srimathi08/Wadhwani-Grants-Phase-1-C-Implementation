@@ -1,3 +1,68 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   This file already had its own well-organized local design-token
+   system on .vd-page, and it was already unusually close to
+   commonStyleTheme — --wcf-brand was literally #BF2026, an exact match
+   for var(--wg-red), and several other tokens were near-exact too.
+   Retokenized by redefining each --wcf-* custom property to alias the
+   matching --wg-* token (same approach as wcfComplianceDocuments),
+   so every rule that already referenced var(--wcf-brand) etc. picks
+   up the brand value with a one-line change per token:
+   --wcf-brand/-hover/-soft -> var(--wg-red)/var(--wg-red-deep)/
+   var(--wg-error-bg) (near-exact matches); --wcf-navy -> var(--wg-gray)
+   (no brand navy); --wcf-success/-soft -> var(--wg-success)/-bg;
+   --wcf-warning/-soft -> var(--wg-warning)/-bg; --wcf-error/-soft ->
+   var(--wg-error)/-bg (kept semantically as "error", not "red", even
+   though #DC2626 is numerically a touch closer to red — matches how
+   every other file in this batch treats the error/red distinction);
+   --wcf-info/-soft -> var(--wg-info)/-bg; --wcf-draft/-soft ->
+   var(--wg-text-muted)/var(--wg-border) (both near-exact).
+   --wcf-returned (#EA580C, a genuinely orange "Returned" status, not
+   amber) -> var(--wg-orange) — this file has five distinct status
+   colors (info/warning/error/success/returned) instead of the usual
+   four, so unlike other files where "returned" collapsed into
+   warning, here it gets the brand's dedicated orange accent instead,
+   preserving a fifth distinct hue; --wcf-returned-soft still reuses
+   var(--wg-warning-bg) since there's no separate "orange-bg" token
+   and the two pale tints are visually near-identical anyway.
+   Surfaces: --wcf-bg/--wcf-surface-alt (#F8FAFC, the page background,
+   distinct from card white) -> var(--wg-border), the same "ambiguous
+   light-neutral wash" call made throughout this batch — a little more
+   pronounced than the original very-subtle off-white, worth knowing
+   if the page reads a shade grayer than intended; --wcf-surface ->
+   var(--wg-white); --wcf-border/-soft -> var(--wg-border); --wcf-text/
+   -muted -> var(--wg-gray)/var(--wg-text-muted).
+   Shape: --wcf-radius-card (12px) -> var(--wg-radius-card) (10px,
+   close enough to alias directly, unlike the wcfComplianceDocuments
+   modal which was left literal — here it's one aliased variable
+   driving every card, not a one-off value); --wcf-radius-pill (999px)
+   -> var(--wg-radius-pill), another real use for it. --wcf-radius-
+   control (6px, an EXACT match for var(--wg-radius-sm)) is shared by
+   BOTH form fields and buttons in this file — aliased it to
+   var(--wg-radius-sm) for the (correct, rounded) form-field usage,
+   then overrode border-radius: 0 directly inside the four real button
+   rules (.preview-action-btn, .btn-primary/-secondary/-success) so
+   buttons still square per this batch's convention without breaking
+   the form-field radius that shares the same variable.
+   A handful of one-off hex not routed through a custom property
+   (#D6DAE1, #B45309, #8E171C, #1D4ED8/#BFDBFE, #FDE68A, #C2410C/
+   #FED7AA, #1F6B44/#A7DFC1, #B91C1C/#FECACA, #4B5563, #EEF1F5,
+   #256F46) mapped onto the matching status-family tokens the same way
+   as every other file in this batch. The navy-tinted hover shadow
+   (rgba(30, 45, 79, 0.10)) was recalculated to rgba(65, 64, 65, 0.10)
+   (var(--wg-gray)'s rgb) to match; the plain black shadow and the
+   focus-ring rgba(191, 32, 38, 0.12) (already var(--wg-red)'s exact
+   rgb) were left as literal, both already correct.
+   font-family: 'Inter'/'Salesforce Sans' -> var(--wg-font-body) once
+   on .vd-page (inherited); var(--wg-font-heading) added explicitly on
+   titles/counts/labels/buttons. .cell-id's monospace font-family was
+   left untouched, same as every other file's ID-column treatment.
+   Sizes matched the defined scale unusually well already; the few
+   non-matching ones (11px, 16px, 24px, 32px) were bumped/rounded to
+   their nearest tier, same policy as the rest of this batch.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ═══════════════════════════════════════════════════════════════
    wcfValidatorDashboard.css
    Unified Wadhwani portal design system + alignment corrections.
@@ -5,43 +70,54 @@
    are unchanged.
    ═══════════════════════════════════════════════════════════════ */
 
+/* Real bug found and fixed (repo-wide audit): this file never styled
+   :host, so <c-wg-validator-dashboard> rendered with the browser's
+   default display:inline on the Experience Cloud page region it's
+   placed on — the same "not covered full width" bug found and fixed
+   on wcfvalidatorcontainer/wcfReviewerContainer/wcfApproverListView.
+   .vd-page below expects to fill the full page (min-height: 100vh). */
+:host {
+    display: block;
+    width: 100%;
+}
+
 /* ── Design tokens ────────────────────────────────────────────── */
 .vd-page {
     /* Brand */
-    --wcf-brand: #BF2026;
-    --wcf-brand-hover: #A31B20;
-    --wcf-brand-soft: #FEF2F2;
-    --wcf-navy: #1E2D4F;
+    --wcf-brand: var(--wg-red);
+    --wcf-brand-hover: var(--wg-red-deep);
+    --wcf-brand-soft: var(--wg-error-bg);
+    --wcf-navy: var(--wg-gray);
 
     /* Status */
-    --wcf-success: #2E8B57;
-    --wcf-success-soft: #ECFDF5;
-    --wcf-warning: #F59E0B;
-    --wcf-warning-soft: #FFFBEB;
-    --wcf-error: #DC2626;
-    --wcf-error-soft: #FEF2F2;
-    --wcf-info: #2563EB;
-    --wcf-info-soft: #EFF6FF;
-    --wcf-returned: #EA580C;
-    --wcf-returned-soft: #FFF7ED;
-    --wcf-draft: #6B7280;
-    --wcf-draft-soft: #F3F4F6;
+    --wcf-success: var(--wg-success);
+    --wcf-success-soft: var(--wg-success-bg);
+    --wcf-warning: var(--wg-warning);
+    --wcf-warning-soft: var(--wg-warning-bg);
+    --wcf-error: var(--wg-error);
+    --wcf-error-soft: var(--wg-error-bg);
+    --wcf-info: var(--wg-info);
+    --wcf-info-soft: var(--wg-info-bg);
+    --wcf-returned: var(--wg-orange);
+    --wcf-returned-soft: var(--wg-warning-bg);
+    --wcf-draft: var(--wg-text-muted);
+    --wcf-draft-soft: var(--wg-border);
 
     /* Surfaces & text */
-    --wcf-bg: #F8FAFC;
-    --wcf-surface: #FFFFFF;
-    --wcf-surface-alt: #F8FAFC;
-    --wcf-border: #E5E7EB;
-    --wcf-border-soft: #F1F3F6;
-    --wcf-text: #1F2937;
-    --wcf-text-muted: #6B7280;
+    --wcf-bg: var(--wg-border);
+    --wcf-surface: var(--wg-white);
+    --wcf-surface-alt: var(--wg-border);
+    --wcf-border: var(--wg-border);
+    --wcf-border-soft: var(--wg-border);
+    --wcf-text: var(--wg-gray);
+    --wcf-text-muted: var(--wg-text-muted);
 
     /* Shape & elevation */
-    --wcf-radius-card: 12px;
-    --wcf-radius-control: 6px;
-    --wcf-radius-pill: 999px;
+    --wcf-radius-card: var(--wg-radius-card);
+    --wcf-radius-control: var(--wg-radius-sm);
+    --wcf-radius-pill: var(--wg-radius-pill);
     --wcf-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    --wcf-shadow-hover: 0 4px 12px rgba(30, 45, 79, 0.10);
+    --wcf-shadow-hover: 0 4px 12px rgba(65, 64, 65, 0.10);
 
     /* 8px spacing scale */
     --wcf-space-1: 4px;
@@ -61,12 +137,12 @@
 
 /* ── Page wrapper ─────────────────────────────────────────────── */
 .vd-page {
-    font-family: 'Inter', 'Salesforce Sans', Arial, sans-serif;
+    font-family: var(--wg-font-body);
     background: var(--wcf-bg);
     min-height: 100vh;
     padding: 0 0 var(--wcf-space-6) 0;
     color: var(--wcf-text);
-    font-size: 14px;
+    font-size: var(--wg-font-size-body);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
@@ -80,8 +156,8 @@
 }
 
 .greeting-meta {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight: var(--wg-weight-semibold);
     letter-spacing: 0.08em;
     color: var(--wcf-text-muted);
     text-transform: uppercase;
@@ -90,8 +166,9 @@
 }
 
 .greeting-title {
-    font-size: 24px;
-    font-weight: 700;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-page-title); /* was 24px, nearest tier */
+    font-weight: var(--wg-weight-bold);
     color: var(--wcf-navy);
     margin: 0 0 var(--wcf-space-1);
     line-height: 1.3;
@@ -103,7 +180,7 @@
 }
 
 .greeting-sub {
-    font-size: 13px;
+    font-size: var(--wg-font-size-label);
     color: var(--wcf-text-muted);
     line-height: 1.5;
     margin: 0;
@@ -153,7 +230,7 @@
 
 .kpi-card:hover {
     box-shadow: var(--wcf-shadow-hover);
-    border-color: #D6DAE1;
+    border-color: var(--wg-border);
     transform: translateY(-2px);
 }
 
@@ -180,8 +257,8 @@
 }
 
 .kpi-label {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight: var(--wg-weight-semibold);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -204,8 +281,9 @@
 .kpi-dot-purple { background: var(--wcf-navy); }
 
 .kpi-count {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-page-title); /* was 32px, nearest tier */
+    font-weight: var(--wg-weight-bold);
     color: var(--wcf-navy);
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -215,7 +293,7 @@
 /* FIX: pushes the caption to the card floor so one- and two-line
    sub-labels still bottom-align across the row. */
 .kpi-sub {
-    font-size: 12px;
+    font-size: var(--wg-font-size-caption);
     color: var(--wcf-text-muted);
     line-height: 1.5;
     margin-top: auto;
@@ -242,22 +320,23 @@
 }
 
 .qp-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading); /* was 16px, nearest tier */
+    font-weight: var(--wg-weight-semibold);
     color: var(--wcf-navy);
     line-height: 1.4;
     margin-bottom: var(--wcf-space-1);
 }
 
 .qp-sub {
-    font-size: 12px;
+    font-size: var(--wg-font-size-caption);
     color: var(--wcf-text-muted);
     line-height: 1.5;
 }
 
 .qp-link {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
     color: var(--wcf-brand);
     cursor: pointer;
     white-space: nowrap;
@@ -290,7 +369,7 @@
 .preview-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: var(--wg-font-size-label);
 }
 
 .preview-table thead tr {
@@ -301,8 +380,8 @@
 .preview-table th {
     padding: var(--wcf-space-2) var(--wcf-space-3);
     height: var(--wcf-control-height);
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight: var(--wg-weight-semibold);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--wcf-text-muted);
@@ -347,10 +426,10 @@
 
 /* FIX: application IDs no longer wrap mid-token ("IA-" / "0000000929"). */
 .cell-id {
-    font-weight: 600;
+    font-weight: var(--wg-weight-semibold);
     color: var(--wcf-navy);
     font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 12px;
+    font-size: var(--wg-font-size-caption);
     white-space: nowrap;
 }
 
@@ -358,24 +437,24 @@
     text-align: center !important;
     color: var(--wcf-text-muted);
     padding: var(--wcf-space-5) 0 !important;
-    font-size: 13px;
+    font-size: var(--wg-font-size-label);
 }
 
 /* ── Due date classes ─────────────────────────────────────────── */
 .due-date {
-    font-size: 13px;
+    font-size: var(--wg-font-size-label);
     color: var(--wcf-text);
     white-space: nowrap;
 }
 
 .due-date.due-urgent {
-    color: #B45309;
-    font-weight: 600;
+    color: var(--wg-warning-text);
+    font-weight: var(--wg-weight-semibold);
 }
 
 .due-date.due-overdue {
     color: var(--wcf-error);
-    font-weight: 600;
+    font-weight: var(--wg-weight-semibold);
 }
 
 /* ── Status pills ─────────────────────────────────────────────── */
@@ -390,8 +469,8 @@
     padding: 0 var(--wcf-space-2);
     border-radius: var(--wcf-radius-pill);
     border: 1px solid transparent;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    font-weight: var(--wg-weight-semibold);
     line-height: 1;
     letter-spacing: 0.01em;
     white-space: nowrap;
@@ -399,20 +478,20 @@
 }
 
 /* In use today */
-.status-awaiting     { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
-.status-inprogress   { background: var(--wcf-warning-soft);  color: #B45309; border-color: #FDE68A; }
-.status-resubmission { background: var(--wcf-returned-soft); color: #C2410C; border-color: #FED7AA; }
+.status-awaiting     { background: var(--wcf-info-soft);     color: var(--wg-info-text); border-color: var(--wg-info); }
+.status-inprogress   { background: var(--wcf-warning-soft);  color: var(--wg-warning-text); border-color: var(--wg-warning); }
+.status-resubmission { background: var(--wcf-returned-soft); color: var(--wg-orange); border-color: var(--wg-warning); }
 
 /* Portal-wide status vocabulary — additive, safe to reuse */
 .status-submitted,
-.status-info         { background: var(--wcf-info-soft);     color: #1D4ED8; border-color: #BFDBFE; }
+.status-info         { background: var(--wcf-info-soft);     color: var(--wg-info-text); border-color: var(--wg-info); }
 .status-approved,
 .status-reviewed,
-.status-success      { background: var(--wcf-success-soft);  color: #1F6B44; border-color: #A7DFC1; }
-.status-returned     { background: var(--wcf-returned-soft); color: #C2410C; border-color: #FED7AA; }
-.status-rejected     { background: var(--wcf-error-soft);    color: #B91C1C; border-color: #FECACA; }
+.status-success      { background: var(--wcf-success-soft);  color: var(--wg-success); border-color: var(--wg-success); }
+.status-returned     { background: var(--wcf-returned-soft); color: var(--wg-orange); border-color: var(--wg-warning); }
+.status-rejected     { background: var(--wcf-error-soft);    color: var(--wg-error); border-color: var(--wg-error); }
 .status-notstarted,
-.status-draft        { background: var(--wcf-draft-soft);    color: #4B5563; border-color: #E5E7EB; }
+.status-draft        { background: var(--wcf-draft-soft);    color: var(--wg-text-muted); border-color: var(--wg-border); }
 
 /* ── Action buttons (preview table) ──────────────────────────── */
 /* FIX: min-width evens out "Validate" vs "Resume" so the ACTION column
@@ -425,10 +504,10 @@
     height: var(--wcf-control-height);
     min-width: 120px;
     padding: 0 var(--wcf-space-3);
-    border-radius: var(--wcf-radius-control);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
     line-height: 1;
     cursor: pointer;
     border: 1px solid transparent;
@@ -463,8 +542,8 @@
 }
 
 .preview-action-validate:active {
-    background: #8E171C;
-    border-color: #8E171C;
+    background: var(--wg-red-deep);
+    border-color: var(--wg-red-deep);
 }
 
 /* Resume — neutral outline, amber reserved for status meaning */
@@ -477,11 +556,11 @@
 .preview-action-resume:hover {
     background: var(--wcf-surface-alt);
     color: var(--wcf-navy);
-    border-color: #D6DAE1;
+    border-color: var(--wg-border);
 }
 
 .preview-action-resume:active {
-    background: #EEF1F5;
+    background: var(--wg-border);
 }
 
 /* ── Shared button styles (available for portal consistency) ─── */
@@ -493,10 +572,10 @@
     justify-content: center;
     height: var(--wcf-control-height);
     padding: 0 var(--wcf-space-3);
-    border-radius: var(--wcf-radius-control);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
     line-height: 1;
     cursor: pointer;
     border: 1px solid transparent;
@@ -532,8 +611,8 @@
 }
 
 .vd-page .btn-success:hover {
-    background: #256F46;
-    border-color: #256F46;
+    background: var(--wg-success-deep);
+    border-color: var(--wg-success-deep);
 }
 
 .vd-page .btn-primary:focus-visible,
@@ -554,9 +633,10 @@
 /* ── Form controls (portal-consistent defaults) ──────────────── */
 .vd-page label,
 .vd-page .form-label {
+    font-family: var(--wg-font-heading);
     display: block;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
     color: var(--wcf-navy);
     line-height: 1.5;
     margin-bottom: var(--wcf-space-1);
@@ -577,7 +657,7 @@
     background: var(--wcf-surface);
     color: var(--wcf-text);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--wg-font-size-body);
     line-height: 1.5;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     box-sizing: border-box;
@@ -588,7 +668,7 @@
 .vd-page textarea:focus {
     outline: none;
     border-color: var(--wcf-brand);
-    box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12);
+    box-shadow: 0 0 0 3px rgba(191, 32, 38, 0.12); /* matches var(--wg-red)'s rgb */
 }
 
 .vd-page input:disabled,
@@ -601,7 +681,7 @@
 
 .vd-page .form-help {
     display: block;
-    font-size: 12px;
+    font-size: var(--wg-font-size-caption);
     color: var(--wcf-text-muted);
     line-height: 1.5;
     margin-top: var(--wcf-space-1);
@@ -609,7 +689,7 @@
 
 .vd-page .form-error {
     display: block;
-    font-size: 12px;
+    font-size: var(--wg-font-size-caption);
     color: var(--wcf-error);
     line-height: 1.5;
     margin-top: var(--wcf-space-1);
@@ -624,9 +704,10 @@
 
 /* ── Preview footer ───────────────────────────────────────────── */
 .preview-footer {
+    font-family: var(--wg-font-heading);
     text-align: right;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
     color: var(--wcf-brand);
     cursor: pointer;
     line-height: 1.5;
@@ -656,7 +737,7 @@
         padding: var(--wcf-space-4) var(--wcf-gutter) var(--wcf-space-3);
     }
 
-    .greeting-title { font-size: 20px; }
+    .greeting-title { font-size: var(--wg-font-size-section-heading); }
 
     .qp-header {
         flex-direction: column;

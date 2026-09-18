@@ -12,7 +12,6 @@ import submitDynamicApplication from '@salesforce/apex/WCFFormEngineController.s
 import deleteUploadedFile from '@salesforce/apex/WCFFormEngineController.deleteUploadedFile';
 import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedback';
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 function calculateEndingBalance(startBalance, revenue, expense) {
     const start = Number(startBalance) || 0;
@@ -46,6 +45,17 @@ export default class WcfDynamicForm extends LightningElement {
     winLogoUrl = WIN_LOGO; // Set logo URL from static resource
 
     @track isLoading = false;
+    // In-component replacement for native ShowToastEvent — see showBanner()/
+    // closeBanner() below. Renders using commonStyleTheme's existing
+    // .error-banner/.warning-banner/.success-banner/.info-banner classes
+    // so notifications match brand styling instead of the platform's
+    // default SLDS toast (solid-fill, not tokenized, can't be restyled
+    // from component CSS since it renders outside this shadow tree).
+    @track bannerVisible = false;
+    @track bannerVariant = 'info'; // 'error' | 'warning' | 'success' | 'info'
+    @track bannerTitle = '';
+    @track bannerMessage = '';
+    _bannerTimeout;
     @track currentScreen = 'screen1'; // Screen 1 is Track Selection & FAQ (2nd Image is first page)
     @track activeTabId = 'tabAboutOrg';
 
@@ -985,13 +995,37 @@ export default class WcfDynamicForm extends LightningElement {
         return this.currentScreen === 'screen1';
     }
 
+    showBanner(variant, title, message, duration = 6000) {
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+        }
+        this.bannerVariant = variant;
+        this.bannerTitle = title;
+        this.bannerMessage = message;
+        this.bannerVisible = true;
+        this._bannerTimeout = setTimeout(() => {
+            this.bannerVisible = false;
+        }, duration);
+    }
+
+    closeBanner() {
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+        }
+        this.bannerVisible = false;
+    }
+
+    get isBannerError() { return this.bannerVariant === 'error'; }
+    get isBannerWarning() { return this.bannerVariant === 'warning'; }
+    get isBannerSuccess() { return this.bannerVariant === 'success'; }
+    get isBannerInfo() { return this.bannerVariant === 'info'; }
+    get bannerClass() {
+        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
+    }
+
     handleGoToForm() {
         if (this.isNextDisabled) {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Track Selection Required',
-                message: 'Please select at least one track that your work covers.',
-                variant: 'warning'
-            }));
+            this.showBanner('warning', 'Track Selection Required', 'Please select at least one track that your work covers.');
             return;
         }
         this.currentScreen = 'screen2';
@@ -1449,11 +1483,7 @@ export default class WcfDynamicForm extends LightningElement {
 
     async handleDownloadPDF() {
         if (!this.isJsLoaded || !window.jspdf?.jsPDF) {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Preparing PDF',
-                message: 'Loading PDF library, please wait…',
-                variant: 'info'
-            }));
+            this.showBanner('info', 'Preparing PDF', 'Loading PDF library, please wait…');
             this._scriptsInitiated = false;
             this._loadPdfLibraries();
             const ready = await this._waitForPdfLibrary(8000);
@@ -1504,7 +1534,7 @@ export default class WcfDynamicForm extends LightningElement {
         let y = 20;
         let pageCount = 1;
 
-        const BRAND      = [153, 0, 0];      // Wadhwani Crimson Red (#990000)
+        const BRAND      = [191, 32, 38];    // Wadhwani Crimson Red -- corrected to var(--wg-red)'s actual rgb (was stale pre-rebrand #990000; audit sweep fix)
         const NAVY       = [27, 42, 74];     // Navy (#1B2A4A)
         const BRAND_SOFT = [253, 246, 244];  // Soft tint
         const TEXT_DARK  = [33, 37, 41];
@@ -1911,11 +1941,7 @@ export default class WcfDynamicForm extends LightningElement {
         const fileName = `Wadhwani Grants Application ${form.Organization_Name__c || 'Draft'}.pdf`;
         doc.save(fileName);
 
-        this.dispatchEvent(new ShowToastEvent({
-            title: 'PDF Downloaded',
-            message: `${fileName} has been saved to your downloads.`,
-            variant: 'success'
-        }));
+        this.showBanner('success', 'PDF Downloaded', `${fileName} has been saved to your downloads.`);
     }
 
     _syncRichTextFieldsFromDOM() {
@@ -2570,7 +2596,7 @@ export default class WcfDynamicForm extends LightningElement {
         if (!errEl) {
             errEl = document.createElement('p');
             errEl.className = 'field-error-msg';
-            errEl.style.color      = '#C23934';
+            errEl.style.color      = 'var(--wg-error)'; // audit sweep fix -- was stale literal #C23934, now uses the token (inherits through the shadow tree from :host)
             errEl.style.fontSize   = '12px';
             errEl.style.lineHeight = '1.4';
             errEl.style.marginTop  = '4px';
@@ -2601,7 +2627,7 @@ export default class WcfDynamicForm extends LightningElement {
         if (!errEl) {
             errEl = document.createElement('p');
             errEl.className = 'field-error-msg';
-            errEl.style.color = '#C23934';
+            errEl.style.color = 'var(--wg-error)'; // audit sweep fix -- was stale literal #C23934
             errEl.style.fontSize = '12px';
             errEl.style.marginTop = '4px';
             row.parentElement.appendChild(errEl);
@@ -3796,11 +3822,7 @@ export default class WcfDynamicForm extends LightningElement {
         let isValid = true;
 
         if (!this.isAttested) {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Validation Error',
-                message: 'Please confirm the accuracy of your application before submitting.',
-                variant: 'error'
-            }));
+            this.showBanner('error', 'Validation Error', 'Please confirm the accuracy of your application before submitting.');
             const box = this.template.querySelector('.attest-checkbox');
             if (box) {
                 this._registerInvalid(box);
@@ -3862,13 +3884,13 @@ export default class WcfDynamicForm extends LightningElement {
             ));
             const labelsStr = uniqueLabels.map(l => `"${l}"`).join(', ');
 
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Missing Required Fields',
-                message: labelsStr
+            this.showBanner(
+                'error',
+                'Missing Required Fields',
+                labelsStr
                     ? `Please complete all required fields before proceeding: ${labelsStr}`
-                    : 'Please complete all required fields before proceeding.',
-                variant: 'error'
-            }));
+                    : 'Please complete all required fields before proceeding.'
+            );
 
             this._scrollToFirstError();
             return false;
@@ -4903,11 +4925,7 @@ export default class WcfDynamicForm extends LightningElement {
         const submitterName = this.formValues.Submitter_Name__c || '';
 
         if (!submitterName) {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Missing Info',
-                message: 'Please fill in the Submitter Name on Page 1 before using AI Feedback.',
-                variant: 'warning'
-            }));
+            this.showBanner('warning', 'Missing Info', 'Please fill in the Submitter Name on Page 1 before using AI Feedback.');
             return;
         }
 
@@ -4923,11 +4941,7 @@ export default class WcfDynamicForm extends LightningElement {
 
         const plain = this.stripHtml(fieldValue).replace(/\u00A0/g, ' ').trim();
         if (!plain) {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Empty Field',
-                message: 'Please write something in this field before requesting AI feedback.',
-                variant: 'warning'
-            }));
+            this.showBanner('warning', 'Empty Field', 'Please write something in this field before requesting AI feedback.');
             return;
         }
 
@@ -5063,11 +5077,7 @@ export default class WcfDynamicForm extends LightningElement {
                 contentVersionId: f.contentVersionId
             }));
             this.q24UploadedFiles = [...this.q24UploadedFiles, ...newFiles];
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'File Uploaded',
-                message: 'Verification Report uploaded successfully.',
-                variant: 'success'
-            }));
+            this.showBanner('success', 'File Uploaded', 'Verification Report uploaded successfully.');
         }
     }
 
@@ -5096,11 +5106,7 @@ export default class WcfDynamicForm extends LightningElement {
                 contentVersionId: f.contentVersionId
             }));
             this.q28UploadedFiles = [...this.q28UploadedFiles, ...newFiles];
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'File Uploaded',
-                message: 'Supporting Document uploaded successfully.',
-                variant: 'success'
-            }));
+            this.showBanner('success', 'File Uploaded', 'Supporting Document uploaded successfully.');
         }
     }
 
@@ -5300,28 +5306,16 @@ export default class WcfDynamicForm extends LightningElement {
                 this._recordId = result.recordId;
                 this.isDirty = false;
                 if (showToast) {
-                    this.dispatchEvent(new ShowToastEvent({
-                        title: 'Draft Saved',
-                        message: 'Your RFI application draft has been saved successfully.',
-                        variant: 'success'
-                    }));
+                    this.showBanner('success', 'Draft Saved', 'Your RFI application draft has been saved successfully.');
                 }
             } else if (showToast) {
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Error Saving Draft',
-                    message: result ? result.message : 'Draft save failed.',
-                    variant: 'error'
-                }));
+                this.showBanner('error', 'Error Saving Draft', result ? result.message : 'Draft save failed.');
             }
         })
         .catch(err => {
             console.error('Draft save failed:', err);
             if (showToast) {
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Error Saving Draft',
-                    message: err.body ? err.body.message : err.message || 'Draft save failed.',
-                    variant: 'error'
-                }));
+                this.showBanner('error', 'Error Saving Draft', err.body ? err.body.message : err.message || 'Draft save failed.');
             }
         })
         .finally(() => {
@@ -5395,34 +5389,21 @@ export default class WcfDynamicForm extends LightningElement {
         .then(result => {
             if (result && result.isSuccess) {
                 this.isDirty = false;
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Submitted',
-                    message: 'Your RFI application has been successfully submitted.',
-                    variant: 'success'
-                }));
+                this.showBanner('success', 'Submitted', 'Your RFI application has been successfully submitted.');
                 this.dispatchEvent(new CustomEvent('submitted', { detail: { recordId: result.recordId } }));
                 setTimeout(() => {
                     window.location.href = '/wcf/s/';
                 }, 1500);
             } else {
-                this.dispatchEvent(new ShowToastEvent({
-                    title: 'Submission Error',
-                    message: result ? result.message : 'Submission failed.',
-                    variant: 'error'
-                }));
+                this.showBanner('error', 'Submission Error', result ? result.message : 'Submission failed.');
             }
         })
         .catch(err => {
             console.error('Submit failed:', err);
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Submission Error',
-                message: err.body ? err.body.message : err.message || 'Submission failed.',
-                variant: 'error'
-            }));
+            this.showBanner('error', 'Submission Error', err.body ? err.body.message : err.message || 'Submission failed.');
         })
         .finally(() => {
             this.isLoading = false;
         });
     }
 }
-

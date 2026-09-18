@@ -56,7 +56,6 @@ import { LightningElement, wire, track, api } from 'lwc';
         import CL_Not_at_this_time from '@salesforce/label/c.CL_Not_at_this_time';
 
         import { NavigationMixin } from 'lightning/navigation';
-        import { ShowToastEvent } from 'lightning/platformShowToastEvent';
         import { FlowNavigationBackEvent } from 'lightning/flowSupport';
         // Custom Labels
         import CL_WCF_Form_Title from '@salesforce/label/c.CL_WCF_Form_Title';
@@ -389,6 +388,61 @@ import USER_PHONE_FIELD from '@salesforce/schema/User.Phone';
 import USER_MOBILE_FIELD from '@salesforce/schema/User.MobilePhone';
 
         export default class WcfForm extends NavigationMixin(LightningElement) {
+            // ─────────────────────────────────────────────────────────────────────────────
+            // WG TOAST BANNER — replaces the native ShowToastEvent, which renders outside
+            // this component's shadow tree and cannot be restyled to match the brand.
+            // Built from scratch (no prior custom-toast infrastructure existed here).
+            // All 33 former ShowToastEvent dispatch sites now call this.showBanner({...})
+            // with the SAME config-object shape (title/message/variant[/mode]) they always
+            // passed to `new ShowToastEvent({...})`, so no call site needed restructuring —
+            // only the wrapper changed. mode:'sticky' keeps the banner up until the person
+            // dismisses it; anything else (including no mode at all, the common case)
+            // auto-dismisses after 6s, matching this batch's established banner pattern.
+            // ─────────────────────────────────────────────────────────────────────────────
+            @track bannerVisible = false;
+            @track bannerVariant = 'info';
+            @track bannerTitle   = '';
+            @track bannerMessage = '';
+            _bannerTimeout;
+
+            showBanner(config) {
+                const { title, message, variant, mode } = config || {};
+                if (this._bannerTimeout) {
+                    clearTimeout(this._bannerTimeout);
+                    this._bannerTimeout = null;
+                }
+                this.bannerVariant = variant || 'info';
+                this.bannerTitle   = title || '';
+                this.bannerMessage = message || '';
+                this.bannerVisible = true;
+                if (mode !== 'sticky') {
+                    this._bannerTimeout = setTimeout(() => {
+                        this.bannerVisible = false;
+                    }, 6000);
+                }
+            }
+
+            closeBanner() {
+                if (this._bannerTimeout) {
+                    clearTimeout(this._bannerTimeout);
+                    this._bannerTimeout = null;
+                }
+                this.bannerVisible = false;
+            }
+
+            handleDismissBanner() {
+                this.closeBanner();
+            }
+
+            get isBannerError()   { return this.bannerVariant === 'error'; }
+            get isBannerWarning() { return this.bannerVariant === 'warning'; }
+            get isBannerSuccess() { return this.bannerVariant === 'success'; }
+            get isBannerInfo()    { return this.bannerVariant === 'info'; }
+
+            get bannerClass() {
+                return 'wg-toast-banner ' + this.bannerVariant + '-banner';
+            }
+
             @track useDynamicEngine = true;
             @api recordId;
             selectedLanguage = 'en_US';
@@ -1841,13 +1895,11 @@ get p5FY1JVWrapperClass() {
             this.isModalOpen = false;
 
             // Show success toast
-            this.dispatchEvent(
-                new ShowToastEvent({
+            this.showBanner({
                     title: 'Saved',
                     message: 'Content saved successfully!',
                     variant: 'success'
-                })
-            );
+                });
         }
 
         stripHtml(html) {
@@ -2182,27 +2234,27 @@ if (VERIFY_CELL_MAP[field] && !this._isYesValue(field)) {
         
                 console.log('✅ Auto-saved. recordId =', this.recordId);
         
-                /*this.dispatchEvent(new ShowToastEvent({
+                /*this.showBanner({
                     title: 'Draft Saved', message: 'Your progress has been saved.',
                     variant: 'success', mode: 'dismissible'
-                }));*/
-            this.dispatchEvent(new ShowToastEvent({
+                });*/
+            this.showBanner({
             title: this.labels.CL_Progress_Auto_Saved,
             message: this.labels.CL_Your_answers_are_saved_To_save_and_exit_at_any_time_click_Save_Draft_in_t,
             variant: 'success', mode: 'dismissible'
-        }));
+        });
             return true;
         
             } catch (error) {
                 console.error('⚠️ Auto-save error:', JSON.stringify(error));
                 const serverMessage = error?.body?.message || error?.message || '';
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                 title: this.labels.CL_Auto_save_Failed,
             message: serverMessage
             ? `Could not save your progress: ${serverMessage}`
             : this.labels.CL_Could_not_save_your_progress_Please_use_Save_Draft_manually,
                     variant: 'error', mode: 'sticky'
-                }));
+                });
                 return false;
             } finally {
                 this.isSaving = false;
@@ -2498,7 +2550,7 @@ _clearAllInlineErrors() {
             if (!errEl) {
                 errEl = document.createElement('p');
                 errEl.className = 'inline-date-error-msg';
-                errEl.style.color = '#C23934';
+                errEl.style.color = 'var(--wg-error)';
                 errEl.style.fontSize = '12px';
                 errEl.style.marginTop = '4px';
                 inputEl.parentElement.appendChild(errEl);
@@ -2523,7 +2575,7 @@ _showNativeError(el, message) {
     if (!errEl) {
         errEl = document.createElement('p');
         errEl.className = 'field-error-msg';
-        errEl.style.color      = '#C23934';
+        errEl.style.color      = 'var(--wg-error)';
         errEl.style.fontSize   = '12px';
         errEl.style.lineHeight = '1.4';
         errEl.style.marginTop  = '4px';
@@ -2552,7 +2604,7 @@ _showChipError(card, message) {
     if (!errEl) {
         errEl = document.createElement('p');
         errEl.className = 'field-error-msg';
-        errEl.style.color = '#C23934';
+        errEl.style.color = 'var(--wg-error)';
         errEl.style.fontSize = '12px';
         errEl.style.marginTop = '4px';
         row.parentElement.appendChild(errEl);
@@ -3251,13 +3303,11 @@ this._applyVerifiedPhone();
                     console.log('Fetched Funding Opportunity ID:', id);
                 } catch (error) {
                     console.error('Failed to fetch Funding Opportunity ID:', error);
-                    this.dispatchEvent(
-                        new ShowToastEvent({
+                    this.showBanner({
                             title: 'Error',
                             message: 'Could not load Funding Opportunity.',
                             variant: 'error'
-                        })
-                    );
+                        });
                 }
             }
             
@@ -4175,33 +4225,33 @@ this._syncPhoneFromIti(input, true, true);
         if (typeof this.flushAllInputs === 'function') this.flushAllInputs();
 
         if (!this.isJsLoaded || !window.jspdf?.jsPDF) {
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
                 title: 'Preparing PDF',
                 message: 'Loading PDF library, please wait…',
                 variant: 'info',
                 mode: 'dismissible'
-            }));
+            });
             this._scriptsInitiated = false; // allow a fresh attempt
             this._loadPdfLibraries();
             const ready = await this._waitForPdfLibrary(8000);
             if (!ready) {
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title: 'PDF Library Not Ready',
                     message: 'Could not load the PDF library. Please check your connection and try again.',
                     variant: 'error',
                     mode: 'sticky'
-                }));
+                });
                 return;
             }
         }
 
         const jsPDFLib = window.jspdf?.jsPDF;
         if (!jsPDFLib) {
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
                 title: 'Error',
                 message: 'PDF library not available. Please refresh the page and try again.',
                 variant: 'error'
-            }));
+            });
             return;
         }
 
@@ -4269,13 +4319,17 @@ this._syncPhoneFromIti(input, true, true);
         let y = 20;
         let pageCount = 1;
 
-        // ── Brand palette — matches the Review & Submit page (Wadhwani red) ──
-        const BRAND      = [200, 57, 29];   // #C8391D — matches wcfFormPreview.css
-const NAVY       = [27, 42, 74];    // #1B2A4A — matches .rv-section-head
-const BRAND_SOFT = [253, 246, 244]; // #FDF6F4 — matches .rv-table even-row tint
-const TEXT_DARK  = [27, 42, 74];    // navy body text, matches .rv-info-value
-const TEXT_GRAY  = [112, 110, 107]; // matches .rv-info-label
-const LINE_GRAY  = [232, 221, 217]; // #E8DDD9 — matches .rv-section border
+        // ── Brand palette — jsPDF renders to canvas/PDF colorspace directly, not
+        // through the DOM/CSSOM, so these MUST stay literal numeric RGB triplets —
+        // var(--wg-*) tokens don't apply here. Updated to the real commonStyleTheme
+        // brand tokens (this used to reference wcfFormPreview.css's pre-rebrand
+        // navy/red scheme, which this batch already retokenized in an earlier pass).
+        const BRAND      = [191, 32, 38];   // var(--wg-red) #BF2026
+        const NAVY       = [65, 64, 65];    // var(--wg-gray) #414041 — no brand "navy" token exists; folds to gray, same as every other file in this batch
+        const BRAND_SOFT = [252, 245, 245]; // ~5% tint of var(--wg-red) over white
+        const TEXT_DARK  = [65, 64, 65];    // var(--wg-gray) #414041
+        const TEXT_GRAY  = [107, 107, 107]; // var(--wg-text-muted) #6B6B6B
+        const LINE_GRAY  = [228, 228, 228]; // var(--wg-border) #E4E4E4
 
         const addHeader = () => {
             if (this.logoBase64 && pageCount === 1) {
@@ -4622,11 +4676,11 @@ if (showJC) {
         const fileName = `Wadhwani Grants Application ${orgData.Organization_Name__c || 'Draft'}.pdf`;
         doc.save(fileName);
 
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: 'PDF Downloaded',
             message: `${fileName} has been saved.`,
             variant: 'success'
-        }));
+        });
     }
     handleCurrencyInput(event) {
         this.hasUnsavedChanges = true;
@@ -5305,11 +5359,11 @@ if (showJC) {
                 numFields.forEach(({ field, label }) => {
                     if (row[field] !== '' && row[field] !== null && row[field] !== undefined) {
                         if (Number(row[field]) < 0) {
-                            this.dispatchEvent(new ShowToastEvent({
+                            this.showBanner({
                                 title: 'Validation Error',
                                 message: `Domain ${i + 1}: ${label} cannot be negative.`,
                                 variant: 'error',
-                            }));
+                            });
                             isValid = false;
                         }
                     }
@@ -5320,11 +5374,11 @@ if (showJC) {
             this.businessSectors.forEach((row, i) => {
                 if (row.yearlyEnrolment !== '' && row.yearlyEnrolment !== null && row.yearlyEnrolment !== undefined) {
                     if (Number(row.yearlyEnrolment) < 0) {
-                        this.dispatchEvent(new ShowToastEvent({
+                        this.showBanner({
                             title: 'Validation Error',
                             message: `Sector ${i + 1}: Yearly Enrolment cannot be negative.`,
                             variant: 'error',
-                        }));
+                        });
                         isValid = false;
                     }
                 }
@@ -5540,11 +5594,11 @@ validateNativeRequiredFields() {
         const isRichTextValid = this.currentPage === 1 ? true : this.validateRichTextFields();
 
             if (!isValid || !isRichTextValid) {
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title: 'Error',
                     message: 'Please fill all required fields before proceeding.',
                     variant: 'error'
-                }));
+                });
                 return;
             }
 
@@ -5621,13 +5675,13 @@ validateNativeRequiredFields() {
         ));
         const labelsStr = uniqueLabels.map(l => `"${l}"`).join(', ');
         
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: this.labels.CL_Missing_Required_Fields,
             message: labelsStr
                 ? `${this.labels.CL_This_is_a_required_fields}: ${labelsStr}`
                 : this.labels.CL_Please_complete_all_required_fields_before_proceeding,
             variant: 'error'
-        }));
+        });
 
         this._scrollToFirstError();
         return;
@@ -6216,11 +6270,11 @@ validateNativeRequiredFields() {
                 || '';
 
             if (!submitterName) {
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title: 'Missing Info',
                     message: 'Please fill in the Submitter Name on Page 1 before using AI Feedback.',
                     variant: 'warning'
-                }));
+                });
                 return;
             }
             let fieldValue = this.organizationData[fieldApiName] || '';
@@ -6235,11 +6289,11 @@ const plain = this.stripHtml(fieldValue).replace(/\u00A0/g, ' ').trim();
 if (plain === '') {
     this._showFieldError(fieldApiName, 'Please write your answer before requesting AI feedback.');
     this._scrollToFirstError();
-    this.dispatchEvent(new ShowToastEvent({
+    this.showBanner({
         title:   'Empty Field',
         message: 'Please write something in this field before requesting AI feedback.',
         variant: 'warning'
-    }));
+    });
     return;
 }
             // ... rest of the method unchanged
@@ -6600,19 +6654,19 @@ async _processUploadFinished(uploadedFiles, cellKey) {
             this.invalidFileCells = cleared;
         }
 
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: 'File Uploaded',
             message: `${validFiles.length} PDF file(s) uploaded.`,
             variant: 'success'
-        }));
+        });
     } catch (error) {
         console.error('❌ File upload error:', JSON.stringify(error));
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: 'Upload Error',
             message: error?.body?.message || 'File uploaded but could not be mapped.',
             variant: 'error',
             mode: 'sticky'
-        }));
+        });
     }
 }
 /*handleIncorporationDateValueOnly(event) {
@@ -6725,12 +6779,12 @@ validateFileUploads() {
     this.invalidFileCells = { ...this.invalidFileCells };
 
     if (missingFiles.length > 0) {
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title:   'File Attachment Required',
             message: `${this.labels.CL_File_Required_Message}: ${missingFiles.join(', ')}`,
             variant: 'error',
              mode:    'dismissible'
-        }));
+        });
         this._scrollToFirstError();
         return false;
     }
@@ -6751,18 +6805,18 @@ validateFileUploads() {
                 this.uploadedFiles = this.uploadedFiles.filter(id => id !== docId);
                 this.hasUnsavedChanges = true;
 
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title: 'File Removed',
                     message: 'The file was deleted successfully.',
                     variant: 'success'
-                }));
+                });
             } catch (error) {
                 console.error('❌ Delete file error:', JSON.stringify(error));
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title: 'Delete Failed',
                     message: error?.body?.message || 'Could not delete the file. Please try again.',
                     variant: 'error'
-                }));
+                });
             }
         }
 
@@ -6798,15 +6852,15 @@ async _processQ21UploadFinished(uploadedFiles) {
             ? `"${f.name}" is not an accepted file type (PDF, Word, PowerPoint, or Excel only).`
             : `"${f.name}" exceeds the 50 MB limit.`;
     });
-    this.dispatchEvent(new ShowToastEvent({
+    this.showBanner({
         title: 'Invalid File', message: msgs.join(' '), variant: 'error', mode: 'sticky'
-    }));
+    });
 }
     if (duplicateFiles.length > 0) {
         const msgs = duplicateFiles.map(f => `"${f.name}" has already been uploaded.`);
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: 'Duplicate File', message: msgs.join(' '), variant: 'error', mode: 'sticky'
-        }));
+        });
     }
 
     for (const f of rejected) {
@@ -6834,11 +6888,11 @@ async _processQ21UploadFinished(uploadedFiles) {
     });
     this.additionalInfoFiles = updated;   // ← this now actually runs
 
-    this.dispatchEvent(new ShowToastEvent({
+    this.showBanner({
     title:   'File Uploaded',
     message: `${validFiles.length} file(s) uploaded.`,
     variant: 'success'
-}));
+});
 }
     async handleQ21DeleteFile(event) {
         const docId = event.target.dataset.docId;
@@ -6846,17 +6900,17 @@ async _processQ21UploadFinished(uploadedFiles) {
             await deleteUploadedFile({ contentDocumentId: docId });
             this.additionalInfoFiles = this.additionalInfoFiles.filter(f => f.documentId !== docId);
             this.hasUnsavedChanges = true;
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
                 title: 'File Removed',
                 message: 'The file was deleted successfully.',
                 variant: 'success'
-            }));
+            });
         } catch (error) {
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
                 title: 'Delete Failed',
                 message: error?.body?.message || 'Could not delete the file. Please try again.',
                 variant: 'error'
-            }));
+            });
         }
     }
         // PREVIEW FUNCTIONS:
@@ -6983,11 +7037,11 @@ handleDateFocusOut(event) {
                 }
             });
             if (draftHasBadText) {
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
             title: this.labels.CL_Invalid_Input,
             message: this.labels.CL_Please_fix_the_highlighted_fields_before_saving_your_draft,
             variant: 'error'
-        }));
+        });
         this._scrollToFirstError();
                 return;
             }
@@ -7078,11 +7132,11 @@ handleDateFocusOut(event) {
                     }));
                 }
         
-                this.dispatchEvent(new ShowToastEvent({
+                this.showBanner({
                     title:   'Success',
                     message: 'Draft saved successfully! You can resume from the Drafts page.',
                     variant: 'success'
-                }));
+                });
         
             } catch (error) {
                 console.error('❌ Save Draft Error:', JSON.stringify(error, null, 2));
@@ -7090,7 +7144,7 @@ handleDateFocusOut(event) {
                     || error?.body?.pageErrors?.[0]?.message
                     || error?.message
                     || 'Something went wrong while saving the draft.';
-                this.dispatchEvent(new ShowToastEvent({ title: 'Error', message, variant: 'error' }));
+                this.showBanner({ title: 'Error', message, variant: 'error' });
             }
         }
 
@@ -7125,12 +7179,12 @@ handleDateFocusOut(event) {
     this.updateRichTextFieldsForCurrentPage();
 
     if (!this.isAttested) {
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: this.labels.CL_Validation_Error,
             message: this.labels.CL_Attestation_Checkbox
                      || 'Please confirm the accuracy of your application before submitting.',
             variant: 'error'
-        }));
+        });
         const box = this.template.querySelector('.wcf-attest-checkbox-row lightning-input');
         if (box) { this._registerInvalid(box); this._scrollToFirstError(); }
         return;
@@ -7141,13 +7195,13 @@ handleDateFocusOut(event) {
             this._invalidElements.filter(el => el && el.isConnected).map(el => this._getFieldLabel(el)).filter(Boolean)
         ));
         const labelsStr = uniqueLabels.map(l => `"${l}"`).join(', ');
-        this.dispatchEvent(new ShowToastEvent({
+        this.showBanner({
             title: this.labels.CL_Validation_Error,
             message: labelsStr
                 ? `${this.labels.CL_This_is_a_required_fields}: ${labelsStr}`
                 : this.labels.CL_Please_fix_the_highlighted_fields_before_proceeding,
             variant: 'error'
-        }));
+        });
         this._scrollToFirstError();
         return;
     }
@@ -7165,11 +7219,11 @@ handleDateFocusOut(event) {
             // 2) Validate presence of Funding Opportunity
             if (!this.organizationData.FundingOpportunityId) {
                 this.isLoading = false;
-                return this.dispatchEvent(new ShowToastEvent({
+                return this.showBanner({
                     title:   'Error',
                     message: 'Funding Opportunity ID is missing!',
                     variant: 'error'
-                }));
+                });
 
             }
             // ✅ Auto-populate attestation fields from submitter info
@@ -7201,11 +7255,11 @@ handleDateFocusOut(event) {
             this.isSubmitted = true;
             localStorage.removeItem('wcf_draft_recordId');
 
-            this.dispatchEvent(new ShowToastEvent({
+            this.showBanner({
                 title:   'Success',
                 message: 'Application submitted successfully.',
                 variant: 'success'
-            }));
+            });
 
             setTimeout(() => {
                 this[NavigationMixin.Navigate]({
@@ -7228,13 +7282,11 @@ handleDateFocusOut(event) {
                 error?.message ||
                 'Unknown error occurred during submission';
 
-            this.dispatchEvent(
-                new ShowToastEvent({
+            this.showBanner({
                     title: 'Error',
                     message: message,
                     variant: 'error'
-                })
-            );
+                });
         });
         }
         

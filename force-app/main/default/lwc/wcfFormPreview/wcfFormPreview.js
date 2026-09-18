@@ -1048,7 +1048,7 @@ export default class WcfFormPreview extends LightningElement {
 
     async _paintOfficePreview(container, extension, base64Data, title) {
         if (!container) return;
-        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p style="color: #666; font-size: 14px;">Loading document preview...</p></div>';
+        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-body);">Loading document preview...</p></div>';
 
         const ext = (extension || '').toLowerCase().replace(/^\./, '');
 
@@ -1093,13 +1093,13 @@ export default class WcfFormPreview extends LightningElement {
                             const worksheet = workbook.Sheets[sheetName];
                             if (worksheet) {
                                 if (workbook.SheetNames.length > 1) {
-                                    html += `<div style="font-weight: 700; font-size: 15px; color: #0176d3; margin: 16px 0 8px; border-bottom: 2px solid #0176d3; padding-bottom: 4px;">📊 Sheet: ${this._escapeHtml(sheetName)}</div>`;
+                                    html += `<div style="font-weight: var(--wg-weight-bold); font-size: var(--wg-font-size-sub-heading); color: var(--wg-orange); margin: 16px 0 8px; border-bottom: 2px solid var(--wg-orange); padding-bottom: 4px;">📊 Sheet: ${this._escapeHtml(sheetName)}</div>`;
                                 }
                                 const tableHtml = xlsxLib.utils.sheet_to_html(worksheet, { id: `preview-table-${idx}`, editable: false });
-                                html += `<div style="overflow-x: auto; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 6px;">${tableHtml}</div>`;
+                                html += `<div style="overflow-x: auto; margin-bottom: 20px; border: 1px solid var(--wg-border); border-radius: 6px;">${tableHtml}</div>`;
                             }
                         });
-                        container.innerHTML = html || '<p style="padding: 20px; color: #666;">No data found in spreadsheet.</p>';
+                        container.innerHTML = html || '<p style="padding: 20px; color: var(--wg-text-muted);">No data found in spreadsheet.</p>';
                         return;
                     }
                 }
@@ -1116,7 +1116,7 @@ export default class WcfFormPreview extends LightningElement {
                             bytes[i] = binaryString.charCodeAt(i);
                         }
                         const result = await window.mammoth.convertToHtml({ arrayBuffer: bytes.buffer });
-                        container.innerHTML = `<div style="line-height: 1.6; color: #2d3748; padding: 12px; font-size: 14px;">${result.value || '<p>Empty document.</p>'}</div>`;
+                        container.innerHTML = `<div style="line-height: 1.6; color: var(--wg-gray); padding: 12px; font-size: var(--wg-font-size-body);">${result.value || '<p>Empty document.</p>'}</div>`;
                         return;
                     }
                 } catch (mammothErr) {
@@ -1124,7 +1124,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
             } else if (ext === 'txt') {
                 const text = atob(base64Data);
-                container.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.5; padding: 16px; background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 6px;">${this._escapeHtml(text)}</pre>`;
+                container.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: var(--wg-font-size-label); line-height: 1.5; padding: 16px; background: #f8f9fa; border: 1px solid var(--wg-border); border-radius: 6px;">${this._escapeHtml(text)}</pre>`;
                 return;
             }
 
@@ -1132,17 +1132,17 @@ export default class WcfFormPreview extends LightningElement {
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px;">
                     <div style="font-size: 48px; margin-bottom: 12px;">📁</div>
-                    <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">${title}</h3>
-                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">This file type (${ext.toUpperCase()}) is not supported for inline browser rendering.</p>
-                    <p style="color: #64748b; font-size: 13px;">Please click <strong>Download File</strong> above to open it on your device.</p>
+                    <h3 style="font-size: 18px; font-weight: var(--wg-weight-bold); color: var(--wg-gray); margin-bottom: 6px;">${title}</h3>
+                    <p style="color: var(--wg-text-muted); margin-bottom: 20px; font-size: var(--wg-font-size-body);">This file type (${ext.toUpperCase()}) is not supported for inline browser rendering.</p>
+                    <p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-label);">Please click <strong>Download File</strong> above to open it on your device.</p>
                 </div>
             `;
         } catch (err) {
             console.error('Error rendering office preview:', err);
             container.innerHTML = `
                 <div style="text-align: center; padding: 30px;">
-                    <p style="color: #c23934; font-weight: 600; margin-bottom: 12px;">Could not render preview for ${title}.</p>
-                    <p style="color: #666; font-size: 13px;">Please click <strong>Download File</strong> in the header to view this document.</p>
+                    <p style="color: var(--wg-error); font-weight: var(--wg-weight-semibold); margin-bottom: 12px;">Could not render preview for ${title}.</p>
+                    <p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-label);">Please click <strong>Download File</strong> in the header to view this document.</p>
                 </div>
             `;
         }
@@ -1275,7 +1275,7 @@ export default class WcfFormPreview extends LightningElement {
             const jsPDFLib = window.jspdf?.jsPDF;
             if (!jsPDFLib) return;
 
-            const RED    = [153, 0, 0];       // #990000
+            const RED    = [191, 32, 38];     // corrected to var(--wg-red)'s actual rgb (was stale pre-rebrand #990000; audit sweep fix)
             const NAVY   = [27, 42, 74];      // #1B2A4A
             const LIGHT  = [253, 246, 244];  // soft tint
             const GREY   = [112, 110, 107];

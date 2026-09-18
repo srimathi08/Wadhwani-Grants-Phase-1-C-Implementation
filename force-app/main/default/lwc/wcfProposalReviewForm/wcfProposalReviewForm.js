@@ -1,5 +1,4 @@
 import { LightningElement, track, wire } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import WIN_LOGO from '@salesforce/resourceUrl/WIN_Logo';
 import getReviewerFormV5Metadata from '@salesforce/apex/WCF_ReviewFormJFController.getReviewerFormV5Metadata';
@@ -148,6 +147,42 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     @track rejectionReasons = [];
     @track rejectionReasonOptions = [];
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // WG TOAST BANNER — replaces the native ShowToastEvent, which renders
+    // outside this component's shadow tree and cannot be restyled to match
+    // the brand. Built from scratch (no prior custom-toast infrastructure
+    // existed here) — but this component already funneled every toast
+    // through its own showToast(title, message, variant) wrapper method
+    // (8 call sites), so only that method's body changes below; no call
+    // sites needed touching.
+    // ─────────────────────────────────────────────────────────────────────────────
+    @track bannerVisible = false;
+    @track bannerVariant = 'info';
+    @track bannerTitle   = '';
+    @track bannerMessage = '';
+    _bannerTimeout;
+
+    closeBanner() {
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+            this._bannerTimeout = null;
+        }
+        this.bannerVisible = false;
+    }
+
+    handleDismissBanner() {
+        this.closeBanner();
+    }
+
+    get isBannerError()   { return this.bannerVariant === 'error'; }
+    get isBannerWarning() { return this.bannerVariant === 'warning'; }
+    get isBannerSuccess() { return this.bannerVariant === 'success'; }
+    get isBannerInfo()    { return this.bannerVariant === 'info'; }
+
+    get bannerClass() {
+        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
+    }
 
     @wire(getRejectionReasonOptions)
     wiredRejectionReasons({ data, error }) {
@@ -1128,7 +1163,17 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             });
     }
 
-    showToast(title, message, variant) {
-        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    showToast(title, message, variant, duration = 6000) {
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+            this._bannerTimeout = null;
+        }
+        this.bannerVariant = variant;
+        this.bannerTitle   = title;
+        this.bannerMessage = message;
+        this.bannerVisible = true;
+        this._bannerTimeout = setTimeout(() => {
+            this.bannerVisible = false;
+        }, duration);
     }
 }

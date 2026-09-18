@@ -1,3 +1,123 @@
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ──────────────────────────────────
+   This file previously had its own parallel design system (see header
+   below) with different color values than the brand doc / commonStyleTheme
+   uses. Recolored to brand tokens per explicit confirmation:
+     - primary red family (#8A1C1C, #C30000, #990000, #d92d20, hover
+       states) -> var(--wg-red) / var(--wg-red-deep)
+     - SLDS default error red (#c23934) -> var(--wg-error)
+     - SLDS focus blue (#0176d3) -> var(--wg-orange), matching
+       commonStyleTheme's own focus-ring color on .primary-btn/.form-input
+     - near-black/muted grays (many distinct shades) -> var(--wg-gray) /
+       var(--wg-text-muted); one of them (#414042) was the exact typo the
+       brand doc itself flags as a known bad value
+     - card/table/input border grays -> var(--wg-border) / var(--wg-input-border)
+     - green submit-button family -> var(--wg-success) / var(--wg-success-bg)
+       (a new --wg-success-deep token was added to commonStyleTheme for the
+       hover state, mirroring --wg-red-deep/--wg-orange-deep)
+     - orange divider/tag/callout family -> var(--wg-warning) family,
+       including one more one-digit hex typo (#f68721 vs #F68720)
+     - blue info callout -> var(--wg-info) family (a new --wg-info-text
+       token was added to commonStyleTheme for the darker banner-copy color,
+       mirroring --wg-warning-text)
+   Deliberately LEFT UNTOUCHED (out of scope for this pass):
+     - the purple "optional question"/AI-assist sub-palette (#7d5bd6 and
+       friends) — not in the brand doc, looks like an intentional distinct
+       accent, not a bug
+     - the many near-white pink background tints (#fff5f5, #fff8f8,
+       #fffafa, #fdf6f6, #fff0f0, #fef1f0, #FAECE7, #feb2b2) — decorative,
+       and none of them map cleanly to a semantically-correct token
+     - font-size (rem units) elsewhere in the file — doesn't map cleanly
+       onto the brand doc's px-based type scale; a separate decision from
+       color recoloring
+     - two font-weight: 500 uses (.tracker-main-title, .rv-lbl) — no
+       matching weight token exists (scale only has 400/600/700)
+
+   SECOND PASS — button shape + button typography (per explicit follow-up
+   request): EVERY real action button, no exceptions on shape, including
+   the "Previous"/"Next" step-nav buttons (.btn-primary-red/.btn-brand-red,
+   .btn-tab-next, .btn-secondary-grey, .btn-submit-green ×2,
+   .btn-secondary-outline, .btn-save-draft, .btn-remove-row,
+   .btn-download-pdf, .mockup-add-btn, .toolbar-min-btn) is now
+   border-radius: 0 (square), matching commonStyleTheme's
+   .primary-btn/.ghost-btn convention, and the labeled CTA-style buttons
+   among them now use var(--wg-font-heading) / 14px
+   var(--wg-font-size-button) / var(--wg-weight-semibold) — the brand
+   doc's Barlow-SemiBold-600 button spec — instead of the inherited
+   Open-Sans/bold/rem values they had before. (An earlier version of this
+   pass made the step-nav pair round as an exception; that was a
+   misreading of the request and was corrected back to square.)
+     - "Previous"/"Next" labels were shortened from "← Previous Tab"/
+       "Next Tab →" to "Previous"/"Next", and the text arrows were
+       replaced with inline SVG chevrons (stroke: currentColor) for a
+       crisper, resolution-independent look instead of the old Unicode
+       arrow glyphs. .btn-secondary-grey (Previous only) was also
+       recolored from a muted-gray-on-near-white look — which read as a
+       disabled control — to the same red-border/red-text ghost-button
+       treatment as .btn-save-draft beside it, so it reads as an active,
+       on-brand control.
+     - EXCEPTION: .modern-ai-btn was squared for shape consistency, but its
+       purple color/font were left alone (same off-brand-by-design accent
+       noted above).
+     - EXCEPTION: .btn-file-chip-remove (the small "✕" dismiss control on
+       file-upload chips) was left circular — an icon-only chip affordance,
+       not a labeled action button, so square didn't read correctly there;
+       flagged instead of changed silently.
+     - Also swapped two remaining hardcoded disabled-state grays
+       (#e0e0e0 on .btn-primary-red:disabled / button:disabled and
+       .btn-submit-green:disabled) for var(--wg-border), closing the last
+       hardcoded colors on these specific button rules.
+
+   THIRD PASS — wcfDynamicForm.html inline styles (previously out of
+   scope, now fixed per explicit follow-up): 46 hardcoded hex colors used
+   directly in style="" attributes throughout the HTML — duplicates of
+   colors already tokenized in this CSS file, plus a standalone Bootstrap-
+   style warning box (#fff3cd/#ffeeba/#856404, not part of any design
+   system here) — were replaced with the matching var(--wg-*) tokens.
+   These inherit correctly through the shadow tree since --wg-* is set on
+   :host by the @import above. Left untouched: #faf8ff, a light lavender
+   that pairs with the purple AI-assist accent already excluded above.
+   Also found, NOT fixed here (separate from tokens, flagging only):
+     - .btn-submit-green, .subtext-muted are each defined twice with
+       conflicting values; the second definition silently wins
+     - .question-number's own rule is fully overridden by the earlier
+       ".modern-subsection-number, .question-number, .mockup-optional-number"
+       group, which uses !important on every property
+
+   FOURTH PASS — native toast replacement + a second recolor sweep
+   (per explicit follow-up): the "Missing Required Fields"-style red
+   block wasn't from this file at all — it was the platform's native
+   ShowToastEvent (lightning/platformShowToastEvent), rendered as SLDS's
+   default solid-fill toast outside this component's shadow tree, so no
+   CSS here could ever have restyled it. All 15 dispatchEvent(new
+   ShowToastEvent(...)) calls in the .js were replaced with a
+   showBanner()/closeBanner() pair that renders an in-component,
+   auto-dismissing .wg-toast-banner using the SAME tokenized
+   .error-banner/.warning-banner/.success-banner/.info-banner classes
+   as everywhere else, so it now gets the tinted-bg/left-accent/icon
+   look instead of a solid block. The now-unused ShowToastEvent import
+   was removed.
+     - While investigating, a second sweep turned up ~14 more hardcoded
+       hex values this file's original recolor pass had missed (it
+       wasn't exhaustive the first time): clear-cut near-black text
+       (#1f2937/#1a202c/#333333 -> var(--wg-gray)), light-gray borders/
+       dividers (#ddd/#e5e7eb/#edf2f7/#ececec/#d8dde6/#f3f2f2 ->
+       var(--wg-border)), an error-state hover pairing on the file-chip
+       remove control (#dc2626 -> var(--wg-error), #fee2e2 ->
+       var(--wg-error-bg)), and two more disabled/track grays
+       (#e0e0e0, #f3f3f3 -> var(--wg-border)).
+     - NOT fixed, flagged instead: a cluster of ~9 generic light-neutral
+       background washes (#f7fafc, #fafafa, #f8f9fa, #f7f7f7, #f5f5f5,
+       #f4f6f9, #f3f4f6, #f0f8ff, #fffdfa) used for table-header/chip/
+       hover-highlight fills. None of them carry brand-red/status-color
+       meaning, and commonStyleTheme doesn't currently define a "light
+       neutral surface" token distinct from --wg-white/--wg-border to
+       map them onto cleanly — reusing --wg-border felt too dark/flat
+       for some of these (several are blue-tinted, not gray). Left as-is
+       pending a decision on whether to add such a token.
+   ──────────────────────────────────────────────────────────────────── */
+
 /* ==========================================================================
    WADHWANI GRANTS RFI FORM - DYNAMIC ENGINE DESIGN SYSTEM (MATCHING wcfForm)
    Headings: Barlow | Subheadings & Body: Open Sans
@@ -5,26 +125,33 @@
 
 /* ── Typography Definitions ── */
 h1, h2, h3, h4, .rfi-page-title, .q-title, .section-heading, .faq-q-title, .section-card-title, .modern-section-title, .modern-subsection-title, .mockup-optional-title {
-    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-weight: 700;
+    font-family: var(--wg-font-heading) !important;
+    font-weight: var(--wg-weight-bold);
 }
 
 p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .faq-ans, .modern-section-description, .modern-subsection-description, .mockup-optional-description {
-    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--wg-font-body);
 }
 
 .required, .req-star {
-    color: #c23934 !important;
-    font-weight: 700;
+    color: var(--wg-error) !important;
+    font-weight: var(--wg-weight-bold);
     margin-left: 2px;
 }
 
 /* ── Outer Page Wrapper (Matching wcfForm) ── */
+/* was max-width: 990px (a hardcoded, brand-token-adjacent value —
+   commonStyleTheme defines --wg-container-max-width: 960px, but this
+   never referenced it). Per explicit request, the cap was removed so
+   the form fills its page/region instead of floating as a narrow
+   centered card — and that "fill the page" behavior is now the
+   .wg-full-width shared utility from commonStyleTheme (see the .html,
+   which adds that class alongside this one) rather than being
+   redefined locally, so any other full-page component can reuse it. */
 .centered-form-container {
-    max-width: 990px;
     margin: 36px auto 0 auto;
     padding: 36px 30px 120px 30px;
-    background: #ffffff;
+    background: var(--wg-white);
     border-radius: 20px;
     box-shadow: 0 8px 24px rgba(80, 44, 100, 0.07);
     position: relative;
@@ -48,9 +175,9 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .rfi-page-title, .form-title {
     font-size: 1.4rem;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     text-align: center;
-    color: #8A1C1C;
+    color: var(--wg-red);
     letter-spacing: 0.02em;
     margin-bottom: 2px;
     line-height: 1.3;
@@ -81,46 +208,46 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     left: 50%;
     width: 100%;
     height: 2px;
-    background: #e0e0e0;
+    background: var(--wg-border);
     z-index: 0;
 }
 
 .tracker-connector--done {
-    background: #C30000;
+    background: var(--wg-red);
 }
 
 .tracker-bubble {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid #d0d0d0;
-    background: #fff;
+    border: 2px solid var(--wg-border);
+    background: var(--wg-white);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
-    font-weight: 600;
-    color: #888;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
     position: relative;
     z-index: 1;
     transition: all 0.2s ease;
 }
 
 .tracker-bubble--active {
-    border-color: #C30000;
-    background: #C30000;
-    color: #fff;
+    border-color: var(--wg-red);
+    background: var(--wg-red);
+    color: var(--wg-white);
 }
 
 .tracker-bubble--done {
-    border-color: #C30000;
-    background: #C30000;
-    color: #fff;
+    border-color: var(--wg-red);
+    background: var(--wg-red);
+    color: var(--wg-white);
 }
 
 .tracker-label {
     font-size: 11px;
-    color: #888;
+    color: var(--wg-text-muted);
     margin-top: 8px;
     text-align: center;
     line-height: 1.3;
@@ -128,20 +255,20 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .tracker-label--active {
-    color: #C30000;
-    font-weight: 600;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
 }
 
 /* ── Block Divider Labels ── */
 .block-divider-label {
-    font-family: 'Barlow', sans-serif;
+    font-family: var(--wg-font-heading);
     font-size: 0.75rem;
-    font-weight: 700;
-    color: #dd6b20;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-warning);
     letter-spacing: 0.08em;
     margin: 24px 0 16px 0;
     text-transform: uppercase;
-    border-bottom: 2px solid #dd6b20;
+    border-bottom: 2px solid var(--wg-warning);
     padding-bottom: 6px;
 }
 
@@ -152,8 +279,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .rfi-card-box {
-    background: #ffffff;
-    border: 1px solid #d0d0d0;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
     border-radius: 12px;
     padding: 24px;
     margin-bottom: 20px;
@@ -161,14 +288,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .q-title {
     font-size: 1.15rem;
-    font-weight: 700;
-    color: #1e1e1e;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin: 0 0 6px 0;
 }
 
 .q-subtitle {
     font-size: 0.88rem;
-    color: #666666;
+    color: var(--wg-text-muted);
     margin: 0 0 18px 0;
 }
 
@@ -183,8 +310,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     display: flex;
     align-items: center;
     gap: 14px;
-    background: #ffffff;
-    border: 1.5px solid #d0d0d0;
+    background: var(--wg-white);
+    border: 1.5px solid var(--wg-border);
     border-radius: 8px;
     padding: 14px 18px;
     cursor: pointer;
@@ -192,40 +319,40 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .track-card-option:hover {
-    border-color: #8A1C1C;
+    border-color: var(--wg-red);
     background: #fffafa;
 }
 
 .track-card-option.selected {
-    border: 2px solid #8A1C1C;
+    border: 2px solid var(--wg-red);
     background: #fff8f8;
 }
 
 .custom-checkbox {
     width: 22px;
     height: 22px;
-    border: 2px solid #a0a0a0;
+    border: 2px solid var(--wg-text-muted);
     border-radius: 4px;
-    background: #ffffff;
+    background: var(--wg-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     font-size: 13px;
-    color: #ffffff;
+    color: var(--wg-white);
     flex-shrink: 0;
     transition: all 0.15s ease;
 }
 
 .track-card-option.selected .custom-checkbox {
-    background: #8A1C1C;
-    border-color: #8A1C1C;
+    background: var(--wg-red);
+    border-color: var(--wg-red);
 }
 
 .track-label-text {
     font-size: 0.98rem;
-    font-weight: 600;
-    color: #2d3748;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
 }
 
 .next-btn-row {
@@ -236,10 +363,10 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .section-tag {
     display: inline-block;
-    background: #feebc8;
-    color: #c05621;
+    background: var(--wg-warning-bg);
+    color: var(--wg-warning-text);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     letter-spacing: 0.05em;
     padding: 3px 8px;
     border-radius: 4px;
@@ -249,14 +376,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .section-heading {
     font-size: 1.15rem;
-    font-weight: 700;
-    color: #2d3748;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     margin: 4px 0 6px 0;
 }
 
 .section-desc {
     font-size: 0.88rem;
-    color: #4a5568;
+    color: var(--wg-text-muted);
     margin: 0;
     line-height: 1.5;
 }
@@ -268,8 +395,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .section-step {
     font-size: 0.78rem;
-    font-weight: 700;
-    color: #8A1C1C;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-red);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 4px;
@@ -277,21 +404,21 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .modern-section-title {
     font-size: 1.6rem;
-    font-weight: 700;
-    color: #1e1e1e;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin: 0 0 6px 0;
 }
 
 .modern-section-description {
     font-size: 0.95rem;
-    color: #555555;
+    color: var(--wg-text-muted);
     line-height: 1.6;
     margin-bottom: 24px;
 }
 
 .modern-subsection-card {
-    background: #ffffff;
-    border: 1px solid #e5e5e5;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
     border-radius: 14px;
     padding: 24px 28px;
     margin-bottom: 24px;
@@ -311,41 +438,41 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 28px !important;
     height: 28px !important;
     border-radius: 50% !important;
-    background: #b10d18 !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
+    background: var(--wg-red-deep) !important;
+    color: var(--wg-white) !important;
+    font-weight: var(--wg-weight-bold) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     font-size: 0.92rem !important;
     flex-shrink: 0 !important;
-    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--wg-font-heading) !important;
 }
 
 .modern-subsection-title,
 .question-title,
 .mockup-optional-title,
 .q-title {
-    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--wg-font-heading) !important;
     font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    color: #1e1e1e !important;
+    font-weight: var(--wg-weight-bold) !important;
+    color: var(--wg-gray) !important;
     margin: 0 0 4px 0 !important;
     line-height: 1.3 !important;
 }
 
 .modern-subsection-description {
     font-size: 0.88rem;
-    color: #666666;
+    color: var(--wg-text-muted);
     line-height: 1.5;
     margin: 0;
 }
 
 .subtext-muted {
     font-size: 0.78rem;
-    color: #666666;
+    color: var(--wg-text-muted);
     margin-top: 3px;
-    font-weight: 400;
+    font-weight: var(--wg-weight-regular);
     line-height: 1.35;
 }
 
@@ -367,7 +494,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     border-radius: 8px;
     background: #FAECE7;
     color: #993C1D;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -377,14 +504,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .question-title {
     font-size: 1.15rem;
-    font-weight: 700;
-    color: #1e1e1e;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin-bottom: 4px;
 }
 
 .question-subtext {
     font-size: 0.88rem;
-    color: #666;
+    color: var(--wg-text-muted);
 }
 
 .option-grid {
@@ -394,8 +521,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .option-card {
-    background: #ffffff;
-    border: 1.5px solid #e5e5e5;
+    background: var(--wg-white);
+    border: 1.5px solid var(--wg-border);
     border-radius: 12px;
     padding: 20px;
     cursor: pointer;
@@ -404,25 +531,25 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .option-card:hover {
-    border-color: #8A1C1C;
+    border-color: var(--wg-red);
     box-shadow: 0 4px 12px rgba(138, 28, 28, 0.08);
 }
 
 .option-card.selected {
-    border: 2px solid #8A1C1C;
+    border: 2px solid var(--wg-red);
     background: #fffafa;
 }
 
 .option-title {
     font-size: 1rem;
-    font-weight: 700;
-    color: #1e1e1e;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin-bottom: 6px;
 }
 
 .option-description {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--wg-text-muted);
     line-height: 1.5;
 }
 
@@ -433,13 +560,13 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #8A1C1C;
-    color: #fff;
+    background: var(--wg-red);
+    color: var(--wg-white);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
 }
 
 /* ── Modern Form Grids & Inputs ── */
@@ -464,16 +591,16 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .field-helper {
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #3e3e3c;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
     margin-bottom: 4px;
 }
 
 .modern-field .slds-form-element__label,
 .field-label {
     font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    color: #3e3e3c !important;
+    font-weight: var(--wg-weight-semibold) !important;
+    color: var(--wg-text-muted) !important;
     margin-bottom: 4px !important;
     display: block;
 }
@@ -499,11 +626,11 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     height: 30px;
     border-radius: 50%;
     background: #7d5bd6;
-    color: white;
+    color: var(--wg-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     font-size: 0.9rem;
     flex-shrink: 0;
 }
@@ -520,8 +647,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .mockup-optional-title {
     font-size: 1.3rem;
-    font-weight: 700;
-    color: #222;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
 }
 
 .mockup-optional-pill {
@@ -531,18 +658,18 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     border-radius: 999px;
     font-size: 0.72rem;
     font-style: italic;
-    font-weight: 600;
+    font-weight: var(--wg-weight-semibold);
 }
 
 .mockup-optional-description {
     margin-top: 8px;
-    color: #666;
+    color: var(--wg-text-muted);
     line-height: 1.7;
     font-size: 0.88rem;
 }
 
 .mockup-inner-card {
-    background: white;
+    background: var(--wg-white);
     border: 1px solid #d9cdf6;
     border-radius: 10px;
     padding: 18px;
@@ -553,7 +680,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px dashed #ddd;
+    border-bottom: 1px dashed var(--wg-border);
     padding-bottom: 14px;
     margin-bottom: 18px;
 }
@@ -561,8 +688,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .mockup-inner-label {
     font-size: 0.76rem;
     letter-spacing: 1px;
-    font-weight: 700;
-    color: #666;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
 }
 
 .mockup-grid-two {
@@ -586,12 +713,12 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .mockup-add-btn {
-    border: 1px dashed #d92d20;
-    background: white;
-    color: #d92d20;
+    border: 1px dashed var(--wg-red);
+    background: var(--wg-white);
+    color: var(--wg-red);
     padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 0;
+    font-weight: var(--wg-weight-semibold);
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -608,14 +735,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .modern-richtext-label {
     font-size: 0.92rem;
-    font-weight: 600;
-    color: #222;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
     margin-bottom: 6px;
 }
 
 .modern-richtext-helper {
     font-size: 0.82rem;
-    color: #777;
+    color: var(--wg-text-muted);
     margin-bottom: 12px;
     line-height: 1.5;
 }
@@ -625,7 +752,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     align-items: center;
     gap: 8px;
     background: #f7f7f7;
-    border: 1px solid #e4e4e4;
+    border: 1px solid var(--wg-border);
     border-bottom: none;
     padding: 8px 12px;
     border-radius: 10px 10px 0 0;
@@ -634,29 +761,29 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .toolbar-min-btn {
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    border-radius: 0;
     border: none;
     background: transparent;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 0.9rem;
 }
 
 .toolbar-min-btn:hover {
-    background: #ececec;
+    background: var(--wg-border);
 }
 
 .modern-richtext-area {
     min-height: 180px;
-    border: 1px solid #e4e4e4;
+    border: 1px solid var(--wg-border);
     border-top: none;
     padding: 16px;
     outline: none;
     font-size: 0.92rem;
     line-height: 1.6;
     border-radius: 0 0 10px 10px;
-    background: #fff;
+    background: var(--wg-white);
     overflow-y: auto;
 }
 
@@ -669,10 +796,13 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .modern-ai-btn {
+    /* border/background/text stay off the brand palette on purpose — this
+       is the same decorative purple "AI-assist" accent flagged as out of
+       scope elsewhere in this file; only the shape is squared here */
     border: 1px solid #d8c8ff;
     background: #f9f4ff;
     color: #6e43d6;
-    border-radius: 999px;
+    border-radius: 0;
     padding: 6px 14px;
     font-size: 0.82rem;
     cursor: pointer;
@@ -686,7 +816,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .word-counter {
     margin-left: auto;
     font-size: 0.82rem;
-    color: #777;
+    color: var(--wg-text-muted);
 }
 
 /* ── Callout Banners ── */
@@ -694,23 +824,23 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     display: flex;
     gap: 12px;
     align-items: center;
-    background: #e8f4fb;
-    border: 1px solid #b8def0;
+    background: var(--wg-info-bg);
+    border: 1px solid var(--wg-info);
     padding: 12px 16px;
     border-radius: 8px;
     margin-bottom: 20px;
     font-size: 0.88rem;
-    color: #003f73;
+    color: var(--wg-info-text);
     line-height: 1.5;
 }
 
 .orange-callout-box {
-    background: #fffaf0;
-    border: 1px solid #fbd38d;
+    background: var(--wg-warning-bg);
+    border: 1px solid var(--wg-warning);
     border-radius: 8px;
     padding: 12px 16px;
     font-size: 0.88rem;
-    color: #c05621;
+    color: var(--wg-warning-text);
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -727,14 +857,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid #dddbda;
+    border: 1px solid var(--wg-input-border);
     border-radius: 8px;
     overflow: hidden;
 }
 
 .rfi-data-table th, .rfi-data-table td {
-    border-bottom: 1px solid #dddbda;
-    border-right: 1px solid #dddbda;
+    border-bottom: 1px solid var(--wg-input-border);
+    border-right: 1px solid var(--wg-input-border);
     padding: 10px 14px;
     font-size: 0.85rem;
 }
@@ -748,15 +878,15 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .rfi-data-table th {
-    background: #f3f2f2;
-    font-family: 'Barlow', sans-serif;
-    font-weight: 700;
-    color: #2d3748;
+    background: var(--wg-border);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
 }
 
 .end-balance-row {
-    background: #f0fff4;
-    color: #276749;
+    background: var(--wg-success-bg);
+    color: var(--wg-success);
 }
 
 /* ── Action Buttons & Sticky Footer Bar ── */
@@ -765,9 +895,9 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     bottom: 0;
     left: 0;
     right: 0;
-    background: #ffffff;
+    background: var(--wg-white);
     padding: 14px 32px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--wg-border);
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
     display: flex;
     justify-content: space-between;
@@ -782,47 +912,58 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .tracker-main-title {
     font-size: 0.85rem;
     font-weight: 500;
-    color: #4a4a4a;
+    color: var(--wg-text-muted);
     line-height: 1.2;
 }
 
 .tracker-qrange-subtitle {
     font-size: 0.72rem;
-    color: #706e6b;
+    color: var(--wg-text-muted);
     margin-top: 2px;
-    font-weight: 400;
+    font-weight: var(--wg-weight-regular);
 }
 
 .tracker-label--active .tracker-main-title {
-    color: #990000;
-    font-weight: 700;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-bold);
 }
 
 .tracker-label--active .tracker-qrange-subtitle {
-    color: #990000;
-    font-weight: 600;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
 }
 
 .btn-primary-red, .btn-brand-red {
-    background: #8A1C1C;
-    color: #ffffff;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 700;
-    font-size: 0.92rem;
+    background: var(--wg-red);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-button);
     padding: 10px 28px;
-    border-radius: 20px;
+    border-radius: 0;
     border: none;
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
+/* Tab-nav variant — added alongside .btn-primary-red ONLY on the "Next"
+   step-navigation button (see form-footer-bar in the .html), so it gets
+   the square shape + Barlow/14px/semibold styling from .btn-primary-red
+   above automatically. This modifier just adds the flex layout needed
+   to align the chevron icon with the "Next" label. */
+.btn-tab-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .btn-primary-red:hover, .btn-brand-red:hover {
-    background: #6e1515;
+    background: var(--wg-red-deep);
 }
 
 .btn-primary-red:disabled, button:disabled {
-    background: #e0e0e0 !important;
-    color: #9e9e9e !important;
+    background: var(--wg-border) !important;
+    color: var(--wg-text-muted) !important;
     border: none !important;
     cursor: not-allowed !important;
     opacity: 0.7;
@@ -830,51 +971,72 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .btn-secondary-grey {
-    background: #edf2f7;
-    color: #4a5568;
-    font-weight: 600;
+    /* used only by the "Previous" step-nav button. Square, matching every
+       other button in the file. Border/text are brand red (same ghost-
+       button treatment as .btn-save-draft right next to it in the footer
+       bar) rather than the previous muted-gray-on-near-white styling,
+       which read as a disabled control at a glance. */
+    background: var(--wg-white);
+    color: var(--wg-red);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-button);
     padding: 10px 22px;
-    border-radius: 20px;
-    border: 1px solid #cbd5e0;
+    border-radius: 0;
+    border: 1.5px solid var(--wg-red);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-secondary-grey:hover {
+    background: var(--wg-error-bg);
 }
 
 .btn-submit-green {
-    background: #2f855a;
-    color: #ffffff;
-    font-weight: 700;
+    background: var(--wg-success);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-button);
     padding: 10px 30px;
-    border-radius: 20px;
+    border-radius: 0;
     border: none;
     cursor: pointer;
 }
 
 .btn-secondary-outline {
     background: transparent;
-    border: 1px solid #8A1C1C;
-    color: #8A1C1C;
-    font-weight: 600;
+    border: 1px solid var(--wg-red);
+    color: var(--wg-red);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-button);
     padding: 6px 16px;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
 }
 
 .btn-save-draft {
-    background: #ffffff;
-    color: #8A1C1C;
-    border: 1.5px solid #8A1C1C;
-    font-weight: 700;
+    background: var(--wg-white);
+    color: var(--wg-red);
+    border: 1.5px solid var(--wg-red);
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-button);
     padding: 6px 18px;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
 }
 
 .tagline-footer-banner {
     text-align: center;
-    font-family: 'Barlow', sans-serif;
+    font-family: var(--wg-font-heading);
     font-size: 1.1rem;
-    font-weight: 700;
-    color: #8A1C1C;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-red);
     margin-top: 32px;
     padding: 16px;
     background: #fff5f5;
@@ -910,8 +1072,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     position: absolute;
     z-index: 9999;
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #dddbda;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-height: 240px;
@@ -924,7 +1086,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid #f3f2f2;
+    border-bottom: 1px solid var(--wg-border);
     transition: background-color 0.15s ease;
 }
 
@@ -938,13 +1100,13 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .hq-city-name {
     font-size: 0.875rem;
-    font-weight: 600;
-    color: #1c1c1c;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
 
 .hq-city-detail {
     font-size: 0.75rem;
-    color: #706e6b;
+    color: var(--wg-text-muted);
     margin-top: 2px;
 }
 
@@ -952,8 +1114,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     position: absolute;
     z-index: 9999;
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #dddbda;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     padding: 12px;
     text-align: center;
@@ -964,12 +1126,12 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     position: absolute;
     z-index: 9999;
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #dddbda;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     padding: 12px 14px;
     font-size: 0.875rem;
-    color: #706e6b;
+    color: var(--wg-text-muted);
     margin-top: 2px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -982,20 +1144,20 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     box-sizing: border-box;
     width: 100%;
     height: 36px;
-    border: 1px solid #dddbda;
+    border: 1px solid var(--wg-input-border);
     border-radius: 0.25rem;
-    background: #fff;
+    background: var(--wg-white);
     transition: border-color .15s ease, box-shadow .15s ease;
     overflow: visible;
 }
 
 .phone-input-group:focus-within {
-    border-color: #0176d3;
-    box-shadow: 0 0 3px #0176d3;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
-.phone-input-group.has-error { border-color: #c23934; }
-.phone-input-group.has-error:focus-within { box-shadow: 0 0 3px #c23934; }
+.phone-input-group.has-error { border-color: var(--wg-error); }
+.phone-input-group.has-error:focus-within { box-shadow: 0 0 3px var(--wg-error); }
 
 .phone-input-group .iti {
     display: block;
@@ -1021,7 +1183,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     background: transparent;
     font-family: inherit;
     font-size: 0.8125rem !important;
-    color: #181818;
+    color: var(--wg-gray);
 }
 
 .phone-input-group .iti__flag-container { top: 0; bottom: 0; height: 100%; }
@@ -1033,7 +1195,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     align-items: center;
     padding: 0 8px 0 10px;
     background-color: transparent !important;
-    border-right: 1px solid #ececec;
+    border-right: 1px solid var(--wg-border);
     border-radius: 0.25rem 0 0 0.25rem;
 }
 .phone-input-group .iti__selected-flag:hover,
@@ -1041,18 +1203,18 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .phone-input-group .iti__selected-dial-code {
     font-size: 0.8125rem;
-    font-weight: 400;
-    color: #181818;
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
 }
-.phone-input-group .iti__arrow { border-top-color: #706e6b; margin-left: 4px; }
+.phone-input-group .iti__arrow { border-top-color: var(--wg-text-muted); margin-left: 4px; }
 
 .phone-input-group input:-webkit-autofill,
 .phone-input-group input:-webkit-autofill:hover,
 .phone-input-group input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
-    box-shadow: 0 0 0 1000px #fff inset !important;
-    -webkit-text-fill-color: #181818 !important;
-    caret-color: #181818;
+    -webkit-box-shadow: 0 0 0 1000px var(--wg-white) inset !important;
+    box-shadow: 0 0 0 1000px var(--wg-white) inset !important;
+    -webkit-text-fill-color: var(--wg-gray) !important;
+    caret-color: var(--wg-gray);
     transition: background-color 100000s ease-in-out 0s !important;
 }
 
@@ -1067,38 +1229,38 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 100%;
     height: 36px;
     padding: 0 1rem;
-    border: 1px solid #dddbda;
+    border: 1px solid var(--wg-input-border);
     border-radius: 0.25rem;
-    background: #fff;
+    background: var(--wg-white);
     font-family: inherit;
     font-size: 0.8125rem;
-    color: #181818;
+    color: var(--wg-gray);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 .wcf-native-input:focus {
     outline: none;
-    border-color: #0176d3;
-    box-shadow: 0 0 3px #0176d3;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
 .wcf-native-input:disabled,
 .wcf-native-input[readonly] {
-    background-color: #f3f3f3 !important;
-    color: #181818 !important;
+    background-color: var(--wg-border) !important;
+    color: var(--wg-gray) !important;
     cursor: not-allowed !important;
-    border-color: #dddbda !important;
+    border-color: var(--wg-input-border) !important;
 }
 
-.phone-error-msg { color: #c23934; font-size: 12px; margin-top: 4px; }
+.phone-error-msg { color: var(--wg-error); font-size: 12px; margin-top: 4px; }
 
 .computed-cell {
     background-color: #f8f9fa;
     padding: 8px 12px;
     border-radius: 4px;
-    font-weight: 600;
-    color: #2b2b2b;
-    border: 1px solid #e2e8f0;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    border: 1px solid var(--wg-border);
     flex: 1;
     width: 100%;
     box-sizing: border-box;
@@ -1117,8 +1279,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .currency-prefix {
-    font-weight: 700;
-    color: #2d3748;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     font-size: 0.9rem;
     flex-shrink: 0;
 }
@@ -1126,8 +1288,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .modern-field-label {
     display: block;
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #444;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
     margin-bottom: 4px;
 }
 
@@ -1141,20 +1303,20 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     height: 36px;
     box-sizing: border-box;
     padding: 0 12px;
-    border: 1px solid #d0c8e0;
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     font-size: 0.8125rem;
     font-family: inherit;
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
-    background: #fff;
+    background: var(--wg-white);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 .date-native-input:focus {
     outline: none;
-    border-color: #0176d3;
-    box-shadow: 0 0 3px #0176d3;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
 .date-native-input::-webkit-datetime-edit,
@@ -1189,7 +1351,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     transform: translateY(-50%);
     pointer-events: none;
     font-size: 0.8125rem;
-    color: #181818;
+    color: var(--wg-gray);
     max-width: calc(100% - 44px);
     overflow: hidden;
     white-space: nowrap;
@@ -1198,65 +1360,65 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .date-overlay-text:empty::after {
     content: 'DD/MM/YYYY';
-    color: #9aa1ab;
+    color: var(--wg-text-muted);
 }
 
 .date-native-input.input-error {
-    border-color: #C23934 !important;
+    border-color: var(--wg-error) !important;
     background: #fff8f8 !important;
 }
 
 .richtext-invalid {
-    border: 1.5px solid #c23934 !important;
+    border: 1.5px solid var(--wg-error) !important;
     background: #fff8f8 !important;
 }
 
 .input-error {
-    border: 1.5px solid #c23934 !important;
+    border: 1.5px solid var(--wg-error) !important;
     background: #fff8f8 !important;
     border-radius: 4px;
 }
 
 .chips-error {
-    outline: 1.5px solid #c23934;
+    outline: 1.5px solid var(--wg-error);
     outline-offset: 2px;
     border-radius: 4px;
     padding: 2px;
 }
 
 .field-error-msg {
-    color: #c23934;
+    color: var(--wg-error);
     font-size: 12px;
     line-height: 1.4;
     margin-top: 4px;
 }
 
 .error-msg {
-    color: #c23934;
+    color: var(--wg-error);
     font-size: 12px;
     margin-top: 4px;
 }
 
 .word-count-over {
-    color: #c23934 !important;
-    font-weight: 700 !important;
+    color: var(--wg-error) !important;
+    font-weight: var(--wg-weight-bold) !important;
 }
 
 .btn-remove-row {
     background: transparent;
     border: none;
-    color: #c23934;
+    color: var(--wg-error);
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: var(--wg-weight-bold);
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 0;
     transition: background 0.15s ease, color 0.15s ease;
 }
 
 .btn-remove-row:hover {
     background: #fef1f0;
-    color: #a61c1d;
+    color: var(--wg-red-deep);
 }
 
 /* ── Native Number Input with Stepper Arrows (Matching wcfForm) ── */
@@ -1265,19 +1427,19 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 100%;
     height: 36px;
     padding: 0 8px;
-    border: 1px solid #d0c8e0;
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     font-size: 0.8125rem;
     font-family: inherit;
-    color: #181818;
-    background: #ffffff;
+    color: var(--wg-gray);
+    background: var(--wg-white);
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 .wcf-number-input:focus {
     outline: none;
-    border-color: #0176d3;
-    box-shadow: 0 0 3px #0176d3;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
 .wcf-number-input::-webkit-inner-spin-button,
@@ -1293,34 +1455,34 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     min-width: 170px;
     height: 36px;
     padding: 0 8px;
-    border: 1px solid #d0c8e0;
+    border: 1px solid var(--wg-input-border);
     border-radius: 4px;
     font-size: 0.8125rem;
     font-family: inherit;
-    color: #181818;
-    background: #ffffff;
+    color: var(--wg-gray);
+    background: var(--wg-white);
     cursor: pointer;
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 
 .rfi-select-input:focus {
     outline: none;
-    border-color: #0176d3;
-    box-shadow: 0 0 3px #0176d3;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
 /* ── File Upload & File Chips Styling ── */
 .field-label-bold {
     font-size: 0.8125rem;
-    font-weight: 700;
-    color: #3e3e3e;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     margin-bottom: 2px;
     display: block;
 }
 
 .subtext-muted {
     font-size: 0.78rem;
-    color: #666666;
+    color: var(--wg-text-muted);
     margin: 2px 0 8px 0;
 }
 
@@ -1335,11 +1497,11 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     display: inline-flex;
     align-items: center;
     background: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--wg-border);
     border-radius: 20px;
     padding: 4px 12px;
     font-size: 0.8125rem;
-    color: #1f2937;
+    color: var(--wg-gray);
     max-width: 100%;
 }
 
@@ -1358,9 +1520,9 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .btn-file-chip-remove {
     background: transparent;
     border: none;
-    color: #6b7280;
+    color: var(--wg-text-muted);
     font-size: 0.9rem;
-    font-weight: bold;
+    font-weight: var(--wg-weight-bold);
     cursor: pointer;
     margin-left: 8px;
     padding: 0 4px;
@@ -1370,18 +1532,18 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .btn-file-chip-remove:hover {
-    color: #dc2626;
-    background: #fee2e2;
+    color: var(--wg-error);
+    background: var(--wg-error-bg);
 }
 
 /* ── Sector Support Type Multi-Select Chips ── */
 .sector-chip {
-    background: #ffffff;
-    border: 1px solid #d0c8e0;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-input-border);
     border-radius: 20px;
     padding: 6px 16px;
     font-size: 0.8125rem;
-    color: #4a4a4a;
+    color: var(--wg-text-muted);
     cursor: pointer;
     transition: all 0.15s ease;
     font-family: inherit;
@@ -1390,22 +1552,22 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .sector-chip:hover {
-    border-color: #8A1C1C;
-    color: #8A1C1C;
+    border-color: var(--wg-red);
+    color: var(--wg-red);
     background: #fdf6f6;
 }
 
 .sector-chip.selected {
     background: #fff0f0;
-    border-color: #c30000;
-    color: #c30000;
-    font-weight: 600;
+    border-color: var(--wg-red);
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
 }
 
 /* ── Review & Submit Section Styles (Matching Image & wcfForm) ── */
 .rv-section {
-    background: #ffffff;
-    border: 1px solid #e2e2e2;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
     border-radius: 10px;
     padding: 22px 26px;
     margin-bottom: 24px;
@@ -1414,8 +1576,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .rv-section-head {
     font-size: 1.1rem;
-    font-weight: 700;
-    color: #8A1C1C;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-red);
     background: #fff0f0;
     padding: 10px 16px;
     border-radius: 6px;
@@ -1424,13 +1586,13 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     align-items: center;
     justify-content: space-between;
     letter-spacing: 0.02em;
-    font-family: 'Barlow', sans-serif;
+    font-family: var(--wg-font-heading);
 }
 
 .rv-sub-head {
     font-size: 0.95rem;
-    font-weight: 700;
-    color: #4a5568;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     margin: 16px 0 8px 0;
 }
 
@@ -1440,7 +1602,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     gap: 20px;
     padding: 9px 0;
     font-size: 0.88rem;
-    border-bottom: 1px dashed #e2e2e2;
+    border-bottom: 1px dashed var(--wg-border);
 }
 
 .rv-row:last-child {
@@ -1448,7 +1610,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .rv-lbl {
-    color: #6d6e71;
+    color: var(--wg-text-muted);
     line-height: 1.5;
     font-weight: 500;
 }
@@ -1456,8 +1618,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 .rv-q-num {
     display: inline-block;
     background: #f7fafc;
-    color: #8A1C1C;
-    font-weight: 700;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-bold);
     font-size: 0.75rem;
     padding: 2px 6px;
     border-radius: 4px;
@@ -1466,8 +1628,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .rv-val {
-    color: #1a202c;
-    font-weight: 600;
+    color: var(--wg-gray);
+    font-weight: var(--wg-weight-semibold);
     word-break: break-word;
     line-height: 1.5;
 }
@@ -1486,22 +1648,22 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .rv-table th {
     background: #f7fafc;
-    font-weight: 700;
-    color: #2d3748;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     padding: 10px 12px;
     text-align: left;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--wg-border);
 }
 
 .rv-table td {
     padding: 9px 12px;
-    color: #2d3748;
-    border-bottom: 1px dashed #e2e8f0;
+    color: var(--wg-text-muted);
+    border-bottom: 1px dashed var(--wg-border);
 }
 
 .wcf-attest-card {
     background: #fffdfa;
-    border: 1.5px solid #f68721;
+    border: 1.5px solid var(--wg-warning);
     border-radius: 12px;
     padding: 24px 28px;
     margin-top: 24px;
@@ -1510,14 +1672,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .wcf-attest-title {
     font-size: 1.15rem;
-    font-weight: 700;
-    color: #2D3748;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     margin-bottom: 8px;
 }
 
 .wcf-attest-body {
     font-size: 0.88rem;
-    color: #4A5568;
+    color: var(--wg-text-muted);
     line-height: 1.5;
     margin-bottom: 16px;
 }
@@ -1538,7 +1700,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .attest-checkbox-label {
     font-size: 0.9rem;
-    color: #2D3748;
+    color: var(--wg-text-muted);
     line-height: 1.4;
     cursor: pointer;
 }
@@ -1556,24 +1718,24 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .attest-date-label {
     font-size: 0.88rem;
-    font-weight: 600;
-    color: #414042;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
     margin-bottom: 4px;
 }
 
 .attest-date-hint {
     font-size: 0.78rem;
-    color: #939598;
+    color: var(--wg-text-muted);
     margin-bottom: 8px;
 }
 
 .attest-date-display {
     background: #f5f5f5;
-    border: 1px solid #e2e2e2;
+    border: 1px solid var(--wg-border);
     border-radius: 6px;
     padding: 10px 14px;
     font-size: 0.85rem;
-    color: #555555;
+    color: var(--wg-text-muted);
     font-style: italic;
     min-width: 320px;
     width: max-content;
@@ -1587,24 +1749,25 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .btn-submit-green {
-    background-color: #28a745;
-    color: white;
+    background-color: var(--wg-success);
+    color: var(--wg-white);
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     padding: 12px 28px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-button);
+    font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .btn-submit-green:hover:not(:disabled) {
-    background-color: #218838;
+    background-color: var(--wg-success-deep);
 }
 
 .btn-submit-green:disabled {
-    background-color: #e0e0e0;
-    color: #a0a0a0;
+    background-color: var(--wg-border);
+    color: var(--wg-text-muted);
     cursor: not-allowed;
 }
 
@@ -1620,19 +1783,20 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .btn-download-pdf {
-    background: #8A1C1C;
-    color: #ffffff;
+    background: var(--wg-red);
+    color: var(--wg-white);
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 8px 18px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-button);
+    font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.2s ease;
 }
 
 .btn-download-pdf:hover {
-    background: #6b1414;
+    background: var(--wg-red-deep);
 }
 
 /* ── Print / PDF Generation Styles ── */
@@ -1658,7 +1822,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     }
 
     body, .centered-form-container, .screen-questionnaire {
-        background: #ffffff !important;
+        background: var(--wg-white) !important;
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
@@ -1680,39 +1844,39 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     }
 
     .rfi-page-title {
-        color: #990000 !important;
+        color: var(--wg-red) !important;
         font-size: 22px !important;
-        font-weight: 700 !important;
+        font-weight: var(--wg-weight-bold) !important;
         margin: 0 !important;
     }
 
     .rv-section, .modern-subsection-card, .wcf-attest-card {
         page-break-inside: avoid;
-        border: 1px solid #d8dde6 !important;
+        border: 1px solid var(--wg-border) !important;
         box-shadow: none !important;
         margin-bottom: 20px !important;
         border-radius: 8px !important;
     }
 
     .rv-section-head {
-        background: #990000 !important;
-        color: #ffffff !important;
+        background: var(--wg-red) !important;
+        color: var(--wg-white) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        font-weight: 700 !important;
+        font-weight: var(--wg-weight-bold) !important;
         padding: 10px 16px !important;
     }
 
     .rv-table th {
         background: #f4f6f9 !important;
-        color: #333333 !important;
+        color: var(--wg-gray) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .rv-q-num {
-        background: #990000 !important;
-        color: #ffffff !important;
+        background: var(--wg-red) !important;
+        color: var(--wg-white) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -1724,7 +1888,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .faq-item {
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid var(--wg-border);
     padding: 14px 0;
 }
 
@@ -1742,8 +1906,8 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .faq-symbol {
     font-size: 1.25rem;
-    font-weight: 700;
-    color: #8A1C1C;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-red);
     width: 20px;
     text-align: center;
     line-height: 1;
@@ -1751,26 +1915,81 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .faq-question-text {
     font-size: 1.05rem;
-    font-weight: 600;
-    color: #2d3748;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
     margin: 0;
 }
 
 .faq-content-body {
     padding: 12px 0 6px 32px;
     font-size: 0.92rem;
-    color: #4a5568;
+    color: var(--wg-text-muted);
     line-height: 1.6;
 }
 
 .faq-example-box {
     margin-top: 10px;
     background: #f7fafc;
-    border-left: 3px solid #8A1C1C;
+    border-left: 3px solid var(--wg-red);
     padding: 10px 14px;
     border-radius: 0 6px 6px 0;
     font-size: 0.88rem;
-    color: #4a5568;
+    color: var(--wg-text-muted);
+}
+
+/* ── In-component toast banner (replaces native ShowToastEvent) ──
+   Reuses .error-banner/.warning-banner/.success-banner/.info-banner from
+   commonStyleTheme for the tinted-bg/left-accent/icon styling, and adds
+   fixed positioning + shadow + a close button on top so it behaves like
+   the toast it replaces. See showBanner()/closeBanner() in the .js. */
+.wg-toast-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99998;
+    width: min(520px, calc(100vw - 32px));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.wg-toast-banner .wg-toast-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.wg-toast-banner .wg-toast-title {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-bold);
+}
+
+.wg-toast-banner svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.wg-toast-banner .wg-toast-close {
+    flex-shrink: 0;
+    margin-left: auto;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.65;
+}
+
+.wg-toast-banner .wg-toast-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .wg-toast-banner {
+        top: 10px;
+        width: calc(100vw - 20px);
+    }
 }
 
 /* ── Submit / Processing Overlay ── */
@@ -1789,7 +2008,7 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .wcf-submit-modal {
-    background: #ffffff;
+    background: var(--wg-white);
     border-radius: 16px;
     padding: 36px 40px;
     text-align: center;
@@ -1807,11 +2026,11 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 }
 
 .wcf-submit-spinner-track {
-    stroke: #f3f3f3;
+    stroke: var(--wg-border);
 }
 
 .wcf-submit-spinner-arc {
-    stroke: #8A1C1C;
+    stroke: var(--wg-red);
     stroke-linecap: round;
     stroke-dasharray: 90, 150;
     stroke-dashoffset: 0;
@@ -1828,20 +2047,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
 
 .wcf-submit-modal-title {
     font-size: 1.3rem;
-    font-weight: 700;
-    color: #1a1a1a;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
     margin: 0 0 8px 0;
 }
 
 .wcf-submit-modal-sub {
     font-size: 0.9rem;
-    color: #666666;
+    color: var(--wg-text-muted);
     margin: 0;
     line-height: 1.5;
 }
-
-
-
-
-
-

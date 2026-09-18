@@ -1,5 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+// WG TOAST BANNER — ShowToastEvent renders outside the shadow tree and can't
+// be restyled to match the brand, so it's replaced with a custom banner (see
+// showBanner()/closeBanner()/showToast() below). The import is no longer used.
 import getComplianceChecklist from '@salesforce/apex/WCFComplianceController.getComplianceChecklist';
 import saveComplianceDocument from '@salesforce/apex/WCFComplianceController.saveComplianceDocument';
 import getOrCreateComplianceRecord from '@salesforce/apex/WCFComplianceController.getOrCreateComplianceRecord';
@@ -74,6 +76,13 @@ export default class WcfComplianceDocs extends LightningElement {
     @track totalValidated  = 0;
     @track totalUploaded   = 0;
     @track uploadingDocType;
+
+    // WG TOAST BANNER state (replaces ShowToastEvent — see showToast() below)
+    @track bannerVisible = false;
+    @track bannerVariant = 'info';
+    @track bannerTitle   = '';
+    @track bannerMessage = '';
+    _bannerTimeout;
 
     expiryDateByType = {};
 
@@ -475,7 +484,53 @@ cleanupStaleModal() {
     return 'Something went wrong. Please try again.';
 }
 
+    // All existing call sites already funnel through this one wrapper (like
+    // wcfProposalReviewForm's showToast precedent), so only its body needed
+    // to change — no call site needed touching.
     showToast(title, message, variant) {
-        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+        this.showBanner({ title, message, variant });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // WG TOAST BANNER — replaces native ShowToastEvent (renders outside the
+    // shadow tree and cannot be restyled to match the brand).
+    // ─────────────────────────────────────────────────────────────
+
+    showBanner(config) {
+        const { title, message, variant, autoDismissMs = 6000 } = config || {};
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+            this._bannerTimeout = null;
+        }
+        this.bannerVariant = variant || 'info';
+        this.bannerTitle   = title || '';
+        this.bannerMessage = message || '';
+        this.bannerVisible = true;
+        if (autoDismissMs) {
+            this._bannerTimeout = setTimeout(() => {
+                this.bannerVisible = false;
+            }, autoDismissMs);
+        }
+    }
+
+    closeBanner() {
+        if (this._bannerTimeout) {
+            clearTimeout(this._bannerTimeout);
+            this._bannerTimeout = null;
+        }
+        this.bannerVisible = false;
+    }
+
+    handleDismissBanner() {
+        this.closeBanner();
+    }
+
+    get isBannerError()   { return this.bannerVariant === 'error'; }
+    get isBannerWarning() { return this.bannerVariant === 'warning'; }
+    get isBannerSuccess() { return this.bannerVariant === 'success'; }
+    get isBannerInfo()    { return this.bannerVariant === 'info'; }
+
+    get bannerClass() {
+        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
     }
 }

@@ -1,22 +1,49 @@
-/* ══════════════════════════════════════════════════════════════════
-   wcf-dashboard.css
-   Updated to use the shared WCF color tokens (--wcf-red, --wcf-orange)
-   defined at :root in the Experience Site theme CSS.
-══════════════════════════════════════════════════════════════════ */
+@import "c/commonStyleTheme";
+
+/* ── commonStyleTheme wiring notes ────────────────────────────────────
+   This file's own header (removed below) said it uses "shared WCF
+   color tokens (--wcf-red, --wcf-orange) defined at :root in the
+   Experience Site theme CSS" — that's the same uploaded Experience
+   Cloud Custom CSS already found, earlier in this project, to declare
+   its tokens with a single-hyphen typo (-wcf-red instead of
+   --wcf-red), which means --wcf-red/--wcf-gray/etc. were NEVER
+   actually registered anywhere, and every var(--wcf-x, #fallback)
+   reference here was silently resting on its fallback hex the whole
+   time. Replaced all of them with the equivalent --wg-* token instead
+   of that fragile cross-page dependency — the fallback hexes already
+   matched brand values exactly (the red/gray/white/error/orange
+   fallbacks are var(--wg-red)/var(--wg-gray)/var(--wg-white)/
+   var(--wg-error)/var(--wg-orange) respectively), so this is a
+   like-for-like swap, not a recolor decision.
+   Other hardcoded values: the two border/divider grays -> var(--wg-border);
+   the two secondary-text grays -> var(--wg-text-muted) (one was an
+   exact match to that token's own hex); the light-red disclaimer
+   background -> var(--wg-error-bg) (near-exact match). Literal
+   'Barlow'/'Open Sans' font-family strings -> var(--wg-font-heading)/
+   var(--wg-font-body). Several sizes were exact matches to the brand
+   scale and tokenized (20px section-heading, 14px body, 13px label,
+   12px caption); the one non-matching size (11px eyebrow) was bumped
+   to the nearest tier (12px caption), same call made in
+   wcfReturnBanner. border-radius on .wcf-card/.wcf-links-card (10px)
+   and .wcf-disclaimer-banner (8px) matched --wg-radius-card/-md
+   exactly and were tokenized. .lang-btn/.btn-primary (the two actual
+   buttons, previously 6px) are now square per the codebase-wide
+   button convention.
+   ────────────────────────────────────────────────────────── */
 
 .wcf-dashboard {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--wg-font-body);
     padding: 24px;
 }
 
 .wcf-title {
-    font-family: 'Barlow', sans-serif !important;
-    color: var(--wcf-gray, #414041);
-    font-size: 20px;
+    font-family: var(--wg-font-heading) !important;
+    color: var(--wg-gray);
+    font-size: var(--wg-font-size-section-heading);
 }
 
 .wcf-subtitle {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: var(--wg-font-body) !important;
 }
 
 .wcf-header {
@@ -32,20 +59,20 @@
 }
 
 .lang-btn {
-    border: 1px solid #d8d8d8;
-    background: var(--wcf-white, #fff);
-    color: #444;
+    border: 1px solid var(--wg-border);
+    background: var(--wg-white);
+    color: var(--wg-text-muted);
     padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
+    border-radius: 0;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
     cursor: pointer;
 }
 
 .lang-btn-active {
-    background: var(--wcf-red, #BF2026);
-    border-color: var(--wcf-red, #BF2026);
-    color: #fff;
+    background: var(--wg-red);
+    border-color: var(--wg-red);
+    color: var(--wg-white);
 }
 
 .wcf-content {
@@ -56,32 +83,32 @@
 
 .wcf-card,
 .wcf-links-card {
-    background: var(--wcf-white, #fff);
-    border: 1px solid var(--wcf-line, #e5e5e5);
-    border-radius: 10px;
+    background: var(--wg-white);
+    border: 1px solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
     padding: 24px;
 }
 
 .wcf-eyebrow {
-    color: var(--wcf-err, #B3261E);
-    font-size: 11px;
-    font-weight: 700;
+    color: var(--wg-error);
+    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest defined tier */
+    font-weight: var(--wg-weight-bold);
     letter-spacing: 0.5px;
     margin: 0 0 8px 0;
-    font-family: 'Barlow', sans-serif !important;
+    font-family: var(--wg-font-heading) !important;
 }
 
 .wcf-card-title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
     margin: 0 0 12px 0;
-    font-family: 'Barlow', sans-serif !important;
-    color: var(--wcf-gray, #414041);
+    font-family: var(--wg-font-heading) !important;
+    color: var(--wg-gray);
 }
 
 .wcf-card-desc {
-    color: var(--wcf-gray, #414041);
-    font-size: 14px;
+    color: var(--wg-gray);
+    font-size: var(--wg-font-size-body);
     line-height: 1.5;
     margin: 0 0 20px 0;
 }
@@ -93,39 +120,39 @@
 }
 
 .btn-primary {
-    background: var(--wcf-red, #BF2026);
-    color: #fff;
+    background: var(--wg-red);
+    color: var(--wg-white);
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
     cursor: pointer;
 }
 
 .btn-primary:hover {
-    background: var(--wcf-orange, #F2672A);
+    background: var(--wg-orange);
 }
 
 .link-secondary {
-    color: var(--wcf-red, #BF2026);
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--wg-red);
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
     text-decoration: none;
 }
 
 .link-secondary:hover {
-    color: var(--wcf-orange, #F2672A);
+    color: var(--wg-orange);
     text-decoration: underline;
 }
 
 .wcf-links-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #6b6b6b;
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-text-muted);
     letter-spacing: 0.5px;
     margin: 0 0 12px 0;
-    font-family: 'Barlow', sans-serif !important;
+    font-family: var(--wg-font-heading) !important;
 }
 
 .wcf-links-list {
@@ -135,17 +162,17 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    font-size: 14px;
-    color: var(--wcf-red, #BF2026);
-    font-weight: 600;
+    font-size: var(--wg-font-size-body);
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
 }
 
 .wcf-links-list a {
-    color: var(--wcf-red, #BF2026);
+    color: var(--wg-red);
 }
 
 .wcf-links-list a:hover {
-    color: var(--wcf-orange, #F2672A);
+    color: var(--wg-orange);
 }
 
 /* ── Fonts ────────────────────────────────────────────────────── */
@@ -157,7 +184,7 @@
 .link-secondary,
 .wcf-links-list,
 .wcf-links-list a {
-    font-family: 'Open Sans', sans-serif !important;
+    font-family: var(--wg-font-body) !important;
 }
 .wcf-disclaimer-banner {
     display: flex;
@@ -167,9 +194,9 @@
     max-width: 820px;
     margin: 0 auto 20px auto;
     padding: 12px 18px;
-    background: #FDECEC;
-    border: 1px solid var(--wcf-red, #BF2026);
-    border-radius: 8px;
+    background: var(--wg-error-bg);
+    border: 1px solid var(--wg-red);
+    border-radius: var(--wg-radius-md);
     text-align: center;
 }
 
@@ -178,28 +205,28 @@
     width: 18px;
     height: 18px;
     margin-top: 2px;
-    color: var(--wcf-red, #BF2026);
+    color: var(--wg-red);
 }
 
 .wcf-disclaimer-text {
-    font-family: 'Open Sans', sans-serif !important;
-    font-size: 13px;
+    font-family: var(--wg-font-body) !important;
+    font-size: var(--wg-font-size-label);
     line-height: 1.5;
-    color: var(--wcf-gray, #414041);
+    color: var(--wg-gray);
     margin: 0;
 }
 
 .wcf-disclaimer-text strong {
-    color: var(--wcf-red, #BF2026);
-    font-weight: 700;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-bold);
 }
 
 .wcf-disclaimer-text a {
-    color: var(--wcf-red, #BF2026);
-    font-weight: 600;
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
     text-decoration: underline;
 }
 
 .wcf-disclaimer-text a:hover {
-    color: var(--wcf-orange, #F2672A);
+    color: var(--wg-orange);
 }

@@ -1,0 +1,273 @@
+/* ============================================================
+   c/commonStyleTheme
+   Shared CSS module for the WCF / WF Grants portal LWCs.
+
+   This bundle is CSS-only (no .js/.html — see .js-meta.xml,
+   isExposed = false) and is never placed on a page directly.
+   Other components pull these rules in at BUILD TIME with:
+
+       @import "c/commonStyleTheme";
+
+   at the top of their own .css file. Because it's a compile-time
+   import, the rules below are compiled straight into each
+   importing component's own scoped stylesheet — no runtime
+   loading, no page-placement dependency, no load-order risk.
+
+   Values here are the single source of truth for brand colors,
+   status colors, type scale, radii, spacing and shared UI
+   classes (buttons / status banners / field labels / inputs).
+   They mirror force-app/.../wgFonts static resource's
+   wgTokens.css --wg-* set — keep the two in sync if either
+   changes. wgTokens.css (loaded via wgGlobalTokens on :root)
+   stays responsible ONLY for @font-face / font-file loading,
+   since a static resource's URL isn't resolvable at CSS
+   compile time and so can't live in an @import-shared module.
+   ============================================================ */
+
+:host {
+    /* ---- Brand colors (90% / house colors) ---- */
+    --wg-red: #BF2026;          /* CTA / buttons ONLY — never a message background */
+    --wg-red-deep: #A3181D;     /* red pressed/hover state (new — not yet in wgTokens.css, port it over) */
+    --wg-orange: #F2672A;       /* accent / secondary — use sparingly */
+    --wg-orange-deep: #D8551E;  /* orange pressed/hover state (new — not yet in wgTokens.css, port it over) */
+    --wg-yellow: #F68720;       /* also the Warning status color, see below */
+    --wg-gray: #414041;         /* body text — replaces pure black everywhere */
+    --wg-white: #FFFFFF;
+
+    /* ---- Status colors — always paired with a tint background.
+       Values below match the brand doc exactly (these are the
+       corrected hex values — see review notes for the typos that
+       existed in wfGrantsSignup's old local copy: FCEBEA/FEF2E4/
+       EAF4EA/E9F3FB were all one hex digit off). ---- */
+    --wg-error: #B3261E;        --wg-error-bg: #FCECEA;
+    --wg-warning: #F68720;      --wg-warning-bg: #FEF3E6;   --wg-warning-text: #8A4B00;
+    --wg-success: #2E7D32;      --wg-success-bg: #EAF4EB;   --wg-success-deep: #218838; /* pressed/hover state, added for wcfDynamicForm's submit button */
+    --wg-info: #2380D1;         --wg-info-bg: #E9F2FB;      --wg-info-text: #003F73;    /* darker copy color for info banners, added for wcfDynamicForm */
+
+    /* ---- Neutral / borders / muted text ---- */
+    --wg-border: #E4E4E4;
+    --wg-input-border: #CFCFCF;
+    --wg-text-muted: #6B6B6B;   /* subtitles, secondary/caption copy — lighter than --wg-gray */
+
+    /* ---- Typography — families ---- */
+    --wg-font-heading: 'Barlow', Arial, sans-serif;
+    --wg-font-body: 'Open Sans', Arial, sans-serif;
+
+    /* ---- Typography — scale (confirmed against the portal mockup) ---- */
+    --wg-font-size-page-title: 28px;       /* h1 — Barlow Bold 700 */
+    --wg-font-size-section-heading: 20px;  /* h2 — Barlow SemiBold 600 */
+    --wg-font-size-sub-heading: 15px;      /* h3 — Barlow SemiBold 600 */
+    --wg-font-size-body: 14px;             /* body copy, inputs, banners, notes — Open Sans 400 */
+    --wg-font-size-button: 14px;           /* button label — Barlow SemiBold 600 */
+    --wg-font-size-label: 13px;            /* field labels, bold captions — Open Sans SemiBold 600 */
+    --wg-font-size-caption: 12px;          /* smallest UI text — tags, swatch captions */
+
+    /* ---- Typography — weights ---- */
+    --wg-weight-regular: 400;
+    --wg-weight-semibold: 600;
+    --wg-weight-bold: 700;
+
+    /* ---- Shared shape conventions ---- */
+    --wg-radius-sm: 6px;      /* inputs, status banners */
+    --wg-radius-md: 8px;      /* swatch cards, the "note" info box */
+    --wg-radius-card: 10px;   /* comparison / content panels */
+    --wg-radius-badge: 20px;  /* status tag / badge pills */
+    --wg-radius-pill: 24px;   /* defined per the brand book's pill-button spec, but
+                                 currently unused — .primary-btn/.ghost-btn below
+                                 use a square shape instead by design decision.
+                                 Kept in case pill buttons are reinstated later. */
+
+    /* ---- Border widths ---- */
+    --wg-border-width-thin: 1px;      /* default card/swatch/note/input borders */
+    --wg-border-width-ghost: 1.5px;   /* ghost/secondary button border */
+    --wg-border-width-rule: 2px;      /* h2 underline rule */
+    --wg-border-width-banner: 4px;    /* status banner left accent */
+
+    /* ---- Generic spacing scale (4px base) ---- */
+    --wg-space-1: 4px;
+    --wg-space-2: 8px;
+    --wg-space-3: 12px;
+    --wg-space-4: 16px;
+    --wg-space-5: 20px;
+    --wg-space-6: 24px;
+    --wg-space-8: 32px;
+    --wg-space-9: 36px;
+    --wg-space-16: 64px;
+
+    /* ---- Component-specific padding — exact values from the signed-off mockup ---- */
+    --wg-padding-input: 9px 11px;
+    --wg-padding-button: 11px 26px;
+    --wg-padding-banner: 11px 13px;
+    --wg-padding-note: 14px 16px;
+    --wg-padding-tag: 3px 10px;
+    --wg-padding-swatch-label: 8px 10px;
+
+    /* ---- Layout ---- */
+    --wg-container-max-width: 960px;
+    --wg-line-height-base: 1.5;
+}
+
+/* ============================================================
+   Shared UI classes
+   Same class names already used in wfGrantsSignup.html so wiring
+   it up via @import is a drop-in swap for its duplicated local
+   rules, not an HTML rename.
+   ============================================================ */
+
+/* ---- Full-width container utility ----
+   Generic "fill the page/region" width behavior — no centered/narrow
+   max-width cap, safe padding math via border-box. Add this class
+   alongside a component's own container class to opt in (e.g.
+   wcfDynamicForm's .centered-form-container, which spans its page).
+   Narrow centered "panel" containers — like wfGrantsSignup's login
+   card (max-width: 460px by design) — intentionally do NOT use this;
+   only components meant to span their full page/region should. ---- */
+.wg-full-width {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---- Buttons ----
+   Square by design decision (not the brand book's pill spec) —
+   this is the shared default for every component that imports
+   commonStyleTheme, not just wfGrantsSignup. ---- */
+.primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--wg-padding-button);
+    border: 0;
+    border-radius: 0;
+    background: var(--wg-red);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-button);
+    font-weight: var(--wg-weight-semibold);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+.primary-btn:hover:not(:disabled)  { background: var(--wg-red-deep); }
+.primary-btn:active:not(:disabled) { background: var(--wg-red-deep); transform: translateY(1px); }
+.primary-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.primary-btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+/* ---- Ghost / secondary button (brand doc: white bg, red text + 1.5px
+   border) — same square-by-design shape as .primary-btn above. ---- */
+.ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--wg-padding-button);
+    border: var(--wg-border-width-ghost) solid var(--wg-red);
+    border-radius: 0;
+    background: var(--wg-white);
+    color: var(--wg-red);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-button);
+    font-weight: var(--wg-weight-semibold);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.ghost-btn:hover:not(:disabled) { background: var(--wg-error-bg); }
+.ghost-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.ghost-btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+/* ---- Status banners ---- */
+.error-banner,
+.warning-banner,
+.success-banner,
+.info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: var(--wg-radius-sm);
+    border-left: var(--wg-border-width-banner) solid transparent;
+    padding: var(--wg-padding-banner);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+}
+
+.error-banner {
+    background: var(--wg-error-bg);
+    border-left-color: var(--wg-error);
+}
+.error-banner .error-icon { color: var(--wg-error); }
+
+.warning-banner {
+    background: var(--wg-warning-bg);
+    border-left-color: var(--wg-warning);
+    color: var(--wg-warning-text);
+}
+.warning-banner .warning-icon { color: var(--wg-warning); }
+
+.success-banner {
+    background: var(--wg-success-bg);
+    border-left-color: var(--wg-success);
+}
+.success-banner .success-icon { color: var(--wg-success); }
+
+.info-banner {
+    background: var(--wg-info-bg);
+    border-left-color: var(--wg-info);
+}
+.info-banner .info-icon { color: var(--wg-info); }
+
+/* ---- Field label ---- */
+.field-label {
+    display: block;
+    margin-bottom: 3px;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+/* ---- Generic text input (used for email / phone / OTP-style fields) ---- */
+.form-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--wg-padding-input);
+    border: var(--wg-border-width-thin) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    color: var(--wg-gray);
+    background: var(--wg-white);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.form-input:focus {
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 0 3px rgba(242, 103, 42, 0.18);
+}
+
+/* ---- Spinner ---- */
+.spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: var(--wg-white);
+    border-radius: 50%;
+    animation: wg-spin 0.7s linear infinite;
+}
+.spinner--sm {
+    width: 12px;
+    height: 12px;
+    border-color: rgba(242, 103, 42, 0.3);
+    border-top-color: var(--wg-orange);
+}
+@keyframes wg-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner { animation-duration: 1.4s; }
+}

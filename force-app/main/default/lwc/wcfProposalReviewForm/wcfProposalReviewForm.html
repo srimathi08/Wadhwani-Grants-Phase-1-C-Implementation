@@ -1,5 +1,41 @@
 <template>
 
+    <!-- ══ WG TOAST BANNER ══════════════════════════════════
+         Replaces native ShowToastEvent (built from scratch —
+         no prior custom-toast infrastructure existed in this
+         component, though its JS already funneled every toast
+         through one showToast() wrapper method). Renders at
+         top level so it floats above either screen state below. -->
+    <template if:true={bannerVisible}>
+        <div class={bannerClass}>
+            <template if:true={isBannerError}>
+                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5v-1.5h1.5v1.5zm0-3h-1.5V5.75h1.5v5.5z"></path>
+                </svg>
+            </template>
+            <template if:true={isBannerWarning}>
+                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M10.91 2.6a1 1 0 00-1.82 0l-8 16A1 1 0 002 20h16a1 1 0 00.91-1.4l-8-16zM11 16H9v-2h2v2zm0-4H9V7h2v5z"></path>
+                </svg>
+            </template>
+            <template if:true={isBannerSuccess}>
+                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm-1.2 13L4.6 9.8l1.4-1.4 2.8 2.8 5.2-5.2 1.4 1.4L8.8 14z"></path>
+                </svg>
+            </template>
+            <template if:true={isBannerInfo}>
+                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5V8.75h1.5v5.5zm0-7h-1.5v-1.5h1.5v1.5z"></path>
+                </svg>
+            </template>
+            <div class="wg-toast-banner-body">
+                <div class="wg-toast-banner-title">{bannerTitle}</div>
+                <div class="wg-toast-banner-message">{bannerMessage}</div>
+            </div>
+            <button class="wg-toast-banner-close" onclick={handleDismissBanner} title="Dismiss" type="button">&#10005;</button>
+        </div>
+    </template>
+
     <!-- Main Form -->
     <template if:true={showForm}>
         <div class="form-wrap">
@@ -96,18 +132,18 @@
 
                                         <!-- Track-specific guidance badges & text -->
                                         <template if:true={q.trackAware}>
-                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 10px 14px; background: #faf8f5; border-left: 3px solid #E8622A; border-radius: 6px; border: 1px solid #f2e9e1;">
-                                                <div style="font-size: 0.78rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 10px 14px; background: var(--wg-bg-warm); border-left: 3px solid var(--wg-brand); border-radius: 6px; border: 1px solid var(--wg-rule);">
+                                                <div style="font-size: 0.78rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
                                                     🎯 Track-Specific Review Guidance:
                                                 </div>
                                                 <template for:each={q.trackDescriptions} for:item="td">
-                                                    <div key={td.trackKey} style="margin-bottom: 6px; font-size: 0.85rem; color: #334155; line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;">
-                                                        <span style="font-weight: 700; color: #1e293b; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 7px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap;">{td.trackLabel}</span>
+                                                    <div key={td.trackKey} style="margin-bottom: 6px; font-size: 0.85rem; color: var(--wg-ink); line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;">
+                                                        <span style="font-weight: var(--wg-weight-bold); color: var(--wg-ink); background: var(--wg-rule-soft); border: 1px solid var(--wg-rule); padding: 1px 7px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap;">{td.trackLabel}</span>
                                                         <span>{td.text}</span>
                                                     </div>
                                                 </template>
                                                 <template if:false={q.trackDescriptions.length}>
-                                                    <div style="font-size: 0.85rem; color: #444; line-height: 1.4;">
+                                                    <div style="font-size: 0.85rem; color: var(--wg-ink); line-height: 1.4;">
                                                         {q.resolvedDescription}
                                                     </div>
                                                 </template>
@@ -115,7 +151,7 @@
                                         </template>
                                         <template if:false={q.trackAware}>
                                             <template if:true={q.resolvedDescription}>
-                                                <div class="qhint" style="margin-top: 4px; font-size: 0.82rem; color: #666;">
+                                                <div class="qhint" style="margin-top: 4px; font-size: 0.82rem; color: var(--wg-ink-soft);">
                                                     {q.resolvedDescription}
                                                 </div>
                                             </template>
@@ -150,8 +186,8 @@
 
                                 <!-- Selected Rating Ladder Anchor Badge -->
                                 <template if:true={q.selectedLadderText}>
-                                    <div class="selected-ladder-badge" style="margin: 6px 0 10px 0; padding: 6px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 0.83rem; color: #166534; display: flex; align-items: center; gap: 6px;">
-                                        <span style="font-weight: 700;">Level {q.selectedRating}:</span>
+                                    <div class="selected-ladder-badge" style="margin: 6px 0 10px 0; padding: 6px 12px; background: var(--wg-good-tint); border: 1px solid var(--wg-good-rule); border-radius: 6px; font-size: 0.83rem; color: var(--wg-good); display: flex; align-items: center; gap: 6px;">
+                                        <span style="font-weight: var(--wg-weight-bold);">Level {q.selectedRating}:</span>
                                         <span>{q.selectedLadderText}</span>
                                     </div>
                                 </template>
@@ -159,17 +195,17 @@
                                 <!-- Question-Specific 5-Point Ladder Accordion -->
                                 <div class="q-ladder-toggle-wrap" style="margin-bottom: 12px;">
                                     <button class="q-ladder-toggle-btn" type="button" data-qid={q.questionId} onclick={handleToggleQuestionLadder}
-                                            style="background: none; border: none; padding: 0; font-size: 0.78rem; color: #E8622A; cursor: pointer; text-decoration: underline; font-weight: 600;">
+                                            style="background: none; border: none; padding: 0; font-size: 0.78rem; color: var(--wg-brand); cursor: pointer; text-decoration: underline; font-weight: var(--wg-weight-semibold);">
                                         {q.ladderToggleLabel}
                                     </button>
                                     <template if:true={q.showLadder}>
-                                        <div class="q-ladder-drawer" style="margin-top: 8px; padding: 10px 14px; background: #fffaf7; border: 1px dashed #fcd5c1; border-radius: 6px;">
-                                            <div style="font-size: 0.75rem; font-weight: 700; color: #c94e1c; text-transform: uppercase; margin-bottom: 6px;">
+                                        <div class="q-ladder-drawer" style="margin-top: 8px; padding: 10px 14px; background: rgba(242, 103, 42, 0.04); border: 1px dashed var(--wg-brand); border-radius: 6px;">
+                                            <div style="font-size: 0.75rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand-deep); text-transform: uppercase; margin-bottom: 6px;">
                                                 5-Point Rating Ladder for Question {q.questionId}:
                                             </div>
                                             <template for:each={q.ladderItems} for:item="lItem">
-                                                <div key={lItem.level} style="font-size: 0.8rem; margin-bottom: 4px; color: #333; display: flex; gap: 8px;">
-                                                    <span style="font-weight: 700; color: #E8622A; min-width: 55px;">Level {lItem.level}:</span>
+                                                <div key={lItem.level} style="font-size: 0.8rem; margin-bottom: 4px; color: var(--wg-ink); display: flex; gap: 8px;">
+                                                    <span style="font-weight: var(--wg-weight-bold); color: var(--wg-brand); min-width: 55px;">Level {lItem.level}:</span>
                                                     <span>{lItem.text}</span>
                                                 </div>
                                             </template>
@@ -426,14 +462,14 @@
                         </div>
 
                         <!-- Overall Score Card Banner -->
-                        <div class="overall-score-banner" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, #fff4ef 0%, #ffffff 100%); border: 1.5px solid #E8622A; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div class="overall-score-banner" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, var(--wg-brand-tint) 0%, var(--wg-surface) 100%); border: 1.5px solid var(--wg-brand); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <div style="font-size: 0.82rem; font-weight: 700; color: #E8622A; text-transform: uppercase; letter-spacing: 0.5px;">Arithmetic Mean across All 7 Categories</div>
-                                <div style="font-size: 1.3rem; font-weight: 800; color: #1a1a1a;">Overall Review Score</div>
+                                <div style="font-size: 0.82rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand); text-transform: uppercase; letter-spacing: 0.5px;">Arithmetic Mean across All 7 Categories</div>
+                                <div style="font-size: 1.3rem; font-weight: 800; color: var(--wg-ink);">Overall Review Score</div>
                             </div>
                             <div style="display: flex; align-items: baseline; gap: 6px;">
-                                <span style="font-size: 2.2rem; font-weight: 800; color: #E8622A;">{overallCalculatedScore}</span>
-                                <span style="font-size: 1rem; color: #777; font-weight: 600;">/ 5.0</span>
+                                <span style="font-size: 2.2rem; font-weight: 800; color: var(--wg-brand);">{overallCalculatedScore}</span>
+                                <span style="font-size: 1rem; color: var(--wg-ink-mute); font-weight: var(--wg-weight-semibold);">/ 5.0</span>
                             </div>
                         </div>
 
@@ -451,14 +487,14 @@
                                     <template for:each={dim.qs} for:item="rq">
                                         <div key={rq.id} class="review-q">
                                             <div class="qx">
-                                                <span style="font-weight: 700; color: #E8622A; margin-right: 4px;">{rq.id}</span>
+                                                <span style="font-weight: var(--wg-weight-bold); color: var(--wg-brand); margin-right: 4px;">{rq.id}</span>
                                                 {rq.text}
                                             </div>
                                             <div class="rx">
                                                 <span class={rq.pipCls}>{rq.ratingLabel}</span>&nbsp;<span>{rq.ratingNum}</span>
                                             </div>
                                             <template if:true={rq.ladderText}>
-                                                <div style="font-size: 0.78rem; color: #166534; margin-top: 2px;">
+                                                <div style="font-size: 0.78rem; color: var(--wg-good); margin-top: 2px;">
                                                     ↳ <em>{rq.ladderText}</em>
                                                 </div>
                                             </template>
