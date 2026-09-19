@@ -376,68 +376,6 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>Mail_to_Applicant_on_Conditionally_approve</name>
-        <label>Mail to Applicant on Conditionally approve</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>$Record.Account.PersonEmail</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>wcf@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Application_Conditionally_Approved</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>$Record.Account.PersonContactId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.Id</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
         <name>Resubmitted_mail_to_Applicant</name>
         <label>Resubmitted mail to Applicant</label>
         <locationX>0</locationX>
@@ -543,6 +481,130 @@
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
                 <setupReference>WCF_Folder/Action_Required_Update_Application</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_100_Day_Closure_Email</name>
+        <label>Send 100 Day Closure Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>$Record.Account.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Draft_Abandonment_Warning</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_30_Day_Revision_Reminder_Email</name>
+        <label>Send 30 Day Revision Reminder Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>$Record.Account.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Additional_Information_Reminder</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -873,21 +935,6 @@
             <label>Recommended for Fund</label>
         </rules>
         <rules>
-            <name>Conditionally_Approver</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Application_Decision.ApplicationDecision</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Conditionally Approve</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Mail_to_Applicant_on_Conditionally_approve</targetReference>
-            </connector>
-            <label>Conditionally Approver</label>
-        </rules>
-        <rules>
             <name>Not_Recommended_for_Fund</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
@@ -902,17 +949,49 @@
             </connector>
             <label>Not  Recommended for Fund</label>
         </rules>
+    </decisions>
+    <decisions>
+        <name>Check_If_Still_Revision_Requested</name>
+        <label>Check If Still Revision Requested</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
-            <name>Revoke</name>
+            <name>Still_In_Revision_Requested_30_Days</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Application_Decision.ApplicationDecision</leftValueReference>
+                <leftValueReference>Get_Latest_Record_For_Reminder.Status</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Revoke</stringValue>
+                    <stringValue>Revision Requested</stringValue>
                 </rightValue>
             </conditions>
-            <label>Revoke</label>
+            <connector>
+                <targetReference>Send_30_Day_Revision_Reminder_Email</targetReference>
+            </connector>
+            <label>Still In Revision Requested 30 Days</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_If_Still_Revision_Requested_100</name>
+        <label>Check If Still Revision Requested 100</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Still_In_Revision_Requested_100_Days</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Latest_Record_For_Closure.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Revision Requested</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_100_Day_Closure_Email</targetReference>
+            </connector>
+            <label>Still In Revision Requested 100 Days</label>
         </rules>
     </decisions>
     <decisions>
@@ -1225,6 +1304,48 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
+        <name>Get_Latest_Record_For_Closure</name>
+        <label>Get Latest Record For Closure</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_If_Still_Revision_Requested_100</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>IndividualApplication</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Latest_Record_For_Reminder</name>
+        <label>Get Latest Record For Reminder</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_If_Still_Revision_Requested</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>IndividualApplication</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Get_Proposal_Review</name>
         <label>Get Proposal Review</label>
         <locationX>0</locationX>
@@ -1290,12 +1411,12 @@
             <targetReference>Update_Return_Commends</targetReference>
         </connector>
         <inputAssignments>
-            <field>Due_Date__c</field>
+            <field>Due_Date_for_Resubmission__c</field>
             <value>
                 <elementReference>RevisionDueDate</elementReference>
             </value>
         </inputAssignments>
-        <inputReference>$Record.Account</inputReference>
+        <inputReference>$Record</inputReference>
     </recordUpdates>
     <recordUpdates>
         <name>Update_Resubmission_round</name>
@@ -1389,6 +1510,28 @@
             </connector>
             <label>80% due validate</label>
             <offsetNumber>8</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>Initial_Submission_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <scheduledPaths>
+            <name>X30_Days_Revision_Reminder</name>
+            <connector>
+                <targetReference>Get_Latest_Record_For_Reminder</targetReference>
+            </connector>
+            <label>30 Days Revision Reminder</label>
+            <offsetNumber>30</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>Initial_Submission_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <scheduledPaths>
+            <name>X100_Days_Revision_Closure</name>
+            <connector>
+                <targetReference>Get_Latest_Record_For_Closure</targetReference>
+            </connector>
+            <label>100 Days Revision Closure</label>
+            <offsetNumber>100</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Initial_Submission_Date__c</recordField>
             <timeSource>RecordField</timeSource>
