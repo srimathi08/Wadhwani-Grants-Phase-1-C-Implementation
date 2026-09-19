@@ -279,16 +279,20 @@ public without sharing class WCFFormEngineController {
                 'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c',
                 'Submitter_Name__c', 'Job_Title__c', 'Work_Email_ID__c', 'Phone__c', 'WG_Phone_Country_Code__c',
                 'Legal_Type__c', 'Legal_Type_Other__c', 'Registration_Jurisdiction__c', 'Registration_Jurisdiction_Other__c',
-                'Legal_Structure__c', 'Current_fiscal_year_s_end_date__c',
+                'Incorporation_Date__c', 'Legal_Structure__c',
+                'Has_501c3_Status__c', 'Has_Equivalency_Determination__c', 'Is_FCRA_Registered__c', 'Willing_to_Pursue_ED__c',
+                'Current_fiscal_year_s_end_date__c', 'Fiscal_Month__c', 'Fiscal_Day__c',
                 'Funder_1_Name__c', 'Funder_1_Amount__c', 'Funder_1_Period_Start__c', 'Funder_1_Period_End__c', 'Funder_1_Type__c',
                 'Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c', 'Funder_2_Period_End__c', 'Funder_2_Type__c',
                 'Funder_3_Name__c', 'Funder_3_Amount__c', 'Funder_3_Period_Start__c', 'Funder_3_Period_End__c', 'Funder_3_Type__c',
                 'Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c',
                 'Reference_2_Name__c', 'Reference_2_Role__c', 'Reference_2_Email__c',
+                'Revenue_Explanation__c',
                 'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c',
+                'Q24_VERIFIED__c', 'Details_of_Ethical_Received__c', 'Q24_REPORT_URL__c',
                 'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c', 'Use_of_Additional_Funding_JC__c',
                 'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
-                'Attesting_User_Name__c', 'Attesting_User_Title__c'
+                'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c'
             };
 
             Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();
@@ -330,6 +334,10 @@ public without sharing class WCFFormEngineController {
             if (appFieldMap.containsKey('organizational_area_s_for_funding_inves1__c')) {
                 Object val1 = app.get('Organizational_Area_s_for_Funding_Inves1__c');
                 if (val1 != null) multiTracksStr = String.valueOf(val1);
+            }
+            if (appFieldMap.containsKey('selected_funding_tracks__c')) {
+                Object val2 = app.get('Selected_Funding_Tracks__c');
+                if (val2 != null) multiTracksStr += ';' + String.valueOf(val2);
             }
             String combined = (tracksStr != null ? tracksStr : '') + ';' + multiTracksStr;
             if (String.isNotBlank(combined)) {
@@ -395,17 +403,47 @@ public without sharing class WCFFormEngineController {
             } else if (fv.containsKey('Has_501c3_Status__c') && !fv.containsKey('Do_you_have_a_US_501_c_3_organization__c')) {
                 fv.put('Do_you_have_a_US_501_c_3_organization__c', fv.get('Has_501c3_Status__c'));
             }
+            if (fv.containsKey('Has_501c3_Status__c')) {
+                fv.put('Q5_US_501C3', fv.get('Has_501c3_Status__c'));
+            }
 
             if (fv.containsKey('Have_you_cleared_Equivalency_Determinat__c') && !fv.containsKey('Has_Equivalency_Determination__c')) {
                 fv.put('Has_Equivalency_Determination__c', fv.get('Have_you_cleared_Equivalency_Determinat__c'));
             } else if (fv.containsKey('Has_Equivalency_Determination__c') && !fv.containsKey('Have_you_cleared_Equivalency_Determinat__c')) {
                 fv.put('Have_you_cleared_Equivalency_Determinat__c', fv.get('Has_Equivalency_Determination__c'));
             }
+            if (fv.containsKey('Has_Equivalency_Determination__c')) {
+                fv.put('Q5_ED_STATUS', fv.get('Has_Equivalency_Determination__c'));
+            }
 
             if (fv.containsKey('Are_you_FCRA_exempted_compliant__c') && !fv.containsKey('Is_FCRA_Registered__c')) {
                 fv.put('Is_FCRA_Registered__c', fv.get('Are_you_FCRA_exempted_compliant__c'));
             } else if (fv.containsKey('Is_FCRA_Registered__c') && !fv.containsKey('Are_you_FCRA_exempted_compliant__c')) {
                 fv.put('Are_you_FCRA_exempted_compliant__c', fv.get('Is_FCRA_Registered__c'));
+            }
+            if (fv.containsKey('Is_FCRA_Registered__c')) {
+                fv.put('Q5_FCRA_STATUS', fv.get('Is_FCRA_Registered__c'));
+            }
+
+            if (fv.containsKey('If_none_of_the_above_apply_would_you__c') && !fv.containsKey('Willing_to_Pursue_ED__c')) {
+                fv.put('Willing_to_Pursue_ED__c', fv.get('If_none_of_the_above_apply_would_you__c'));
+            } else if (fv.containsKey('Willing_to_Pursue_ED__c') && !fv.containsKey('If_none_of_the_above_apply_would_you__c')) {
+                fv.put('If_none_of_the_above_apply_would_you__c', fv.get('Willing_to_Pursue_ED__c'));
+            }
+            if (fv.containsKey('Willing_to_Pursue_ED__c')) {
+                fv.put('Q5_WILLING_ED', fv.get('Willing_to_Pursue_ED__c'));
+            }
+
+            // Q24 (Independent Verification) Aliases
+            if (fv.containsKey('Q24_VERIFIED__c') && (!fv.containsKey('Q24_VERIFIED') || String.isBlank(String.valueOf(fv.get('Q24_VERIFIED'))))) {
+                fv.put('Q24_VERIFIED', fv.get('Q24_VERIFIED__c'));
+            } else if (fv.containsKey('Q24_VERIFIED') && (!fv.containsKey('Q24_VERIFIED__c') || String.isBlank(String.valueOf(fv.get('Q24_VERIFIED__c'))))) {
+                fv.put('Q24_VERIFIED__c', fv.get('Q24_VERIFIED'));
+            }
+            if (fv.containsKey('Details_of_Ethical_Received__c') && (!fv.containsKey('X3rd_Party_Verification_Description_FY_1__c') || String.isBlank(String.valueOf(fv.get('X3rd_Party_Verification_Description_FY_1__c'))))) {
+                fv.put('X3rd_Party_Verification_Description_FY_1__c', fv.get('Details_of_Ethical_Received__c'));
+            } else if (fv.containsKey('X3rd_Party_Verification_Description_FY_1__c') && (!fv.containsKey('Details_of_Ethical_Received__c') || String.isBlank(String.valueOf(fv.get('Details_of_Ethical_Received__c'))))) {
+                fv.put('Details_of_Ethical_Received__c', fv.get('X3rd_Party_Verification_Description_FY_1__c'));
             }
 
             if (!fv.containsKey('Fiscal_Month__c') || String.isBlank(String.valueOf(fv.get('Fiscal_Month__c')))) {
@@ -579,8 +617,13 @@ public without sharing class WCFFormEngineController {
                 fv.put('JC_EXIST_JOBS_PROJ', o.Jobs_from_Growing_Businesses_CFY__c != null ? String.valueOf(o.Jobs_from_Growing_Businesses_CFY__c) : '');
                 fv.put('JC_COST_PROJ', o.Avg_Cost_per_Job_CFY__c != null ? String.valueOf(o.Avg_Cost_per_Job_CFY__c) : '');
 
-                if (String.isNotBlank(o.Job_Verification_3rd_Party_CFY__c) && String.isBlank(String.valueOf(fv.get('Q24_VERIFIED__c')))) {
-                    fv.put('Q24_VERIFIED__c', o.Job_Verification_3rd_Party_CFY__c);
+                if (String.isNotBlank(o.Job_Verification_3rd_Party_CFY__c)) {
+                    if (!fv.containsKey('Q24_VERIFIED__c') || String.isBlank(String.valueOf(fv.get('Q24_VERIFIED__c')))) {
+                        fv.put('Q24_VERIFIED__c', o.Job_Verification_3rd_Party_CFY__c);
+                    }
+                    if (!fv.containsKey('Q24_VERIFIED') || String.isBlank(String.valueOf(fv.get('Q24_VERIFIED')))) {
+                        fv.put('Q24_VERIFIED', o.Job_Verification_3rd_Party_CFY__c);
+                    }
                 }
             }
             wrapper.formValues = fv;
@@ -777,11 +820,22 @@ public without sharing class WCFFormEngineController {
         } else {
             Set<String> updateFieldNames = new Set<String>{
                 'Id', 'RecordTypeId', 'AccountId', 'Category', 'Status', 'OwnerId', 'Initial_Submission_Date__c', 'Last_Resubmission_Date__c', 'Last_Page__c',
-                'Organization_Name__c', 'ContactId', 'Principal_Investigator_PI__c', 'PI__c', 'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c',
-                'Draft_Email_Sent__c', 'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c',
+                'Organization_Name__c', 'Headquarters_City_and_Country__c', 'Primary_Service_Regions__c',
+                'Leader_Name__c', 'Leader_Title__c', 'Leader_Tenure__c',
+                'Submitter_Name__c', 'Job_Title__c', 'Work_Email_ID__c', 'Phone__c', 'WG_Phone_Country_Code__c',
+                'Legal_Type__c', 'Legal_Type_Other__c', 'Registration_Jurisdiction__c', 'Registration_Jurisdiction_Other__c',
+                'Incorporation_Date__c', 'Legal_Structure__c',
+                'Has_501c3_Status__c', 'Has_Equivalency_Determination__c', 'Is_FCRA_Registered__c', 'Willing_to_Pursue_ED__c',
+                'Current_fiscal_year_s_end_date__c', 'Fiscal_Month__c', 'Fiscal_Day__c',
+                'ContactId', 'Principal_Investigator_PI__c', 'PI__c',
+                'Revenue_Explanation__c',
+                'Skilling_Approach__c', 'Job_Creation_Approach__c', 'Livelihood_Approach__c',
+                'Q24_VERIFIED__c', 'Details_of_Ethical_Received__c', 'Q24_REPORT_URL__c',
                 'Organizational_Sustainability__c', 'Use_of_Additional_Funding__c', 'Use_of_Additional_Funding_JC__c',
                 'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
-                'Leader_Tenure__c', 'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c'
+                'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c',
+                'Draft_Email_Sent__c',
+                'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c'
             };
             for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
                 if (String.isNotBlank(q.Field_API_Name__c) && (q.Target_Object__c == 'IndividualApplication' || String.isBlank(q.Target_Object__c))) {
@@ -945,6 +999,66 @@ public without sharing class WCFFormEngineController {
         }
         if (valuesMap.containsKey('Job_Creation_Approach__c') && valuesMap.get('Job_Creation_Approach__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Job_Creation_Approach__c')))) {
             app.Job_Creation_Approach__c = String.valueOf(valuesMap.get('Job_Creation_Approach__c'));
+        }
+
+        // Section 5 Fallbacks
+        if (valuesMap.containsKey('Has_501c3_Status__c') && valuesMap.get('Has_501c3_Status__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Has_501c3_Status__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_501c3_status__c').getDescribe(), String.valueOf(valuesMap.get('Has_501c3_Status__c')));
+            if (cleanVal != null) app.put('Has_501c3_Status__c', cleanVal);
+        } else if (valuesMap.containsKey('Q5_US_501C3') && valuesMap.get('Q5_US_501C3') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q5_US_501C3')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_501c3_status__c').getDescribe(), String.valueOf(valuesMap.get('Q5_US_501C3')));
+            if (cleanVal != null) app.put('Has_501c3_Status__c', cleanVal);
+        } else if (valuesMap.containsKey('Do_you_have_a_US_501_c_3_organization__c') && valuesMap.get('Do_you_have_a_US_501_c_3_organization__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Do_you_have_a_US_501_c_3_organization__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_501c3_status__c').getDescribe(), String.valueOf(valuesMap.get('Do_you_have_a_US_501_c_3_organization__c')));
+            if (cleanVal != null) app.put('Has_501c3_Status__c', cleanVal);
+        }
+
+        if (valuesMap.containsKey('Has_Equivalency_Determination__c') && valuesMap.get('Has_Equivalency_Determination__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Has_Equivalency_Determination__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_equivalency_determination__c').getDescribe(), String.valueOf(valuesMap.get('Has_Equivalency_Determination__c')));
+            if (cleanVal != null) app.put('Has_Equivalency_Determination__c', cleanVal);
+        } else if (valuesMap.containsKey('Q5_ED_STATUS') && valuesMap.get('Q5_ED_STATUS') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q5_ED_STATUS')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_equivalency_determination__c').getDescribe(), String.valueOf(valuesMap.get('Q5_ED_STATUS')));
+            if (cleanVal != null) app.put('Has_Equivalency_Determination__c', cleanVal);
+        } else if (valuesMap.containsKey('Have_you_cleared_Equivalency_Determinat__c') && valuesMap.get('Have_you_cleared_Equivalency_Determinat__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Have_you_cleared_Equivalency_Determinat__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('has_equivalency_determination__c').getDescribe(), String.valueOf(valuesMap.get('Have_you_cleared_Equivalency_Determinat__c')));
+            if (cleanVal != null) app.put('Has_Equivalency_Determination__c', cleanVal);
+        }
+
+        if (valuesMap.containsKey('Is_FCRA_Registered__c') && valuesMap.get('Is_FCRA_Registered__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Is_FCRA_Registered__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('is_fcra_registered__c').getDescribe(), String.valueOf(valuesMap.get('Is_FCRA_Registered__c')));
+            if (cleanVal != null) app.put('Is_FCRA_Registered__c', cleanVal);
+        } else if (valuesMap.containsKey('Q5_FCRA_STATUS') && valuesMap.get('Q5_FCRA_STATUS') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q5_FCRA_STATUS')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('is_fcra_registered__c').getDescribe(), String.valueOf(valuesMap.get('Q5_FCRA_STATUS')));
+            if (cleanVal != null) app.put('Is_FCRA_Registered__c', cleanVal);
+        } else if (valuesMap.containsKey('Are_you_FCRA_exempted_compliant__c') && valuesMap.get('Are_you_FCRA_exempted_compliant__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Are_you_FCRA_exempted_compliant__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('is_fcra_registered__c').getDescribe(), String.valueOf(valuesMap.get('Are_you_FCRA_exempted_compliant__c')));
+            if (cleanVal != null) app.put('Is_FCRA_Registered__c', cleanVal);
+        }
+
+        if (valuesMap.containsKey('Willing_to_Pursue_ED__c') && valuesMap.get('Willing_to_Pursue_ED__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Willing_to_Pursue_ED__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('willing_to_pursue_ed__c').getDescribe(), String.valueOf(valuesMap.get('Willing_to_Pursue_ED__c')));
+            if (cleanVal != null) app.put('Willing_to_Pursue_ED__c', cleanVal);
+        } else if (valuesMap.containsKey('Q5_WILLING_ED') && valuesMap.get('Q5_WILLING_ED') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q5_WILLING_ED')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('willing_to_pursue_ed__c').getDescribe(), String.valueOf(valuesMap.get('Q5_WILLING_ED')));
+            if (cleanVal != null) app.put('Willing_to_Pursue_ED__c', cleanVal);
+        } else if (valuesMap.containsKey('If_none_of_the_above_apply_would_you__c') && valuesMap.get('If_none_of_the_above_apply_would_you__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('If_none_of_the_above_apply_would_you__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('willing_to_pursue_ed__c').getDescribe(), String.valueOf(valuesMap.get('If_none_of_the_above_apply_would_you__c')));
+            if (cleanVal != null) app.put('Willing_to_Pursue_ED__c', cleanVal);
+        }
+
+        // Q24 Fallbacks
+        if (valuesMap.containsKey('Q24_VERIFIED') && valuesMap.get('Q24_VERIFIED') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q24_VERIFIED')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('q24_verified__c').getDescribe(), String.valueOf(valuesMap.get('Q24_VERIFIED')));
+            if (cleanVal != null) app.put('Q24_VERIFIED__c', cleanVal);
+        } else if (valuesMap.containsKey('Q24_VERIFIED__c') && valuesMap.get('Q24_VERIFIED__c') != null && String.isNotBlank(String.valueOf(valuesMap.get('Q24_VERIFIED__c')))) {
+            String cleanVal = sanitizePicklistValue(appFields.get('q24_verified__c').getDescribe(), String.valueOf(valuesMap.get('Q24_VERIFIED__c')));
+            if (cleanVal != null) app.put('Q24_VERIFIED__c', cleanVal);
+        }
+
+        if (valuesMap.containsKey('Details_of_Ethical_Received__c') && valuesMap.get('Details_of_Ethical_Received__c') != null) {
+            app.put('Details_of_Ethical_Received__c', String.valueOf(valuesMap.get('Details_of_Ethical_Received__c')));
+        } else if (valuesMap.containsKey('X3rd_Party_Verification_Description_FY_1__c') && valuesMap.get('X3rd_Party_Verification_Description_FY_1__c') != null) {
+            app.put('Details_of_Ethical_Received__c', String.valueOf(valuesMap.get('X3rd_Party_Verification_Description_FY_1__c')));
         }
 
         // Map legacy UI key Q_ORG_NAME if present

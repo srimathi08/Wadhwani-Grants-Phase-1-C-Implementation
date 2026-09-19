@@ -1,4 +1,4 @@
-﻿/* â”€â”€ Wrapper & Container â”€â”€ */
+/* â”€â”€ Wrapper & Container â”€â”€ */
 .rfi-response-wrapper {
     max-width: 960px;
     margin: 0 auto;
@@ -40,7 +40,25 @@
     margin: 0;
 }
 
-/* â”€â”€ Question Card & Reviewer Note â”€â”€ */
+/* ── Validation Error Banner ── */
+.rfi-validation-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #FEF0F0;
+    border-left: 5px solid #EA001E;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    color: #BA0517;
+    font-weight: 600;
+    font-size: 14px;
+}
+.rfi-validation-text {
+    flex: 1;
+}
+
+/* ── Question Card & Reviewer Note ── */
 .rfi-questions-container {
     display: flex;
     flex-direction: column;
@@ -52,7 +70,7 @@
     border: 1px solid #D8DDE6;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .rfi-validator-note {
@@ -60,6 +78,8 @@
     gap: 14px;
     background: #FFF4E5;
     border-bottom: 2px solid #FFB75D;
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
     padding: 16px 20px;
 }
 .rfi-note-icon {
@@ -89,7 +109,7 @@
     padding: 24px 20px;
 }
 
-/* â”€â”€ Grids & Form Layouts â”€â”€ */
+/* ── Grids & Form Layouts ── */
 .rfi-grid-two {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -107,6 +127,7 @@
 }
 .rfi-full-width {
     grid-column: 1 / -1;
+    width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -147,6 +168,18 @@
     color: #990000;
     font-size: 14px;
     background: #FFF;
+    flex-shrink: 0;
+}
+.rfi-track-card--selected .custom-checkbox {
+    background: #990000;
+    color: #FFFFFF;
+    border-color: #990000;
+}
+.custom-checkmark {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
 }
 .track-label-text {
     font-size: 14px;

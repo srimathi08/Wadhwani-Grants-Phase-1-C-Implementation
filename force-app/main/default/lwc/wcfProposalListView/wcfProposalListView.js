@@ -183,7 +183,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             return !!info.isFlagged;
         }
         if (this.activeReviewFilter === 'rejected') {
-            return p.Status === 'Reviewer Rejected';
+            return p.Status === 'Reviewer Rejected' || info.status === 'Reviewer Rejected';
         }
         if (this.activeReviewFilter === 'returnedByApprover') {
             return p.Status === 'Returned by Approver';
@@ -243,10 +243,15 @@ _isEligibleForQueue(p) {
     const info = this.reviewStatusMap[p.Id] || {};
     return !info.isFlagged &&
            p.Status !== 'Reviewer Rejected' &&
-           p.Status !== 'Returned by Approver';
+           p.Status !== 'Returned by Approver' &&
+           info.status !== 'Reviewer Rejected';
 }
 
   get totalCount() {
+    return this.proposals.length;
+}
+
+get validatedProposalsCount() {
     return this.proposals.filter(p => this._isEligibleForQueue(p)).length;
 }
     get hasProposals()  { return this.filteredCount > 0; }
@@ -275,6 +280,20 @@ get notStartedCount() {
         if (!this._isEligibleForQueue(p)) return false;
         const info = this.reviewStatusMap[p.Id] || {};
         return !info.isSubmitted && info.status !== 'In Progress';
+    }).length;
+}
+
+get flaggedCount() {
+    return this.proposals.filter(p => {
+        const info = this.reviewStatusMap[p.Id] || {};
+        return !!info.isFlagged;
+    }).length;
+}
+
+get rejectedCount() {
+    return this.proposals.filter(p => {
+        const info = this.reviewStatusMap[p.Id] || {};
+        return p.Status === 'Reviewer Rejected' || info.status === 'Reviewer Rejected';
     }).length;
 }
     // ── Active filter label (shown in UI when filter is active) ──
@@ -457,17 +476,7 @@ if (parsedDue && !isSubmitted) {
     get isSortedByName() { return this.sortField === 'Name'; }
     get isSortedByDate() { return this.sortField === 'CreatedDate'; }
     get sortIcon()       { return this.sortAscending ? 'utility:arrowup' : 'utility:arrowdown'; }
-    get flaggedCount() {
-    return this.proposals.filter(p => {
-        return !!(this.reviewStatusMap[p.Id] || {}).isFlagged;
-    }).length;
-}
 
-get rejectedCount() {
-    return this.proposals.filter(p => {
-        return p.Status === 'Reviewer Rejected';
-    }).length;
-}
     handleSort(evt) {
         const field = evt.currentTarget.dataset.field;
         if (this.sortField === field) {

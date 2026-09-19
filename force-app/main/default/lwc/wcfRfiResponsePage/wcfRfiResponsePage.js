@@ -13,6 +13,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     @track isLoading = true;
     @track isSaving = false;
     @track isSubmitted = false;
+    @track validationErrorMessage = '';
 
     @track selectedTracks = [];
     @track formValues = {
@@ -227,30 +228,30 @@ export default class WcfRfiResponsePage extends LightningElement {
             Q2: 'Organizational Identifying Information',
             Q3: 'Submitter Contact Information',
             Q4: 'Legal Structure',
-            Q5: 'Fiscal Year End Date',
-            Q6: 'Historical Financial Data',
-            Q7: 'Current Fiscal Year Data',
-            Q8: '501(c)(3) & Equivalency Determination',
-            Q9: 'FCRA Registration',
-            Q10: 'Top Funders and References for Outreach',
+            Q5: 'Legal and Tax Compliance',
+            Q6: 'Fiscal Year End Date',
+            Q7: 'Top 3 Most Prominent Funders',
+            Q8: 'References for Outreach',
+            Q9: 'Historical Financial Data',
+            Q10: 'Current Fiscal Year Data',
             Q11: 'Your Skilling & Placement Approach',
             Q12: 'Skilling Domains Offered',
-            Q13: 'Job Fulfillment Outcomes (Last 3 Fiscal Years)',
-            Q14: 'Job Fulfillment Outcomes (Current FY Projections)',
+            Q13: 'Job Fulfillment Outcomes (Actuals)',
+            Q14: 'Job Fulfillment Outcomes (Projections)',
             Q15: 'Your Job Creation Approach',
             Q16: 'Business Sectors Served',
-            Q17: 'Job Creation Outcomes (Last 3 Fiscal Years)',
-            Q18: 'Job Creation Outcomes (Current FY Projections)',
-            Q19: 'Livelihood Upliftment Approach',
-            Q20: 'Livelihood Programs Offered',
-            Q21: 'Target Communities & Local Ecosystem Partners',
-            Q22: 'Livelihood Outcomes (Last 3 Fiscal Years)',
-            Q23: 'Livelihood Outcomes (Current FY Projections)',
+            Q17: 'Job Creation Outcomes (Actuals)',
+            Q18: 'Job Creation Outcomes (Projections)',
+            Q19: 'Your Livelihood Upliftment Approach',
+            Q20: 'Your Key Programs / Initiatives',
+            Q21: 'Communities that you work in',
+            Q22: 'Livelihood Outcomes (Actuals)',
+            Q23: 'Livelihood Outcomes, Current FY Projections',
             Q24: 'Independent Verification of Your Outcomes',
             Q25: 'Organizational Sustainability',
             Q26: 'Desired Use of Additional Funding / Investment',
-            Q27: 'Operational Synergies & GenieAI Interest',
-            Q28: 'Additional Supporting Documentation'
+            Q27: 'Operational Synergies — GenieAI',
+            Q28: 'Supporting Documents'
         };
     }
 
@@ -333,12 +334,30 @@ export default class WcfRfiResponsePage extends LightningElement {
         return this.flaggedQuestions && this.flaggedQuestions.length > 0;
     }
 
-    // â”€â”€ Input & Field Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Input & Field Handlers ───────────────────────────────────────────────
     handleFieldChange(event) {
         const field = event.target.dataset.field || event.currentTarget.dataset.field;
         const value = event.detail?.value !== undefined ? event.detail.value : event.target.value;
         if (field) {
             this.formValues = { ...this.formValues, [field]: value };
+            if (this.validationErrorMessage) {
+                this.validationErrorMessage = '';
+            }
+            if (field === 'Incorporation_Date__c') {
+                const today = new Date().toISOString().split('T')[0];
+                const inputEl = event.target;
+                if (value && value > today) {
+                    if (inputEl.setCustomValidity) {
+                        inputEl.setCustomValidity('Incorporation Date cannot be in the future.');
+                        inputEl.reportValidity();
+                    }
+                } else {
+                    if (inputEl.setCustomValidity) {
+                        inputEl.setCustomValidity('');
+                        inputEl.reportValidity();
+                    }
+                }
+            }
         }
     }
 
@@ -352,6 +371,9 @@ export default class WcfRfiResponsePage extends LightningElement {
             trks.push(trackCode);
         }
         this.selectedTracks = trks;
+        if (this.validationErrorMessage) {
+            this.validationErrorMessage = '';
+        }
     }
 
     get trackCards() {
@@ -378,7 +400,19 @@ export default class WcfRfiResponsePage extends LightningElement {
         ];
     }
 
-    // â”€â”€ Location Autocomplete (HQ) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    handleTrackToggle(event) {
+        const code = event.currentTarget.dataset.code;
+        if (!code) return;
+        let current = [...(this.selectedTracks || [])];
+        if (current.includes(code)) {
+            current = current.filter(t => t !== code);
+        } else {
+            current.push(code);
+        }
+        this.selectedTracks = current;
+    }
+
+    // ── Location Autocomplete (HQ) ───────────────────────────────────────────
     handleLocationInput(event) {
         const query = event.target.value;
         this.formValues = { ...this.formValues, Headquarters_City_and_Country__c: query };
@@ -412,7 +446,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         this.locationResults = [];
     }
 
-    // â”€â”€ Fiscal Year & Dates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Fiscal Year & Dates ──────────────────────────────────────────────────
     get fiscalMonthOptions() {
         return [
             { label: 'January', value: '01' }, { label: 'February', value: '02' },
@@ -447,10 +481,10 @@ export default class WcfRfiResponsePage extends LightningElement {
         this.loadMetadata();
     }
 
-    // â”€â”€ Picklists â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Picklists ────────────────────────────────────────────────────────────
     get legalTypeOptions() {
         return [
-            { label: 'â€” Select â€”', value: '' },
+            { label: '— Select —', value: '' },
             { label: 'Non-profit', value: 'Non-profit' },
             { label: 'For-profit', value: 'For-profit' },
             { label: 'Hybrid', value: 'Hybrid' },
@@ -464,7 +498,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get countryOptions() {
         return [
-            { label: 'â€” Select country â€”', value: '' },
+            { label: '— Select country —', value: '' },
             { label: 'Brazil', value: 'Brazil' },
             { label: 'Egypt', value: 'Egypt' },
             { label: 'India', value: 'India' },
@@ -494,7 +528,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get funderTypeOptions() {
         return [
-            { label: 'â€” Select â€”', value: '' },
+            { label: '— Select —', value: '' },
             { label: 'Grant', value: 'Grant' },
             { label: 'Loan', value: 'Loan' },
             { label: 'Equity', value: 'Equity' },
@@ -504,7 +538,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get genieAIOptions() {
         return [
-            { label: 'â€” Select â€”', value: '' },
+            { label: '— Select —', value: '' },
             { label: 'Yes, interested', value: 'Yes, interested' },
             { label: 'Maybe, want to learn more', value: 'Maybe, want to learn more' },
             { label: 'Not at this time', value: 'Not at this time' }
@@ -767,11 +801,11 @@ export default class WcfRfiResponsePage extends LightningElement {
         }
     }
 
-    // â”€â”€ Resubmit Action â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Resubmit Action ──────────────────────────────────────────────────────
     async handleSubmitResponse() {
         if (this.isSaving) return;
 
-        // Sync rich text fields from DOM
+        // 1. Sync rich text fields from DOM
         const richSelectors = this.template.querySelectorAll('[contenteditable="true"][data-field]');
         richSelectors.forEach(el => {
             const f = el.dataset.field;
@@ -780,20 +814,77 @@ export default class WcfRfiResponsePage extends LightningElement {
             }
         });
 
-        // Validate standard lightning inputs/comboboxes
-        const inputs = this.template.querySelectorAll('lightning-input[required], lightning-combobox[required], lightning-radio-group[required]');
-        let valid = true;
-        inputs.forEach(i => {
-            if (!i.reportValidity()) valid = false;
-        });
-        if (!valid) {
+        // 2. Validate Track Selection
+        if (!this.selectedTracks || this.selectedTracks.length === 0) {
+            this.validationErrorMessage = 'Please select at least one Track before submitting.';
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Validation Error',
-                message: 'Please fill in all required fields before resubmitting.',
+                message: this.validationErrorMessage,
                 variant: 'error'
             }));
             return;
         }
+
+        // 3. Validate Incorporation Date (cannot be in the future)
+        const today = new Date().toISOString().split('T')[0];
+        if (this.formValues.Incorporation_Date__c && this.formValues.Incorporation_Date__c > today) {
+            this.validationErrorMessage = 'Incorporation Date cannot be in the future.';
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Validation Error',
+                message: this.validationErrorMessage,
+                variant: 'error'
+            }));
+            return;
+        }
+
+        // 4. Validate all standard lightning inputs, comboboxes, radio-groups
+        const inputs = [...this.template.querySelectorAll('lightning-input, lightning-combobox, lightning-radio-group')];
+        let valid = true;
+        inputs.forEach(i => {
+            if (i.reportValidity && !i.reportValidity()) {
+                valid = false;
+            }
+        });
+
+        // 5. Validate required rich text areas for returned questions
+        const flagged = this.flaggedQuestions || [];
+        for (const q of flagged) {
+            if (q.isQ4) {
+                const text = this.stripHtml(this.formValues.Legal_Structure__c).trim();
+                if (!text) valid = false;
+            }
+            if (q.isQ11) {
+                const text = this.stripHtml(this.formValues.Skilling_Approach__c).trim();
+                if (!text) valid = false;
+            }
+            if (q.isQ15) {
+                const text = this.stripHtml(this.formValues.Job_Creation_Approach__c).trim();
+                if (!text) valid = false;
+            }
+            if (q.isQ19) {
+                const text = this.stripHtml(this.formValues.Livelihood_Approach__c).trim();
+                if (!text) valid = false;
+            }
+            if (q.isQ25) {
+                const text = this.stripHtml(this.formValues.Organizational_Sustainability__c).trim();
+                if (!text) valid = false;
+            }
+            if (q.isQ26) {
+                const text = this.stripHtml(this.formValues.Use_of_Additional_Funding__c).trim();
+                if (!text) valid = false;
+            }
+        }
+
+        if (!valid) {
+            this.validationErrorMessage = 'Please fill in all required fields and complete required descriptions before resubmitting.';
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Validation Error',
+                message: this.validationErrorMessage,
+                variant: 'error'
+            }));
+            return;
+        }
+        this.validationErrorMessage = '';
 
         this.isSaving = true;
         try {

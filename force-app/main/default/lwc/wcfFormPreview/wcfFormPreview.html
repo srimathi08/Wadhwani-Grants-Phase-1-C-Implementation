@@ -740,6 +740,74 @@
                         </div>
                     </div>
 
+                    <!-- Q20: Key Programs / Initiatives -->
+                    <template if:true={hasLivelihoodPrograms}>
+                        <div class="rv-row">
+                            <div class="rv-lbl">
+                                <span class="rv-q-num">{qNum.Q20}</span>
+                                <span class="rv-lbl-text">Your Key Programs / Initiatives <span class="rv-tag rv-tag-liv">LIVELIHOOD</span></span>
+                            </div>
+                            <div class="rv-val">
+                                <table class="rv-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Program / Initiative Name</th>
+                                            <th>Type of Support Provided</th>
+                                            <th>Duration in Man-Hours</th>
+                                            <th>Annual Enrollment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={livelihoodPrograms} for:item="prog">
+                                            <tr key={prog.idx}>
+                                                <td>{prog.name}</td>
+                                                <td>{prog.supportType}</td>
+                                                <td>{prog.manHours}</td>
+                                                <td>{prog.enrollment}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Q21: Communities that you work in -->
+                    <template if:true={hasCommunities}>
+                        <div class="rv-row">
+                            <div class="rv-lbl">
+                                <span class="rv-q-num">{qNum.Q21}</span>
+                                <span class="rv-lbl-text">Communities that you work in <span class="rv-tag rv-tag-liv">LIVELIHOOD</span></span>
+                            </div>
+                            <div class="rv-val">
+                                <table class="rv-table">
+                                    <thead>
+                                        <tr>
+                                            <th>State</th>
+                                            <th>District / Area</th>
+                                            <th>{fyLabel3}</th>
+                                            <th>{fyLabel2}</th>
+                                            <th>{fyLabel1}</th>
+                                            <th>CFY (projected)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={communities} for:item="comm">
+                                            <tr key={comm.idx}>
+                                                <td>{comm.state}</td>
+                                                <td>{comm.district}</td>
+                                                <td>{comm.fy3}</td>
+                                                <td>{comm.fy2}</td>
+                                                <td>{comm.fy1}</td>
+                                                <td>{comm.proj}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+
                     <!-- Q22: Livelihood Outcomes (Actuals) -->
                     <div class="rv-row">
                         <div class="rv-lbl">

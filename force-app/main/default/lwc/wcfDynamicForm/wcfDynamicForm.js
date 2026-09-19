@@ -98,7 +98,9 @@ export default class WcfDynamicForm extends LightningElement {
         Reference_2_Name__c: '',
         Reference_2_Role__c: '',
         Reference_2_Email__c: '',
-        Revenue_Explanation__c: ''
+        Revenue_Explanation__c: '',
+        Q24_VERIFIED: '',
+        Details_of_Ethical_Received__c: ''
     };
 
     @track fiscalYears = {};
@@ -4055,6 +4057,119 @@ export default class WcfDynamicForm extends LightningElement {
         if (isNaN(num)) return val;
         return num.toLocaleString('en-US');
     }
+
+    _getPreviewVal(val, defaultZero = '0') {
+        if (val === null || val === undefined || String(val).trim() === '') {
+            return defaultZero;
+        }
+        return val;
+    }
+
+    // ── Q9 Preview Getters (Historical Financials) ───────────────────────
+    get previewStartFY3() { return this._getPreviewVal(this.formValues.START_FY3); }
+    get previewRevFY3() { return this._getPreviewVal(this.formValues.REV_FY3); }
+    get previewRevFY2() { return this._getPreviewVal(this.formValues.REV_FY2); }
+    get previewRevFY1() { return this._getPreviewVal(this.formValues.REV_FY1); }
+    get previewCapFY3() { return this._getPreviewVal(this.formValues.CAP_FY3); }
+    get previewCapFY2() { return this._getPreviewVal(this.formValues.CAP_FY2); }
+    get previewCapFY1() { return this._getPreviewVal(this.formValues.CAP_FY1); }
+    get previewOpFY3() { return this._getPreviewVal(this.formValues.OP_FY3); }
+    get previewOpFY2() { return this._getPreviewVal(this.formValues.OP_FY2); }
+    get previewOpFY1() { return this._getPreviewVal(this.formValues.OP_FY1); }
+
+    // ── Q10 Preview Getters (Current Fiscal Year Data) ───────────────────
+    get previewCfyRevBudget() { return this._getPreviewVal(this.formValues.CFY_REV_BUDGET); }
+    get previewCfyRevProj() { return this._getPreviewVal(this.formValues.CFY_REV_PROJ); }
+    get previewCfyCapBudget() { return this._getPreviewVal(this.formValues.CFY_CAP_BUDGET); }
+    get previewCfyCapProj() { return this._getPreviewVal(this.formValues.CFY_CAP_PROJ); }
+    get previewCfyOpBudget() { return this._getPreviewVal(this.formValues.CFY_OP_BUDGET); }
+    get previewCfyOpProj() { return this._getPreviewVal(this.formValues.CFY_OP_PROJ); }
+
+    // ── Q13 & Q14 Preview Getters (Job Fulfillment Outcomes) ─────────────
+    get previewJfCostFY3() { return this._getPreviewVal(this.formValues.JF_COST_FY3); }
+    get previewJfCostFY2() { return this._getPreviewVal(this.formValues.JF_COST_FY2); }
+    get previewJfCostFY1() { return this._getPreviewVal(this.formValues.JF_COST_FY1); }
+    get previewJfCostProj() { return this._getPreviewVal(this.formValues.JF_COST_PROJ); }
+
+    get previewJfEnrollFY3() {
+        const f = this.formattedJfEnrollFY3;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfEnrollFY2() {
+        const f = this.formattedJfEnrollFY2;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfEnrollFY1() {
+        const f = this.formattedJfEnrollFY1;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfPlaceFY3() {
+        const f = this.formattedJfPlaceFY3;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfPlaceFY2() {
+        const f = this.formattedJfPlaceFY2;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfPlaceFY1() {
+        const f = this.formattedJfPlaceFY1;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfEnrollProj() {
+        const f = this.formattedJfEnrollProj;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+    get previewJfPlaceProj() {
+        const f = this.formattedJfPlaceProj;
+        return (f !== null && f !== undefined && f !== '') ? f : '0';
+    }
+
+    // ── Q17 & Q18 Preview Getters (Job Creation Outcomes) ────────────────
+    get previewJcNewBizFY3() { return this._getPreviewVal(this.formValues.JC_NEW_BIZ_FY3); }
+    get previewJcNewBizFY2() { return this._getPreviewVal(this.formValues.JC_NEW_BIZ_FY2); }
+    get previewJcNewBizFY1() { return this._getPreviewVal(this.formValues.JC_NEW_BIZ_FY1); }
+    get previewJcNewBizProj() { return this._getPreviewVal(this.formValues.JC_NEW_BIZ_PROJ); }
+
+    get previewJcNewJobsFY3() { return this._getPreviewVal(this.formValues.JC_NEW_JOBS_FY3); }
+    get previewJcNewJobsFY2() { return this._getPreviewVal(this.formValues.JC_NEW_JOBS_FY2); }
+    get previewJcNewJobsFY1() { return this._getPreviewVal(this.formValues.JC_NEW_JOBS_FY1); }
+    get previewJcNewJobsProj() { return this._getPreviewVal(this.formValues.JC_NEW_JOBS_PROJ); }
+
+    get previewJcExistBizFY3() { return this._getPreviewVal(this.formValues.JC_EXIST_BIZ_FY3); }
+    get previewJcExistBizFY2() { return this._getPreviewVal(this.formValues.JC_EXIST_BIZ_FY2); }
+    get previewJcExistBizFY1() { return this._getPreviewVal(this.formValues.JC_EXIST_BIZ_FY1); }
+    get previewJcExistBizProj() { return this._getPreviewVal(this.formValues.JC_EXIST_BIZ_PROJ); }
+
+    get previewJcExistJobsFY3() { return this._getPreviewVal(this.formValues.JC_EXIST_JOBS_FY3); }
+    get previewJcExistJobsFY2() { return this._getPreviewVal(this.formValues.JC_EXIST_JOBS_FY2); }
+    get previewJcExistJobsFY1() { return this._getPreviewVal(this.formValues.JC_EXIST_JOBS_FY1); }
+    get previewJcExistJobsProj() { return this._getPreviewVal(this.formValues.JC_EXIST_JOBS_PROJ); }
+
+    get previewJcCostFY3() { return this._getPreviewVal(this.formValues.JC_COST_FY3); }
+    get previewJcCostFY2() { return this._getPreviewVal(this.formValues.JC_COST_FY2); }
+    get previewJcCostFY1() { return this._getPreviewVal(this.formValues.JC_COST_FY1); }
+    get previewJcCostProj() { return this._getPreviewVal(this.formValues.JC_COST_PROJ); }
+
+    // ── Q22 & Q23 Preview Getters (Livelihood Upliftment Outcomes) ───────
+    get previewLivServedFY3() { return this._getPreviewVal(this.formValues.LIV_SERVED_FY3); }
+    get previewLivServedFY2() { return this._getPreviewVal(this.formValues.LIV_SERVED_FY2); }
+    get previewLivServedFY1() { return this._getPreviewVal(this.formValues.LIV_SERVED_FY1); }
+    get previewLivServedProj() { return this._getPreviewVal(this.formValues.LIV_SERVED_PROJ); }
+
+    get previewLivEnrollFY3() { return this._getPreviewVal(this.formValues.LIV_ENROLL_FY3); }
+    get previewLivEnrollFY2() { return this._getPreviewVal(this.formValues.LIV_ENROLL_FY2); }
+    get previewLivEnrollFY1() { return this._getPreviewVal(this.formValues.LIV_ENROLL_FY1); }
+    get previewLivEnrollProj() { return this._getPreviewVal(this.formValues.LIV_ENROLL_PROJ); }
+
+    get previewLivOutcomeFY3() { return this._getPreviewVal(this.formValues.LIV_OUTCOME_FY3); }
+    get previewLivOutcomeFY2() { return this._getPreviewVal(this.formValues.LIV_OUTCOME_FY2); }
+    get previewLivOutcomeFY1() { return this._getPreviewVal(this.formValues.LIV_OUTCOME_FY1); }
+    get previewLivOutcomeProj() { return this._getPreviewVal(this.formValues.LIV_OUTCOME_PROJ); }
+
+    get previewLivCostFY3() { return this._getPreviewVal(this.formValues.LIV_COST_FY3); }
+    get previewLivCostFY2() { return this._getPreviewVal(this.formValues.LIV_COST_FY2); }
+    get previewLivCostFY1() { return this._getPreviewVal(this.formValues.LIV_COST_FY1); }
+    get previewLivCostProj() { return this._getPreviewVal(this.formValues.LIV_COST_PROJ); }
 
     get formattedJfEnrollFY3() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_FY3); }
     get formattedJfEnrollFY2() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_FY2); }

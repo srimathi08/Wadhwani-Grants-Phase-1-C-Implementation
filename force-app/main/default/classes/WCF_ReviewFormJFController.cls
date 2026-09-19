@@ -51,6 +51,7 @@ public without sharing class WCF_ReviewFormJFController {
             review.RecordTypeId = recordTypeIdFromApplication(review.ApplicationId);
 
             review.ReviewedById = userId;
+            review.WG_Reviewer_Name__c = UserInfo.getName();
             review.IsSubmitted  = false;
             review.Status       = 'In Progress';
             review.Form_Template_Version__c = 'v5';
@@ -67,6 +68,12 @@ public without sharing class WCF_ReviewFormJFController {
             } else {
                 insert review;
             }
+
+            // Populate reviewer name on IndividualApplication during draft
+            update as system new IndividualApplication(
+                Id                  = review.ApplicationId,
+                WG_Reviewer_Name__c = UserInfo.getName()
+            );
 
             return review;
 
@@ -104,6 +111,7 @@ public without sharing class WCF_ReviewFormJFController {
             review.RecordTypeId = recordTypeIdFromApplication(review.ApplicationId);
 
             review.ReviewedById = userId;
+            review.WG_Reviewer_Name__c = UserInfo.getName();
             review.IsSubmitted  = true;
             review.Status       = 'Review Submitted';
             review.EndDate      = Date.today();
@@ -128,10 +136,11 @@ public without sharing class WCF_ReviewFormJFController {
                 : 'Review Completed - Not Recommended';
 
             IndividualApplication app = new IndividualApplication(
-                Id     = review.ApplicationId,
-                Status = appStatus
+                Id                  = review.ApplicationId,
+                Status              = appStatus,
+                WG_Reviewer_Name__c = UserInfo.getName()
             );
-            update app;
+            update as system app;
 
             result.isSuccess = true;
             result.reviewId = review.Id;

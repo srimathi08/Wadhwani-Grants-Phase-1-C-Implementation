@@ -24,10 +24,10 @@ private class WCFComplianceDocumentTriggerHandlerTest {
     }
 
     private static IndividualApplication newApp(String status) {
-        IndividualApplication app = new IndividualApplication(
-            Category = 'Grant Application',
-            Status   = status
-        );
+        Account acc = WCF_TestDataFactory.createAccount(true);
+        Contact con = WCF_TestDataFactory.createContact(acc.Id, true);
+        IndividualApplication app = WCF_TestDataFactory.createApplication(acc.Id, con.Id, status, false);
+        app.Status = status;
         insert app;
         return app;
     }
@@ -152,12 +152,8 @@ private class WCFComplianceDocumentTriggerHandlerTest {
     static void testBulkMixedApplications() {
         List<IndividualApplication> apps = new List<IndividualApplication>();
         for (Integer i = 0; i < 5; i++) {
-            apps.add(new IndividualApplication(
-                Category = 'Grant Application',
-                Status   = (i == 0) ? 'Onboarded' : 'Compliance Review'
-            ));
+            apps.add(newApp((i == 0) ? 'Onboarded' : 'Compliance Review'));
         }
-        insert apps;
 
         String type = docTypeValues(1)[0];
         List<WCF_Compliance_Document__c> docs = new List<WCF_Compliance_Document__c>();

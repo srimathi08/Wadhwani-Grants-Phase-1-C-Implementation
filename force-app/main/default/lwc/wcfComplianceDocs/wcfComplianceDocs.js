@@ -8,6 +8,7 @@ import getOrCreateComplianceRecord from '@salesforce/apex/WCFComplianceControlle
 import deleteComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteComplianceDocumentFile';
 import saveAdHocComplianceDocument from '@salesforce/apex/WCFComplianceController.saveAdHocComplianceDocument';
 import deleteAdHocComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteAdHocComplianceDocumentFile';
+import saveDraftComplianceDocuments from '@salesforce/apex/WCFComplianceController.saveDraftComplianceDocuments';
 import submitComplianceDocuments from '@salesforce/apex/WCFComplianceController.submitComplianceDocuments';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -32,26 +33,37 @@ const STATUS_CONFIG = {
     'Not Started':        { badgeClass: 'comp-badge comp-badge--pending',    label: 'NOT STARTED',        canUpload: true,  showReplace: false },
     'Draft':              { badgeClass: 'comp-badge comp-badge--draft',      label: 'DRAFT SAVED',        canUpload: true,  showReplace: true  },
     'Pending Review':     { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',     canUpload: false, showReplace: true  },
-    'Validated':          { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: true  },
+    'Submitted':          { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',     canUpload: false, showReplace: true  },
+    'Validated':          { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: false },
+    'Pass':               { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: false },
+    'Approved':           { badgeClass: 'comp-badge comp-badge--active',     label: 'APPROVED',           canUpload: false, showReplace: false },
     'Returned':           { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',      canUpload: true,  showReplace: false },
-    'Flagged':            { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',       canUpload: false, showReplace: true  },
+    'Return':             { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',      canUpload: true,  showReplace: false },
+    'Flagged':            { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',       canUpload: false, showReplace: false },
     'Refresh Required':   { badgeClass: 'comp-badge comp-badge--expired',    label: 'REFRESH REQUIRED',   canUpload: true,  showReplace: false },
     'Pending Submission': { badgeClass: 'comp-badge comp-badge--returned',   label: 'DOCUMENT REQUESTED', canUpload: true,  showReplace: false },
     'Rejected':           { badgeClass: 'comp-badge comp-badge--rejected',   label: 'REJECTED',           canUpload: false, showReplace: false },
-    'Suspended':          { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false }
+    'Reject':             { badgeClass: 'comp-badge comp-badge--rejected',   label: 'REJECTED',           canUpload: false, showReplace: false },
+    'Suspended':          { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false },
+    'Suspend':            { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false }
 };
 
 const OVERALL_STATUS_BADGE_CLASS = {
     'Complete'          : 'comp-overall-badge comp-overall-badge--complete',
     'Submitted'         : 'comp-overall-badge comp-overall-badge--inprogress',
+    'Pending Review'    : 'comp-overall-badge comp-overall-badge--inprogress',
     'Draft'             : 'comp-overall-badge comp-overall-badge--draft',
     'Refresh Required'  : 'comp-overall-badge comp-overall-badge--refresh',
     'In Progress'       : 'comp-overall-badge comp-overall-badge--inprogress',
     'Pending Submission': 'comp-overall-badge comp-overall-badge--pending',
     'Validated'         : 'comp-overall-badge comp-overall-badge--complete',
+    'Pass'              : 'comp-overall-badge comp-overall-badge--complete',
     'Rejected'          : 'comp-overall-badge comp-overall-badge--rejected',
+    'Reject'            : 'comp-overall-badge comp-overall-badge--rejected',
     'Suspended'         : 'comp-overall-badge comp-overall-badge--suspended',
-    'Returned'          : 'comp-overall-badge comp-overall-badge--returned'
+    'Suspend'           : 'comp-overall-badge comp-overall-badge--suspended',
+    'Returned'          : 'comp-overall-badge comp-overall-badge--returned',
+    'Return'            : 'comp-overall-badge comp-overall-badge--returned'
 };
 
 const EXPIRY_WARNING_DAYS = 30;
@@ -216,19 +228,19 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get overallStatusDisplay() {
-        if (this.complianceStatus === 'Rejected') return 'REJECTED';
-        if (this.complianceStatus === 'Suspended') return 'SUSPENDED';
-        if (this.complianceStatus === 'Returned') return 'ACTION NEEDED';
-        if (this.complianceStatus === 'Validated') return 'COMPLETE';
+        if (this.complianceStatus === 'Rejected' || this.complianceStatus === 'Reject') return 'REJECTED';
+        if (this.complianceStatus === 'Suspended' || this.complianceStatus === 'Suspend') return 'SUSPENDED';
+        if (this.complianceStatus === 'Returned' || this.complianceStatus === 'Return') return 'ACTION NEEDED';
+        if (this.complianceStatus === 'Validated' || this.complianceStatus === 'Pass') return 'COMPLETE';
 
         if (this.checklistItems && this.checklistItems.length > 0) {
-            if (this.checklistItems.some(item => item.status === 'Rejected')) return 'REJECTED';
-            if (this.checklistItems.some(item => item.status === 'Suspended')) return 'SUSPENDED';
-            if (this.checklistItems.some(item => item.status === 'Returned')) return 'ACTION NEEDED';
+            if (this.checklistItems.some(item => item.status === 'Rejected' || item.status === 'Reject')) return 'REJECTED';
+            if (this.checklistItems.some(item => item.status === 'Suspended' || item.status === 'Suspend')) return 'SUSPENDED';
+            if (this.checklistItems.some(item => item.status === 'Returned' || item.status === 'Return')) return 'ACTION NEEDED';
         }
 
         if (this.overallStatus === 'Draft') return 'DRAFT';
-        if (this.overallStatus === 'Submitted') return 'SUBMITTED';
+        if (this.overallStatus === 'Submitted' || this.overallStatus === 'Pending Review') return 'PENDING REVIEW';
         if (this.overallStatus === 'Complete') return 'COMPLETE';
         return this.overallStatus ? this.overallStatus.toUpperCase() : 'IN PROGRESS';
     }
@@ -250,7 +262,7 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get showActionFooter() {
-        return this.hasItems && !this.isSubmitted && this.complianceStatus !== 'Validated';
+        return this.hasItems && !this.isSubmitted && this.complianceStatus !== 'Validated' && this.complianceStatus !== 'Pass';
     }
 
     get uploadProgressText() {
@@ -258,19 +270,19 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get showPassedBanner() {
-        return this.complianceStatus === 'Validated';
+        return this.complianceStatus === 'Validated' || this.complianceStatus === 'Pass';
     }
 
     get showRejectedBanner() {
-        return this.complianceStatus === 'Rejected';
+        return this.complianceStatus === 'Rejected' || this.complianceStatus === 'Reject';
     }
 
     get showSuspendedBanner() {
-        return this.complianceStatus === 'Suspended';
+        return this.complianceStatus === 'Suspended' || this.complianceStatus === 'Suspend';
     }
 
     get showReturnedBanner() {
-        return this.complianceStatus === 'Returned';
+        return this.complianceStatus === 'Returned' || this.complianceStatus === 'Return';
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -372,11 +384,23 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     handleSaveDraft() {
-        this.showToast(
-            'Draft Saved',
-            'Your uploaded compliance documents are saved as drafts. You can return anytime to continue or submit.',
-            'info'
-        );
+        if (!this.recordId) return;
+        this.isLoading = true;
+        saveDraftComplianceDocuments({ applicationId: this.recordId })
+            .then(() => {
+                this.showToast(
+                    'Draft Saved',
+                    'Your uploaded compliance documents are saved as drafts. You can return anytime to continue or submit.',
+                    'success'
+                );
+                return this.loadChecklist();
+            })
+            .catch(error => {
+                this.showToast('Could not save draft', this.extractErrorMessage(error), 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
     }
 
     handleSubmit() {
@@ -394,7 +418,7 @@ export default class WcfComplianceDocs extends LightningElement {
             .then(() => {
                 this.showToast(
                     'Documents Submitted',
-                    'All compliance documents have been successfully submitted for review.',
+                    'All compliance documents have been successfully submitted for review (Status: Pending Review).',
                     'success'
                 );
                 return this.loadChecklist();

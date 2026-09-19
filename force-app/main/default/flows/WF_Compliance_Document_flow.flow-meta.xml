@@ -12,7 +12,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -47,7 +47,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -74,7 +74,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -109,7 +109,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -136,7 +136,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -171,7 +171,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -193,15 +193,12 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>Document_Submitted_Reviewer</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -236,69 +233,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Document_Submitted_Reviewer</name>
-        <label>Compliance docs submitted for review (E-36)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>Get_Reviewer_email.PersonEmail</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Docs_Submitted_Validator</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>Get_Reviewer_email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -325,7 +260,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -360,7 +295,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -387,7 +322,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -422,7 +357,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -449,7 +384,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -484,7 +419,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -511,7 +446,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.PersonEmail</elementReference>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -546,7 +481,7 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.PersonContactId</elementReference>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -564,6 +499,94 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
+        <name>Check_Applicant_For_Approved</name>
+        <label>Check Applicant For Approved</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Applicant_Found_For_Approved</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Approved_Email</targetReference>
+            </connector>
+            <label>Applicant Found For Approved</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Applicant_For_Rejected</name>
+        <label>Check Applicant For Rejected</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Applicant_Found_For_Rejected</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Onboarding_Rejected_Email</targetReference>
+            </connector>
+            <label>Applicant Found For Rejected</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Applicant_For_Revision</name>
+        <label>Check Applicant For Revision</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Applicant_Found_For_Revision</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Doc_Revision_Email</targetReference>
+            </connector>
+            <label>Applicant Found For Revision</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Applicant_For_Suspended</name>
+        <label>Check Applicant For Suspended</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Applicant_Found_For_Suspended</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Onboarding_Suspended_Email</targetReference>
+            </connector>
+            <label>Applicant Found For Suspended</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>STATUS_change</name>
         <label>STATUS change</label>
         <locationX>0</locationX>
@@ -571,7 +594,14 @@
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_Rule</name>
-            <conditionLogic>or</conditionLogic>
+            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
             <conditions>
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
@@ -595,6 +625,13 @@
             <name>Draft_Rule</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
@@ -608,7 +645,14 @@
         </rules>
         <rules>
             <name>Pending_Review_Rule</name>
-            <conditionLogic>or</conditionLogic>
+            <conditionLogic>1 AND (2 OR 3 OR 4)</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
             <conditions>
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
@@ -732,7 +776,14 @@
         </rules>
         <rules>
             <name>Refresh_Required_Rule</name>
-            <conditionLogic>or</conditionLogic>
+            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
             <conditions>
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
@@ -782,39 +833,25 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_Reviewer_email</targetReference>
+            <targetReference>STATUS_change</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
+        <filterLogic>or</filterLogic>
         <filters>
             <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Proposals_Information.ContactId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>AccountId</field>
             <operator>EqualTo</operator>
             <value>
                 <elementReference>Get_Proposals_Information.AccountId</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Account</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <name>Get_Approver_email</name>
-        <label>Get Approver email</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>STATUS_change</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>WCF_Approver__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Account</object>
+        <object>Contact</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -838,34 +875,13 @@
         <object>IndividualApplication</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
-    <recordLookups>
-        <name>Get_Reviewer_email</name>
-        <label>Get Reviewer email</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Get_Approver_email</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>WCF_Reviewer__c</field>
-            <operator>EqualTo</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Account</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
     <recordUpdates>
         <name>Update_IA_To_Doc_Revision_Request</name>
         <label>Update IA To Doc Revision Request</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Send_Doc_Revision_Email</targetReference>
+            <targetReference>Check_Applicant_For_Revision</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -889,7 +905,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Approved_Email</targetReference>
+            <targetReference>Check_Applicant_For_Approved</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -913,7 +929,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Send_Onboarding_Rejected_Email</targetReference>
+            <targetReference>Check_Applicant_For_Rejected</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -937,7 +953,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Send_Onboarding_Suspended_Email</targetReference>
+            <targetReference>Check_Applicant_For_Suspended</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>

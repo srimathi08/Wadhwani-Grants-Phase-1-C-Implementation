@@ -66,6 +66,12 @@ private class WCF_ReviewFormJFControllerTest {
             
             ApplicationReview savedDraft = WCF_ReviewFormJFController.saveDraftReview(draftJson);
             System.assertNotEquals(null, savedDraft.Id);
+            System.assertEquals(UserInfo.getName(), savedDraft.WG_Reviewer_Name__c);
+
+            IndividualApplication draftApp = [
+                SELECT WG_Reviewer_Name__c FROM IndividualApplication WHERE Id = :app.Id
+            ];
+            System.assertEquals(UserInfo.getName(), draftApp.WG_Reviewer_Name__c);
 
             // Call again with ID to cover update path
             draftReview.Id = savedDraft.Id;
@@ -78,14 +84,36 @@ private class WCF_ReviewFormJFControllerTest {
             // Test hasAlreadyReviewed (False state)
             System.assertEquals(false, WCF_ReviewFormJFController.hasAlreadyReviewed(app.Id));
 
-            // 3. Test saveApplicationReview
+            // 3. Test saveApplicationReview (Recommended)
             ApplicationReview submitReview = new ApplicationReview(
                 ApplicationId = app.Id,
-                Recommend_for_CEO_review__c = WCF_TestDataFactory.pickValue('ApplicationReview', 'Recommend_for_CEO_review__c', 'Recommend')
+                Recommend_for_CEO_review__c = 'Yes'
             );
             WCF_ReviewFormJFController.ReviewSubmitResult submitRes = WCF_ReviewFormJFController.saveApplicationReview(JSON.serialize(submitReview));
             System.assertNotEquals(null, submitRes);
             System.assertEquals(true, submitRes.isSuccess);
+            System.assertEquals('Review Completed - Recommended', submitRes.applicationStatus);
+
+            IndividualApplication submittedApp = [
+                SELECT Status, WG_Reviewer_Name__c FROM IndividualApplication WHERE Id = :app.Id
+            ];
+            System.assertEquals('Review Completed - Recommended', submittedApp.Status);
+            System.assertEquals(UserInfo.getName(), submittedApp.WG_Reviewer_Name__c);
+
+            // Test saveApplicationReview (Not Recommended)
+            ApplicationReview notRecReview = new ApplicationReview(
+                ApplicationId = app.Id,
+                Recommend_for_CEO_review__c = 'No'
+            );
+            WCF_ReviewFormJFController.ReviewSubmitResult notRecRes = WCF_ReviewFormJFController.saveApplicationReview(JSON.serialize(notRecReview));
+            System.assertEquals(true, notRecRes.isSuccess);
+            System.assertEquals('Review Completed - Not Recommended', notRecRes.applicationStatus);
+
+            IndividualApplication notRecApp = [
+                SELECT Status, WG_Reviewer_Name__c FROM IndividualApplication WHERE Id = :app.Id
+            ];
+            System.assertEquals('Review Completed - Not Recommended', notRecApp.Status);
+            System.assertEquals(UserInfo.getName(), notRecApp.WG_Reviewer_Name__c);
 
             // Test hasAlreadyReviewed (True state)
             System.assertEquals(true, WCF_ReviewFormJFController.hasAlreadyReviewed(app.Id));

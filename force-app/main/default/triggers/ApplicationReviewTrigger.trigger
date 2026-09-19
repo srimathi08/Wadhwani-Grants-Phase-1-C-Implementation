@@ -120,6 +120,13 @@
 
 trigger ApplicationReviewTrigger on ApplicationReview (before insert, before update, after insert, after update) {
 
+    Set<Id> reviewerRtIds;
+    try {
+        reviewerRtIds = RecordTypeHelper.applicationReviewReviewerAllowedIds();
+    } catch (Exception e) {
+        reviewerRtIds = new Set<Id>();
+    }
+
     if (Trigger.isBefore) {
 
         // Populate Consolidated Return Comments field
@@ -131,6 +138,15 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
         for (ApplicationReview ar : Trigger.new) {
 
             ApplicationReview oldRec = Trigger.isUpdate ? Trigger.oldMap.get(ar.Id) : null;
+
+            // ── Reviewer Name Population on ApplicationReview ──
+            if (ar.RecordTypeId != null && reviewerRtIds.contains(ar.RecordTypeId)) {
+                if (ar.Status == 'In Progress' || ar.Status == 'Review Submitted') {
+                    if (String.isBlank(ar.WG_Reviewer_Name__c)) {
+                        ar.WG_Reviewer_Name__c = UserInfo.getName();
+                    }
+                }
+            }
 
             Boolean justSealed = ar.Status == 'Validated'
                 && (oldRec == null || oldRec.Status != 'Validated');
@@ -144,12 +160,17 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
 
             // Override Status based on Validator decision
             if (justSealed) {
-                Id validatorRtId = Schema.SObjectType.ApplicationReview
-                    .getRecordTypeInfosByDeveloperName()
-                    .get('WCF_Validator')
-                    .getRecordTypeId();
+                Id validatorRtId;
+                try {
+                    validatorRtId = RecordTypeHelper.applicationReviewValidatorId();
+                } catch (Exception e) {
+                    validatorRtId = Schema.SObjectType.ApplicationReview
+                        .getRecordTypeInfosByDeveloperName()
+                        .get('WCF_Validator')
+                        ?.getRecordTypeId();
+                }
 
-                if (ar.RecordTypeId == validatorRtId) {
+                if (validatorRtId != null && ar.RecordTypeId == validatorRtId) {
                     String decision = ar.Decision_Final_Decision_from_Sec_1_2__c;
 
                     if (decision == 'Flag') {
@@ -165,21 +186,27 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
 
     if (Trigger.isAfter) {
 
-        Id validatorRtId = Schema.SObjectType.ApplicationReview
-            .getRecordTypeInfosByDeveloperName()
-            .get('WCF_Validator')
-            .getRecordTypeId();
+        Id validatorRtId;
+        try {
+            validatorRtId = RecordTypeHelper.applicationReviewValidatorId();
+        } catch (Exception e) {
+            validatorRtId = Schema.SObjectType.ApplicationReview
+                .getRecordTypeInfosByDeveloperName()
+                .get('WCF_Validator')
+                ?.getRecordTypeId();
+        }
 
-        Set<Id> returnAppIds = new Set<Id>();
-        Set<Id> passAppIds = new Set<Id>();
-        Set<Id> flagAppIds = new Set<Id>();
-        
+        Set<Id> returnAppIds   = new Set<Id>();
+        Set<Id> passAppIds     = new Set<Id>();
+        Set<Id> flagAppIds     = new Set<Id>();
+        Set<Id> reviewedAppIds = new Set<Id>();
 
         for (ApplicationReview ar : Trigger.new) {
 
             ApplicationReview oldRec = Trigger.isUpdate ? Trigger.oldMap.get(ar.Id) : null;
 
-            Boolean wasJustProcessed = ar.RecordTypeId == validatorRtId
+            Boolean wasJustProcessed = validatorRtId != null
+                && ar.RecordTypeId == validatorRtId
                 && (oldRec == null || oldRec.Status != ar.Status)
                 && (ar.Status == 'Validated'
                     || ar.Status == 'Flagged'
@@ -198,13 +225,21 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
                 }
             }
 
+            Boolean wasJustReviewed = ar.RecordTypeId != null
+                && reviewerRtIds.contains(ar.RecordTypeId)
+                && (oldRec == null || oldRec.Status != ar.Status)
+                && ar.Status == 'Review Submitted';
+
+            if (wasJustReviewed && ar.ApplicationId != null) {
+                reviewedAppIds.add(ar.ApplicationId);
+            }
         }
 
         Set<Id> allAppIds = new Set<Id>();
         allAppIds.addAll(returnAppIds);
         allAppIds.addAll(passAppIds);
         allAppIds.addAll(flagAppIds);
-      
+        allAppIds.addAll(reviewedAppIds);
 
         if (!allAppIds.isEmpty()) {
 
@@ -212,7 +247,9 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
                 SELECT Id,
                        Status,
                        Validated__c,
-                       Flagged__c
+                       Flagged__c,
+                       WG_Validator_Name__c,
+                       WG_Reviewer_Name__c
                 FROM IndividualApplication
                 WHERE Id IN :allAppIds
             ];
@@ -234,7 +271,9 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
                     app.WG_Validator_Name__c = UserInfo.getName();
                 }
 
-              
+                if (reviewedAppIds.contains(app.Id)) {
+                    app.WG_Reviewer_Name__c = UserInfo.getName();
+                }
             }
 
             Database.SaveResult[] results = Database.update(appsToUpdate, false);

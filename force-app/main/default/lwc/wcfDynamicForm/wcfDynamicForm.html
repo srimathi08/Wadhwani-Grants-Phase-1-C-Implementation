@@ -2852,27 +2852,27 @@
                                         <tbody>
                                             <tr>
                                                 <td>Balance at Start of Year</td>
-                                                <td>${formValues.START_FY3}</td>
+                                                <td>${previewStartFY3}</td>
                                                 <td>${computedStartFY2}</td>
                                                 <td>${computedStartFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Revenue</td>
-                                                <td>${formValues.REV_FY3}</td>
-                                                <td>${formValues.REV_FY2}</td>
-                                                <td>${formValues.REV_FY1}</td>
+                                                <td>${previewRevFY3}</td>
+                                                <td>${previewRevFY2}</td>
+                                                <td>${previewRevFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Capital Expenditure</td>
-                                                <td>${formValues.CAP_FY3}</td>
-                                                <td>${formValues.CAP_FY2}</td>
-                                                <td>${formValues.CAP_FY1}</td>
+                                                <td>${previewCapFY3}</td>
+                                                <td>${previewCapFY2}</td>
+                                                <td>${previewCapFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Operating Expenditure</td>
-                                                <td>${formValues.OP_FY3}</td>
-                                                <td>${formValues.OP_FY2}</td>
-                                                <td>${formValues.OP_FY1}</td>
+                                                <td>${previewOpFY3}</td>
+                                                <td>${previewOpFY2}</td>
+                                                <td>${previewOpFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Balance at End of Year</td>
@@ -2901,20 +2901,20 @@
                                         <tbody>
                                             <tr>
                                                 <td>Revenue</td>
-                                                <td>${formValues.CFY_REV_BUDGET}</td>
-                                                <td>${formValues.CFY_REV_PROJ}</td>
+                                                <td>${previewCfyRevBudget}</td>
+                                                <td>${previewCfyRevProj}</td>
                                                 <td>${computedRevDeviation}</td>
                                             </tr>
                                             <tr>
                                                 <td>Capital Expenditure</td>
-                                                <td>${formValues.CFY_CAP_BUDGET}</td>
-                                                <td>${formValues.CFY_CAP_PROJ}</td>
+                                                <td>${previewCfyCapBudget}</td>
+                                                <td>${previewCfyCapProj}</td>
                                                 <td>${computedCapDeviation}</td>
                                             </tr>
                                             <tr>
                                                 <td>Operating Expenditure</td>
-                                                <td>${formValues.CFY_OP_BUDGET}</td>
-                                                <td>${formValues.CFY_OP_PROJ}</td>
+                                                <td>${previewCfyOpBudget}</td>
+                                                <td>${previewCfyOpProj}</td>
                                                 <td>${computedOpDeviation}</td>
                                             </tr>
                                             <tr>
@@ -3008,15 +3008,15 @@
                                             <tbody>
                                                 <tr>
                                                     <td># Learner Enrolments</td>
-                                                    <td>{formattedJfEnrollFY3}</td>
-                                                    <td>{formattedJfEnrollFY2}</td>
-                                                    <td>{formattedJfEnrollFY1}</td>
+                                                    <td>{previewJfEnrollFY3}</td>
+                                                    <td>{previewJfEnrollFY2}</td>
+                                                    <td>{previewJfEnrollFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># of learner placements</td>
-                                                    <td>{formattedJfPlaceFY3}</td>
-                                                    <td>{formattedJfPlaceFY2}</td>
-                                                    <td>{formattedJfPlaceFY1}</td>
+                                                    <td>{previewJfPlaceFY3}</td>
+                                                    <td>{previewJfPlaceFY2}</td>
+                                                    <td>{previewJfPlaceFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Placement %</td>
@@ -3026,9 +3026,9 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg Cost per Placement</td>
-                                                    <td>${formValues.JF_COST_FY3}</td>
-                                                    <td>${formValues.JF_COST_FY2}</td>
-                                                    <td>${formValues.JF_COST_FY1}</td>
+                                                    <td>${previewJfCostFY3}</td>
+                                                    <td>${previewJfCostFY2}</td>
+                                                    <td>${previewJfCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3049,11 +3049,11 @@
                                             <tbody>
                                                 <tr>
                                                     <td># Learner Enrolments</td>
-                                                    <td>{formattedJfEnrollProj}</td>
+                                                    <td>{previewJfEnrollProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># of learner placements</td>
-                                                    <td>{formattedJfPlaceProj}</td>
+                                                    <td>{previewJfPlaceProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Placement %</td>
@@ -3061,7 +3061,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg Cost per Placement</td>
-                                                    <td>${formValues.JF_COST_PROJ}</td>
+                                                    <td>${previewJfCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3138,33 +3138,33 @@
                                             <tbody>
                                                 <tr>
                                                     <td># New Businesses Started</td>
-                                                    <td>{formValues.JC_NEW_BIZ_FY3}</td>
-                                                    <td>{formValues.JC_NEW_BIZ_FY2}</td>
-                                                    <td>{formValues.JC_NEW_BIZ_FY1}</td>
+                                                    <td>{previewJcNewBizFY3}</td>
+                                                    <td>{previewJcNewBizFY2}</td>
+                                                    <td>{previewJcNewBizFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># jobs created by new businesses</td>
-                                                    <td>{formValues.JC_NEW_JOBS_FY3}</td>
-                                                    <td>{formValues.JC_NEW_JOBS_FY2}</td>
-                                                    <td>{formValues.JC_NEW_JOBS_FY1}</td>
+                                                    <td>{previewJcNewJobsFY3}</td>
+                                                    <td>{previewJcNewJobsFY2}</td>
+                                                    <td>{previewJcNewJobsFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Existing Businesses Supported</td>
-                                                    <td>{formValues.JC_EXIST_BIZ_FY3}</td>
-                                                    <td>{formValues.JC_EXIST_BIZ_FY2}</td>
-                                                    <td>{formValues.JC_EXIST_BIZ_FY1}</td>
+                                                    <td>{previewJcExistBizFY3}</td>
+                                                    <td>{previewJcExistBizFY2}</td>
+                                                    <td>{previewJcExistBizFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># jobs created by existing businesses</td>
-                                                    <td>{formValues.JC_EXIST_JOBS_FY3}</td>
-                                                    <td>{formValues.JC_EXIST_JOBS_FY2}</td>
-                                                    <td>{formValues.JC_EXIST_JOBS_FY1}</td>
+                                                    <td>{previewJcExistJobsFY3}</td>
+                                                    <td>{previewJcExistJobsFY2}</td>
+                                                    <td>{previewJcExistJobsFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Total Avg Cost per Job Created</td>
-                                                    <td>${formValues.JC_COST_FY3}</td>
-                                                    <td>${formValues.JC_COST_FY2}</td>
-                                                    <td>${formValues.JC_COST_FY1}</td>
+                                                    <td>${previewJcCostFY3}</td>
+                                                    <td>${previewJcCostFY2}</td>
+                                                    <td>${previewJcCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3185,23 +3185,23 @@
                                             <tbody>
                                                 <tr>
                                                     <td># New Businesses Started</td>
-                                                    <td>{formValues.JC_NEW_BIZ_PROJ}</td>
+                                                    <td>{previewJcNewBizProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># jobs created by new businesses</td>
-                                                    <td>{formValues.JC_NEW_JOBS_PROJ}</td>
+                                                    <td>{previewJcNewJobsProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Existing Businesses Supported</td>
-                                                    <td>{formValues.JC_EXIST_BIZ_PROJ}</td>
+                                                    <td>{previewJcExistBizProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td># jobs created by existing businesses</td>
-                                                    <td>{formValues.JC_EXIST_JOBS_PROJ}</td>
+                                                    <td>{previewJcExistJobsProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Total Avg Cost per Job Created</td>
-                                                    <td>${formValues.JC_COST_PROJ}</td>
+                                                    <td>${previewJcCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3311,27 +3311,27 @@
                                             <tbody>
                                                 <tr>
                                                     <td>Households served during the year</td>
-                                                    <td>{formValues.LIV_SERVED_FY3}</td>
-                                                    <td>{formValues.LIV_SERVED_FY2}</td>
-                                                    <td>{formValues.LIV_SERVED_FY1}</td>
+                                                    <td>{previewLivServedFY3}</td>
+                                                    <td>{previewLivServedFY2}</td>
+                                                    <td>{previewLivServedFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Households newly enrolled during the year</td>
-                                                    <td>{formValues.LIV_ENROLL_FY3}</td>
-                                                    <td>{formValues.LIV_ENROLL_FY2}</td>
-                                                    <td>{formValues.LIV_ENROLL_FY1}</td>
+                                                    <td>{previewLivEnrollFY3}</td>
+                                                    <td>{previewLivEnrollFY2}</td>
+                                                    <td>{previewLivEnrollFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Households meeting outcome criteria</td>
-                                                    <td>{formValues.LIV_OUTCOME_FY3}</td>
-                                                    <td>{formValues.LIV_OUTCOME_FY2}</td>
-                                                    <td>{formValues.LIV_OUTCOME_FY1}</td>
+                                                    <td>{previewLivOutcomeFY3}</td>
+                                                    <td>{previewLivOutcomeFY2}</td>
+                                                    <td>{previewLivOutcomeFY1}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Avg. cost per outcome (USD)</td>
-                                                    <td>${formValues.LIV_COST_FY3}</td>
-                                                    <td>${formValues.LIV_COST_FY2}</td>
-                                                    <td>${formValues.LIV_COST_FY1}</td>
+                                                    <td>${previewLivCostFY3}</td>
+                                                    <td>${previewLivCostFY2}</td>
+                                                    <td>${previewLivCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3352,19 +3352,19 @@
                                             <tbody>
                                                 <tr>
                                                     <td>Households served during the year (projected)</td>
-                                                    <td>{formValues.LIV_SERVED_PROJ}</td>
+                                                    <td>{previewLivServedProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Households newly enrolled during the year (projected)</td>
-                                                     <td>{formValues.LIV_ENROLL_PROJ}</td>
+                                                    <td>{previewLivEnrollProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Households expected to meet outcome criteria</td>
-                                                    <td>{formValues.LIV_OUTCOME_PROJ}</td>
+                                                    <td>{previewLivOutcomeProj}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Avg. cost per outcome (USD) - projected</td>
-                                                    <td>${formValues.LIV_COST_PROJ}</td>
+                                                    <td>${previewLivCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3522,16 +3522,6 @@
                                         readonly
                                         value="(server-stamped at submission)" />
                                 </div>
-
-                                <div class="wcf-attest-actions">
-                                    <button
-                                        type="button"
-                                        class="btn-submit-green"
-                                        onclick={handleSubmit}
-                                        disabled={isSubmitDisabled}>
-                                        Submit Application
-                                    </button>
-                                </div>
                             </div>
 
                             <!-- Tagline Banner -->
@@ -3559,6 +3549,15 @@
                                 <button class="btn-primary-red btn-tab-next" onclick={handleNextTab}>
                                     Next
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                                </button>
+                            </template>
+                            <template if:true={isLastTab}>
+                                <button
+                                    type="button"
+                                    class="btn-submit-green"
+                                    onclick={handleSubmit}
+                                    disabled={isSubmitDisabled}>
+                                    Submit Application
                                 </button>
                             </template>
                         </div>

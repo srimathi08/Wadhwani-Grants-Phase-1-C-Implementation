@@ -163,7 +163,8 @@ public without sharing class WCFComplianceController {
 
             if (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
                     || doc.Status__c == 'Under Review' || doc.Status__c == 'Received'
-                    || doc.Status__c == 'Pending Review') {
+                    || doc.Status__c == 'Pending Review' || doc.Status__c == 'Pass'
+                    || doc.Status__c == 'Approved') {
                 isSubmitted = true;
             }
         }
@@ -172,7 +173,8 @@ public without sharing class WCFComplianceController {
         Map<String, ComplianceChecklistItem> adHocItemsByLabel = new Map<String, ComplianceChecklistItem>();
         for (WCF_Compliance_Document__c doc : adHocRequests) {
             Boolean docIsSubmitted = (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
-                || doc.Status__c == 'Under Review' || doc.Status__c == 'Received');
+                || doc.Status__c == 'Under Review' || doc.Status__c == 'Received'
+                || doc.Status__c == 'Pending Review' || doc.Status__c == 'Pass');
 
             for (String label : doc.Document_Types__c.split(';')) {
                 label = label.trim();
@@ -210,7 +212,7 @@ public without sharing class WCFComplianceController {
                             item.status = docIsSubmitted ? 'Pending Review' : 'Draft';
                         }
                     } else {
-                        item.status = 'Pending Submission';
+                        item.status = (doc.Status__c == 'Draft') ? 'Draft' : 'Pending Submission';
                     }
 
                     item.contentDocumentId = entry != null ? entry.contentDocumentId : null;
@@ -258,11 +260,12 @@ public without sharing class WCFComplianceController {
         Integer totalValidated     = 0;
         Integer totalUploaded      = 0;
         Boolean anyRefreshRequired = false;
+        Boolean anyDraft           = false;
 
         for (ComplianceChecklistItem item : result.items) {
             if (item.required) {
                 totalRequired++;
-                if (item.status == 'Validated') {
+                if (item.status == 'Validated' || item.status == 'Pass') {
                     totalValidated++;
                 }
                 if (String.isNotBlank(item.contentDocumentId)) {
@@ -272,24 +275,21 @@ public without sharing class WCFComplianceController {
             if (item.status == 'Refresh Required') {
                 anyRefreshRequired = true;
             }
+            if (item.status == 'Draft') {
+                anyDraft = true;
+            }
+        }
+
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (doc.Status__c == 'Draft') {
+                anyDraft = true;
+            }
         }
 
         result.totalRequired  = totalRequired;
         result.totalValidated = totalValidated;
         result.totalUploaded  = totalUploaded;
         result.isSubmitted    = isSubmitted;
-
-        if (anyRefreshRequired) {
-            result.overallStatus = 'Refresh Required';
-        } else if (totalRequired > 0 && totalValidated >= totalRequired) {
-            result.overallStatus = 'Complete';
-        } else if (isSubmitted) {
-            result.overallStatus = 'Submitted';
-        } else if (totalUploaded > 0) {
-            result.overallStatus = 'Draft';
-        } else {
-            result.overallStatus = 'Pending Submission';
-        }
 
         // Calculate decision status and notes
         String compStatus = 'Pending';
@@ -303,17 +303,17 @@ public without sharing class WCFComplianceController {
         String suspendedNotes = '';
 
         for (WCF_Compliance_Document__c doc : allDocs) {
-            if (doc.Status__c == 'Rejected') {
+            if (doc.Status__c == 'Rejected' || doc.Status__c == 'Reject') {
                 hasRejected = true;
                 if (String.isNotBlank(doc.Reviewer_Notes__c)) {
                     rejectedNotes = doc.Reviewer_Notes__c;
                 }
-            } else if (doc.Status__c == 'Suspended') {
+            } else if (doc.Status__c == 'Suspended' || doc.Status__c == 'Suspend') {
                 hasSuspended = true;
                 if (String.isNotBlank(doc.Reviewer_Notes__c)) {
                     suspendedNotes = doc.Reviewer_Notes__c;
                 }
-            } else if (doc.Status__c == 'Returned') {
+            } else if (doc.Status__c == 'Returned' || doc.Status__c == 'Return') {
                 hasReturned = true;
                 if (String.isNotBlank(doc.Reviewer_Notes__c)) {
                     if (String.isNotBlank(returnedNotes)) {
@@ -323,6 +323,24 @@ public without sharing class WCFComplianceController {
                     }
                 }
             }
+        }
+
+        if (anyRefreshRequired) {
+            result.overallStatus = 'Refresh Required';
+        } else if (totalRequired > 0 && totalValidated >= totalRequired) {
+            result.overallStatus = 'Complete';
+        } else if (hasRejected) {
+            result.overallStatus = 'Rejected';
+        } else if (hasSuspended) {
+            result.overallStatus = 'Suspended';
+        } else if (hasReturned) {
+            result.overallStatus = 'Returned';
+        } else if (isSubmitted) {
+            result.overallStatus = 'Pending Review';
+        } else if (totalUploaded > 0 || anyDraft) {
+            result.overallStatus = 'Draft';
+        } else {
+            result.overallStatus = 'Pending Submission';
         }
 
         if (hasRejected) {
@@ -337,8 +355,8 @@ public without sharing class WCFComplianceController {
         } else if (totalRequired > 0 && totalValidated >= totalRequired) {
             compStatus = 'Validated';
         } else if (isSubmitted) {
-            compStatus = 'Submitted';
-        } else if (totalUploaded > 0) {
+            compStatus = 'Pending Review';
+        } else if (totalUploaded > 0 || anyDraft) {
             compStatus = 'Draft';
         } else {
             compStatus = 'In Progress';
@@ -411,9 +429,9 @@ public without sharing class WCFComplianceController {
 
         doc.ContentDocumentId__c = contentDocumentId;
         doc.File_Name__c         = fileName;
-        // Keep as Pending Submission upon upload — only explicit submit flips to Pending Review
-        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review') {
-            doc.Status__c = 'Pending Submission';
+        // Keep as Draft upon upload — only explicit submit flips to Pending Review
+        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review' && doc.Status__c != 'Validated' && doc.Status__c != 'Pass' && doc.Status__c != 'Approved') {
+            doc.Status__c = 'Draft';
         }
         doc.Uploaded_Date__c     = DateTime.now();
         doc.Reviewer_Notes__c    = null; // clear on re-upload
@@ -434,7 +452,7 @@ public without sharing class WCFComplianceController {
         ComplianceChecklistItem item = new ComplianceChecklistItem();
         item.recordId          = doc.Id;
         item.documentType      = doc.Document_Type__c;
-        item.status            = (doc.Status__c == 'Pending Submission' || doc.Status__c == 'Not Started') ? 'Draft' : doc.Status__c;
+        item.status            = (doc.Status__c == 'Pending Submission' || doc.Status__c == 'Not Started' || doc.Status__c == 'Draft') ? 'Draft' : doc.Status__c;
         item.contentDocumentId = doc.ContentDocumentId__c;
         item.fileName          = doc.File_Name__c;
         item.issueDate         = doc.Issue_Date__c   != null ? String.valueOf(doc.Issue_Date__c)        : null;
@@ -578,9 +596,9 @@ public without sharing class WCFComplianceController {
         statusMap.put(documentLabel, entry);
         doc.Document_Status_JSON__c = JSON.serialize(statusMap);
         
-        // Keep doc.Status__c in Pending Submission / Returned until explicit submit
-        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted') {
-            doc.Status__c = 'Pending Submission';
+        // Keep doc.Status__c in Draft / Returned until explicit submit
+        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review' && doc.Status__c != 'Validated' && doc.Status__c != 'Pass' && doc.Status__c != 'Approved') {
+            doc.Status__c = 'Draft';
         }
         update doc;
 
@@ -641,9 +659,78 @@ public without sharing class WCFComplianceController {
     }
 
     // ─────────────────────────────────────────────────────────────────
+    // WRITE — Explicit Save Draft of all Compliance Documents
+    // Updates active unsubmitted compliance document records to Status__c = 'Draft'
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void saveDraftComplianceDocuments(Id applicationId) {
+        if (applicationId == null) {
+            throw new AuraHandledException('Missing application ID.');
+        }
+
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = [
+            SELECT Id, Document_Type__c, Document_Types__c, Status__c,
+                   ContentDocumentId__c, Document_Status_JSON__c, Uploaded_Date__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  IndividualApplication__c = :applicationId
+            WITH   SYSTEM_MODE
+        ];
+
+        if (allDocs.isEmpty()) {
+            return;
+        }
+
+        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
+
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            // Do not override terminal/decision statuses
+            if (doc.Status__c == 'Validated' || doc.Status__c == 'Pass' 
+                    || doc.Status__c == 'Approved' || doc.Status__c == 'Rejected' 
+                    || doc.Status__c == 'Suspended' || doc.Status__c == 'Pending Review'
+                    || doc.Status__c == 'Submitted') {
+                continue;
+            }
+
+            Boolean isChanged = false;
+
+            if (String.isNotBlank(doc.Document_Types__c)) {
+                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+                for (String label : statusMap.keySet()) {
+                    DocStatusEntry entry = statusMap.get(label);
+                    if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
+                        if (entry.status != 'Validated' && entry.status != 'Pass' && entry.status != 'Approved' && entry.status != 'Rejected' && entry.status != 'Suspended' && entry.status != 'Pending Review') {
+                            entry.status = 'Draft';
+                            isChanged = true;
+                        }
+                    }
+                }
+                if (isChanged) {
+                    doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+                }
+            }
+
+            if (doc.Status__c != 'Draft') {
+                doc.Status__c = 'Draft';
+                isChanged = true;
+            }
+
+            if (isChanged) {
+                doc.Uploaded_Date__c = (doc.Uploaded_Date__c != null) ? doc.Uploaded_Date__c : DateTime.now();
+                docsToUpdate.add(doc);
+            }
+        }
+
+        if (!docsToUpdate.isEmpty()) {
+            update docsToUpdate;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
     // WRITE — Explicit Final Submit of all Compliance Documents
     // Validates that all requested documents have been uploaded, sets
-    // internal statuses to Pending Review, and updates Status__c to Submitted.
+    // internal statuses to Pending Review, and updates Status__c to Pending Review.
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static void submitComplianceDocuments(Id applicationId) {
@@ -690,7 +777,7 @@ public without sharing class WCFComplianceController {
                 }
 
                 doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-                doc.Status__c = 'Submitted';
+                doc.Status__c = 'Pending Review';
                 doc.Uploaded_Date__c = DateTime.now();
                 docsToUpdate.add(doc);
             } 

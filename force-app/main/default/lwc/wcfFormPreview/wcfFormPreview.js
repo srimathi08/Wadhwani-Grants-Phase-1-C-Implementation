@@ -95,9 +95,11 @@ export default class WcfFormPreview extends LightningElement {
     @track _outcome  = null;
 
     @track isPreviewLoading = false;
-    @track _skillingDomains = [];
-    @track _businessSectors = [];
-    @track _attachments     = [];
+    @track _skillingDomains    = [];
+    @track _businessSectors    = [];
+    @track _livelihoodPrograms = [];
+    @track _communities        = [];
+    @track _attachments        = [];
     @track _additionalInfoFiles = [];
 
     @track isOfficePreviewOpen = false;
@@ -156,6 +158,32 @@ export default class WcfFormPreview extends LightningElement {
                     });
                 } else {
                     this._businessSectors = [];
+                }
+
+                if (data.livelihoodPrograms?.length > 0) {
+                    this._livelihoodPrograms = data.livelihoodPrograms.map((r, i) => ({
+                        idx            : i,
+                        name           : r.Program_Name__c || r.name || '—',
+                        supportType    : r.Type_of_Support_Provided__c || r.supportType || '—',
+                        manHours       : (r.Duration_in_Man_Hours__c != null && r.Duration_in_Man_Hours__c !== '') ? r.Duration_in_Man_Hours__c : (r.manHours || '—'),
+                        enrollment     : (r.Annual_Enrollment__c != null && r.Annual_Enrollment__c !== '') ? r.Annual_Enrollment__c : (r.enrollment || '—')
+                    }));
+                } else {
+                    this._livelihoodPrograms = [];
+                }
+
+                if (data.communities?.length > 0) {
+                    this._communities = data.communities.map((r, i) => ({
+                        idx            : i,
+                        state          : r.State__c || r.state || '—',
+                        district       : r.District__c || r.district || '—',
+                        fy3            : (r.FY_Minus_3__c != null && r.FY_Minus_3__c !== '') ? r.FY_Minus_3__c : (r.fy3 || '—'),
+                        fy2            : (r.FY_Minus_2__c != null && r.FY_Minus_2__c !== '') ? r.FY_Minus_2__c : (r.fy2 || '—'),
+                        fy1            : (r.FY_Minus_1__c != null && r.FY_Minus_1__c !== '') ? r.FY_Minus_1__c : (r.fy1 || '—'),
+                        proj           : (r.Projected_CFY__c != null && r.Projected_CFY__c !== '') ? r.Projected_CFY__c : (r.proj || '—')
+                    }));
+                } else {
+                    this._communities = [];
                 }
             } else {
                 this._app = null;
@@ -723,6 +751,10 @@ export default class WcfFormPreview extends LightningElement {
 
     // ── Track 3: Livelihood Upliftment Getters (Q19 - Q23) ───────────────────
     get livelihoodApproach()         { return this._val(this._app?.Livelihood_Approach__c); }
+    get livelihoodPrograms()         { return this._livelihoodPrograms; }
+    get hasLivelihoodPrograms()      { return this._livelihoodPrograms.length > 0; }
+    get communities()                { return this._communities; }
+    get hasCommunities()             { return this._communities.length > 0; }
 
     // ── Outcome Data Grid (All Tracks) ───────────────────────────────────────
     get outcomeData() {
@@ -1752,6 +1784,34 @@ export default class WcfFormPreview extends LightningElement {
                 sectionHeader('Track 3: Livelihood Upliftment', this.sectionLivStepLabel);
 
                 simpleQRow(q.Q19, 'Your Livelihood Upliftment Approach', parseHtml(this.livelihoodApproach));
+
+                if (this.hasLivelihoodPrograms) {
+                    checkPage(10);
+                    const t20 = y;
+                    drawQLabel(q.Q20, 'Your Key Programs / Initiatives', t20);
+                    y = t20 + 10;
+                    doc.setFontSize(8.5);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(...NAVY);
+                    doc.text('Key Programs / Initiatives', marginX, y);
+                    y += 4;
+                    const progRows = this.livelihoodPrograms.map(p => [p.name, p.supportType, p.manHours, p.enrollment]);
+                    table(['Program / Initiative Name', 'Type of Support Provided', 'Duration (Man-Hours)', 'Annual Enrollment'], progRows);
+                }
+
+                if (this.hasCommunities) {
+                    checkPage(10);
+                    const t21 = y;
+                    drawQLabel(q.Q21, 'Communities that you work in', t21);
+                    y = t21 + 10;
+                    doc.setFontSize(8.5);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(...NAVY);
+                    doc.text('Communities Worked In', marginX, y);
+                    y += 4;
+                    const commRows = this.communities.map(c => [c.state, c.district, c.fy3, c.fy2, c.fy1, c.proj]);
+                    table(['State', 'District / Area', this.fyLabel3, this.fyLabel2, this.fyLabel1, 'CFY (projected)'], commRows);
+                }
 
                 const o = this.outcomeData;
                 checkPage(10);

@@ -362,10 +362,15 @@ private class WCFComplianceControllerTest {
                 System.assertNotEquals(null, e.getMessage());
             }
 
+            // 2. Test save draft
+            WCFComplianceController.saveDraftComplianceDocuments(app.Id);
+            WCF_Compliance_Document__c draftDoc = [SELECT Status__c FROM WCF_Compliance_Document__c WHERE Id = :doc.Id];
+            System.assertEquals('Draft', draftDoc.Status__c);
+
             Test.stopTest();
         }
 
-        // 2. Upload file and test successful submission
+        // 3. Upload file and test successful submission
         Id cdId = makeLinkedFile(doc.Id);
         System.runAs(u) {
             WCFComplianceController.saveComplianceDocument(
@@ -376,7 +381,10 @@ private class WCFComplianceControllerTest {
             WCFComplianceController.ComplianceChecklistResult checklist =
                 WCFComplianceController.getComplianceChecklist(app.Id);
             System.assertEquals(true, checklist.isSubmitted);
-            System.assertEquals('Submitted', checklist.overallStatus);
+            System.assertEquals('Pending Review', checklist.overallStatus);
+
+            WCF_Compliance_Document__c submittedDoc = [SELECT Status__c FROM WCF_Compliance_Document__c WHERE Id = :doc.Id];
+            System.assertEquals('Pending Review', submittedDoc.Status__c);
         }
     }
 
@@ -413,6 +421,11 @@ private class WCFComplianceControllerTest {
 
         try {
             WCFComplianceController.deleteAdHocComplianceDocumentFile(null, 'Some Type');
+            System.assert(false, 'Expected AuraHandledException');
+        } catch (AuraHandledException e) { System.assertNotEquals(null, e.getMessage()); }
+
+        try {
+            WCFComplianceController.saveDraftComplianceDocuments(null);
             System.assert(false, 'Expected AuraHandledException');
         } catch (AuraHandledException e) { System.assertNotEquals(null, e.getMessage()); }
 

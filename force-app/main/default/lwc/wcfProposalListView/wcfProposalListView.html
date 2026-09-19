@@ -49,7 +49,7 @@
         <template if:false={isLoading}>
             <div class="summary-row">
     <div class="summary-item" onclick={handleFilterClick} data-filter="total">
-    <span class="summary-num">{totalCount}</span>
+    <span class="summary-num">{validatedProposalsCount}</span>
     <span class="summary-lbl">Validated Proposals</span>
 </div>
     <div class="summary-div"></div>
@@ -72,24 +72,6 @@
         <span class="summary-num s-flagged">{flaggedCount}</span>
         <span class="summary-lbl">Flagged</span>
     </div>
-    
-<div class="summary-div"></div>
-
-<div class="summary-item"
-     onclick={handleFilterClick}
-     data-filter="rejected">
-
-    <span class="summary-num s-rejected">
-        {rejectedCount}
-    </span>
-
-    <span class="summary-lbl">
-        Rejected
-    </span>
-
-</div>
-
-
 </div>
 
 

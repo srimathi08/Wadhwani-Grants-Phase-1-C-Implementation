@@ -224,14 +224,9 @@ Map<String, Integer> queue = WCFProposalListController.getQueueSummary();
 result.flagged = queue.get('flagged');
 result.review  = queue.get('reviewed');
 
-        // Approved
-        result.approved = [
-            SELECT COUNT()
-            FROM ApplicationDecision
-            WHERE ApplicationDecision = 'Approve'
-            AND RecordTypeId IN :decisionRTIds
-            WITH SYSTEM_MODE
-        ];
+        // Approved — matches Approved Dashboard count
+        WCFApproverListController.ApproverSummary approverSummary = WCFApproverListController.getApproverSummary();
+        result.approved = approverSummary != null ? approverSummary.approved : 0;
 
         // Approval tile not used
         result.approval = 0;

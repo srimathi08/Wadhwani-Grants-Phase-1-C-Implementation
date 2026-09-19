@@ -234,7 +234,10 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
     // ── Paginated slice ──────────────────────────────────────────
     get filteredApplications() {
         const start = (this.currentPage - 1) * PAGE_SIZE;
-        return this.allFiltered.slice(start, start + PAGE_SIZE);
+        return this.allFiltered.slice(start, start + PAGE_SIZE).map((app, idx) => ({
+            ...app,
+            rowNum: start + idx + 1
+        }));
     }
 
     // ── Computed helpers ─────────────────────────────────────────
