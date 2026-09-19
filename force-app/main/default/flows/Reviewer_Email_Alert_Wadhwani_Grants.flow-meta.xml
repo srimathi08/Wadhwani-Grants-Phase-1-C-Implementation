@@ -17,6 +17,20 @@
             </value>
         </inputParameters>
         <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
             <name>useEmailTemplate</name>
             <value>
                 <stringValue>True</stringValue>
@@ -33,7 +47,14 @@
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Copy_1_of_Get_Account_details.PersonContact.Id</elementReference>
+                <elementReference>Copy_1_of_Get_Account_details.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.ApplicationId</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -42,8 +63,8 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>new_evaluation_assigned_to_you</name>
-        <label>new evaluation assigned to you</label>
+        <name>Send_Flagged_Concern_Reviewer_Email</name>
+        <label>Passed to review with a flagged concern (E-46)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -68,7 +89,7 @@
             <name>senderAddress</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>wcf@wadhwanifoundation.org</stringValue>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -93,6 +114,82 @@
             </value>
         </inputParameters>
         <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.ApplicationId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>logEmailOnSend</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>new_evaluation_assigned_to_you</name>
+        <label>New evaluation assigned (E-06)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>Get_Account_details.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/New_Evaluation_Assigned</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_Account_details.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.ApplicationId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
             <name>logEmailOnSend</name>
             <value>
                 <booleanValue>true</booleanValue>
@@ -105,6 +202,31 @@
     </actionCalls>
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Flag_Status</name>
+        <label>Check Flag Status</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>new_evaluation_assigned_to_you</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Standard Pass</defaultConnectorLabel>
+        <rules>
+            <name>Is_Flagged</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Decision_Final_Decision_from_Sec_1_2__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Flag</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Flagged_Concern_Reviewer_Email</targetReference>
+            </connector>
+            <label>Flagged</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Sealed_records</name>
         <label>Sealed records</label>
@@ -122,12 +244,12 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>new_evaluation_assigned_to_you</targetReference>
+                <targetReference>Check_Flag_Status</targetReference>
             </connector>
             <label>Sealed</label>
         </rules>
     </decisions>
-    <description>WCF</description>
+    <description>Reviewer Email Alerts for Wadhwani Grants</description>
     <environments>Default</environments>
     <interviewLabel>Reviewer Email Alert - Wadhwani Grants {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Reviewer Email Alert - Wadhwani Grants</label>
