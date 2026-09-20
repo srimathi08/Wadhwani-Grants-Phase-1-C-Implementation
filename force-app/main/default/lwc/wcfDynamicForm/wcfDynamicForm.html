@@ -1199,33 +1199,33 @@
                                                     <span class="required">*</span> <strong>Balance at Start of Year</strong>
                                                     <div class="subtext-muted">Earliest year only — chains forward automatically..</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.START_FY3} onchange={handleInputChange} data-key="START_FY3" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.START_FY3} onchange={handleInputChange} data-key="START_FY3" min="0" required></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell">{computedStartFY2}</div></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell">{computedStartFY1}</div></div></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Revenue</strong></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY3} onchange={handleInputChange} data-key="REV_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY2} onchange={handleInputChange} data-key="REV_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY1} onchange={handleInputChange} data-key="REV_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY3} onchange={handleInputChange} data-key="REV_FY3" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY2} onchange={handleInputChange} data-key="REV_FY2" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY1} onchange={handleInputChange} data-key="REV_FY1" min="0" required></lightning-input></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Capital expenditure</strong>
                                                     <div class="subtext-muted">Capital expenditure: money spent on lasting assets, such as equipment, vehicles, or premises.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY3} onchange={handleInputChange} data-key="CAP_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY2} onchange={handleInputChange} data-key="CAP_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY1} onchange={handleInputChange} data-key="CAP_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY3} onchange={handleInputChange} data-key="CAP_FY3" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY2} onchange={handleInputChange} data-key="CAP_FY2" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY1} onchange={handleInputChange} data-key="CAP_FY1" min="0" required></lightning-input></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Operating expenditure</strong>
                                                     <div class="subtext-muted">Operating expenditure: day-to-day running costs, such as salaries, rent, and program delivery.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY3} onchange={handleInputChange} data-key="OP_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY2} onchange={handleInputChange} data-key="OP_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY1} onchange={handleInputChange} data-key="OP_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY3} onchange={handleInputChange} data-key="OP_FY3" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY2} onchange={handleInputChange} data-key="OP_FY2" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY1} onchange={handleInputChange} data-key="OP_FY1" min="0" required></lightning-input></div></td>
                                             </tr>
                                             <tr class="end-balance-row">
                                                 <td>
@@ -1267,8 +1267,8 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Revenue</strong></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_BUDGET} onchange={handleInputChange} data-key="CFY_REV_BUDGET" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_PROJ} onchange={handleInputChange} data-key="CFY_REV_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_BUDGET} onchange={handleInputChange} data-key="CFY_REV_BUDGET" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_PROJ} onchange={handleInputChange} data-key="CFY_REV_PROJ" min="0" required></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedRevDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr>
@@ -1276,8 +1276,8 @@
                                                     <span class="required">*</span> <strong>Capital expenditure</strong>
                                                     <div class="subtext-muted">Capital expenditure: money spent on lasting assets, such as equipment, vehicles, or premises.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_BUDGET} onchange={handleInputChange} data-key="CFY_CAP_BUDGET" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_PROJ} onchange={handleInputChange} data-key="CFY_CAP_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_BUDGET} onchange={handleInputChange} data-key="CFY_CAP_BUDGET" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_PROJ} onchange={handleInputChange} data-key="CFY_CAP_PROJ" min="0" required></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedCapDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr>
@@ -1285,8 +1285,8 @@
                                                     <span class="required">*</span> <strong>Operating expenditure</strong>
                                                     <div class="subtext-muted">Operating expenditure: day-to-day running costs, such as salaries, rent, and program delivery.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_BUDGET} onchange={handleInputChange} data-key="CFY_OP_BUDGET" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_PROJ} onchange={handleInputChange} data-key="CFY_OP_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_BUDGET} onchange={handleInputChange} data-key="CFY_OP_BUDGET" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_PROJ} onchange={handleInputChange} data-key="CFY_OP_PROJ" min="0" required></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedOpDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr class="end-balance-row">

@@ -113,7 +113,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Send_the_values_to_Prompt</targetReference>
+            <targetReference>Check_If_Prompt_Inputs_Are_Present</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -129,7 +129,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Send_the_values_to_Prompt</targetReference>
+            <targetReference>Check_If_Prompt_Inputs_Are_Present</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -145,7 +145,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Send_the_values_to_Prompt</targetReference>
+            <targetReference>Check_If_Prompt_Inputs_Are_Present</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -161,9 +161,62 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Send_the_values_to_Prompt</targetReference>
+            <targetReference>Check_If_Prompt_Inputs_Are_Present</targetReference>
         </connector>
     </assignments>
+    <decisions>
+        <name>Check_If_Prompt_Inputs_Are_Present</name>
+        <label>Check If Prompt Inputs Are Present</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Check_whether_job_creation_value_is_present</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Prompt Inputs</defaultConnectorLabel>
+        <rules>
+            <name>Has_Prompt_Inputs</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Proposal_Record_6_Fields.Legal_Structure__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Proposal_Record_6_Fields.Organizational_Sustainability__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Proposal_Record_6_Fields.Use_of_Additional_Funding__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Proposal_Record_6_Fields.Skilling_Approach__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>OperationalSynergies_Var</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue></stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_the_values_to_Prompt</targetReference>
+            </connector>
+            <label>Has Prompt Inputs</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Check_If_Record_Is_Still_Editable</name>
         <label>Check If Record Is Still Editable</label>
@@ -270,27 +323,27 @@
     <formulas>
         <name>Safe_Job_Creation_Approach</name>
         <dataType>String</dataType>
-        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Job_Creation_Approach__c}, &quot;&quot;)</expression>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Job_Creation_Approach__c}, &quot;Not Applicable&quot;)</expression>
     </formulas>
     <formulas>
         <name>Safe_Legal_Structure</name>
         <dataType>String</dataType>
-        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Legal_Structure__c}, &quot;&quot;)</expression>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Legal_Structure__c}, &quot;Not Applicable&quot;)</expression>
     </formulas>
     <formulas>
         <name>Safe_Org_Sustainability</name>
         <dataType>String</dataType>
-        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Organizational_Sustainability__c}, &quot;&quot;)</expression>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Organizational_Sustainability__c}, &quot;Not Applicable&quot;)</expression>
     </formulas>
     <formulas>
         <name>Safe_Skilling_Approach</name>
         <dataType>String</dataType>
-        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Skilling_Approach__c}, &quot;&quot;)</expression>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Skilling_Approach__c}, &quot;Not Applicable&quot;)</expression>
     </formulas>
     <formulas>
         <name>Safe_Use_of_Funds</name>
         <dataType>String</dataType>
-        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Use_of_Additional_Funding__c}, &quot;&quot;)</expression>
+        <expression>BLANKVALUE({!Get_Proposal_Record_6_Fields.Use_of_Additional_Funding__c}, &quot;Not Applicable&quot;)</expression>
     </formulas>
     <interviewLabel>AI Feedback Update in Proposal {!$Flow.CurrentDateTime}</interviewLabel>
     <label>AI Feedback Update in Proposal</label>

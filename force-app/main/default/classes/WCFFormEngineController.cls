@@ -814,8 +814,8 @@ public without sharing class WCFFormEngineController {
             app = new IndividualApplication(
                 AccountId = accountId,
                 OwnerId = currentUser.Id,
-                Category = 'WCF Grant Application',
-                Draft_Email_Sent__c = true
+                Category = 'WCF Grant Application'
+                
             );
         } else {
             Set<String> updateFieldNames = new Set<String>{
@@ -854,7 +854,7 @@ public without sharing class WCFFormEngineController {
             app = Database.query(updateSoql);
         }
 
-        app.Draft_Email_Sent__c = true;
+       
         app.Category = 'WCF Grant Application';
         if (app.AccountId == null && accountId != null) {
             app.AccountId = accountId;

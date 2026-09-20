@@ -56,6 +56,7 @@ export default class WcfDynamicForm extends LightningElement {
     @track bannerTitle = '';
     @track bannerMessage = '';
     _bannerTimeout;
+    _liveValidationTimeout = null;
     @track currentScreen = 'screen1'; // Screen 1 is Track Selection & FAQ (2nd Image is first page)
     @track activeTabId = 'tabAboutOrg';
 
@@ -80,27 +81,71 @@ export default class WcfDynamicForm extends LightningElement {
         Primary_Service_Regions__c: '',
         Leader_Name__c: '',
         Leader_Title__c: '',
+        Leader_Tenure__c: '',
         Submitter_Name__c: '',
         Job_Title__c: '',
         Work_Email_ID__c: '',
         Phone__c: '',
+        WG_Phone_Country_Code__c: '+91',
         Legal_Type__c: '',
+        Legal_Type_Other__c: '',
         Registration_Jurisdiction__c: '',
+        Registration_Jurisdiction_Other__c: '',
         Incorporation_Date__c: '',
         Legal_Structure__c: '',
         Has_501c3_Status__c: '',
         Has_Equivalency_Determination__c: '',
         Is_FCRA_Registered__c: '',
         Willing_to_Pursue_ED__c: '',
+        Funder_1_Name__c: '',
+        Funder_1_Amount__c: '',
+        Funder_1_Period_Start__c: '',
+        Funder_1_Period_End__c: '',
+        Funder_1_Type__c: '',
+        Funder_2_Name__c: '',
+        Funder_2_Amount__c: '',
+        Funder_2_Period_Start__c: '',
+        Funder_2_Period_End__c: '',
+        Funder_2_Type__c: '',
+        Funder_3_Name__c: '',
+        Funder_3_Amount__c: '',
+        Funder_3_Period_Start__c: '',
+        Funder_3_Period_End__c: '',
+        Funder_3_Type__c: '',
         Reference_1_Name__c: '',
         Reference_1_Role__c: '',
         Reference_1_Email__c: '',
         Reference_2_Name__c: '',
         Reference_2_Role__c: '',
         Reference_2_Email__c: '',
+        START_FY3: '',
+        REV_FY3: '',
+        REV_FY2: '',
+        REV_FY1: '',
+        CAP_FY3: '',
+        CAP_FY2: '',
+        CAP_FY1: '',
+        OP_FY3: '',
+        OP_FY2: '',
+        OP_FY1: '',
+        CFY_REV_BUDGET: '',
+        CFY_REV_PROJ: '',
+        CFY_CAP_BUDGET: '',
+        CFY_CAP_PROJ: '',
+        CFY_OP_BUDGET: '',
+        CFY_OP_PROJ: '',
         Revenue_Explanation__c: '',
+        Skilling_Approach__c: '',
+        Job_Creation_Approach__c: '',
+        Livelihood_Approach__c: '',
+        Organizational_Sustainability__c: '',
+        Use_of_Additional_Funding__c: '',
+        GenieAI_Interest_Level__c: '',
+        Operational_Synergies_with_WOF__c: '',
         Q24_VERIFIED: '',
-        Details_of_Ethical_Received__c: ''
+        Details_of_Ethical_Received__c: '',
+        Attesting_User_Name__c: '',
+        Attesting_User_Title__c: ''
     };
 
     @track fiscalYears = {};
@@ -156,6 +201,7 @@ export default class WcfDynamicForm extends LightningElement {
     @track hqIsLoading = false;
     @track hqShowNoResults = false;
     hqDelayTimeout;
+    _liveValidationTimeout = null;
 
     PHONE_LENGTH_BY_COUNTRY_CODE = {
         '+1':   { min: 10, max: 10, example: '2025551234' },
@@ -704,7 +750,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ...q,
                 key: keyVal,
                 displayNumber: basePrefix ? `${basePrefix}.${idx + 1}` : `${idx + 1}`,
-                value: val !== undefined ? val : '',
+                value: (val !== undefined && val !== null) ? val : '',
                 displayValue: String(displayVal),
                 isText: dt === 'text' || dt === 'string' || dt === 'phone' || dt === 'email',
                 isTextArea: dt === 'textarea' || dt === 'richtext',
@@ -2044,10 +2090,8 @@ export default class WcfDynamicForm extends LightningElement {
             val = event.target?.value ?? '';
         }
 
-        this.formValues = {
-            ...this.formValues,
-            [key]: val
-        };
+        // Direct property mutation prevents full-component VDOM re-evaluation on each keystroke
+        this.formValues[key] = val;
 
         const fldAttr = event.currentTarget?.dataset?.field || event.target?.dataset?.field;
         if (fldAttr && fldAttr !== key) {
@@ -2059,13 +2103,20 @@ export default class WcfDynamicForm extends LightningElement {
         }
 
         if (key === 'GenieAI_Interest_Level__c' && (val === 'Not at this time' || !val)) {
-            this.formValues = {
-                ...this.formValues,
-                Operational_Synergies_with_WOF__c: '',
-                GenieAI_Synergies_Description__c: ''
-            };
+            this.formValues.Operational_Synergies_with_WOF__c = '';
+            this.formValues.GenieAI_Synergies_Description__c = '';
         }
 
+        // Debounce live validation to prevent synchronous reportValidity() blocking on every keystroke
+        if (this._liveValidationTimeout) {
+            clearTimeout(this._liveValidationTimeout);
+        }
+        this._liveValidationTimeout = setTimeout(() => {
+            this._runLiveFieldValidation(key, val);
+        }, 300);
+    }
+
+    _runLiveFieldValidation(key, val) {
         // Real-time quality validation for Q2 & Q3 text fields
         const liveTextValidators = {
             Organization_Name__c:             v => this._validateNameLikeField(v, 'Organization Name'),
@@ -2283,11 +2334,8 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Only overwrite formValues.Phone__c if input has a value OR if formValues.Phone__c was not set yet
         if (input.value || !this.formValues.Phone__c) {
-            this.formValues = {
-                ...this.formValues,
-                WG_Phone_Country_Code__c: dial,
-                Phone__c: national
-            };
+            this.formValues.WG_Phone_Country_Code__c = dial;
+            this.formValues.Phone__c = national;
         }
 
         if (national) {
@@ -2413,10 +2461,7 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     _setHQValue(val) {
-        this.formValues = {
-            ...this.formValues,
-            Headquarters_City_and_Country__c: val
-        };
+        this.formValues.Headquarters_City_and_Country__c = val;
 
         const err = val ? this._validateHQCityCountry(val) : null;
         if (err) {
@@ -2948,10 +2993,7 @@ export default class WcfDynamicForm extends LightningElement {
             if (elText.length > 0) {
                 htmlVal = el.innerHTML || '';
                 text = elText;
-                this.formValues = {
-                    ...this.formValues,
-                    [field]: htmlVal
-                };
+                this.formValues[field] = htmlVal;
             } else if (this.formValues[field] && String(this.formValues[field]).trim() !== '') {
                 htmlVal = this.formValues[field];
                 text = this.stripHtml(htmlVal).trim();
@@ -3275,7 +3317,7 @@ export default class WcfDynamicForm extends LightningElement {
             }
         });
 
-        // Q9 Historical Financials: check negative numbers
+        // Q9 Historical Financials: required and non-negative
         const histNumKeys = [
             'START_FY3',
             'REV_FY3', 'REV_FY2', 'REV_FY1',
@@ -3284,17 +3326,22 @@ export default class WcfDynamicForm extends LightningElement {
         ];
         histNumKeys.forEach(k => {
             const v = org[k];
-            if (v !== '' && v !== null && v !== undefined) {
-                if (Number(v) < 0) {
-                    this._showLightningError(k, 'Amount cannot be negative.');
-                    isValid = false;
-                } else {
-                    this._clearLightningError(k);
-                }
+            const label = this._getLabelForFieldKey(k);
+            if (v === '' || v === null || v === undefined) {
+                this._showLightningError(k, `${label} is required.`);
+                isValid = false;
+            } else if (isNaN(Number(v))) {
+                this._showLightningError(k, `${label} must be a number.`);
+                isValid = false;
+            } else if (Number(v) < 0) {
+                this._showLightningError(k, 'Amount cannot be negative.');
+                isValid = false;
+            } else {
+                this._clearLightningError(k);
             }
         });
 
-        // Q10 Current FY Financials: check negative numbers & deviation explanation
+        // Q10 Current FY Financials: required and non-negative & deviation explanation
         const cfyNumKeys = [
             'CFY_REV_BUDGET', 'CFY_REV_PROJ',
             'CFY_CAP_BUDGET', 'CFY_CAP_PROJ',
@@ -3302,13 +3349,18 @@ export default class WcfDynamicForm extends LightningElement {
         ];
         cfyNumKeys.forEach(k => {
             const v = org[k];
-            if (v !== '' && v !== null && v !== undefined) {
-                if (Number(v) < 0) {
-                    this._showLightningError(k, 'Amount cannot be negative.');
-                    isValid = false;
-                } else {
-                    this._clearLightningError(k);
-                }
+            const label = this._getLabelForFieldKey(k);
+            if (v === '' || v === null || v === undefined) {
+                this._showLightningError(k, `${label} is required.`);
+                isValid = false;
+            } else if (isNaN(Number(v))) {
+                this._showLightningError(k, `${label} must be a number.`);
+                isValid = false;
+            } else if (Number(v) < 0) {
+                this._showLightningError(k, 'Amount cannot be negative.');
+                isValid = false;
+            } else {
+                this._clearLightningError(k);
             }
         });
 
@@ -4697,14 +4749,11 @@ export default class WcfDynamicForm extends LightningElement {
 
     handleRemoveFunder2() {
         this.showFunder2 = false;
-        this.formValues = {
-            ...this.formValues,
-            Funder_2_Name__c: '',
-            Funder_2_Amount__c: '',
-            Funder_2_Period_Start__c: '',
-            Funder_2_Period_End__c: '',
-            Funder_2_Type__c: ''
-        };
+        this.formValues.Funder_2_Name__c = '';
+        this.formValues.Funder_2_Amount__c = '';
+        this.formValues.Funder_2_Period_Start__c = '';
+        this.formValues.Funder_2_Period_End__c = '';
+        this.formValues.Funder_2_Type__c = '';
         this._clearLightningError('Funder_2_Name__c');
         this._clearLightningError('Funder_2_Amount__c');
         this._clearLightningError('Funder_2_Period_Start__c');
@@ -4714,14 +4763,11 @@ export default class WcfDynamicForm extends LightningElement {
 
     handleRemoveFunder3() {
         this.showFunder3 = false;
-        this.formValues = {
-            ...this.formValues,
-            Funder_3_Name__c: '',
-            Funder_3_Amount__c: '',
-            Funder_3_Period_Start__c: '',
-            Funder_3_Period_End__c: '',
-            Funder_3_Type__c: ''
-        };
+        this.formValues.Funder_3_Name__c = '';
+        this.formValues.Funder_3_Amount__c = '';
+        this.formValues.Funder_3_Period_Start__c = '';
+        this.formValues.Funder_3_Period_End__c = '';
+        this.formValues.Funder_3_Type__c = '';
         this._clearLightningError('Funder_3_Name__c');
         this._clearLightningError('Funder_3_Amount__c');
         this._clearLightningError('Funder_3_Period_Start__c');
@@ -4820,12 +4866,9 @@ export default class WcfDynamicForm extends LightningElement {
 
     handleRemoveReference2() {
         this.showReference2 = false;
-        this.formValues = {
-            ...this.formValues,
-            Reference_2_Name__c: '',
-            Reference_2_Role__c: '',
-            Reference_2_Email__c: ''
-        };
+        this.formValues.Reference_2_Name__c = '';
+        this.formValues.Reference_2_Role__c = '';
+        this.formValues.Reference_2_Email__c = '';
         this._clearLightningError('Reference_2_Name__c');
         this._clearLightningError('Reference_2_Role__c');
         this._clearLightningError('Reference_2_Email__c');
@@ -4965,10 +5008,7 @@ export default class WcfDynamicForm extends LightningElement {
             const words = text.split(/\s+/).filter(w => w.length > 0);
             const fieldKey = el.dataset?.field || el.dataset?.id;
             if (fieldKey) {
-                this.formValues = {
-                    ...this.formValues,
-                    [fieldKey]: el.innerHTML
-                };
+                this.formValues[fieldKey] = el.innerHTML;
                 this._updateWordCountForField(fieldKey, words.length);
             }
         }
@@ -5010,10 +5050,7 @@ export default class WcfDynamicForm extends LightningElement {
             const rawWords = (el.innerText || '').trim().split(/\s+/).filter(w => w.length > 0);
             const fieldKey = el.dataset?.field || el.dataset?.id;
             if (fieldKey) {
-                this.formValues = {
-                    ...this.formValues,
-                    [fieldKey]: el.innerHTML
-                };
+                this.formValues[fieldKey] = el.innerHTML;
                 this._updateWordCountForField(fieldKey, rawWords.length);
             }
         }
@@ -5048,10 +5085,7 @@ export default class WcfDynamicForm extends LightningElement {
         const rtEl = this.template.querySelector(`[contenteditable="true"][data-field="${fieldApiName}"]`);
         if (rtEl) {
             fieldValue = this._sanitizeHtml(rtEl.innerHTML);
-            this.formValues = {
-                ...this.formValues,
-                [fieldApiName]: fieldValue
-            };
+            this.formValues[fieldApiName] = fieldValue;
         }
 
         const plain = this.stripHtml(fieldValue).replace(/\u00A0/g, ' ').trim();

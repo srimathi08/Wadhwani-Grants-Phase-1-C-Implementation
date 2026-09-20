@@ -869,6 +869,13 @@
                     <stringValue>Submitted</stringValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Submitted</stringValue>
+                </rightValue>
+            </conditions>
             <connector>
                 <targetReference>Submitted_Mail_to_Applicant</targetReference>
             </connector>
@@ -880,6 +887,13 @@
             <conditions>
                 <leftValueReference>$Record.Status</leftValueReference>
                 <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Revision Requested</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
                 <rightValue>
                     <stringValue>Revision Requested</stringValue>
                 </rightValue>
@@ -899,6 +913,13 @@
                     <stringValue>Application Resubmitted</stringValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Application Resubmitted</stringValue>
+                </rightValue>
+            </conditions>
             <connector>
                 <targetReference>Resubmitted_mail_to_Applicant</targetReference>
             </connector>
@@ -910,6 +931,13 @@
             <conditions>
                 <leftValueReference>$Record.Status</leftValueReference>
                 <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Under Review</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
                 <rightValue>
                     <stringValue>Under Review</stringValue>
                 </rightValue>
@@ -929,6 +957,13 @@
                     <stringValue>Recommend for Fund</stringValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Recommend for Fund</stringValue>
+                </rightValue>
+            </conditions>
             <connector>
                 <targetReference>Grant_Approved_Mail_to_Applicant</targetReference>
             </connector>
@@ -940,6 +975,13 @@
             <conditions>
                 <leftValueReference>$Record.Status</leftValueReference>
                 <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Not Recommend for Fund</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
                 <rightValue>
                     <stringValue>Not Recommend for Fund</stringValue>
                 </rightValue>

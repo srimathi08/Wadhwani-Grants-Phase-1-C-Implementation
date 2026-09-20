@@ -88,6 +88,8 @@ export default class WcfRfiResponsePage extends LightningElement {
     @track showLocationDropdown = false;
     @track isSearchingLocation = false;
     searchTimeout = null;
+    _incorpDateTimeout = null;
+    _wordCountTimeout = null;
 
     acceptedFileFormats = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.png', '.jpg', '.jpeg'];
     pdfOnlyFormats = ['.pdf'];
@@ -339,24 +341,31 @@ export default class WcfRfiResponsePage extends LightningElement {
         const field = event.target.dataset.field || event.currentTarget.dataset.field;
         const value = event.detail?.value !== undefined ? event.detail.value : event.target.value;
         if (field) {
-            this.formValues = { ...this.formValues, [field]: value };
+            this.formValues[field] = value;
             if (this.validationErrorMessage) {
                 this.validationErrorMessage = '';
             }
             if (field === 'Incorporation_Date__c') {
-                const today = new Date().toISOString().split('T')[0];
-                const inputEl = event.target;
-                if (value && value > today) {
-                    if (inputEl.setCustomValidity) {
-                        inputEl.setCustomValidity('Incorporation Date cannot be in the future.');
-                        inputEl.reportValidity();
-                    }
-                } else {
-                    if (inputEl.setCustomValidity) {
-                        inputEl.setCustomValidity('');
-                        inputEl.reportValidity();
-                    }
+                if (this._incorpDateTimeout) {
+                    clearTimeout(this._incorpDateTimeout);
                 }
+                this._incorpDateTimeout = setTimeout(() => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const inputEl = this.template.querySelector('[data-field="Incorporation_Date__c"]');
+                    if (inputEl) {
+                        if (value && value > today) {
+                            if (inputEl.setCustomValidity) {
+                                inputEl.setCustomValidity('Incorporation Date cannot be in the future.');
+                                inputEl.reportValidity();
+                            }
+                        } else {
+                            if (inputEl.setCustomValidity) {
+                                inputEl.setCustomValidity('');
+                                inputEl.reportValidity();
+                            }
+                        }
+                    }
+                }, 300);
             }
         }
     }
@@ -400,22 +409,10 @@ export default class WcfRfiResponsePage extends LightningElement {
         ];
     }
 
-    handleTrackToggle(event) {
-        const code = event.currentTarget.dataset.code;
-        if (!code) return;
-        let current = [...(this.selectedTracks || [])];
-        if (current.includes(code)) {
-            current = current.filter(t => t !== code);
-        } else {
-            current.push(code);
-        }
-        this.selectedTracks = current;
-    }
-
     // ── Location Autocomplete (HQ) ───────────────────────────────────────────
     handleLocationInput(event) {
         const query = event.target.value;
-        this.formValues = { ...this.formValues, Headquarters_City_and_Country__c: query };
+        this.formValues.Headquarters_City_and_Country__c = query;
         if (this.searchTimeout) clearTimeout(this.searchTimeout);
         if (!query || query.length < 3) {
             this.locationResults = [];
@@ -441,7 +438,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     handleSelectLocation(event) {
         const val = event.currentTarget.dataset.value;
-        this.formValues = { ...this.formValues, Headquarters_City_and_Country__c: val };
+        this.formValues.Headquarters_City_and_Country__c = val;
         this.showLocationDropdown = false;
         this.locationResults = [];
     }
@@ -472,13 +469,13 @@ export default class WcfRfiResponsePage extends LightningElement {
     }
 
     handleFiscalMonthChange(event) {
-        this.formValues = { ...this.formValues, Fiscal_Month__c: event.detail.value };
-        this.loadMetadata();
+        this.formValues.Fiscal_Month__c = event.detail.value;
+        this.computeFiscalYears();
     }
 
     handleFiscalDayChange(event) {
-        this.formValues = { ...this.formValues, Fiscal_Day__c: event.detail.value };
-        this.loadMetadata();
+        this.formValues.Fiscal_Day__c = event.detail.value;
+        this.computeFiscalYears();
     }
 
     // ── Picklists ────────────────────────────────────────────────────────────
@@ -555,10 +552,15 @@ export default class WcfRfiResponsePage extends LightningElement {
         const field = event.target.dataset.field;
         if (field) {
             const html = event.target.innerHTML;
-            this.formValues = { ...this.formValues, [field]: html };
-            const text = this.stripHtml(html).trim();
-            const count = text ? text.split(/\s+/).length : 0;
-            this.wordCounts = { ...this.wordCounts, [field]: count };
+            this.formValues[field] = html;
+            if (this._wordCountTimeout) {
+                clearTimeout(this._wordCountTimeout);
+            }
+            this._wordCountTimeout = setTimeout(() => {
+                const text = this.stripHtml(html).trim();
+                const count = text ? text.split(/\s+/).length : 0;
+                this.wordCounts = { ...this.wordCounts, [field]: count };
+            }, 300);
         }
     }
 
@@ -810,7 +812,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         richSelectors.forEach(el => {
             const f = el.dataset.field;
             if (f) {
-                this.formValues = { ...this.formValues, [f]: el.innerHTML };
+                this.formValues[f] = el.innerHTML;
             }
         });
 
