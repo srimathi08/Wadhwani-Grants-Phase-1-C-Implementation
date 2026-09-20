@@ -126,6 +126,7 @@ public without sharing class WFGrantsSignUpController {
                 FirstName         = firstName,
                 LastName          = lastName,
                 MobilePhone       = formattedPhone,
+                CompanyName       = String.isNotBlank(organizationName) ? organizationName.left(80) : null,
                 ProfileId         = prf.Id,
                 ContactId         = personContactId,
                 Alias             = buildAlias(firstName, lastName),
