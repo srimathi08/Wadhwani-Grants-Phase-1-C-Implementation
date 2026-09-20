@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Fires when: The applicant submits all compliance documents</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>We have received your compliance documents</name>
+    <style>none</style>
+    <subject>We have received your compliance documents</subject>
+    <textOnly>[{!Account.WCF_Organizational_Name__c}] We have your compliance documents. Here is what we received..
+
+{!Account.WCF_Organizational_Name__c} A few items need updating before your application can move ahead.
+
+We have received your documents
+
+Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c}
+
+Hi {!Account.Name},
+
+Thank you. We have received the following compliance documents:
+
+{!WCF_Compliance_Document__c.File_Name__c}
+
+Our team will review them. We will write to you again once that review is done. Nothing further is needed from you right now.
+
+View Your Documents
+
+Kind Regards,
+Wadhwani Grants,
+
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+
+Questions? Just reply to this email; it reaches me and the Wadhwani Grants team at grants.support@wadhwanifoundation.org.
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

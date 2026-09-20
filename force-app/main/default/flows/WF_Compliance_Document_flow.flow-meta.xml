@@ -72,6 +72,9 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Get_Approver_Account_For_Compliance</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -477,7 +480,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Docs_Submitted_Validator</setupReference>
+                <setupReference>WCF_Folder/We_have_received_your_compliance_documents</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -539,7 +542,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Draft_Saved</setupReference>
+                <setupReference>WCF_Folder/Compliance_your_document_upload_has_started</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -725,7 +728,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Account_Locked</setupReference>
+                <setupReference>WCF_Folder/Your_account_is_suspended</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -747,8 +750,92 @@
         <offset>0</offset>
         <versionString>3.0.1</versionString>
     </actionCalls>
+    <actionCalls>
+        <name>Send_Compliance_Cleared_Approver_Email</name>
+        <label>Compliance cleared, ready for approval (E-33)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>Get_Approver_Account_For_Compliance.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Compliance_Cleared_Approver_Alert</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_Approver_Account_For_Compliance.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Approver_For_Compliance</name>
+        <label>Check Approver For Compliance</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Approver_Found_For_Compliance</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Approver_Account_For_Compliance.PersonContactId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Compliance_Cleared_Approver_Email</targetReference>
+            </connector>
+            <label>Approver Found For Compliance</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Check_Applicant_For_Approved</name>
         <label>Check Applicant For Approved</label>
@@ -1230,6 +1317,27 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Approver_Account_For_Compliance</name>
+        <label>Get Approver Account For Compliance</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Approver_For_Compliance</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WCF_Approver__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <name>Get_Applicant_Email</name>
         <label>Get Applicant Email</label>

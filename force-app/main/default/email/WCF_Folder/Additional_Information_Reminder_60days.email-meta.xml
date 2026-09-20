@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Fires when: An application sent back has had no response, at sixty  days</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Additional Information Reminder- 60days</name>
+    <style>none</style>
+    <subject>{!IndividualApplication.Organization_Name__c} Your application is waiting for your updates</subject>
+    <textOnly>[{!Account.WCF_Organizational_Name__c}] Your application is waiting for your updates
+
+{!Account.WCF_Organizational_Name__c} A few items need updating before your application can move ahead.
+
+Your application is waiting for your updates
+
+Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c}
+
+Hi {!Account.Name},
+
+We sent your application back to you for a few updates, and those updates have not reached us yet.
+
+What we still need:
+
+{!ApplicationReview.Consolidated_Return_Comments__c}
+
+Everything else you entered is saved. Open your application, update the items above, and submit it again.
+
+Please send them within 60 calendar days.
+
+In case of any queries, please write to us at grants.support@wadhwanifoundation.org
+
+Update your application
+
+Kind Regards,
+Wadhwani Grants
+
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+
+Questions? Just reply to this email; it reaches me and the Wadhwani Grants team at grants.support@wadhwanifoundation.org.
+
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>
