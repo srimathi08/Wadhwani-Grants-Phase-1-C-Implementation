@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Information Located Review Can Resume</name>
+    <style>none</style>
+    <subject>{{{org_name}}} — information located, review can resume</subject>
+    <textOnly>Subject: {{{org_name}}} — information located, review can resume
+
+Hello {{{reviewer_first_name}}},
+
+The Validator has verified and resolved the requested information for {{{org_name}}}. The application is now back in review.
+
+You can now resume your evaluation on the portal:
+{{{application_link}}}
+
+Wadhwani Grants Platform
+
+Questions? Reply at grants.support@wadhwanifoundation.org
+
+© {{{year}}} Wadhwani Charitable Foundation. All rights reserved.</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>
