@@ -259,6 +259,7 @@ public static String saveDecision(
     upsert as system ad;
 
     IndividualApplication app = new IndividualApplication(Id = applicationId);
+    app.WG_Approver_Name__c = UserInfo.getName();
 
     if (decision == 'Accept') {
         // Condition 1: Recommend=Yes  -> Recommend for Fund

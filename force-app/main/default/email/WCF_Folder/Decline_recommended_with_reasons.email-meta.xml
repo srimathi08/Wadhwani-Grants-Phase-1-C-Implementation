@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Goes to: Approver   Fires when: The reviewer recommends a decline and records the reasons</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Decline recommended, with reasons</name>
+    <style>none</style>
+    <subject>Decline recommended: your decision by {!ApplicationReview.Due_Date_For_Approver__c}</subject>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

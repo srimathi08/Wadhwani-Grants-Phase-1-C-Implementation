@@ -159,6 +159,10 @@ private class WCFApproverListControllerTest {
             app.Status = 'Under Review';
             update app;
             System.assertNotEquals(null, WCFApproverListController.getExistingDecision(app.Id));
+
+            // Verify WG_Approver_Name__c is populated
+            IndividualApplication updatedApp = [SELECT Id, WG_Approver_Name__c FROM IndividualApplication WHERE Id = :app.Id];
+            System.assertEquals(UserInfo.getName(), updatedApp.WG_Approver_Name__c);
         }
     }
 

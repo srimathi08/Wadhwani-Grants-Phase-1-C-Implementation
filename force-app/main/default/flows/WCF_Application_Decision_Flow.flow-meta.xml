@@ -93,6 +93,28 @@
             <label>Decision Recorded (Accept or Reject)</label>
         </rules>
     </decisions>
+    <decisions>
+        <name>Check_Reviewer_Found</name>
+        <label>Check Reviewer Found</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Reviewer Found</defaultConnectorLabel>
+        <rules>
+            <name>Reviewer_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Reviewer_Account.PersonContactId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Decision_Recorded_Email_to_Reviewer</targetReference>
+            </connector>
+            <label>Reviewer Found</label>
+        </rules>
+    </decisions>
     <description>WCF Application Decision Flow for Reviewer Email Alerts (E-31)</description>
     <environments>Default</environments>
     <interviewLabel>WCF Application Decision Flow {!$Flow.CurrentDateTime}</interviewLabel>
@@ -123,7 +145,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Send_Decision_Recorded_Email_to_Reviewer</targetReference>
+            <targetReference>Check_Reviewer_Found</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
