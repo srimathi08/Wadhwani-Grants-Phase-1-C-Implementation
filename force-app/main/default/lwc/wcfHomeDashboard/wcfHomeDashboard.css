@@ -1,71 +1,14 @@
-@import "c/commonStyleTheme";
-
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   Reds: #c0392b (card accent border, red dot, loading-overlay tint —
-   already near-identical to the brand red by luminance) -> var(--wg-red).
-   Greens ("approved" family): #15803d -> var(--wg-success).
-   Ambers ("flag"/locked-notice family, one consistent amber palette
-   across .ps-card--flag / .ps-dot--orange / .ps-notice / .ps-count--flag):
-   #d97706 (primary amber accent/border/icon/button) -> var(--wg-warning);
-   #fdf6ec (notice bg) -> var(--wg-warning-bg) (near-exact match);
-   #7c4a03 / #92400e (darker amber text — title, flagged count) ->
-   var(--wg-warning-text); #b45f05 (button hover, darker still) also ->
-   var(--wg-warning-text), reusing it as the "darkest available amber"
-   since there's no dedicated warning-deep token (--wg-success-deep
-   exists but --wg-warning does not; same limitation, same fallback
-   used elsewhere in this batch). #8a6534 (notice body copy, a third,
-   lighter amber shade) and #b0844a (dismiss-button default, a fourth)
-   both collapse onto --wg-warning-text too — a real loss of the
-   original 4-shade amber hierarchy down to 2 tokens (base + text), but
-   consistent with the token budget used everywhere else in this
-   project. #f0d9b5 (notice's soft pastel border) -> var(--wg-warning),
-   which is more saturated than the original — a visible but intentional
-   simplification onto the defined token, matching how
-   commonStyleTheme's own .warning-banner pairs a tint bg with the full
-   warning color as its accent rather than a separate pastel border.
-   Neutrals: #ffffff -> var(--wg-white); #1a2130 -> var(--wg-gray);
-   #dde1e8 / #e4e7ec / #d5dae2 (borders/dividers) -> var(--wg-border);
-   #fbfcfd (locked-card bg, near-white) -> var(--wg-border) too — reads
-   as a visibly "grayed out" card against the white active cards, which
-   actually suits the locked/disabled meaning. #a0a8b5 / #6b7585 /
-   #94a3b8 / #98a2b3 / #c4cbd6 / #b0b8c4 (six different light
-   gray-blue shades for default icon/label/sub/locked text) all
-   collapse onto var(--wg-text-muted) — the single closest available
-   token, same "many grays -> one muted-text token" simplification used
-   throughout this batch.
-   The pre-"FIX" .ps-row-text / .ps-row-label::before/::after /
-   .ps-divider / .ps-loading rules (white-on-white, left over from when
-   this strip had a red background) are fully overridden later in the
-   same file by the "role gating additions" block below them — same
-   selectors, same specificity, cascade order wins — so they render as
-   dead code today. Left them in place (not touched) rather than
-   deleting working overrides; not tokenizing genuinely-dead rgba rules
-   avoided introducing risk for zero visual effect.
-   font-family: 'Salesforce Sans' -> var(--wg-font-body); notice button's
-   font-family: inherit -> var(--wg-font-heading) (button convention).
-   Sizes bumped to the nearest defined tier: 9/10/11px -> 12px caption
-   (same "smallest tier" call made throughout this batch); 30px (the
-   big pipeline count) -> 28px page-title, the closest defined size
-   (nothing larger exists in the scale); 12/13/20px were exact matches
-   to caption/label/section-heading and tokenized directly.
-   .ps-notice-btn (the one real <button> in this file) squared to
-   border-radius: 0, matching the codebase-wide button convention —
-   .ps-card/.ps-notice/.ps-loading/.ps-root keep their rounded
-   card-style radii (tokenized to --wg-radius-card/-md/-sm), since the
-   square-button rule applies to clickable CTA buttons, not data cards.
-   ──────────────────────────────────────────────────────────────────── */
-
 /* ═══════════════════════════════════════════════════════
    WCF Pipeline Strip  ·  wcfPipelineStrip.css
    ═══════════════════════════════════════════════════════ */
 
 /* ── Root shell — red background ── */
 .ps-root {
-    background    : var(--wg-white);
-    border-radius : var(--wg-radius-card);
+    background    : #ffffff;
+    border-radius : 10px;
     padding       : 18px 20px 20px;
     position      : relative;
-    font-family   : var(--wg-font-body);
+    font-family   : 'Salesforce Sans', Arial, sans-serif;
 }
 
 /* ── Row section label ── */
@@ -85,8 +28,8 @@
 }
 
 .ps-row-text {
-    font-size      : var(--wg-font-size-caption);
-    font-weight    : var(--wg-weight-bold);
+    font-size      : 9px;
+    font-weight    : 700;
     letter-spacing : 1.5px;
     text-transform : uppercase;
     color          : rgba(255, 255, 255, 0.85);
@@ -111,10 +54,10 @@
    CARD — force solid white, override any inherited colour
    ══════════════════════════════════════════════════════ */
 .ps-card {
-    background    : var(--wg-white) !important;
-    border        : 1px solid var(--wg-border) !important;
-    border-left   : 3px solid var(--wg-red) !important;
-    border-radius : var(--wg-radius-md);
+    background    : #ffffff !important;
+    border        : 1px solid #dde1e8 !important;
+    border-left   : 3px solid #c0392b !important;
+    border-radius : 8px;
     padding       : 14px 14px 12px;
     cursor        : pointer;
     transition    : transform 0.12s, box-shadow 0.15s;
@@ -123,7 +66,7 @@
     isolation     : isolate;
     overflow      : visible;
     /* reset any inherited colour */
-    color         : var(--wg-gray);
+    color         : #1a2130;
 }
 
 .ps-card:hover {
@@ -133,12 +76,12 @@
 
 /* Flag card — amber left border */
 .ps-card--flag {
-    border-left : 3px solid var(--wg-warning) !important;
+    border-left : 3px solid #d97706 !important;
 }
 
 /* Approved card — green left border */
 .ps-card--approved {
-    border-left : 3px solid var(--wg-success) !important;
+    border-left : 3px solid #15803d !important;
 }
 
 /* Remove the ::before pseudo-element entirely — border-left handles accent */
@@ -155,15 +98,15 @@
 }
 
 .ps-card-icon {
-    --lwc-colorTextIconDefault: var(--wg-text-muted);
+    --lwc-colorTextIconDefault: #a0a8b5;
 }
 
 .ps-card-icon--flag {
-    --lwc-colorTextIconDefault: var(--wg-warning);
+    --lwc-colorTextIconDefault: #d97706;
 }
 
 .ps-card-icon--approved {
-    --lwc-colorTextIconDefault: var(--wg-success);
+    --lwc-colorTextIconDefault: #15803d;
 }
 
 /* ── Status dot ── */
@@ -175,40 +118,40 @@
     display       : block;
 }
 
-.ps-dot--blue   { background : var(--wg-info); }
-.ps-dot--orange { background : var(--wg-warning); }
-.ps-dot--red    { background : var(--wg-red); }
-.ps-dot--green  { background : var(--wg-success); }
+.ps-dot--blue   { background : #1a56c4; }
+.ps-dot--orange { background : #d97706; }
+.ps-dot--red    { background : #c0392b; }
+.ps-dot--green  { background : #15803d; }
 
 /* ── Count ── */
 .ps-count {
-    font-size      : var(--wg-font-size-page-title);
-    font-weight    : var(--wg-weight-bold);
-    color          : var(--wg-gray);
+    font-size      : 30px;
+    font-weight    : 700;
+    color          : #1a2130;
     line-height    : 1;
     margin-bottom  : 4px;
     letter-spacing : -0.5px;
     display        : block;
 }
 
-.ps-count--flag     { color : var(--wg-warning-text); }
-.ps-count--approved { color : var(--wg-success); }
+.ps-count--flag     { color : #92400e; }
+.ps-count--approved { color : #15803d; }
 
 /* ── Label ── */
 .ps-label {
-    font-size      : var(--wg-font-size-caption);
-    font-weight    : var(--wg-weight-bold);
+    font-size      : 10px;
+    font-weight    : 700;
     letter-spacing : 0.8px;
     text-transform : uppercase;
-    color          : var(--wg-text-muted);
+    color          : #6b7585;
     margin-bottom  : 2px;
     display        : block;
 }
 
 /* ── Sub text ── */
 .ps-sub {
-    font-size   : var(--wg-font-size-caption);
-    color       : var(--wg-text-muted);
+    font-size   : 11px;
+    color       : #94a3b8;
     line-height : 1.4;
     display     : block;
 }
@@ -216,10 +159,10 @@
 /* ── Error state ── */
 .ps-error {
     background    : rgba(255,255,255,0.15);
-    border-radius : var(--wg-radius-sm);
+    border-radius : 6px;
     padding       : 10px 14px;
     margin-top    : 12px;
-    font-size     : var(--wg-font-size-caption);
+    font-size     : 12px;
     color         : rgba(255,255,255,0.85);
     text-align    : center;
 }
@@ -228,8 +171,8 @@
 .ps-loading {
     position        : absolute;
     inset           : 0;
-    background      : rgba(191, 32, 38, 0.55); /* corrected to var(--wg-red)'s actual rgb -- this rgba() form of the old #c0392b was missed by the earlier solid-color conversion pass (audit sweep fix) */
-    border-radius   : var(--wg-radius-card);
+    background      : rgba(192, 57, 43, 0.55);
+    border-radius   : 10px;
     display         : flex;
     align-items     : center;
     justify-content : center;
@@ -245,16 +188,16 @@
    when the strip had a red background. "INTAKE" and
    "EVALUATION" have been invisible. These override them. */
 .ps-row-text {
-    color : var(--wg-text-muted);
+    color : #6b7585;
 }
 
 .ps-row-label::before,
 .ps-row-label::after {
-    background : var(--wg-border);
+    background : #e4e7ec;
 }
 
 .ps-divider {
-    background : var(--wg-border);
+    background : #e4e7ec;
 }
 
 .ps-loading {
@@ -265,8 +208,8 @@
    Still readable — the count is real pipeline data — but
    visibly not a doorway. */
 .ps-card--locked {
-    border-left : 3px solid var(--wg-border) !important;
-    background  : var(--wg-border) !important;
+    border-left : 3px solid #d5dae2 !important;
+    background  : #fbfcfd !important;
     cursor      : default;
 }
 
@@ -276,25 +219,25 @@
 }
 
 .ps-card--locked .ps-label {
-    color : var(--wg-text-muted);
+    color : #98a2b3;
 }
 
 .ps-count--locked {
-    color : var(--wg-text-muted) !important;
+    color : #98a2b3 !important;
 }
 
 .ps-card--locked .ps-card-icon {
-    --lwc-colorTextIconDefault : var(--wg-text-muted);
+    --lwc-colorTextIconDefault : #c4cbd6;
 }
 
 .ps-card-lock {
-    --lwc-colorTextIconDefault : var(--wg-text-muted);
+    --lwc-colorTextIconDefault : #b0b8c4;
     flex-shrink : 0;
 }
 
 .ps-sub--locked {
-    color          : var(--wg-text-muted);
-    font-weight    : var(--wg-weight-semibold);
+    color          : #b0b8c4;
+    font-weight    : 600;
     letter-spacing : 0.3px;
 }
 
@@ -303,16 +246,16 @@
     display       : flex;
     align-items   : flex-start;
     gap           : 12px;
-    background    : var(--wg-warning-bg);
-    border        : 1px solid var(--wg-warning);
-    border-left   : 3px solid var(--wg-warning);
-    border-radius : var(--wg-radius-md);
+    background    : #fdf6ec;
+    border        : 1px solid #f0d9b5;
+    border-left   : 3px solid #d97706;
+    border-radius : 8px;
     padding       : 12px 14px;
     margin-bottom : 16px;
 }
 
 .ps-notice-icon {
-    --lwc-colorTextIconDefault : var(--wg-warning);
+    --lwc-colorTextIconDefault : #d97706;
     flex-shrink : 0;
     margin-top  : 2px;
 }
@@ -323,17 +266,15 @@
 }
 
 .ps-notice-title {
-    font-family   : var(--wg-font-heading);
-    font-size     : var(--wg-font-size-label);
-    font-weight   : var(--wg-weight-bold);
-    color         : var(--wg-warning-text);
+    font-size     : 13px;
+    font-weight   : 700;
+    color         : #7c4a03;
     margin-bottom : 2px;
 }
 
 .ps-notice-text {
-    font-family : var(--wg-font-body);
-    font-size   : var(--wg-font-size-caption);
-    color       : var(--wg-warning-text);
+    font-size   : 12px;
+    color       : #8a6534;
     line-height : 1.45;
 }
 
@@ -345,40 +286,40 @@
 }
 
 .ps-notice-btn {
-    background    : var(--wg-warning);
-    color         : var(--wg-white);
+    background    : #d97706;
+    color         : #ffffff;
     border        : none;
-    border-radius : 0;
+    border-radius : 6px;
     padding       : 6px 14px;
-    font-family   : var(--wg-font-heading);
-    font-size     : var(--wg-font-size-caption);
-    font-weight   : var(--wg-weight-semibold);
+    font-size     : 12px;
+    font-weight   : 600;
+    font-family   : inherit;
     cursor        : pointer;
     white-space   : nowrap;
     transition    : background 0.15s;
 }
 
 .ps-notice-btn:hover {
-    background : var(--wg-warning-text);
+    background : #b45f05;
 }
 
 .ps-notice-btn:focus-visible {
-    outline        : 2px solid var(--wg-warning-text);
+    outline        : 2px solid #7c4a03;
     outline-offset : 2px;
 }
 
 .ps-notice-dismiss {
     background  : transparent;
     border      : none;
-    color       : var(--wg-warning);
-    font-size   : var(--wg-font-size-section-heading);
+    color       : #b0844a;
+    font-size   : 20px;
     line-height : 1;
     padding     : 0 4px;
     cursor      : pointer;
 }
 
 .ps-notice-dismiss:hover {
-    color : var(--wg-warning-text);
+    color : #7c4a03;
 }
 
 @media (max-width: 640px) {

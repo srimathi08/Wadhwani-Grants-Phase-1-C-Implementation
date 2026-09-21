@@ -1,7 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getApproverQueue   from '@salesforce/apex/WCFApproverListController.getApproverQueue';
-import getApproverSummary from '@salesforce/apex/WCFApproverListController.getApproverSummary';   // ← NEW
+import getApproverSummary from '@salesforce/apex/WCFApproverListController.getApproverSummary';
 
 export default class WcfApproverDashboard extends NavigationMixin(LightningElement) {
 
@@ -26,133 +26,108 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
     }
 
     /**
-     * Build KPI tile counts.
-     *  - pending / approved / declined / returned come from getApproverSummary()
-     *    (authoritative — correctly excludes Returned apps from "pending")
-     *  - recYes stays client-computed from the queue rows (different metric:
-     *    "recommended Yes" regardless of decision state)
+     * KPI tiles — same order, labels and colors as the Approver Queue tiles.
+     *  - pending / approved / declined / returned / backFromReviewer come from
+     *    getApproverSummary() (authoritative)
+     *  - recYes / recNo are client-computed from the queue rows (unchanged)
      */
     _buildCards(rows, summary) {
         const recYes = rows.filter(r => r.recommendation === 'Yes').length;
-    const recNo  = rows.filter(r => r.recommendation === 'No').length;   // ← NEW
+        const recNo  = rows.filter(r => r.recommendation === 'No').length;
 
-        this.approverCards = [
-            {
-                id:       'pending',
-                label:    'Pending Decisions',
-                subtitle: 'Reviewed proposals awaiting your decision',
-                count:    summary.pending || 0,
-                status:   'pending',
-                kpiClass: (summary.pending || 0) > 0 ? 'kpi-card kpi-card-alert' : 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-red'
-            },
-            {
-                id:       'recYes',
-                label:    'Recommended',
-                subtitle: 'Proposals recommended for approval',
-                count:    recYes,
-                status:   'recYes',
-                kpiClass: 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-green'
-            },
-            {
-                id:       'recNo',
-                label:    'Not Recommended',
-                subtitle: 'Proposals not recommended for approval',
-                count:    recNo,
-                status:   'recNo',
-                kpiClass: 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-red'
-            },
-            {
-                id:       'approved',
-                label:    'Approved',
-                subtitle: 'Proposals approved and finalised',
-                count:    summary.approved || 0,
-                status:   'approved',
-                kpiClass: 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-blue'
-            },
-            {
-                id:       'declined',
-                label:    'Declined',
-                subtitle: 'Proposals declined after review',
-                count:    summary.declined || 0,
-                status:   'declined',
-                kpiClass: 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-amber'
-            },
-            {
-                id:       'returned',
-                label:    'Returned',
-                subtitle: 'Sent back to Reviewer for clarification',
-                count:    summary.returned || 0,
-                status:   'returned',
-                kpiClass: 'kpi-card kpi-card-returned',
-                dotClass: 'kpi-dot kpi-dot-navy'
-            },
-             {
-            id:       'backFromReviewer',
-            label:    'Back from Reviewer',
-            subtitle: 'Reviewer responded — ready for your final decision',
-            count:    summary.backFromReviewer || 0,
-            status:   'backFromReviewer',
-            kpiClass: (summary.backFromReviewer || 0) > 0 ? 'kpi-card kpi-card-highlight' : 'kpi-card',
-            dotClass: 'kpi-dot kpi-dot-purple'
-        }
+        const defs = [
+            { id: 'pending',          label: 'Pending Decisions',    subtitle: 'Reviewed proposals awaiting your decision',   count: summary.pending || 0,          tone: 'brand',    alertWhenPositive: true },
+            { id: 'backFromReviewer', label: 'Back from Reviewer',   subtitle: 'Reviewer responded — ready for your final decision', count: summary.backFromReviewer || 0, tone: 'warning', alertWhenPositive: true },
+            { id: 'returned',         label: 'Returned to Reviewer', subtitle: 'Sent back to the Reviewer for clarification', count: summary.returned || 0,         tone: 'returned' },
+            { id: 'recYes',           label: 'Recommended',          subtitle: 'Proposals recommended for approval',          count: recYes,                        tone: 'info' },
+            { id: 'recNo',            label: 'Not Recommended',      subtitle: 'Proposals not recommended for approval',      count: recNo,                         tone: 'neutral' },
+            { id: 'approved',         label: 'Approved',             subtitle: 'Proposals approved and finalised',            count: summary.approved || 0,         tone: 'success' },
+            { id: 'declined',         label: 'Declined',             subtitle: 'Proposals declined after review',             count: summary.declined || 0,         tone: 'error' }
         ];
+
+        this.approverCards = defs.map(d => ({
+            id      : d.id,
+            label   : d.label,
+            subtitle: d.subtitle,
+            count   : d.count,
+            status  : d.id,
+            kpiClass: 'wg-stat' + (d.alertWhenPositive && d.count > 0 ? ' wg-stat--alert' : ''),
+            dotClass: 'wg-stat-dot wg-stat-dot--' + d.tone
+        }));
     }
 
-    // ── _buildPreviewRows and everything below is UNCHANGED ──
     _buildPreviewRows(rows) {
+        const SM = ' wg-btn-sm';
+        const TAGS = {
+            JF  : { label: 'Job Fulfillment',       cls: 'wg-tag wg-tag--info' },
+            JC  : { label: 'Job Creation',          cls: 'wg-tag wg-tag--warning' },
+            LU  : { label: 'Livelihood Upliftment', cls: 'wg-tag wg-tag--success' },
+            Both: { label: 'JF + JC',               cls: 'wg-tag' }
+        };
+
         const mapped = rows.map(row => {
+            const isClearedReturn =
+                row.existingDecision === 'Approved with Resubmission'
+                && row.applicationStatus !== 'Returned by Approver';
 
-             const isClearedReturn =
-            row.existingDecision === 'Approved with Resubmission'
-            && row.applicationStatus !== 'Returned by Approver';
+            const hasDecision = !!row.existingDecision && !isClearedReturn;
+            const isReady     = !!row.reviewId;
 
-            
-        const hasDecision = !!row.existingDecision && !isClearedReturn;
-        const isReady      = !!row.reviewId;
-
-            // Track badges
             const trackBadges = (row.track || '').split(',').filter(Boolean).map(code => {
                 const trimmed = code.trim();
-                let pillClass = 'track-pill';
-                if      (trimmed === 'Both') pillClass += ' track-both';
-                else if (trimmed === 'JF')   pillClass += ' track-jf';
-                else if (trimmed === 'JC')   pillClass += ' track-jc';
-                else if (trimmed === 'LU')   pillClass += ' track-lu';
-                return { code: trimmed, pillClass };
+                const t = TAGS[trimmed] || { label: trimmed, cls: 'wg-tag' };
+                return { code: trimmed, label: t.label, pillClass: t.cls };
             });
 
             const rec = row.recommendation || '';
-            let recPillClass = 'rec-pill';
-            if      (rec === 'Yes') recPillClass += ' rec-yes';
-            else if (rec === 'No')  recPillClass += ' rec-no';
-            else                    recPillClass += ' rec-none';
+            let recPillClass = 'wg-pill wg-pill--neutral';
+            if      (rec === 'Yes') recPillClass = 'wg-pill wg-pill--success';
+            else if (rec === 'No')  recPillClass = 'wg-pill wg-pill--error';
 
-            let statusPillClass = 'status-pill';
+            // Status pill (same meaning-colors as the queue)
+            let statusPillClass;
             let decisionLabel;
-            if (row.existingDecision === 'Approve') {
-                statusPillClass += ' status-approved';
-                decisionLabel    = 'Approved';
+            if (row.existingDecision === 'Approve' || row.existingDecision === 'Accept') {
+                // FIX (display): 'Accept' — the value the decision screen sends —
+                // previously fell through to "Pending Decision".
+                statusPillClass = 'wg-pill wg-pill--success';
+                decisionLabel   = 'Approved';
             } else if (row.existingDecision === 'Decline') {
-                statusPillClass += ' status-declined';
-                decisionLabel    = 'Declined';
+                statusPillClass = 'wg-pill wg-pill--error';
+                decisionLabel   = 'Declined';
             } else if (row.existingDecision === 'Approved with Resubmission' && !isClearedReturn) {
-                statusPillClass += ' status-returned';   // ← NEW pill state
-                decisionLabel    = 'Returned to Reviewer';
+                statusPillClass = 'wg-pill wg-pill--returned';
+                decisionLabel   = 'Returned to Reviewer';
             } else if (isClearedReturn) {
-            statusPillClass += ' status-pending';
-            decisionLabel    = 'Back from Reviewer';   // ← NEW distinct label
-        }
-            else if (isReady) {
-                statusPillClass += ' status-pending';
-                decisionLabel    = 'Pending Decision';
+                statusPillClass = 'wg-pill wg-pill--warning';
+                decisionLabel   = 'Back from Reviewer';
+            } else if (isReady) {
+                statusPillClass = 'wg-pill wg-pill--info';
+                decisionLabel   = 'Pending Decision';
             } else {
-                statusPillClass += ' status-decided';
-                decisionLabel    = 'Not Ready';
+                statusPillClass = 'wg-pill wg-pill--neutral';
+                decisionLabel   = 'Not Ready';
+            }
+
+            // Action button — same wording as the queue
+            let actionLabel, actionClass, actionIcon, actionDisabled = false;
+            if (hasDecision) {
+                actionLabel = 'View Decision';
+                actionClass = 'neutral-btn' + SM;
+                actionIcon  = 'utility:preview';
+            } else if (isClearedReturn) {
+                actionLabel = 'Start Reapprove';
+                actionClass = 'primary-btn' + SM;
+                actionIcon  = 'utility:refresh';
+            } else if (isReady) {
+                actionLabel = 'Start Approve';
+                actionClass = 'primary-btn' + SM;
+                actionIcon  = 'utility:approval';
+            } else {
+                actionLabel    = 'Not Ready';
+                actionClass    = 'neutral-btn' + SM;
+                actionIcon     = 'utility:block_visitor';
+                actionDisabled = true;
             }
 
             return {
@@ -163,10 +138,16 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
                 recPillClass,
                 statusPillClass,
                 decisionLabel,
+                actionLabel,
+                actionClass,
+                actionIcon,
+                actionDisabled,
+                rowClass: isClearedReturn ? 'wg-row--attention' : '',
                 recommendation: rec || '—'
             };
         });
 
+        // Sort (unchanged): pending first → recommended first → approved first
         mapped.sort((a, b) => {
             const aPending = !a.hasDecision && a.isReady;
             const bPending = !b.hasDecision && b.isReady;
@@ -189,6 +170,7 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
             .map((r, i) => ({ ...r, rowNum: i + 1 }));
     }
 
+    // ── Navigation (unchanged) ────────────────────────────────────
     _basePath() {
         const parts = window.location.pathname.split('/');
         const sIdx  = parts.indexOf('s');

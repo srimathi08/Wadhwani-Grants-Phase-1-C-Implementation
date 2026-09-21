@@ -1,5 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getPipelineCounts from '@salesforce/apex/wcfHomeDashboardController.getPipelineCounts';
 import getDashboardAccess from '@salesforce/apex/WCFDashboardAccessController.getDashboardAccess';
 
@@ -100,13 +101,6 @@ export default class WcfPipelineStrip extends NavigationMixin(LightningElement) 
     @track activeRole  = null;
     @track accessNotice = null;
 
-    // ── Brand toast banner state (replaces native ShowToastEvent) ──
-    @track bannerVisible = false;
-    @track bannerVariant = 'info';
-    @track bannerTitle = '';
-    @track bannerMessage = '';
-    _bannerTimeout;
-
     connectedCallback() {
         this._loadAccess();
         this._loadCounts();
@@ -161,31 +155,17 @@ export default class WcfPipelineStrip extends NavigationMixin(LightningElement) 
             console.error('WcfPipelineStrip load error:', msg);
             this.loadError = msg;
 
-            this.showBanner('error', 'Pipeline Strip — load error', msg, 8000);
+            this.dispatchEvent(new ShowToastEvent({
+                title   : 'Pipeline Strip — load error',
+                message : msg,
+                variant : 'error',
+                mode    : 'sticky'
+            }));
 
         } finally {
             this.isLoading = false;
         }
     }
-
-    // ── Brand toast banner (replaces native ShowToastEvent) ────────
-    showBanner(variant, title, message, duration = 6000) {
-        if (this._bannerTimeout) { clearTimeout(this._bannerTimeout); }
-        this.bannerVariant = variant;
-        this.bannerTitle = title;
-        this.bannerMessage = message;
-        this.bannerVisible = true;
-        this._bannerTimeout = setTimeout(() => { this.bannerVisible = false; }, duration);
-    }
-    closeBanner() {
-        if (this._bannerTimeout) { clearTimeout(this._bannerTimeout); }
-        this.bannerVisible = false;
-    }
-    get isBannerError() { return this.bannerVariant === 'error'; }
-    get isBannerWarning() { return this.bannerVariant === 'warning'; }
-    get isBannerSuccess() { return this.bannerVariant === 'success'; }
-    get isBannerInfo() { return this.bannerVariant === 'info'; }
-    get bannerClass() { return 'wg-toast-banner ' + this.bannerVariant + '-banner'; }
 
     /*
      * ==========================

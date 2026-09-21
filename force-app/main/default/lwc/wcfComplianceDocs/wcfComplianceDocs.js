@@ -1,14 +1,11 @@
 import { LightningElement, api, track } from 'lwc';
-// WG TOAST BANNER — ShowToastEvent renders outside the shadow tree and can't
-// be restyled to match the brand, so it's replaced with a custom banner (see
-// showBanner()/closeBanner()/showToast() below). The import is no longer used.
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getComplianceChecklist from '@salesforce/apex/WCFComplianceController.getComplianceChecklist';
 import saveComplianceDocument from '@salesforce/apex/WCFComplianceController.saveComplianceDocument';
 import getOrCreateComplianceRecord from '@salesforce/apex/WCFComplianceController.getOrCreateComplianceRecord';
 import deleteComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteComplianceDocumentFile';
 import saveAdHocComplianceDocument from '@salesforce/apex/WCFComplianceController.saveAdHocComplianceDocument';
 import deleteAdHocComplianceDocumentFile from '@salesforce/apex/WCFComplianceController.deleteAdHocComplianceDocumentFile';
-import saveDraftComplianceDocuments from '@salesforce/apex/WCFComplianceController.saveDraftComplianceDocuments';
 import submitComplianceDocuments from '@salesforce/apex/WCFComplianceController.submitComplianceDocuments';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -33,37 +30,26 @@ const STATUS_CONFIG = {
     'Not Started':        { badgeClass: 'comp-badge comp-badge--pending',    label: 'NOT STARTED',        canUpload: true,  showReplace: false },
     'Draft':              { badgeClass: 'comp-badge comp-badge--draft',      label: 'DRAFT SAVED',        canUpload: true,  showReplace: true  },
     'Pending Review':     { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',     canUpload: false, showReplace: true  },
-    'Submitted':          { badgeClass: 'comp-badge comp-badge--inprogress', label: 'PENDING REVIEW',     canUpload: false, showReplace: true  },
-    'Validated':          { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: false },
-    'Pass':               { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: false },
-    'Approved':           { badgeClass: 'comp-badge comp-badge--active',     label: 'APPROVED',           canUpload: false, showReplace: false },
+    'Validated':          { badgeClass: 'comp-badge comp-badge--active',     label: 'VALIDATED',          canUpload: false, showReplace: true  },
     'Returned':           { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',      canUpload: true,  showReplace: false },
-    'Return':             { badgeClass: 'comp-badge comp-badge--returned',   label: 'ACTION NEEDED',      canUpload: true,  showReplace: false },
-    'Flagged':            { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',       canUpload: false, showReplace: false },
+    'Flagged':            { badgeClass: 'comp-badge comp-badge--flagged',    label: 'UNDER REVIEW',       canUpload: false, showReplace: true  },
     'Refresh Required':   { badgeClass: 'comp-badge comp-badge--expired',    label: 'REFRESH REQUIRED',   canUpload: true,  showReplace: false },
     'Pending Submission': { badgeClass: 'comp-badge comp-badge--returned',   label: 'DOCUMENT REQUESTED', canUpload: true,  showReplace: false },
     'Rejected':           { badgeClass: 'comp-badge comp-badge--rejected',   label: 'REJECTED',           canUpload: false, showReplace: false },
-    'Reject':             { badgeClass: 'comp-badge comp-badge--rejected',   label: 'REJECTED',           canUpload: false, showReplace: false },
-    'Suspended':          { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false },
-    'Suspend':            { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false }
+    'Suspended':          { badgeClass: 'comp-badge comp-badge--suspended',  label: 'SUSPENDED',          canUpload: false, showReplace: false }
 };
 
 const OVERALL_STATUS_BADGE_CLASS = {
     'Complete'          : 'comp-overall-badge comp-overall-badge--complete',
     'Submitted'         : 'comp-overall-badge comp-overall-badge--inprogress',
-    'Pending Review'    : 'comp-overall-badge comp-overall-badge--inprogress',
     'Draft'             : 'comp-overall-badge comp-overall-badge--draft',
     'Refresh Required'  : 'comp-overall-badge comp-overall-badge--refresh',
     'In Progress'       : 'comp-overall-badge comp-overall-badge--inprogress',
     'Pending Submission': 'comp-overall-badge comp-overall-badge--pending',
     'Validated'         : 'comp-overall-badge comp-overall-badge--complete',
-    'Pass'              : 'comp-overall-badge comp-overall-badge--complete',
     'Rejected'          : 'comp-overall-badge comp-overall-badge--rejected',
-    'Reject'            : 'comp-overall-badge comp-overall-badge--rejected',
     'Suspended'         : 'comp-overall-badge comp-overall-badge--suspended',
-    'Suspend'           : 'comp-overall-badge comp-overall-badge--suspended',
-    'Returned'          : 'comp-overall-badge comp-overall-badge--returned',
-    'Return'            : 'comp-overall-badge comp-overall-badge--returned'
+    'Returned'          : 'comp-overall-badge comp-overall-badge--returned'
 };
 
 const EXPIRY_WARNING_DAYS = 30;
@@ -88,13 +74,6 @@ export default class WcfComplianceDocs extends LightningElement {
     @track totalValidated  = 0;
     @track totalUploaded   = 0;
     @track uploadingDocType;
-
-    // WG TOAST BANNER state (replaces ShowToastEvent — see showToast() below)
-    @track bannerVisible = false;
-    @track bannerVariant = 'info';
-    @track bannerTitle   = '';
-    @track bannerMessage = '';
-    _bannerTimeout;
 
     expiryDateByType = {};
 
@@ -228,19 +207,19 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get overallStatusDisplay() {
-        if (this.complianceStatus === 'Rejected' || this.complianceStatus === 'Reject') return 'REJECTED';
-        if (this.complianceStatus === 'Suspended' || this.complianceStatus === 'Suspend') return 'SUSPENDED';
-        if (this.complianceStatus === 'Returned' || this.complianceStatus === 'Return') return 'ACTION NEEDED';
-        if (this.complianceStatus === 'Validated' || this.complianceStatus === 'Pass') return 'COMPLETE';
+        if (this.complianceStatus === 'Rejected') return 'REJECTED';
+        if (this.complianceStatus === 'Suspended') return 'SUSPENDED';
+        if (this.complianceStatus === 'Returned') return 'ACTION NEEDED';
+        if (this.complianceStatus === 'Validated') return 'COMPLETE';
 
         if (this.checklistItems && this.checklistItems.length > 0) {
-            if (this.checklistItems.some(item => item.status === 'Rejected' || item.status === 'Reject')) return 'REJECTED';
-            if (this.checklistItems.some(item => item.status === 'Suspended' || item.status === 'Suspend')) return 'SUSPENDED';
-            if (this.checklistItems.some(item => item.status === 'Returned' || item.status === 'Return')) return 'ACTION NEEDED';
+            if (this.checklistItems.some(item => item.status === 'Rejected')) return 'REJECTED';
+            if (this.checklistItems.some(item => item.status === 'Suspended')) return 'SUSPENDED';
+            if (this.checklistItems.some(item => item.status === 'Returned')) return 'ACTION NEEDED';
         }
 
         if (this.overallStatus === 'Draft') return 'DRAFT';
-        if (this.overallStatus === 'Submitted' || this.overallStatus === 'Pending Review') return 'PENDING REVIEW';
+        if (this.overallStatus === 'Submitted') return 'SUBMITTED';
         if (this.overallStatus === 'Complete') return 'COMPLETE';
         return this.overallStatus ? this.overallStatus.toUpperCase() : 'IN PROGRESS';
     }
@@ -262,7 +241,7 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get showActionFooter() {
-        return this.hasItems && !this.isSubmitted && this.complianceStatus !== 'Validated' && this.complianceStatus !== 'Pass';
+        return this.hasItems && !this.isSubmitted && this.complianceStatus !== 'Validated';
     }
 
     get uploadProgressText() {
@@ -270,19 +249,19 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     get showPassedBanner() {
-        return this.complianceStatus === 'Validated' || this.complianceStatus === 'Pass';
+        return this.complianceStatus === 'Validated';
     }
 
     get showRejectedBanner() {
-        return this.complianceStatus === 'Rejected' || this.complianceStatus === 'Reject';
+        return this.complianceStatus === 'Rejected';
     }
 
     get showSuspendedBanner() {
-        return this.complianceStatus === 'Suspended' || this.complianceStatus === 'Suspend';
+        return this.complianceStatus === 'Suspended';
     }
 
     get showReturnedBanner() {
-        return this.complianceStatus === 'Returned' || this.complianceStatus === 'Return';
+        return this.complianceStatus === 'Returned';
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -384,23 +363,11 @@ export default class WcfComplianceDocs extends LightningElement {
     }
 
     handleSaveDraft() {
-        if (!this.recordId) return;
-        this.isLoading = true;
-        saveDraftComplianceDocuments({ applicationId: this.recordId })
-            .then(() => {
-                this.showToast(
-                    'Draft Saved',
-                    'Your uploaded compliance documents are saved as drafts. You can return anytime to continue or submit.',
-                    'success'
-                );
-                return this.loadChecklist();
-            })
-            .catch(error => {
-                this.showToast('Could not save draft', this.extractErrorMessage(error), 'error');
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
+        this.showToast(
+            'Draft Saved',
+            'Your uploaded compliance documents are saved as drafts. You can return anytime to continue or submit.',
+            'info'
+        );
     }
 
     handleSubmit() {
@@ -418,7 +385,7 @@ export default class WcfComplianceDocs extends LightningElement {
             .then(() => {
                 this.showToast(
                     'Documents Submitted',
-                    'All compliance documents have been successfully submitted for review (Status: Pending Review).',
+                    'All compliance documents have been successfully submitted for review.',
                     'success'
                 );
                 return this.loadChecklist();
@@ -508,53 +475,7 @@ cleanupStaleModal() {
     return 'Something went wrong. Please try again.';
 }
 
-    // All existing call sites already funnel through this one wrapper (like
-    // wcfProposalReviewForm's showToast precedent), so only its body needed
-    // to change — no call site needed touching.
     showToast(title, message, variant) {
-        this.showBanner({ title, message, variant });
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // WG TOAST BANNER — replaces native ShowToastEvent (renders outside the
-    // shadow tree and cannot be restyled to match the brand).
-    // ─────────────────────────────────────────────────────────────
-
-    showBanner(config) {
-        const { title, message, variant, autoDismissMs = 6000 } = config || {};
-        if (this._bannerTimeout) {
-            clearTimeout(this._bannerTimeout);
-            this._bannerTimeout = null;
-        }
-        this.bannerVariant = variant || 'info';
-        this.bannerTitle   = title || '';
-        this.bannerMessage = message || '';
-        this.bannerVisible = true;
-        if (autoDismissMs) {
-            this._bannerTimeout = setTimeout(() => {
-                this.bannerVisible = false;
-            }, autoDismissMs);
-        }
-    }
-
-    closeBanner() {
-        if (this._bannerTimeout) {
-            clearTimeout(this._bannerTimeout);
-            this._bannerTimeout = null;
-        }
-        this.bannerVisible = false;
-    }
-
-    handleDismissBanner() {
-        this.closeBanner();
-    }
-
-    get isBannerError()   { return this.bannerVariant === 'error'; }
-    get isBannerWarning() { return this.bannerVariant === 'warning'; }
-    get isBannerSuccess() { return this.bannerVariant === 'success'; }
-    get isBannerInfo()    { return this.bannerVariant === 'info'; }
-
-    get bannerClass() {
-        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
+        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
 }

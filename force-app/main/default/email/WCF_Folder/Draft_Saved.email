@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="x-apple-disable-message-reformatting"/>
-<title>Your Wadhwani Grants application draft is saved</title>
+<title> {!Account.WCF_Organizational_Name__c} Your draft is saved It has not been submitted yet</title>
 
 <style>
 html,body{margin:0 !important;padding:0 !important;width:100% !important;}
@@ -44,16 +44,12 @@ a{color:#BF2026;}
 <!-- LEFT: text -->
 <td align="left" valign="middle">
 <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;">
-YOUR APPLICATION
+Your draft has been saved
 </p>
 
 <h1 class="hdr-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;">
-Your draft has been saved
+Application {!IndividualApplication.Name} -  {!Account.WCF_Organizational_Name__c}
 </h1>
-
-<p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#ffffff;">
-{!Account.Name}'s application with application number {!IndividualApplication.Name}
-</p>
 </td>
 
 <!-- RIGHT: logo -->
@@ -77,18 +73,26 @@ Your draft has been saved
 <td class="pad" style="padding:28px 32px 10px;">
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hello {!Account.Name},
+Hi {!Account.Name},
 </p>
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Your progress is saved. Sign in anytime to continue where you left off. This is the only draft-saved note we send; save as often as you need.
+your application for {!Account.WCF_Organizational_Name__c} is saved as a draft. It has not been submitted yet.
+</p>
+
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+Sign in whenever you want to continue. Your answers stay exactly as you left them. You can submit once every required question is answered.
+</p>
+
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+We send this email only the first time you save a draft. Later saves will not send you an email.
 </p>
 
 <!-- BUTTON -->
 <table cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal"
+<a href="https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/wcf/s/login/"
 target="_blank"
 style="display:inline-block;padding:13px 30px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 Resume your application
@@ -98,7 +102,7 @@ Resume your application
 </table>
 
 <p style="margin:18px 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
-Warm regards,<br/>
+Kind Regards,<br/>
 The Wadhwani Grants Team
 </p>
 
@@ -121,11 +125,11 @@ width="132"alt="Wadhwani Grants" class="logo-ftr" style="display:block;width:132
 
 
 <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
 </p>
 
 <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Questions? Reply at
+Questions? Just reply to this email; it reaches the wadhwani grants team at
 <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#6D6E71;text-decoration:underline;">
 grants.support@wadhwanifoundation.org
 </a>

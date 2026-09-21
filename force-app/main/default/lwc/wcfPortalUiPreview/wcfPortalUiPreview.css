@@ -1,0 +1,40 @@
+@import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
+
+/* Harness-only layout. Everything visual comes from the two imports. */
+:host {
+    display: block;
+    width: 100%;
+}
+
+.demo-block {
+    margin-top: var(--wg-space-8);
+}
+
+.demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wg-space-3);
+}
+
+.demo-row-spaced {
+    margin-top: var(--wg-space-4);
+}
+
+.demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-3);
+}
+
+.demo-two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--wg-space-4);
+}
+
+/* wcfPortalUi's stacked-card margin isn't wanted inside a grid */
+.demo-two-col .wg-card + .wg-card {
+    margin-top: 0;
+}

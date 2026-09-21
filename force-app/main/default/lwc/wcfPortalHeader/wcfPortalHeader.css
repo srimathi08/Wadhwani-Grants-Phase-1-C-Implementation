@@ -1,83 +1,15 @@
-@import "c/commonStyleTheme";
-
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   BIGGEST IDENTITY CHANGE IN THIS BATCH — flagging for visual review.
-   This header runs its own local design-token set (--wcf-navy/-gold/
-   -red/etc. on :host) implementing a deliberate "navy + gold + red"
-   three-color signature (see the "Brand thread" comment in the HTML
-   and the CSS gradient it powers) — a genuinely different identity
-   from commonStyleTheme's red/orange/yellow-on-white palette, not a
-   near-miss like the other components in this batch. Since the
-   instruction is to bring every component onto commonStyleTheme as
-   the single source of truth, the local tokens below were retired and
-   mapped onto the closest --wg-* equivalents, same as every other
-   file in this batch — but because this is the global header (present
-   on every page), this is the one recoloring in the batch most worth
-   the team's own eyes before shipping:
-     --wcf-navy (#1B2A4A, the "strong" dark color — active nav text,
-       hover/focus states, badge text, thread start) -> var(--wg-gray),
-       the only dark-neutral brand token; there is no brand "navy".
-     --wcf-red (#C8391D) -> var(--wg-red) — this one WAS already a
-       near-exact match to the brand red, no real change.
-     --wcf-gold (#E8A020, the accent for the loading dot / role-active
-       dot / thread midpoint) -> var(--wg-yellow) — picked over
-       var(--wg-warning) even though they share the same hex value,
-       because --wg-yellow is documented as a 90%-palette *brand*
-       color and --wg-warning as a *status* color; this is decorative
-       branding, not a caution signal.
-     --wcf-text (#445070) -> var(--wg-text-muted); --wcf-text-strong
-       (#1B2A4A) -> var(--wg-gray); --wcf-bg (#FFFFFF) -> var(--wg-white).
-     --wcf-border / the dropdown's literal #FFFFFF -> var(--wg-border) /
-       var(--wg-white).
-     --wcf-hover-bg (#F3F5FA) and --wcf-active-bg (#EEF1FA) — two
-       subtly different light blue-gray washes for :hover vs.
-       [aria-expanded=true] — both collapse onto the single
-       var(--wg-border) token, since commonStyleTheme has no second
-       light-neutral tone. This is a real, visible loss of the
-       original hover/active distinction (both states now render the
-       identical fill); flagging explicitly rather than let it pass
-       as a routine swap.
-     #8A93AB (dropdown label / icon / role eyebrow, a blue-gray not
-       used via a custom property) -> var(--wg-text-muted).
-     rgba(27, 42, 74, 0.08) — the focus/hover glow ring, built from
-     --wcf-navy's own rgb — recalculated to rgba(65, 64, 65, 0.08)
-     (var(--wg-gray)'s rgb) so the ring still matches the text color
-     it now surrounds instead of leaving a stray navy tint behind.
-     Box-shadow blacks (rgba(16,24,40,0.06)/(0.14)) were left as literal
-     dark neutral shadows, same as every other component in this batch.
-   No font-family existed anywhere in this file — added
-   var(--wg-font-body) once on .wcf-header (inherited down) and
-   var(--wg-font-heading) explicitly on the interactive/label text:
-   nav items, dropdown items, dropdown label, role eyebrow/value, and
-   the badge.
-   Font sizes here are all rem-based (0.625–0.8125rem); left as literal
-   rem values rather than forced onto the px type scale, same exception
-   already used for wcfApplicationFaqModal's rem sizes.
-   Button shape — deliberately NOT squared, unlike the rest of this
-   batch: everything clickable in this header is a nav tab, a menu
-   trigger/chip, a profile avatar circle, or a dropdown menu row, not a
-   primary/secondary CTA button in the .primary-btn/.ghost-btn sense
-   the square-button rule was written for. Squaring a round avatar
-   trigger or a pill-shaped role chip would break those conventions
-   for no benefit, so .wcf-profile__trigger / .wcf-role__trigger keep
-   their pill/circle radii, and .wcf-dropdown__item / the role-select
-   <button> variant keep their small menu-row radius (tokenized to
-   --wg-radius-sm) rather than being flattened to 0.
-   ──────────────────────────────────────────────────────────────────── */
-
 :host {
-    --wcf-navy: var(--wg-gray);
-    --wcf-navy-soft: var(--wg-gray);
-    --wcf-red: var(--wg-red);
-    --wcf-gold: var(--wg-yellow);
-    --wcf-bg: var(--wg-white);
-    --wcf-border: var(--wg-border);
-    --wcf-hover-bg: var(--wg-border);
-    --wcf-active-bg: var(--wg-border);
-    --wcf-text: var(--wg-text-muted);
-    --wcf-text-strong: var(--wg-gray);
+    --wcf-navy: #1B2A4A;
+    --wcf-navy-soft: #2D3E63;
+    --wcf-red: #C8391D;
+    --wcf-gold: #E8A020;
+    --wcf-bg: #FFFFFF;
+    --wcf-border: #E6E9F0;
+    --wcf-hover-bg: #F3F5FA;
+    --wcf-active-bg: #EEF1FA;
+    --wcf-text: #445070;
+    --wcf-text-strong: #1B2A4A;
     display: block;
-    font-family: var(--wg-font-body);
 }
 
 .wcf-header {
@@ -140,7 +72,7 @@
     gap: 0.5rem;
     color: var(--wcf-text);
     font-size: 0.8125rem;
-    font-weight: var(--wg-weight-regular);
+    font-weight: 500;
     opacity: 0.7;
 }
 
@@ -175,11 +107,10 @@
 }
 
 .wcf-nav-item {
-    font-family: var(--wg-font-heading);
     color: var(--wcf-text);
     text-decoration: none;
     font-size: 0.8125rem;
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
     letter-spacing: 0.01em;
     padding: 0 0.7rem;
     position: relative;
@@ -236,12 +167,11 @@
 }
 
 .wcf-nav-item__trigger {
-    font-family: var(--wg-font-heading);
     color: var(--wcf-text);
     background: none;
     border: none;
     font-size: 0.8125rem;
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -277,9 +207,9 @@
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
-    background: var(--wg-white);
+    background: #FFFFFF;
     border: 1px solid var(--wcf-border);
-    border-radius: var(--wg-radius-card);
+    border-radius: 10px;
     box-shadow: 0 12px 32px rgba(16, 24, 40, 0.14);
     min-width: 230px;
     z-index: 100;
@@ -294,17 +224,15 @@
 }
 
 .wcf-dropdown__label {
-    font-family: var(--wg-font-heading);
     margin: 0.25rem 0.6rem 0.35rem;
     font-size: 0.6875rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--wg-text-muted);
+    color: #8A93AB;
 }
 
 .wcf-dropdown__item {
-    font-family: var(--wg-font-heading);
     display: flex;
     align-items: center;
     gap: 0.55rem;
@@ -312,14 +240,14 @@
     color: var(--wcf-text-strong);
     text-decoration: none;
     font-size: 0.8125rem;
-    font-weight: var(--wg-weight-regular);
-    border-radius: var(--wg-radius-sm);
+    font-weight: 500;
+    border-radius: 6px;
     white-space: nowrap;
     transition: background 0.12s ease;
 }
 
 .wcf-dropdown__icon {
-    --sds-c-icon-color-foreground-default: var(--wg-text-muted);
+    --sds-c-icon-color-foreground-default: #8A93AB;
     flex-shrink: 0;
 }
 
@@ -329,7 +257,7 @@
 
 .wcf-dropdown__item--logout {
     color: var(--wcf-red);
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
 }
 
 .wcf-dropdown__item--logout .wcf-dropdown__icon {
@@ -339,7 +267,7 @@
 /* Log In reads as a positive/neutral action, not a warning — keep it in brand navy */
 .wcf-dropdown__item--login {
     color: var(--wcf-navy);
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
 }
 
 .wcf-dropdown__item--login .wcf-dropdown__icon {
@@ -347,13 +275,12 @@
 }
 
 .wcf-badge {
-    font-family: var(--wg-font-heading);
     background: var(--wcf-gold);
     color: var(--wcf-navy);
     font-size: 0.65rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     padding: 0.05rem 0.4rem;
-    border-radius: var(--wg-radius-card);
+    border-radius: 10px;
     line-height: 1.3;
 }
 
@@ -390,7 +317,7 @@
 .wcf-profile__trigger[aria-expanded="true"] {
     background: var(--wcf-active-bg);
     border-color: var(--wcf-navy);
-    box-shadow: 0 0 0 3px rgba(65, 64, 65, 0.08);
+    box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08);
 }
 
 .wcf-profile__trigger lightning-icon {
@@ -450,22 +377,20 @@
 .wcf-role__trigger[aria-expanded="true"] {
     background: var(--wcf-active-bg);
     border-color: var(--wcf-navy);
-    box-shadow: 0 0 0 3px rgba(65, 64, 65, 0.08);
+    box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08);
 }
 
 .wcf-role__eyebrow {
-    font-family: var(--wg-font-heading);
     font-size: 0.625rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--wg-text-muted);
+    color: #8A93AB;
 }
 
 .wcf-role__value {
-    font-family: var(--wg-font-heading);
     font-size: 0.8125rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     color: var(--wcf-navy);
 }
 
@@ -479,7 +404,7 @@
     text-align: left;
     background: transparent;
     border: none;
-    font-family: var(--wg-font-heading);
+    font-family: inherit;
     cursor: pointer;
 }
 
@@ -494,7 +419,7 @@
 
 .wcf-dropdown__item--role-active {
     color: var(--wcf-navy);
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     background: var(--wcf-active-bg);
 }
 

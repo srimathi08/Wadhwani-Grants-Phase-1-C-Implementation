@@ -1,209 +1,192 @@
 <template>
-    <div class="shell">
+    <div class="wg-page wcf-rq">
 
-        <!-- ══ TOP BAR ══════════════════════════════════════════════ -->
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <div class="brand-rule"></div>
-                <div class="top-bar-titles">
-                    <h1 class="top-title">Wadhwani Grants Review Proposals</h1>
-                    <span class="top-sub">{filteredCount} of {totalCount} validated proposal(s)</span>
-                </div>
+        <!-- ══ PAGE HEADER ══════════════════════════════════════ -->
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Reviewer portal</p>
+                <h1 class="wg-page-title">Wadhwani Grants Review Proposals</h1>
+                <p class="wg-page-subtitle">{subtitle}</p>
             </div>
-            <div class="top-bar-right">
-                <div class="search-wrap">
-                    <lightning-icon icon-name="utility:search" size="x-small" class="search-icon"></lightning-icon>
+            <div class="wg-page-actions">
+                <div class="wg-search">
+                    <lightning-icon icon-name="utility:search" size="x-small" alternative-text=""></lightning-icon>
                     <input
                         type="text"
                         placeholder="Search by ID, organization, submitter…"
-                        class="search-input"
+                        aria-label="Search proposals"
                         value={searchTerm}
                         oninput={handleSearch}
                     />
                 </div>
-                <!--<lightning-combobox
-                    name="trackFilter"
-                    label=""
-                    placeholder="All Tracks"
-                    value={selectedTrack}
-                    options={trackOptions}
-                    onchange={handleTrackFilter}
-                    class="filter-combo"
-                ></lightning-combobox>
-                <lightning-combobox
-                    name="statusFilter"
-                    label=""
-                    placeholder="All Statuses"
-                    value={selectedStatus}
-                    options={statusOptions}
-                    onchange={handleStatusFilter}
-                    class="filter-combo"
-                ></lightning-combobox>-->
-                <button class="icon-btn" onclick={handleRefresh} title="Refresh">
-                    <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
+                <button class="wg-icon-btn" onclick={handleRefresh} title="Refresh" aria-label="Refresh list">
+                    <lightning-icon icon-name="utility:refresh" size="x-small" alternative-text=""></lightning-icon>
                 </button>
             </div>
         </div>
 
-        <!-- ══ SUMMARY ROW ═════════════════════════════════════════ -->
-        <template if:false={isLoading}>
-            <div class="summary-row">
-    <div class="summary-item" onclick={handleFilterClick} data-filter="total">
-    <span class="summary-num">{validatedProposalsCount}</span>
-    <span class="summary-lbl">Validated Proposals</span>
-</div>
-    <div class="summary-div"></div>
-    <div class="summary-item" onclick={handleFilterClick} data-filter="reviewed">
-        <span class="summary-num s-reviewed">{reviewedCount}</span>
-        <span class="summary-lbl">Reviewed</span>
-    </div>
-    <div class="summary-div"></div>
-    <div class="summary-item" onclick={handleFilterClick} data-filter="inProgress">
-        <span class="summary-num s-progress">{inProgressCount}</span>
-        <span class="summary-lbl">In Progress</span>
-    </div>
-    <div class="summary-div"></div>
-    <div class="summary-item" onclick={handleFilterClick} data-filter="notStarted">
-        <span class="summary-num s-pending">{notStartedCount}</span>
-        <span class="summary-lbl">Not Started</span>
-    </div>
-    <div class="summary-div"></div>
-    <div class="summary-item" onclick={handleFilterClick} data-filter="flagged">
-        <span class="summary-num s-flagged">{flaggedCount}</span>
-        <span class="summary-lbl">Flagged</span>
-    </div>
-</div>
+        <div class="wg-page-body">
 
+            <!-- ══ ACTIVE FILTER BANNER (from a dashboard tile or a tile click) ══ -->
+            <template lwc:if={hasActiveReviewFilter}>
+                <div class="info-banner wcf-rq-filter" role="status">
+                    <lightning-icon icon-name="utility:filter" size="x-small" alternative-text=""></lightning-icon>
+                    <div class="wg-banner-body">
+                        Filtered by: <strong>{activeFilterLabel}</strong>
+                    </div>
+                    <button class="ghost-btn wg-btn-sm wg-banner-action" onclick={handleClearReviewFilter}>
+                        <lightning-icon icon-name="utility:close" size="xx-small" alternative-text=""></lightning-icon>
+                        Show all
+                    </button>
+                </div>
+            </template>
 
-        </template>
+            <!-- ══ SUMMARY TILES ═══════════════════════════════════ -->
+            <template lwc:if={isLoading}>
+                <div class="wg-card">
+                    <div class="wg-loading">
+                        <lightning-spinner alternative-text="Loading proposals" size="medium"></lightning-spinner>
+                        <p class="wg-loading-text">Loading validated proposals…</p>
+                    </div>
+                </div>
+            </template>
 
-        <!-- ══ LOADING ══════════════════════════════════════════════ -->
-        <template if:true={isLoading}>
-            <div class="loading-block">
-                <lightning-spinner alternative-text="Loading proposals" size="medium"></lightning-spinner>
-                <p class="loading-text">Loading validated proposals…</p>
-            </div>
-        </template>
+            <template lwc:else>
+                <div class="wg-stat-grid wcf-rq-stats" role="group" aria-label="Filter by review status">
+                    <template for:each={summaryItems} for:item="s">
+                        <button key={s.id}
+                                class={s.cls}
+                                data-filter={s.id}
+                                aria-pressed={s.pressed}
+                                title="Click to filter"
+                                onclick={handleFilterClick}>
+                            <span class="wg-stat-head">
+                                <span class="wg-stat-label">{s.label}</span>
+                                <span class={s.dotCls}></span>
+                            </span>
+                            <span class="wg-stat-value">{s.count}</span>
+                        </button>
+                    </template>
+                </div>
 
-        <!-- ══ TABLE ════════════════════════════════════════════════ -->
-        <template if:false={isLoading}>
-            <template if:true={hasProposals}>
-                <div class="table-wrap">
-                    <table class="tbl">
-                        <thead>
-                            <tr>
-                                <th class="th c-sno">#</th>
-                                <th class="th c-id sortable" data-field="Name" onclick={handleSort}>
-                                    <div class="th-inner">
-                                        Application ID
-                                        <template if:true={isSortedByName}>
-                                            <lightning-icon icon-name={sortIcon} size="xx-small"></lightning-icon>
+                <!-- ══ TABLE CARD ══════════════════════════════════ -->
+                <div class="wg-card">
+                    <template lwc:if={hasProposals}>
+                        <div class="wg-table-wrap">
+                            <table class="wg-table wcf-rq-table">
+                                <thead>
+                                    <tr>
+                                        <th class="wg-col-index" scope="col">#</th>
+                                        <th scope="col" aria-sort={ariaSortName}>
+                                            <button class={sortClassName} data-field="Name" onclick={handleSort}>
+                                                Application ID
+                                                <lightning-icon icon-name={sortIconName} size="xx-small" alternative-text=""></lightning-icon>
+                                            </button>
+                                        </th>
+                                        <th scope="col">Organization</th>
+                                        <th scope="col">Headquarters</th>
+                                        <th scope="col">Submitter</th>
+                                        <th scope="col">Track</th>
+                                        <th scope="col">Review status</th>
+                                        <template lwc:if={isAcceptedFilterActive}>
+                                            <th scope="col">Approver comment</th>
                                         </template>
-                                    </div>
-                                </th>
-                                <th class="th c-org">Organization</th>
-                                <th class="th c-hq">Headquarters</th>
-                                <th class="th c-sub">Submitter</th>
-                                <th class="th c-track tc">Track</th>
-                               <!-- <th class="th c-appstatus">App Status</th>-->
-                                <th class="th c-revstatus tc">Review Status</th>
-                                <template if:true={isAcceptedFilterActive}>
-    <th class="th c-comment">Approver Comment</th>
-</template>
-                                <th class="th c-due">Due Date</th>
-                                <th class="th c-action tc">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template for:each={paginatedProposals} for:item="p">
-                                <tr key={p.Id} class={p.rowClass}>
-                                    <td class="td c-sno tc td-sno">{p.sno}</td>
-                                    <td class="td c-id">
-    <span class="id-text">{p.Name}</span>
-</td>
-                                    <td class="td c-org"><span class="trunc" title={p.Organization_Name__c}>{p.Organization_Name__c}</span></td>
-                                    <td class="td c-hq"><span class="trunc" title={p.Headquarters_City_and_Country__c}>{p.Headquarters_City_and_Country__c}</span></td>
-                                    <td class="td c-sub"><span class="trunc" title={p.Submitter_Name__c}>{p.Submitter_Name__c}</span></td>
-                                    <td class="td c-track tc">
-                                        <div class="track-badges-wrap">
-                                            <template for:each={p.trackBadges} for:item="tb">
-                                                <span key={tb.code} class={tb.badgeClass} title={tb.label}>{tb.code}</span>
+                                        <th scope="col">Due date</th>
+                                        <th class="wg-col-action" scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={paginatedProposals} for:item="p">
+                                        <tr key={p.Id} class={p.rowClass}>
+                                            <td class="wg-col-index">{p.sno}</td>
+                                            <td class="wg-cell-id">{p.Name}</td>
+                                            <td><span class="wcf-trunc" title={p.Organization_Name__c}>{p.Organization_Name__c}</span></td>
+                                            <td><span class="wcf-trunc" title={p.Headquarters_City_and_Country__c}>{p.Headquarters_City_and_Country__c}</span></td>
+                                            <td><span class="wcf-trunc" title={p.Submitter_Name__c}>{p.Submitter_Name__c}</span></td>
+                                            <td>
+                                                <div class="wcf-rq-tags">
+                                                    <template for:each={p.trackBadges} for:item="tb">
+                                                        <span key={tb.code} class={tb.badgeClass} title={tb.label}>{tb.code}</span>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class={p.reviewBadgeClass}>{p.reviewBadgeLabel}</span>
+                                            </td>
+                                            <template lwc:if={isAcceptedFilterActive}>
+                                                <td>
+                                                    <span class="wcf-trunc wcf-trunc-wide" title={p.approverComment}>{p.approverComment}</span>
+                                                </td>
                                             </template>
-                                        </div>
-                                    </td>
-                                   <!--  <td class="td c-appstatus">
-                                       <span class={p.statusBadgeClass}>{p.Status}</span> 
-                                    </td>-->
-                                    <td class="td c-revstatus tc">
-                                        <span class={p.reviewBadgeClass}>{p.reviewBadgeLabel}</span>
-                                    </td>
-                                    <template if:true={isAcceptedFilterActive}>
-    <td class="td c-comment">
-        <span class="trunc" title={p.approverComment}>{p.approverComment}</span>
-    </td>
-</template>
-                                    <td class="td c-due">
-                                        <span class={p.dueDateClass}>{p.dueDateDisplay}</span>
-                                    </td>
-                                    <td class="td c-action tc">
-                                        <button
-    class={p.actionBtnClass}
-    data-id={p.Id}
-    data-appname={p.Name}
-    data-review-id={p.reviewId}
-    data-action={p.reviewAction}
-    data-headquarters={p.Headquarters_City_and_Country__c}
-    data-track={p.trackParam}
-    disabled={p.isRejected}
-    onclick={handleReviewAction}
->
-    {p.actionLabel}
-</button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
+                                            <td>
+                                                <span class={p.dueDateClass}>{p.dueDateDisplay}</span>
+                                            </td>
+                                            <td class="wg-col-action">
+                                                <button
+                                                    class={p.actionBtnClass}
+                                                    data-id={p.Id}
+                                                    data-appname={p.Name}
+                                                    data-review-id={p.reviewId}
+                                                    data-action={p.reviewAction}
+                                                    data-headquarters={p.Headquarters_City_and_Country__c}
+                                                    data-track={p.trackParam}
+                                                    disabled={p.isRejected}
+                                                    onclick={handleReviewAction}>
+                                                    <lightning-icon icon-name={p.actionIcon} size="xx-small" alternative-text=""></lightning-icon>
+                                                    {p.actionLabel}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
 
-                <!-- Pagination -->
-                <div class="pg-bar">
-                    <span class="pg-info">Showing {paginationStart}–{paginationEnd} of {filteredCount} proposals</span>
-                    <div class="pg-controls">
-                        <button class="pg-btn" onclick={handlePrevPage} disabled={isFirstPage}>
-                            <lightning-icon icon-name="utility:chevronleft" size="xx-small"></lightning-icon>
-                        </button>
-                        <template for:each={pageNumbers} for:item="pg">
-                            <button key={pg.num} class={pg.btnClass} data-page={pg.num} onclick={handlePageClick}>{pg.num}</button>
-                        </template>
-                        <button class="pg-btn" onclick={handleNextPage} disabled={isLastPage}>
-                            <lightning-icon icon-name="utility:chevronright" size="xx-small"></lightning-icon>
-                        </button>
-                    </div>
-                    <div class="pg-size-row">
-                        <span class="pg-size-lbl">Rows per page:</span>
-                        <lightning-combobox
-                            name="pageSize"
-                            label=""
-                            value={pageSizeStr}
-                            options={pageSizeOptions}
-                            onchange={handlePageSizeChange}
-                            class="pg-size-combo"
-                        ></lightning-combobox>
-                    </div>
-                </div>
-            </template>
+                        <!-- Pagination -->
+                        <div class="wg-pagination">
+                            <span>Showing {paginationStart}–{paginationEnd} of {filteredCount} proposals</span>
+                            <div class="wg-pagination-controls">
+                                <button class="wg-icon-btn" onclick={handlePrevPage} disabled={isFirstPage} aria-label="Previous page">
+                                    <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text=""></lightning-icon>
+                                </button>
+                                <template for:each={pageNumbers} for:item="pg">
+                                    <button key={pg.num}
+                                            class={pg.btnClass}
+                                            data-page={pg.num}
+                                            aria-current={pg.current}
+                                            onclick={handlePageClick}>{pg.num}</button>
+                                </template>
+                                <button class="wg-icon-btn" onclick={handleNextPage} disabled={isLastPage} aria-label="Next page">
+                                    <lightning-icon icon-name="utility:chevronright" size="xx-small" alternative-text=""></lightning-icon>
+                                </button>
+                            </div>
+                            <div class="wcf-rq-pagesize">
+                                <span>Rows per page</span>
+                                <lightning-combobox
+                                    name="pageSize"
+                                    label="Rows per page"
+                                    variant="label-hidden"
+                                    value={pageSizeStr}
+                                    options={pageSizeOptions}
+                                    onchange={handlePageSizeChange}
+                                    class="wcf-rq-pagesize-combo">
+                                </lightning-combobox>
+                            </div>
+                        </div>
+                    </template>
 
-            <!-- Empty -->
-            <template if:false={hasProposals}>
-                <div class="empty-block">
-                    <lightning-icon icon-name="utility:list" size="large" class="empty-icon"></lightning-icon>
-                    <p class="empty-title">No Proposals Found</p>
-                    <p class="empty-sub">No validated proposals match your current filters.</p>
-                    <button class="ghost-btn" onclick={handleClearFilters}>Clear Filters</button>
+                    <!-- Empty -->
+                    <template lwc:else>
+                        <div class="wg-empty">
+                            <lightning-icon icon-name="utility:list" size="large" alternative-text=""></lightning-icon>
+                            <p class="wg-empty-title">No proposals found</p>
+                            <p class="wg-empty-text">No validated proposals match your current filters.</p>
+                            <button class="ghost-btn wg-btn-sm wcf-rq-clear" onclick={handleClearFilters}>Clear filters</button>
+                        </div>
+                    </template>
                 </div>
             </template>
-        </template>
 
+        </div>
     </div>
 </template>

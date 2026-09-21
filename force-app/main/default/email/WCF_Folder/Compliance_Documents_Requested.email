@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8"/>
@@ -8,14 +7,7 @@
 <meta name="x-apple-disable-message-reformatting"/>
 <meta name="color-scheme" content="light"/>
 <meta name="supported-color-schemes" content="light"/>
-<title>[{{{org_name}}}] Compliance documents requested</title>
-
-<!--[if mso]>
-<xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
-<style>body,table,td,a,p,h1{font-family:Arial,Helvetica,sans-serif !important;}</style>
-<![endif]-->
-
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+<title>[{!Account.WCF_Organizational_Name__c}] The compliance documents we need to start your onboarding</title>
 
 <style>
 html,body{margin:0 !important;padding:0 !important;width:100% !important;}
@@ -29,12 +21,12 @@ div[style*="margin: 16px 0"]{margin:0 !important;}
 .frame{padding:0 !important;}
 .container{width:100% !important;max-width:100% !important;border-radius:0 !important;border-left:0 !important;border-right:0 !important;}
 .pad{padding-left:22px !important;padding-right:22px !important;}
-.hdr{padding:20px 22px 18px !important;}
-.logo-hdr{width:124px !important;}
+.hdr{padding:20px 22px !important;}
+.logo-hdr{width:100px !important;}
 .logo-ftr{width:114px !important;}
 .btn{width:100% !important;}
 .btn a{display:block !important;}
-.bh{font-size:21px !important;line-height:1.25 !important;}
+.bh{font-size:19px !important;line-height:1.25 !important;}
 }
 </style>
 
@@ -44,7 +36,7 @@ div[style*="margin: 16px 0"]{margin:0 !important;}
 <center role="article" aria-roledescription="email" lang="en" style="width:100%;background-color:#F4F4F5;">
 
 <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;color:#F4F4F5;">
-A few documents are needed to keep your onboarding moving.
+{!Account.WCF_Organizational_Name__c} The compliance documents we need to start your onboarding
 </div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
@@ -53,100 +45,121 @@ A few documents are needed to keep your onboarding moving.
 
 <table role="presentation" class="container" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;">
 
+<!-- HEADER -->
 <tr>
-<td class="hdr" bgcolor="#BF2026" align="left" style="padding:24px 32px 22px;border-radius:8px 8px 0 0;">
+<td class="hdr" bgcolor="#BF2026" style="padding:24px 32px;border-radius:8px 8px 0 0;">
 
-<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000%22alt="Wadhwani Foundation" width="136"style="display:block;height:auto;border:0;outline:none;text-decoration:none;">
+<!-- Header: text left, logo right (same row) -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td align="left" valign="middle">
 
 <p style="margin:0 0 6px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;">
-Compliance
+Documents requested
 </p>
 
 <h1 class="bh" style="margin:0;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;">
-Documents requested
+Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c} 
 </h1>
+
+</td>
+<td align="right" valign="middle" width="136" style="padding-left:16px;">
+
+<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="136" class="logo-hdr" style="display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;">
+
+</td>
+</tr>
+</table>
 
 </td>
 </tr>
 
+<!-- ORANGE DIVIDER -->
 <tr>
 <td bgcolor="#F2672A" height="4" style="height:4px;background:#F2672A;">&nbsp;</td>
 </tr>
 
+<!-- BODY -->
 <tr>
 <td class="pad" style="padding:28px 32px 10px;">
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hello {{{contact_first_name}}},
+Hi {!Account.Name},
 </p>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-To continue <strong>{{{org_name}}}</strong>'s onboarding, we need the following documents from you:
+Your application is approved, so onboarding starts now. These are the compliance documents we need from you:
 </p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+What we need:
+</p>
+
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
 <tr>
 <td style="padding:16px 20px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
-{{{document_list}}}<br/><br/>
-<strong>Please submit by:</strong> {{{due_date}}}
+{!WCF_Compliance_Document__c.Document_Types__c}
 </td>
 </tr>
 </table>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-You can upload everything securely through the portal:
+You can upload them in the portal whenever they are ready, one at a time or all together. There is no fixed due date for any single document.
+</p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+We need to have received all of them by {!WCF_Compliance_Document__c.Due_Date__c}. If nothing has reached us by {!WCF_Compliance_Document__c.Due_Date__c}, we will close this application, and you would be welcome to apply again.
+</p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+If anything on the list is unclear, write to us at  grants.support@wadhwanifoundation.org
 </p>
 
 <table role="presentation" class="btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="{{{portal_url}}}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
+<a href="https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite/s/wg-reviewer-dashboard?role=reviewer" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 Upload documents
 </a>
 </td>
 </tr>
 </table>
 
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-If you have any trouble or need more time, just let me know at grants.support@wadhwanifoundation.org — happy to help.
-</p>
 
 <p style="margin:18px 0 8px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
-Best regards,<br/>
-{{{pl_name}}}<br/>
+Kind regards,<br/>
 Wadhwani Grants
 </p>
 
 </td>
 </tr>
 
+<!-- DIVIDER -->
 <tr>
 <td class="pad" style="padding:0 32px;">
 <hr style="border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;"/>
 </td>
 </tr>
 
+<!-- FOOTER -->
 <tr>
 <td class="pad" style="padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;">
 
-<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&oid=00DF6000000APXN&lastMod=1782560396000%22
+<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&oid=00DF6000000APXN&lastMod=1782560396000"
 width="132"alt="Wadhwani Grants" class="logo-ftr" style="display:block;width:132px;height:auto;margin:0 0 12px;"/>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Questions? Just reply to this email — it reaches the Wadhwani Grants team at 
+Questions? Just reply to this email; it reaches me and the Wadhwani Grants team at 
 <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#6D6E71;text-decoration:underline;">grants.support@wadhwanifoundation.org</a>.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-&copy; {{{year}}} Wadhwani Charitable Foundation. All rights reserved.
-</p>
-
-<p style="margin:0;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-<a href="{{{preferences_url}}}" style="color:#6D6E71;text-decoration:underline;">Notification preferences</a>
+&copy; {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.
 </p>
 
 </td>

@@ -1,23 +1,94 @@
 <template>
-    <div class="emboss-wrapper">
-        <div class="dashboard-title">Validator Dashboard</div>
-        <div class="grid">
-            <template for:each={cards} for:item="c">
-                <article
-                    key={c.id}
-                    class={c.combinedClass}
-                    data-status={c.status}
-                    onclick={handleNavigate}
-                    title={c.label}
-                >
-                    <div class="card-header">
-                        <span class="card-title">{c.label}</span>
-                        <span class="corner-icon">↗</span>
+    <div class="wg-page vd-page">
+
+        <!-- PAGE HEADER -->
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Validator portal</p>
+                <h1 class="wg-page-title">{greeting}, <span class="wg-page-title-accent">Validator</span></h1>
+                <p class="wg-page-subtitle">{todayDate}</p>
+            </div>
+        </div>
+
+        <div class="wg-page-body">
+
+            <!-- KPI TILES — click opens the queue filtered to that bucket -->
+            <div class="wg-stat-grid vd-stats" role="group" aria-label="Open the queue filtered by">
+                <template for:each={validatorCards} for:item="c">
+                    <button key={c.id}
+                            class={c.kpiClass}
+                            data-status={c.status}
+                            onclick={handleValidatorTileClick}>
+                        <span class="wg-stat-head">
+                            <span class="wg-stat-label">{c.label}</span>
+                            <span class={c.dotClass}></span>
+                        </span>
+                        <span class="wg-stat-value">{c.count}</span>
+                        <span class="wg-stat-caption">{c.subtitle}</span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- DUE SOON PREVIEW -->
+            <div class="vd-queue">
+                <div class="wg-section-head">
+                    <div>
+                        <h2 class="wg-section-title">Due soon</h2>
+                        <p class="wg-section-subtitle">Proposals awaiting validation, nearest due date first</p>
                     </div>
-                    <div class="card-count">{c.count}</div>
-                    <div class="card-subtitle">{c.subtitle}</div>
-                </article>
-            </template>
+                    <button class="wg-link" onclick={handleViewAllValidatorQueue}>View full queue →</button>
+                </div>
+
+                <div class="wg-card">
+                    <div class="wg-table-wrap">
+                        <table class="wg-table vd-table">
+                            <thead>
+                                <tr>
+                                    <th class="wg-col-index" scope="col">#</th>
+                                    <th scope="col">Application ID</th>
+                                    <th scope="col">Account</th>
+                                    <th scope="col">Due date</th>
+                                    <th scope="col">Status</th>
+                                    <th class="wg-col-action" scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={validatorPreviewRows} for:item="row">
+                                    <tr key={row.id} class={row.rowClass}>
+                                        <td class="wg-col-index">{row.rowNum}</td>
+                                        <td class="wg-cell-id">{row.appId}</td>
+                                        <td>{row.account}</td>
+                                        <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
+                                        <td><span class={row.statusClass}>{row.status}</span></td>
+                                        <td class="wg-col-action">
+                                            <template lwc:if={row.showAction}>
+                                                <button class={row.actionClass}
+                                                        data-id={row.id}
+                                                        data-appname={row.appId}
+                                                        onclick={handlePreviewValidate}>
+                                                    <lightning-icon icon-name={row.actionIcon} size="xx-small" alternative-text=""></lightning-icon>
+                                                    {row.action}
+                                                </button>
+                                            </template>
+                                            <template lwc:else>
+                                                <span class="wg-cell-muted">No action</span>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template lwc:if={noValidatorPreviewRows}>
+                                    <tr>
+                                        <td colspan="6" class="wg-table-empty">
+                                            No proposals awaiting validation
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>

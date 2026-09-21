@@ -1,152 +1,3 @@
-@import "c/commonStyleTheme";
-
-/* ═══════════════════════════════════════════════════════════════════════
-   WCF COMPLIANCE DOCS — CSS
-   Rebranded to the Wadhwani token system (commonStyleTheme).
-   (Distinct component from wcfComplianceDocuments — already rebranded
-   earlier in this batch — this is the smaller, separate checklist widget.)
-
-   WIRING / MAPPING NOTES:
-
-   • Straightforward status-color mapping: error/rejected/expired reds
-     (#c23934, #fdecea, #d32f2f, #fdf2f2) → var(--wg-error)/-bg; success
-     greens (#04844b, #d4f4e2, #eaf8f0, #2e7d32) → var(--wg-success)/-bg;
-     SLDS-ish info blue (#1a73e8, #e8f0fe) → var(--wg-info)/-bg; neutral
-     grays/borders (#ecebea, #e5e5e5, #dddbda) → var(--wg-border); muted
-     text (#5c5c5c, #706e6b, #514f4d) → var(--wg-text-muted); near-black
-     text (#181818, #1b1b1b, #2b2b2b, #4e342e) → var(--wg-gray).
-   • LEFTOVER HUE — AMBER/ORANGE CONSOLIDATION: this file originally used
-     THREE different amber/orange pairs for three different "needs
-     attention" states — In Progress/Suspended badges (#fff3cd/#8a6d00),
-     the overall "Returned" badge (#fff4e5/#93540a), and the whole-app
-     decision banners for Suspended (#fffde7/#fbc02d) and Returned
-     (#fff3e0/#f57c00), plus the returned-comments box border (#ffe0b2)
-     and its heading text (#e65100). All consolidated onto the single
-     var(--wg-warning) / var(--wg-warning-bg) / var(--wg-warning-text)
-     family, per the same technique already used for wcfValidatorForm's
-     three-gold consolidation — the brand token set only defines one
-     amber/orange shade, so these were never going to stay visually
-     distinct from each other.
-   • LEFTOVER HUE — no brand purple token exists for the "Flagged / Under
-     Review" document badge (#e3e1fb/#4b3fb0). Reassigned to the
-     var(--wg-error) family: like wcfValidatorForm's pink Flag-badge
-     reassignment, "Flagged" reads as an escalation/caution state closer
-     to error than to any other claimed hue, and it never appears
-     alongside this file's other red badges in the same list in a way
-     that would make them ambiguous (the badge label text itself already
-     disambiguates "Flagged"/"Under Review" from "Rejected"/"Expired").
-   • ShowToastEvent replaced with a custom .wg-toast-banner (JS side
-     already updated — see wcfComplianceDocs.js) since native toasts
-     render outside the shadow tree and can't be restyled.
-   • No real <button> HTML elements exist in this component — every
-     action is a <lightning-button>, squared below via the
-     --slds-c-button-radius-border SLDS hook.
-   • .comp-overall-badge / .comp-badge keep their literal 999px capsule
-     radius — they are <span> status pills, not real <button> elements,
-     so the batch's tag-based squaring rule does not apply to them.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-:host {
-    display: block;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   WG TOAST BANNER — replaces native ShowToastEvent. JS side (@track
-   bannerVisible/bannerVariant/bannerTitle/bannerMessage, showBanner(),
-   closeBanner(), handleDismissBanner(), isBannerError/Warning/Success/
-   Info, bannerClass) already added — see wcfComplianceDocs.js. Reuses
-   the shared .error-banner/.warning-banner/.success-banner/.info-banner
-   classes from commonStyleTheme.
-   ═══════════════════════════════════════════════════════════════════ */
-.wg-toast-banner {
-    position       : fixed;
-    top            : 20px;
-    left           : 50%;
-    transform      : translateX(-50%);
-    z-index        : 99998;
-    display        : flex;
-    align-items    : flex-start;
-    gap            : 0.6rem;
-    min-width      : 320px;
-    max-width      : 520px;
-    padding        : 0.85rem 1.1rem;
-    border-radius  : var(--wg-radius-md);
-    box-shadow     : 0 4px 16px rgba(65, 64, 65, 0.18);
-    animation      : wg-toast-slide-in 0.2s ease;
-}
-
-@keyframes wg-toast-slide-in {
-    from { opacity: 0; transform: translate(-50%, -10px); }
-    to   { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.wg-toast-banner-icon {
-    flex-shrink : 0;
-    font-size   : 1.1rem;
-    line-height : 1;
-}
-
-.wg-toast-banner-body {
-    flex      : 1;
-    min-width : 0;
-}
-
-.wg-toast-banner-title {
-    font-weight   : var(--wg-weight-bold);
-    font-size     : var(--wg-font-size-label);
-    margin-bottom : 0.15rem;
-}
-
-.wg-toast-banner-message {
-    font-size   : var(--wg-font-size-caption);
-    line-height : 1.4;
-    overflow-wrap: break-word;
-}
-
-.wg-toast-banner-close {
-    background    : none;
-    border        : none;
-    cursor        : pointer;
-    flex-shrink   : 0;
-    font-size     : 1rem;
-    line-height   : 1;
-    opacity       : 0.6;
-    padding       : 0.1rem;
-    border-radius : 0;   /* real <button> — squared */
-}
-.wg-toast-banner-close:hover { opacity: 1; }
-
-/* ═══════════════════════════════════════════════════════════════════
-   BUTTON SQUARING — every action here is a <lightning-button>; squared
-   via the SLDS radius hook since lightning-button renders its own
-   internal shadow DOM that plain CSS border-radius can't reach.
-   ═══════════════════════════════════════════════════════════════════ */
-.comp-upload-row lightning-button,
-.comp-replace-btn,
-.comp-delete-btn,
-.comp-btn-draft,
-.comp-btn-submit {
-    --slds-c-button-radius-border: 0;
-}
-
-/* "Prepare upload" and "Submit Compliance Documents" are both
-   variant="brand" — protect their label text from the Experience Cloud
-   site theme's brand-button text-color override (dark text on the
-   theme's red brand background instead of white), the same fix already
-   applied to wcfValidatorForm's "Seal" button and wcfFormPreview's
-   "Download as PDF" button. */
-.comp-btn-prepare,
-.comp-btn-submit {
-    --slds-c-button-brand-text-color       : var(--wg-white);
-    --slds-c-button-brand-text-color-hover : var(--wg-white);
-    --slds-c-button-brand-text-color-active: var(--wg-white);
-    --sds-c-button-brand-text-color        : var(--wg-white);
-    --sds-c-button-brand-text-color-hover  : var(--wg-white);
-    --slds-c-button-text-color             : var(--wg-white);
-    --slds-c-button-text-color-hover       : var(--wg-white);
-    color: var(--wg-white);
-}
-
 .comp-loading {
     display: flex;
     justify-content: center;
@@ -158,8 +9,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background-color: var(--wg-error-bg);
-    border-left: 4px solid var(--wg-error);
+    background-color: #fdecea;
+    border-left: 4px solid #c23934;
     margin: 0 1rem 1rem;
 }
 
@@ -175,49 +26,49 @@
 }
 
 .comp-geography {
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
     font-size: 0.95rem;
 }
 
 .comp-overall-progress-bar {
     height: 8px;
     border-radius: 4px;
-    background-color: var(--wg-border);
+    background-color: #ecebea;
     overflow: hidden;
 }
 
 .comp-overall-progress-fill {
     height: 100%;
     width: 0%;
-    background-color: var(--wg-success);
+    background-color: #04844b;
     transition: width 0.3s ease;
 }
 
 .comp-summary-label {
     font-size: 0.8rem;
-    color: var(--wg-text-muted);
+    color: #5c5c5c;
     margin-top: 0.35rem;
 }
 
 .comp-overall-badge {
     font-size: 0.7rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     letter-spacing: 0.04em;
     padding: 0.25rem 0.6rem;
     border-radius: 999px;
     text-transform: uppercase;
 }
-.comp-overall-badge--complete   { background-color: var(--wg-success-bg); color: var(--wg-success); }
-.comp-overall-badge--inprogress { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.comp-overall-badge--draft      { background-color: var(--wg-info-bg); color: var(--wg-info); }
-.comp-overall-badge--pending    { background-color: var(--wg-border); color: var(--wg-text-muted); }
-.comp-overall-badge--refresh    { background-color: var(--wg-error-bg); color: var(--wg-error); }
-.comp-overall-badge--rejected   { background-color: var(--wg-error-bg); color: var(--wg-error); }
-.comp-overall-badge--suspended  { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.comp-overall-badge--returned   { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.comp-overall-badge--complete   { background-color: #d4f4e2; color: #04844b; }
+.comp-overall-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
+.comp-overall-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
+.comp-overall-badge--pending    { background-color: #ecebea; color: #514f4d; }
+.comp-overall-badge--refresh    { background-color: #fdecea; color: #c23934; }
+.comp-overall-badge--rejected   { background-color: #fdecea; color: #c23934; }
+.comp-overall-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
+.comp-overall-badge--returned   { background-color: #fff4e5; color: #93540a; }
 
 .comp-row {
-    border-top: 1px solid var(--wg-border);
+    border-top: 1px solid #e5e5e5;
     padding: 1rem;
 }
 
@@ -228,53 +79,53 @@
 }
 
 .comp-doc-label {
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
     font-size: 0.95rem;
     margin-right: 0.5rem;
 }
 
 .comp-required-tag {
     font-size: 0.65rem;
-    color: var(--wg-text-muted);
+    color: #706e6b;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
 .comp-doc-desc {
     font-size: 0.8rem;
-    color: var(--wg-text-muted);
+    color: #5c5c5c;
     margin: 0.35rem 0 0.75rem;
 }
 
 .comp-badge {
     font-size: 0.65rem;
-    font-weight: var(--wg-weight-bold);
+    font-weight: 700;
     letter-spacing: 0.03em;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
     text-transform: uppercase;
     white-space: nowrap;
 }
-.comp-badge--pending    { background-color: var(--wg-border); color: var(--wg-text-muted); }
-.comp-badge--draft      { background-color: var(--wg-info-bg); color: var(--wg-info); }
-.comp-badge--inprogress { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.comp-badge--active     { background-color: var(--wg-success-bg); color: var(--wg-success); }
-.comp-badge--returned   { background-color: var(--wg-error-bg); color: var(--wg-error); }
-.comp-badge--flagged    { background-color: var(--wg-error-bg); color: var(--wg-error); }
-.comp-badge--expired    { background-color: var(--wg-error-bg); color: var(--wg-error); }
+.comp-badge--pending    { background-color: #ecebea; color: #514f4d; }
+.comp-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
+.comp-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
+.comp-badge--active     { background-color: #d4f4e2; color: #04844b; }
+.comp-badge--returned   { background-color: #fdecea; color: #c23934; }
+.comp-badge--flagged    { background-color: #e3e1fb; color: #4b3fb0; }
+.comp-badge--expired    { background-color: #fdecea; color: #c23934; }
 
 .comp-return-banner {
     display: flex;
     align-items: flex-start;
     gap: 0.4rem;
-    background-color: var(--wg-error-bg);
-    border-left: 3px solid var(--wg-error);
+    background-color: #fdecea;
+    border-left: 3px solid #c23934;
     padding: 0.5rem 0.75rem;
     margin-bottom: 0.75rem;
     font-size: 0.8rem;
 }
-.comp-return-banner--refresh { background-color: var(--wg-error-bg); border-left-color: var(--wg-error); }
-.comp-return-banner--warning { background-color: var(--wg-warning-bg); border-left-color: var(--wg-warning-text); }
+.comp-return-banner--refresh { background-color: #fdecea; border-left-color: #c23934; }
+.comp-return-banner--warning { background-color: #fff3cd; border-left-color: #8a6d00; }
 
 .comp-file-row {
     display: flex;
@@ -286,7 +137,7 @@
 }
 
 .comp-file-meta {
-    color: var(--wg-text-muted);
+    color: #706e6b;
 }
 
 .comp-upload-row {
@@ -319,55 +170,55 @@
 
 .decision-content strong {
     font-size: 1rem;
-    color: var(--wg-gray);
+    color: #1b1b1b;
     display: block;
     margin-bottom: 0.25rem;
 }
 
 .decision-content p {
-    color: var(--wg-gray);
+    color: #2b2b2b;
     margin: 0;
     line-height: 1.4;
 }
 
 /* Passed (Green) */
 .decision-banner--passed {
-    background-color: var(--wg-success-bg);
-    border-color: var(--wg-success);
+    background-color: #eaf8f0;
+    border-color: #2e7d32;
     border-left-width: 5px;
 }
 
 /* Rejected (Red) */
 .decision-banner--rejected {
-    background-color: var(--wg-error-bg);
-    border-color: var(--wg-error);
+    background-color: #fdf2f2;
+    border-color: #d32f2f;
     border-left-width: 5px;
 }
 
 /* Suspended (Yellow) */
 .decision-banner--suspended {
-    background-color: var(--wg-warning-bg);
-    border-color: var(--wg-warning);
+    background-color: #fffde7;
+    border-color: #fbc02d;
     border-left-width: 5px;
 }
 .decision-icon-suspended {
-    --sds-c-icon-color-foreground: var(--wg-warning);
+    --sds-c-icon-color-foreground: #fbc02d;
 }
 
 /* Returned (Orange/Warning) */
 .decision-banner--returned {
-    background-color: var(--wg-warning-bg);
-    border-color: var(--wg-warning);
+    background-color: #fff3e0;
+    border-color: #f57c00;
     border-left-width: 5px;
 }
 .decision-icon-returned {
-    --sds-c-icon-color-foreground: var(--wg-warning);
+    --sds-c-icon-color-foreground: #f57c00;
 }
 
 /* Returned Comments Box */
 .comments-section {
     background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid var(--wg-warning);
+    border: 1px solid #ffe0b2;
     border-radius: 4px;
     padding: 0.75rem 1rem;
     margin: 0.75rem 0;
@@ -375,13 +226,13 @@
 
 .comments-section strong {
     font-size: 0.85rem;
-    color: var(--wg-warning-text);
+    color: #e65100;
     margin-bottom: 0.25rem;
 }
 
 .reviewer-comments {
     font-style: italic;
-    color: var(--wg-gray) !important;
+    color: #4e342e !important;
 }
 
 .footer-note {
@@ -396,8 +247,8 @@
     align-items: center;
     padding: 1.25rem 1.25rem;
     margin: 1.25rem 0 0 0;
-    border-top: 1px solid var(--wg-border);
-    background-color: var(--wg-white);
+    border-top: 1px solid #dddbda;
+    background-color: #fbfbfb;
     border-radius: 0 0 4px 4px;
     flex-wrap: wrap;
     gap: 1rem;
@@ -411,18 +262,18 @@
 
 .comp-footer-count {
     font-size: 0.95rem;
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
+    font-weight: 700;
+    color: #181818;
 }
 
 .comp-footer-hint {
     font-size: 0.8rem;
-    color: var(--wg-text-muted);
+    color: #706e6b;
 }
 
 .comp-footer-hint--ready {
-    color: var(--wg-success);
-    font-weight: var(--wg-weight-semibold);
+    color: #04844b;
+    font-weight: 600;
 }
 
 .comp-footer-actions {

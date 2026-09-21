@@ -1,54 +1,362 @@
-.preview-loading { display: flex; flex-direction: column; align-items: center; padding: 40px; gap: 12px; color: #666; font-size: 13px; }
-.preview-empty   { padding: 40px; text-align: center; color: #888; font-size: 13px; }
+@import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
 
-.preview-wrap { padding: 0 0 24px 0; }
+/* ═══════════════════════════════════════════════════════════════
+   wcfReviewerFormPreview — read-only reviewer evaluation
+   Used by the Reviewer "View Review" screen and the Approver side.
+   Looks the same as the Review & Submit step of
+   wcfProposalReviewForm, so a submitted review reads identically
+   to what the reviewer saw before submitting.
+   Class names are unchanged because the JS builds some of them
+   (rec-pill rec-yes/rec-no, pip pip-r1…pip-r5, pip-empty).
+   No hex values below by design.
+   ═══════════════════════════════════════════════════════════════ */
 
-/* Header */
-.preview-header { padding: 16px 20px; border-bottom: 2px solid #7b0d1e; margin-bottom: 4px; }
-.preview-title  { font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 0 0 6px 0; }
-.preview-meta   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: #555; }
-.meta-sep       { color: #ccc; }
-.meta-item      { color: #555; }
-.strength-label { color: #555; }
+:host {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+    container-type: inline-size;
+}
 
-.rec-pill     { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-.rec-yes      { background: #d4edda; color: #155724; }
-.rec-no       { background: #f8d7da; color: #721c24; }
+.preview-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-4);
+    padding-bottom: var(--wg-space-6);
+}
 
-/* Dimension block */
-.dim-block    { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; }
-.dim-header   { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.dim-num      { width: 26px; height: 26px; background: #7b0d1e; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-.dim-title-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
-.dim-title    { font-size: 13px; font-weight: 700; color: #1a1a1a; }
-.dim-mean     { font-size: 12px; color: #666; margin-left: auto; }
-.dim-mean strong { color: #7b0d1e; }
+/* Shared card surface */
+.preview-card {
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+    overflow: hidden;
+}
 
-/* Question row */
-.q-row    { display: flex; gap: 12px; padding: 8px 0; border-top: 1px solid #f8f8f8; flex-wrap: wrap; }
-.q-text   { flex: 1; min-width: 200px; font-size: 12px; color: #444; }
-.q-right  { display: flex; flex-direction: column; gap: 4px; min-width: 160px; }
-.q-comment { font-size: 11px; color: #666; font-style: italic; background: #f9f9f9; padding: 4px 8px; border-radius: 4px; border-left: 2px solid #ddd; }
+/* ── Header ── */
+.preview-header {
+    padding: var(--wg-space-5) var(--wg-space-6);
+}
 
-/* Rating pip */
-.pip       { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; }
-.pip-r5    { background: #d4edda; color: #155724; }
-.pip-r4    { background: #d1ecf1; color: #0c5460; }
-.pip-r3    { background: #fff3cd; color: #7a5200; }
-.pip-r2    { background: #f8d7da; color: #721c24; }
-.pip-r1    { background: #f5c6cb; color: #721c24; }
-.pip-empty { background: #eee; color: #999; }
+.preview-eyebrow {
+    margin: 0 0 var(--wg-space-1);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
 
-/* Strengths & Weaknesses */
-.sw-block   { display: flex; gap: 0; border-bottom: 1px solid #f0f0f0; }
-.sw-section { flex: 1; padding: 14px 20px; }
-.sw-section:first-child { border-right: 1px solid #f0f0f0; }
-.sw-title   { font-size: 12px; font-weight: 700; color: #7b0d1e; text-transform: uppercase; letter-spacing: .5px; margin: 0 0 8px 0; }
-.sw-item    { display: flex; gap: 8px; margin-bottom: 6px; }
-.sw-num     { width: 18px; height: 18px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #555; flex-shrink: 0; }
-.sw-text    { font-size: 12px; color: #444; }
-.sw-empty   { font-size: 12px; color: #bbb; font-style: italic; }
+.preview-title {
+    margin: 0 0 var(--wg-space-3);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
 
-/* Recommendation comments */
-.rec-block    { padding: 14px 20px; }
-.rec-comments { font-size: 12px; color: #444; line-height: 1.6; margin: 0; }
+.preview-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2) var(--wg-space-6);
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+}
+
+.meta-label {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.strength-label {
+    font-weight: var(--wg-weight-semibold);
+}
+
+/* Recommendation pill (classes from JS) */
+.rec-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-1);
+    padding: var(--wg-padding-tag);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+.rec-yes { background: var(--wg-success-bg); border-color: var(--wg-success); color: var(--wg-success); }
+.rec-no  { background: var(--wg-error-bg);   border-color: var(--wg-error);   color: var(--wg-error); }
+
+/* ── Overall score (same card as the review form's summary) ── */
+.score-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-5) var(--wg-space-6);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-left: var(--wg-border-width-banner) solid var(--wg-red);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+}
+
+.score-card-label {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.score-card-title {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.score-card-value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.score-card-num {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-page-title);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
+
+.score-card-of {
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+/* ── Category block ── */
+.dim-header {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-3) var(--wg-space-5);
+    background: var(--wg-surface-subtle);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.dim-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+}
+
+.dim-title-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1;
+    gap: var(--wg-space-2) var(--wg-space-3);
+    min-width: 0;
+}
+
+.dim-title {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
+}
+
+.dim-mean {
+    margin-left: auto;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+}
+
+.dim-mean strong { font-weight: var(--wg-weight-bold); }
+
+/* ── Question row ── */
+.q-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2) var(--wg-space-4);
+    padding: var(--wg-space-3) var(--wg-space-5);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.dim-header + .q-row { border-top: none; }
+
+.q-text {
+    flex: 1 1 240px;
+    min-width: 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+.q-id {
+    margin-right: var(--wg-space-1);
+    font-weight: var(--wg-weight-bold);
+}
+
+.q-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wg-space-1);
+    flex: 0 1 280px;
+    min-width: 0;
+}
+
+.q-ladder {
+    font-size: var(--wg-font-size-caption);
+    font-style: italic;
+    color: var(--wg-success);
+}
+
+.q-comment {
+    align-self: stretch;
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-surface-subtle);
+    border-left: 3px solid var(--wg-input-border);
+    border-radius: 0 var(--wg-radius-sm) var(--wg-radius-sm) 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* Rating pips (classes from JS) — same colors as the review form */
+.pip {
+    display: inline-block;
+    padding: 2px var(--wg-space-2);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+.pip-r5 { background: var(--wg-success-bg);     color: var(--wg-success);      border-color: var(--wg-success); }
+.pip-r4 { background: var(--wg-info-bg);        color: var(--wg-info-text);    border-color: var(--wg-info); }
+.pip-r3 { background: var(--wg-surface-subtle); color: var(--wg-gray);         border-color: var(--wg-input-border); }
+.pip-r2 { background: var(--wg-warning-bg);     color: var(--wg-warning-text); border-color: var(--wg-warning); }
+.pip-r1 { background: var(--wg-error-bg);       color: var(--wg-error);        border-color: var(--wg-error); }
+.pip-empty { border-style: dashed; font-style: italic; }
+
+/* ── Strengths & weaknesses ── */
+.sw-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.sw-section {
+    min-width: 0;
+    padding: var(--wg-space-4) var(--wg-space-5);
+}
+
+.sw-section:first-child {
+    border-right: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.sw-title {
+    margin: 0 0 var(--wg-space-3);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.sw-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-2);
+}
+
+.sw-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+}
+
+.sw-text {
+    font-size: var(--wg-font-size-label);
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+.sw-empty {
+    font-size: var(--wg-font-size-label);
+    font-style: italic;
+    color: var(--wg-text-muted);
+}
+
+/* ── Recommendation comments ── */
+.rec-block {
+    padding: var(--wg-space-4) var(--wg-space-5);
+}
+
+.rec-comments {
+    margin: 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* ── Narrow panel (e.g. inside the approver split screen) ── */
+@container (max-width: 620px) {
+    .preview-header,
+    .score-card { padding: var(--wg-space-4); }
+
+    .dim-header,
+    .q-row,
+    .sw-section,
+    .rec-block { padding-left: var(--wg-space-3); padding-right: var(--wg-space-3); }
+
+    .q-right { flex: 1 1 100%; }
+
+    .sw-block { grid-template-columns: 1fr; }
+    .sw-section:first-child {
+        border-right: none;
+        border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    }
+
+    .dim-mean { margin-left: 0; }
+}

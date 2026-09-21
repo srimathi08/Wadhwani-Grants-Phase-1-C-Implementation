@@ -1,276 +1,291 @@
 @import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
 
 /* ═══════════════════════════════════════════════════════════════
-   WCF Approver Container — Wadhwani Foundation Design System
-
-   Wiring notes (brand consolidation pass):
-   - This file used the same local "navy + gold + red" secondary
-     palette as wcfPortalHeader (#1B2A4A / #C8391D / #E8A020), but
-     unlike that file the colors were literal hex scattered through
-     the rules rather than aliased through custom properties. Mapped
-     identically to wcfPortalHeader for cross-app consistency:
-       navy #1B2A4A / #243560           -> var(--wg-gray)
-       red  #C8391D / #c0392b           -> var(--wg-red)
-       red (deep) #a82e17 / #8a2412     -> var(--wg-red-deep)
-       gold #E8A020                     -> var(--wg-yellow)  (brand accent, not --wg-warning)
-       gold text tints #c9871a/#a8700f/#92670a -> var(--wg-warning-text)
-   - Track badges (jf/jc/lu/both) follow the established cross-
-     component convention: jf -> info (blue), jc -> warning (amber),
-     lu -> success (green, kept distinct from jf within the column),
-     both -> error (red).
-   - Assorted blues (#1a73e8, #1557b0, #103d82, #0369a1, #1e3a8a,
-     #bfdbfe, #bae6fd) -> var(--wg-info) / var(--wg-info-text) as the
-     "third distinct hue" for this file's status/decision system.
-   - Neutral washes (#f9fafc, #f7f8fa, #f4f6f9, #f0f2f6, #edf0f4,
-     #dde2eb, #e8ecf0, #d0d7e3) -> var(--wg-border); grays (#374151,
-     #302a2a) -> var(--wg-gray); (#4b5563, #8a94a6, #999, #aab2bf)
-     -> var(--wg-text-muted).
-   - Translucent overlays recalculated to the new tokens' actual rgb
-     (old navy rgba(27,42,74,x) -> rgba(65,64,65,x); old red
-     rgba(200,57,29,x)/rgba(196,57,43,x) -> rgba(191,32,38,x)).
-     Plain black/white shadow rgba values left untouched.
-   - Deliberately preserved as literal (not brand tokens): #f9fdfb
-     and #ff8b78 on .decision-tag / .dec-approve / .dec-decline —
-     these are contrast-tuned pastel text colors hand-picked to sit
-     legibly on the dark red topbar gradient; substituting brand
-     tokens here would break contrast against that specific background.
-   - Real buttons squared (border-radius: 0): .back-btn, .revoke-btn,
-     .pane-toggle-btn, .dec-btn, .modal-btn (and its confirm variants).
-     Badges/pills/cards kept rounded and tokenized to
-     var(--wg-radius-badge) / var(--wg-radius-pill) / var(--wg-radius-card)
-     / var(--wg-radius-sm) as appropriate.
-   - Typography: :host font-family -> var(--wg-font-body); headings,
-     labels, and buttons -> var(--wg-font-heading); all font-weight
-     and font-size literals tokenized to the nearest brand tier.
-   - Native toasts (lightning/platformShowToastEvent) replaced with
-     the established in-shadow-DOM banner pattern; see JS wiring notes.
+   wcfApproverContainer — Approver decision screen
+   RFI (left) + Reviewer evaluation (right) + decision action bar.
+   Visuals come from commonStyleTheme + wcfPortalUi, matching the
+   Validator and Reviewer split screens. Class names used by the JS
+   (decision-tag dec-*, modal-header modal-*, modal-btn btn-confirm-*,
+   pane-*, reason-tile*) are unchanged.
+   No hex values below by design.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Host ── */
 :host {
+    display: block;
+    width: 100%;
+
+    /* Height of the site header above this component. The screen fills
+       the rest of the viewport. Raise this if the action bar is cut off. */
+    --ac-offset: 0px;
+}
+
+.ac-shell {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh - var(--ac-offset));
     overflow: hidden;
+    background: var(--wg-surface-page);
     font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
 }
 
-/* ══════════════════════════════════════════════
-   TOP BAR
-   ══════════════════════════════════════════════ */
-.appr-topbar {
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red) 100%);
-    padding: 0 28px;
+/* ══ TOP BAR (white, like every other portal screen) ═══════════ */
+.ac-topbar {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
     flex-shrink: 0;
-    z-index: 100;
-    min-height: 64px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.28);
-    border-bottom: 3px solid var(--wg-red);
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
-.appr-topbar-left {
+.ac-topbar-left,
+.ac-topbar-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    min-width: 0;
 }
 
-.appr-topbar-right {
+.ac-title-block { min-width: 0; }
+
+.ac-title-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
 }
 
-/* Back button */
-.back-btn {
-    font-family: var(--wg-font-heading);
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.18);
-    color: rgba(255,255,255,0.9);
-    padding: 7px 14px;
-    border-radius: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-regular);
-    letter-spacing: 0.3px;
-    transition: background 0.15s, border-color 0.15s;
-    white-space: nowrap;
-    --lwc-colorTextIconDefault: rgba(255,255,255,0.85);
-}
-.back-btn:hover {
-    background: rgba(255,255,255,0.16);
-    border-color: rgba(255,255,255,0.35);
-}
-
-/* Brand divider */
-.brand-rule {
-    width: 3px;
-    height: 36px;
-    background: linear-gradient(180deg, var(--wg-red) 0%, var(--wg-yellow) 100%);
-    border-radius: 2px;
-    flex-shrink: 0;
-}
-
-/* Title block */
-.appr-title {
+.ac-title {
+    margin: 0;
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-white);
-    margin: 0 0 2px 0;
-    letter-spacing: 0.2px;
-}
-.appr-sub {
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.2px;
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
 
-/* Track Badges */
-.track-badge {
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: var(--wg-radius-badge);
-    font-size: var(--wg-font-size-caption); /* was 10px, bumped */
-    font-weight: var(--wg-weight-bold);
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+.ac-sub {
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
 }
-.track-jf   { background: var(--wg-white); color: var(--wg-info-text); border: 1px solid var(--wg-info); }
-.track-jc   { background: var(--wg-warning-bg); color: var(--wg-warning-text); border: 1px solid var(--wg-warning); }
-.track-lu   { background: var(--wg-success-bg); color: var(--wg-info-text); border: 1px solid var(--wg-info); }
-.track-both { background: var(--wg-error-bg); color: var(--wg-error); border: 1px solid var(--wg-error); }
 
-/* ══════════════════════════════════════════════
-   DECISION STATUS PILL
-   ══════════════════════════════════════════════ */
+.ac-status-pill {
+    white-space: normal;
+    text-align: left;
+}
+
+/* Recorded decision (class set by JS) */
 .decision-tag {
-    font-family: var(--wg-font-heading);
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 14px;
+    padding: var(--wg-padding-tag);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
     border-radius: var(--wg-radius-badge);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
     white-space: nowrap;
-    flex-shrink: 0;
 }
+
 .decision-tag::before {
     content: '';
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    flex-shrink: 0;
-}
-.dec-approve {
-    background: rgba(46, 125, 50, 0.15);
-    color: var(--wg-white); /* audit sweep fix -- near-white literal missed by the original pass */
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-.dec-approve::before { background: var(--wg-success); }
-
-.dec-decline {
-    background: rgba(191, 32, 38, 0.18);
-    color: #ff8b78; /* audit sweep note: deliberate light tint of var(--wg-red) for text contrast on the translucent red badge background (rgba(191,32,38,0.18)) -- commonStyleTheme has no dedicated "light red" text token, so left as literal per this batch's convention for tokenless tints */
-    border: 1px solid rgba(191, 32, 38, 0.35);
-}
-.dec-decline::before { background: var(--wg-red); } /* audit sweep fix -- solid dot now mirrors .dec-approve::before's solid var(--wg-success) treatment instead of the mismatched light tint */
-
-/* ══════════════════════════════════════════════
-   REVOKE ZONE — inline chip + button
-   ══════════════════════════════════════════════ */
-.revoke-zone {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(246, 135, 32, 0.1);
-    border: 1px solid rgba(246, 135, 32, 0.3);
-    border-radius: 8px;
-    padding: 5px 10px 5px 12px;
-    flex-shrink: 0;
+    background: currentColor;
 }
 
-.revoke-timer {
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-yellow);
-    white-space: nowrap;
-    letter-spacing: 0.3px;
-}
+.decision-tag.dec-approve     { background: var(--wg-success-bg); border-color: var(--wg-success); color: var(--wg-success); }
+.decision-tag.dec-decline     { background: var(--wg-error-bg);   border-color: var(--wg-error);   color: var(--wg-error); }
+.decision-tag.dec-conditional { background: var(--wg-warning-bg); border-color: var(--wg-warning); color: var(--wg-warning-text); }
 
-.revoke-btn {
-    font-family: var(--wg-font-heading);
-    background: var(--wg-gray);
-    color: var(--wg-white);
-    border: none;
-    border-radius: 0;
-    padding: 5px 12px;
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    letter-spacing: 0.4px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    white-space: nowrap;
-    text-transform: uppercase;
-}
-.revoke-btn:hover {
-    background: var(--wg-red-deep);
-    transform: translateY(-1px);
-}
-.revoke-btn:active { transform: translateY(0); }
-
-/* Locked state */
-.revoke-expired {
+.ac-revoke-timer,
+.ac-revoke-expired {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
+    gap: var(--wg-space-1);
+    font-size: var(--wg-font-size-caption);
     font-weight: var(--wg-weight-semibold);
-    color: rgba(24, 31, 31, 0.952);
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: var(--wg-radius-badge);
-    padding: 4px 12px;
-    letter-spacing: 0.3px;
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
-/* ══════════════════════════════════════════════
-   SPLIT PANE
-   ══════════════════════════════════════════════ */
+.ac-revoke-timer   { color: var(--wg-warning-text); --slds-c-icon-color-foreground-default: var(--wg-warning-text); }
+.ac-revoke-expired { color: var(--wg-text-muted);   --slds-c-icon-color-foreground-default: var(--wg-text-muted); }
+
+/* ══ RETURN CONVERSATION — compact collapsible strip ═══════════
+   Collapsed (default): a single ~44px line with the latest reply,
+   so the RFI and review panels keep their height.
+   Expanded: the thread in time order, capped at ~180px with its
+   own scroll so a long message never pushes the panels down.   */
+.ac-convo {
+    flex-shrink: 0;
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.ac-convo-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: var(--wg-space-2) var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border: 0;
+    border-left: 3px solid var(--wg-warning);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.3;
+    color: var(--wg-gray);
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background 0.15s ease;
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
+}
+
+.ac-convo-bar:hover { background: var(--wg-warning-bg); }
+
+.ac-convo-bar:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: -2px;
+}
+
+.ac-convo-icon { flex-shrink: 0; }
+
+.ac-convo-title {
+    flex-shrink: 0;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--wg-gray);
+}
+
+.ac-convo-count {
+    flex-shrink: 0;
+    padding: 1px var(--wg-space-2);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+    white-space: nowrap;
+}
+
+/* One-line preview of the latest reply, truncated with … */
+.ac-convo-preview {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: var(--wg-space-2);
+    padding-left: var(--wg-space-3);
+    border-left: var(--wg-border-width-thin) solid var(--wg-border);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--wg-text-muted);
+}
+
+.ac-convo-preview strong {
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.ac-convo-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-1);
+    flex-shrink: 0;
+    margin-left: auto;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-red);
+    --slds-c-icon-color-foreground-default: var(--wg-red);
+}
+
+/* Expanded thread */
+.ac-convo-thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-2);
+    max-height: 180px;
+    overflow-y: auto;
+    padding: var(--wg-space-3) var(--wg-space-4);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    box-sizing: border-box;
+}
+
+.ac-msg {
+    max-width: 760px;
+    padding: var(--wg-space-2) var(--wg-space-3);
+    border-left: 3px solid transparent;
+    border-radius: var(--wg-radius-sm);
+}
+
+.ac-msg--approver { background: var(--wg-warning-bg); border-left-color: var(--wg-warning); }
+.ac-msg--reviewer { background: var(--wg-info-bg);    border-left-color: var(--wg-info); }
+
+.ac-msg-meta {
+    display: flex;
+    align-items: baseline;
+    gap: var(--wg-space-2);
+    margin-bottom: 2px;
+}
+
+.ac-msg-author {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.ac-msg-date {
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
+}
+
+.ac-msg-text {
+    margin: 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* ══ SPLIT PANE ════════════════════════════════════════════════ */
 .split-pane {
     position: relative;
     display: flex;
     flex: 1;
-    overflow: hidden;
     min-height: 0;
+    overflow: hidden;
     --left-width: 50%;
     --right-width: 50%;
 }
 
 .pane {
-    min-width: 0;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     overflow: hidden;
-    transition: flex-basis 0.05s linear;
+    background: var(--wg-white);
 }
 
 .pane-left {
     flex: 0 0 var(--left-width);
     max-width: var(--left-width);
-    border-right: 2px solid var(--wg-border);
 }
 
 .pane-right {
@@ -278,619 +293,309 @@
     max-width: var(--right-width);
 }
 
-/* Collapsed state overrides the variable-driven width */
 .pane-left.pane-collapsed,
 .pane-right.pane-collapsed {
     flex: 0 0 44px;
     max-width: 44px;
+    border-right: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
-/* When the *other* pane is collapsed, this pane should fill remaining space */
-.split-pane:has(.pane-left.pane-collapsed) .pane-right:not(.pane-collapsed) {
-    flex: 1 1 auto;
-    max-width: none;
-}
+.split-pane:has(.pane-left.pane-collapsed) .pane-right:not(.pane-collapsed),
 .split-pane:has(.pane-right.pane-collapsed) .pane-left:not(.pane-collapsed) {
     flex: 1 1 auto;
     max-width: none;
 }
 
-/* Pane label bar */
 .pane-label {
-    font-family: var(--wg-font-heading);
-    background: var(--wg-border);
-    border-bottom: 2px solid var(--wg-gray);
-    padding: 9px 20px;
-    font-size: var(--wg-font-size-caption); /* was 10px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: var(--wg-space-2);
+    flex-shrink: 0;
+    min-height: 48px;
+    padding: var(--wg-space-2) var(--wg-space-4);
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    box-sizing: border-box;
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
 }
 
+.pane-left .pane-label .pane-toggle-btn { margin-left: auto; }
+
 .pane-label-text {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .pane-toggle-btn {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-border);
-    border-radius: 0;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s;
-}
-.pane-toggle-btn:hover {
-    background: var(--wg-border);
-    border-color: var(--wg-gray);
+    width: var(--wg-control-height);
+    height: var(--wg-control-height);
 }
 
 .pane-body {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    background: var(--wg-white);
+    background: var(--wg-surface-page);
 }
 
-/* Collapsed rail styling */
+.pane-body--padded {
+    padding: var(--wg-space-4);
+    box-sizing: border-box;
+}
+
 .pane-collapsed .pane-label {
     flex-direction: column;
-    justify-content: flex-start;
-    padding: 12px 4px;
-}
-.pane-collapsed .pane-label-text {
-    display: none;
+    padding: var(--wg-space-3) var(--wg-space-1);
+    border-bottom: none;
 }
 
-/* Draggable divider */
+.pane-collapsed .pane-label-text { display: none; }
+.pane-collapsed .pane-label .pane-toggle-btn { margin-left: 0; }
+
+/* Draggable divider — neutral at rest, brand red on hover */
 .resizer {
-    width: 6px;
-    flex-shrink: 0;
-    cursor: col-resize;
-    background: var(--wg-border);
     position: relative;
-    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 6px;
+    background: var(--wg-border);
+    cursor: col-resize;
+    transition: background 0.15s ease;
 }
-.resizer:hover {
-    background: var(--wg-red);
-}
-.resizer::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 3px;
-    height: 44px;
-    background: rgba(255,255,255,0.6);
+
+.resizer:hover { background: var(--wg-red); }
+
+.resizer-handle {
+    width: 2px;
+    height: 32px;
     border-radius: 2px;
+    background: var(--wg-input-border);
+    pointer-events: none;
 }
-/* ══════════════════════════════════════════════
-   ACTION BAR
-   ══════════════════════════════════════════════ */
+
+.resizer:hover .resizer-handle { background: var(--wg-white); }
+
+/* ══ ACTION BAR ════════════════════════════════════════════════ */
 .action-bar {
     flex-shrink: 0;
-    background: var(--wg-white);
-    border-top: 3px solid var(--wg-gray);
-    padding: 14px 28px;
-    z-index: 200;
-    box-shadow: 0 -4px 20px rgba(65, 64, 65, 0.10);
     max-height: 60vh;
     overflow-y: auto;
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-white);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    box-shadow: 0 -3px 10px rgba(65, 64, 65, 0.08);   /* rgb of --wg-gray */
 }
+
 .action-bar-inner {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: var(--wg-space-3);
 }
 
-.comment-wrap { width: 100%; }
+.ac-field { width: 100%; }
 
-.comment-label {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
-    display: block;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.ac-req {
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-error);
 }
-.opt { font-weight: var(--wg-weight-regular); color: var(--wg-text-muted); text-transform: none; letter-spacing: 0; }
 
-.comment-box {
-    width: 100%;
-    border: 1.5px solid var(--wg-border);
-    border-radius: var(--wg-radius-sm);
-    padding: 8px 12px;
-    font-size: var(--wg-font-size-label);
-    resize: none;
-    outline: none;
-    font-family: inherit;
-    color: var(--wg-gray);
-    background: var(--wg-border);
-    transition: border-color 0.15s, box-shadow 0.15s;
-    box-sizing: border-box;
+.ac-textarea {
+    min-height: 64px;
+    resize: vertical;
+    line-height: var(--wg-line-height-base);
 }
-.comment-box:focus {
-    border-color: var(--wg-gray);
-    background: var(--wg-white);
-    box-shadow: 0 0 0 3px rgba(65, 64, 65, 0.08);
-}
-.comment-box::placeholder { color: var(--wg-text-muted); }
 
-/* Decision buttons */
 .btn-group {
     display: flex;
-    gap: 10px;
+    align-items: center;
     justify-content: flex-end;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
 }
 
-.dec-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 28px;
-    border-radius: 0;
-    border: none;
-    font-size: var(--wg-font-size-label);
-    font-weight: var(--wg-weight-bold);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-}
-.dec-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-}
-.dec-btn:active:not(:disabled) { transform: translateY(0); }
-.dec-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-.dec-icon { --lwc-colorTextIconDefault: var(--wg-white); }
-
-.btn-approve {
-    font-family: var(--wg-font-heading);
-    background: linear-gradient(135deg, var(--wg-info) 0%, var(--wg-info-text) 100%);
-    color: var(--wg-white);
-}
-.btn-approve:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-info-text) 0%, var(--wg-info-text) 100%);
-}
-
-.btn-decline {
-    font-family: var(--wg-font-heading);
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%);
-    color: var(--wg-white);
-}
-.btn-decline:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-red-deep) 0%, var(--wg-red-deep) 100%);
-}
-
-/* ══════════════════════════════════════════════
-   MODAL — shared base
-   ══════════════════════════════════════════════ */
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 15, 30, 0.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(3px);
-}
-
-.modal-box {
-    background: var(--wg-white);
-    border-radius: 14px;
-    width: 460px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
-    overflow: hidden;
-    animation: modalIn 0.2s ease;
-}
-
-@keyframes modalIn {
-    from { opacity: 0; transform: scale(0.95) translateY(8px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-header {
-    padding: 20px 28px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.modal-approve { background: linear-gradient(135deg, var(--wg-info) 0%, var(--wg-info-text) 100%); }
-.modal-decline { background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%); }
-.modal-revoke  { background: linear-gradient(135deg, var(--wg-gray) 0%, var(--wg-gray) 100%); }
-
-.modal-header-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    --lwc-colorTextIconDefault: var(--wg-white);
-}
-
-.modal-title {
-    font-family: var(--wg-font-heading);
-    color: var(--wg-white);
-    font-size: var(--wg-font-size-sub-heading); /* was 16px, nearest tier */
-    font-weight: var(--wg-weight-bold);
-    margin: 0;
-    letter-spacing: 0.2px;
-}
-
-.modal-body { padding: 24px 28px; }
-
-.modal-body p {
-    font-size: var(--wg-font-size-body);
-    color: var(--wg-gray);
-    margin: 0 0 14px 0;
-    line-height: 1.65;
-}
-
-.modal-comment {
-    background: var(--wg-border);
-    border-left: 3px solid var(--wg-gray);
-    padding: 10px 14px;
-    border-radius: 0 6px 6px 0;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-text-muted);
-    font-style: italic;
-}
-
-.modal-revoke-warning {
-    background: rgba(246, 135, 32, 0.08);
-    border: 1px solid rgba(246, 135, 32, 0.3);
-    border-radius: var(--wg-radius-sm);
-    padding: 12px 14px;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-warning-text);
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    line-height: 1.5;
-}
-
-.modal-footer {
-    padding: 16px 28px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    border-top: 1px solid var(--wg-border);
-    background: var(--wg-border);
-}
-
-.modal-btn {
-    padding: 9px 22px;
-    border-radius: 0;
-    font-size: var(--wg-font-size-label);
-    font-weight: var(--wg-weight-bold);
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    letter-spacing: 0.3px;
-    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-}
-.modal-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-}
-.modal-btn:active:not(:disabled) { transform: translateY(0); }
-.modal-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-
-.btn-cancel         {
-    font-family: var(--wg-font-heading); background: var(--wg-border); color: var(--wg-text-muted); }
-.btn-cancel:hover:not(:disabled) { background: var(--wg-border); }
-
-.btn-confirm-approve {
-    background: linear-gradient(135deg, var(--wg-info) 0%, var(--wg-info-text) 100%);
-    color: var(--wg-white);
-}
-.btn-confirm-approve:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-info-text) 0%, var(--wg-info-text) 100%);
-}
-
-.btn-confirm-decline {
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%);
-    color: var(--wg-white);
-}
-.btn-confirm-decline:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-red-deep) 0%, var(--wg-red-deep) 100%);
-}
-
-.btn-confirm-revoke {
-    background: linear-gradient(135deg, var(--wg-gray) 0%, var(--wg-gray) 100%);
-    color: var(--wg-white);
-}
-.btn-confirm-revoke:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-gray) 0%, var(--wg-gray) 100%);
-}
-
-.btn-conditional {
-    font-family: var(--wg-font-heading);
-    background: linear-gradient(135deg, var(--wg-yellow) 0%, var(--wg-warning-text) 100%);
-    color: var(--wg-white);
-}
-.btn-conditional:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-warning-text) 0%, var(--wg-warning-text) 100%);
-}
-
-.modal-header.modal-conditional {
-    background: linear-gradient(135deg, var(--wg-yellow) 0%, var(--wg-warning-text) 100%);
-}
-
-.modal-btn.btn-confirm-conditional {
-    background: linear-gradient(135deg, var(--wg-yellow) 0%, var(--wg-warning-text) 100%);
-    color: var(--wg-white);
-}
-.modal-btn.btn-confirm-conditional:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-warning-text) 0%, var(--wg-warning-text) 100%);
-}
-
-.decision-tag.dec-conditional {
-    background: rgba(246, 135, 32, 0.15);
-    color: var(--wg-yellow);
-    border: 1px solid rgba(246, 135, 32, 0.3);
-}
-.decision-tag.dec-conditional::before { background: var(--wg-yellow); }
-
-.comment-label .required {
-    color: var(--wg-red);
-    font-weight: var(--wg-weight-bold);
-    margin-left: 4px;
-}
-/* ══════════════════════════════════════════════
-   RETURN — button, modal, and awaiting-reviewer banner
-   ══════════════════════════════════════════════ */
-.btn-return {
-    font-family: var(--wg-font-heading);
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%);
-    color: var(--wg-white);
-}
-.btn-return:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-red-deep) 0%, var(--wg-red-deep) 100%);
-}
-
-.modal-header.modal-return {
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%);
-}
-
-.modal-btn.btn-confirm-return {
-    background: linear-gradient(135deg, var(--wg-red) 0%, var(--wg-red-deep) 100%);
-    color: var(--wg-white);
-}
-.modal-btn.btn-confirm-return:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--wg-red-deep) 0%, var(--wg-red-deep) 100%);
-}
-
-.returned-banner {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: var(--wg-radius-badge);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    letter-spacing: 0.3px;
-    background: rgba(255,255,255,0.12);
-    color: var(--wg-white);
-    border: 1px solid rgba(255,255,255,0.3);
-    white-space: nowrap;
-    --lwc-colorTextIconDefault: var(--wg-white);
-}
-.convo-thread {
-    background: var(--wg-border);
-    border-bottom: 2px solid var(--wg-gray);
-    padding: 16px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.convo-thread-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    --lwc-colorTextIconDefault: var(--wg-gray);
-}
-
-.convo-header-title {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-/* NEW: wrapper to hold both messages in a row */
-.convo-thread-body {
-    display: flex;
-    gap: 16px;
-    align-items: stretch;
-}
-
-.convo-msg {
-    background: var(--wg-white);
-    border-radius: var(--wg-radius-card);
-    padding: 12px 16px;
-    flex: 1 1 50%;
-    min-width: 0;
-    box-shadow: 0 1px 4px rgba(65, 64, 65, 0.08);
-    border-left: 4px solid transparent;
-}
-
-.convo-msg--approver {
-    border-left-color: var(--wg-yellow);
-    background: rgba(246, 135, 32, 0.06);
-}
-
-.convo-msg--reviewer {
-    border-left-color: var(--wg-gray);
-    background: rgba(65, 64, 65, 0.04);
-    margin-left: 0; /* remove old indent */
-}
-
-.convo-msg-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-}
-
-.convo-msg-author {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-}
-
-.convo-msg-date {
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest tier */
-    color: var(--wg-text-muted);
-    font-weight: var(--wg-weight-regular);
-}
-
-.convo-msg-text {
-    font-size: var(--wg-font-size-label); /* was 13.5px, nearest tier */
-    color: var(--wg-gray);
-    margin: 0;
-    line-height: 1.55;
-    font-style: italic;
-}
-.reasons-wrap {
-    width: 100%;
-}
-
+/* Rejection reason tiles — same selection language as the forms */
 .reason-tile-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wg-space-2);
 }
 
 .reason-tile {
     display: flex;
     align-items: center;
-    gap: 10px;
-    border: 1.5px solid var(--wg-border);
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
     border-radius: var(--wg-radius-sm);
-    padding: 10px 14px;
-    background: var(--wg-border);
-    cursor: pointer;
     font-size: var(--wg-font-size-label);
-    color: var(--wg-gray);
-    transition: border-color 0.15s, background 0.15s;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.reason-tile:hover {
-    border-color: var(--wg-gray);
-    background: var(--wg-white);
-}
+.reason-tile:hover { border-color: var(--wg-red); }
 
 .reason-tile--selected {
+    background: var(--wg-error-bg);
     border-color: var(--wg-red);
-    background: rgba(191, 32, 38, 0.06);
 }
 
 .reason-tile input[type="checkbox"] {
+    flex-shrink: 0;
     width: 16px;
     height: 16px;
+    margin: 0;
     accent-color: var(--wg-red);
     cursor: pointer;
-    flex-shrink: 0;
-    margin: 0;
 }
 
 .reason-tile-label {
-    font-weight: var(--wg-weight-regular);
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
-.convo-reason-list {
-    margin: 8px 0 0 0;
-    padding-left: 18px;
-    font-size: var(--wg-font-size-caption); /* was 12.5px, nearest tier */
-    color: var(--wg-warning-text);
-}
-.convo-reason-list li { margin-bottom: 2px; }
-/* ── Toast banner (replaces native ShowToastEvent) ─────────────────
-   Same .wg-toast-banner pattern built for wcfDynamicForm / wcfvalidator-
-   container, reusing the shared .error-banner/.warning-banner/
-   .success-banner/.info-banner tinted-bg/left-accent classes from
-   commonStyleTheme. ── */
-.wg-toast-banner {
+/* ══ MODALS ════════════════════════════════════════════════════ */
+.modal-backdrop {
     position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99998;
-    width: min(520px, calc(100vw - 32px));
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-}
-.wg-toast-banner .wg-toast-body {
-    flex: 1;
+    inset: 0;
+    z-index: 9999;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    padding: var(--wg-space-4);
+    background: rgba(65, 64, 65, 0.55);   /* rgb of --wg-gray */
 }
-.wg-toast-banner .wg-toast-title {
+
+.modal-box {
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    background: var(--wg-white);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-hover);
+    animation: ac-modal-in 0.2s ease;
+}
+
+@keyframes ac-modal-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header: white with a colored top edge that carries the meaning */
+.modal-header {
+    padding: var(--wg-space-4) var(--wg-space-6);
+    background: var(--wg-white);
+    border-top: var(--wg-border-width-banner) solid var(--wg-gray);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.modal-approve     { border-top-color: var(--wg-success); }
+.modal-return,
+.modal-decline     { border-top-color: var(--wg-error); }
+.modal-conditional { border-top-color: var(--wg-warning); }
+.modal-revoke      { border-top-color: var(--wg-gray); }
+
+.modal-title {
+    margin: 0;
     font-family: var(--wg-font-heading);
-    font-weight: var(--wg-weight-bold);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
-.wg-toast-banner svg {
-    flex-shrink: 0;
-    margin-top: 1px;
+
+.modal-body { padding: var(--wg-space-5) var(--wg-space-6); }
+
+.modal-body p {
+    margin: 0 0 var(--wg-space-3);
+    line-height: 1.6;
 }
-.wg-toast-banner .wg-toast-close {
-    flex-shrink: 0;
-    margin-left: auto;
-    background: none;
-    border: none;
-    padding: 0;
+
+.modal-comment {
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-surface-subtle);
+    border-left: 3px solid var(--wg-input-border);
+    border-radius: 0 var(--wg-radius-sm) var(--wg-radius-sm) 0;
+    font-size: var(--wg-font-size-label);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-3) var(--wg-space-6);
+    background: var(--wg-surface-subtle);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+/* Confirm buttons (classes set by JS) — square, like every portal button */
+.modal-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wg-space-2);
+    min-width: 120px;
+    height: var(--wg-control-height);
+    padding: 0 var(--wg-space-4);
+    border: 0;
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-white);
     cursor: pointer;
-    color: inherit;
-    opacity: 0.65;
+    transition: background 0.15s ease;
 }
-.wg-toast-banner .wg-toast-close:hover {
-    opacity: 1;
+
+.modal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.modal-btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
 }
-@media (max-width: 600px) {
-    .wg-toast-banner {
-        top: 10px;
-        width: calc(100vw - 20px);
+
+.btn-confirm-approve                               { background: var(--wg-success); }
+.btn-confirm-approve:hover:not(:disabled)          { background: var(--wg-success-deep); }
+.btn-confirm-return,
+.btn-confirm-decline                               { background: var(--wg-red); }
+.btn-confirm-return:hover:not(:disabled),
+.btn-confirm-decline:hover:not(:disabled)          { background: var(--wg-red-deep); }
+.btn-confirm-conditional                           { background: var(--wg-orange); }
+.btn-confirm-conditional:hover:not(:disabled)      { background: var(--wg-orange-deep); }
+
+/* ══ RESPONSIVE ════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+    .ac-shell { height: auto; overflow: visible; }
+
+    .split-pane { flex-direction: column; overflow: visible; }
+
+    .pane-left,
+    .pane-right {
+        flex: none !important;
+        max-width: 100% !important;
     }
+
+    .pane-left { max-height: 60vh; border-bottom: var(--wg-border-width-thin) solid var(--wg-border); }
+
+    .resizer { display: none; }
+
+    .ac-convo-preview { display: none; }
+
+    .reason-tile-grid { grid-template-columns: 1fr; }
+
+    .action-bar { position: sticky; bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-box { animation: none; }
+    .resizer, .reason-tile, .modal-btn, .ac-convo-bar { transition: none; }
 }

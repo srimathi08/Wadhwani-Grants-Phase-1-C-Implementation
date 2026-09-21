@@ -1,1487 +1,1206 @@
 @import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
 
-/* ═══════════════════════════════════════════════════════════════════
-   WCF VALIDATOR FORM — CSS  (Full-width + badge fix)
-   Rebranded to the Wadhwani token system (commonStyleTheme).
+/* ═══════════════════════════════════════════════════════
+   WCF VALIDATOR FORM — wcfValidatorForm.css
+   Right panel of the validator split screen.
 
-   WIRING / MAPPING NOTES (read before touching colors below):
+   All colors / fonts / radii come from commonStyleTheme and
+   wcfPortalUi. No hex values below by design.
 
-   • Primary brand hue in this file is ORANGE (#E8622A, 24 occurrences)
-     rather than the red seen in most sibling components → mapped to
-     var(--wg-orange). Its 0.3-alpha box-shadow on .wcf-vf-sec-num was
-     recalculated from wg-orange's own rgb (242,103,42) rather than the
-     original hex's rgb, per the batch's "recalc translucent overlays
-     to the new token's actual rgb" rule.
-   • Warm neutral borders (#e5e1d8, #f1f1f1, #e5e7eb, #e0e0e0) → var(--wg-border).
-     Form-control resting borders (#e2ddd5 / #d8d4cc / #d1cfc8 / #c8c4bc,
-     used on pills/checkboxes/radios/decision cards) → var(--wg-input-border),
-     kept as a separate bucket from the structural borders above because
-     they represent interactive-control chrome, not layout dividers.
-   • Near-black text (#1a1a1a, #111827, #444) → var(--wg-gray). Mid-gray
-     text (#999, #6b6b6b, #555, #706e6b, #777, #bbb, #aaa, #333, #374151)
-     → var(--wg-text-muted).
-   • This file has THREE originally-distinct amber/gold palettes (the
-     auto-state amber, the S3.1 "Return" decision badge amber, and the
-     Draft Resume Banner gold) plus the Save-Draft button's own amber
-     hooks — all consolidated onto the single var(--wg-warning) family,
-     matching the precedent set by wcfReviewerContainer's two-gold
-     consolidation. The Flag-checklist amber "Suggested by S2" tag and
-     .wcf-check-suggested also join this family.
-   • LEFTOVER HUE #1 — the Flag decision badge/selected-state pair
-     (.wcf-dec-badge-flag / .wcf-dec-sel-flag) was pink (#fce7f3 family)
-     with no brand token. Blue/info was ruled out because it's already
-     claimed by the Return-workflow family below (qnum pills, question
-     cards, dep-banner-return) and both would otherwise render side by
-     side in the same decision-cards grid. Reassigned instead to the
-     var(--wg-error) family — "Flag" is semantically an escalation /
-     concern marker, closer to error than to any other claimed hue, and
-     it never appears on-screen at the same time as this file's other
-     red usages (the Return-branch question-remove buttons, the
-     word-count-limit text), which live in a different section.
-   • LEFTOVER HUE #2 — .wcf-dep-banner-other (purple, #6b21a8) is a
-     small uppercase label with no brand token and no strong semantic
-     fit; folded into var(--wg-gray) as a neutral "leftover", the same
-     treatment this batch has given navy elsewhere.
-   • .wcf-dep-banner-flag (amber/brown, #b45309) was, in the original
-     file, ALREADY a different color from the pink Flag decision badge
-     above it — the original author never unified these two "Flag"
-     touchpoints. That distinction is preserved rather than forced
-     together: this label stays in the warning family
-     (var(--wg-warning-text)) while the decision badge moves to error.
-   • The Return-workflow blue family (question-number pills, question
-     cards, preview question cards, .wcf-dep-banner-return) all map to
-     var(--wg-info) / var(--wg-info-bg) / var(--wg-info-text). Light-blue
-     tints that have no matching brand background token (#bfdbfe,
-     #dbeafe, #eff6ff, #f0f7ff and their box-shadow alpha) were
-     recalculated as rgba() over wg-info's own rgb (35,128,209).
-   • .wcf-saving-text's original comment literally reads "Wadhwani red,
-     matches your rebrand" — that is brand RED, not error-red, so it
-     maps to var(--wg-red) rather than var(--wg-error).
-   • .wcf-reviewer-return-banner (the "Returned by Reviewer" notice) is
-     a genuine alert state → full var(--wg-error) / var(--wg-error-bg)
-     family.
-   • The PREVIEW MODAL block (.preview-*, .decision-card, .decision-title,
-     .slds-modal__* overrides) is a visibly OLDER, second color palette
-     within this same file (navy #16325c, orange #ea580c/#c2410c, grays
-     #374151/#111827) distinct from the #E8622A used everywhere else.
-     Retokenized in place using the same navy→gray and orange→wg-orange
-     rules as the rest of the file, rather than treated as a separate
-     "leftover hue" case, since both palettes ultimately resolve to
-     tokens already in use here.
-   • BUTTON SQUARING: three real <button> elements exist in the markup
-     (.wcf-draft-dismiss, .wcf-qnum-pill / -sel, .wcf-qcard-remove) and
-     are squared with border-radius: 0 despite their pill/circular
-     resting shape, per the batch convention that only the HTML tag
-     (real <button> vs. a decorative <div>) decides squaring — badges,
-     pills and tags that are NOT real buttons keep their rounded shape.
-     .wcf-draft-btn / .wcf-seal-btn (lightning-button) and the two
-     unclassed lightning-button CTAs in the preview-modal footer are
-     squared via the --slds-c-button-radius-border SLDS hook, since
-     lightning-button renders its own internal shadow DOM that plain
-     CSS selectors cannot reach — same technique first used on
-     wcfFormPreview's .rv-download-btn.
-   • No pre-existing custom-toast infrastructure existed anywhere in
-     this component (verified via grep before starting), unlike
-     wcfReviewerContainer's half-built version — the full .wg-toast-banner
-     block below, and the matching JS/HTML, were built from scratch.
+   Class names are unchanged because the JS builds many of
+   them (pills, options, decision cards, checklist, question
+   cards, word counters, progress bar). Only their look changed:
+   the orange/beige palette is replaced by the shared tokens,
+   and duplicate rule blocks were merged.
 
-   UPDATED: Container-query based responsiveness so the form stays
-   readable at ANY split-pane divider width — layout reacts to the
-   PANEL width, not the viewport.
-═══════════════════════════════════════════════════════════════════ */
+   Selection language used everywhere in this form:
+     unselected → white, grey border
+     hover      → red border
+     selected   → red border + pale red tint + red-deep text
 
-/* ── HOST: stretch component to fill the Experience Cloud region ── */
+   Container queries react to the PANEL width (split-pane
+   divider), not the browser viewport.
+═══════════════════════════════════════════════════════ */
+
 :host {
-    display        : block;
-    width          : 100%;
-    max-width      : 100%;
-    box-sizing     : border-box;
-    font-family    : var(--wg-font-body), 'Salesforce Sans', Arial, sans-serif;
-    container-type : inline-size;   /* ← ADDED: enables width-based container queries */
-}
+    display: block;
+    position: relative;             /* anchors the saving overlay to this panel */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+    container-type: inline-size;
 
-/* ═══════════════════════════════════════════════════════════════════
-   WG TOAST BANNER — replaces native ShowToastEvent (renders outside
-   the shadow tree and cannot be restyled). Built from scratch for
-   this component; reuses the shared .error-banner / .warning-banner /
-   .success-banner / .info-banner classes from commonStyleTheme.
-═══════════════════════════════════════════════════════════════════ */
-.wg-toast-banner {
-    position       : fixed;
-    top            : 20px;
-    left           : 50%;
-    transform      : translateX(-50%);
-    z-index        : 99998;
-    display        : flex;
-    align-items    : flex-start;
-    gap            : 0.6rem;
-    min-width      : 320px;
-    max-width      : 520px;
-    padding        : 0.85rem 1.1rem;
-    border-radius  : var(--wg-radius-md);
-    box-shadow     : 0 4px 16px rgba(65, 64, 65, 0.18);
-    animation      : wg-toast-slide-in 0.2s ease;
-}
-
-@keyframes wg-toast-slide-in {
-    from { opacity: 0; transform: translate(-50%, -10px); }
-    to   { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.wg-toast-banner-icon {
-    flex-shrink : 0;
-    font-size   : 1.1rem;
-    line-height : 1;
-}
-
-.wg-toast-banner-body {
-    flex      : 1;
-    min-width : 0;
-}
-
-.wg-toast-banner-title {
-    font-weight   : var(--wg-weight-bold);
-    font-size     : var(--wg-font-size-label);
-    margin-bottom : 0.15rem;
-}
-
-.wg-toast-banner-message {
-    font-size   : var(--wg-font-size-caption);
-    line-height : 1.4;
-    overflow-wrap: break-word;
-}
-
-.wg-toast-banner-close {
-    background    : none;
-    border        : none;
-    cursor        : pointer;
-    flex-shrink   : 0;
-    font-size     : 1rem;
-    line-height   : 1;
-    opacity       : 0.6;
-    padding       : 0.1rem;
-    border-radius : 0;   /* real <button> — squared */
-}
-.wg-toast-banner-close:hover { opacity: 1; }
-
-/* ──────────────────────────────────────────
-   HEADER
-────────────────────────────────────────── */
-.wcf-header {
-    display        : flex;
-    align-items    : center;
-    gap            : 1.5rem;
-    padding        : 0.75rem 2rem;
-    background     : var(--wg-white);
-    border-bottom  : 2px solid var(--wg-border);
-    position       : sticky;
-    top            : 0;
-    z-index        : 200;
-    width          : 100%;
-    box-sizing     : border-box;
-}
-
-.wcf-header-brand {
-    display     : flex;
-    align-items : center;
-    gap         : 0.6rem;
-    flex        : 0 0 auto;
-}
-
-.wcf-header-logo {
-    height      : 32px;
-    width       : auto;
-    object-fit  : contain;
-}
-
-.wcf-header-org {
-    font-size      : var(--wg-font-size-sub-heading);
-    font-weight    : var(--wg-weight-bold);
-    color          : var(--wg-gray);
-    letter-spacing : 0.01em;
-}
-
-.wcf-header-nav {
-    display    : flex;
-    gap        : 1.75rem;
-    flex       : 1;
-    font-size  : var(--wg-font-size-body);
-    color      : var(--wg-text-muted);
-}
-
-.wcf-header-nav span {
-    cursor         : pointer;
-    padding-bottom : 3px;
-    transition     : color 0.15s;
-}
-.wcf-header-nav span:hover { color: var(--wg-orange); }
-
-.wcf-nav-active {
-    color         : var(--wg-orange) !important;
-    font-weight   : var(--wg-weight-bold);
-    border-bottom : 2px solid var(--wg-orange);
-}
-
-.wcf-header-user {
-    display     : flex;
-    align-items : center;
-    gap         : 0.6rem;
-    margin-left : auto;
-    flex        : 0 0 auto;
-}
-
-.wcf-header-role {
-    font-size : var(--wg-font-size-caption);
-    color     : var(--wg-text-muted);
-}
-
-.wcf-header-avatar {
-    width           : 34px;
-    height          : 34px;
-    border-radius   : 50%;
-    background      : var(--wg-orange);
-    color           : var(--wg-white);
-    font-size       : var(--wg-font-size-caption);
-    font-weight     : var(--wg-weight-bold);
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    flex-shrink     : 0;
+    --wcf-pad-x: var(--wg-space-6); /* form side padding — footer bleeds by the same amount */
 }
 
 /* ──────────────────────────────────────────
-   CONTEXT / APP META BAR
+   CONTEXT BAR
 ────────────────────────────────────────── */
 .wcf-context-bar {
-    background    : var(--wg-white);   /* was #faf8f5 — a near-white warm wash; mapped to white rather than
-                                           var(--wg-border) (used just below for the border-bottom) so the
-                                           border stays visible instead of blending into its own background */
-    border-bottom : 2px solid var(--wg-border);
-    padding       : 1.25rem 2rem 1rem;
-    width         : 100%;
-    box-sizing    : border-box;
+    padding: var(--wg-space-5) var(--wcf-pad-x) var(--wg-space-4);
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    box-sizing: border-box;
 }
 
 .wcf-context-stage {
-    font-size      : var(--wg-font-size-caption);
-    font-weight    : var(--wg-weight-bold);
-    letter-spacing : 0.1em;
-    color          : var(--wg-text-muted);
-    text-transform : uppercase;
-    margin-bottom  : 0.2rem;
+    margin: 0 0 var(--wg-space-1);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
 
 .wcf-context-title {
-    font-size      : var(--wg-font-size-page-title);
-    font-weight    : 800;
-    color          : var(--wg-gray);
-    margin         : 0 0 0.75rem 0;
-    letter-spacing : -0.01em;
+    margin: 0 0 var(--wg-space-3);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
+    line-height: 1.3;
+    color: var(--wg-gray);
 }
 
 .wcf-context-meta {
-    display      : flex;
-    align-items  : center;
-    flex-wrap    : wrap;
-    gap          : 1.5rem;
-    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2) var(--wg-space-6);
 }
 
 .wcf-meta-item {
-    display     : flex;
-    align-items : baseline;
-    gap         : 0.4rem;
-    flex-wrap   : wrap;          /* ← ADDED: label/value pair wraps cleanly when narrow */
-    min-width   : 0;             /* ← ADDED */
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    min-width: 0;
 }
 
 .wcf-meta-label {
-    font-size      : var(--wg-font-size-caption);
-    color          : var(--wg-text-muted);
-    font-weight    : var(--wg-weight-semibold);
-    text-transform : uppercase;
-    letter-spacing : 0.04em;
-    white-space    : nowrap;     /* ← ADDED: "APPLICATION ID" never splits mid-label */
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+    white-space: nowrap;
 }
 
 .wcf-meta-val {
-    font-size  : var(--wg-font-size-body);
-    color      : var(--wg-gray);
+    min-width: 0;
+    font-size: var(--wg-font-size-body);
     font-weight: var(--wg-weight-semibold);
-    overflow-wrap: break-word;   /* ← ADDED */
-    min-width  : 0;              /* ← ADDED */
-}
-
-.wcf-app-id {
-    font-family   : 'Courier New', monospace;   /* monospace left untouched, per convention */
-    background    : var(--wg-border);
-    padding       : 0.1em 0.45em;
-    border-radius : 4px;
-    font-size     : 0.82rem;
-    color         : var(--wg-gray);
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
 }
 
 .wcf-meta-pill {
-    background    : rgba(242, 103, 42, 0.12);   /* orange wash, recalculated from wg-orange's rgb */
-    border        : 1px solid var(--wg-orange);
-    border-radius : var(--wg-radius-pill);
-    padding       : 0.2rem 0.8rem;
-    font-size     : var(--wg-font-size-caption);
-    color         : var(--wg-orange-deep);
-    font-weight   : var(--wg-weight-semibold);
-}
-
-.wcf-context-autosave {
-    display     : flex;
-    align-items : center;
-    gap         : 0.5rem;
-    font-size   : var(--wg-font-size-caption);
-    color       : var(--wg-text-muted);
-}
-
-.wcf-autosave-dot {
-    width         : 8px;
-    height        : 8px;
-    border-radius : 50%;
-    background    : var(--wg-success);
-    display       : inline-block;
-    animation     : wcf-pulse 2s infinite;
-}
-
-@keyframes wcf-pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
-}
-
-.wcf-template-tag {
-    margin-left    : auto;
-    font-size      : var(--wg-font-size-caption);
-    letter-spacing : 0.06em;
-    color          : var(--wg-text-muted);
-    text-transform : uppercase;
-    font-weight    : var(--wg-weight-semibold);
+    display: inline-block;
+    padding: var(--wg-padding-tag);
+    background: var(--wg-info-bg);
+    border: var(--wg-border-width-thin) solid var(--wg-info);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-info-text);
 }
 
 /* ──────────────────────────────────────────
-   FORM BODY WRAPPER — TRUE FULL WIDTH
+   BANNERS — draft (warning) and reviewer return (error)
+────────────────────────────────────────── */
+.wcf-draft-banner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    margin: var(--wg-space-4) var(--wcf-pad-x) 0;
+    padding: var(--wg-padding-banner);
+    background: var(--wg-warning-bg);
+    border-left: var(--wg-border-width-banner) solid var(--wg-warning);
+    border-radius: var(--wg-radius-sm);
+    color: var(--wg-warning-text);
+    --slds-c-icon-color-foreground-default: var(--wg-warning-text);
+}
+
+.wcf-draft-banner-left {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-2);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.wcf-draft-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.wcf-draft-banner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.wcf-draft-banner-title {
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-body);
+}
+
+.wcf-draft-banner-sub {
+    font-size: var(--wg-font-size-label);
+    overflow-wrap: break-word;
+}
+
+.wcf-reviewer-return-banner {
+    background: var(--wg-error-bg);
+    border-left-color: var(--wg-error);
+    color: var(--wg-gray);
+    --slds-c-icon-color-foreground-default: var(--wg-error);
+}
+
+.wcf-reviewer-return-banner .wcf-draft-banner-title {
+    color: var(--wg-error);
+}
+
+/* Progress bar (width set by wcf-pb-N classes from JS) */
+.wcf-draft-progress-bar-wrap {
+    flex: 0 0 160px;
+    height: 6px;
+    background: var(--wg-white);
+    border-radius: var(--wg-radius-badge);
+    overflow: hidden;
+}
+
+.wcf-draft-progress-bar {
+    height: 100%;
+    min-width: 4px;
+    background: var(--wg-warning);
+    border-radius: var(--wg-radius-badge);
+    transition: width 0.4s ease;
+}
+
+.wcf-draft-progress-bar.wcf-pb-0   { width: 2%;   }
+.wcf-draft-progress-bar.wcf-pb-10  { width: 10%;  }
+.wcf-draft-progress-bar.wcf-pb-20  { width: 20%;  }
+.wcf-draft-progress-bar.wcf-pb-30  { width: 30%;  }
+.wcf-draft-progress-bar.wcf-pb-40  { width: 40%;  }
+.wcf-draft-progress-bar.wcf-pb-50  { width: 50%;  }
+.wcf-draft-progress-bar.wcf-pb-60  { width: 60%;  }
+.wcf-draft-progress-bar.wcf-pb-70  { width: 70%;  }
+.wcf-draft-progress-bar.wcf-pb-80  { width: 80%;  }
+.wcf-draft-progress-bar.wcf-pb-90  { width: 90%;  }
+.wcf-draft-progress-bar.wcf-pb-100 { width: 100%; }
+
+.wcf-draft-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--wg-radius-sm);
+    cursor: pointer;
+}
+
+.wcf-draft-dismiss:hover { background: var(--wg-white); }
+
+.wcf-draft-dismiss:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+/* ──────────────────────────────────────────
+   FORM BODY
 ────────────────────────────────────────── */
 .wcf-vf-wrapper {
-    width      : 100%;
-    max-width  : 100%;
-    box-sizing : border-box;
-    padding    : 1.75rem 2.5rem 5rem;
-    margin     : 0;
-    background : var(--wg-border);
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: var(--wg-space-5) var(--wcf-pad-x) 0;
+    background: var(--wg-surface-page);
+    box-sizing: border-box;
 }
 
 /* ──────────────────────────────────────────
    SECTIONS
 ────────────────────────────────────────── */
 .wcf-vf-section {
-    background    : var(--wg-white);
-    border        : 1px solid var(--wg-border);
-    border-radius : var(--wg-radius-card);
-    padding       : 1.75rem 2rem;
-    margin-bottom : 1.5rem;
-    box-shadow    : 0 1px 4px rgba(0,0,0,0.04);   /* plain black overlay — left literal */
+    margin-bottom: var(--wg-space-5);
+    padding: var(--wg-space-6);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
 }
 
 .wcf-vf-sec-head {
-    display       : flex;
-    align-items   : flex-start;
-    gap           : 1rem;
-    margin-bottom : 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-3);
+    margin-bottom: var(--wg-space-5);
 }
 
 .wcf-vf-sec-num {
-    width           : 34px;
-    height          : 34px;
-    border-radius   : 50%;
-    background      : var(--wg-orange);
-    color           : var(--wg-white);
-    font-size       : var(--wg-font-size-sub-heading);
-    font-weight     : 800;
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    flex-shrink     : 0;
-    box-shadow      : 0 2px 6px rgba(242, 103, 42, 0.3);   /* recalculated from wg-orange's rgb */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-bold);
 }
 
-.wcf-vf-sec-info { min-width: 0; }   /* ← ADDED: title/lede shrink inside flex row */
+.wcf-vf-sec-info { min-width: 0; }
 
 .wcf-vf-sec-title {
-    font-size   : var(--wg-font-size-sub-heading);
-    font-weight : var(--wg-weight-bold);
-    color       : var(--wg-gray);
-    margin      : 0 0 0.3rem 0;
+    margin: 0 0 var(--wg-space-1);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1.3;
+    color: var(--wg-gray);
 }
 
 .wcf-vf-sec-lede {
-    font-size   : var(--wg-font-size-body);
-    color       : var(--wg-text-muted);
-    margin      : 0;
-    line-height : 1.55;
+    margin: 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    color: var(--wg-text-muted);
 }
 
 /* ──────────────────────────────────────────
    FIELD ROWS
 ────────────────────────────────────────── */
 .wcf-vf-field {
-    border-top  : 1px solid var(--wg-border);
-    padding-top : 1.1rem;
-    margin-top  : 1.1rem;
+    margin-top: var(--wg-space-4);
+    padding-top: var(--wg-space-4);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
 }
-.wcf-vf-field:first-of-type {
-    border-top  : none;
-    margin-top  : 0;
-    padding-top : 0;
+
+/* FIX: was :first-of-type, which never matched (the first div in a
+   section is the header), so every section's first field had an
+   extra divider. Now the field right after the header has none. */
+.wcf-vf-sec-head + .wcf-vf-field,
+.wcf-dep-wrapper > .wcf-vf-field:first-child,
+.wcf-dep-nested > .wcf-vf-field:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
 }
 
 .wcf-vf-field-top {
-    display         : flex;
-    align-items     : flex-start;
-    justify-content : space-between;
-    gap             : 0.5rem;
-    margin-bottom   : 0.45rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-2);
 }
 
 .wcf-vf-field-q {
-    font-size   : var(--wg-font-size-body);
-    font-weight : var(--wg-weight-semibold);
-    color       : var(--wg-gray);
-    line-height : 1.45;
-    flex        : 1;
-    min-width   : 0;             /* ← ADDED */
-    overflow-wrap: break-word;   /* ← ADDED: long question text stays inside the card */
-}
-
-.wcf-field-id {
-    font-size      : 0.68rem;
-    background     : var(--wg-border);
-    color          : var(--wg-text-muted);
-    border-radius  : 4px;
-    padding        : 0.15em 0.5em;
-    font-weight    : var(--wg-weight-bold);
-    white-space    : nowrap;
-    flex-shrink    : 0;
-    align-self     : flex-start;
-    letter-spacing : 0.03em;
+    flex: 1;
+    min-width: 0;
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1.45;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
 }
 
 .wcf-hint {
-    font-size   : var(--wg-font-size-body);
-    color       : var(--wg-text-muted);
-    margin      : 0 0 0.6rem 0;
-    line-height : 1.55;
-    overflow-wrap: break-word;   /* ← ADDED */
+    margin: 0 0 var(--wg-space-3);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    color: var(--wg-text-muted);
+    overflow-wrap: break-word;
 }
 
-.wcf-req { color: var(--wg-orange); font-weight: var(--wg-weight-bold); }
+.wcf-req { color: var(--wg-error);      font-weight: var(--wg-weight-bold); }
 .wcf-opt { color: var(--wg-text-muted); font-weight: var(--wg-weight-regular); }
 
+/* Word counters (classes from JS) */
 .wcf-char-count {
-    font-size  : var(--wg-font-size-caption);
-    color      : var(--wg-text-muted);
-    margin-top : 0.3rem;
-    text-align : right;
+    margin-top: var(--wg-space-1);
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
+    text-align: right;
 }
 
+.wcf-wc-warn  { color: var(--wg-warning-text); font-weight: var(--wg-weight-semibold); }
+.wcf-wc-limit { color: var(--wg-error);        font-weight: var(--wg-weight-semibold); }
+
 /* ──────────────────────────────────────────
-   AUTO-STATE INDICATOR
+   AUTO-STATE INDICATOR (S1.1 – S1.3)
 ────────────────────────────────────────── */
 .wcf-auto-state {
-    display       : flex;
-    align-items   : center;
-    gap           : 0.5rem;
-    font-size     : var(--wg-font-size-body);
-    padding       : 0.45rem 0.85rem;
-    border-radius : var(--wg-radius-sm);
-    margin-bottom : 0.6rem;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-3);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    border-left: 3px solid transparent;
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-label);
 }
+
 .wcf-auto-state > div:last-child {
-    min-width    : 0;
+    min-width: 0;
     overflow-wrap: break-word;
-    white-space  : pre-line;
+    white-space: pre-line;
 }
+
 .wcf-auto-green {
-    background : var(--wg-success-bg);
-    color      : var(--wg-success);
-    border     : 1px solid var(--wg-success);
+    background: var(--wg-success-bg);
+    border-left-color: var(--wg-success);
+    color: var(--wg-gray);
 }
-/* ← ADDED (original author's comment, preserved): amber state referenced
-   by s1_2_stateClass but previously unstyled. Folded into the warning family. */
+
+.wcf-auto-green .wcf-auto-icon { color: var(--wg-success); }
+
 .wcf-auto-amber {
-    background : var(--wg-warning-bg);
-    color      : var(--wg-warning-text);
-    border     : 1px solid var(--wg-warning);
+    background: var(--wg-warning-bg);
+    border-left-color: var(--wg-warning);
+    color: var(--wg-warning-text);
 }
-.wcf-auto-icon { font-size: 0.9rem; font-weight: var(--wg-weight-bold); flex-shrink: 0; }   /* ← ADDED flex-shrink */
+
+.wcf-auto-icon {
+    flex-shrink: 0;
+    font-weight: var(--wg-weight-bold);
+}
 
 /* ──────────────────────────────────────────
-   CONFIRM PILLS  (S1.x)
+   SHARED CHOICE RESET — the options are <button>s now,
+   so they are keyboard reachable. This strips browser
+   button defaults before the looks below apply.
+────────────────────────────────────────── */
+.wcf-confirm-pill,
+.wcf-pick-opt,
+.wcf-dec-card,
+.wcf-check-opt {
+    appearance: none;
+    margin: 0;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wcf-confirm-pill:focus-visible,
+.wcf-pick-opt:focus-visible,
+.wcf-dec-card:focus-visible,
+.wcf-check-opt:focus-visible,
+.wcf-qnum-pill:focus-visible,
+.wcf-qcard-remove:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+/* ──────────────────────────────────────────
+   CONFIRM PILLS (S1.x)
 ────────────────────────────────────────── */
 .wcf-confirm-row {
-    display    : flex;
-    gap        : 0.5rem;
-    flex-wrap  : wrap;
-    margin-top : 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    margin-top: var(--wg-space-2);
 }
 
 .wcf-confirm-pill {
-    padding       : 0.38rem 1.1rem;
-    border-radius : var(--wg-radius-pill);
-    border        : 1.5px solid var(--wg-input-border);
-    background    : var(--wg-white);
-    font-size     : var(--wg-font-size-body);
-    color         : var(--wg-text-muted);
-    cursor        : pointer;
-    transition    : all 0.15s ease;
-    user-select   : none;
-    font-weight   : 500;
-    text-align    : center;      /* ← ADDED: looks right when pill text wraps to 2 lines */
+    padding: 6px var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    text-align: center;
+    color: var(--wg-gray);
 }
-.wcf-confirm-pill:hover {
-    border-color : var(--wg-orange);
-    color        : var(--wg-orange);
-    background   : rgba(242, 103, 42, 0.08);   /* recalculated selected/hover wash, see .wcf-pick-sel */
-}
+
+.wcf-confirm-pill:hover { border-color: var(--wg-red); }
+
 .wcf-confirm-pill-sel {
-    background   : rgba(242, 103, 42, 0.08);
-    border-color : var(--wg-orange);
-    color        : var(--wg-orange);
-    font-weight  : var(--wg-weight-bold);
+    background: var(--wg-error-bg);
+    border-color: var(--wg-red);
+    color: var(--wg-red-deep);
 }
 
 /* ──────────────────────────────────────────
-   STANDARD PICKLIST (radio style)
+   PICKLIST OPTIONS
 ────────────────────────────────────────── */
 .wcf-picklist {
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.45rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-2);
 }
+
 .wcf-picklist-wrap {
-    display   : flex;
-    flex-wrap : wrap;
-    gap       : 0.45rem;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .wcf-pick-opt {
-    display       : flex;
-    align-items   : center;
-    gap           : 0.55rem;
-    padding       : 0.6rem 1rem;
-    border        : 1.5px solid var(--wg-input-border);
-    border-radius : var(--wg-radius-sm);
-    cursor        : pointer;
-    font-size     : var(--wg-font-size-body);
-    color         : var(--wg-gray);
-    background    : var(--wg-white);
-    transition    : all 0.12s ease;
-    font-weight   : 500;
-    min-width     : 0;           /* ← ADDED */
-    overflow-wrap : break-word;  /* ← ADDED */
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    min-width: 0;
+    padding: 10px var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-regular);
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
 }
-/* NOTE: original hover wash (#fef9f9) was a subtler tint than the
-   selected wash (#fff4ef) used throughout this file — that two-tier
-   distinction is preserved here via two different alphas over
-   wg-orange's own rgb, rather than collapsing both to one value. */
-.wcf-pick-opt:hover { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
-.wcf-pick-sel       { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.08); color: var(--wg-orange); font-weight: var(--wg-weight-bold); }
+
+.wcf-pick-opt:hover { border-color: var(--wg-red); }
+
+.wcf-pick-sel {
+    background: var(--wg-error-bg);
+    border-color: var(--wg-red);
+    color: var(--wg-red-deep);
+    font-weight: var(--wg-weight-semibold);
+}
 
 .wcf-pick-dot {
-    width         : 13px;
-    height        : 13px;
-    border-radius : 50%;
-    border        : 2px solid var(--wg-input-border);
-    flex-shrink   : 0;
-    transition    : all 0.12s;
-}
-.wcf-pick-sel .wcf-pick-dot {
-    border-color : var(--wg-orange);
-    background   : var(--wg-orange);
-    box-shadow   : 0 0 0 2px var(--wg-white), 0 0 0 4px var(--wg-orange);
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--wg-input-border);
+    border-radius: 50%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* ──────────────────────────────────────────
-   BINARY PICKLIST  (S2.3)
-────────────────────────────────────────── */
+.wcf-pick-sel .wcf-pick-dot {
+    border-color: var(--wg-red);
+    box-shadow: inset 0 0 0 3px var(--wg-white), inset 0 0 0 7px var(--wg-red);
+}
+
+/* Binary picklist (S2.3) — two cards side by side */
 .wcf-picklist-binary {
-    display               : grid;
-    grid-template-columns : 1fr 1fr;
-    gap                   : 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wg-space-3);
 }
 
 .wcf-pick-binary {
-    display       : flex;
-    align-items   : flex-start;
-    gap           : 0.65rem;
-    padding       : 1rem 1.1rem;
-    border-radius : var(--wg-radius-md);
-    border        : 1.5px solid var(--wg-input-border);
-    background    : var(--wg-white);
-    cursor        : pointer;
-    transition    : all 0.15s ease;
-    min-width     : 0;           /* ← ADDED: card can shrink inside the grid */
+    align-items: flex-start;
+    padding: var(--wg-space-4);
 }
-.wcf-pick-binary:hover         { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
-.wcf-pick-binary.wcf-pick-sel  { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.08); }
 
 .wcf-pick-radio {
-    width         : 16px;
-    height        : 16px;
-    border-radius : 50%;
-    border        : 2px solid var(--wg-input-border);
-    flex-shrink   : 0;
-    margin-top    : 2px;
-    transition    : all 0.15s;
-}
-.wcf-pick-binary.wcf-pick-sel .wcf-pick-radio {
-    border-color : var(--wg-orange);
-    box-shadow   : inset 0 0 0 3px var(--wg-white), inset 0 0 0 8px var(--wg-orange);
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    border: 2px solid var(--wg-input-border);
+    border-radius: 50%;
+    box-sizing: border-box;
 }
 
-.wcf-pick-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }   /* ← ADDED min-width */
-.wcf-pick-main { font-size: var(--wg-font-size-body); font-weight: var(--wg-weight-semibold); color: var(--wg-gray); overflow-wrap: break-word; }   /* ← ADDED overflow-wrap */
-.wcf-pick-sub  { font-size: var(--wg-font-size-caption); color: var(--wg-text-muted); font-style: italic; }
+.wcf-pick-binary.wcf-pick-sel .wcf-pick-radio {
+    border-color: var(--wg-red);
+    box-shadow: inset 0 0 0 3px var(--wg-white), inset 0 0 0 8px var(--wg-red);
+}
+
+.wcf-pick-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.wcf-pick-main {
+    font-weight: var(--wg-weight-semibold);
+    overflow-wrap: break-word;
+}
+
+.wcf-pick-sub {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-regular);
+    font-style: italic;
+    color: var(--wg-text-muted);
+}
 
 /* ══════════════════════════════════════════════════════
-   DECISION CARDS  (S3.1)
-   KEY FIX: grid so all 3 cards always share equal width;
-   badge wraps on multiple lines instead of overflowing.
+   DECISION CARDS (S3.1)
+   Pass = success, Return = returned (orange), Flag = error.
+   Same meaning-colors as the status pills in the queue.
 ══════════════════════════════════════════════════════ */
 .wcf-decision-cards {
-    display               : grid;
-    grid-template-columns : repeat(3, 1fr);
-    gap                   : 1rem;
-    width                 : 100%;
-    box-sizing            : border-box;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--wg-space-3);
+    width: 100%;
 }
 
 .wcf-dec-card {
-    box-sizing     : border-box;
-    border         : 2px solid var(--wg-input-border);
-    border-radius  : var(--wg-radius-card);
-    padding        : 1.1rem;
-    cursor         : pointer;
-    background     : var(--wg-white);
-    transition     : all 0.15s ease;
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.5rem;
-    min-width      : 0;           /* crucial — prevents grid blowout */
-    overflow       : hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-2);
+    min-width: 0;
+    padding: var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-rule) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-md);
+    overflow: hidden;
 }
+
 .wcf-dec-card:hover {
-    border-color : var(--wg-text-muted);
-    box-shadow   : 0 4px 12px rgba(0,0,0,0.08);   /* plain black overlay — left literal */
+    border-color: var(--wg-text-muted);
 }
 
-/* Card title row: label + badge stacked vertically so badge never
-   pushes outside the card boundary                               */
 .wcf-dec-label {
-    display        : flex;
-    flex-direction : column;     /* ← stack vertically */
-    align-items    : flex-start;
-    gap            : 0.4rem;
-    font-size      : 1rem;
-    font-weight    : var(--wg-weight-bold);
-    color          : var(--wg-gray);
-    overflow-wrap  : break-word; /* ← ADDED */
+    display: block;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
 }
 
-/* Badge: wraps text, never clips */
-.wcf-dec-badge {
-    display        : inline-block;
-    font-size      : 0.6rem;
-    font-weight    : var(--wg-weight-bold);
-    letter-spacing : 0.04em;
-    text-transform : uppercase;
-    border-radius  : 4px;
-    padding        : 0.2em 0.5em;
-    white-space    : normal;     /* ← allow wrap */
-    word-break     : break-word;
-    line-height    : 1.4;
-    max-width      : 100%;       /* never wider than card */
+.wcf-dec-desc {
+    display: block;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.5;
+    color: var(--wg-text-muted);
 }
-.wcf-dec-badge-pass   { background: var(--wg-success-bg); color: var(--wg-success);      border: 1px solid var(--wg-success); }
-.wcf-dec-badge-return { background: var(--wg-warning-bg); color: var(--wg-warning-text); border: 1px solid var(--wg-warning); }
-/* LEFTOVER HUE — was pink (#fce7f3 family), no brand token; reassigned
-   to var(--wg-error): see the wiring notes at the top of this file. */
-.wcf-dec-badge-flag    { background: var(--wg-error-bg); color: var(--wg-error); border: 1px solid var(--wg-error); }
 
-.wcf-dec-desc { font-size: var(--wg-font-size-body); color: var(--wg-text-muted); line-height: 1.5; }
+/* Colored top edge hints at the meaning even before selection */
+.wcf-dec-pass   { box-shadow: inset 0 3px 0 var(--wg-success); }
+.wcf-dec-return { box-shadow: inset 0 3px 0 var(--wg-orange); }
+.wcf-dec-flag   { box-shadow: inset 0 3px 0 var(--wg-error); }
 
-/* Selected states — box-shadow alphas recalculated from each token's own rgb */
-.wcf-dec-sel-pass   { border-color: var(--wg-success) !important; background: var(--wg-success-bg) !important; box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15); }
-.wcf-dec-sel-return { border-color: var(--wg-warning) !important; background: var(--wg-warning-bg) !important; box-shadow: 0 0 0 3px rgba(246, 135, 32, 0.15); }
-.wcf-dec-sel-flag    { border-color: var(--wg-error)   !important; background: var(--wg-error-bg)   !important; box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.15); }
+.wcf-dec-sel-pass   { border-color: var(--wg-success) !important; background: var(--wg-success-bg) !important; }
+.wcf-dec-sel-return { border-color: var(--wg-orange)  !important; background: var(--wg-warning-bg) !important; }
+.wcf-dec-sel-flag   { border-color: var(--wg-error)   !important; background: var(--wg-error-bg)   !important; }
+
+.wcf-dec-sel-pass   .wcf-dec-label { color: var(--wg-success); }
+.wcf-dec-sel-return .wcf-dec-label { color: var(--wg-orange-deep); }
+.wcf-dec-sel-flag   .wcf-dec-label { color: var(--wg-error); }
 
 /* ──────────────────────────────────────────
-   DEPENDENT FIELD WRAPPERS
+   DEPENDENT (FOLLOW-ON) FIELDS
 ────────────────────────────────────────── */
 .wcf-dep-wrapper {
-    margin-top   : 0.85rem;
-    border-left  : 3px solid var(--wg-border);
-    padding-left : 1.1rem;
-    animation    : wcf-slide-in 0.2s ease;
+    margin-top: var(--wg-space-4);
+    padding-left: var(--wg-space-4);
+    border-left: 3px solid var(--wg-border);
+    animation: wcf-slide-in 0.2s ease;
 }
 
+.wcf-dep-flag   { border-left-color: var(--wg-error); }
+.wcf-dep-return { border-left-color: var(--wg-orange); }
+
 .wcf-dep-nested {
-    margin-top   : 0.75rem;
-    border-left  : 3px solid var(--wg-warning);
-    padding-left : 1rem;
-    animation    : wcf-slide-in 0.2s ease;
+    margin-top: var(--wg-space-4);
+    padding-left: var(--wg-space-4);
+    border-left: 3px solid var(--wg-warning);
+    animation: wcf-slide-in 0.2s ease;
 }
 
 @keyframes wcf-slide-in {
-    from { opacity: 0; transform: translateY(-8px); }
+    from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-.wcf-dep-banner {
-    font-size      : var(--wg-font-size-caption);
-    font-weight    : var(--wg-weight-bold);
-    letter-spacing : 0.05em;
-    text-transform : uppercase;
-    color          : var(--wg-text-muted);
-    margin-bottom  : 0.6rem;
-    display        : flex;
-    align-items    : center;
-    gap            : 0.25rem;
-}
-
-/* NOTE: the original file already used two different "Flag" colors —
-   this label stayed amber/brown while the decision badge above was
-   pink. That existing internal distinction is preserved rather than
-   unified; see wiring notes. */
-.wcf-dep-banner-flag   { color: var(--wg-warning-text); }
-.wcf-dep-banner-return { color: var(--wg-info); }
-/* LEFTOVER HUE — was purple (#6b21a8), no brand token; folded into
-   var(--wg-gray) as a neutral leftover, same treatment as navy elsewhere. */
-.wcf-dep-banner-other  { color: var(--wg-gray); }
-.wcf-dep-banner-notes  { color: var(--wg-success); }
-
-/* ──────────────────────────────────────────
-   CHECKLIST  (S3.3)
-────────────────────────────────────────── */
-.wcf-checklist {
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.5rem;
-}
-
-.wcf-check-opt {
-    display       : flex;
-    align-items   : center;
-    gap           : 0.75rem;
-    padding       : 0.75rem 1rem;
-    border        : 1.5px solid var(--wg-input-border);
-    border-radius : var(--wg-radius-sm);
-    background    : var(--wg-white);
-    cursor        : pointer;
-    font-size     : var(--wg-font-size-body);
-    color         : var(--wg-gray);
-    transition    : all 0.15s;
-    font-weight   : 500;
-    flex-wrap     : wrap;        /* ← ADDED: "Suggested by S2" tag drops below when narrow */
-}
-.wcf-check-opt:hover  { border-color: var(--wg-orange); background: rgba(242, 103, 42, 0.04); }
-.wcf-check-sel        { border-color: var(--wg-orange) !important; background: rgba(242, 103, 42, 0.08) !important; }
-.wcf-check-suggested  { border-color: var(--wg-warning); border-style: dashed; background: var(--wg-warning-bg); }
-
-.wcf-checkbox {
-    width         : 17px;
-    height        : 17px;
-    border-radius : 4px;
-    border        : 2px solid var(--wg-input-border);
-    flex-shrink   : 0;
-    position      : relative;
-    transition    : all 0.15s;
-}
-.wcf-check-sel .wcf-checkbox { background: var(--wg-orange); border-color: var(--wg-orange); }
-.wcf-check-sel .wcf-checkbox::after {
-    content     : '✓';
-    position    : absolute;
-    top         : -2px;
-    left        : 1px;
-    font-size   : 11px;
-    color       : var(--wg-white);
-    font-weight : 800;
-}
-
-.wcf-check-label { flex: 1; min-width: 0; overflow-wrap: break-word; }   /* ← ADDED min-width + overflow-wrap */
-
-.wcf-suggest-tag {
-    font-size     : 0.68rem;
-    font-weight   : var(--wg-weight-bold);
-    background    : var(--wg-warning-bg);
-    color         : var(--wg-warning-text);
-    border        : 1px solid var(--wg-warning);
-    border-radius : var(--wg-radius-pill);
-    padding       : 0.1em 0.55em;
-    white-space   : nowrap;
-}
-
-/* ──────────────────────────────────────────
-   CONDITIONAL INNER BOX
-────────────────────────────────────────── */
 .wcf-cond-inner {
-    padding       : 0.85rem 1rem;
-    background    : var(--wg-white);   /* was #fafafa — near-white; kept distinct from the border below,
-                                           same reasoning as .wcf-context-bar above */
-    border        : 1px solid var(--wg-border);
-    border-radius : var(--wg-radius-sm);
-    margin-top    : 0.6rem;
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
 }
 
 .wcf-cond-label {
-    font-size    : var(--wg-font-size-body);
-    font-weight  : var(--wg-weight-bold);
-    color        : var(--wg-gray);
-    margin-bottom: 0.45rem;
+    margin-bottom: var(--wg-space-2);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
 
-/* ── Footer: compact strip — now sticky to stay visible while scrolling ── */
-.wcf-vf-footer {
-    display        : flex;
-    align-items    : center;
-    justify-content: space-between;
-    padding        : 8px 16px;
-    background     : var(--wg-white);
-    border-top     : 1px solid var(--wg-border);
-    gap            : 10px;
-    flex-shrink    : 0;
-    min-height     : 0;
-
-    /* ── pins the footer to the bottom of the scrolling panel ── */
-    position       : sticky;
-    bottom         : 0;
-    z-index        : 40;
-    box-shadow     : 0 -3px 10px rgba(0, 0, 0, 0.08);   /* plain black overlay — left literal */
+/* ──────────────────────────────────────────
+   CHECKLIST (S3.3 flag reasons)
+────────────────────────────────────────── */
+.wcf-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-2);
 }
 
-.wcf-footer-status {
-    font-size  : 11.5px;
-    color      : var(--wg-text-muted);
-    flex       : 1;
-    min-width  : 0;
-    overflow   : hidden;
-    text-overflow: ellipsis;
+.wcf-check-opt {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    width: 100%;
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-body);
+    color: var(--wg-gray);
+}
+
+.wcf-check-opt:hover { border-color: var(--wg-red); }
+
+.wcf-check-sel {
+    border-color: var(--wg-red) !important;
+    background: var(--wg-error-bg) !important;
+}
+
+.wcf-check-suggested {
+    border-color: var(--wg-warning);
+    border-style: dashed;
+    background: var(--wg-warning-bg);
+}
+
+.wcf-checkbox {
+    position: relative;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--wg-input-border);
+    border-radius: 3px;
+    background: var(--wg-white);
+    box-sizing: border-box;
+}
+
+.wcf-check-sel .wcf-checkbox {
+    background: var(--wg-red);
+    border-color: var(--wg-red);
+}
+
+.wcf-check-sel .wcf-checkbox::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 4px;
+    height: 9px;
+    border: solid var(--wg-white);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.wcf-check-label {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.wcf-suggest-tag {
+    padding: 1px var(--wg-space-2);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-warning);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-warning-text);
     white-space: nowrap;
 }
 
-.wcf-footer-actions {
-    display    : flex;
-    gap        : 8px;
-    flex-shrink: 0;
-    flex-wrap  : wrap;           /* ← ADDED: buttons wrap instead of overflowing the panel */
-}
-
-/* Squared per the SLDS-hook convention: lightning-button renders its own
-   shadow DOM, so plain border-radius cannot reach it. */
-.slds-modal__footer lightning-button {
-    --slds-c-button-radius-border: 0;
-}
-
-/* Make the buttons smaller */
-.wcf-draft-btn,
-.wcf-seal-btn {
-    --slds-c-button-sizing-height : 28px;
-    --slds-c-button-radius-border : 0;   /* real CTA — squared */
-    font-size: 12px !important;
-    padding  : 0 12px !important;
-    color: var(--wg-white);
-}
-
-/* Save Draft is deliberately neutral/gold-toned, distinct from the
-   brand-orange Seal button — consolidated onto the warning family
-   along with this file's other two amber palettes. */
-.wcf-draft-btn {
-    --slds-c-button-neutral-color-background: var(--wg-white);
-    --slds-c-button-neutral-color-border    : var(--wg-warning);
-    --slds-c-button-neutral-text-color      : var(--wg-warning-text);
-}
-
-.wcf-draft-btn:hover:not([disabled]) {
-    --slds-c-button-neutral-color-background: var(--wg-warning-bg);
-}
-
-/* "Seal" label must stay WHITE — the Experience Cloud theme overrides
-   the brand button text color, so it's pinned explicitly via SLDS
-   styling hooks (old + new token names for compatibility), plus a
-   color fallback on the host. */
-.wcf-seal-btn {
-    --slds-c-button-brand-text-color       : var(--wg-white);
-    --slds-c-button-brand-text-color-hover : var(--wg-white);
-    --slds-c-button-brand-text-color-active: var(--wg-white);
-    --sds-c-button-brand-text-color        : var(--wg-white);
-    --sds-c-button-brand-text-color-hover  : var(--wg-white);
-    --slds-c-button-text-color             : var(--wg-white);
-    --slds-c-button-text-color-hover       : var(--wg-white);
-    color: var(--wg-white);
-}
-
 /* ──────────────────────────────────────────
-   LOADING
+   RETURN: QUESTION NUMBER GRID
 ────────────────────────────────────────── */
-.wcf-vf-loading {
-    display         : flex;
-    justify-content : center;
-    align-items     : center;
-    padding         : 5rem;
-    min-height      : 300px;
+.wcf-qnum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-4);
 }
 
-/* ──────────────────────────────────────────
-   RESPONSIVE (viewport fallback — kept for mobile devices;
-   container queries at the bottom of this file handle the
-   split-pane divider case on desktop)
-────────────────────────────────────────── */
-@media (max-width: 768px) {
-    .wcf-header      { padding: 0.6rem 1rem; gap: 0.75rem; }
-    .wcf-header-nav  { display: none; }
-    .wcf-context-bar { padding: 1rem 1rem 0.75rem; }
-    .wcf-vf-wrapper  { padding: 1rem 1rem 5rem; }
-    .wcf-vf-footer   { padding: 0.75rem 1rem; }
-    .wcf-vf-section  { padding: 1.25rem 1rem; }
-
-    .wcf-decision-cards  { grid-template-columns: 1fr; }
-    .wcf-picklist-binary { grid-template-columns: 1fr; }
-}
-
-.wcf-wc-warn {
-    color: var(--wg-warning-text);
-    font-weight: 500;
-}
-
-.wcf-wc-limit {
-    color: var(--wg-error);
-    font-weight: var(--wg-weight-semibold);
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   DRAFT RESUME BANNER  (appears at top of form when a Draft is loaded
-   or after every Save Draft click) — third amber/gold palette in this
-   file, consolidated onto var(--wg-warning) with the other two.
-═══════════════════════════════════════════════════════════════════ */
-
-.wcf-draft-banner {
-    display        : flex;
-    align-items    : center;
-    gap            : 1rem;
-    background     : var(--wg-warning-bg);
-    border         : 1.5px solid var(--wg-warning);
-    border-radius  : var(--wg-radius-md);
-    padding        : 0.85rem 1.1rem;
-    margin         : 0.75rem 1.5rem 0;
-    box-shadow     : 0 1px 4px rgba(246, 135, 32, 0.15);   /* recalculated from wg-warning's rgb */
-    flex-wrap      : wrap;
-}
-
-.wcf-draft-banner-left {
-    display     : flex;
-    align-items : center;
-    gap         : 0.65rem;
-    flex        : 1 1 auto;
-    min-width   : 0;             /* ← ADDED */
-}
-
-.wcf-draft-icon {
-    font-size    : 1.35rem;
-    line-height  : 1;
-    flex-shrink  : 0;
-}
-
-.wcf-draft-banner-text {
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.15rem;
-    min-width      : 0;          /* ← ADDED */
-}
-
-.wcf-draft-banner-title {
-    font-weight  : var(--wg-weight-semibold);
-    font-size    : var(--wg-font-size-body);
-    color        : var(--wg-warning-text);
-    letter-spacing: 0.01em;
-}
-
-.wcf-draft-banner-sub {
-    font-size : var(--wg-font-size-caption);
-    color     : var(--wg-warning-text);
-    overflow-wrap: break-word;   /* ← ADDED */
-}
-
-/* Progress bar inside the banner */
-.wcf-draft-progress-bar-wrap {
-    flex        : 0 0 160px;
-    height      : 6px;
-    background  : var(--wg-warning-bg);
-    border-radius : var(--wg-radius-pill);
-    overflow    : hidden;
-    align-self  : center;
-}
-
-.wcf-draft-progress-bar {
-    height        : 100%;
-    background    : var(--wg-warning);
-    border-radius : var(--wg-radius-pill);
-    transition    : width 0.4s ease;
-    min-width     : 4px;
-}
-
-.wcf-draft-dismiss {
-    background   : none;
-    border       : none;
-    color        : var(--wg-warning-text);
-    cursor       : pointer;
-    font-size    : 1rem;
-    line-height  : 1;
-    padding      : 0.2rem 0.3rem;
-    border-radius: 0;   /* real <button> — squared */
-    flex-shrink  : 0;
-    opacity      : 0.7;
-    transition   : opacity 0.15s;
-}
-
-.wcf-draft-dismiss:hover {
-    opacity      : 1;
-    background   : rgba(246, 135, 32, 0.15);   /* recalculated from wg-warning's rgb */
-}
-
-/* ===== Preview Modal =====
-   Second, older color palette (navy / #ea580c-orange / cool grays) —
-   retokenized in place onto the same brand tokens used above rather
-   than treated as its own leftover-hue case. */
-
-.slds-modal__container {
-    width: 90% !important;
-    max-width: 1000px !important;
-}
-
-.preview-container {
-    background: var(--wg-border);
-    max-height: 70vh;
-}
-
-.preview-section {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-border);
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);   /* plain black overlay — left literal */
-}
-
-.preview-section h3 {
-    margin-bottom: 16px;
-    font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);   /* was navy #16325c — folded into gray, same as navy elsewhere in the batch */
-}
-
-.preview-item {
+.wcf-qnum-pill {
+    appearance: none;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--wg-border);
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: var(--wg-space-2) var(--wg-space-1);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1.2;
+    text-align: center;
+    color: var(--wg-gray);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.preview-item:last-child {
-    border-bottom: none;
+.wcf-qnum-pill:hover { border-color: var(--wg-orange); }
+
+.wcf-qnum-pill-sel {
+    background: var(--wg-gray) !important;
+    border-color: var(--wg-gray) !important;
+    color: var(--wg-white) !important;
 }
 
-.preview-item .label {
+/* ──────────────────────────────────────────
+   RETURN: QUESTION CARDS
+────────────────────────────────────────── */
+.wcf-qcards-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-3);
+}
+
+.wcf-qcard {
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-md);
+    overflow: hidden;
+    animation: wcf-slide-in 0.18s ease;
+}
+
+/* Softer than before: dashed amber = "still needs a reason",
+   not a red error the moment the card opens */
+.wcf-qcard-missing {
+    border: var(--wg-border-width-ghost) dashed var(--wg-warning);
+}
+
+.wcf-qcard-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-surface-subtle);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.wcf-qcard-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 32px;
+    height: 24px;
+    padding: 0 6px;
+    background: var(--wg-gray);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+    box-sizing: border-box;
+}
+
+.wcf-qcard-title {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--wg-font-size-label);
     font-weight: var(--wg-weight-semibold);
     color: var(--wg-gray);
-    min-width: 180px;
+    overflow-wrap: break-word;
 }
 
-.preview-item span:last-child {
-    text-align: right;
+.wcf-qcard-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-1);
+    flex-shrink: 0;
+    padding: 2px var(--wg-space-2);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
+}
+
+.wcf-qcard-remove:hover {
+    border-color: var(--wg-error);
+    color: var(--wg-error);
+    --slds-c-icon-color-foreground-default: var(--wg-error);
+}
+
+.wcf-qcard-textarea {
+    display: block;
+    padding: var(--wg-space-2) var(--wg-space-3) var(--wg-space-3);
+}
+
+/* ──────────────────────────────────────────
+   FOOTER — sticky, full panel width
+────────────────────────────────────────── */
+.wcf-vf-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    margin: var(--wg-space-2) calc(var(--wcf-pad-x) * -1) 0;   /* bleed to the panel edges */
+    padding: var(--wg-space-3) var(--wcf-pad-x);
+    background: var(--wg-white);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    box-shadow: 0 -3px 10px rgba(65, 64, 65, 0.08);            /* rgb of --wg-gray */
+}
+
+.wcf-footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-1);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.wcf-footer-status {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+}
+
+.wcf-footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    flex-shrink: 0;
+}
+
+.wcf-draft-chip {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    width: fit-content;
+    max-width: 100%;
+    padding: 2px var(--wg-space-3);
+    background: var(--wg-warning-bg);
+    border: var(--wg-border-width-thin) solid var(--wg-warning);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-warning-text);
+}
+
+.wcf-draft-chip-dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--wg-warning);
+    animation: wcf-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes wcf-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+}
+
+/* ──────────────────────────────────────────
+   LOADING / SAVING
+────────────────────────────────────────── */
+/* Covers THIS panel only (was position:fixed over the whole screen,
+   including the application preview on the left) */
+.wcf-saving-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.wcf-saving-inner {
+    position: sticky;
+    top: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: var(--wg-space-16);
+}
+
+.wcf-saving-inner lightning-spinner {
+    position: relative;
+}
+
+.wcf-saving-text {
+    margin-top: var(--wg-space-9);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
     color: var(--wg-gray);
-    min-width: 0;                /* ← ADDED */
-    overflow-wrap: break-word;   /* ← ADDED */
 }
 
-.decision-card {
-    background: rgba(242, 103, 42, 0.08);   /* orange wash, matches .wcf-pick-sel elsewhere in this file */
-    border-left: 5px solid var(--wg-orange);
-    padding: 16px;
-    border-radius: var(--wg-radius-md);
+.wcf-saving-overlay-modal {
+    z-index: 10001; /* above the SLDS modal */
 }
 
-.decision-title {
-    font-size: 22px;
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-orange-deep);
-    margin-bottom: 10px;
-}
-
-.decision-rationale {
-    color: var(--wg-gray);
-    line-height: 1.6;
-    overflow-wrap: break-word;   /* ← ADDED */
-}
-
-.preview-notes {
-    min-height: 60px;
-    color: var(--wg-gray);
-    line-height: 1.6;
-    overflow-wrap: break-word;   /* ← ADDED */
+/* ══════════════════════════════════════════════════════
+   CONFIRM MODAL
+══════════════════════════════════════════════════════ */
+.slds-modal__container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
 }
 
 .slds-modal__header {
     background: var(--wg-white);
-    border-bottom: 2px solid var(--wg-border);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.preview-modal-title {
+    margin: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
 
 .slds-modal__footer {
     background: var(--wg-white);
-    border-top: 2px solid var(--wg-border);
-}
-.preview-subsection {
-    margin-top: 20px;
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
-.preview-subsection h4 {
-    font-size: var(--wg-font-size-body);
+.preview-container {
+    max-height: 70vh;
+    padding: var(--wg-space-4);
+    background: var(--wg-surface-page);
+}
+
+.preview-section {
+    margin-bottom: var(--wg-space-4);
+    padding: var(--wg-space-4) var(--wg-space-5);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+}
+
+.preview-section:last-child { margin-bottom: 0; }
+
+.preview-section h3 {
+    margin: 0 0 var(--wg-space-3);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.preview-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-5);
+    padding: var(--wg-space-2) 0;
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.preview-item:last-child { border-bottom: none; }
+
+.preview-item .label {
+    flex-shrink: 0;
+    width: 180px;
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+/* FIX: values were right-aligned, which made paragraphs hard to read */
+.preview-item .value {
+    flex: 1;
+    min-width: 0;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
+}
+
+.decision-card {
+    padding: var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border-left: var(--wg-border-width-banner) solid var(--wg-red);
+    border-radius: var(--wg-radius-sm);
+}
+
+.decision-title {
+    margin-bottom: var(--wg-space-2);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
     font-weight: var(--wg-weight-bold);
-    margin-bottom: 10px;
-    color: var(--wg-gray);   /* was navy #16325c — folded into gray */
+    color: var(--wg-gray);
+}
+
+.decision-rationale,
+.preview-notes {
+    line-height: 1.6;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.preview-notes { min-height: 40px; }
+
+.preview-subsection { margin-top: var(--wg-space-5); }
+
+.preview-subsection h4 {
+    margin: 0 0 var(--wg-space-2);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
 
 .preview-tag {
     display: inline-block;
-    background: rgba(242, 103, 42, 0.08);
-    border: 1px solid var(--wg-orange);
-    color: var(--wg-orange-deep);
-    padding: 6px 12px;
-    border-radius: var(--wg-radius-pill);
-    margin-right: 8px;
-    margin-bottom: 8px;
+    margin: 0 var(--wg-space-2) var(--wg-space-2) 0;
+    padding: var(--wg-padding-tag);
+    background: var(--wg-error-bg);
+    border: var(--wg-border-width-thin) solid var(--wg-error);
+    border-radius: var(--wg-radius-badge);
     font-size: var(--wg-font-size-caption);
     font-weight: var(--wg-weight-semibold);
+    color: var(--wg-error);
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   QUESTION NUMBER PILL GRID  (Return section) — Return-workflow blue
-   family, mapped to var(--wg-info). Light-blue tints with no matching
-   brand background token were recalculated as rgba() over wg-info's
-   own rgb (35,128,209).
-═══════════════════════════════════════════════════════════════════ */
-
-.wcf-qnum-grid {
-    display               : grid;
-    grid-template-columns : repeat(10, 1fr);
-    gap                   : 0.45rem;
-    margin-bottom         : 1rem;
-}
-
-@media (max-width: 768px) {
-    .wcf-qnum-grid { grid-template-columns: repeat(5, 1fr); }
-}
-
-/* Real <button> — squared, despite the pill resting shape, per the
-   batch's tag-based squaring convention. */
-.wcf-qnum-pill {
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    padding         : 0.45rem 0.25rem;
-    border          : 1.5px solid var(--wg-input-border);
-    border-radius   : 0;
-    background      : var(--wg-white);
-    font-size       : 0.85rem;
-    font-weight     : var(--wg-weight-semibold);
-    color           : var(--wg-gray);
-    cursor          : pointer;
-    transition      : all 0.15s ease;
-    line-height     : 1;
-    text-align      : center;
-    min-width       : 0;         /* ← ADDED */
-}
-
-.wcf-qnum-pill:hover {
-    border-color : var(--wg-info);
-    background   : var(--wg-info-bg);
-    color        : var(--wg-info);
-}
-
-.wcf-qnum-pill-sel {
-    border-color : var(--wg-info) !important;
-    background   : var(--wg-info) !important;
-    color        : var(--wg-white) !important;
-    box-shadow   : 0 2px 6px rgba(35, 128, 209, 0.25);   /* recalculated from wg-info's rgb */
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   QUESTION CARDS  (one per selected question number)
-═══════════════════════════════════════════════════════════════════ */
-
-.wcf-qcards-wrap {
-    display        : flex;
-    flex-direction : column;
-    gap            : 0.85rem;
-    margin-top     : 0.25rem;
-}
-
-.wcf-qcard {
-    border        : 1.5px solid rgba(35, 128, 209, 0.4);
-    border-radius : var(--wg-radius-card);
-    background    : var(--wg-info-bg);
-    overflow      : hidden;
-    animation     : wcf-slide-in 0.18s ease;
-}
-
-.wcf-qcard-header {
-    display      : flex;
-    align-items  : center;
-    gap          : 0.65rem;
-    padding      : 0.6rem 0.9rem;
-    background   : rgba(35, 128, 209, 0.15);
-    border-bottom: 1px solid rgba(35, 128, 209, 0.4);
-    flex-wrap    : wrap;         /* ← ADDED: Remove button drops below title when narrow */
-}
-
-.wcf-qcard-num {
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    width           : 28px;
-    height          : 28px;
-    border-radius   : 50%;
-    background      : var(--wg-info);
-    color           : var(--wg-white);
-    font-size       : 0.75rem;
-    font-weight     : 800;
-    flex-shrink     : 0;
-}
-
-.wcf-qcard-title {
-    font-size   : var(--wg-font-size-body);
-    font-weight : var(--wg-weight-bold);
-    color       : var(--wg-info-text);
-    flex        : 1;
-    min-width   : 0;             /* ← ADDED */
-    overflow-wrap: break-word;   /* ← ADDED */
-}
-
-/* Real <button>, pill-shaped — squared per convention; this is the
-   "Remove" CTA on an open question card, and shares this file's error
-   family with .wcf-wc-limit / .wcf-reviewer-return-banner. */
-.wcf-qcard-remove {
-    display       : flex;
-    align-items   : center;
-    gap           : 0.3rem;
-    padding       : 0.25rem 0.65rem;
-    background    : var(--wg-white);
-    border        : 1.5px solid var(--wg-error);
-    border-radius : 0;
-    color         : var(--wg-error);
-    font-size     : 0.73rem;
-    font-weight   : var(--wg-weight-bold);
-    cursor        : pointer;
-    transition    : all 0.15s;
-    white-space   : nowrap;
-    flex-shrink   : 0;
-}
-
-.wcf-qcard-remove:hover {
-    background   : var(--wg-error-bg);
-    border-color : var(--wg-error);
-}
-
-.wcf-qcard-textarea {
-    display : block;
-    padding : 0.6rem 0.9rem 0.75rem;
-}
-
-/* Force the lightning-textarea inside the card to be transparent */
-.wcf-qcard-textarea .slds-form-element__control textarea,
-.wcf-qcard lightning-textarea .slds-textarea {
-    background    : var(--wg-white);
-    border-color  : rgba(35, 128, 209, 0.4);
-    border-radius : 6px;
-}
-/* ═══════════════════════════════════════════════════════════════════
-   PREVIEW MODAL — Question Return Reason Cards
-═══════════════════════════════════════════════════════════════════ */
-
-/* Row of selected Q-number pills shown at the top of the subsection */
 .preview-qnum-pills {
-    display     : flex;
-    flex-wrap   : wrap;
-    gap         : 0.4rem;
-    margin-bottom : 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-1);
+    margin-bottom: var(--wg-space-3);
 }
 
-.preview-qnum-pill {
-    display         : inline-flex;
-    align-items     : center;
-    justify-content : center;
-    min-width       : 36px;
-    padding         : 0.25rem 0.65rem;
-    background      : var(--wg-info);
-    color           : var(--wg-white);
-    border-radius   : var(--wg-radius-sm);
-    font-size       : 0.78rem;
-    font-weight     : var(--wg-weight-bold);
-    letter-spacing  : 0.02em;
+.preview-qnum-pill,
+.preview-qcard-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 24px;
+    padding: 0 6px;
+    background: var(--wg-gray);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+    box-sizing: border-box;
 }
 
-/* Individual question card in preview */
 .preview-qcard {
-    border        : 1px solid rgba(35, 128, 209, 0.4);
-    border-radius : var(--wg-radius-md);
-    overflow      : hidden;
-    margin-bottom : 0.65rem;
-    background    : var(--wg-white);
+    margin-bottom: var(--wg-space-2);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-md);
+    overflow: hidden;
 }
 
 .preview-qcard-header {
-    display      : flex;
-    align-items  : center;
-    gap          : 0.6rem;
-    padding      : 0.5rem 0.85rem;
-    background   : rgba(35, 128, 209, 0.15);
-    border-bottom: 1px solid rgba(35, 128, 209, 0.4);
-}
-
-.preview-qcard-num {
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    width           : 26px;
-    height          : 26px;
-    border-radius   : 50%;
-    background      : var(--wg-info);
-    color           : var(--wg-white);
-    font-size       : 0.72rem;
-    font-weight     : 800;
-    flex-shrink     : 0;
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-surface-subtle);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
 .preview-qcard-label {
-    font-size   : 0.82rem;
-    font-weight : var(--wg-weight-bold);
-    color       : var(--wg-info-text);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
 
 .preview-qcard-text {
-    padding     : 0.65rem 0.85rem;
-    font-size   : var(--wg-font-size-body);
-    color       : var(--wg-text-muted);
-    line-height : 1.6;
-    white-space : pre-wrap;
-    overflow-wrap: break-word;   /* ← ADDED */
-}
-
-.wcf-saving-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.75);   /* plain white overlay — left literal */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9001;
-    gap: 0.75rem;
-}
-
-.wcf-saving-overlay-modal {
-    position: absolute;
-    z-index: 10001; /* above SLDS modal (10000) */
-}
-
-.wcf-saving-text {
+    padding: var(--wg-space-3);
     font-size: var(--wg-font-size-body);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-red); /* original comment: "Wadhwani red, matches your rebrand" — brand red, not error-red */
-    margin-top: 2.25rem;
+    line-height: 1.6;
+    color: var(--wg-gray);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CONTAINER-RESPONSIVE LAYOUT
-   Reacts to the PANEL's own width (split-pane divider), not the
-   browser viewport. This is what keeps the Validator Form readable
-   while the red divider is dragged — mirroring the approach already
-   proven on wcfFormPreview.
+   CONTAINER-RESPONSIVE LAYOUT (panel width, not viewport)
 ═══════════════════════════════════════════════════════════════════ */
-
-/* Panel moderately narrow → tighten paddings, relax grids */
 @container (max-width: 820px) {
-    .wcf-context-bar  { padding: 1rem 1.25rem 0.85rem; }
-    .wcf-context-title{ font-size: 1.4rem; }
-    .wcf-vf-wrapper   { padding: 1.25rem 1.25rem 4rem; }
-    .wcf-vf-section   { padding: 1.4rem 1.25rem; }
-    .wcf-draft-banner { margin: 0.75rem 1rem 0; }
+    /* :host can't be targeted by its own container query, so the
+       padding variable is overridden on the elements that use it */
+    .wcf-context-bar,
+    .wcf-draft-banner,
+    .wcf-vf-wrapper { --wcf-pad-x: var(--wg-space-4); }
 
-    /* 3 decision cards → 2 + 1 would look uneven; go straight to stacked */
+    .wcf-vf-section { padding: var(--wg-space-5) var(--wg-space-4); }
+
+    /* 3 cards → 2 + 1 would look uneven; stack instead */
     .wcf-decision-cards { grid-template-columns: 1fr; }
-
-    .wcf-qnum-grid { grid-template-columns: repeat(7, 1fr); }
 }
 
-/* Panel narrow (deep divider drag) → single-column everything */
 @container (max-width: 620px) {
-    .wcf-context-bar  { padding: 0.85rem 1rem 0.75rem; }
-    .wcf-context-title{ font-size: 1.25rem; margin-bottom: 0.5rem; }
-    .wcf-context-meta { gap: 0.6rem 1.25rem; }
-    .wcf-vf-wrapper   { padding: 1rem 0.85rem 4rem; }
-    .wcf-vf-section   { padding: 1.1rem 0.9rem; margin-bottom: 1rem; }
-    .wcf-vf-sec-head  { gap: 0.7rem; margin-bottom: 1rem; }
-    .wcf-vf-sec-num   { width: 28px; height: 28px; font-size: 0.8rem; }
-    .wcf-vf-sec-title { font-size: 1rem; }
+    .wcf-context-bar,
+    .wcf-draft-banner,
+    .wcf-vf-wrapper { --wcf-pad-x: var(--wg-space-3); }
+
+    .wcf-context-title { font-size: var(--wg-font-size-sub-heading); }
+    .wcf-vf-section    { padding: var(--wg-space-4) var(--wg-space-3); margin-bottom: var(--wg-space-4); }
+    .wcf-vf-sec-head   { gap: var(--wg-space-2); margin-bottom: var(--wg-space-4); }
+    .wcf-vf-sec-num    { width: 28px; height: 28px; font-size: var(--wg-font-size-caption); }
+    .wcf-vf-sec-title  { font-size: var(--wg-font-size-sub-heading); }
 
     .wcf-picklist-binary { grid-template-columns: 1fr; }
-    .wcf-qnum-grid       { grid-template-columns: repeat(5, 1fr); }
 
-    /* Dependent wrappers lose some indent so content keeps usable width */
-    .wcf-dep-wrapper { padding-left: 0.75rem; }
-    .wcf-dep-nested  { padding-left: 0.7rem;  }
+    .wcf-dep-wrapper,
+    .wcf-dep-nested { padding-left: var(--wg-space-3); }
 
-    /* Draft banner: progress bar drops to its own full-width line */
     .wcf-draft-progress-bar-wrap { flex: 1 1 100%; order: 3; }
 
-    /* Footer: status on top, buttons below it, full readable width */
     .wcf-vf-footer      { flex-direction: column; align-items: stretch; }
-    .wcf-footer-status  { white-space: normal; overflow: visible; text-overflow: unset; }
+    .wcf-footer-status  { white-space: normal; overflow: visible; }
     .wcf-footer-actions { justify-content: flex-end; }
+
+    .preview-item        { flex-direction: column; gap: 2px; }
+    .preview-item .label { width: auto; }
 }
 
-/* Panel very narrow → compact pills and stack footer buttons */
 @container (max-width: 440px) {
-    .wcf-qnum-grid      { grid-template-columns: repeat(4, 1fr); }
-    .wcf-confirm-pill   { padding: 0.35rem 0.8rem; font-size: 0.78rem; }
-    .wcf-pick-opt       { padding: 0.5rem 0.75rem; font-size: 0.82rem; }
-    .wcf-meta-pill      { font-size: 0.72rem; padding: 0.15rem 0.6rem; }
+    .wcf-qnum-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
 
     .wcf-footer-actions { flex-direction: column; align-items: stretch; }
     .wcf-footer-actions lightning-button { width: 100%; }
 }
-/* ═══════════════════════════════════════════════════════
-   REVIEWER RETURN NOTICE — same shape as the draft banner,
-   error-red instead of amber to distinguish "needs decision"
-   from "you have unsaved progress". Genuine alert state, so
-   this gets the full var(--wg-error) family rather than a
-   leftover-hue substitution.
-═══════════════════════════════════════════════════════ */
-.wcf-reviewer-return-banner {
-    background   : var(--wg-error-bg);
-    border-color : var(--wg-error);
-    box-shadow   : 0 1px 4px rgba(179, 38, 30, 0.15);   /* recalculated from wg-error's rgb */
+
+/* Viewport fallback for true mobile devices */
+@media (max-width: 768px) {
+    .wcf-decision-cards  { grid-template-columns: 1fr; }
+    .wcf-picklist-binary { grid-template-columns: 1fr; }
 }
-.wcf-reviewer-return-banner .wcf-draft-banner-title {
-    color : var(--wg-error);
-}
-.wcf-reviewer-return-banner .wcf-draft-banner-sub {
-    color : var(--wg-error);
-}
-.wcf-qcard-missing {
-    border: 1px solid var(--wg-error);
+
+/* ══ MOTION ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .wcf-dep-wrapper,
+    .wcf-dep-nested,
+    .wcf-qcard,
+    .wcf-draft-chip-dot {
+        animation: none;
+    }
+
+    .wcf-confirm-pill,
+    .wcf-pick-opt,
+    .wcf-dec-card,
+    .wcf-check-opt,
+    .wcf-qnum-pill,
+    .wcf-draft-progress-bar {
+        transition: none;
+    }
 }

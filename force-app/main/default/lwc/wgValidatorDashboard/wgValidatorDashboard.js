@@ -19,11 +19,11 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
 async loadValidatorCounts() {
     try {
         const data = await getActionCounts();
-        const resume    = (data?.resume ?? 0) + (data?.awaitingApplicant ?? 0);
+        const resume    = data?.resume    ?? 0;
         const validate  = data?.validate  ?? 0;
         const validated = data?.validated ?? 0;
         const resubmit  = data?.resubmit  ?? 0;
-        const returnedByReviewer = data?.returnedByReviewer ?? 0;
+        const returnedByReviewer = data?.returnedByReviewer ?? 0;   // ← ADD
 
         this.validatorCards = [
             { /* resume card — unchanged */

@@ -1,63 +1,8 @@
-@import "c/commonStyleTheme";
-
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   Three near-identical reds were in play here and are kept as three
-   distinct tokens rather than flattened to one, since they mark
-   different semantics: #c0392b / #c8391d (progress fill, phase-icon,
-   dot "danger"/"active" fills) -> var(--wg-red) (both are essentially
-   the same brand red already); #993c1d / #7d3a22 (the pervasive
-   default-accent rust used for badges, active-card text, links, the
-   phase-hover label, "toggle all") -> var(--wg-error), since it's
-   always paired with the near-exact-match error-bg tint (#fdf0ec ->
-   var(--wg-error-bg)); #a12a1e (the explicit ".. --danger" text
-   overrides) -> var(--wg-error) as well, since there's no separate
-   "danger-text" token and it's visually the same family.
-   Greens: #1e7e34 -> var(--wg-success); #eef7f0 (completion panel bg)
-   -> var(--wg-success-bg) (near-exact match); #1a5c2a (darkest green
-   text) -> var(--wg-success-deep); #3c7a4c (mid green text) ->
-   var(--wg-success).
-   Ambers: solid "warning" fills (#b26a00 — progress fill/phase-icon/
-   dot) -> var(--wg-warning), matching how the danger fills use the
-   base --wg-red rather than a darker variant; the warning TEXT/tint
-   family (#8a5200, #7a4b06, badge bg #fff4e0) -> var(--wg-warning-text)
-   / var(--wg-warning-bg) (both near-exact matches).
-   Neutrals: #fff -> var(--wg-white); #1a1a1a (near-black text, tooltip
-   bg) -> var(--wg-gray); #e5e5e5 / #f0f0f0 / #ddd / #eee / #f7f7f7
-   (borders, track backgrounds, ghost-dot fill — all light neutral
-   washes) -> var(--wg-border); #555 / #888 / #999 / #666 / #aaa /
-   #b5b5b5 / #777 (seven different mid-gray shades for labels/meta/
-   muted text) all collapse onto var(--wg-text-muted) — same "many
-   grays, one token" simplification used throughout this batch.
-   No font-family existed anywhere in this file (fully inherited from
-   the host page). Added var(--wg-font-body) once on the root
-   .timeline-card container (inherited down to every descendant by
-   normal CSS inheritance) and var(--wg-font-heading) explicitly on the
-   bold/label-weight elements (section titles, phase/step/lead names,
-   the two real buttons). The decorative "i" tooltip-glyph's
-   Georgian-serif font-family was left untouched — it's a faux-icon
-   character, not brand copy.
-   Sizes: 12/13/14/15px were all exact matches to the defined scale and
-   tokenized directly; the handful of small glyph-ish sizes below the
-   scale's floor (9px dot number, 10px phase-icon/badge/info-icon) were
-   bumped to the nearest defined tier (12px caption), same "smallest
-   tier" call made throughout this batch; 17px (the checkmark inside
-   the completion circle) has no defined tier above 14px/page-title=28
-   to round to sensibly and is a decorative glyph, not running text, so
-   it was left as a literal value.
-   .tl-phase-head and .tl-action (the only two real buttons) were
-   squared to border-radius: 0 per the codebase-wide button convention
-   — .tl-badge's 10px radius happened to be an exact match for
-   --wg-radius-card and was tokenized as such even though it's a small
-   tag, not a card, since token reuse here is about the pixel value,
-   not the semantic name.
-   ──────────────────────────────────────────────────────────────────── */
-
 .timeline-card {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-border);
-    border-radius: var(--wg-radius-card);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
     padding: 20px;
-    font-family: var(--wg-font-body);
 }
 
 /* ── Header + progress ─────────────────────────────────────────── */
@@ -69,25 +14,24 @@
 }
 
 .timeline-title {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
-    font-weight: var(--wg-weight-bold);
+    font-size: 13px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--wg-text-muted);
+    color: #555;
     margin: 0;
 }
 
 .tl-counter {
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-text-muted);
+    font-size: 12px;
+    color: #888;
     white-space: nowrap;
 }
 
 .tl-progress {
     height: 6px;
     border-radius: 3px;
-    background: var(--wg-border);
+    background: #f0f0f0;
     overflow: hidden;
     margin: 10px 0 16px 0;
 }
@@ -95,17 +39,17 @@
 .tl-progress-fill {
     height: 100%;
     width: 0;
-    background: var(--wg-success);
+    background: #1e7e34;
     transition: width 0.3s ease;
 }
 
-.tl-progress-fill--warning { background: var(--wg-warning); }
-.tl-progress-fill--danger  { background: var(--wg-red); }
+.tl-progress-fill--warning { background: #b26a00; }
+.tl-progress-fill--danger  { background: #c0392b; }
 
 /* ── Completion panel ──────────────────────────────────────────── */
 .tl-complete {
-    background: var(--wg-success-bg);
-    border-radius: var(--wg-radius-md);
+    background: #eef7f0;
+    border-radius: 8px;
     padding: 14px;
     text-align: center;
     margin-bottom: 14px;
@@ -116,24 +60,23 @@
     height: 34px;
     margin: 0 auto 6px auto;
     border-radius: 50%;
-    background: var(--wg-success);
-    color: var(--wg-white);
+    background: #1e7e34;
+    color: #fff;
     font-size: 17px;
     line-height: 34px;
 }
 
 .tl-complete-title {
     margin: 0;
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-success-deep);
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a5c2a;
 }
 
 .tl-complete-body {
     margin: 2px 0 0 0;
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-success);
+    font-size: 12px;
+    color: #3c7a4c;
 }
 
 /* ── Phase rows ────────────────────────────────────────────────── */
@@ -144,7 +87,7 @@
 }
 
 .tl-phase {
-    border-top: 1px solid var(--wg-border);
+    border-top: 1px solid #f0f0f0;
 }
 
 .tl-phase:first-child { border-top: none; }
@@ -157,32 +100,31 @@
     padding: 12px 0;
     background: none;
     border: none;
-    border-radius: 0;
     text-align: left;
     cursor: pointer;
-    font-family: var(--wg-font-heading);
+    font-family: inherit;
 }
 
-.tl-phase-head:hover .tl-phase-label { color: var(--wg-error); }
+.tl-phase-head:hover .tl-phase-label { color: #993c1d; }
 
 .tl-phase-icon {
     flex-shrink: 0;
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--wg-border);
-    color: var(--wg-text-muted);
+    background: #eee;
+    color: #999;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-bold);
+    font-size: 12px;
+    font-weight: 700;
 }
 
-.tl-phase-icon--done    { background: var(--wg-success); color: var(--wg-white); }
-.tl-phase-icon--active  { background: var(--wg-red); color: var(--wg-white); }
-.tl-phase-icon--warning { background: var(--wg-warning); color: var(--wg-white); }
-.tl-phase-icon--danger  { background: var(--wg-red); color: var(--wg-white); }
+.tl-phase-icon--done    { background: #1e7e34; color: #fff; }
+.tl-phase-icon--active  { background: #c8391d; color: #fff; }
+.tl-phase-icon--warning { background: #b26a00; color: #fff; }
+.tl-phase-icon--danger  { background: #c0392b; color: #fff; }
 
 .tl-phase-text {
     flex: 1;
@@ -192,37 +134,36 @@
 }
 
 .tl-phase-label {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-body);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-gray);
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
 }
 
 .tl-phase-meta {
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-text-muted);
+    font-size: 12px;
+    color: #999;
     margin-top: 1px;
 }
 
 .tl-badge {
     flex-shrink: 0;
-    font-size: var(--wg-font-size-caption); /* was 10px, bumped to nearest defined tier */
-    font-weight: var(--wg-weight-bold);
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
     padding: 3px 8px;
-    border-radius: var(--wg-radius-card);
-    background: var(--wg-error-bg);
-    color: var(--wg-error);
+    border-radius: 10px;
+    background: #fdf0ec;
+    color: #993c1d;
 }
 
-.tl-badge--warning { background: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.tl-badge--danger  { background: var(--wg-error-bg); color: var(--wg-error); }
+.tl-badge--warning { background: #fff4e0; color: #8a5200; }
+.tl-badge--danger  { background: #fdecea; color: #a12a1e; }
 
 .tl-chev {
     flex-shrink: 0;
-    font-size: var(--wg-font-size-body);
-    color: var(--wg-text-muted);
+    font-size: 14px;
+    color: #aaa;
     line-height: 1;
     transition: transform 0.2s ease;
 }
@@ -254,37 +195,37 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: var(--wg-white);
-    border: 2px solid var(--wg-border);
-    color: var(--wg-white);
-    font-size: var(--wg-font-size-caption); /* was 9px, bumped to nearest defined tier */
+    background: #fff;
+    border: 2px solid #ddd;
+    color: #fff;
+    font-size: 9px;
     line-height: 10px;
     text-align: center;
 }
 
 .tl-dot--done {
-    background: var(--wg-success);
-    border-color: var(--wg-success);
+    background: #1e7e34;
+    border-color: #1e7e34;
 }
 
 .tl-dot--active {
-    background: var(--wg-red);
-    border-color: var(--wg-red);
+    background: #c8391d;
+    border-color: #c8391d;
 }
 
-.tl-dot--warning { background: var(--wg-warning); border-color: var(--wg-warning); }
-.tl-dot--danger  { background: var(--wg-red); border-color: var(--wg-red); }
-.tl-dot--ghost   { border-color: var(--wg-border); background: var(--wg-border); }
+.tl-dot--warning { background: #b26a00; border-color: #b26a00; }
+.tl-dot--danger  { background: #c0392b; border-color: #c0392b; }
+.tl-dot--ghost   { border-color: #e5e5e5; background: #f7f7f7; }
 
 .tl-line {
     width: 2px;
     flex: 1;
     min-height: 12px;
-    background: var(--wg-border);
+    background: #e5e5e5;
 }
 
-.tl-line--done { background: var(--wg-success); }
-.tl-line--half { background: linear-gradient(to bottom, var(--wg-success) 50%, var(--wg-border) 50%); }
+.tl-line--done { background: #1e7e34; }
+.tl-line--half { background: linear-gradient(to bottom, #1e7e34 50%, #e5e5e5 50%); }
 
 .tl-step-body {
     flex: 1;
@@ -299,66 +240,65 @@
 }
 
 .tl-step-label {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-text-muted);
+    font-size: 13px;
+    color: #666;
 }
 
 /* ── Active step card ──────────────────────────────────────────── */
 .tl-active-card {
-    background: var(--wg-error-bg);
-    border-radius: var(--wg-radius-md);
+    background: #fdf0ec;
+    border-radius: 8px;
     padding: 10px 12px;
     margin-bottom: 2px;
 }
 
-.tl-active-card--warning { background: var(--wg-warning-bg); }
-.tl-active-card--danger  { background: var(--wg-error-bg); }
+.tl-active-card--warning { background: #fff4e0; }
+.tl-active-card--danger  { background: #fdecea; }
 
 .tl-active-title {
     margin: 0 0 4px 0;
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-body);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-error);
+    font-size: 14px;
+    font-weight: 600;
+    color: #993c1d;
 }
 
-.tl-active-card--warning .tl-active-title { color: var(--wg-warning-text); }
-.tl-active-card--danger  .tl-active-title { color: var(--wg-error); }
+.tl-active-card--warning .tl-active-title { color: #8a5200; }
+.tl-active-card--danger  .tl-active-title { color: #a12a1e; }
 
 .tl-active-desc {
     margin: 0;
-    font-size: var(--wg-font-size-caption);
+    font-size: 12px;
     line-height: 1.5;
-    color: var(--wg-error);
+    color: #7d3a22;
 }
 
-.tl-active-card--warning .tl-active-desc { color: var(--wg-warning-text); }
-.tl-active-card--danger  .tl-active-desc { color: var(--wg-error); }
+.tl-active-card--warning .tl-active-desc { color: #7a4b06; }
+.tl-active-card--danger  .tl-active-desc { color: #8f2b21; }
 
 .tl-active-note {
     margin: 8px 0 0 0;
-    font-size: var(--wg-font-size-caption);
+    font-size: 12px;
     line-height: 1.5;
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-warning-text);
+    font-weight: 600;
+    color: #8a5200;
 }
 
-.tl-active-card--danger .tl-active-note { color: var(--wg-error); }
+.tl-active-card--danger .tl-active-note { color: #a12a1e; }
 
 .tl-action {
     margin-top: 10px;
     padding: 6px 12px;
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-error);
-    background: var(--wg-white);
-    border: 1px solid var(--wg-error);
-    border-radius: 0;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #993c1d;
+    background: #fff;
+    border: 1px solid #e0c3b8;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-.tl-action:hover { background: var(--wg-error-bg); }
+.tl-action:hover { background: #fff8f6; }
 
 /* ── Remaining-steps summary ───────────────────────────────────── */
 .tl-step--remaining .tl-step-body {
@@ -368,13 +308,13 @@
 }
 
 .tl-remaining-label {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-text-muted);
+    font-size: 13px;
+    color: #999;
 }
 
 .tl-remaining-names {
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-text-muted);
+    font-size: 12px;
+    color: #b5b5b5;
     line-height: 1.4;
     margin-top: 1px;
 }
@@ -382,8 +322,8 @@
 .tl-toggle-all {
     display: inline-block;
     margin-top: 4px;
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-error);
+    font-size: 12px;
+    color: #993c1d;
     text-decoration: none;
     cursor: pointer;
 }
@@ -399,10 +339,10 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: var(--wg-border);
-    color: var(--wg-text-muted);
-    font-size: var(--wg-font-size-caption); /* was 10px, bumped to nearest defined tier */
-    font-weight: var(--wg-weight-bold);
+    background: #eee;
+    color: #777;
+    font-size: 10px;
+    font-weight: 700;
     cursor: help;
     flex-shrink: 0;
 }
@@ -419,13 +359,13 @@
     top: 50%;
     transform: translateY(-50%);
     width: 220px;
-    background: var(--wg-gray);
-    color: var(--wg-white);
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-regular);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
     line-height: 1.4;
     padding: 10px 12px;
-    border-radius: var(--wg-radius-sm);
+    border-radius: 6px;
     z-index: 10;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
@@ -438,7 +378,7 @@
     transform: translateY(-50%);
     border-width: 5px 5px 5px 0;
     border-style: solid;
-    border-color: transparent var(--wg-gray) transparent transparent;
+    border-color: transparent #1a1a1a transparent transparent;
 }
 
 .timeline-info-icon:hover .timeline-tooltip,
@@ -451,16 +391,15 @@
 .timeline-links-card {
     margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid var(--wg-border);
+    border-top: 1px solid #f0f0f0;
 }
 
 .timeline-lead-title {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-bold);
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--wg-text-muted);
+    color: #555;
     margin: 0 0 10px 0;
 }
 
@@ -474,28 +413,27 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--wg-error-bg);
-    color: var(--wg-red);
+    background: #fdecea;
+    color: #c0392b;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: var(--wg-weight-bold);
-    font-size: var(--wg-font-size-label);
+    font-weight: 700;
+    font-size: 13px;
     flex-shrink: 0;
 }
 
 .timeline-lead-name {
     margin: 0;
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-gray);
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
 }
 
 .timeline-lead-email {
     margin: 2px 0 0 0;
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-error);
+    font-size: 12px;
+    color: #993c1d;
 }
 
 .timeline-link-list {
@@ -509,8 +447,8 @@
 }
 
 .timeline-link-list a {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-error);
+    font-size: 13px;
+    color: #993c1d;
     text-decoration: none;
 }
 

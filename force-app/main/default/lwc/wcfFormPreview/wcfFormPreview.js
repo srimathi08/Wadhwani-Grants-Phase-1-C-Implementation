@@ -95,11 +95,9 @@ export default class WcfFormPreview extends LightningElement {
     @track _outcome  = null;
 
     @track isPreviewLoading = false;
-    @track _skillingDomains    = [];
-    @track _businessSectors    = [];
-    @track _livelihoodPrograms = [];
-    @track _communities        = [];
-    @track _attachments        = [];
+    @track _skillingDomains = [];
+    @track _businessSectors = [];
+    @track _attachments     = [];
     @track _additionalInfoFiles = [];
 
     @track isOfficePreviewOpen = false;
@@ -158,32 +156,6 @@ export default class WcfFormPreview extends LightningElement {
                     });
                 } else {
                     this._businessSectors = [];
-                }
-
-                if (data.livelihoodPrograms?.length > 0) {
-                    this._livelihoodPrograms = data.livelihoodPrograms.map((r, i) => ({
-                        idx            : i,
-                        name           : r.Program_Name__c || r.name || '—',
-                        supportType    : r.Type_of_Support_Provided__c || r.supportType || '—',
-                        manHours       : (r.Duration_in_Man_Hours__c != null && r.Duration_in_Man_Hours__c !== '') ? r.Duration_in_Man_Hours__c : (r.manHours || '—'),
-                        enrollment     : (r.Annual_Enrollment__c != null && r.Annual_Enrollment__c !== '') ? r.Annual_Enrollment__c : (r.enrollment || '—')
-                    }));
-                } else {
-                    this._livelihoodPrograms = [];
-                }
-
-                if (data.communities?.length > 0) {
-                    this._communities = data.communities.map((r, i) => ({
-                        idx            : i,
-                        state          : r.State__c || r.state || '—',
-                        district       : r.District__c || r.district || '—',
-                        fy3            : (r.FY_Minus_3__c != null && r.FY_Minus_3__c !== '') ? r.FY_Minus_3__c : (r.fy3 || '—'),
-                        fy2            : (r.FY_Minus_2__c != null && r.FY_Minus_2__c !== '') ? r.FY_Minus_2__c : (r.fy2 || '—'),
-                        fy1            : (r.FY_Minus_1__c != null && r.FY_Minus_1__c !== '') ? r.FY_Minus_1__c : (r.fy1 || '—'),
-                        proj           : (r.Projected_CFY__c != null && r.Projected_CFY__c !== '') ? r.Projected_CFY__c : (r.proj || '—')
-                    }));
-                } else {
-                    this._communities = [];
                 }
             } else {
                 this._app = null;
@@ -751,10 +723,6 @@ export default class WcfFormPreview extends LightningElement {
 
     // ── Track 3: Livelihood Upliftment Getters (Q19 - Q23) ───────────────────
     get livelihoodApproach()         { return this._val(this._app?.Livelihood_Approach__c); }
-    get livelihoodPrograms()         { return this._livelihoodPrograms; }
-    get hasLivelihoodPrograms()      { return this._livelihoodPrograms.length > 0; }
-    get communities()                { return this._communities; }
-    get hasCommunities()             { return this._communities.length > 0; }
 
     // ── Outcome Data Grid (All Tracks) ───────────────────────────────────────
     get outcomeData() {
@@ -1080,7 +1048,7 @@ export default class WcfFormPreview extends LightningElement {
 
     async _paintOfficePreview(container, extension, base64Data, title) {
         if (!container) return;
-        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-body);">Loading document preview...</p></div>';
+        container.innerHTML = '<div style="text-align: center; padding: 40px;"><p style="color: #666; font-size: 14px;">Loading document preview...</p></div>';
 
         const ext = (extension || '').toLowerCase().replace(/^\./, '');
 
@@ -1125,13 +1093,13 @@ export default class WcfFormPreview extends LightningElement {
                             const worksheet = workbook.Sheets[sheetName];
                             if (worksheet) {
                                 if (workbook.SheetNames.length > 1) {
-                                    html += `<div style="font-weight: var(--wg-weight-bold); font-size: var(--wg-font-size-sub-heading); color: var(--wg-orange); margin: 16px 0 8px; border-bottom: 2px solid var(--wg-orange); padding-bottom: 4px;">📊 Sheet: ${this._escapeHtml(sheetName)}</div>`;
+                                    html += `<div style="font-weight: 700; font-size: 15px; color: #0176d3; margin: 16px 0 8px; border-bottom: 2px solid #0176d3; padding-bottom: 4px;">📊 Sheet: ${this._escapeHtml(sheetName)}</div>`;
                                 }
                                 const tableHtml = xlsxLib.utils.sheet_to_html(worksheet, { id: `preview-table-${idx}`, editable: false });
-                                html += `<div style="overflow-x: auto; margin-bottom: 20px; border: 1px solid var(--wg-border); border-radius: 6px;">${tableHtml}</div>`;
+                                html += `<div style="overflow-x: auto; margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 6px;">${tableHtml}</div>`;
                             }
                         });
-                        container.innerHTML = html || '<p style="padding: 20px; color: var(--wg-text-muted);">No data found in spreadsheet.</p>';
+                        container.innerHTML = html || '<p style="padding: 20px; color: #666;">No data found in spreadsheet.</p>';
                         return;
                     }
                 }
@@ -1148,7 +1116,7 @@ export default class WcfFormPreview extends LightningElement {
                             bytes[i] = binaryString.charCodeAt(i);
                         }
                         const result = await window.mammoth.convertToHtml({ arrayBuffer: bytes.buffer });
-                        container.innerHTML = `<div style="line-height: 1.6; color: var(--wg-gray); padding: 12px; font-size: var(--wg-font-size-body);">${result.value || '<p>Empty document.</p>'}</div>`;
+                        container.innerHTML = `<div style="line-height: 1.6; color: #2d3748; padding: 12px; font-size: 14px;">${result.value || '<p>Empty document.</p>'}</div>`;
                         return;
                     }
                 } catch (mammothErr) {
@@ -1156,7 +1124,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
             } else if (ext === 'txt') {
                 const text = atob(base64Data);
-                container.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: var(--wg-font-size-label); line-height: 1.5; padding: 16px; background: #f8f9fa; border: 1px solid var(--wg-border); border-radius: 6px;">${this._escapeHtml(text)}</pre>`;
+                container.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.5; padding: 16px; background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 6px;">${this._escapeHtml(text)}</pre>`;
                 return;
             }
 
@@ -1164,17 +1132,17 @@ export default class WcfFormPreview extends LightningElement {
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px;">
                     <div style="font-size: 48px; margin-bottom: 12px;">📁</div>
-                    <h3 style="font-size: 18px; font-weight: var(--wg-weight-bold); color: var(--wg-gray); margin-bottom: 6px;">${title}</h3>
-                    <p style="color: var(--wg-text-muted); margin-bottom: 20px; font-size: var(--wg-font-size-body);">This file type (${ext.toUpperCase()}) is not supported for inline browser rendering.</p>
-                    <p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-label);">Please click <strong>Download File</strong> above to open it on your device.</p>
+                    <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">${title}</h3>
+                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">This file type (${ext.toUpperCase()}) is not supported for inline browser rendering.</p>
+                    <p style="color: #64748b; font-size: 13px;">Please click <strong>Download File</strong> above to open it on your device.</p>
                 </div>
             `;
         } catch (err) {
             console.error('Error rendering office preview:', err);
             container.innerHTML = `
                 <div style="text-align: center; padding: 30px;">
-                    <p style="color: var(--wg-error); font-weight: var(--wg-weight-semibold); margin-bottom: 12px;">Could not render preview for ${title}.</p>
-                    <p style="color: var(--wg-text-muted); font-size: var(--wg-font-size-label);">Please click <strong>Download File</strong> in the header to view this document.</p>
+                    <p style="color: #c23934; font-weight: 600; margin-bottom: 12px;">Could not render preview for ${title}.</p>
+                    <p style="color: #666; font-size: 13px;">Please click <strong>Download File</strong> in the header to view this document.</p>
                 </div>
             `;
         }
@@ -1307,7 +1275,7 @@ export default class WcfFormPreview extends LightningElement {
             const jsPDFLib = window.jspdf?.jsPDF;
             if (!jsPDFLib) return;
 
-            const RED    = [191, 32, 38];     // corrected to var(--wg-red)'s actual rgb (was stale pre-rebrand #990000; audit sweep fix)
+            const RED    = [153, 0, 0];       // #990000
             const NAVY   = [27, 42, 74];      // #1B2A4A
             const LIGHT  = [253, 246, 244];  // soft tint
             const GREY   = [112, 110, 107];
@@ -1784,34 +1752,6 @@ export default class WcfFormPreview extends LightningElement {
                 sectionHeader('Track 3: Livelihood Upliftment', this.sectionLivStepLabel);
 
                 simpleQRow(q.Q19, 'Your Livelihood Upliftment Approach', parseHtml(this.livelihoodApproach));
-
-                if (this.hasLivelihoodPrograms) {
-                    checkPage(10);
-                    const t20 = y;
-                    drawQLabel(q.Q20, 'Your Key Programs / Initiatives', t20);
-                    y = t20 + 10;
-                    doc.setFontSize(8.5);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(...NAVY);
-                    doc.text('Key Programs / Initiatives', marginX, y);
-                    y += 4;
-                    const progRows = this.livelihoodPrograms.map(p => [p.name, p.supportType, p.manHours, p.enrollment]);
-                    table(['Program / Initiative Name', 'Type of Support Provided', 'Duration (Man-Hours)', 'Annual Enrollment'], progRows);
-                }
-
-                if (this.hasCommunities) {
-                    checkPage(10);
-                    const t21 = y;
-                    drawQLabel(q.Q21, 'Communities that you work in', t21);
-                    y = t21 + 10;
-                    doc.setFontSize(8.5);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(...NAVY);
-                    doc.text('Communities Worked In', marginX, y);
-                    y += 4;
-                    const commRows = this.communities.map(c => [c.state, c.district, c.fy3, c.fy2, c.fy1, c.proj]);
-                    table(['State', 'District / Area', this.fyLabel3, this.fyLabel2, this.fyLabel1, 'CFY (projected)'], commRows);
-                }
 
                 const o = this.outcomeData;
                 checkPage(10);

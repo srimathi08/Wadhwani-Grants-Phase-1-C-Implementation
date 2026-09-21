@@ -1,71 +1,9 @@
-@import "c/commonStyleTheme";
-
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   Status-family mapping (this file is almost entirely status-driven
-   badges/banners, so everything sorted cleanly into the four existing
-   status pairs):
-     Draft/Revision/Rejected/Expired (red) -> var(--wg-error)/
-     var(--wg-error-bg); a couple of slightly different original reds
-     (#c0392b, #c23934, #d32f2f) all collapse onto the single
-     var(--wg-error) token, same "close reds share one token"
-     simplification used throughout this batch — .dash-badge--draft
-     and .dash-badge--revision (and their #c0392b) instead map to
-     var(--wg-red) specifically, matching how that exact hex has been
-     mapped everywhere else in this project.
-     Submitted/Approved/Passed (green) -> var(--wg-success)/
-     var(--wg-success-bg); the one darker green text
-     (#2a5e35, congrats-banner body copy) -> var(--wg-success-deep).
-     Sealed (blue) -> var(--wg-info)/var(--wg-info-bg).
-     Review/In-progress/Pending-note/Info & Action banners/Suspended/
-     Returned (amber — by far the largest family here, at least eight
-     originally-distinct amber/gold/orange shades) all collapse onto
-     var(--wg-warning)/var(--wg-warning-bg)/var(--wg-warning-text) —
-     the biggest single consolidation in this batch, but they were
-     already all "the same idea" (a caution/pending state) even though
-     the original hex values drifted across many small edits over
-     time.
-     .dash-badge--decided (#6b7280 bg / white text, a neutral "closed"
-     state) -> var(--wg-text-muted) as the background, since that
-     token's hex (#6B6B6B) is nearly identical to the original #6b7280.
-   Neutrals: #fff -> var(--wg-white); #1a1a1a/#333/#1b1b1b/#2b2b2b/
-   #514f4d/#4e342e (six different near-black/dark shades) -> var(--wg-gray);
-   #6b6b6b/#888/#999/#555/#5c5c5c (five different mid-grays) ->
-   var(--wg-text-muted) — #6b6b6b was already an exact match.
-   #e5e5e5/#f7f7f7/#f0f0f0/#f3f3f3/#ecebea (five light-neutral washes)
-   -> var(--wg-border).
-   No font-family existed anywhere in this file. Added
-   var(--wg-font-body) once on :host (this component renders one of
-   several different top-level state templates — draft/submitted/
-   sealed/review/approved — so :host is the one place a single
-   declaration reaches all of them) and var(--wg-font-heading)
-   explicitly on headings/titles/badges/bold-label text.
-   Sizes: the original px values matched the defined scale almost
-   perfectly and were tokenized directly (28/18/15/14/13/12/11px, the
-   11px badge text bumped to the nearest tier, 12px caption); the
-   later-appended "Compliance Decision Banners" section at the bottom
-   of the file uses rem units instead and was left as literal rem,
-   same exception used for the other rem-based files in this batch.
-   .dash-badge 4px -> bumped to var(--wg-radius-sm); .dash-track-badge's
-   999px (a true pill) -> var(--wg-radius-pill), commonStyleTheme's own
-   comment calls this token "currently unused" — this is a legitimate
-   use for it. .comments-section's 4px -> also bumped to
-   var(--wg-radius-sm). No custom-radius <button> elements were found
-   in this file to square — the two button-shaped bits
-   (.dash-back-btn/.dash-track-action-btn) are just spacing wrappers
-   around base lightning-button components, which this batch has
-   consistently left untouched elsewhere too.
-   ──────────────────────────────────────────────────────────────────── */
-
 /* ══════════════════════════════════════════════════════════════════
    wcfApplicantDashboard.css
    Full stylesheet — includes all existing rules PLUS the missing
    Approved / Stage-4 track layout rules that were causing the
    "title jammed into badge" and unstyled track rows issues.
 ══════════════════════════════════════════════════════════════════ */
-
-:host {
-    font-family: var(--wg-font-body);
-}
 
 /* ── Loading ──────────────────────────────────────────────────── */
 .dash-loading {
@@ -81,15 +19,14 @@
 }
 
 .dash-greeting h1 {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-page-title);
-    font-weight: var(--wg-weight-bold);
+    font-size: 28px;
+    font-weight: 700;
     margin: 0;
-    color: var(--wg-gray);
+    color: #1a1a1a;
 }
 
 .dash-subtitle {
-    color: var(--wg-text-muted);
+    color: #6b6b6b;
     margin-top: 4px;
 }
 
@@ -116,32 +53,31 @@
 
 /* ── Cards ────────────────────────────────────────────────────── */
 .dash-card {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-border);
-    border-radius: var(--wg-radius-card);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
     padding: 20px;
 }
 
 /* ── Status badges (top of each card) ────────────────────────── */
 .dash-badge {
     display: inline-block;
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption); /* was 11px, bumped to nearest defined tier */
-    font-weight: var(--wg-weight-bold);
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 0.04em;
     padding: 4px 10px;
-    border-radius: var(--wg-radius-sm);
+    border-radius: 4px;
     margin-bottom: 12px;
     text-transform: uppercase;
 }
 
-.dash-badge--draft      { background: var(--wg-error-bg); color: var(--wg-red); }
-.dash-badge--submitted  { background: var(--wg-success-bg); color: var(--wg-success); }
-.dash-badge--revision   { background: var(--wg-error-bg); color: var(--wg-red); }
-.dash-badge--sealed     { background: var(--wg-info-bg); color: var(--wg-info); }
-.dash-badge--review     { background: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.dash-badge--approved   { background: var(--wg-success-bg); color: var(--wg-success); }
-.dash-badge--decided    { background: var(--wg-text-muted); color: var(--wg-white); }
+.dash-badge--draft      { background: #fdecea; color: #c0392b; }
+.dash-badge--submitted  { background: #eaf6ec; color: #1e7e34; }
+.dash-badge--revision   { background: #fdecea; color: #c0392b; }
+.dash-badge--sealed     { background: #e9f0fb; color: #2c5cc5; }
+.dash-badge--review     { background: #fff3cd; color: #8a6d00; }
+.dash-badge--approved   { background: #d4f4e2; color: #04844b; }
+.dash-badge--decided    { background: #6b7280; color: #ffffff; }
 
 /* ── Card row (title + action button) ────────────────────────── */
 .dash-card-row {
@@ -153,16 +89,15 @@
 }
 
 .dash-app-name {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-section-heading); /* was 18px, nearest defined tier */
-    font-weight: var(--wg-weight-bold);
+    font-size: 18px;
+    font-weight: 700;
     margin: 0 0 4px 0;
-    color: var(--wg-gray);
+    color: #1a1a1a;
 }
 
 .dash-meta {
-    color: var(--wg-text-muted);
-    font-size: var(--wg-font-size-label);
+    color: #888;
+    font-size: 13px;
     margin: 0;
 }
 
@@ -173,69 +108,67 @@
 
 .dash-progress-bar {
     height: 6px;
-    background: var(--wg-border);
+    background: #f0e6e6;
     border-radius: 3px;
     overflow: hidden;
 }
 
 .dash-progress-fill {
     height: 100%;
-    background: var(--wg-red) !important;
+    background: #993c1d !important;
     border-radius: 3px;
     transition: width 0.3s ease;
 }
 
 .dash-progress-label {
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-text-muted);
+    font-size: 12px;
+    color: #999;
     margin-top: 8px;
 }
 
 /* ── Info / warning / action banners ─────────────────────────── */
 .dash-info-banner {
-    background: var(--wg-warning-bg);
-    border: 1px solid var(--wg-warning);
-    border-radius: var(--wg-radius-md);
+    background: #fff9e6;
+    border: 1px solid #f5e3a3;
+    border-radius: 8px;
     padding: 14px 16px;
     margin-top: 20px;
 }
 
 .dash-info-banner strong {
     display: block;
-    font-family: var(--wg-font-heading);
-    color: var(--wg-warning-text);
+    color: #8a6d00;
     margin-bottom: 4px;
-    font-size: var(--wg-font-size-label);
+    font-size: 13px;
 }
 
 .dash-info-banner p {
     margin: 0;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-warning-text);
+    font-size: 13px;
+    color: #6b5e1f;
 }
 
 .dash-action-banner {
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    background: var(--wg-warning-bg);
-    border: 1px solid var(--wg-warning);
-    border-radius: var(--wg-radius-md);
+    background: #fff4e5;
+    border: 1px solid #f4cf9e;
+    border-radius: 8px;
     padding: 14px 16px;
     margin: 16px 24px 0 24px;
 }
 
 .dash-action-banner strong {
     display: block;
-    font-family: var(--wg-font-heading);
-    color: var(--wg-warning-text);
-    font-size: var(--wg-font-size-body);
+    color: #93540a;
+    font-size: 14px;
 }
 
 .dash-action-banner p {
     margin: 2px 0 0 0;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-warning-text);
+    font-size: 13px;
+    color: #8a6d40;
 }
 
 /* ── Congratulations banner (Approved state top) ─────────────── */
@@ -243,50 +176,48 @@
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    background: var(--wg-success-bg);
-    border: 1px solid var(--wg-success);
-    border-radius: var(--wg-radius-md);
+    background: #eaf6ec;
+    border: 1px solid #a3d9b1;
+    border-radius: 8px;
     padding: 14px 16px;
     margin: 16px 24px 0 24px;
 }
 
 .dash-congrats-banner strong {
     display: block;
-    font-family: var(--wg-font-heading);
-    color: var(--wg-success);
-    font-size: var(--wg-font-size-body);
+    color: #1e7e34;
+    font-size: 14px;
     margin-bottom: 2px;
 }
 
 .dash-congrats-banner p {
     margin: 0;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-success-deep);
+    font-size: 13px;
+    color: #2a5e35;
 }
 
 /* ── Note box (revision notes) ───────────────────────────────── */
 .dash-note-box {
-    background: var(--wg-border);
-    border-radius: var(--wg-radius-md);
+    background: #f7f7f7;
+    border-radius: 8px;
     padding: 14px 16px;
     margin-top: 18px;
 }
 
 .dash-note-title {
-    font-family: var(--wg-font-heading);
-    font-weight: var(--wg-weight-bold);
-    font-size: var(--wg-font-size-caption);
+    font-weight: 700;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--wg-text-muted);
+    color: #555;
     margin: 0 0 8px 0;
 }
 
 .dash-note-list {
     margin: 0;
     padding-left: 18px;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-gray);
+    font-size: 13px;
+    color: #333;
 }
 
 .dash-note-list li {
@@ -296,8 +227,8 @@
 .dash-view-original {
     display: inline-block;
     margin-top: 14px;
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-error);
+    font-size: 13px;
+    color: #993c1d;
     text-decoration: none;
 }
 
@@ -307,12 +238,11 @@
 
 /* ── Side card ───────────────────────────────────────────────── */
 .dash-side-title {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
-    font-weight: var(--wg-weight-bold);
+    font-size: 13px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--wg-text-muted);
+    color: #555;
     margin: 0 0 12px 0;
 }
 
@@ -327,9 +257,9 @@
 }
 
 .dash-link-list a {
-    color: var(--wg-error);
+    color: #993c1d;
     text-decoration: none;
-    font-size: var(--wg-font-size-body);
+    font-size: 14px;
 }
 
 .dash-link-list a:hover {
@@ -338,16 +268,15 @@
 
 /* Programme Lead contact (Approved side card) */
 .dash-pl-name {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-gray);
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
     margin: 0 0 4px 0;
 }
 
 .dash-pl-email {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-error);
+    font-size: 13px;
+    color: #993c1d;
     text-decoration: none;
 }
 
@@ -385,9 +314,9 @@
     justify-content: center;
 }
 
-.dash-track-icon--mou        { background: var(--wg-error-bg); }
-.dash-track-icon--docs       { background: var(--wg-info-bg); }
-.dash-track-icon--programme  { background: var(--wg-border); }
+.dash-track-icon--mou        { background: #fdecea; }
+.dash-track-icon--docs       { background: #e9f0fb; }
+.dash-track-icon--programme  { background: #f3f3f3; }
 
 /* Content column */
 .dash-track-body {
@@ -407,24 +336,23 @@
 }
 
 .dash-track-title {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
 }
 
 .dash-track-desc {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-text-muted);
+    font-size: 13px;
+    color: #5c5c5c;
     margin: 0 0 10px 0;
     line-height: 1.5;
 }
 
 .dash-track-link {
-    font-size: var(--wg-font-size-label);
-    color: var(--wg-error);
+    font-size: 13px;
+    color: #993c1d;
     text-decoration: none;
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 600;
 }
 
 .dash-track-link:hover {
@@ -432,8 +360,8 @@
 }
 
 .dash-track-pending-note {
-    font-size: var(--wg-font-size-caption);
-    color: var(--wg-text-muted);
+    font-size: 12px;
+    color: #888;
     margin: 0;
     font-style: italic;
 }
@@ -441,33 +369,32 @@
 /* Divider between track rows */
 .dash-track-divider {
     border: none;
-    border-top: 1px solid var(--wg-border);
+    border-top: 1px solid #f0f0f0;
     margin: 16px 0;
 }
 
 /* Per-track status pills (different from the card-level .dash-badge) */
 .dash-track-badge {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption); /* was 10px, bumped to nearest defined tier */
-    font-weight: var(--wg-weight-bold);
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0.04em;
     padding: 3px 8px;
-    border-radius: var(--wg-radius-pill);
+    border-radius: 999px;
     text-transform: uppercase;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-.dash-track-badge--active     { background: var(--wg-success-bg); color: var(--wg-success); }
-.dash-track-badge--pending    { background: var(--wg-border); color: var(--wg-gray); }
-.dash-track-badge--inprogress { background: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.dash-track-badge--expired    { background: var(--wg-error-bg); color: var(--wg-error); }
+.dash-track-badge--active     { background: #d4f4e2; color: #04844b; }
+.dash-track-badge--pending    { background: #ecebea; color: #514f4d; }
+.dash-track-badge--inprogress { background: #fff3cd; color: #8a6d00; }
+.dash-track-badge--expired    { background: #fdecea; color: #c23934; }
 
 /* Compliance progress bar fill (distinct class from draft .dash-progress-fill
    so renderedCallback can target each independently) */
 .dash-compliance-fill {
     height: 100%;
-    background: var(--wg-success) !important;   /* green, not red */
+    background: #04844b !important;   /* green, not red */
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -491,9 +418,9 @@
 }
 
 /* Compliance Decision Badges */
-.dash-track-badge--rejected   { background-color: var(--wg-error-bg); color: var(--wg-error); }
-.dash-track-badge--suspended  { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
-.dash-track-badge--returned   { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.dash-track-badge--rejected   { background-color: #fdecea; color: #c23934; }
+.dash-track-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
+.dash-track-badge--returned   { background-color: #fff4e5; color: #93540a; }
 
 /* Compliance Decision Banners */
 .decision-banner {
@@ -502,103 +429,80 @@
     gap: 1rem;
     padding: 1rem 1.25rem;
     margin: 16px 24px 0 24px;
-    border-radius: var(--wg-radius-sm);
+    border-radius: 6px;
     border-left: 4px solid;
     font-size: 0.9rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .decision-content strong {
-    font-family: var(--wg-font-heading);
     font-size: 1rem;
-    color: var(--wg-gray);
+    color: #1b1b1b;
     display: block;
     margin-bottom: 0.25rem;
 }
 
 .decision-content p {
-    color: var(--wg-gray);
+    color: #2b2b2b;
     margin: 0;
     line-height: 1.4;
 }
 
 /* Passed (Green) */
 .decision-banner--passed {
-    background-color: var(--wg-success-bg);
-    border-color: var(--wg-success);
+    background-color: #eaf8f0;
+    border-color: #2e7d32;
     border-left-width: 5px;
 }
 
 /* Rejected (Red) */
 .decision-banner--rejected {
-    background-color: var(--wg-error-bg);
-    border-color: var(--wg-error);
+    background-color: #fdf2f2;
+    border-color: #d32f2f;
     border-left-width: 5px;
 }
 
 /* Suspended (Yellow) */
 .decision-banner--suspended {
-    background-color: var(--wg-warning-bg);
-    border-color: var(--wg-warning);
+    background-color: #fffde7;
+    border-color: #fbc02d;
     border-left-width: 5px;
 }
 .decision-icon-suspended {
-    --sds-c-icon-color-foreground: var(--wg-warning);
+    --sds-c-icon-color-foreground: #fbc02d;
 }
 
 /* Returned (Orange/Warning) */
 .decision-banner--returned {
-    background-color: var(--wg-warning-bg);
-    border-color: var(--wg-warning);
+    background-color: #fff3e0;
+    border-color: #f57c00;
     border-left-width: 5px;
 }
 .decision-icon-returned {
-    --sds-c-icon-color-foreground: var(--wg-warning);
+    --sds-c-icon-color-foreground: #f57c00;
 }
 
 /* Returned Comments Box */
 .comments-section {
     background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid var(--wg-warning);
-    border-radius: var(--wg-radius-sm);
+    border: 1px solid #ffe0b2;
+    border-radius: 4px;
     padding: 0.75rem 1rem;
     margin: 0.75rem 0;
 }
 
 .comments-section strong {
-    font-family: var(--wg-font-heading);
     font-size: 0.85rem;
-    color: var(--wg-warning-text);
+    color: #e65100;
     margin-bottom: 0.25rem;
 }
 
 .reviewer-comments {
     font-style: italic;
-    color: var(--wg-gray) !important;
+    color: #4e342e !important;
 }
 
 .footer-note {
-    font-weight: var(--wg-weight-semibold);
+    font-weight: 500;
     margin-top: 0.5rem !important;
-}
-
-/* "Resume application" / "Open and respond" (x2) were bare
-   variant="brand" lightning-buttons with no class at all, so they had
-   no square-shape treatment and no protection from the Experience
-   Cloud site theme's brand-button text-color override, which renders
-   dark text on the theme's red brand background instead of white — the
-   same bug found on wcfFormPreview's "Download as PDF" button and
-   already fixed on wcfValidatorForm's "Seal" button. Same fix here:
-   text color pinned via SLDS styling hooks (old + new token names for
-   compatibility) plus a color fallback, and squared as a real CTA. */
-.dash-brand-btn {
-    --slds-c-button-radius-border          : 0;
-    --slds-c-button-brand-text-color       : var(--wg-white);
-    --slds-c-button-brand-text-color-hover : var(--wg-white);
-    --slds-c-button-brand-text-color-active: var(--wg-white);
-    --sds-c-button-brand-text-color        : var(--wg-white);
-    --sds-c-button-brand-text-color-hover  : var(--wg-white);
-    --slds-c-button-text-color             : var(--wg-white);
-    --slds-c-button-text-color-hover       : var(--wg-white);
-    color: var(--wg-white);
 }

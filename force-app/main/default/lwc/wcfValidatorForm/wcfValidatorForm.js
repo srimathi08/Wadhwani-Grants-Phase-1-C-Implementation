@@ -1,4 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
+import { ShowToastEvent }                     from 'lightning/platformShowToastEvent';
 import { getPicklistValues, getObjectInfo }   from 'lightning/uiObjectInfoApi';
 import { getRecord, getFieldValue }           from 'lightning/uiRecordApi';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
@@ -122,53 +123,6 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     @track showDraftBanner   = false;
     @track showPreview       = false;
     @track _wiredAppId       = null;
-
-    // ─────────────────────────────────────────────────────────────────────────────
-    // WG TOAST BANNER — replaces the native ShowToastEvent, which renders
-    // outside this component's shadow tree and cannot be restyled to match
-    // the brand. Built from scratch for this component (no prior custom-toast
-    // infrastructure existed here, unlike wcfReviewerContainer).
-    // ─────────────────────────────────────────────────────────────────────────────
-    @track bannerVisible = false;
-    @track bannerVariant = 'info';
-    @track bannerTitle   = '';
-    @track bannerMessage = '';
-    _bannerTimeout;
-
-    showBanner(variant, title, message, duration = 6000) {
-        if (this._bannerTimeout) {
-            clearTimeout(this._bannerTimeout);
-            this._bannerTimeout = null;
-        }
-        this.bannerVariant = variant;
-        this.bannerTitle   = title;
-        this.bannerMessage = message;
-        this.bannerVisible = true;
-        this._bannerTimeout = setTimeout(() => {
-            this.bannerVisible = false;
-        }, duration);
-    }
-
-    closeBanner() {
-        if (this._bannerTimeout) {
-            clearTimeout(this._bannerTimeout);
-            this._bannerTimeout = null;
-        }
-        this.bannerVisible = false;
-    }
-
-    handleDismissBanner() {
-        this.closeBanner();
-    }
-
-    get isBannerError()   { return this.bannerVariant === 'error'; }
-    get isBannerWarning() { return this.bannerVariant === 'warning'; }
-    get isBannerSuccess() { return this.bannerVariant === 'success'; }
-    get isBannerInfo()    { return this.bannerVariant === 'info'; }
-
-    get bannerClass() {
-        return 'wg-toast-banner ' + this.bannerVariant + '-banner';
-    }
 
     _reviewLoaded = false;
     _effectiveRecordId = null;
@@ -1073,17 +1027,21 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             this.draftLastSaved = this._formatNow();
             this.showDraftBanner = true;
 
-            this.showBanner(
-                'success',
-                'Draft saved',
-                `Progress saved — ${this.completionPercent}% complete (${this.completedFieldCount} of ${this.totalRequiredFieldCount} required fields).`
-            );
+            this.dispatchEvent(new ShowToastEvent({
+                title   : 'Draft saved',
+                message : `Progress saved — ${this.completionPercent}% complete (${this.completedFieldCount} of ${this.totalRequiredFieldCount} required fields).`,
+                variant : 'success'
+            }));
 
             setTimeout(() => {
                 window.location.reload();
             }, 800);
         } catch (e) {
-            this.showBanner('error', 'Save failed', e.body?.message || e.message);
+            this.dispatchEvent(new ShowToastEvent({
+                title   : 'Save failed',
+                message : e.body?.message || e.message,
+                variant : 'error'
+            }));
         } finally {
             this.isSaving = false;
         }
@@ -1115,11 +1073,19 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
                 title: 'Validator Record Validated', message: 'Record successfully Validated.'
             };
 
-            this.showBanner('success', toastInfo.title, toastInfo.message);
+            this.dispatchEvent(new ShowToastEvent({
+                title: toastInfo.title,
+                message: toastInfo.message,
+                variant: 'success'
+            }));
 
             setTimeout(() => { window.location.reload(); }, 800);
         } catch (e) {
-            this.showBanner('error', 'Seal failed', e.body?.message || e.message);
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Seal failed',
+                message: e.body?.message || e.message,
+                variant: 'error'
+            }));
         } finally {
             this.isSaving = false;
         }

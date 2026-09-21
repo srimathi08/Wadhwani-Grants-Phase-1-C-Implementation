@@ -42,7 +42,7 @@ div[style*="margin: 16px 0"]{margin:0 !important;}
 <center role="article" aria-roledescription="email" lang="en" style="width:100%;background-color:#F4F4F5;">
 
 <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;color:#F4F4F5;">
-Your evaluation for {!Account.WCF_Organizational_Name__c} is due soon.
+Evaluation due {!ApplicationReview.DueDate} - {!IndividualApplication.Name}
 </div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
@@ -61,11 +61,11 @@ Your evaluation for {!Account.WCF_Organizational_Name__c} is due soon.
 <td align="left" valign="middle">
 
 <p style="margin:0 0 6px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;">
-Evaluation
+Deadline approaching
 </p>
 
 <h1 class="bh" style="margin:0;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;">
-Evaluation due soon
+Your evaluation is running out of time.
 </h1>
 
 </td>
@@ -92,31 +92,40 @@ style="display:block;width:136px;height:auto;">
 <td class="pad" style="padding:28px 32px 10px;">
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hello {!Account.FirstName},
+Hi {!Account.Name},
 </p>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-A quick reminder that your evaluation for <strong>{!Account.WCF_Organizational_Name__c}</strong> is due soon:
+Your evaluation of application {!IndividualApplication.Name} from {!IndividualApplication.Organization_Name__c} has not been submitted yet.
 </p>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+where it stands:
+</p>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
 <tr>
-<td style="padding:16px 20px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
-<strong>Organization:</strong> {!Account.WCF_Organizational_Name__c}<br/>
-<strong>Due:</strong> {!ApplicationReview.DueDate}
+<td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
+<strong>Application:</strong>{!IndividualApplication.Name}<br/>
+<strong>Application organization:</strong> {!IndividualApplication.Organization_Name__c}<br/>
+<strong>Evaluation due:</strong> {!IndividualApplication.Due_Date__c}<br/>
+<strong>Time left:</strong> {!ApplicationReview.Time_Left__c}<br/>
+<strong>Status:</strong> not yet submitted
 </td>
 </tr>
 </table>
 
+
+
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Please complete it in the Reviewer Portal at your earliest convenience:
+Can you please submit the evaluation by {!ApplicationReview.DueDate} ? If that date is not workable, please let the applicant know about the delay.
 </p>
 
 <!-- BUTTON -->
 <table role="presentation" class="btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/reviewersite/s/wg-reviewer-queue"
+<a href="https://wadhwanifoundation.my.site.com/internal/s/wg-reviewer-queue"
 target="_blank"
 style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 Complete evaluation
@@ -124,10 +133,6 @@ Complete evaluation
 </td>
 </tr>
 </table>
-
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-If you're blocked or need more time, let {!Account.PL__c} know.
-</p>
 
 <p style="margin:18px 0 8px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
 Wadhwani Grants Platform

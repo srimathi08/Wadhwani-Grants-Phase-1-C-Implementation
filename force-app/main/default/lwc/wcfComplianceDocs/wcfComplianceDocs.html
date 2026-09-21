@@ -1,39 +1,4 @@
 <template>
-    <!-- ══ WG TOAST BANNER ══════════════════════════════════
-         Replaces native ShowToastEvent (renders outside the shadow tree and
-         cannot be restyled). JS infrastructure already added in
-         wcfComplianceDocs.js. Renders at the very top level, fixed
-         position, so it floats above the loading spinner and every row. -->
-    <template if:true={bannerVisible}>
-        <div class={bannerClass}>
-            <template if:true={isBannerError}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5v-1.5h1.5v1.5zm0-3h-1.5V5.75h1.5v5.5z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerWarning}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10.91 2.6a1 1 0 00-1.82 0l-8 16A1 1 0 002 20h16a1 1 0 00.91-1.4l-8-16zM11 16H9v-2h2v2zm0-4H9V7h2v5z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerSuccess}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm-1.2 13L4.6 9.8l1.4-1.4 2.8 2.8 5.2-5.2 1.4 1.4L8.8 14z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerInfo}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5V8.75h1.5v5.5zm0-7h-1.5v-1.5h1.5v1.5z"></path>
-                </svg>
-            </template>
-            <div class="wg-toast-banner-body">
-                <div class="wg-toast-banner-title">{bannerTitle}</div>
-                <div class="wg-toast-banner-message">{bannerMessage}</div>
-            </div>
-            <button class="wg-toast-banner-close" onclick={handleDismissBanner} title="Dismiss" type="button">&#10005;</button>
-        </div>
-    </template>
-
 <lightning-card title="Compliance Documents" icon-name="standard:document">
 
     <template if:true={isLoading}>
@@ -51,72 +16,6 @@
 
     <template if:false={isLoading}>
         <template if:true={hasItems}>
-
-            <!-- ── Compliance Decision (Passed / Rejected / Suspended / Returned) ──
-                 BUG FIX: this component's CSS (.decision-banner*, .comments-section,
-                 .reviewer-comments, .footer-note) and JS (showPassedBanner /
-                 showRejectedBanner / showSuspendedBanner / showReturnedBanner
-                 getters, the complianceReviewerNotes tracked property, already
-                 fetched from Apex) were both fully built for this banner, but the
-                 HTML template never actually rendered it anywhere — the compliance
-                 team's decision and reviewer comments were silently invisible to
-                 the applicant. Wired up here using the existing getters/classes
-                 exactly as they were already defined. -->
-            <template if:true={showPassedBanner}>
-                <div class="decision-banner decision-banner--passed">
-                    <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
-                    <div class="decision-content">
-                        <strong>Compliance documents validated</strong>
-                        <p>All required compliance documents have been reviewed and approved.</p>
-                    </div>
-                </div>
-            </template>
-
-            <template if:true={showRejectedBanner}>
-                <div class="decision-banner decision-banner--rejected">
-                    <lightning-icon icon-name="utility:ban" size="small"></lightning-icon>
-                    <div class="decision-content">
-                        <strong>Compliance documents rejected</strong>
-                        <template if:true={complianceReviewerNotes}>
-                            <div class="comments-section">
-                                <strong>Reviewer comments:</strong>
-                                <p class="reviewer-comments">{complianceReviewerNotes}</p>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </template>
-
-            <template if:true={showSuspendedBanner}>
-                <div class="decision-banner decision-banner--suspended">
-                    <lightning-icon icon-name="utility:pause" size="small" class="decision-icon-suspended"></lightning-icon>
-                    <div class="decision-content">
-                        <strong>Compliance review suspended</strong>
-                        <template if:true={complianceReviewerNotes}>
-                            <div class="comments-section">
-                                <strong>Reviewer comments:</strong>
-                                <p class="reviewer-comments">{complianceReviewerNotes}</p>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </template>
-
-            <template if:true={showReturnedBanner}>
-                <div class="decision-banner decision-banner--returned">
-                    <lightning-icon icon-name="utility:warning" size="small" class="decision-icon-returned"></lightning-icon>
-                    <div class="decision-content">
-                        <strong>Action needed on compliance documents</strong>
-                        <template if:true={complianceReviewerNotes}>
-                            <div class="comments-section">
-                                <strong>Reviewer comments:</strong>
-                                <p class="reviewer-comments">{complianceReviewerNotes}</p>
-                            </div>
-                        </template>
-                        <p class="footer-note">Please review the item-level notes below and re-upload the affected document(s).</p>
-                    </div>
-                </div>
-            </template>
 
             <!-- ── Overall checklist progress ── -->
             <div class="comp-summary">
@@ -235,8 +134,7 @@
                                     label="Prepare upload"
                                     data-doctype={item.documentType}
                                     onclick={handlePrepareUpload}
-                                    disabled={item.isPreparing}
-                                    class="comp-btn-prepare">
+                                    disabled={item.isPreparing}>
                                 </lightning-button>
                                 <template if:true={item.isPreparing}>
                                     <lightning-spinner alternative-text="Preparing" size="small"></lightning-spinner>

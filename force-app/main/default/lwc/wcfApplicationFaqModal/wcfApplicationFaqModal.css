@@ -1,33 +1,3 @@
-@import "c/commonStyleTheme";
-
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   This file used a generic slate/orange/sky-blue palette unrelated to
-   the brand — not a near-miss, a fully different design system, same
-   situation as wcfDynamicForm before its recolor. Full mapping:
-     - var(--wg-white) -> var(--wg-white); var(--wg-border)/var(--wg-border)/var(--wg-border) (borders +
-       hover fill) -> var(--wg-border)
-     - var(--wg-orange) (header accent + hover-state text) and var(--wg-orange)
-       (blockquote accent) -> var(--wg-orange); var(--wg-orange-deep) (+/- symbol,
-       a deeper orange) -> var(--wg-orange-deep)
-     - var(--wg-gray)/var(--wg-gray) (near-black text) -> var(--wg-gray);
-       var(--wg-text-muted)/var(--wg-text-muted)/var(--wg-text-muted) (secondary/muted text) ->
-       var(--wg-text-muted)
-     - var(--wg-border) (example-box background) -> var(--wg-border), reused as
-       a light neutral fill — same call made repeatedly in
-       wcfDynamicForm for generic slate washes with no brand-color
-       identity of their own
-     - var(--wg-info-bg)/var(--wg-info)/var(--wg-info)/var(--wg-info-text) (the "contact us" footer + FAQ
-       links, all blue) -> var(--wg-info-bg)/var(--wg-info)/
-       var(--wg-info)/var(--wg-info-text) — an informational callout
-       maps cleanly onto the brand's info-banner colors
-   font-family: inherit (×4) replaced with var(--wg-font-heading) on
-   the modal title / question text and var(--wg-font-body) on body/
-   contact copy, since nothing upstream of this modal actually set a
-   font — sizes left in px/rem as-is (not forced onto the brand scale).
-   .modal-close (the only button, an icon-only "✕") squared from
-   border-radius: 6px to match the rest of this codebase.
-   ───────────────────────────────────────────────────────────── */
-
 /* ── Backdrop (Popup Modal Mode) ── */
 .modal-backdrop {
     position: fixed;
@@ -43,14 +13,14 @@
 
 /* ── Container (Popup Modal Mode) ── */
 .modal-container {
-    background: var(--wg-white);
+    background: #ffffff;
     border-radius: 12px;
     width: 820px;
     max-width: 94vw;
     max-height: 88vh;
     overflow-y: auto;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--wg-border);
+    border: 1px solid #e2e8f0;
 }
 
 /* ── Modal Header ── */
@@ -59,8 +29,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 26px;
-    border-bottom: 2px solid var(--wg-orange);
-    background: var(--wg-white);
+    border-bottom: 2px solid #ea580c;
+    background: #ffffff;
     position: sticky;
     top: 0;
     z-index: 10;
@@ -69,10 +39,10 @@
 }
 
 .modal-title {
-    font-family: var(--wg-font-heading);
+    font-family: inherit;
     font-size: 1.25rem;
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
+    font-weight: 700;
+    color: #0f172a;
     margin: 0;
     letter-spacing: -0.2px;
 }
@@ -82,15 +52,15 @@
     border: none;
     cursor: pointer;
     font-size: 1.1rem;
-    color: var(--wg-text-muted);
+    color: #64748b;
     line-height: 1;
     padding: 6px 10px;
-    border-radius: 0;
+    border-radius: 6px;
     transition: background 0.15s ease, color 0.15s ease;
 }
 .modal-close:hover { 
-    background: var(--wg-border); 
-    color: var(--wg-gray);
+    background: #f1f5f9; 
+    color: #0f172a;
 }
 
 /* ── Modal Body ── */
@@ -106,8 +76,8 @@
 
 /* ── Block 3 Card Box Style ── */
 .rfi-card-box {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-border);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 24px;
     margin-bottom: 20px;
@@ -122,7 +92,7 @@
 
 /* ── Accordion Items (Dashed Dividers matching Block 3) ── */
 .faq-item {
-    border-bottom: 1px dashed var(--wg-border);
+    border-bottom: 1px dashed #cbd5e1;
     padding-bottom: 16px;
     margin-bottom: 16px;
 }
@@ -148,13 +118,13 @@
 }
 
 .faq-header:hover .faq-question-text {
-    color: var(--wg-orange);
+    color: #ea580c;
 }
 
 /* ── Symbol (- / +) on the left ── */
 .faq-symbol {
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-orange-deep);
+    font-weight: 700;
+    color: #c2410c;
     font-size: 16px;
     line-height: 1;
     min-width: 14px;
@@ -165,10 +135,10 @@
 
 /* ── Question Title Text ── */
 .faq-question-text {
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-sub-heading);
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-gray);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
     margin: 0;
     line-height: 1.4;
 }
@@ -177,31 +147,29 @@
 .faq-content-body {
     padding-top: 10px;
     padding-left: 24px;
-    font-family: var(--wg-font-body);
-    font-size: var(--wg-font-size-body);
-    color: var(--wg-text-muted);
+    font-family: inherit;
+    font-size: 14px;
+    color: #475569;
     line-height: 1.6;
 }
 
 .faq-content-body p {
-    font-family: var(--wg-font-body);
     margin: 0 0 8px 0;
-    font-size: var(--wg-font-size-body);
-    color: var(--wg-text-muted);
+    font-size: 14px;
+    color: #475569;
     line-height: 1.6;
 }
 
 .faq-content-body blockquote,
 .faq-content-body .faq-example-box,
 .faq-content-body .example-box {
-    background: var(--wg-border);
-    border-left: 3px solid var(--wg-orange);
-    font-family: var(--wg-font-body);
+    background: #f8fafc;
+    border-left: 3px solid #f97316;
     padding: 10px 14px;
     margin-top: 10px;
     margin-bottom: 4px;
     font-size: 13.5px;
-    color: var(--wg-text-muted);
+    color: #334155;
     line-height: 1.5;
     border-radius: 0 6px 6px 0;
 }
@@ -209,8 +177,8 @@
 .faq-content-body blockquote strong,
 .faq-content-body .faq-example-box strong,
 .faq-content-body .example-box strong {
-    color: var(--wg-gray);
-    font-weight: var(--wg-weight-bold);
+    color: #1e293b;
+    font-weight: 700;
 }
 
 /* ── Contact Footer ── */
@@ -220,29 +188,29 @@
     gap: 12px;
     margin-top: 20px;
     padding: 14px 18px;
-    background: var(--wg-info-bg);
-    border: 1px solid var(--wg-info);
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
     border-radius: 8px;
 }
 
 .faq-contact-icon {
     flex-shrink: 0;
-    --lwc-colorTextIconDefault: var(--wg-info);
+    --lwc-colorTextIconDefault: #0284c7;
 }
 
 .faq-contact-text {
     margin: 0;
-    font-family: var(--wg-font-body);
+    font-family: inherit;
     font-size: 13.5px;
-    color: var(--wg-info-text);
+    color: #0369a1;
     line-height: 1.5;
 }
 
 .faq-link {
-    color: var(--wg-info);
-    font-weight: var(--wg-weight-semibold);
+    color: #0284c7;
+    font-weight: 600;
     text-decoration: underline;
 }
 .faq-link:hover { 
-    color: var(--wg-info-text); 
+    color: #0369a1; 
 }

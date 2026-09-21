@@ -1,62 +1,33 @@
 <template>
 
-    <!-- ══ WG TOAST BANNER ══════════════════════════════════
-         Replaces native ShowToastEvent (built from scratch —
-         no prior custom-toast infrastructure existed in this
-         component, though its JS already funneled every toast
-         through one showToast() wrapper method). Renders at
-         top level so it floats above either screen state below. -->
-    <template if:true={bannerVisible}>
-        <div class={bannerClass}>
-            <template if:true={isBannerError}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5v-1.5h1.5v1.5zm0-3h-1.5V5.75h1.5v5.5z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerWarning}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10.91 2.6a1 1 0 00-1.82 0l-8 16A1 1 0 002 20h16a1 1 0 00.91-1.4l-8-16zM11 16H9v-2h2v2zm0-4H9V7h2v5z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerSuccess}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm-1.2 13L4.6 9.8l1.4-1.4 2.8 2.8 5.2-5.2 1.4 1.4L8.8 14z"></path>
-                </svg>
-            </template>
-            <template if:true={isBannerInfo}>
-                <svg class="wg-toast-banner-icon" viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true">
-                    <path d="M10 1a9 9 0 100 18 9 9 0 000-18zm.75 13.25h-1.5V8.75h1.5v5.5zm0-7h-1.5v-1.5h1.5v1.5z"></path>
-                </svg>
-            </template>
-            <div class="wg-toast-banner-body">
-                <div class="wg-toast-banner-title">{bannerTitle}</div>
-                <div class="wg-toast-banner-message">{bannerMessage}</div>
-            </div>
-            <button class="wg-toast-banner-close" onclick={handleDismissBanner} title="Dismiss" type="button">&#10005;</button>
-        </div>
-    </template>
-
-    <!-- Main Form -->
+    <!-- ══ MAIN FORM ═══════════════════════════════════════════ -->
     <template if:true={showForm}>
         <div class="form-wrap">
 
-            <!-- Form Header Band -->
+            <!-- Form header band -->
             <div class="formhead">
-                <h2 class="form-title serif">Wadhwani Grants Project Proposal Review</h2>
+                <p class="eyebrow">Proposal review</p>
+                <h2 class="form-title">Wadhwani Grants Project Proposal Review</h2>
                 <div class="applicant">
-                    <div><strong>Applicant:</strong>&nbsp;{institutionName}</div>
-                    <div class="sep">·</div>
-                    <div><strong>ID:</strong>&nbsp;{applicationName}</div>
+                    <div class="applicant-item">
+                        <span class="applicant-label">Applicant</span>
+                        <span class="applicant-value">{institutionName}</span>
+                    </div>
+                    <div class="applicant-item">
+                        <span class="applicant-label">ID</span>
+                        <span class="applicant-value">{applicationName}</span>
+                    </div>
                     <template if:true={hasOutcomeType}>
-                        <div class="sep">·</div>
-                        <div class="track-header-wrap" style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <strong>Track:</strong>&nbsp;
-                            <template for:each={headerTrackBadges} for:item="tb">
-                                <span key={tb.label} class={tb.badgeClass}>
-                                    <span class="dot"></span>
-                                    {tb.label}
-                                </span>
-                            </template>
+                        <div class="applicant-item">
+                            <span class="applicant-label">Track</span>
+                            <span class="track-badge-list">
+                                <template for:each={headerTrackBadges} for:item="tb">
+                                    <span key={tb.label} class={tb.badgeClass}>
+                                        <span class="dot"></span>
+                                        {tb.label}
+                                    </span>
+                                </template>
+                            </span>
                         </div>
                     </template>
                 </div>
@@ -79,25 +50,26 @@
                 </div>
             </div>
 
-            <!-- Step Body -->
+            <!-- Step body -->
             <div class="body">
 
-                <!-- Loading State -->
+                <!-- Loading -->
                 <template if:true={isLoadingMetadata}>
-                    <div class="metadata-loading" style="text-align: center; padding: 40px;">
-                        <lightning-spinner alternative-text="Loading review questions..." size="medium"></lightning-spinner>
-                        <p style="margin-top: 16px; color: var(--wg-ink-soft);">Loading Reviewer Rubric & Questions from Custom Metadata…</p>
+                    <div class="wg-loading">
+                        <lightning-spinner alternative-text="Loading review questions" size="medium"></lightning-spinner>
+                        <p class="wg-loading-text">Loading the reviewer rubric and questions…</p>
                     </div>
                 </template>
 
-                <!-- ===== CATEGORY / DIMENSION STEPS (0–6) ===== -->
                 <template if:false={isLoadingMetadata}>
+
+                    <!-- ═════ CATEGORY STEPS ═════ -->
                     <template if:true={isDimStep}>
                         <div class="step-intro">
                             <div class="dim-head">
-                                <div class="dim-num serif">{currentDim.categoryNumber}</div>
+                                <div class="dim-num">{currentDim.categoryNumber}</div>
                                 <div class="dim-title">
-                                    <h3 class="serif">{currentDim.title}</h3>
+                                    <h3>{currentDim.title}</h3>
                                     <p class="lede">{currentDim.lede}</p>
                                 </div>
                             </div>
@@ -108,7 +80,7 @@
                                 <span class="qcount">{currentDim.questionCount} question(s) in this category</span>
                             </div>
                             <div class={rubricClass}>
-                                <h4>General Scoring Philosophy · Category {currentDim.categoryNumber}: {currentDim.title}</h4>
+                                <h4>General scoring philosophy · Category {currentDim.categoryNumber}: {currentDim.title}</h4>
                                 <div class="rubric-grid">
                                     <template for:each={currentDim.rubricCols} for:item="col">
                                         <div key={col.n} class={col.cls}>
@@ -120,7 +92,7 @@
                             </div>
                         </div>
 
-                        <!-- Questions in this Category -->
+                        <!-- Questions in this category -->
                         <template for:each={currentQuestions} for:item="q">
                             <div key={q.questionId} class={q.cardClass}>
                                 <div class="subq-top">
@@ -130,30 +102,24 @@
                                             {q.questionText}
                                         </div>
 
-                                        <!-- Track-specific guidance badges & text -->
+                                        <!-- Track-specific guidance -->
                                         <template if:true={q.trackAware}>
-                                            <div class="track-guidance-box" style="margin-top: 8px; padding: 10px 14px; background: var(--wg-bg-warm); border-left: 3px solid var(--wg-brand); border-radius: 6px; border: 1px solid var(--wg-rule);">
-                                                <div style="font-size: 0.78rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-                                                    🎯 Track-Specific Review Guidance:
-                                                </div>
+                                            <div class="track-guidance">
+                                                <div class="track-guidance-title">Track-specific review guidance</div>
                                                 <template for:each={q.trackDescriptions} for:item="td">
-                                                    <div key={td.trackKey} style="margin-bottom: 6px; font-size: 0.85rem; color: var(--wg-ink); line-height: 1.45; display: flex; align-items: flex-start; gap: 8px;">
-                                                        <span style="font-weight: var(--wg-weight-bold); color: var(--wg-ink); background: var(--wg-rule-soft); border: 1px solid var(--wg-rule); padding: 1px 7px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap;">{td.trackLabel}</span>
+                                                    <div key={td.trackKey} class="track-guidance-row">
+                                                        <span class="track-guidance-tag">{td.trackLabel}</span>
                                                         <span>{td.text}</span>
                                                     </div>
                                                 </template>
                                                 <template if:false={q.trackDescriptions.length}>
-                                                    <div style="font-size: 0.85rem; color: var(--wg-ink); line-height: 1.4;">
-                                                        {q.resolvedDescription}
-                                                    </div>
+                                                    <div class="track-guidance-text">{q.resolvedDescription}</div>
                                                 </template>
                                             </div>
                                         </template>
                                         <template if:false={q.trackAware}>
                                             <template if:true={q.resolvedDescription}>
-                                                <div class="qhint" style="margin-top: 4px; font-size: 0.82rem; color: var(--wg-ink-soft);">
-                                                    {q.resolvedDescription}
-                                                </div>
+                                                <div class="qhint">{q.resolvedDescription}</div>
                                             </template>
                                         </template>
                                     </div>
@@ -163,10 +129,10 @@
                                     </template>
                                 </div>
 
-                                <!-- Rating Row (1 to 5 Buttons) -->
+                                <!-- Rating 5 → 1 -->
                                 <div class="rating-row">
                                     <span class="rating-label">Rating <span class="req">*</span></span>
-                                    <div class="segmented" role="radiogroup">
+                                    <div class="segmented" role="radiogroup" aria-label="Rating">
                                         <template for:each={q.ratingBtns} for:item="rb">
                                             <button
                                                 key={rb.n}
@@ -184,28 +150,25 @@
                                     </div>
                                 </div>
 
-                                <!-- Selected Rating Ladder Anchor Badge -->
+                                <!-- Selected level description -->
                                 <template if:true={q.selectedLadderText}>
-                                    <div class="selected-ladder-badge" style="margin: 6px 0 10px 0; padding: 6px 12px; background: var(--wg-good-tint); border: 1px solid var(--wg-good-rule); border-radius: 6px; font-size: 0.83rem; color: var(--wg-good); display: flex; align-items: center; gap: 6px;">
-                                        <span style="font-weight: var(--wg-weight-bold);">Level {q.selectedRating}:</span>
+                                    <div class="ladder-selected">
+                                        <span class="ladder-selected-level">Level {q.selectedRating}</span>
                                         <span>{q.selectedLadderText}</span>
                                     </div>
                                 </template>
 
-                                <!-- Question-Specific 5-Point Ladder Accordion -->
-                                <div class="q-ladder-toggle-wrap" style="margin-bottom: 12px;">
-                                    <button class="q-ladder-toggle-btn" type="button" data-qid={q.questionId} onclick={handleToggleQuestionLadder}
-                                            style="background: none; border: none; padding: 0; font-size: 0.78rem; color: var(--wg-brand); cursor: pointer; text-decoration: underline; font-weight: var(--wg-weight-semibold);">
+                                <!-- 5-point ladder accordion -->
+                                <div class="ladder-toggle-wrap">
+                                    <button class="link-btn" type="button" data-qid={q.questionId} onclick={handleToggleQuestionLadder}>
                                         {q.ladderToggleLabel}
                                     </button>
                                     <template if:true={q.showLadder}>
-                                        <div class="q-ladder-drawer" style="margin-top: 8px; padding: 10px 14px; background: rgba(242, 103, 42, 0.04); border: 1px dashed var(--wg-brand); border-radius: 6px;">
-                                            <div style="font-size: 0.75rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand-deep); text-transform: uppercase; margin-bottom: 6px;">
-                                                5-Point Rating Ladder for Question {q.questionId}:
-                                            </div>
+                                        <div class="ladder-drawer">
+                                            <div class="ladder-drawer-title">5-point rating ladder · Question {q.questionId}</div>
                                             <template for:each={q.ladderItems} for:item="lItem">
-                                                <div key={lItem.level} style="font-size: 0.8rem; margin-bottom: 4px; color: var(--wg-ink); display: flex; gap: 8px;">
-                                                    <span style="font-weight: var(--wg-weight-bold); color: var(--wg-brand); min-width: 55px;">Level {lItem.level}:</span>
+                                                <div key={lItem.level} class="ladder-row">
+                                                    <span class="ladder-row-level">Level {lItem.level}</span>
                                                     <span>{lItem.text}</span>
                                                 </div>
                                             </template>
@@ -213,11 +176,11 @@
                                     </template>
                                 </div>
 
-                                <!-- Comment Textarea -->
+                                <!-- Comment -->
                                 <div class={q.commentClass}>
                                     <div class="clab">
                                         <span class="l">
-                                            Reviewer Justification / Comment
+                                            Reviewer justification / comment
                                             <template if:true={q.commentRequired}>
                                                 <span class="req"> *</span>
                                             </template>
@@ -229,6 +192,7 @@
                                             class={q.commentTextareaClass}
                                             data-qid={q.questionId}
                                             placeholder={q.commentPlaceholder}
+                                            aria-label="Reviewer justification"
                                             rows="3"
                                             oninput={handleCommentInput}
                                             onkeydown={handleCommentKeyDown}
@@ -239,69 +203,70 @@
                                 </div>
                             </div>
                         </template>
-
                     </template>
 
-                    <!-- ===== STEP 7: Strengths & Weaknesses ===== -->
+                    <!-- ═════ STRENGTHS & WEAKNESSES ═════ -->
                     <template if:true={isSwStep}>
                         <div class="step-intro">
                             <div class="dim-head">
-                                <div class="dim-num serif">8</div>
+                                <div class="dim-num">8</div>
                                 <div class="dim-title">
-                                    <h3 class="serif">Strengths and Weaknesses</h3>
+                                    <h3>Strengths and weaknesses</h3>
                                     <p class="lede">Capture your top three strengths and your top three weaknesses or concerns at the proposal level across all 7 categories. Order matters: the first entry should be the most material. At least one entry is required in each block (max 200 words each).</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="sw-indent">
-                            <div class="sw-block">
-                                <h4 class="serif">Top 3 Strengths · Ranked</h4>
-                                <p class="sub">First entry is the most material strength. Each entry: 1–2 concise sentences.</p>
-                                <template for:each={strengthRows} for:item="row">
-                                    <div key={row.idx} class="ranked-row">
-                                        <div class="rank serif">{row.num}</div>
-                                        <lightning-input
-                                            type="text"
-                                            name={row.strengthField}
-                                            value={row.strengthValue}
-                                            placeholder={row.sPlaceholder}
-                                            onchange={handleSwChange}
-                                            data-kind="strength"
-                                            data-idx={row.idx}
-                                        ></lightning-input>
-                                        <span class="req-mark">{row.reqMark}</span>
-                                    </div>
-                                </template>
-                            </div>
-                            <div class="sw-block">
-                                <h4 class="serif">Top 3 Weaknesses · Ranked</h4>
-                                <p class="sub">First entry is the most material concern. Each entry: 1–2 concise sentences.</p>
-                                <template for:each={weaknessRows} for:item="row">
-                                    <div key={row.idx} class="ranked-row">
-                                        <div class="rank serif">{row.num}</div>
-                                        <lightning-input
-                                            type="text"
-                                            name={row.weaknessField}
-                                            value={row.weaknessValue}
-                                            placeholder={row.wPlaceholder}
-                                            onchange={handleSwChange}
-                                            data-kind="weakness"
-                                            data-idx={row.idx}
-                                        ></lightning-input>
-                                        <span class="req-mark">{row.reqMark}</span>
-                                    </div>
-                                </template>
-                            </div>
+                        <div class="sw-block">
+                            <h4>Top 3 strengths · ranked</h4>
+                            <p class="sub">First entry is the most material strength. Each entry: 1–2 concise sentences.</p>
+                            <template for:each={strengthRows} for:item="row">
+                                <div key={row.idx} class="ranked-row">
+                                    <div class="rank">{row.num}</div>
+                                    <lightning-input
+                                        type="text"
+                                        name={row.strengthField}
+                                        label="Strength"
+                                        variant="label-hidden"
+                                        value={row.strengthValue}
+                                        placeholder={row.sPlaceholder}
+                                        onchange={handleSwChange}
+                                        data-kind="strength"
+                                        data-idx={row.idx}
+                                    ></lightning-input>
+                                    <span class="req-mark">{row.reqMark}</span>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="sw-block">
+                            <h4>Top 3 weaknesses · ranked</h4>
+                            <p class="sub">First entry is the most material concern. Each entry: 1–2 concise sentences.</p>
+                            <template for:each={weaknessRows} for:item="row">
+                                <div key={row.idx} class="ranked-row">
+                                    <div class="rank">{row.num}</div>
+                                    <lightning-input
+                                        type="text"
+                                        name={row.weaknessField}
+                                        label="Weakness"
+                                        variant="label-hidden"
+                                        value={row.weaknessValue}
+                                        placeholder={row.wPlaceholder}
+                                        onchange={handleSwChange}
+                                        data-kind="weakness"
+                                        data-idx={row.idx}
+                                    ></lightning-input>
+                                    <span class="req-mark">{row.reqMark}</span>
+                                </div>
+                            </template>
                         </div>
                     </template>
 
-                    <!-- ===== STEP 8: Final Recommendation ===== -->
+                    <!-- ═════ FINAL RECOMMENDATION ═════ -->
                     <template if:true={isRecStep}>
                         <div class="step-intro">
                             <div class="dim-head">
-                                <div class="dim-num serif">9</div>
+                                <div class="dim-num">9</div>
                                 <div class="dim-title">
-                                    <h3 class="serif">Final Recommendation</h3>
+                                    <h3>Final recommendation</h3>
                                     <p class="lede">Based on your evaluation across all 7 categories (Institutional Credibility, Operational Maturity, Outcome Track Record, Alignment with WCF Priorities, Absorptive Capacity, Measurement Readiness, and Use of WCF Funds), provide your independent recommendation.</p>
                                 </div>
                             </div>
@@ -309,28 +274,28 @@
                         <div class="finalrec">
                             <div class="yesno-row">
                                 <span class="ynl">Recommendation <span class="req">*</span></span>
-                                <div class="yesno yesno-4">
+                                <div class="yesno">
                                     <button type="button" class={recStronglyRecommendClass} data-rec="Strongly Recommend" onclick={handleRecChoice}>
-                                        ✓ Strongly recommend
+                                        Strongly recommend
                                     </button>
                                     <button type="button" class={recRecommendClass} data-rec="Recommend" onclick={handleRecChoice}>
-                                        ✓ Recommend
+                                        Recommend
                                     </button>
                                     <button type="button" class={recReservationsClass} data-rec="Recommend with Reservations" onclick={handleRecChoice}>
-                                        ~ Recommend with reservations
+                                        Recommend with reservations
                                     </button>
                                     <button type="button" class={recDoNotRecommendClass} data-rec="Do Not Recommend" onclick={handleRecChoice}>
-                                        ✕ Do not recommend
+                                        Do not recommend
                                     </button>
                                 </div>
                             </div>
 
                             <template if:true={showCeoRecommendationYes}>
                                 <div class="path yes">
-                                    <div class="pathlab good">↳ Recommendation Strength</div>
+                                    <div class="pathlab good">Recommendation strength</div>
                                     <div class="subform-row">
                                         <span class="l">How strongly do you recommend FOR consideration of this proposal? <span class="req">*</span></span>
-                                        <div class="segmented yes-seg" role="radiogroup">
+                                        <div class="segmented" role="radiogroup" aria-label="Recommendation strength">
                                             <template for:each={recStrengthBtns} for:item="rb">
                                                 <button key={rb.n} type="button" class={rb.yesSelCls} data-recstr={rb.n} onclick={handleRecStrength}>
                                                     <span class="num">{rb.n}</span>{rb.label}
@@ -345,6 +310,7 @@
                                                 class="lwc-textarea"
                                                 data-field="Recommendation_Strength_Comments__c"
                                                 placeholder="Explain why you recommend this proposal with this degree of conviction…"
+                                                aria-label="Recommendation strength comments"
                                                 rows="3"
                                                 oninput={handleRecCommentInput}
                                                 onkeydown={handleRecCommentKeyDown}
@@ -358,12 +324,11 @@
 
                             <template if:true={showCeoRecommendationNo}>
                                 <div class="path no">
-                                    <div class="pathlab danger">↳ Do Not Recommend</div>
+                                    <div class="pathlab danger">Do not recommend</div>
 
-                                    <!-- Rejection Reasons -->
                                     <div class="subform-row">
                                         <span class="l">Rejection reason(s) <span class="req">*</span></span>
-                                        <div class="checkbox-grid" role="group">
+                                        <div class="checkbox-grid" role="group" aria-label="Rejection reasons">
                                             <template for:each={rejectionReasonRows} for:item="r">
                                                 <label key={r.value} class="checkbox-row">
                                                     <input
@@ -378,7 +343,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Rejection Comment -->
                                     <div class="subform-row">
                                         <span class="l">
                                             Rejection comment <span class="req">*</span>
@@ -390,6 +354,7 @@
                                             <textarea
                                                 class="lwc-textarea"
                                                 placeholder="Explain the detailed basis for rejection…"
+                                                aria-label="Rejection comment"
                                                 rows="3"
                                                 oninput={handleRejectionCommentInput}
                                                 onkeydown={handleRejectionCommentKeyDown}
@@ -406,10 +371,10 @@
                             </template>
                         </div>
 
-                        <!-- Supporting Documents upload -->
-                        <div class="upload-section upload-section-rec">
+                        <!-- Supporting documents -->
+                        <div class="upload-section">
                             <div class="upload-header">
-                                <span class="upload-title">Supporting Documents</span>
+                                <span class="upload-title">Supporting documents</span>
                                 <span class="upload-sub">Optional — attach any notes, spreadsheets, or memos to support your review</span>
                             </div>
                             <template if:true={reviewRecordId}>
@@ -425,15 +390,19 @@
                                     <div class="uploaded-list">
                                         <template for:each={uploadedFiles} for:item="f">
                                             <div key={f.documentId} class="uploaded-file">
-                                                <span class="file-icon">📎</span>
+                                                <lightning-icon icon-name="utility:attach" size="x-small" alternative-text="" class="file-icon"></lightning-icon>
                                                 <span class="file-name">{f.name}</span>
                                                 <button
                                                     class="file-delete-btn"
                                                     type="button"
                                                     title="Remove file"
+                                                    aria-label="Remove file"
                                                     data-docid={f.documentId}
+                                                    data-id={f.documentId}
                                                     onclick={handleDeleteFile}
-                                                >✕</button>
+                                                >
+                                                    <lightning-icon icon-name="utility:close" size="xx-small" alternative-text=""></lightning-icon>
+                                                </button>
                                             </div>
                                         </template>
                                     </div>
@@ -446,57 +415,55 @@
                                 </div>
                             </template>
                         </div>
-
                     </template>
 
-                    <!-- ===== STEP 9: Review & Submit Summary ===== -->
+                    <!-- ═════ REVIEW & SUBMIT ═════ -->
                     <template if:true={isReviewStep}>
                         <div class="step-intro">
                             <div class="dim-head">
-                                <div class="dim-num serif">10</div>
+                                <div class="dim-num">10</div>
                                 <div class="dim-title">
-                                    <h3 class="serif">Review &amp; Submit</h3>
-                                    <p class="lede">Comprehensive summary of your 7-category evaluation. Use the progress bar above to jump back to any category. When submitted, this evaluation will be sealed and forwarded to the Approver.</p>
+                                    <h3>Review &amp; submit</h3>
+                                    <p class="lede">Summary of your 7-category evaluation. Use the progress bar above to jump back to any category. When submitted, this evaluation is sealed and forwarded to the Approver.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Overall Score Card Banner -->
-                        <div class="overall-score-banner" style="margin-bottom: 24px; padding: 18px 24px; background: linear-gradient(135deg, var(--wg-brand-tint) 0%, var(--wg-surface) 100%); border: 1.5px solid var(--wg-brand); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <!-- Overall score -->
+                        <div class="score-card">
                             <div>
-                                <div style="font-size: 0.82rem; font-weight: var(--wg-weight-bold); color: var(--wg-brand); text-transform: uppercase; letter-spacing: 0.5px;">Arithmetic Mean across All 7 Categories</div>
-                                <div style="font-size: 1.3rem; font-weight: 800; color: var(--wg-ink);">Overall Review Score</div>
+                                <div class="score-card-label">Arithmetic mean across all categories</div>
+                                <div class="score-card-title">Overall review score</div>
                             </div>
-                            <div style="display: flex; align-items: baseline; gap: 6px;">
-                                <span style="font-size: 2.2rem; font-weight: 800; color: var(--wg-brand);">{overallCalculatedScore}</span>
-                                <span style="font-size: 1rem; color: var(--wg-ink-mute); font-weight: var(--wg-weight-semibold);">/ 5.0</span>
+                            <div class="score-card-value">
+                                <span class="score-card-num">{overallCalculatedScore}</span>
+                                <span class="score-card-of">/ 5.0</span>
                             </div>
                         </div>
 
-                        <!-- 7 Categories Breakdown -->
+                        <!-- Category breakdown -->
                         <div class="review-summary">
                             <template for:each={reviewSummaryDims} for:item="dim">
                                 <div key={dim.id} class="review-dim">
                                     <div class="head">
                                         <div class="name">
-                                            <span class="num serif">{dim.id}</span>
-                                            <span class="ttl serif">{dim.title}</span>
+                                            <span class="num">{dim.id}</span>
+                                            <span class="ttl">{dim.title}</span>
                                         </div>
-                                        <div class="mean serif"><span class="lab">Category Mean</span>{dim.mean}</div>
+                                        <div class="mean"><span class="lab">Category mean</span>{dim.mean}</div>
                                     </div>
                                     <template for:each={dim.qs} for:item="rq">
                                         <div key={rq.id} class="review-q">
                                             <div class="qx">
-                                                <span style="font-weight: var(--wg-weight-bold); color: var(--wg-brand); margin-right: 4px;">{rq.id}</span>
+                                                <span class="qx-id">{rq.id}</span>
                                                 {rq.text}
                                             </div>
                                             <div class="rx">
-                                                <span class={rq.pipCls}>{rq.ratingLabel}</span>&nbsp;<span>{rq.ratingNum}</span>
+                                                <span class={rq.pipCls}>{rq.ratingLabel}</span>
+                                                <span>{rq.ratingNum}</span>
                                             </div>
                                             <template if:true={rq.ladderText}>
-                                                <div style="font-size: 0.78rem; color: var(--wg-good); margin-top: 2px;">
-                                                    ↳ <em>{rq.ladderText}</em>
-                                                </div>
+                                                <div class="review-q-ladder">{rq.ladderText}</div>
                                             </template>
                                             <template if:true={rq.hasComment}>
                                                 <div class="review-q-comment">{rq.comment}</div>
@@ -507,7 +474,7 @@
                             </template>
 
                             <div class="review-other">
-                                <h5 class="serif">Top 3 Strengths</h5>
+                                <h5>Top 3 strengths</h5>
                                 <ul>
                                     <template for:each={reviewStrengths} for:item="s">
                                         <li key={s}>{s}</li>
@@ -516,7 +483,7 @@
                             </div>
 
                             <div class="review-other">
-                                <h5 class="serif">Top 3 Weaknesses</h5>
+                                <h5>Top 3 weaknesses</h5>
                                 <ul>
                                     <template for:each={reviewWeaknesses} for:item="w">
                                         <li key={w}>{w}</li>
@@ -525,12 +492,14 @@
                             </div>
 
                             <div class="review-rec">
-                                <h5 class="serif">Final Recommendation</h5>
-                                <div class="recvalue-row">
-                                    <span class={recValueClass}>{recValueIcon} {recChoiceDisplayLabel}</span>
-                                    <template if:true={recStrengthLabel}>
-                                        <span class="strength">Strength: {recStrengthLabel}</span>
-                                    </template>
+                                <div class="review-rec-head">
+                                    <h5>Final recommendation</h5>
+                                    <div class="recvalue-row">
+                                        <span class={recValueClass}>{recValueIcon} {recChoiceDisplayLabel}</span>
+                                        <template if:true={recStrengthLabel}>
+                                            <span class="strength">Strength: {recStrengthLabel}</span>
+                                        </template>
+                                    </div>
                                 </div>
 
                                 <template if:true={showCeoRecommendationYes}>
@@ -556,31 +525,33 @@
                                 </template>
                             </div>
 
-                            <!-- Uploaded files summary in Review step -->
                             <template if:true={uploadedFiles.length}>
                                 <div class="review-other">
-                                    <h5 class="serif">Attached Documents</h5>
-                                    <div class="uploaded-list uploaded-list-review">
+                                    <h5>Attached documents</h5>
+                                    <div class="uploaded-list">
                                         <template for:each={uploadedFiles} for:item="f">
                                             <div key={f.documentId} class="uploaded-file">
-                                                <span class="file-icon">📎</span>
+                                                <lightning-icon icon-name="utility:attach" size="x-small" alternative-text="" class="file-icon"></lightning-icon>
                                                 <span class="file-name">{f.name}</span>
                                             </div>
                                         </template>
                                     </div>
                                 </div>
                             </template>
-
                         </div>
                     </template>
                 </template>
 
             </div><!-- /body -->
 
-            <!-- Validation Banner -->
+            <!-- Validation message -->
             <template if:true={validationError}>
-                <div class="validate show">
-                    <strong>Cannot continue:</strong> {validationError}
+                <div class="error-banner validate" role="alert">
+                    <lightning-icon icon-name="utility:error" size="x-small" variant="error" alternative-text=""></lightning-icon>
+                    <div class="wg-banner-body">
+                        <span class="wg-banner-title">Cannot continue</span>
+                        {validationError}
+                    </div>
                 </div>
             </template>
 
@@ -599,15 +570,17 @@
         </div>
     </template>
 
-    <!-- Submitted Success Screen -->
+    <!-- ══ SUBMITTED ═══════════════════════════════════════════ -->
     <template if:true={submitted}>
         <div class="form-wrap">
             <div class="done-state">
-                <div class="done-icon">✓</div>
-                <h3 class="serif">Evaluation Submitted</h3>
+                <div class="done-icon">
+                    <lightning-icon icon-name="utility:check" size="small" alternative-text=""></lightning-icon>
+                </div>
+                <h3>Evaluation submitted</h3>
                 <p>Your evaluation of <strong>{institutionName}</strong> across all 7 categories has been sealed and submitted to the Approver.</p>
                 <button class="btn btn-secondary" type="button" onclick={handleBackToDashboard}>
-                    Back to Dashboard
+                    Back to dashboard
                 </button>
             </div>
         </div>

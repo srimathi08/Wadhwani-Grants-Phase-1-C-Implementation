@@ -1,123 +1,97 @@
 <template>
-    <div class="ad-page">
+    <div class="wg-page ad-page">
 
         <!-- PAGE HEADER -->
-        <div class="page-header">
-            <div class="greeting-block">
-                <div class="greeting-meta">APPROVER PORTAL</div>
-                <h1 class="greeting-title">{greeting}, <span class="accent">Approver</span></h1>
-                <p class="greeting-sub">{todayDate}</p>
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Approver portal</p>
+                <h1 class="wg-page-title">{greeting}, <span class="wg-page-title-accent">Approver</span></h1>
+                <p class="wg-page-subtitle">{todayDate}</p>
             </div>
         </div>
 
-        <!-- KPI TILES -->
-        <div class="kpi-row kpi-row-4">
-            <template for:each={approverCards} for:item="c">
-                <div key={c.id}
-                     class={c.kpiClass}
-                     data-status={c.status}
-                     onclick={handleApproverTileClick}>
-                    <div class="kpi-header">
-                        <span class="kpi-label">{c.label}</span>
-                        <span class={c.dotClass}></span>
-                    </div>
-                    <div class="kpi-count">{c.count}</div>
-                    <div class="kpi-sub">{c.subtitle}</div>
-                </div>
-            </template>
-        </div>
+        <div class="wg-page-body">
 
-        <!-- PENDING DECISIONS PREVIEW TABLE -->
-        <div class="queue-preview-section">
-            <div class="qp-header">
+            <!-- KPI TILES — click opens the queue filtered to that bucket -->
+            <div class="wg-stat-grid ad-stats" role="group" aria-label="Open the queue filtered by">
+                <template for:each={approverCards} for:item="c">
+                    <button key={c.id}
+                            class={c.kpiClass}
+                            data-status={c.status}
+                            onclick={handleApproverTileClick}>
+                        <span class="wg-stat-head">
+                            <span class="wg-stat-label">{c.label}</span>
+                            <span class={c.dotClass}></span>
+                        </span>
+                        <span class="wg-stat-value">{c.count}</span>
+                        <span class="wg-stat-caption">{c.subtitle}</span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- PENDING DECISIONS -->
+            <div class="wg-section-head">
                 <div>
-                    <div class="qp-title">Pending Decisions — Approver Queue</div>
-                    <div class="qp-sub">Reviewed proposals awaiting approval decision, newest recommendation first</div>
+                    <h2 class="wg-section-title">Pending decisions</h2>
+                    <p class="wg-section-subtitle">Reviewed proposals awaiting your decision, recommended first</p>
                 </div>
-                <div class="qp-link" onclick={handleViewAllApproverQueue}>
-                    View all in Queue →
-                </div>
+                <button class="wg-link" onclick={handleViewAllApproverQueue}>View full queue →</button>
             </div>
 
-            <div class="workspace-card workspace-card-full">
-                <table class="preview-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>APPLICATION ID</th>
-                            <th>ORGANIZATION</th>
-                            <th>TRACK</th>
-                            <th>RECOMMENDATION</th>
-                            <th>STATUS</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={approverPreviewRows} for:item="row">
-                            <tr key={row.applicationId}>
-                                <td>{row.rowNum}</td>
-                                <td class="cell-id">{row.applicationName}</td>
-                                <td>{row.organizationName}</td>
-                                <td>
-                                    <div style="display: inline-flex; gap: 4px; flex-wrap: wrap;">
-                                        <template for:each={row.trackBadges} for:item="tb">
-                                            <span key={tb.code} class={tb.pillClass}>{tb.code}</span>
-                                        </template>
-                                    </div>
-                                </td>
-                                <td><span class={row.recPillClass}>{row.recommendation}</span></td>
-                                <td><span class={row.statusPillClass}>{row.decisionLabel}</span></td>
-                                <td>
-                                    <!-- Already decided -->
-                                    <template if:true={row.hasDecision}>
-                                        <button class="preview-action-btn preview-action-view"
+            <div class="wg-card">
+                <div class="wg-table-wrap">
+                    <table class="wg-table ad-table">
+                        <thead>
+                            <tr>
+                                <th class="wg-col-index" scope="col">#</th>
+                                <th scope="col">Application ID</th>
+                                <th scope="col">Organization</th>
+                                <th scope="col">Track</th>
+                                <th scope="col">Recommendation</th>
+                                <th scope="col">Status</th>
+                                <th class="wg-col-action" scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={approverPreviewRows} for:item="row">
+                                <tr key={row.applicationId} class={row.rowClass}>
+                                    <td class="wg-col-index">{row.rowNum}</td>
+                                    <td class="wg-cell-id">{row.applicationName}</td>
+                                    <td>{row.organizationName}</td>
+                                    <td>
+                                        <div class="ad-tags">
+                                            <template for:each={row.trackBadges} for:item="tb">
+                                                <span key={tb.code} class={tb.pillClass} title={tb.label}>{tb.code}</span>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td><span class={row.recPillClass}>{row.recommendation}</span></td>
+                                    <td><span class={row.statusPillClass}>{row.decisionLabel}</span></td>
+                                    <td class="wg-col-action">
+                                        <button class={row.actionClass}
                                                 data-id={row.applicationId}
                                                 data-appname={row.applicationName}
                                                 data-review-id={row.reviewId}
                                                 data-track={row.track}
                                                 data-track-label={row.trackLabel}
+                                                disabled={row.actionDisabled}
                                                 onclick={handlePreviewApprove}>
-                                            View Decision
+                                            <lightning-icon icon-name={row.actionIcon} size="xx-small" alternative-text=""></lightning-icon>
+                                            {row.actionLabel}
                                         </button>
-                                    </template>
-                                    <!-- Ready to approve -->
-                                    <template if:false={row.hasDecision}>
-                                        <template if:true={row.isReady}>
-                                            <button class="preview-action-btn preview-action-approve"
-                                                    data-id={row.applicationId}
-                                                    data-appname={row.applicationName}
-                                                    data-review-id={row.reviewId}
-                                                    data-track={row.track}
-                                                    data-track-label={row.trackLabel}
-                                                    onclick={handlePreviewApprove}>
-                                                Start Approve
-                                            </button>
-                                        </template>
-                                        <!-- Not ready (no review yet) -->
-                                        <template if:false={row.isReady}>
-                                            <button class="preview-action-btn preview-action-disabled" disabled>
-                                                Not Ready
-                                            </button>
-                                        </template>
-                                    </template>
-                                </td>
-                            </tr>
-                        </template>
-                        <template if:true={noApproverPreviewRows}>
-                            <tr>
-                                <td colspan="7" class="preview-empty">
-                                    No proposals awaiting approval decision
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template lwc:if={noApproverPreviewRows}>
+                                <tr>
+                                    <td colspan="7" class="wg-table-empty">No proposals awaiting approval decision</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="preview-footer" onclick={handleViewAllApproverQueue}>
-                View full queue →
-            </div>
         </div>
-
     </div>
 </template>

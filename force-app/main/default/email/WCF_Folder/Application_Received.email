@@ -1,86 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="x-apple-disable-message-reformatting"/>
-<meta name="color-scheme" content="light"/>
-<meta name="supported-color-schemes" content="light"/>
 <title>We received your application </title>
-
-<!--[if mso]>
-<xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
-<style>body,table,td,a,p,h1{font-family:Arial,Helvetica,sans-serif !important;}</style>
-<![endif]-->
-
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 
 <style>
 html,body{margin:0 !important;padding:0 !important;width:100% !important;}
 body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
-table{border-collapse:collapse !important;mso-table-lspace:0pt !important;mso-table-rspace:0pt !important;}
-img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none;}
+table{border-collapse:collapse !important;}
+img{border:0;outline:none;text-decoration:none;}
 a{color:#BF2026;}
-div[style*="margin: 16px 0"]{margin:0 !important;}
 
 @media only screen and (max-width:620px){
-.frame{padding:0 !important;}
-.container{width:100% !important;max-width:100% !important;border-radius:0 !important;border-left:0 !important;border-right:0 !important;}
+.container{width:100% !important;max-width:100% !important;}
 .pad{padding-left:22px !important;padding-right:22px !important;}
-.hdr{padding:20px 22px 18px !important;}
-.logo-hdr{width:104px !important;}
+.logo-hdr{width:100px !important;}
 .logo-ftr{width:114px !important;}
-.btn{width:100% !important;}
-.btn a{display:block !important;}
-.bh{font-size:21px !important;line-height:1.25 !important;}
-.hdr-text-td{display:block !important;width:100% !important;padding-bottom:14px !important;}
-.logo-td{display:block !important;width:100% !important;text-align:left !important;}
+.hdr-text{font-size:19px !important;}
 }
 </style>
-
 </head>
 
-<body width="100%" bgcolor="#F4F4F5" style="margin:0;padding:0 !important;background-color:#F4F4F5;">
-<center role="article" aria-roledescription="email" lang="en" style="width:100%;background-color:#F4F4F5;">
+<body style="margin:0;padding:0;background-color:#F4F4F5;">
+<center style="width:100%;background-color:#F4F4F5;">
 
-<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;color:#F4F4F5;">
-We've received your application. Here's what happens next.
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
 <tr>
-<td class="frame" align="center" style="padding:24px 12px;">
+<td align="center" style="padding:24px 12px;">
 
-<table role="presentation" class="container" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;">
+<table class="container" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;">
 
 <!-- HEADER -->
 <tr>
-<td class="hdr" bgcolor="#BF2026" style="padding:24px 32px 22px;border-radius:8px 8px 0 0;">
+<td bgcolor="#BF2026" style="padding:24px 32px;border-radius:8px 8px 0 0;">
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<!-- two-column layout: text left, logo right -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
 
-<!-- Left: eyebrow + bold headline + detail line, stacked -->
-<td class="hdr-text-td" align="left" valign="middle">
-
-<p style="margin:0 0 6px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;">
-we have received your application
+<!-- LEFT: text -->
+<td align="left" valign="middle">
+<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;">
+We have received your application
 </p>
 
-<h1 class="bh" style="margin:0 0 6px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:22px;line-height:1.25;font-weight:700;color:#ffffff;">
-Your application has been received
+<h1 class="hdr-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;">
+Application {!IndividualApplication.Name} -  {!Account.WCF_Organizational_Name__c}
 </h1>
-
-<p style="margin:0;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.5;color:#F3D2D4;">
-{!Account.WCF_Organizational_Name__c}'s application with application number {!IndividualApplication.Name}
-</p>
-
 </td>
 
-<!-- Right: logo, vertically centered -->
-<td class="logo-td" align="right" valign="middle" width="140">
-<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="120" class="logo-hdr" style="display:block;height:auto;border:0;outline:none;text-decoration:none;">
+<!-- RIGHT: logo -->
+<td align="right" valign="middle" width="136" style="padding-left:16px;">
+<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="136" class="logo-hdr" style="display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;">
 </td>
 
 </tr>
@@ -91,51 +65,53 @@ Your application has been received
 
 <!-- ORANGE DIVIDER -->
 <tr>
-<td bgcolor="#F2672A" height="4" style="height:4px;background:#F2672A;">&nbsp;</td>
+<td bgcolor="#F2672A" height="4" style="height:4px;font-size:4px;line-height:4px;">&nbsp;</td>
 </tr>
 
 <!-- BODY -->
 <tr>
 <td class="pad" style="padding:28px 32px 10px;">
 
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hello {!Account.FirstName},
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+Hi {!Account.Name},
 </p>
 
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Thank you. The Organization's application  has been submitted successfully. Nothing further is needed from you at this stage.
+
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+Thank you. We have received your application for {!Account.WCF_Organizational_Name__c} , submitted on {!IndividualApplication.Initial_Submission_Date__c}. Nothing further is needed from you at this stage.
 </p>
 
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
 Here is what happens next:
 </p>
+
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
 <tr>
 <td style="padding:16px 20px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
-<strong>1. Completeness check</strong>: we checks that your application is complete.<br/><br/>
-<strong>2. Review</strong>: once complete, our team reviews your application for fit with Wadhwani Grants.<br/><br/>
-<strong>3. Decision</strong>: we write to you with the outcome and any next steps.
+<strong>1. Completeness check</strong> : we check your application before it goes to review <br/><br/>
+<strong>2. Review</strong> : once complete, our team reviews your application for fit with Wadhwani Grants.<br/><br/>
+<strong>3. Decision</strong> : we write to you with the outcome and any next steps.
 </td>
 </tr>
 </table>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-We will keep you posted at each stage. 
+Our next email to you will be after the completeness check.
 </p>
 
 <table role="presentation" class="btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
+<a href="https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/wcf/s/login/" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 View your application
 </a>
 </td>
 </tr>
 </table>
 
-<p style="margin:18px 0 8px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
-Warm regards,<br/>
+<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+Kind regards,<br/>
 The Wadhwani Grants Team
 </p>
 
@@ -158,11 +134,11 @@ width="132"alt="Wadhwani Grants" class="logo-ftr" style="display:block;width:132
 
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Questions? Just reply to this email — it reaches the Wadhwani Grants team at 
+Questions? Just reply to this email; it reaches the Wadhwani Grants team at 
 <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#6D6E71;text-decoration:underline;">grants.support@wadhwanifoundation.org</a>.
 </p>
 

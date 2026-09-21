@@ -1,248 +1,224 @@
 <template>
-    <div class="wcf-list-wrapper">
+    <div class="wg-page wcf-list">
 
-        <!-- ══ TOP BAR ══════════════════════════════════════════ -->
-        <div class="wcf-top-bar">
-            <div class="wcf-top-bar-left">
-                <div class="wcf-brand-rule"></div>
-                <div class="wcf-top-bar-titles">
-                    <h1 class="wcf-top-title">Wadhwani Grants Validator Queue</h1>
-                    <span class="wcf-top-sub">
-                        <template if:true={applications}>
-                          Total {applications.length} proposals.
-                        </template>
-                    </span>
-                </div>
+        <!-- ══ PAGE HEADER ══════════════════════════════════════ -->
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Validator portal</p>
+                <h1 class="wg-page-title">Wadhwani Grants Validator Queue</h1>
+                <p class="wg-page-subtitle">{subtitle}</p>
             </div>
-            <div class="wcf-top-bar-right">
-                <div class="wcf-search-wrap">
-                    <lightning-icon icon-name="utility:search" size="x-small" class="wcf-search-icon"></lightning-icon>
+            <div class="wg-page-actions">
+                <div class="wg-search">
+                    <lightning-icon icon-name="utility:search" size="x-small" alternative-text=""></lightning-icon>
                     <input
                         type="text"
                         placeholder="Search by ID, account, status…"
-                        class="wcf-search-input"
+                        aria-label="Search proposals"
                         value={searchTerm}
                         oninput={handleSearchInput}
                     />
                 </div>
-                <button class="wcf-icon-btn" onclick={handleRefresh} title="Refresh">
-                    <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
+                <button class="wg-icon-btn" onclick={handleRefresh} title="Refresh" aria-label="Refresh list">
+                    <lightning-icon icon-name="utility:refresh" size="x-small" alternative-text=""></lightning-icon>
                 </button>
             </div>
         </div>
 
-        <!-- ══ SUMMARY ROW ══════════════════════════════════════ -->
-        <template if:false={isLoading}>
-            <div class="wcf-summary-row">
-                <div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="validated" title="Click to filter">
-                    <span class="wcf-summary-num">{validatedCount}</span>
-                    <span class="wcf-summary-lbl">Validated</span>
-                </div>
-                <div class="wcf-summary-div"></div>
-                <div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="validate" title="Click to filter">
-                    <span class="wcf-summary-num">{validateCount}</span>
-                    <span class="wcf-summary-lbl">To Validate</span>
-                </div>
-                <div class="wcf-summary-div"></div>
-                <div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="resume" title="Click to filter">
-                    <span class="wcf-summary-num">{resumeCount}</span>
-                    <span class="wcf-summary-lbl">In Progress</span>
-                </div>
-                <div class="wcf-summary-div"></div>
-                <div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="resubmit" title="Click to filter">
-                    <span class="wcf-summary-num">{resubmitCount}</span>
-                    <span class="wcf-summary-lbl">Revalidate</span>
-                </div>
+        <div class="wg-page-body">
 
-                <div class="wcf-summary-div"></div>
-<div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="returnedByReviewer" title="Click to filter">
-    <span class="wcf-summary-num">{returnedByReviewerCount}</span>
-    <span class="wcf-summary-lbl">Returned by Reviewer</span>
-</div>
-
-   <div class="wcf-summary-div"></div>
-<div class="wcf-summary-item" onclick={handleSummaryClick} data-filter="awaiting" title="Click to filter">
-    <span class="wcf-summary-num">{awaitingApplicantCount}</span>
-    <span class="wcf-summary-lbl">Awaiting Application</span>
-</div>
-            </div>
-        </template>
-
-        <!-- Error state -->
-        <template if:true={error}>
-            <div class="wcf-error">
-                <lightning-icon icon-name="utility:error" size="small" variant="error"></lightning-icon>
-                <span>Could not load applications. {error}</span>
-            </div>
-        </template>
-
-        <!-- Loading state -->
-        <template if:true={isLoading}>
-            <div class="wcf-loading">
-                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
-                <p class="wcf-loading-text">Loading proposals…</p>
-            </div>
-        </template>
-
-        <!-- Table -->
-        <template if:false={isLoading}>
-            <template if:true={hasRecords}>
-                <div class="wcf-table-wrapper">
-                    <table class="wcf-table">
-                        <thead>
-                            <tr>
-                                <th class="wcf-th wcf-th-num">#</th>
-                                <th class="wcf-th wcf-th-sortable" data-field="Application_ID__c" onclick={handleSort}>
-                                    <div class="wcf-th-inner">
-                                        Application ID
-                                        <lightning-icon icon-name={sortIconId} size="xx-small" class="wcf-sort-icon"></lightning-icon>
-                                    </div>
-                                </th>
-                                <th class="wcf-th wcf-th-sortable" data-field="Account.Name" onclick={handleSort}>
-                                    <div class="wcf-th-inner">
-                                        Account
-                                        <lightning-icon icon-name={sortIconAccount} size="xx-small" class="wcf-sort-icon"></lightning-icon>
-                                    </div>
-                                </th>
-                                <th class="wcf-th">Status</th>
-                                <th class="wcf-th wcf-th-sortable" data-field="Due_Date__c" onclick={handleSort}>
-    <div class="wcf-th-inner">
-        Due Date
-        <lightning-icon icon-name={sortIconDueDate} size="xx-small" class="wcf-sort-icon"></lightning-icon>
-    </div>
-</th>
-                                <th class="wcf-th wcf-th-action">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template for:each={filteredApplications} for:item="app" for:index="idx">
-                                <tr key={app.Id} class={app.rowClass}>
-                                    <td class="wcf-td wcf-td-num">{app.rowNum}</td>
-                                    <td class="wcf-td wcf-td-id">
-                                        <a href="#" data-id={app.Id} onclick={handleRecordClick} class="wcf-app-link">
-                                            {app.Application_ID__c}
-                                        </a>
-                                        <div class="wcf-app-name">{app.Name}</div>
-                                        <template if:true={app.hasTrackBadges}>
-                                            <div class="wcf-track-badge-list">
-                                                <template for:each={app.trackBadges} for:item="trk">
-                                                    <span key={trk.label} class={trk.class}>{trk.label}</span>
-                                                </template>
-                                            </div>
-                                        </template>
-                                    </td>
-                                    <td class="wcf-td">{app.acctName}</td>
-                                    <td class="wcf-td">
-                                        <span class={app.statusClass}>{app.Status}</span>
-                                    </td>
-                                    <td class="wcf-td wcf-td-date">{app.formattedDueDate}</td>
-                                   <td class="wcf-td wcf-td-action">
-
-    <!-- 0. Returned by Reviewer — takes priority over every other state -->
-    <template if:true={app.isReturnedByReviewer}>
-        <button
-            class="wcf-action-btn wcf-btn-returned-reviewer"
-            data-id={app.Id}
-            data-name={app.Name}
-            onclick={handleValidate}>
-            <lightning-icon icon-name="utility:reply" size="xx-small" class="wcf-btn-icon"></lightning-icon>
-            Returned by Reviewer
-        </button>
-    </template>
-
-    <template if:false={app.isReturnedByReviewer}>
-
-        <!-- 0b. Sealed via Return — waiting on the applicant, not actionable -->
-        <template if:true={app.isAwaitingApplicant}>
-            <span class="wcf-awaiting-badge">
-                <lightning-icon icon-name="utility:clock" size="xx-small" class="wcf-awaiting-icon"></lightning-icon>
-                Awaiting Applicant
-            </span>
-        </template>
-
-        <template if:false={app.isAwaitingApplicant}>
-
-            <!-- 1. Resubmission pending -->
-            <template if:true={app.isResubmission}>
-                <button
-                    class="wcf-action-btn wcf-btn-revalidate"
-                    data-id={app.Id}
-                    data-name={app.Name}
-                    onclick={handleValidate}>
-                    <lightning-icon icon-name="utility:redo" size="xx-small" class="wcf-btn-icon"></lightning-icon>
-                    Revalidate
-                </button>
-            </template>
-
-            <!-- 2. Already validated -->
-            <template if:false={app.isResubmission}>
-                <template if:true={app.isValidated}>
-                    <span class="wcf-validated-badge">
-                        <lightning-icon icon-name="utility:check" size="xx-small" class="wcf-validated-icon"></lightning-icon>
-                        Validated
-                    </span>
-                </template>
-
-                <!-- 3. Not yet validated -->
-                <template if:false={app.isValidated}>
-                    <template if:true={app.hasDraft}>
-                        <button
-                            class="wcf-action-btn wcf-btn-resume"
-                            data-id={app.Id}
-                            data-name={app.Name}
-                            onclick={handleValidate}>
-                            <lightning-icon icon-name="utility:edit" size="xx-small" class="wcf-btn-icon"></lightning-icon>
-                            Resume
+            <!-- ══ SUMMARY TILES (click to filter) ══════════════════ -->
+            <template lwc:if={isLoaded}>
+                <div class="wg-stat-grid wcf-list-stats" role="group" aria-label="Filter by action">
+                    <template for:each={summaryItems} for:item="s">
+                        <button key={s.id}
+                                class={s.cls}
+                                data-filter={s.id}
+                                aria-pressed={s.pressed}
+                                title="Click to filter"
+                                onclick={handleSummaryClick}>
+                            <span class="wg-stat-head">
+                                <span class="wg-stat-label">{s.label}</span>
+                                <span class={s.dotCls}></span>
+                            </span>
+                            <span class="wg-stat-value">{s.count}</span>
                         </button>
                     </template>
-                    <template if:false={app.hasDraft}>
-                        <button
-                            class="wcf-action-btn wcf-btn-validate"
-                            data-id={app.Id}
-                            data-name={app.Name}
-                            onclick={handleValidate}>
-                            <lightning-icon icon-name="utility:shield" size="xx-small" class="wcf-btn-icon"></lightning-icon>
-                            Validate
-                        </button>
-                    </template>
-                </template>
-            </template>
-        </template>
-    </template>
-
-</td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
                 </div>
+            </template>
 
-                <!-- Pagination -->
-                <div class="wcf-pagination">
-                    <span class="wcf-page-info">
-                        Showing {pageStart}–{pageEnd} of {allFiltered.length}
-                    </span>
-                    <div class="wcf-page-controls">
-                        <button class="wcf-pg-btn" onclick={handlePrevPage} disabled={isPrevDisabled}>
-                            <lightning-icon icon-name="utility:chevronleft" size="xx-small"></lightning-icon>
-                        </button>
-                        <span class="wcf-page-num">Page {currentPage} of {totalPages}</span>
-                        <button class="wcf-pg-btn" onclick={handleNextPage} disabled={isNextDisabled}>
-                            <lightning-icon icon-name="utility:chevronright" size="xx-small"></lightning-icon>
-                        </button>
+            <!-- ══ ERROR ═══════════════════════════════════════════ -->
+            <template lwc:if={error}>
+                <div class="error-banner wcf-list-error" role="alert">
+                    <lightning-icon icon-name="utility:error" size="x-small" variant="error" alternative-text=""></lightning-icon>
+                    <div class="wg-banner-body">
+                        <span class="wg-banner-title">Could not load applications.</span>
+                        {error}
                     </div>
                 </div>
             </template>
 
-            <!-- Empty state -->
-            <template if:false={hasRecords}>
-                <div class="wcf-empty">
-                    <lightning-icon icon-name="utility:inbox" size="large" class="wcf-empty-icon"></lightning-icon>
-                    <p class="wcf-empty-title">No proposals found</p>
-                    <p class="wcf-empty-sub">Try adjusting your search or check back later.</p>
-                </div>
-            </template>
-        </template>
+            <!-- ══ TABLE CARD ══════════════════════════════════════ -->
+            <div class="wg-card">
 
+                <!-- Loading -->
+                <template lwc:if={isLoading}>
+                    <div class="wg-loading">
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                        <p class="wg-loading-text">Loading proposals…</p>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <template lwc:if={hasRecords}>
+                        <div class="wg-table-wrap">
+                            <table class="wg-table wcf-table">
+                                <thead>
+                                    <tr>
+                                        <th class="wg-col-index" scope="col">#</th>
+                                        <th scope="col" aria-sort={ariaSortId}>
+                                            <button class={sortClassId} data-field="Application_ID__c" onclick={handleSort}>
+                                                Application ID
+                                                <lightning-icon icon-name={sortIconId} size="xx-small" alternative-text=""></lightning-icon>
+                                            </button>
+                                        </th>
+                                        <th scope="col" aria-sort={ariaSortAccount}>
+                                            <button class={sortClassAccount} data-field="Account.Name" onclick={handleSort}>
+                                                Account
+                                                <lightning-icon icon-name={sortIconAccount} size="xx-small" alternative-text=""></lightning-icon>
+                                            </button>
+                                        </th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" aria-sort={ariaSortDueDate}>
+                                            <button class={sortClassDueDate} data-field="Due_Date__c" onclick={handleSort}>
+                                                Due Date
+                                                <lightning-icon icon-name={sortIconDueDate} size="xx-small" alternative-text=""></lightning-icon>
+                                            </button>
+                                        </th>
+                                        <th class="wg-col-action" scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredApplications} for:item="app">
+                                        <tr key={app.Id} class={app.rowClass}>
+                                            <td class="wg-col-index">{app.rowNum}</td>
+
+                                            <td>
+                                                <a href="#" data-id={app.Id} onclick={handleRecordClick} class="wg-cell-link">
+                                                    {app.Application_ID__c}
+                                                </a>
+                                                <div class="wg-cell-sub">{app.Name}</div>
+                                                <template lwc:if={app.hasTrackBadges}>
+                                                    <div class="wg-tag-list">
+                                                        <template for:each={app.trackBadges} for:item="trk">
+                                                            <span key={trk.label} class={trk.class}>{trk.label}</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </td>
+
+                                            <td>{app.acctName}</td>
+
+                                            <td>
+                                                <span class={app.statusClass}>{app.Status}</span>
+                                            </td>
+
+                                            <td class="wg-cell-muted">{app.formattedDueDate}</td>
+
+                                            <!-- Action — same priority order as before -->
+                                            <td class="wg-col-action">
+                                                <!-- 0. Returned by Reviewer — takes priority over every other state -->
+                                                <template lwc:if={app.isReturnedByReviewer}>
+                                                    <button class="primary-btn wg-btn-sm"
+                                                            data-id={app.Id}
+                                                            data-name={app.Name}
+                                                            onclick={handleValidate}>
+                                                        <lightning-icon icon-name="utility:reply" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Returned by Reviewer
+                                                    </button>
+                                                </template>
+
+                                                <!-- 0b. Sealed via Return — waiting on the applicant, not actionable -->
+                                                <template lwc:elseif={app.isAwaitingApplicant}>
+                                                    <span class="wg-pill wg-pill--warning">
+                                                        <lightning-icon icon-name="utility:clock" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Awaiting Applicant
+                                                    </span>
+                                                </template>
+
+                                                <!-- 1. Resubmission pending -->
+                                                <template lwc:elseif={app.isResubmission}>
+                                                    <button class="primary-btn wg-btn-sm"
+                                                            data-id={app.Id}
+                                                            data-name={app.Name}
+                                                            onclick={handleValidate}>
+                                                        <lightning-icon icon-name="utility:redo" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Revalidate
+                                                    </button>
+                                                </template>
+
+                                                <!-- 2. Already validated -->
+                                                <template lwc:elseif={app.isValidated}>
+                                                    <span class="wg-pill wg-pill--success">
+                                                        <lightning-icon icon-name="utility:check" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Validated
+                                                    </span>
+                                                </template>
+
+                                                <!-- 3a. Draft exists -->
+                                                <template lwc:elseif={app.hasDraft}>
+                                                    <button class="neutral-btn wg-btn-sm"
+                                                            data-id={app.Id}
+                                                            data-name={app.Name}
+                                                            onclick={handleValidate}>
+                                                        <lightning-icon icon-name="utility:edit" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Resume
+                                                    </button>
+                                                </template>
+
+                                                <!-- 3b. Not started -->
+                                                <template lwc:else>
+                                                    <button class="primary-btn wg-btn-sm"
+                                                            data-id={app.Id}
+                                                            data-name={app.Name}
+                                                            onclick={handleValidate}>
+                                                        <lightning-icon icon-name="utility:shield" size="xx-small" alternative-text=""></lightning-icon>
+                                                        Validate
+                                                    </button>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="wg-pagination">
+                            <span>Showing {pageStart}–{pageEnd} of {allFiltered.length}</span>
+                            <div class="wg-pagination-controls">
+                                <button class="wg-icon-btn" onclick={handlePrevPage} disabled={isPrevDisabled} aria-label="Previous page">
+                                    <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text=""></lightning-icon>
+                                </button>
+                                <span class="wg-pagination-page">Page {currentPage} of {totalPages}</span>
+                                <button class="wg-icon-btn" onclick={handleNextPage} disabled={isNextDisabled} aria-label="Next page">
+                                    <lightning-icon icon-name="utility:chevronright" size="xx-small" alternative-text=""></lightning-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Empty -->
+                    <template lwc:else>
+                        <div class="wg-empty">
+                            <lightning-icon icon-name="utility:inbox" size="large" alternative-text=""></lightning-icon>
+                            <p class="wg-empty-title">No proposals found</p>
+                            <p class="wg-empty-text">Try adjusting your search or filter, or check back later.</p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+        </div>
     </div>
 </template>

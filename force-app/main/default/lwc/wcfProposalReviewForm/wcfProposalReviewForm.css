@@ -1,1152 +1,1477 @@
 @import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
 
 /* ═══════════════════════════════════════════════════════════════════════
-   WCF PROPOSAL REVIEWER FORM — CSS
-   Rebranded to the Wadhwani token system (commonStyleTheme).
+   wcfProposalReviewForm — 7-category reviewer evaluation
+   All colors / fonts / radii come from commonStyleTheme + wcfPortalUi,
+   matching the Validator form. No hex values below by design.
 
-   WIRING / MAPPING NOTES:
+   IMPORTANT: the old file redefined --wg-* tokens on :host (e.g.
+   --wg-info, --wg-bg) with the previous orange palette. Those
+   definitions are removed — they collided with commonStyleTheme's
+   tokens of the same name and would have overridden the brand values.
 
-   • ARCHITECTURE: unlike most sibling components, this file defines its
-     OWN local design-token layer on :host (--wg-bg, --wg-brand, --wg-ink,
-     --wg-good, …) which the rest of the stylesheet consumes throughout.
-     Rather than rewriting every one of the ~120 selectors that reference
-     these local tokens, this file keeps that local layer and re-points
-     each local token's VALUE at the real shared commonStyleTheme token —
-     the same "alias" technique already used for the wg*Dashboard family
-     (wgReviewerDashboard / wgApproverDashboard aliasing wgValidatorDashboard's
-     local token names onto var(--wg-red) etc). Every selector below the
-     :host block therefore inherits the rebrand automatically; only the
-     literal hex values that bypassed the local token system (and this
-     file's substantial inline styles in the HTML template) needed
-     individual retokenizing.
-   • RADII ARE LEFT LOCAL/LITERAL: this file's own radius scale
-     (--wg-r-xs/-sm/-md/-lg/-pill) does not line up with the shared
-     --wg-radius-* scale, and --wg-r-pill specifically means a true
-     999px capsule (used on real pill buttons like .yesno/.btn-soft/
-     .track-badge), while the shared --wg-radius-pill token is only
-     24px. Aliasing it would visibly flatten every capsule-shaped
-     control in this form, so radii are treated as geometry, not
-     brand color, and left as this file's own literal pixel values —
-     only the COLOR tokens below are aliased to the brand.
-   • This is the sibling of wcfValidatorForm (same #E8622A orange,
-     explicitly built to look identical per this file's own original
-     header comment) — the light-orange "selected/hover wash" values
-     (#fff4ef, #fee8df) are recalculated as the SAME rgba(242,103,42,…)
-     figures already established for that sibling file, for visual
-     consistency between the two.
-   • TRACK BADGES (JF / JC / LU): this file's own original design used
-     three arbitrary hues (blue / orange / purple) for these three
-     badges. Overridden here to the cross-file convention already used
-     on every other track-badge component in this batch — jf → info
-     (blue), jc → warning (amber), lu → success (green) — rather than
-     preserved as a one-off, since this is a recurring pattern meant to
-     read consistently across the whole portal, not an isolated design
-     choice the way e.g. wcfProposalListView's neutral "both" category
-     was.
-   • Plain near-black/mid-gray literals (#1a1a1a, #333, #444, #1e293b)
-     → var(--wg-gray) (aliased locally as --wg-ink). Mid-grays (#555,
-     #666, #6b6b6b, #706e6b, #777, #999, #bbb, #b8b5b0, #334155)
-     → var(--wg-text-muted) (aliased locally as --wg-ink-soft / -mute).
-   • Warm/cool neutral borders and washes with no direct brand match
-     (#e2ddd5, #d1cfc8, #dddbd8, #f1f5f9, #e2e8f0, #f2e9e1, #e0dcd3,
-     #e0e0e0) → var(--wg-input-border) on interactive control borders,
-     var(--wg-border) on structural/background neutrals — same split
-     used throughout this batch.
-   • This form has substantial inline `style=""` attributes directly in
-     the HTML template (track-guidance callouts, the overall-score
-     banner, ladder-detail drawers). Those were retokenized in place too
-     (var(--wg-brand) etc. work fine inline — they inherit from :host
-     through the normal DOM regardless of the shadow boundary) rather
-     than left as a loophole around the "recolor every hardcoded value"
-     instruction just because they live in the .html file.
-   • BUTTON SQUARING: every real <button> class (.btn-soft, .segmented
-     button, .yesno button, .btn / .btn-primary / .btn-secondary /
-     .btn-submit / .btn-sm, .file-delete-btn) is squared with
-     border-radius: 0, including the true-capsule pill buttons, per the
-     batch convention that only the HTML tag decides squaring — the
-     decorative, non-button pills/badges (.track-badge, .rank, .dim-num,
-     .progress span, .checkbox-row) keep their rounded shape.
-   • No pre-existing custom-toast infrastructure existed in this
-     component (verified via grep), BUT it already funnels every
-     ShowToastEvent through a single `showToast(title, message, variant)`
-     wrapper method (8 call sites all going through it) — so only that
-     one method's body needed to change to dispatch the custom banner
-     instead of the native toast; no call sites needed touching. The
-     .wg-toast-banner CSS block below was built from scratch.
-   ═══════════════════════════════════════════════════════════════════════ */
+   Class names are unchanged because the JS builds many of them
+   (seg-sel*, save-*, pip-r*, rec-sel*, recval-*, wc-*, col-l*, …).
+
+   Selection language (same as the Validator form):
+     choice buttons  → red border + pale red tint when selected
+     1–5 rating      → dark grey fill for 5/4/3, amber for 2, red for 1
+═══════════════════════════════════════════════════════════════════════ */
 
 :host {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+    container-type: inline-size;
 
-    /* ── Surfaces ─────────────────────────────────────────────────── */
-    --wg-bg              : var(--wg-border);   /* was #f5f3ef — page/form background wash */
-    --wg-bg-warm         : var(--wg-white);    /* was #faf8f5 — kept distinct from --wg-rule below so
-                                                   borders drawn in that color stay visible */
-    --wg-surface         : var(--wg-white);
-    --wg-surface-sunken  : var(--wg-white);    /* was #fafafa — same "stay distinct from its own
-                                                   border" reasoning as --wg-bg-warm */
-    --wg-overlay         : rgba(255, 255, 255, .75);   /* plain white overlay — left literal */
-
-    /* ── Ink ──────────────────────────────────────────────────────── */
-    --wg-ink             : var(--wg-gray);
-    --wg-ink-soft        : var(--wg-text-muted);
-    --wg-ink-mute        : var(--wg-text-muted);
-    --wg-ink-invert      : var(--wg-white);
-
-    /* ── Rules ────────────────────────────────────────────────────── */
-    --wg-rule            : var(--wg-border);
-    --wg-rule-soft       : var(--wg-border);
-
-    /* ── Brand — same orange as wcfValidatorForm ────────────────────── */
-    --wg-brand           : var(--wg-orange);
-    --wg-brand-deep      : var(--wg-orange-deep);
-    --wg-brand-tint      : rgba(242, 103, 42, 0.08);   /* recalculated from wg-orange's rgb — same
-                                                           figure used for the equivalent wash on
-                                                           wcfValidatorForm */
-    --wg-brand-ring      : rgba(242, 103, 42, 0.15);   /* recalculated from wg-orange's rgb */
-    --wg-brand-shadow    : 0 2px 6px rgba(242, 103, 42, 0.30);   /* recalculated from wg-orange's rgb */
-    --wg-accent          : var(--wg-orange);
-    --wg-accent-soft     : rgba(242, 103, 42, 0.12);   /* recalculated from wg-orange's rgb — same
-                                                           figure used for .wcf-meta-pill on
-                                                           wcfValidatorForm */
-
-    /* ── Semantic states ─────────────────────────────────────────── */
-    --wg-good            : var(--wg-success);
-    --wg-good-tint       : var(--wg-success-bg);
-    --wg-good-rule       : var(--wg-success);
-
-    --wg-warn            : var(--wg-warning-text);
-    --wg-warn-tint       : var(--wg-warning-bg);
-    --wg-warn-rule       : var(--wg-warning);
-
-    --wg-danger          : var(--wg-error);
-    --wg-danger-tint     : var(--wg-error-bg);
-    --wg-danger-rule     : var(--wg-error);
-
-    --wg-info            : var(--wg-info);
-    --wg-info-tint       : var(--wg-info-bg);
-    --wg-info-rule       : var(--wg-info);
-
-    /* ── Radii — left as this file's own literal geometry, not brand
-       color; see wiring notes above (the --wg-r-pill / shared
-       --wg-radius-pill mismatch) ─────────────────────────────────── */
-    --wg-r-xs            : 4px;
-    --wg-r-sm            : 7px;
-    --wg-r-md            : 10px;
-    --wg-r-lg            : 12px;
-    --wg-r-pill          : 999px;
-
-    /* ── Elevation — plain black overlays, left literal ─────────────── */
-    --wg-shadow-sm       : 0 1px 4px rgba(0, 0, 0, .04);
-    --wg-shadow-md       : 0 4px 12px rgba(0, 0, 0, .08);
-    --wg-shadow-up       : 0 -3px 10px rgba(0, 0, 0, .08);
-
-    /* ── Typography ───────────────────────────────────────────────── */
-    --wg-font            : var(--wg-font-body), 'Salesforce Sans', Arial, sans-serif;
-    --wg-font-display    : var(--wg-font-heading), 'Salesforce Sans', Arial, sans-serif;
-
-    --wg-fs-base         : var(--wg-font-size-body);   /* was 14px — exact match */
-    /* Everything below is expressed in rem in the original file; rem-based
-       sizes are left un-tokenized throughout this batch (no clean 1:1
-       mapping onto the shared px scale without a visual shift). */
-    --wg-fs-title        : 1.7rem;
-    --wg-fs-h3           : 1.15rem;
-    --wg-fs-body         : 0.9rem;
-    --wg-fs-sm           : 0.875rem;
-    --wg-fs-xs           : 0.79rem;
-    --wg-fs-micro        : 0.7rem;
-
-    /* ── Layout rhythm ────────────────────────────────────────────── */
-    --wg-gutter          : 32px;
-    --wg-gap             : 14px;
-
-    /* ── Focus ────────────────────────────────────────────────────── */
-    --wg-focus           : 0 0 0 3px var(--wg-brand-ring);
-
-    /* ── Base type ────────────────────────────────────────────────── */
-    font-family : var(--wg-font);
-    font-size   : var(--wg-fs-base);
-    line-height : 1.55;
-    color       : var(--wg-ink);
-
-    display     : block;
-    width       : 100%;
-    max-width   : 100%;
-    box-sizing  : border-box;
-
-    /* Forms respond to the PANEL width (split-pane / RFI drawer). */
-    container-type : inline-size;
+    --rf-pad-x: var(--wg-space-6);
 }
 
-/* Legacy local aliases → shared tokens (kept for older selectors). */
-:host {
-    --bg         : var(--wg-bg);
-    --paper      : var(--wg-surface);
-    --ink        : var(--wg-ink);
-    --ink-soft   : var(--wg-ink-soft);
-    --ink-mute   : var(--wg-ink-mute);
-    --rule       : var(--wg-rule);
-    --rule-soft  : var(--wg-rule-soft);
-    --brand      : var(--wg-brand);
-    --brand-deep : var(--wg-brand-deep);
-    --accent     : var(--wg-accent);
-    --accent-soft: var(--wg-accent-soft);
-    --good       : var(--wg-good);
-    --warn       : var(--wg-warn);
-    --danger     : var(--wg-danger);
-    --shadow-sm  : var(--wg-shadow-sm);
-    --shadow-md  : var(--wg-shadow-md);
-}
-
-/* Shared helpers */
-.serif      { font-family: var(--wg-font); }
 .req,
-.wcf-req    { color: var(--wg-brand); font-weight: var(--wg-weight-bold); margin-left: 2px; }
-.wcf-opt    { color: var(--wg-ink-mute); font-weight: var(--wg-weight-regular); }
-
-/* Accessibility floor: visible keyboard focus */
-button:focus-visible,
-textarea:focus-visible,
-input:focus-visible,
-[tabindex]:focus-visible {
-    outline        : 2px solid var(--wg-brand);
-    outline-offset : 2px;
-    border-radius  : var(--wg-r-xs);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration        : .001ms !important;
-        animation-iteration-count : 1 !important;
-        transition-duration       : .001ms !important;
-    }
-}
-
-/* ═══════════════ END TOKENS — component styles below ═══════════════ */
-
-/* ═══════════════════════════════════════════════════════════════════
-   WG TOAST BANNER — replaces native ShowToastEvent (built from scratch;
-   this component already funneled every dispatch through its own
-   showToast() wrapper method, so only that method's body needed to
-   change — see the JS). Reuses the shared .error-banner /
-   .warning-banner / .success-banner / .info-banner classes from
-   commonStyleTheme.
-═══════════════════════════════════════════════════════════════════ */
-.wg-toast-banner {
-    position       : fixed;
-    top            : 20px;
-    left           : 50%;
-    transform      : translateX(-50%);
-    z-index        : 99998;
-    display        : flex;
-    align-items    : flex-start;
-    gap            : 0.6rem;
-    min-width      : 320px;
-    max-width      : 520px;
-    padding        : 0.85rem 1.1rem;
-    border-radius  : var(--wg-radius-md);
-    box-shadow     : 0 4px 16px rgba(65, 64, 65, 0.18);
-    animation      : wg-toast-slide-in 0.2s ease;
-}
-
-@keyframes wg-toast-slide-in {
-    from { opacity: 0; transform: translate(-50%, -10px); }
-    to   { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.wg-toast-banner-icon {
-    flex-shrink : 0;
-    font-size   : 1.1rem;
-    line-height : 1;
-}
-
-.wg-toast-banner-body {
-    flex      : 1;
-    min-width : 0;
-}
-
-.wg-toast-banner-title {
-    font-weight   : var(--wg-weight-bold);
-    font-size     : var(--wg-font-size-label);
-    margin-bottom : 0.15rem;
-}
-
-.wg-toast-banner-message {
-    font-size   : var(--wg-font-size-caption);
-    line-height : 1.4;
-    overflow-wrap: break-word;
-}
-
-.wg-toast-banner-close {
-    background    : none;
-    border        : none;
-    cursor        : pointer;
-    flex-shrink   : 0;
-    font-size     : 1rem;
-    line-height   : 1;
-    opacity       : 0.6;
-    padding       : 0.1rem;
-    border-radius : 0;   /* real <button> — squared */
-}
-.wg-toast-banner-close:hover { opacity: 1; }
+.wcf-req { color: var(--wg-error); font-weight: var(--wg-weight-bold); margin-left: 2px; }
 
 /* ═══════════════════════════════════════════
    FORM WRAP
+   FIX: was height:100vh with its own scroll area, which created a
+   second scrollbar inside the container panel and could hide the
+   footer. The form now grows naturally; the footer stays sticky.
 ═══════════════════════════════════════════ */
 .form-wrap {
-    background     : var(--wg-bg);
-    min-height     : 100vh;
-    height         : 100vh;
-    display        : flex;
-    flex-direction : column;
-    overflow       : hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--wg-surface-page);
+    border-radius: var(--wg-radius-card);
 }
 
 /* ═══════════════════════════════════════════
-   CHROME (optional top bar)
-═══════════════════════════════════════════ */
-.chrome {
-    background      : var(--wg-surface);
-    border-bottom   : 2px solid var(--wg-rule);
-    padding         : 0.75rem var(--wg-gutter);
-    display         : flex;
-    justify-content : space-between;
-    align-items     : center;
-    flex-shrink     : 0;
-}
-.logo {
-    display        : flex;
-    align-items    : center;
-    gap            : 0.6rem;
-    font-weight    : var(--wg-weight-bold);
-    color          : var(--wg-ink);
-    font-size      : 1rem;
-    letter-spacing : .01em;
-}
-.chrome-logo { width: 32px; height: 32px; object-fit: contain; }
-.nav          { display: flex; gap: 1.75rem; font-size: var(--wg-fs-sm); color: var(--wg-ink-soft); }
-.nav a        { color: var(--wg-ink-soft); text-decoration: none; }
-.nav a.active { color: var(--wg-brand); font-weight: var(--wg-weight-bold); border-bottom: 2px solid var(--wg-brand); }
-.you          { display: flex; gap: 0.6rem; align-items: center; font-size: 0.8rem; color: var(--wg-ink-soft); }
-.avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: var(--wg-brand);
-    color: var(--wg-ink-invert);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: var(--wg-weight-bold); font-size: 0.75rem; flex-shrink: 0;
-}
-
-/* ═══════════════════════════════════════════
-   FORM HEADER BAND  — mirrors .wcf-context-bar
+   HEADER BAND
 ═══════════════════════════════════════════ */
 .formhead {
-    padding       : 1.25rem var(--wg-gutter) 0;
-    background    : var(--wg-bg-warm);
-    border-bottom : 2px solid var(--wg-rule);
-    flex-shrink   : 0;
-    box-sizing    : border-box;
+    padding: var(--wg-space-5) var(--rf-pad-x) 0;
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    box-sizing: border-box;
 }
-.eyebrow {
-    text-transform : uppercase;
-    letter-spacing : .1em;
-    font-size      : var(--wg-fs-micro);
-    color          : var(--wg-ink-mute);
-    font-weight    : var(--wg-weight-bold);
-}
-.form-title {
-    font-family    : var(--wg-font);
-    font-weight    : 800;
-    font-size      : var(--wg-fs-title);
-    line-height    : 1.2;
-    letter-spacing : -.01em;
-    margin         : 0 0 0.75rem;
-    color          : var(--wg-ink);
-    overflow-wrap  : break-word;
-}
-.applicant {
-    display     : flex;
-    flex-wrap   : wrap;
-    gap         : 1.5rem;
-    align-items : center;
-    font-size   : var(--wg-fs-sm);
-    color       : var(--wg-ink);
-    margin      : 0 0 0.75rem;
-}
-.applicant > div  { display: flex; align-items: baseline; gap: 0.4rem; min-width: 0; flex-wrap: wrap; }
-.applicant strong {
-    color          : var(--wg-ink-mute);
-    font-weight    : var(--wg-weight-semibold);
-    font-size      : 0.72rem;
-    text-transform : uppercase;
-    letter-spacing : .04em;
-    white-space    : nowrap;
-}
-.sep { color: var(--wg-rule); }
 
-/* Track badge — mirrors .wcf-meta-pill */
-.track-badge {
-    display       : inline-flex;
-    align-items   : center;
-    gap           : 6px;
-    background    : var(--wg-accent-soft);
-    border        : 1px solid var(--wg-orange);
-    padding       : 0.2rem 0.8rem;
-    border-radius : var(--wg-r-pill);
-    font-weight   : var(--wg-weight-semibold);
-    font-size     : 0.78rem;
-    color         : var(--wg-orange-deep);
+.eyebrow {
+    margin: 0 0 var(--wg-space-1);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
-.track-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wg-brand); }
-/* Cross-file track-badge convention (jf=info, jc=warning, lu=success) —
-   overrides this file's own original blue/orange/purple choices; see
-   wiring notes at the top of this file. */
-.track-jf   { background: var(--wg-info-bg);    color: var(--wg-info);         border-color: var(--wg-info);    }
-.track-jc   { background: var(--wg-warning-bg); color: var(--wg-warning-text); border-color: var(--wg-warning); }
-.track-lu   { background: var(--wg-success-bg); color: var(--wg-success);      border-color: var(--wg-success); }
-.track-jf .dot { background: var(--wg-info); }
-.track-jc .dot { background: var(--wg-warning); }
-.track-lu .dot { background: var(--wg-success); }
+
+.form-title {
+    margin: 0 0 var(--wg-space-3);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
+    line-height: 1.3;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
+}
+
+.applicant {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wg-space-2) var(--wg-space-6);
+    margin-bottom: var(--wg-space-3);
+}
+
+.applicant-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    min-width: 0;
+}
+
+.applicant-label {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.applicant-value {
+    font-weight: var(--wg-weight-semibold);
+    overflow-wrap: break-word;
+}
+
+/* Track badges (classes from JS) — same track colors as every portal screen */
+.track-badge-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-1);
+}
+
+.track-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--wg-padding-tag);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.track-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.track-jf { background: var(--wg-info-bg);    color: var(--wg-info-text);    border-color: var(--wg-info); }
+.track-jc { background: var(--wg-warning-bg); color: var(--wg-warning-text); border-color: var(--wg-warning); }
+.track-lu { background: var(--wg-success-bg); color: var(--wg-success);      border-color: var(--wg-success); }
 
 /* ═══════════════════════════════════════════
-   SAVE / PROGRESS BAR
+   SAVE STATE + PROGRESS
 ═══════════════════════════════════════════ */
 .savebar {
-    display         : flex;
-    justify-content : space-between;
-    align-items     : center;
-    gap             : 14px;
-    padding         : 0.85rem 0 1rem;
-    border-top      : 1px solid var(--wg-rule-soft);
-    font-size       : var(--wg-fs-xs);
-    color           : var(--wg-ink-mute);
-    flex-wrap       : wrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-3) 0;
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
 }
-.save-idle   { display: flex; align-items: center; gap: 8px; }
-.save-idle::before   { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--wg-success); display: inline-block; }
-.save-saving { display: flex; align-items: center; gap: 8px; color: var(--wg-warning-text); }
-.save-saving::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--wg-warning); display: inline-block; animation: wcf-pulse 2s infinite; }
-.save-saved  { display: flex; align-items: center; gap: 8px; color: var(--wg-success); }
-.save-saved::before  { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--wg-success); display: inline-block; }
 
-@keyframes wcf-pulse {
+.save-idle,
+.save-saving,
+.save-saved,
+.save-error {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+}
+
+.save-idle::before,
+.save-saving::before,
+.save-saved::before,
+.save-error::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--wg-success);
+}
+
+.save-saving               { color: var(--wg-warning-text); }
+.save-saving::before       { background: var(--wg-warning); animation: rf-pulse 1.6s infinite; }
+.save-saved                { color: var(--wg-success); }
+/* FIX: save-error was set by the JS but never styled */
+.save-error                { color: var(--wg-error); font-weight: var(--wg-weight-semibold); }
+.save-error::before        { background: var(--wg-error); }
+
+@keyframes rf-pulse {
     0%, 100% { opacity: 1; }
-    50%      { opacity: .4; }
+    50%      { opacity: 0.4; }
 }
 
-.step-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.step-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+}
+
 .stepnum {
-    text-transform : uppercase;
-    letter-spacing : .1em;
-    font-size      : var(--wg-fs-micro);
-    color          : var(--wg-ink-mute);
-    font-weight    : var(--wg-weight-bold);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
-.progress { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-1);
+}
+
 .progress span {
-    width: 28px; height: 6px; border-radius: 99px;
-    background: var(--wg-border); cursor: pointer;
-    transition: background .25s, box-shadow .25s; display: inline-block;
+    display: inline-block;
+    width: 28px;
+    height: 6px;
+    border-radius: var(--wg-radius-badge);
+    background: var(--wg-border);
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
-.progress .done { background: var(--wg-brand); }
-.progress .curr { background: var(--wg-brand); box-shadow: 0 0 0 2px var(--wg-brand-ring); }
+
+.progress .done { background: var(--wg-red); }
+.progress .curr { background: var(--wg-red); box-shadow: 0 0 0 2px var(--wg-error-bg); }
 
 /* ═══════════════════════════════════════════
-   BODY — Validator wrapper background
+   BODY
 ═══════════════════════════════════════════ */
 .body {
-    padding    : 1.75rem var(--wg-gutter) 2.5rem;
-    background : var(--wg-bg);
-    flex       : 1 1 auto;
-    overflow-y : auto;
-    min-height : 0;
-    box-sizing : border-box;
+    padding: var(--wg-space-5) var(--rf-pad-x) var(--wg-space-6);
+    box-sizing: border-box;
 }
 
 /* ═══════════════════════════════════════════
-   STEP INTRO — mirrors .wcf-vf-section head
+   CARDS — step intro, question, S/W, recommendation
 ═══════════════════════════════════════════ */
-.step-intro {
-    background    : var(--wg-surface);
-    border        : 1px solid var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    padding       : 1.75rem 2rem;
-    margin-bottom : 1.5rem;
-    box-shadow    : var(--wg-shadow-sm);
-    box-sizing    : border-box;
+.step-intro,
+.subq,
+.sw-block,
+.finalrec {
+    margin-bottom: var(--wg-space-5);
+    padding: var(--wg-space-6);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+    box-sizing: border-box;
 }
-.dim-head { display: flex; align-items: flex-start; gap: 1rem; }
 
-/* Section number — EXACTLY the Validator's .wcf-vf-sec-num */
+.dim-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-3);
+}
+
+/* Section number — same dark grey circle as the Validator form */
 .dim-num {
-    flex            : 0 0 auto;
-    width           : 34px;
-    height          : 34px;
-    border-radius   : 50%;
-    background      : var(--wg-brand);
-    color           : var(--wg-ink-invert);
-    font-family     : var(--wg-font);
-    font-size       : 0.9rem;
-    font-weight     : 800;
-    line-height     : 1;
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-    box-shadow      : var(--wg-brand-shadow);
-    letter-spacing  : 0;
-    padding         : 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    color: var(--wg-white);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-bold);
 }
-.dim-title { flex: 1; min-width: 0; }
-.dim-title h3 {
-    font-family    : var(--wg-font);
-    font-weight    : var(--wg-weight-bold);
-    font-size      : var(--wg-fs-h3);
-    margin         : 0 0 0.3rem;
-    letter-spacing : 0;
-    color          : var(--wg-ink);
-    overflow-wrap  : break-word;
-}
-.dim-title .lede {
-    color: var(--wg-ink-mute); font-size: 0.82rem; line-height: 1.55; margin: 0; max-width: 78ch;
-}
-.dim-tools { display: flex; align-items: center; gap: 10px; margin: 1.1rem 0 0 50px; flex-wrap: wrap; }
 
-/* ═══════════════════════════════════════════
-   RUBRIC TOGGLE + PANEL
-═══════════════════════════════════════════ */
-/* Real <button> — squared, despite the pill resting shape, per the
-   batch's tag-based squaring convention. */
-.btn-soft {
-    background    : var(--wg-surface);
-    border        : 1.5px solid var(--wg-input-border);
-    color         : var(--wg-ink-soft);
-    font-size     : var(--wg-fs-xs);
-    font-weight   : 500;
-    padding       : 0.38rem 0.9rem;
-    border-radius : 0;
-    cursor        : pointer;
-    display       : inline-flex;
-    align-items   : center;
-    gap           : 6px;
-    font-family   : inherit;
-    transition    : all .15s ease;
+.dim-title { flex: 1; min-width: 0; }
+
+.dim-title h3 {
+    margin: 0 0 var(--wg-space-1);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1.3;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
 }
-.btn-soft:hover      { border-color: var(--wg-brand); color: var(--wg-brand); background: var(--wg-brand-tint); }
-.btn-soft-open       { border-color: var(--wg-brand); color: var(--wg-brand); background: var(--wg-brand-tint); font-weight: var(--wg-weight-bold); }
-.btn-soft .chev      { display: inline-block; transition: transform .2s; }
+
+.lede {
+    max-width: 78ch;
+    margin: 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    color: var(--wg-text-muted);
+}
+
+.dim-tools {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    margin: var(--wg-space-4) 0 0 44px;
+}
+
+/* Rubric toggle */
+.btn-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn-soft:hover,
+.btn-soft-open {
+    border-color: var(--wg-red);
+    background: var(--wg-error-bg);
+    color: var(--wg-red-deep);
+}
+
+.btn-soft .chev      { display: inline-block; transition: transform 0.2s ease; }
 .btn-soft-open .chev { transform: rotate(180deg); }
-.qcount { font-size: 0.78rem; color: var(--wg-ink-mute); font-style: italic; margin-left: 4px; }
+
+.qcount {
+    font-size: var(--wg-font-size-caption);
+    font-style: italic;
+    color: var(--wg-text-muted);
+}
 
 .rubric-panel {
-    margin        : 0.9rem 0 0 50px;
-    padding       : 1rem 1.1rem;
-    border-radius : var(--wg-r-md);
-    background    : var(--wg-surface-sunken);
-    border        : 1px solid var(--wg-rule);
+    margin: var(--wg-space-3) 0 0 44px;
+    padding: var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-md);
 }
+
 .rubric-hidden { display: none; }
+
 .rubric-panel h4 {
-    text-transform : uppercase;
-    letter-spacing : .05em;
-    font-size      : var(--wg-fs-micro);
-    color          : var(--wg-ink-mute);
-    margin         : 0 0 12px;
-    font-weight    : var(--wg-weight-bold);
+    margin: 0 0 var(--wg-space-3);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
+
 .rubric-grid {
-    display: flex; border: 1px solid var(--wg-rule);
-    border-radius: var(--wg-r-sm); overflow: hidden; background: var(--wg-surface);
+    display: flex;
+    overflow: hidden;
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
 }
+
 .rubric-grid .col {
-    flex: 1; min-width: 0; padding: 11px 12px 13px;
-    border-right: 1px solid var(--wg-rule);
-    font-size: var(--wg-fs-xs); line-height: 1.5; color: var(--wg-ink-soft);
+    flex: 1;
+    min-width: 0;
+    padding: var(--wg-space-3);
+    border-right: var(--wg-border-width-thin) solid var(--wg-border);
+    font-size: var(--wg-font-size-caption);
+    line-height: 1.5;
+    color: var(--wg-gray);
 }
+
 .rubric-grid .col:last-child { border-right: 0; }
+
 .rubric-grid .col .lvl {
-    font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); display: flex; justify-content: space-between; margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
-.rubric-grid .col .lvl .n { font-family: var(--wg-font); color: var(--wg-ink); font-size: var(--wg-font-size-body); font-weight: 800; }
+
+.rubric-grid .col .lvl .n {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
+
 .rubric-grid .col p { margin: 0; }
-.col-l5 .lvl { color: var(--wg-good);     }
-.col-l4 .lvl { color: var(--wg-ink-soft); }
-.col-l3 .lvl { color: var(--wg-ink-mute); }
+
+.col-l5 .lvl { color: var(--wg-success); }
+.col-l4 .lvl { color: var(--wg-info-text); }
+.col-l3 .lvl { color: var(--wg-text-muted); }
 .col-l2 .lvl { color: var(--wg-warning-text); }
-.col-l1 .lvl { color: var(--wg-error);        }
+.col-l1 .lvl { color: var(--wg-error); }
 
 /* ═══════════════════════════════════════════
-   SUB-QUESTION CARD — mirrors .wcf-vf-section
+   QUESTION CARD
 ═══════════════════════════════════════════ */
-.subq {
-    margin        : 0 0 1.5rem 0;
-    padding       : 1.75rem 2rem;
-    background    : var(--wg-surface);
-    border        : 1px solid var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    box-shadow    : var(--wg-shadow-sm);
-    transition    : box-shadow .2s, border-color .2s;
-    box-sizing    : border-box;
+/* Complete = green left edge (card stays white so content reads easily) */
+.subq-complete {
+    border-left: var(--wg-border-width-banner) solid var(--wg-success);
 }
-.subq:first-of-type { margin-top: 0; }
-.subq-complete { border-color: var(--wg-good-rule); background: var(--wg-good-tint); }
 
-.subq-top { display: flex; justify-content: space-between; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.9rem; }
-.subq-q   { flex: 1; min-width: 0; }
-.qtext    { font-weight: var(--wg-weight-semibold); font-size: var(--wg-fs-body); line-height: 1.45; color: var(--wg-ink); overflow-wrap: break-word; }
-.qhint    { font-size: var(--wg-fs-xs); color: var(--wg-ink-mute); margin-top: 0.4rem; line-height: 1.55; overflow-wrap: break-word; }
+.subq-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-4);
+}
 
-/* Track tag — mirrors .wcf-field-id / meta pill */
+.subq-q { flex: 1; min-width: 0; }
+
+.qtext {
+    font-size: var(--wg-font-size-body);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1.45;
+    color: var(--wg-gray);
+    overflow-wrap: break-word;
+}
+
+.qnum-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 22px;
+    margin-right: var(--wg-space-2);
+    padding: 0 6px;
+    background: var(--wg-gray);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+    vertical-align: 1px;
+}
+
+.qhint {
+    margin-top: var(--wg-space-2);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    color: var(--wg-text-muted);
+    overflow-wrap: break-word;
+}
+
+/* Track-specific guidance (was inline styles + emoji) */
+.track-guidance {
+    margin-top: var(--wg-space-3);
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-info-bg);
+    border-left: 3px solid var(--wg-info);
+    border-radius: var(--wg-radius-sm);
+}
+
+.track-guidance-title {
+    margin-bottom: var(--wg-space-2);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-info-text);
+}
+
+.track-guidance-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-1);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.45;
+}
+
+.track-guidance-tag {
+    flex-shrink: 0;
+    padding: 1px var(--wg-space-2);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    white-space: nowrap;
+}
+
+.track-guidance-text {
+    font-size: var(--wg-font-size-label);
+    line-height: 1.45;
+}
+
+/* Track tag on the question (class from metadata/JS) */
 .track-tag {
-    flex           : 0 0 auto;
-    font-weight    : var(--wg-weight-bold);
-    font-size      : 0.68rem;
-    letter-spacing : .03em;
-    text-transform : uppercase;
-    background     : var(--wg-rule-soft);
-    color          : var(--wg-ink-mute);
-    padding        : 0.15em 0.5em;
-    border-radius  : var(--wg-r-xs);
-    border         : 1px solid var(--wg-rule);
-    white-space    : nowrap;
-    align-self     : flex-start;
+    flex: 0 0 auto;
+    align-self: flex-start;
+    padding: 1px var(--wg-space-2);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+    white-space: nowrap;
 }
-.track-tag-jf { background: var(--wg-info-tint);   color: var(--wg-info); border-color: var(--wg-info-rule);   }
-.track-tag-jc { background: var(--wg-accent-soft); color: var(--wg-orange-deep); border-color: var(--wg-orange); }
+
+.track-tag-jf { background: var(--wg-info-bg);    color: var(--wg-info-text);    border-color: var(--wg-info); }
+.track-tag-jc { background: var(--wg-warning-bg); color: var(--wg-warning-text); border-color: var(--wg-warning); }
 
 /* ═══════════════════════════════════════════
-   RATING SEGMENTED — Validator pick styling
+   RATING (segmented 5 → 1)
 ═══════════════════════════════════════════ */
-.rating-row   { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.rating-label {
-    font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); color: var(--wg-ink-mute);
+.rating-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+}
+
+.rating-label,
+.ynl {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
 
 .segmented {
-    display       : flex;
-    flex-wrap     : wrap;
-    border        : 1.5px solid var(--wg-input-border);
-    border-radius : var(--wg-r-sm);
-    overflow      : hidden;
-    background    : var(--wg-surface);
-    max-width     : 100%;
-}
-/* Real <button>s — squared. The rounded "segmented control" look comes
-   from the .segmented wrapper's own radius + overflow:hidden clip, not
-   from the individual buttons, so squaring them here has no visual
-   effect on the pill-shaped ends; it's set explicitly for certainty. */
-.segmented button {
-    border         : 0;
-    background     : transparent;
-    cursor         : pointer;
-    padding        : 0.6rem 0.85rem;
-    font-family    : inherit;
-    font-size      : var(--wg-fs-xs);
-    color          : var(--wg-ink);
-    font-weight    : 500;
-    border-right   : 1.5px solid var(--wg-input-border);
-    border-radius  : 0;
-    display        : flex;
-    flex-direction : column;
-    align-items    : center;
-    line-height    : 1.15;
-    min-width      : 78px;
-    flex           : 1 1 auto;
-    transition     : background .12s, color .12s;
-}
-.segmented button:last-child { border-right: 0; }
-.segmented button:hover:not(.seg-sel):not([class*="seg-sel-"]) { background: var(--wg-brand-tint); color: var(--wg-brand); }
-.segmented button .num {
-    font-family: var(--wg-font); font-size: var(--wg-font-size-sub-heading); font-weight: 800;
-    margin-bottom: 2px; color: var(--wg-ink);
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    overflow: hidden;
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
 }
 
-/* Selected states — brand orange, matching Validator selections */
-.seg-sel            { background: var(--wg-brand) !important; color: var(--wg-white) !important; }
-.seg-sel .num       { color: var(--wg-white) !important; }
-.seg-sel-poor       { background: var(--wg-warning) !important; color: var(--wg-white) !important; }
-.seg-sel-poor .num  { color: var(--wg-white) !important; }
-.seg-sel-vpoor      { background: var(--wg-error) !important; color: var(--wg-white) !important; }
-.seg-sel-vpoor .num { color: var(--wg-white) !important; }
-.seg-sel-yes        { background: var(--wg-success) !important; color: var(--wg-white) !important; border-color: var(--wg-success) !important; }
-.seg-sel-yes .num   { color: var(--wg-white) !important; }
-.seg-sel-no         { background: var(--wg-error) !important; color: var(--wg-white) !important; border-color: var(--wg-error) !important; }
-.seg-sel-no .num    { color: var(--wg-white) !important; }
+.segmented button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 78px;
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: transparent;
+    border: 0;
+    border-right: var(--wg-border-width-thin) solid var(--wg-border);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    line-height: 1.2;
+    color: var(--wg-gray);
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.segmented button:last-child { border-right: 0; }
+
+.segmented button:hover:not(.seg-sel):not(.seg-sel-poor):not(.seg-sel-vpoor) {
+    background: var(--wg-error-bg);
+    color: var(--wg-red-deep);
+}
+
+.segmented button:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: -2px;
+}
+
+.segmented button .num {
+    margin-bottom: 2px;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    color: inherit;
+}
+
+.seg-sel       { background: var(--wg-gray) !important;        color: var(--wg-white) !important; }
+.seg-sel-poor  { background: var(--wg-warning-bg) !important;  color: var(--wg-warning-text) !important; box-shadow: inset 0 0 0 2px var(--wg-warning); }
+.seg-sel-vpoor { background: var(--wg-error) !important;       color: var(--wg-white) !important; }
+.seg-sel-yes   { background: var(--wg-success) !important;     color: var(--wg-white) !important; }
+.seg-sel-no    { background: var(--wg-error) !important;       color: var(--wg-white) !important; }
+
+/* Selected level description (was inline styles) */
+.ladder-selected {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-2);
+    margin: var(--wg-space-2) 0 var(--wg-space-3);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-success-bg);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.45;
+}
+
+.ladder-selected-level {
+    flex-shrink: 0;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-success);
+}
+
+/* Ladder accordion */
+.ladder-toggle-wrap { margin: var(--wg-space-3) 0; }
+
+.link-btn {
+    padding: 0;
+    background: none;
+    border: 0;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-red);
+    cursor: pointer;
+}
+
+.link-btn:hover { color: var(--wg-red-deep); text-decoration: underline; }
+
+.link-btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+.ladder-drawer {
+    margin-top: var(--wg-space-2);
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) dashed var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+}
+
+.ladder-drawer-title {
+    margin-bottom: var(--wg-space-2);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.ladder-row {
+    display: flex;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-1);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.45;
+}
+
+.ladder-row-level {
+    flex-shrink: 0;
+    min-width: 58px;
+    font-weight: var(--wg-weight-bold);
+}
 
 /* ═══════════════════════════════════════════
-   COMMENT + TEXTAREA
+   COMMENT + TEXTAREAS
 ═══════════════════════════════════════════ */
-.comment { margin-top: 1.1rem; border-top: 1px solid var(--wg-rule-soft); padding-top: 1.1rem; }
+.comment {
+    margin-top: var(--wg-space-4);
+    padding-top: var(--wg-space-4);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
 .clab {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin-bottom: 0.45rem; flex-wrap: wrap; gap: 4px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-1);
+    margin-bottom: var(--wg-space-2);
 }
-.clab .l {
-    font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); color: var(--wg-ink-mute);
+
+.clab .l,
+.subform-row .l {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
-.clab .help { font-size: 0.78rem; color: var(--wg-ink-mute); font-style: italic; }
+
+.help {
+    font-size: var(--wg-font-size-caption);
+    font-style: italic;
+    color: var(--wg-text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+}
 
 .textarea-wrap { position: relative; }
 
 .lwc-textarea {
-    width         : 100%;
-    box-sizing    : border-box;
-    padding       : 10px 12px 28px;
-    border        : 1px solid var(--wg-input-border);
-    border-radius : var(--wg-r-xs);
-    background    : var(--wg-surface);
-    color         : var(--wg-ink);
-    font-family   : var(--wg-font);
-    font-size     : 13.5px;
-    line-height   : 1.55;
-    resize        : vertical;
-    min-height    : 80px;
-    outline       : none;
-    transition    : border-color .15s, box-shadow .15s;
-    display       : block;
+    display: block;
+    width: 100%;
+    min-height: 88px;
+    padding: 10px 12px 28px;
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.lwc-textarea:focus { border-color: var(--wg-brand); box-shadow: var(--wg-focus); }
-.lwc-textarea::placeholder { color: var(--wg-ink-mute); }
 
-.comment-req-now .lwc-textarea { border-color: var(--wg-warn-rule); }
-.lwc-textarea-req { border-color: var(--wg-warn-rule); }
-.lwc-textarea-req:focus { border-color: var(--wg-warning); box-shadow: 0 0 0 3px rgba(246, 135, 32, .15); }
+.lwc-textarea:focus {
+    border-color: var(--wg-orange);
+    box-shadow: var(--wg-focus-ring);
+}
 
-/* Word counter — matches .wcf-char-count colours */
+.lwc-textarea::placeholder { color: var(--wg-text-muted); }
+
+/* Rated but no justification yet → amber border */
+.lwc-textarea-req { border-color: var(--wg-warning); }
+
+/* Word counter */
 .wc-counter {
-    position       : absolute;
-    bottom         : 7px;
-    right          : 10px;
-    font-size      : 0.73rem;
-    font-weight    : var(--wg-weight-semibold);
-    letter-spacing : .02em;
-    color          : var(--wg-ink-mute);
-    background     : var(--wg-surface);
-    padding        : 1px 5px;
-    border-radius  : 3px;
-    pointer-events : none;
-    line-height    : 1.4;
-    border         : 1px solid transparent;
-    transition     : color .2s, border-color .2s;
+    position: absolute;
+    right: 10px;
+    bottom: 7px;
+    padding: 1px 6px;
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid transparent;
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+    pointer-events: none;
 }
-.wc-near  { color: var(--wg-warning-text); border-color: var(--wg-warn-rule); }
-.wc-limit { color: var(--wg-error); border-color: var(--wg-danger-rule); background: var(--wg-danger-tint); }
+
+.wc-near  { color: var(--wg-warning-text); border-color: var(--wg-warning); }
+.wc-limit { color: var(--wg-error); border-color: var(--wg-error); background: var(--wg-error-bg); }
 
 /* ═══════════════════════════════════════════
    STRENGTHS / WEAKNESSES
 ═══════════════════════════════════════════ */
-.sw-indent { margin-left: 0; }
-.sw-block  {
-    background    : var(--wg-surface);
-    border        : 1px solid var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    box-shadow    : var(--wg-shadow-sm);
-    padding       : 1.5rem 2rem;
-    margin-bottom : 1.5rem;
-    box-sizing    : border-box;
-}
 .sw-block h4 {
-    font-family: var(--wg-font);
-    font-weight: var(--wg-weight-bold); font-size: var(--wg-fs-h3); margin: 0 0 0.3rem; color: var(--wg-ink);
+    margin: 0 0 var(--wg-space-1);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
 }
-.sw-block .sub { color: var(--wg-ink-mute); font-size: 0.82rem; margin: 0 0 1.1rem; line-height: 1.55; }
-.ranked-row { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem; }
 
-/* Rank chip — same filled orange circle language as the section number.
-   Decorative, not a real <button> — keeps its round shape. */
-.rank {
-    flex: 0 0 28px;
-    font-family: var(--wg-font);
-    font-weight: 800; font-size: 0.8rem; color: var(--wg-white);
-    background: var(--wg-brand); border: none;
-    border-radius: 50%; width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center; line-height: 1;
-    box-shadow: var(--wg-brand-shadow);
+.sw-block .sub {
+    margin: 0 0 var(--wg-space-4);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    color: var(--wg-text-muted);
 }
+
+.ranked-row {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-3);
+    margin-bottom: var(--wg-space-3);
+}
+
+.rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+}
+
 .ranked-row lightning-input { flex: 1; min-width: 0; }
-.req-mark { font-size: 11px; color: var(--wg-brand); font-weight: var(--wg-weight-bold); flex: 0 0 auto; width: 14px; }
+
+.req-mark {
+    flex: 0 0 14px;
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-error);
+}
 
 /* ═══════════════════════════════════════════
    FINAL RECOMMENDATION
 ═══════════════════════════════════════════ */
-.finalrec {
-    margin-left   : 0;
-    background    : var(--wg-surface);
-    border        : 1px solid var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    box-shadow    : var(--wg-shadow-sm);
-    padding       : 1.5rem 2rem;
-    margin-bottom : 1.5rem;
-    box-sizing    : border-box;
+.yesno-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    margin-bottom: var(--wg-space-4);
 }
-.yesno-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
-.ynl {
-    font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); color: var(--wg-ink-mute);
-}
-.yesno { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-/* Real <button>s — squared despite the pill resting shape. */
-.yesno button {
-    border        : 1.5px solid var(--wg-input-border);
-    background    : var(--wg-surface);
-    cursor        : pointer;
-    padding       : 0.55rem 1.1rem;
-    border-radius : 0;
-    font-family   : inherit;
-    font-size     : var(--wg-fs-xs);
-    font-weight   : 500;
-    color         : var(--wg-ink-soft);
-    transition    : all .15s ease;
-}
-.yesno button:hover { border-color: var(--wg-brand); background: var(--wg-brand-tint); color: var(--wg-brand); }
-.yesno-yes-sel { background: var(--wg-brand-tint) !important; color: var(--wg-brand) !important; border-color: var(--wg-brand) !important; font-weight: var(--wg-weight-bold); }
-.yesno-no-sel  { background: var(--wg-danger-tint) !important; color: var(--wg-error) !important; border-color: var(--wg-error) !important; font-weight: var(--wg-weight-bold); }
 
-/* Dependent paths — same tinted blocks as Validator dependent wrappers */
-.path { padding: 1.1rem 1.25rem; border-radius: var(--wg-r-md); margin-bottom: 1rem; }
-.path.yes { background: var(--wg-good-tint);   border: 1px solid var(--wg-good-rule);   }
-.path.no  { background: var(--wg-danger-tint); border: 1px solid var(--wg-danger-rule); }
-.pathlab {
-    display: flex; align-items: center; gap: 8px; font-weight: var(--wg-weight-bold);
-    text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); margin-bottom: 12px;
+.yesno {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
 }
-.pathlab.good   { color: var(--wg-good); }
+
+.yesno button {
+    padding: var(--wg-space-2) var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-badge);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.yesno button:hover { border-color: var(--wg-red); }
+
+.yesno button:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+/* FIX: the JS sets "rec-sel" / "rec-sel-no", but the old CSS only
+   styled "yesno-yes-sel" / "yesno-no-sel" — so the chosen
+   recommendation never looked selected. */
+.yesno .rec-sel {
+    background: var(--wg-success-bg);
+    border-color: var(--wg-success);
+    color: var(--wg-success);
+}
+
+.yesno .rec-sel-no {
+    background: var(--wg-error-bg);
+    border-color: var(--wg-error);
+    color: var(--wg-error);
+}
+
+.path {
+    margin-bottom: var(--wg-space-4);
+    padding: var(--wg-space-4);
+    border-radius: var(--wg-radius-md);
+    border-left: 3px solid transparent;
+}
+
+.path.yes { background: var(--wg-success-bg); border-left-color: var(--wg-success); }
+.path.no  { background: var(--wg-error-bg);   border-left-color: var(--wg-error); }
+
+.pathlab {
+    margin-bottom: var(--wg-space-3);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pathlab.good   { color: var(--wg-success); }
 .pathlab.danger { color: var(--wg-error); }
 
-.subform-row { margin-bottom: 1rem; }
+.subform-row { margin-bottom: var(--wg-space-4); }
+
 .subform-row .l {
-    display: block; font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); color: var(--wg-ink-mute); margin-bottom: 0.45rem;
-}
-.rec-placeholder {
-    padding: 0.85rem 1rem;
-    background: var(--wg-surface-sunken);
-    border-radius: var(--wg-r-sm);
-    border: 1px dashed var(--wg-rule);
-    font-size: var(--wg-fs-xs);
-    color: var(--wg-ink-mute);
-    font-style: italic;
+    display: block;
+    margin-bottom: var(--wg-space-2);
 }
 
-/* ═══════════════════════════════════════════
-   REJECTION CHECKBOX GRID — Validator checklist look
-═══════════════════════════════════════════ */
+.rec-placeholder {
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) dashed var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-label);
+    font-style: italic;
+    color: var(--wg-text-muted);
+}
+
+/* Rejection reasons */
 .checkbox-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem 0.75rem;
-    margin-top: 4px;
+    gap: var(--wg-space-2);
 }
+
 .checkbox-row {
-    display       : flex;
-    align-items   : flex-start;
-    gap           : 0.75rem;
-    padding       : 0.75rem 1rem;
-    background    : var(--wg-surface);
-    border        : 1.5px solid var(--wg-input-border);
-    border-radius : var(--wg-r-sm);
-    font-size     : var(--wg-fs-sm);
-    font-weight   : 500;
-    color         : var(--wg-ink);
-    cursor        : pointer;
-    transition    : all .15s;
-    line-height   : 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-3) var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-ghost) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-label);
+    line-height: 1.4;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
-.checkbox-row:hover { border-color: var(--wg-brand); background: rgba(242, 103, 42, 0.04); }
+
+.checkbox-row:hover { border-color: var(--wg-red); }
+
 .checkbox-row:has(input:checked) {
-    border-color: var(--wg-brand);
-    background: var(--wg-brand-tint);
-    color: var(--wg-ink);
+    background: var(--wg-error-bg);
+    border-color: var(--wg-red);
 }
+
 .checkbox-row input[type="checkbox"] {
-    flex: 0 0 auto; width: 17px; height: 17px; margin: 1px 0 0;
-    accent-color: var(--wg-brand); cursor: pointer;
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 1px 0 0;
+    accent-color: var(--wg-red);
+    cursor: pointer;
 }
+
 .checkbox-row span { flex: 1; min-width: 0; overflow-wrap: break-word; }
 
 /* ═══════════════════════════════════════════
-   REVIEW STEP
-═══════════════════════════════════════════ */
-.review-summary { margin-top: 0; }
-.review-dim {
-    border        : 1px solid var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    background    : var(--wg-surface);
-    margin-bottom : 1rem;
-    overflow      : hidden;
-    box-shadow    : var(--wg-shadow-sm);
-}
-.review-dim .head {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.85rem 1.25rem; background: var(--wg-bg-warm);
-    border-bottom: 1px solid var(--wg-rule);
-    flex-wrap: wrap; gap: 6px;
-}
-.review-dim .head .name { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
-.review-dim .head .num  {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: var(--wg-brand); color: var(--wg-white);
-    display: inline-flex; align-items: center; justify-content: center;
-    font-family: var(--wg-font); font-weight: 800; font-size: 0.72rem; flex-shrink: 0;
-}
-.review-dim .head .ttl  { font-family: var(--wg-font); font-weight: var(--wg-weight-bold); font-size: 0.95rem; overflow-wrap: break-word; }
-.review-dim .head .mean { font-family: var(--wg-font); font-weight: 800; font-size: 1.05rem; color: var(--wg-ink); }
-.review-dim .head .mean .lab {
-    font-weight: var(--wg-weight-bold); font-size: 0.68rem;
-    color: var(--wg-ink-mute); text-transform: uppercase; letter-spacing: .05em; margin-right: 6px;
-}
-.review-q {
-    padding: 0.6rem 1.25rem; display: flex; justify-content: space-between; gap: 12px;
-    border-top: 1px solid var(--wg-rule-soft); font-size: var(--wg-fs-sm); flex-wrap: wrap;
-}
-.review-q .qx { flex: 1 1 220px; min-width: 0; color: var(--wg-ink-soft); overflow-wrap: break-word; }
-.review-q .rx { flex: 0 0 auto; font-weight: var(--wg-weight-bold); font-size: var(--wg-font-size-body); display: flex; align-items: center; gap: 6px; }
-
-.pip {
-    font-family: inherit; font-size: 11px; font-weight: var(--wg-weight-bold);
-    background: var(--wg-rule-soft); color: var(--wg-ink-soft);
-    padding: 2px 7px; border-radius: var(--wg-r-xs);
-}
-.pip-r5 { background: var(--wg-good-tint);   color: var(--wg-good); border: 1px solid var(--wg-good-rule); }
-.pip-r4 { background: var(--wg-info-tint);   color: var(--wg-info); border: 1px solid var(--wg-info-rule); }
-.pip-r3 { background: var(--wg-rule-soft);   color: var(--wg-ink-soft); border: 1px solid var(--wg-rule); }
-.pip-r2 { background: var(--wg-warn-tint);   color: var(--wg-warning-text); border: 1px solid var(--wg-warn-rule); }
-.pip-r1 { background: var(--wg-danger-tint); color: var(--wg-error);        border: 1px solid var(--wg-danger-rule); }
-
-.review-q-comment {
-    margin-top    : 4px;
-    padding       : 0.6rem 0.85rem;
-    background    : var(--wg-surface-sunken);
-    border-left   : 3px solid var(--wg-rule);
-    border-radius : 0 var(--wg-r-xs) var(--wg-r-xs) 0;
-    font-size     : var(--wg-fs-xs);
-    color         : var(--wg-ink-soft);
-    line-height   : 1.55;
-    white-space   : pre-wrap;
-    overflow-wrap : break-word;
-    flex          : 1 1 100%;
-}
-
-.review-other {
-    border: 1px solid var(--wg-rule); border-radius: var(--wg-r-lg);
-    background: var(--wg-surface); padding: 1.25rem 1.5rem; margin-bottom: 1rem;
-    box-shadow: var(--wg-shadow-sm);
-}
-.review-other h5 { font-family: var(--wg-font); font-weight: var(--wg-weight-bold); font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--wg-ink); }
-.review-other ul { margin: 6px 0 0; padding-left: 20px; font-size: var(--wg-fs-sm); color: var(--wg-ink-soft); }
-.review-other ul li { margin-bottom: 4px; overflow-wrap: break-word; }
-
-.review-rec {
-    border: 1px solid var(--wg-rule); border-radius: var(--wg-r-lg);
-    background: var(--wg-surface); padding: 1.25rem 1.5rem;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px; box-shadow: var(--wg-shadow-sm);
-}
-.review-rec h5 { font-family: var(--wg-font); font-weight: var(--wg-weight-bold); font-size: 0.95rem; margin: 0; color: var(--wg-ink); }
-.recvalue-row  { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-.recvalue-yes  { color: var(--wg-success); font-weight: var(--wg-weight-bold); font-size: var(--wg-font-size-body); }
-.recvalue-no   { color: var(--wg-error);   font-weight: var(--wg-weight-bold); font-size: var(--wg-font-size-body); }
-.strength {
-    font-size: var(--wg-fs-xs); font-weight: var(--wg-weight-semibold); color: var(--wg-orange-deep);
-    background: var(--wg-accent-soft); padding: 0.2rem 0.8rem;
-    border-radius: var(--wg-r-pill); border: 1px solid var(--wg-orange);
-}
-
-/* ═══════════════════════════════════════════
-   VALIDATION BANNER
-═══════════════════════════════════════════ */
-.validate {
-    margin        : 0 var(--wg-gutter);
-    padding       : 0.75rem 1rem;
-    background    : var(--wg-danger-tint);
-    border        : 1.5px solid var(--wg-error);
-    color         : var(--wg-error);
-    border-radius : var(--wg-r-md);
-    font-size     : var(--wg-fs-xs);
-    overflow-wrap : break-word;
-    box-shadow    : 0 1px 4px rgba(179, 38, 30, .15);   /* recalculated from wg-error's rgb */
-}
-.validate.show { display: block; margin-top: 10px; }
-
-/* ═══════════════════════════════════════════
-   FOOTER — mirrors .wcf-vf-footer (sticky, white)
-═══════════════════════════════════════════ */
-.footer {
-    padding         : 8px 16px;
-    border-top      : 1px solid var(--wg-border);
-    display         : flex;
-    justify-content : space-between;
-    align-items     : center;
-    gap             : 10px;
-    flex-wrap       : wrap;
-    background      : var(--wg-white);
-    flex-shrink     : 0;
-    position        : sticky;
-    bottom          : 0;
-    z-index         : 40;
-    box-shadow      : var(--wg-shadow-up);
-}
-.footer .left  { display: flex; gap: 8px; flex-wrap: wrap; }
-.footer .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.step-here     { font-size: 11.5px; color: var(--wg-text-muted); margin-right: 14px; }
-
-/* Real <button>s (Previous / Save draft / Next / Submit / Back to
-   Dashboard) — squared. */
-.btn {
-    padding       : 0 12px;
-    height        : 32px;
-    display       : inline-flex;
-    align-items   : center;
-    justify-content: center;
-    border-radius : 0;
-    font-family   : inherit;
-    font-weight   : var(--wg-weight-semibold);
-    font-size     : var(--wg-font-size-caption);
-    cursor        : pointer;
-    border        : 1px solid transparent;
-    transition    : background .15s, border-color .15s, color .15s;
-}
-/* Neutral — same amber-outlined "Save Draft" treatment as the Validator */
-.btn-secondary { background: var(--wg-white); border-color: var(--wg-warning); color: var(--wg-warning-text); }
-.btn-secondary:hover:not(:disabled) { background: var(--wg-warning-bg); }
-.btn-secondary:disabled { opacity: .4; cursor: not-allowed; }
-/* Brand — same orange primary as the Validator's Submit */
-.btn-primary   { background: var(--wg-brand); color: var(--wg-white); border-color: var(--wg-brand); }
-.btn-primary:hover { background: var(--wg-brand-deep); border-color: var(--wg-brand-deep); }
-.btn-submit    { background: var(--wg-brand); color: var(--wg-white); border-color: var(--wg-brand); }
-.btn-submit:hover { background: var(--wg-brand-deep); border-color: var(--wg-brand-deep); }
-.btn-sm        { height: 28px; padding: 0 10px; font-size: 11.5px; }
-
-/* ═══════════════════════════════════════════
-   DONE STATE
-═══════════════════════════════════════════ */
-.done-state {
-    text-align: center; padding: 60px var(--wg-gutter) 40px;
-    background: var(--wg-surface);
-    border: 1px solid var(--wg-rule); border-radius: var(--wg-r-lg);
-    margin: 1.75rem var(--wg-gutter); box-shadow: var(--wg-shadow-sm);
-}
-.done-icon  { font-size: 48px; margin-bottom: 14px; color: var(--wg-success); }
-.done-state h3 {
-    font-family: var(--wg-font);
-    font-weight: 800; font-size: 1.5rem; margin: 0 0 10px; color: var(--wg-ink);
-}
-.done-state p { color: var(--wg-ink-soft); max-width: 60ch; margin: 0 auto 20px; font-size: var(--wg-fs-sm); }
-
-/* ═══════════════════════════════════════════
-   SUPPORTING DOCUMENTS UPLOAD
+   UPLOADS
 ═══════════════════════════════════════════ */
 .upload-section {
-    margin        : 0 0 1.5rem 0;
-    padding       : 1.25rem 1.5rem;
-    background    : var(--wg-surface);
-    border        : 1px dashed var(--wg-rule);
-    border-radius : var(--wg-r-lg);
-    box-sizing    : border-box;
+    margin-bottom: var(--wg-space-5);
+    padding: var(--wg-space-5);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) dashed var(--wg-input-border);
+    border-radius: var(--wg-radius-card);
 }
-.upload-section-sw,
-.upload-section-rec { margin-left: 0; }
 
-.upload-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.upload-header {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    margin-bottom: var(--wg-space-3);
+}
+
 .upload-title {
-    font-weight: var(--wg-weight-bold); text-transform: uppercase; letter-spacing: .05em;
-    font-size: var(--wg-fs-micro); color: var(--wg-ink-mute);
-}
-.upload-sub  { font-size: var(--wg-fs-xs); color: var(--wg-ink-mute); font-style: italic; }
-.upload-hint {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    font-size: var(--wg-fs-xs); color: var(--wg-ink-mute); font-style: italic; padding: 8px 0;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
 }
 
-.uploaded-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.upload-sub,
+.upload-hint {
+    font-size: var(--wg-font-size-label);
+    font-style: italic;
+    color: var(--wg-text-muted);
+}
+
+.upload-hint {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+}
+
+.uploaded-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wg-space-2);
+    margin-top: var(--wg-space-3);
+}
+
 .uploaded-file {
-    display: flex; align-items: center; gap: 8px;
-    font-size: var(--wg-fs-xs); color: var(--wg-ink-soft);
-    background: var(--wg-surface); border: 1px solid var(--wg-rule);
-    border-radius: var(--wg-r-sm); padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-sm);
+    font-size: var(--wg-font-size-label);
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
 }
-.file-icon { font-size: var(--wg-font-size-body); flex: 0 0 auto; }
+
+.file-icon { flex: 0 0 auto; }
+
 .file-name {
-    font-weight: 500; overflow: hidden; text-overflow: ellipsis;
-    white-space: nowrap; flex: 1; min-width: 0;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--wg-weight-semibold);
 }
-/* Real <button> — squared. */
+
 .file-delete-btn {
-    flex: 0 0 auto; margin-left: auto;
-    background: transparent; border: 1px solid transparent;
-    border-radius: 0; color: var(--wg-ink-mute);
-    cursor: pointer; font-size: 11px; font-weight: var(--wg-weight-bold); line-height: 1;
-    padding: 3px 6px; font-family: inherit;
-    transition: background .15s, color .15s, border-color .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    margin-left: auto;
+    padding: 0;
+    background: transparent;
+    border: var(--wg-border-width-thin) solid transparent;
+    border-radius: var(--wg-radius-sm);
+    cursor: pointer;
 }
+
+/* Keeps the click target on the button itself, so the handler's
+   dataset lookup finds data-id (the icon would otherwise be the target) */
+.file-delete-btn lightning-icon { pointer-events: none; }
+
 .file-delete-btn:hover {
-    background   : var(--wg-danger-tint);
-    border-color : var(--wg-danger-rule);
-    color        : var(--wg-error);
+    background: var(--wg-error-bg);
+    border-color: var(--wg-error);
+    --slds-c-icon-color-foreground-default: var(--wg-error);
+}
+
+/* ═══════════════════════════════════════════
+   REVIEW & SUBMIT
+═══════════════════════════════════════════ */
+.score-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+    margin-bottom: var(--wg-space-5);
+    padding: var(--wg-space-5) var(--wg-space-6);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-left: var(--wg-border-width-banner) solid var(--wg-red);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+}
+
+.score-card-label {
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.score-card-title {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
+
+.score-card-value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.score-card-num {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-page-title);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
+
+.score-card-of {
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+.review-dim,
+.review-other,
+.review-rec {
+    margin-bottom: var(--wg-space-4);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+    overflow: hidden;
+}
+
+.review-dim .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2);
+    padding: var(--wg-space-3) var(--wg-space-5);
+    background: var(--wg-surface-subtle);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+}
+
+.review-dim .head .name {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    min-width: 0;
+}
+
+.review-dim .head .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--wg-gray);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-white);
+}
+
+.review-dim .head .ttl {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    overflow-wrap: break-word;
+}
+
+.review-dim .head .mean {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+}
+
+.review-dim .head .mean .lab {
+    margin-right: 6px;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--wg-text-muted);
+}
+
+.review-q {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-2) var(--wg-space-3);
+    padding: var(--wg-space-3) var(--wg-space-5);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    font-size: var(--wg-font-size-label);
+}
+
+.review-dim .head + .review-q { border-top: none; }
+
+.review-q .qx {
+    flex: 1 1 220px;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.qx-id {
+    margin-right: var(--wg-space-1);
+    font-weight: var(--wg-weight-bold);
+}
+
+.review-q .rx {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 6px;
+    font-weight: var(--wg-weight-semibold);
+}
+
+.review-q-ladder {
+    flex: 1 1 100%;
+    font-size: var(--wg-font-size-caption);
+    font-style: italic;
+    color: var(--wg-success);
+}
+
+/* Rating pips (classes from JS) */
+.pip {
+    padding: 2px var(--wg-space-2);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-text-muted);
+}
+
+.pip-r5 { background: var(--wg-success-bg); color: var(--wg-success);      border-color: var(--wg-success); }
+.pip-r4 { background: var(--wg-info-bg);    color: var(--wg-info-text);    border-color: var(--wg-info); }
+.pip-r3 { background: var(--wg-surface-subtle); color: var(--wg-gray);    border-color: var(--wg-input-border); }
+.pip-r2 { background: var(--wg-warning-bg); color: var(--wg-warning-text); border-color: var(--wg-warning); }
+.pip-r1 { background: var(--wg-error-bg);   color: var(--wg-error);        border-color: var(--wg-error); }
+.pip-empty { border-style: dashed; font-style: italic; }
+
+.review-q-comment {
+    flex: 1 1 100%;
+    margin-top: var(--wg-space-1);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    background: var(--wg-surface-subtle);
+    border-left: 3px solid var(--wg-input-border);
+    border-radius: 0 var(--wg-radius-sm) var(--wg-radius-sm) 0;
+    font-size: var(--wg-font-size-label);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.review-q-comment ul { margin: var(--wg-space-1) 0 0; padding-left: var(--wg-space-5); }
+
+.review-other,
+.review-rec {
+    padding: var(--wg-space-4) var(--wg-space-5);
+}
+
+.review-other h5,
+.review-rec h5 {
+    margin: 0 0 var(--wg-space-2);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+}
+
+.review-other ul {
+    margin: 0;
+    padding-left: var(--wg-space-5);
+    font-size: var(--wg-font-size-label);
+}
+
+.review-other li { margin-bottom: var(--wg-space-1); overflow-wrap: break-word; }
+
+.review-rec-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+}
+
+.review-rec-head h5 { margin: 0; }
+
+.recvalue-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--wg-space-3);
+}
+
+/* FIX: JS sets "recval-yes" / "recval-no"; the old CSS styled
+   "recvalue-yes" / "recvalue-no", so the value was never colored */
+.recval     { font-weight: var(--wg-weight-bold); }
+.recval-yes { color: var(--wg-success); }
+.recval-no  { color: var(--wg-error); }
+
+.strength {
+    padding: var(--wg-padding-tag);
+    background: var(--wg-surface-subtle);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-badge);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+}
+
+/* ═══════════════════════════════════════════
+   VALIDATION MESSAGE
+═══════════════════════════════════════════ */
+.validate {
+    margin: 0 var(--rf-pad-x) var(--wg-space-3);
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER — sticky, same buttons as the Validator form
+═══════════════════════════════════════════ */
+/* Sticky: stays pinned to the bottom of whatever scrolls the form —
+   the review panel in split view, the page when the RFI is closed.
+   Kept on ONE row (Previous left, step + Save draft + Next right). */
+.footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-3) var(--rf-pad-x);
+    background: var(--wg-white);
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    box-shadow: 0 -3px 10px rgba(65, 64, 65, 0.08);   /* rgb of --wg-gray */
+    border-radius: 0 0 var(--wg-radius-card) var(--wg-radius-card);
+}
+
+.footer .left,
+.footer .right {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: var(--wg-space-2);
+    min-width: 0;
+}
+
+.step-here {
+    margin-right: var(--wg-space-2);
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
+    white-space: nowrap;
+}
+
+/* The site theme styles plain <button>/.btn globally (bigger font and
+   padding leak into this component on Aura sites). These more specific
+   rules pin the footer buttons to the portal's compact size. */
+.form-wrap .btn {
+    height: var(--wg-control-height);
+    min-height: 0;
+    margin: 0;
+    padding: 0 var(--wg-space-4);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    box-shadow: none;
+}
+
+.form-wrap .btn-sm {
+    height: 28px;
+    padding: 0 var(--wg-space-3);
+    font-size: var(--wg-font-size-caption);
+}
+
+/* Button classes set in HTML/JS, drawn with the shared button look */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wg-space-2);
+    height: var(--wg-control-height);
+    padding: 0 var(--wg-space-4);
+    border: var(--wg-border-width-thin) solid transparent;
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Secondary = neutral outline (Previous, Save draft) */
+.btn-secondary {
+    background: var(--wg-white);
+    border-color: var(--wg-input-border);
+    color: var(--wg-gray);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--wg-surface-subtle);
+    border-color: var(--wg-text-muted);
+}
+
+/* Primary = brand red (Next category, Submit review) */
+.btn-primary,
+.btn-submit {
+    background: var(--wg-red);
+    border-color: var(--wg-red);
+    color: var(--wg-white);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-submit:hover:not(:disabled) {
+    background: var(--wg-red-deep);
+    border-color: var(--wg-red-deep);
+}
+
+.btn-sm {
+    height: 28px;
+    padding: 0 var(--wg-space-3);
+    font-size: var(--wg-font-size-caption);
+}
+
+/* ═══════════════════════════════════════════
+   SUBMITTED STATE
+═══════════════════════════════════════════ */
+.done-state {
+    margin: var(--wg-space-6) var(--rf-pad-x);
+    padding: var(--wg-space-16) var(--wg-space-6) var(--wg-space-8);
+    background: var(--wg-white);
+    border: var(--wg-border-width-thin) solid var(--wg-border);
+    border-radius: var(--wg-radius-card);
+    box-shadow: var(--wg-shadow-card);
+    text-align: center;
+}
+
+.done-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: var(--wg-space-4);
+    border-radius: 50%;
+    background: var(--wg-success);
+    --slds-c-icon-color-foreground-default: var(--wg-white);
+}
+
+.done-state h3 {
+    margin: 0 0 var(--wg-space-2);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-section-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
+}
+
+.done-state p {
+    max-width: 60ch;
+    margin: 0 auto var(--wg-space-5);
+    color: var(--wg-text-muted);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CONTAINER-RESPONSIVE LAYOUT
-   Same breakpoints as the Validator form: 820 / 620 / 440.
-   Reacts to the PANEL width (split-pane divider), not the viewport.
+   CONTAINER-RESPONSIVE LAYOUT (panel width, not viewport)
+   :host can't be targeted by its own container query, so the padding
+   variable is overridden on the elements that use it.
 ═══════════════════════════════════════════════════════════════════ */
 @container (max-width: 820px) {
-    :host { --wg-gutter: 20px; }
+    .formhead, .body, .footer, .validate, .done-state { --rf-pad-x: var(--wg-space-4); }
 
-    .form-title { font-size: 1.4rem; }
-    .step-intro,
-    .subq, .sw-block, .finalrec { padding: 1.4rem 1.25rem; }
-    .dim-tools, .rubric-panel   { margin-left: 0; }
+    .step-intro, .subq, .sw-block, .finalrec { padding: var(--wg-space-5) var(--wg-space-4); }
+    .dim-tools, .rubric-panel { margin-left: 0; }
 
     .rubric-grid { flex-direction: column; }
-    .rubric-grid .col { border-right: 0; border-bottom: 1px solid var(--wg-rule); }
+    .rubric-grid .col { border-right: 0; border-bottom: var(--wg-border-width-thin) solid var(--wg-border); }
     .rubric-grid .col:last-child { border-bottom: 0; }
 
     .checkbox-grid { grid-template-columns: 1fr; }
 }
 
 @container (max-width: 620px) {
-    :host { --wg-gutter: 14px; }
+    .formhead, .body, .footer, .validate, .done-state { --rf-pad-x: var(--wg-space-3); }
 
-    .formhead    { padding-top: 0.85rem; }
-    .form-title  { font-size: 1.25rem; margin-bottom: 0.5rem; }
-    .body        { padding-top: 1rem; }
-    .dim-head    { gap: 0.7rem; }
-    .dim-num     { width: 28px; height: 28px; font-size: 0.8rem; }
-    .dim-title h3{ font-size: 1rem; }
+    .form-title   { font-size: var(--wg-font-size-sub-heading); }
+    .dim-title h3 { font-size: var(--wg-font-size-sub-heading); }
+    .dim-num      { width: 28px; height: 28px; font-size: var(--wg-font-size-caption); }
 
-    .step-intro,
-    .subq, .sw-block, .finalrec { padding: 1.1rem 0.9rem; margin-bottom: 1rem; }
-    .path      { padding: 0.9rem; }
-    .subq-top  { flex-wrap: wrap; gap: 8px; }
+    .step-intro, .subq, .sw-block, .finalrec { padding: var(--wg-space-4) var(--wg-space-3); margin-bottom: var(--wg-space-4); }
+    .path     { padding: var(--wg-space-3); }
+    .subq-top { flex-wrap: wrap; }
 
-    .segmented button { min-width: 64px; padding: 0.5rem; font-size: 11.5px; }
-    .segmented button .num { font-size: var(--wg-font-size-body); }
+    .segmented button { min-width: 64px; padding: var(--wg-space-2); }
 
     .progress span { width: 16px; }
 
-    .footer .right { width: 100%; justify-content: flex-end; }
-    .step-here     { margin-right: auto; }
+    /* Stay on one row; the step count is already shown in the header */
+    .step-here { display: none; }
 }
 
 @container (max-width: 440px) {
     .segmented button { min-width: 56px; }
-    .yesno button { padding: 0.5rem 0.8rem; font-size: 0.75rem; }
-    .btn { padding: 0 10px; font-size: 11.5px; }
 
-    .footer .right { flex-direction: column; align-items: stretch; }
-    .footer .right .btn { width: 100%; }
-    .footer .left  { width: 100%; }
-    .footer .left .btn { width: 100%; }
-    .step-here { margin: 0 0 4px; text-align: center; width: 100%; }
+    /* Very narrow: compact buttons, still one row */
+    .form-wrap .btn { padding: 0 var(--wg-space-2); font-size: var(--wg-font-size-caption); }
+    .footer         { gap: var(--wg-space-2); }
 }
 
 /* Viewport fallback for true mobile devices */
 @media (max-width: 768px) {
-    .formhead, .body, .footer, .chrome { padding-left: 1rem; padding-right: 1rem; }
     .dim-tools, .rubric-panel { margin-left: 0; }
-    .progress span { width: 18px; }
-    .dim-num { width: 28px; height: 28px; font-size: 0.8rem; }
     .checkbox-grid { grid-template-columns: 1fr; }
+}
+
+/* ══ MOTION ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .save-saving::before { animation: none; }
+
+    .progress span,
+    .btn-soft,
+    .btn-soft .chev,
+    .segmented button,
+    .yesno button,
+    .checkbox-row,
+    .lwc-textarea,
+    .btn { transition: none; }
 }

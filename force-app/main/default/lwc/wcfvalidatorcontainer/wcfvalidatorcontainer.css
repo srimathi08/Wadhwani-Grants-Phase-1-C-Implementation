@@ -1,410 +1,247 @@
 @import "c/commonStyleTheme";
+@import "c/wcfPortalUi";
 
-/* ── commonStyleTheme wiring notes ────────────────────────────────────
-   Reds: #A41E22 (stage badge bg, divider default) -> var(--wg-red-deep)
-   (#A3181D, closest by luminance); #c22428 (divider hover, brighter than
-   default) -> var(--wg-red) (#BF2026) — same relative direction (hover
-   lighter than default) preserved with the two brand red tokens.
-   Neutrals: #ffffff -> var(--wg-white); #0c0c0c/#000000 (near-black
-   text) -> var(--wg-gray); #f3f2f2/#dddbda/#fafaf9/#e5e5e5/#f5f4f0/
-   #f0efeb (light-neutral washes/borders, no brand-color identity) ->
-   var(--wg-border), same reuse policy applied throughout this batch;
-   #3e3e3c -> var(--wg-gray); #706e6b -> var(--wg-text-muted).
-   Scrollbar thumb (#c8c6c0 / hover #a8a6a0) needed two visually distinct
-   neutrals against the var(--wg-border) track, so it's tokenized to
-   var(--wg-input-border) default / var(--wg-text-muted) on hover —
-   darker on hover, same convention as everywhere else.
-   Real bug found and fixed: .wcf-back-btn was styled for a dark-theme
-   context that doesn't exist here — border:#444 and tan text #c4baa9
-   sitting on the white topbar (.wcf-split-topbar background is
-   #ffffff), which reads as barely-visible/washed-out. Restyled as a
-   proper ghost-button: white bg, red border + red text, error-bg tint
-   on hover — matching the same fix already applied to wcfDynamicForm's
-   "Previous" button, which had the identical disabled-looking problem.
-   .wcf-panel-header-right's #fdf5f5 tint -> var(--wg-error-bg), a
-   near-exact match.
-   Blues (filter banner + clear-filter control, all one blue family) ->
-   var(--wg-info)/var(--wg-info-bg)/var(--wg-info-text), the same
-   info-banner mapping used for wcfApplicationFaqModal's contact footer.
-   No font-family existed anywhere in this file (inherits host page
-   default) — added var(--wg-font-heading) on button/badge/title-ish
-   text and var(--wg-font-body) elsewhere, same split used across the
-   rest of this codebase. Non-scale font sizes bumped to the nearest
-   defined tier (12.5/13.5px -> 12/14px picked by legibility role, not
-   pure distance; 10.5px/11px -> 12px caption, same "smallest defined
-   tier" call made for wcfDynamicForm/wcfApplicantWelcomeDashboard's
-   sub-12px leftovers). font-weight: 500 -> var(--wg-weight-semibold)
-   (nearest of the three defined weights).
-   .wcf-back-btn/.wcf-clear-filter/.wcf-preview-expand (real buttons)
-   squared to border-radius: 0. .wcf-stage-badge kept its pill shape
-   (var(--wg-radius-badge)) since it's a status tag, not a button — the
-   square-button decision applies to clickable buttons only, same
-   distinction already made for wcfPortalSidebar's badges.
-   Also replaced the sole native ShowToastEvent call (the "Validator
-   Record Validated" success toast in handleSealComplete) with the same
-   in-component showBanner()/.wg-toast-banner pattern built for
-   wcfDynamicForm, for the same reason: native toasts render outside
-   the shadow tree and can't be brand-styled at all.
-   ──────────────────────────────────────────────────────────────────── */
-
-/* ══════════════════════════════════════════════════════
-   WCF VALIDATOR CONTAINER — wcfValidatorContainer.css
-   Key fixes:
-   - Left panel wider (55%) so label+number never wraps
-   - Full viewport height, no side gaps
-   - Proper overflow so inner panels scroll independently
-   - Real bug found and fixed: this file never styled :host at all, so
-     the <c-wcfvalidatorcontainer> custom element rendered with the
-     browser's default display:inline. On the Experience Cloud page
-     region it's dropped into (this component is placed directly on a
-     page, not nested inside another LWC), an inline-level custom
-     element doesn't reliably participate as a full-width block/flex
-     item, so .wcf-split-shell's own width:100% had nothing correctly
-     sized to fill — the component rendered narrower than the page,
-     with a gap/scrollbar instead of covering full width. Same root
-     cause wcfApproverContainer already hit and fixed with its own
-     :host rule; applied here too.
-══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   wcfValidatorContainer — list view + split-pane shell
+   Visuals come from commonStyleTheme + wcfPortalUi.
+   This file holds the split-pane layout only. No hex values.
+   ═══════════════════════════════════════════════════════════════ */
 
 :host {
     display: block;
     width: 100%;
+
+    /* Height of the site header above this component.
+       The split pane fills the rest of the viewport.
+       Adjust this ONE value if the pane is too tall/short. */
+    --wcf-split-offset: 60px;
 }
 
-/* ── Shell fills full viewport width ── */
+/* ══ LIST MODE ═════════════════════════════════════════════════ */
+.wcf-list-mode {
+    background: var(--wg-surface-page);
+}
+
+.wcf-filter-banner {
+    align-items: center;
+    margin: var(--wg-space-4) var(--wg-gutter) 0;
+    --slds-c-icon-color-foreground-default: var(--wg-info);
+}
+
+/* ══ SPLIT SHELL ═══════════════════════════════════════════════ */
 .wcf-split-shell {
-    display       : flex;
+    display: flex;
     flex-direction: column;
-    height        : calc(100vh - 60px);
-    width         : 100%;
-    background    : var(--wg-border);
-    overflow      : hidden;
-    border        : none;
-    border-radius : 0;
-    box-sizing    : border-box;
-    font-family   : var(--wg-font-body);
+    width: 100%;
+    height: calc(100vh - var(--wcf-split-offset));
+    overflow: hidden;
+    background: var(--wg-surface-page);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    color: var(--wg-gray);
+    box-sizing: border-box;
 }
 
 /* ── Top bar ── */
 .wcf-split-topbar {
-    display    : flex;
+    display: flex;
     align-items: center;
-    gap        : 14px;
-    padding    : 10px 20px;
-    background : var(--wg-white);
-    color      : var(--wg-gray);
-    border-bottom: 1px solid var(--wg-white);
+    flex-wrap: wrap;
+    gap: var(--wg-space-4);
     flex-shrink: 0;
-    flex-wrap  : wrap;
-    box-sizing : border-box;
+    padding: var(--wg-space-3) var(--wg-space-6);
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    box-sizing: border-box;
 }
-
-.wcf-back-btn {
-    display    : flex;
-    align-items: center;
-    gap        : 6px;
-    background : var(--wg-white);
-    border     : 1.5px solid var(--wg-red);
-    color      : var(--wg-red);
-    border-radius: 0;
-    padding    : 6px 12px;
-    cursor     : pointer;
-    font-family: var(--wg-font-heading);
-    font-size  : var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-semibold);
-    transition : background .15s, color .15s;
-    white-space: nowrap;
-}
-.wcf-back-btn:hover { background: var(--wg-error-bg); }
 
 .wcf-split-title {
-    display    : flex;
+    display: flex;
     align-items: center;
-    gap        : 8px;
-    font-family: var(--wg-font-body);
-    font-size  : var(--wg-font-size-body);
+    gap: var(--wg-space-2);
+    flex: 1;
+    min-width: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
     font-weight: var(--wg-weight-semibold);
-    color      : var(--wg-gray);
-    flex       : 1;
-    min-width  : 0;
-    white-space: nowrap;
-    overflow   : hidden;
+    color: var(--wg-gray);
+    --slds-c-icon-color-foreground-default: var(--wg-red);
+}
+
+.wcf-split-title-text {
+    min-width: 0;
+    overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.wcf-stage-badge {
-    background   : var(--wg-red);
-    color        : var(--wg-white);
-    font-family  : var(--wg-font-heading);
-    font-size    : var(--wg-font-size-caption);
-    font-weight  : var(--wg-weight-bold);
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    padding      : 3px 10px;
-    border-radius: var(--wg-radius-badge);
-    white-space  : nowrap;
-    flex-shrink  : 0;
+.wcf-split-title strong {
+    font-weight: var(--wg-weight-bold);
 }
 
-/* ── Split body ── */
+/* ── Body ── */
 .wcf-split-body {
-    display   : flex;
-    flex      : 1;
-    overflow  : hidden;
+    display: flex;
+    flex: 1;
     min-height: 0;
-    width     : 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
-/* ── LEFT panel: 55% — wider to prevent label wrapping ── */
-.wcf-left-panel {
-    display       : flex;
-    flex-direction: column;
-    width         : 55%;
-    flex-shrink   : 0;
-    min-width     : 0;
-    overflow      : hidden;
-    border-right  : 1px solid var(--wg-border);
-}
-
-/* ── RIGHT panel: fills remaining 45% ── */
+/* ── Panels ── */
+.wcf-left-panel,
 .wcf-right-panel {
-    display       : flex;
+    display: flex;
     flex-direction: column;
-    flex          : 1;
-    min-width     : 0;
-    overflow      : hidden;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--wg-white);
+    transition: flex-basis 0.15s ease, max-width 0.15s ease;
+}
+
+.wcf-left-panel {
+    width: 55%;
+    min-width: 280px;
+    flex-shrink: 0;
+}
+
+.wcf-right-panel {
+    flex: 1;
 }
 
 /* ── Panel header strip ── */
 .wcf-panel-header {
-    display      : flex;
-    align-items  : center;
-    gap          : 8px;
-    padding      : 8px 14px;
-    background   : var(--wg-border);
-    border-bottom: 1px solid var(--wg-border);
-    font-family  : var(--wg-font-heading);
-    font-size    : var(--wg-font-size-label);
-    font-weight  : var(--wg-weight-bold);
-    color        : var(--wg-gray);
-    flex-shrink  : 0;
-    box-sizing   : border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: var(--wg-space-2) var(--wg-space-4);
+    background: var(--wg-white);
+    border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-gray);
+    box-sizing: border-box;
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
 }
-.wcf-panel-header-right { background: var(--wg-error-bg); }
 
 .wcf-panel-hint {
     margin-left: auto;
     font-family: var(--wg-font-body);
-    font-size  : var(--wg-font-size-caption);
+    font-size: var(--wg-font-size-caption);
     font-weight: var(--wg-weight-regular);
-    color      : var(--wg-text-muted);
-    font-style : italic;
+    color: var(--wg-text-muted);
     white-space: nowrap;
 }
 
-/* ── Panel scrollable body ── */
-.wcf-panel-body {
-    flex      : 1;
-    min-height: 0;
-    background: var(--wg-border);
+.wcf-pane-toggle {
+    flex-shrink: 0;
 }
+
+/* ── Panel scroll body ── */
+.wcf-panel-body {
+    flex: 1;
+    min-height: 0;
+    background: var(--wg-surface-page);
+}
+
 .wcf-panel-scroll {
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-/* ── Scrollbar styling (optional polish) ── */
-.wcf-panel-scroll::-webkit-scrollbar        { width: 6px; }
-.wcf-panel-scroll::-webkit-scrollbar-track  { background: var(--wg-border); }
-.wcf-panel-scroll::-webkit-scrollbar-thumb  { background: var(--wg-input-border); border-radius: 3px; }
+.wcf-panel-scroll::-webkit-scrollbar       { width: 8px; }
+.wcf-panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.wcf-panel-scroll::-webkit-scrollbar-thumb {
+    background: var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+}
 .wcf-panel-scroll::-webkit-scrollbar-thumb:hover { background: var(--wg-text-muted); }
 
-/* ══ RESPONSIVE: stack vertically on narrow screens ══ */
-@media (max-width: 860px) {
-    .wcf-split-shell { height: auto; }
-    .wcf-split-body  { flex-direction: column; }
-    .wcf-left-panel  { width: 100%; border-right: none; border-bottom: 2px solid var(--wg-border); max-height: 50vh; }
-    .wcf-right-panel { width: 100%; }
+/* ── Draggable divider — neutral at rest, brand red on hover ── */
+.wcf-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 6px;
+    background: var(--wg-border);
+    cursor: col-resize;
+    position: relative;
+    z-index: 10;
+    transition: background 0.15s ease;
 }
 
-/* ── Draggable divider ── */
-.wcf-divider {
-    display        : flex;
-    align-items    : center;
-    justify-content: center;
-    width          : 6px;
-    flex-shrink    : 0;
-    background     : var(--wg-red-deep);
-    cursor         : col-resize;
-    position       : relative;
-    z-index        : 10;
-    transition     : background .15s;
+.wcf-divider:hover {
+    background: var(--wg-red);
 }
-.wcf-divider:hover { background: var(--wg-red); }
 
 .wcf-divider-handle {
-    width        : 2px;
-    height       : 32px;
-    background   : rgba(255,255,255,0.45);
+    width: 2px;
+    height: 32px;
+    background: var(--wg-input-border);
     border-radius: 2px;
     pointer-events: none;
 }
 
-/* ── LEFT panel: remove hard max-width so drag works ── */
-.wcf-left-panel {
-    width      : 55%;
-    min-width  : 280px;
-    flex-shrink: 0;
-}
-.wcf-preview-toggle {
-    margin-left: auto;
-}
-
-/* FIXED: was position:fixed, floating the button off in the corner.
-   Now it's a normal inline flex item inside .wcf-panel-header-right. */
-.wcf-preview-expand {
+.wcf-divider:hover .wcf-divider-handle {
     background: var(--wg-white);
-    border-radius: 0;
-    flex-shrink: 0;
 }
 
-.wcf-panel-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.wcf-panel-header-right {
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-}
-
-.wcf-filter-banner {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--wg-info-bg);
-    border: 1px solid var(--wg-info);
-    border-radius: var(--wg-radius-md);
-    padding: 10px 16px;
-    margin: 12px 16px;
-    font-family: var(--wg-font-body);
-    font-size: var(--wg-font-size-body);
-    color: var(--wg-info-text);
-}
-
-.wcf-filter-banner lightning-icon {
-    color: var(--wg-info);
-    flex-shrink: 0;
-}
-
-.wcf-filter-banner span {
-    flex: 1;
-}
-
-.wcf-filter-banner strong {
-    color: var(--wg-info-text);
-    font-weight: var(--wg-weight-semibold);
-}
-
-.wcf-clear-filter {
-    background: var(--wg-white);
-    border: 1px solid var(--wg-info);
-    border-radius: 0;
-    color: var(--wg-info);
-    font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption);
-    font-weight: var(--wg-weight-semibold);
-    padding: 4px 12px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    white-space: nowrap;
-}
-
-.wcf-clear-filter:hover {
-    background: var(--wg-info);
-    color: var(--wg-white);
-    border-color: var(--wg-info);
-}
-
-/* ── Collapsible pane behavior (mirrors approver container) ── */
-.wcf-left-panel,
-.wcf-right-panel {
-    transition: flex-basis 0.15s ease, max-width 0.15s ease;
-}
-
+/* ══ COLLAPSIBLE PANES (never both collapsed) ══════════════════ */
 .wcf-left-panel.wcf-pane-collapsed,
 .wcf-right-panel.wcf-pane-collapsed {
     flex: 0 0 44px !important;
+    width: 44px !important;
     max-width: 44px !important;
     min-width: 44px !important;
     overflow: hidden;
+    border-right: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
-.wcf-split-body:has(.wcf-left-panel.wcf-pane-collapsed) .wcf-right-panel:not(.wcf-pane-collapsed) {
-    flex: 1 1 auto !important;
-    max-width: none !important;
-}
-
+.wcf-split-body:has(.wcf-left-panel.wcf-pane-collapsed) .wcf-right-panel:not(.wcf-pane-collapsed),
 .wcf-split-body:has(.wcf-right-panel.wcf-pane-collapsed) .wcf-left-panel:not(.wcf-pane-collapsed) {
     flex: 1 1 auto !important;
+    width: auto !important;
     max-width: none !important;
 }
 
 .wcf-pane-collapsed .wcf-panel-header {
     flex-direction: column;
-    padding: 12px 4px;
+    padding: var(--wg-space-3) var(--wg-space-1);
+    border-bottom: none;
 }
 
 .wcf-pane-collapsed .wcf-panel-label-text {
     display: none;
 }
 
-/* ── Toast banner (replaces native ShowToastEvent) ─────────────────
-   Same .wg-toast-banner pattern built for wcfDynamicForm, reusing the
-   shared .error-banner/.warning-banner/.success-banner/.info-banner
-   tinted-bg/left-accent classes from commonStyleTheme. ── */
-.wg-toast-banner {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99998;
-    width: min(520px, calc(100vw - 32px));
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+/* ══ RESPONSIVE — stack panels on narrow screens ═══════════════ */
+@media (max-width: 860px) {
+    .wcf-split-shell { height: auto; }
+
+    .wcf-split-body { flex-direction: column; }
+
+    .wcf-left-panel {
+        width: 100% !important;   /* overrides any width left by dragging */
+        max-height: 50vh;
+        border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
+    }
+
+    .wcf-right-panel { width: 100%; }
+
+    .wcf-divider { display: none; }
+
+    .wcf-split-topbar { padding: var(--wg-space-3) var(--wg-space-4); }
 }
-.wg-toast-banner .wg-toast-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-.wg-toast-banner .wg-toast-title {
-    font-family: var(--wg-font-heading);
-    font-weight: var(--wg-weight-bold);
-}
-.wg-toast-banner svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-}
-.wg-toast-banner .wg-toast-close {
-    flex-shrink: 0;
-    margin-left: auto;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    color: inherit;
-    opacity: 0.65;
-}
-.wg-toast-banner .wg-toast-close:hover {
-    opacity: 1;
-}
-@media (max-width: 600px) {
-    .wg-toast-banner {
-        top: 10px;
-        width: calc(100vw - 20px);
+
+/* ══ MOTION ════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .wcf-left-panel,
+    .wcf-right-panel,
+    .wcf-divider {
+        transition: none;
     }
 }

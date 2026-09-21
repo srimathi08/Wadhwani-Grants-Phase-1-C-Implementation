@@ -1,11 +1,10 @@
 import { LightningElement, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { CurrentPageReference } from 'lightning/navigation';
-// ── NEW: resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
+// ── resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
 import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getValidatedProposals  from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
 import getReviewStatusMap     from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
-
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
 
 const PAGE_SIZE_OPTIONS = [
@@ -32,6 +31,30 @@ const STATUS_OPTIONS = [
 const VALID_REVIEW_FILTERS = ['total', 'reviewed', 'inProgress', 'notStarted', 'all',
     'flagged', 'rejected', 'returnedByApprover', 'acceptedApplications'];
 
+// ── Readable labels for every filter token (banner + tiles) ──────
+const FILTER_LABELS = {
+    total               : 'Validated Proposals',
+    reviewed            : 'Reviewed',
+    inProgress          : 'In Progress',
+    notStarted          : 'Not Started',
+    flagged             : 'Flagged',
+    rejected            : 'Rejected',
+    returnedByApprover  : 'Returned by Approver',
+    acceptedApplications: 'Accepted Applications'
+};
+
+// ── Summary tiles (order = display order) — same shared tile as the validator queue ──
+const SUMMARY_TILES = [
+    { id: 'total',                countGetter: 'totalCount',              tone: 'info' },
+    { id: 'notStarted',           countGetter: 'notStartedCount',         tone: 'neutral' },
+    { id: 'inProgress',           countGetter: 'inProgressCount',         tone: 'warning' },
+    { id: 'reviewed',             countGetter: 'reviewedCount',           tone: 'success' },
+    { id: 'returnedByApprover',   countGetter: 'returnedByApproverCount', tone: 'brand', alertWhenPositive: true },
+    { id: 'acceptedApplications', countGetter: 'acceptedCount',           tone: 'success' },
+    { id: 'flagged',              countGetter: 'flaggedCount',            tone: 'returned' },
+    { id: 'rejected',             countGetter: 'rejectedCount',           tone: 'error' }
+];
+
 export default class WcfProposalListView extends NavigationMixin(LightningElement) {
     @track proposals            = [];
     @track reviewStatusMap      = {};
@@ -40,16 +63,13 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     @track selectedTrack        = '';
     @track selectedStatus       = '';
     @track currentPage          = 1;
-    @track activeReviewFilter   = ''; // 'reviewed' | 'inProgress' | 'notStarted' | ''
+    @track activeReviewFilter   = '';
 
     // pageSize stored as string to match combobox option values.
-    // This prevents the "Select an Option" bug where a number (10)
-    // doesn't match the string option value ('10')
     @track pageSizeStr  = '10';
     @track sortField    = 'CreatedDate';
     @track sortAscending = false;
-    // ── add to @track state ──
-@track acceptedApplicationsMap = new Map();
+    @track acceptedApplicationsMap = new Map();
 
     pageSizeOptions = PAGE_SIZE_OPTIONS;
     trackOptions    = TRACK_OPTIONS;
@@ -58,24 +78,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     // ─────────────────────────────────────────────────────────────
     // SITE BASE PATH (environment-independent navigation)
     // ─────────────────────────────────────────────────────────────
-    // Hardcoding '/reviewersite/s/...' worked in sandbox only because the
-    // site's own base path there IS '/reviewersite/s' — Experience Cloud
-    // saw a URL that already started with the base path and left it alone.
-    // In production the base path is '/internal/s', so the same literal got
-    // prefixed => '/internal/s/reviewersite/s/review-forms' => "Invalid Page".
-    //
-    // @salesforce/community/basePath returns the correct prefix per org
-    // ('/reviewersite/s', '/internal/s', or '' in Lightning app context),
-    // so every URL below is built at runtime instead of being hardcoded.
     get sitePath() {
         return COMMUNITY_BASE_PATH || '';
     }
 
-    /**
-     * Build a site-relative URL.
-     * @param {string} page  page API/URL name, e.g. 'review-forms'
-     * @param {object} params optional query params (values are URI-encoded)
-     */
     _siteUrl(page, params) {
         const path  = String(page || '').replace(/^\/+/, '');
         let url     = `${this.sitePath}/${path}`;
@@ -89,50 +95,36 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         return url;
     }
 
-    // ── Read review filter from page state on EVERY navigation, not just mount ──
-    // Why: dashboard tiles navigate two different ways —
-    //   1. reviewSummary.js uses NavigationMixin standard__webPage with a literal
-    //      "?reviewFilter=xxx" query string.
-    //   2. ValidatorPortalHome.js uses comm__namedPage with state: { reviewFilter }.
-    // Neither of these reliably shows up in window.location.search at the time
-    // connectedCallback runs, especially on SPA navigation (no full page reload).
-    // CurrentPageReference is the supported way to read BOTH cases, and it re-fires
-    // whenever page reference state changes, so it also fixes the "navigate while
-    // already on this page" case that a one-time connectedCallback read can't catch.
+    // ── Read review filter from page state on EVERY navigation ──
     @wire(CurrentPageReference)
     setCurrentPageReference(pageRef) {
         if (!pageRef) return;
-
-        // comm__namedPage state lands in pageRef.state
-        // standard__webPage query params also land in pageRef.state on Experience Cloud
         const filter = pageRef.state?.reviewFilter || '';
 
         if (VALID_REVIEW_FILTERS.includes(filter)) {
             this.activeReviewFilter = filter === 'all' ? '' : filter;
         } else if (!filter) {
-            // No filter param present on this navigation — clear any previously active filter
-            // so navigating back to the plain list (e.g. via "View all") doesn't keep a stale filter.
             this.activeReviewFilter = '';
         }
-
         this.currentPage = 1;
     }
 
     connectedCallback() {
         this.loadData();
-      this.loadAcceptedApplications();  
+        this.loadAcceptedApplications();
     }
 
- async loadAcceptedApplications() {
-    try {
-        const rows = await getAcceptedApplicationsQueue();
-        const map = new Map();
-        (rows || []).forEach(r => map.set(r.applicationId, r.approverComment));
-        this.acceptedApplicationsMap = map;
-    } catch (e) {
-        console.error('Accepted applications error:', e);
+    async loadAcceptedApplications() {
+        try {
+            const rows = await getAcceptedApplicationsQueue();
+            const map = new Map();
+            (rows || []).forEach(r => map.set(r.applicationId, r.approverComment));
+            this.acceptedApplicationsMap = map;
+        } catch (e) {
+            console.error('Accepted applications error:', e);
+        }
     }
-}
+
     async loadData() {
         this.isLoading = true;
         try {
@@ -142,7 +134,6 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             ]);
             this.proposals       = proposals;
             this.reviewStatusMap = reviewMap || {};
-            
         } catch (e) {
             console.error('Error loading proposals:', e);
         } finally {
@@ -150,51 +141,49 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         }
     }
 
-    // ── pageSize as number for math ──────────────────────────────
     get pageSize() {
         return parseInt(this.pageSizeStr, 10);
     }
 
-    // ── Filtering & Sorting ──────────────────────────────────────
-
+    // ── Filtering & Sorting (unchanged) ──────────────────────────
     get filteredProposals() {
         let result = [...this.proposals];
 
-  if (this.activeReviewFilter) {
-    result = result.filter(p => {
-        const info = this.reviewStatusMap[p.Id] || {};
+        if (this.activeReviewFilter) {
+            result = result.filter(p => {
+                const info = this.reviewStatusMap[p.Id] || {};
 
-        if (this.activeReviewFilter === 'total') {
-            return this._isEligibleForQueue(p);
+                if (this.activeReviewFilter === 'total') {
+                    return this._isEligibleForQueue(p);
+                }
+                if (this.activeReviewFilter === 'reviewed') {
+                    return this._isEligibleForQueue(p) &&
+                           (info.isSubmitted || info.status === 'Review Submitted');
+                }
+                if (this.activeReviewFilter === 'inProgress') {
+                    return this._isEligibleForQueue(p) &&
+                           !info.isSubmitted && info.status === 'In Progress';
+                }
+                if (this.activeReviewFilter === 'notStarted') {
+                    return this._isEligibleForQueue(p) &&
+                           !info.isSubmitted && info.status !== 'In Progress';
+                }
+                if (this.activeReviewFilter === 'flagged') {
+                    return !!info.isFlagged;
+                }
+                if (this.activeReviewFilter === 'rejected') {
+                    return p.Status === 'Reviewer Rejected';
+                }
+                if (this.activeReviewFilter === 'returnedByApprover') {
+                    return p.Status === 'Returned by Approver';
+                }
+                if (this.activeReviewFilter === 'acceptedApplications') {
+                    return this.acceptedApplicationsMap.has(p.Id);
+                }
+                return true;
+            });
         }
-        if (this.activeReviewFilter === 'reviewed') {
-            return this._isEligibleForQueue(p) &&
-                   (info.isSubmitted || info.status === 'Review Submitted');
-        }
-        if (this.activeReviewFilter === 'inProgress') {
-            return this._isEligibleForQueue(p) &&
-                   !info.isSubmitted && info.status === 'In Progress';
-        }
-        if (this.activeReviewFilter === 'notStarted') {
-            return this._isEligibleForQueue(p) &&
-                   !info.isSubmitted && info.status !== 'In Progress';
-        }
-        if (this.activeReviewFilter === 'flagged') {
-            return !!info.isFlagged;
-        }
-        if (this.activeReviewFilter === 'rejected') {
-            return p.Status === 'Reviewer Rejected' || info.status === 'Reviewer Rejected';
-        }
-        if (this.activeReviewFilter === 'returnedByApprover') {
-            return p.Status === 'Returned by Approver';
-        }
-        if (this.activeReviewFilter === 'acceptedApplications') {
-            return this.acceptedApplicationsMap.has(p.Id);
-        }
-        return true;
-    });
-}
-        // ── Search ──────────────────────────────────────────────
+
         if (this.searchTerm) {
             const term = this.searchTerm.toLowerCase();
             result = result.filter(p =>
@@ -205,7 +194,6 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             );
         }
 
-        // ── Track filter ─────────────────────────────────────────
         if (this.selectedTrack) {
             const t = this.selectedTrack.toLowerCase();
             result = result.filter(p => {
@@ -220,12 +208,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             });
         }
 
-        // ── Status filter ────────────────────────────────────────
         if (this.selectedStatus) {
             result = result.filter(p => p.Status === this.selectedStatus);
         }
 
-        // ── Sort ─────────────────────────────────────────────────
         result.sort((a, b) => {
             let valA = a[this.sortField] || '';
             let valB = b[this.sortField] || '';
@@ -238,79 +224,100 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     }
 
     get filteredCount() { return this.filteredProposals.length; }
-  // ── Shared eligibility rule — MUST match every summary tile getter below ──
-_isEligibleForQueue(p) {
-    const info = this.reviewStatusMap[p.Id] || {};
-    return !info.isFlagged &&
-           p.Status !== 'Reviewer Rejected' &&
-           p.Status !== 'Returned by Approver' &&
-           info.status !== 'Reviewer Rejected';
-}
 
-  get totalCount() {
-    return this.proposals.length;
-}
+    // ── Shared eligibility rule — MUST match every summary tile getter below ──
+    _isEligibleForQueue(p) {
+        const info = this.reviewStatusMap[p.Id] || {};
+        return !info.isFlagged &&
+               p.Status !== 'Reviewer Rejected' &&
+               p.Status !== 'Returned by Approver';
+    }
 
-get validatedProposalsCount() {
-    return this.proposals.filter(p => this._isEligibleForQueue(p)).length;
-}
+    get totalCount() {
+        return this.proposals.filter(p => this._isEligibleForQueue(p)).length;
+    }
     get hasProposals()  { return this.filteredCount > 0; }
 
     // ── Summary counters (always based on ALL proposals, not filtered) ──
-    // These mirror the ReviewSummaryController counts exactly
-get reviewedCount() {
-    return this.proposals.filter(p => {
-        if (!this._isEligibleForQueue(p)) return false;
-        const info = this.reviewStatusMap[p.Id] || {};
-        return info.isSubmitted || info.status === 'Review Submitted';
-    }).length;
-}
+    get reviewedCount() {
+        return this.proposals.filter(p => {
+            if (!this._isEligibleForQueue(p)) return false;
+            const info = this.reviewStatusMap[p.Id] || {};
+            return info.isSubmitted || info.status === 'Review Submitted';
+        }).length;
+    }
 
+    get inProgressCount() {
+        return this.proposals.filter(p => {
+            if (!this._isEligibleForQueue(p)) return false;
+            const info = this.reviewStatusMap[p.Id] || {};
+            return !info.isSubmitted && info.status === 'In Progress';
+        }).length;
+    }
 
-get inProgressCount() {
-    return this.proposals.filter(p => {
-        if (!this._isEligibleForQueue(p)) return false;
-        const info = this.reviewStatusMap[p.Id] || {};
-        return !info.isSubmitted && info.status === 'In Progress';
-    }).length;
-}
+    get notStartedCount() {
+        return this.proposals.filter(p => {
+            if (!this._isEligibleForQueue(p)) return false;
+            const info = this.reviewStatusMap[p.Id] || {};
+            return !info.isSubmitted && info.status !== 'In Progress';
+        }).length;
+    }
 
-get notStartedCount() {
-    return this.proposals.filter(p => {
-        if (!this._isEligibleForQueue(p)) return false;
-        const info = this.reviewStatusMap[p.Id] || {};
-        return !info.isSubmitted && info.status !== 'In Progress';
-    }).length;
-}
+    get flaggedCount() {
+        return this.proposals.filter(p => !!(this.reviewStatusMap[p.Id] || {}).isFlagged).length;
+    }
 
-get flaggedCount() {
-    return this.proposals.filter(p => {
-        const info = this.reviewStatusMap[p.Id] || {};
-        return !!info.isFlagged;
-    }).length;
-}
+    get rejectedCount() {
+        return this.proposals.filter(p => p.Status === 'Reviewer Rejected').length;
+    }
 
-get rejectedCount() {
-    return this.proposals.filter(p => {
-        const info = this.reviewStatusMap[p.Id] || {};
-        return p.Status === 'Reviewer Rejected' || info.status === 'Reviewer Rejected';
-    }).length;
-}
-    // ── Active filter label (shown in UI when filter is active) ──
+    // NEW (display only): same rules the existing filters already use,
+    // so the dashboard's "Returned by Approver" / "Accepted" tiles now
+    // have a matching tile and count here.
+    get returnedByApproverCount() {
+        return this.proposals.filter(p => p.Status === 'Returned by Approver').length;
+    }
+
+    get acceptedCount() {
+        return this.proposals.filter(p => this.acceptedApplicationsMap.has(p.Id)).length;
+    }
+
+    // ── Summary tiles for the template ───────────────────────────
+    get summaryItems() {
+        return SUMMARY_TILES.map(t => {
+            const count    = this[t.countGetter] || 0;
+            const isActive = this.activeReviewFilter === t.id;
+            const isAlert  = t.alertWhenPositive && count > 0;
+            return {
+                id      : t.id,
+                label   : FILTER_LABELS[t.id],
+                count,
+                pressed : isActive ? 'true' : 'false',
+                cls     : 'wg-stat'
+                          + (isAlert  ? ' wg-stat--alert'  : '')
+                          + (isActive ? ' wg-stat--active' : ''),
+                dotCls  : 'wg-stat-dot wg-stat-dot--' + t.tone
+            };
+        });
+    }
+
+    // ── Active filter label (banner) ─────────────────────────────
     get activeFilterLabel() {
-        if (this.activeReviewFilter === 'reviewed')   return 'Reviewed';
-        if (this.activeReviewFilter === 'inProgress') return 'In Progress';
-        if (this.activeReviewFilter === 'notStarted') return 'Not Started';
-         if (this.activeReviewFilter === 'flagged')    return 'Flagged';  // ADD
-         if (this.activeReviewFilter === 'rejected')
-    return 'Rejected';
-        return '';
+        return FILTER_LABELS[this.activeReviewFilter] || '';
     }
 
     get hasActiveReviewFilter() { return !!this.activeReviewFilter; }
 
-    // ── Pagination ───────────────────────────────────────────────
+    // FIX: was "{filteredCount} of {totalCount}" — totalCount excludes flagged,
+    // rejected and returned rows, so the unfiltered list could read "150 of 144".
+    get subtitle() {
+        const all   = (this.proposals || []).length;
+        const shown = this.filteredCount;
+        const noun  = all === 1 ? 'validated proposal' : 'validated proposals';
+        return shown === all ? `${all} ${noun}` : `Showing ${shown} of ${all} ${noun}`;
+    }
 
+    // ── Pagination ───────────────────────────────────────────────
     get totalPages()      { return Math.ceil(this.filteredCount / this.pageSize) || 1; }
     get paginationStart() { return (this.currentPage - 1) * this.pageSize + 1; }
     get paginationEnd()   { return Math.min(this.currentPage * this.pageSize, this.filteredCount); }
@@ -325,32 +332,40 @@ get rejectedCount() {
         let end   = Math.min(total, start + 4);
         if (end - start < 4) start = Math.max(1, end - 4);
         for (let i = start; i <= end; i++) {
-            pages.push({ num: i, btnClass: i === curr ? 'pg-btn pg-btn-active' : 'pg-btn' });
+            const active = i === curr;
+            pages.push({
+                num     : i,
+                btnClass: active ? 'wg-icon-btn wcf-pg-num wcf-pg-num--active' : 'wg-icon-btn wcf-pg-num',
+                current : active ? 'page' : 'false'
+            });
         }
         return pages;
     }
 
+    // Clicking the active tile again clears the filter (same as the validator queue)
     handleFilterClick(evt) {
-    const filter = evt.currentTarget.dataset.filter; // '' for Total, or reviewed/inProgress/notStarted/flagged
-    this.activeReviewFilter = filter;
-    this.currentPage = 1;
-}
-// ADD this new method
-_parseDate(dateStr) {
-    if (!dateStr) return null;
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-        return new Date(
-            parseInt(parts[0], 10),
-            parseInt(parts[1], 10) - 1,
-            parseInt(parts[2], 10)
-        );
+        const filter = evt.currentTarget.dataset.filter;
+        this.activeReviewFilter = this.activeReviewFilter === filter ? '' : filter;
+        this.currentPage = 1;
     }
-    return new Date(dateStr);
-}
+
+    _parseDate(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return new Date(
+                parseInt(parts[0], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[2], 10)
+            );
+        }
+        return new Date(dateStr);
+    }
+
     get paginatedProposals() {
         const start = (this.currentPage - 1) * this.pageSize;
-        
+        const SM = ' wg-btn-sm';
+
         return this.filteredProposals.slice(start, start + this.pageSize).map((p, idx) => {
 
             const reviewInfo   = this.reviewStatusMap[p.Id] || {};
@@ -359,7 +374,7 @@ _parseDate(dateStr) {
             const reviewId     = reviewInfo.reviewId || null;
             const dueDate      = reviewInfo.dueDate || null;
 
-            // ── Track badges (Multi-Track Aware) ─────────────────
+            // ── Track tags (same colors as every other portal screen) ──
             const rawTrack = p.Organizational_Area_s_for_Funding_Inves1__c || p.Organizational_Area_s_for_Funding_Inves__c || '';
             const rawLower = rawTrack.toLowerCase();
             const hasJF = rawLower.includes('fulfillment') || rawLower.includes('fulfilment') || rawLower.includes('jf') || rawLower.includes('both');
@@ -367,84 +382,80 @@ _parseDate(dateStr) {
             const hasLU = rawLower.includes('livelihood') || rawLower.includes('upliftment') || rawLower.includes('lu');
 
             const trackBadges = [];
-            if (hasJF) trackBadges.push({ code: 'JF', label: 'Job Fulfillment', badgeClass: 'track-badge track-jf' });
-            if (hasJC) trackBadges.push({ code: 'JC', label: 'Job Creation', badgeClass: 'track-badge track-jc' });
-            if (hasLU) trackBadges.push({ code: 'LU', label: 'Livelihood Upliftment', badgeClass: 'track-badge track-lu' });
+            if (hasJF) trackBadges.push({ code: 'JF', label: 'Job Fulfillment',       badgeClass: 'wg-tag wg-tag--info' });
+            if (hasJC) trackBadges.push({ code: 'JC', label: 'Job Creation',          badgeClass: 'wg-tag wg-tag--warning' });
+            if (hasLU) trackBadges.push({ code: 'LU', label: 'Livelihood Upliftment', badgeClass: 'wg-tag wg-tag--success' });
 
             if (trackBadges.length === 0 && rawTrack) {
-                trackBadges.push({ code: rawTrack, label: rawTrack, badgeClass: 'track-badge' });
+                trackBadges.push({ code: rawTrack, label: rawTrack, badgeClass: 'wg-tag' });
             }
 
             const trackShort = trackBadges.map(b => b.code).join(', ');
             const trackParam = trackBadges.map(b => b.code).join(',');
-            const trackBadgeClass = trackBadges.length > 0 ? trackBadges[0].badgeClass : 'track-badge';
+            const trackBadgeClass = trackBadges.length > 0 ? trackBadges[0].badgeClass : 'wg-tag';
 
-            // ── Application Status badge ─────────────────────────
+            // ── Application status pill (column currently hidden in the template) ──
             const status = p.Status || '';
-            let statusBadgeClass = 'status-badge';
-            if (status === 'Submitted')               statusBadgeClass += ' status-submitted';
-            else if (status === 'Under Review')       statusBadgeClass += ' status-under-review';
-            else if (status === 'Revision Requested') statusBadgeClass += ' status-revision';
-           // else if (status === 'Draft')              statusBadgeClass += ' status-draft';
+            let statusBadgeClass = 'wg-pill wg-pill--neutral';
+            if (status === 'Submitted' || status === 'Under Review') statusBadgeClass = 'wg-pill wg-pill--info';
+            else if (status === 'Revision Requested')                statusBadgeClass = 'wg-pill wg-pill--returned';
 
-            // ── Review Status badge ──────────────────────────────
+            // ── Review status pill ──
             let reviewBadgeLabel = 'Not Started';
-            let reviewBadgeClass = 'review-badge review-not-started';
+            let reviewBadgeClass = 'wg-pill wg-pill--neutral';
             if (isSubmitted || reviewStatus === 'Review Submitted') {
                 reviewBadgeLabel = 'Reviewed';
-                reviewBadgeClass = 'review-badge review-done';
+                reviewBadgeClass = 'wg-pill wg-pill--success';
             } else if (reviewId && reviewStatus === 'In Progress') {
                 reviewBadgeLabel = 'In Progress';
-                reviewBadgeClass = 'review-badge review-progress';
+                reviewBadgeClass = 'wg-pill wg-pill--warning';
             }
 
-            // ── Action button ────────────────────────────────────
-            // ── Action button ────────────────────────────────────
-const isRejected = p.Status === 'Reviewer Rejected';
- const isAccepted = this.acceptedApplicationsMap.has(p.Id);
+            // ── Action button (same priority order as before) ──
+            const isRejected = p.Status === 'Reviewer Rejected';
+            const isAccepted = this.acceptedApplicationsMap.has(p.Id);
 
-let actionLabel, actionBtnClass, actionIcon, reviewAction;
-if (isRejected) {
-    actionLabel    = 'Rejected';
-    actionBtnClass = 'action-btn btn-disabled';
-    actionIcon     = 'utility:ban';
-    reviewAction   = 'rejected';
-  } else if (isAccepted) {
-            // ← NEW: overrides the normal View/Resume/Start action for accepted apps
-            actionLabel    = 'Request Compliance';
-            actionBtnClass = 'action-btn btn-compliance';
-            actionIcon     = 'utility:new';
-            reviewAction   = 'complianceRequest';
-        } else if (isSubmitted || reviewStatus === 'Review Submitted') {
-    actionLabel    = 'View Review';
-    actionBtnClass = 'action-btn btn-done';
-    actionIcon     = 'utility:preview';
-    reviewAction   = 'view';
-} else if (reviewId && reviewStatus === 'In Progress') {
-    actionLabel    = 'Resume Review';
-    actionBtnClass = 'action-btn btn-resume';
-    actionIcon     = 'utility:redo';
-    reviewAction   = 'resume';
-} else {
-    actionLabel    = 'Start Review';
-    actionBtnClass = 'action-btn btn-start';
-    actionIcon     = 'utility:play';
-    reviewAction   = 'start';
-}
-            // ── Due date styling ─────────────────────────────────
-           // AFTER:
-const parsedDue    = this._parseDate(dueDate);
-let dueDateDisplay = parsedDue
-    ? parsedDue.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-    : '—';
-let dueDateClass   = 'due-date';
-if (parsedDue && !isSubmitted) {
-    const today    = new Date(); today.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((parsedDue - today) / 86400000);
-    if (diffDays < 0)       dueDateClass = 'due-date due-overdue';
-    else if (diffDays <= 3) dueDateClass = 'due-date due-urgent';
-}
-            // ── Date formatting ──────────────────────────────────
+            let actionLabel, actionBtnClass, actionIcon, reviewAction;
+            if (isRejected) {
+                actionLabel    = 'Rejected';
+                actionBtnClass = 'neutral-btn' + SM;
+                actionIcon     = 'utility:ban';
+                reviewAction   = 'rejected';
+            } else if (isAccepted) {
+                actionLabel    = 'Request Compliance';
+                actionBtnClass = 'success-btn' + SM;
+                actionIcon     = 'utility:new';
+                reviewAction   = 'complianceRequest';
+            } else if (isSubmitted || reviewStatus === 'Review Submitted') {
+                actionLabel    = 'View Review';
+                actionBtnClass = 'neutral-btn' + SM;
+                actionIcon     = 'utility:preview';
+                reviewAction   = 'view';
+            } else if (reviewId && reviewStatus === 'In Progress') {
+                actionLabel    = 'Resume Review';
+                actionBtnClass = 'primary-btn' + SM;
+                actionIcon     = 'utility:edit';
+                reviewAction   = 'resume';
+            } else {
+                actionLabel    = 'Start Review';
+                actionBtnClass = 'primary-btn' + SM;
+                actionIcon     = 'utility:play';
+                reviewAction   = 'start';
+            }
+
+            // ── Due date ──
+            const parsedDue    = this._parseDate(dueDate);
+            let dueDateDisplay = parsedDue
+                ? parsedDue.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                : '—';
+            let dueDateClass   = 'due-date';
+            if (parsedDue && !isSubmitted) {
+                const today    = new Date(); today.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((parsedDue - today) / 86400000);
+                if (diffDays < 0)       dueDateClass = 'due-date due-overdue';
+                else if (diffDays <= 3) dueDateClass = 'due-date due-urgent';
+            }
+
             const formattedDate = p.CreatedDate
                 ? new Date(p.CreatedDate).toLocaleDateString('en-GB', {
                     day: '2-digit', month: 'short', year: 'numeric'
@@ -454,7 +465,8 @@ if (parsedDue && !isSubmitted) {
             return {
                 ...p,
                 sno: start + idx + 1,
-                rowClass: idx % 2 === 0 ? 'table-row row-even' : 'table-row row-odd',
+                // Rows waiting on the reviewer's Approve/Return decision stand out
+                rowClass: p.Status === 'Returned by Approver' ? 'wg-row--attention' : '',
                 trackShort,
                 trackParam,
                 trackBadges,
@@ -463,19 +475,25 @@ if (parsedDue && !isSubmitted) {
                 reviewBadgeLabel, reviewBadgeClass,
                 formattedDate,
                 reviewId, reviewAction,
-                approverComment: this.acceptedApplicationsMap.get(p.Id) || '—',   // ← NEW
+                approverComment: this.acceptedApplicationsMap.get(p.Id) || '—',
                 actionLabel, actionBtnClass, actionIcon,
                 dueDateDisplay, dueDateClass,
-    isRejected 
+                isRejected
             };
         });
     }
 
     // ── Sort ─────────────────────────────────────────────────────
-
     get isSortedByName() { return this.sortField === 'Name'; }
     get isSortedByDate() { return this.sortField === 'CreatedDate'; }
     get sortIcon()       { return this.sortAscending ? 'utility:arrowup' : 'utility:arrowdown'; }
+
+    get sortIconName()  { return this.isSortedByName ? this.sortIcon : 'utility:sort'; }
+    get sortClassName() { return 'wg-sort' + (this.isSortedByName ? ' wg-sort--active' : ''); }
+    get ariaSortName() {
+        if (!this.isSortedByName) return 'none';
+        return this.sortAscending ? 'ascending' : 'descending';
+    }
 
     handleSort(evt) {
         const field = evt.currentTarget.dataset.field;
@@ -489,7 +507,6 @@ if (parsedDue && !isSubmitted) {
     }
 
     // ── Filter handlers ──────────────────────────────────────────
-
     handleSearch(evt)       { this.searchTerm     = evt.target.value;  this.currentPage = 1; }
     handleTrackFilter(evt)  { this.selectedTrack  = evt.detail.value;  this.currentPage = 1; }
     handleStatusFilter(evt) { this.selectedStatus = evt.detail.value;  this.currentPage = 1; }
@@ -498,11 +515,10 @@ if (parsedDue && !isSubmitted) {
         this.searchTerm         = '';
         this.selectedTrack      = '';
         this.selectedStatus     = '';
-        this.activeReviewFilter = ''; // also clears dashboard-driven filter
+        this.activeReviewFilter = '';
         this.currentPage        = 1;
     }
 
-    // ── Clear just the review filter pill ────────────────────────
     handleClearReviewFilter() {
         this.activeReviewFilter = '';
         this.currentPage        = 1;
@@ -513,7 +529,6 @@ if (parsedDue && !isSubmitted) {
     }
 
     // ── Pagination handlers ──────────────────────────────────────
-
     handlePrevPage()     { if (!this.isFirstPage) this.currentPage--; }
     handleNextPage()     { if (!this.isLastPage)  this.currentPage++; }
     handlePageClick(evt) { this.currentPage = parseInt(evt.currentTarget.dataset.page, 10); }
@@ -523,111 +538,62 @@ if (parsedDue && !isSubmitted) {
         this.currentPage = 1;
     }
 
-    // ── Navigation ───────────────────────────────────────────────
-handleReviewAction(evt) {
-    const action = evt.currentTarget.dataset.action;
+    // ── Navigation (unchanged) ───────────────────────────────────
+    handleReviewAction(evt) {
+        const action = evt.currentTarget.dataset.action;
         if (action === 'rejected') return;
 
-    if (action === 'complianceRequest') {
-        const proposalId = evt.currentTarget.dataset.id;
-        const appName    = evt.currentTarget.dataset.appname;
-        this[NavigationMixin.Navigate]({
-            type: 'standard__webPage',
-            attributes: {
-                // CHANGED: was `/reviewersite/s/wg-compliance-documents?...`
-                url: this._siteUrl('wg-compliance-documents', {
-                    applicationId : proposalId,
-                    appName       : appName
-                })
-            }
-        });
-        return;
-    }
-
-    const proposalId   = evt.currentTarget.dataset.id;
-    const appName      = evt.currentTarget.dataset.appname;
-    const reviewId     = evt.currentTarget.dataset.reviewId;
-    
-    const headquarters = evt.currentTarget.dataset.headquarters;
-    const track        = evt.currentTarget.dataset.track;
-    this._navigateReviewer(proposalId, appName, reviewId, action, headquarters, track);
-}
-
-/**
- * Shared reviewer navigation logic.
- * - Non-English (Mexico / Brazil HQ) → IA record page (for Translate button)
- * - English, action=start, no reviewId → review form with recordId=new
- * - English, action=resume/view, reviewId exists → direct to review form
- *
- * NOTE: this is the definition that actually runs. An earlier duplicate of the
- * same method name existed in the original file and was silently overridden by
- * this one (last definition wins in a JS class), so it has been removed —
- * runtime behaviour is unchanged.
- *
- * @param {string} proposalId   - IndividualApplication Id
- * @param {string} appName      - Application Name (e.g. IA-0000000518)
- * @param {string} reviewId     - ApplicationReview Id (null for 'start')
- * @param {string} action       - 'start' | 'resume' | 'view'
- * @param {string} headquarters - Headquarters_City_and_Country__c value
- * @param {string} track        - passed through for record creation
- */
-async _navigateReviewer(proposalId, appName, reviewId, action, headquarters, track) {
-    const hq = (headquarters || '').toLowerCase();
-    const isNonEnglish = hq.includes('mexico') || hq.includes('brazil');
-
-   /* if (isNonEnglish) {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__webPage',
-            attributes: {
-                url: this._siteUrl(`individualapplication/${proposalId}/${(appName || '').toLowerCase()}`)
-            }
-        });
-        return;
-    } */
-
-    if ((action === 'resume' || action === 'view') && reviewId) {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__webPage',
-            attributes: {
-                // CHANGED: was `/reviewersite/s/review-forms?...`
-                url: this._siteUrl('review-forms', {
-                    recordId      : reviewId,
-                    applicationId : proposalId,
-                    action        : action
-                })
-            }
-        });
-        return;
-    }
-
-    // English + start → create record then navigate
-    this[NavigationMixin.Navigate]({
-        type: 'standard__webPage',
-        attributes: {
-            // CHANGED: was `/reviewersite/s/review-forms?recordId=new...`
-            url: this._siteUrl('review-forms', {
-                recordId      : 'new',
-                applicationId : proposalId,
-                track         : track
-            })
+        if (action === 'complianceRequest') {
+            const proposalId = evt.currentTarget.dataset.id;
+            const appName    = evt.currentTarget.dataset.appname;
+            this[NavigationMixin.Navigate]({
+                type: 'standard__webPage',
+                attributes: {
+                    url: this._siteUrl('wg-compliance-documents', {
+                        applicationId : proposalId,
+                        appName       : appName
+                    })
+                }
+            });
+            return;
         }
-    });
-}
 
-  /*  handleRowClick(evt) {
-        evt.preventDefault();
-        const proposalId = evt.currentTarget.dataset.id;
-        const appName    = evt.currentTarget.dataset.appname;
+        const proposalId   = evt.currentTarget.dataset.id;
+        const appName      = evt.currentTarget.dataset.appname;
+        const reviewId     = evt.currentTarget.dataset.reviewId;
+        const headquarters = evt.currentTarget.dataset.headquarters;
+        const track        = evt.currentTarget.dataset.track;
+        this._navigateReviewer(proposalId, appName, reviewId, action, headquarters, track);
+    }
+
+    async _navigateReviewer(proposalId, appName, reviewId, action, headquarters, track) {
+        if ((action === 'resume' || action === 'view') && reviewId) {
+            this[NavigationMixin.Navigate]({
+                type: 'standard__webPage',
+                attributes: {
+                    url: this._siteUrl('review-forms', {
+                        recordId      : reviewId,
+                        applicationId : proposalId,
+                        action        : action
+                    })
+                }
+            });
+            return;
+        }
+
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
-                // CHANGED: was `/reviewersite/s/individualapplication/...`
-                url: this._siteUrl(`individualapplication/${proposalId}/${(appName || '').toLowerCase()}`)
+                url: this._siteUrl('review-forms', {
+                    recordId      : 'new',
+                    applicationId : proposalId,
+                    track         : track
+                })
             }
         });
-    } */
+    }
 
     get isAcceptedFilterActive() {
-    return this.activeReviewFilter === 'acceptedApplications';
-}
+        return this.activeReviewFilter === 'acceptedApplications';
+    }
 }

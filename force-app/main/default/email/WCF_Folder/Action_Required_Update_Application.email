@@ -36,7 +36,7 @@ div[style*="margin: 16px 0"]{margin:0 !important;}
 <center role="article" aria-roledescription="email" lang="en" style="width:100%;background-color:#F4F4F5;">
 
 <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;color:#F4F4F5;">
-A few items in your application need updating before we can proceed.
+{!Account.WCF_Organizational_Name__c} A few items need updating before your application can move ahead.
 </div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
@@ -55,11 +55,11 @@ A few items in your application need updating before we can proceed.
 <td align="left" valign="middle">
 
 <p style="margin:0 0 6px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;">
-Action required
+A few updates needed.
 </p>
 
 <h1 class="bh" style="margin:0;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;">
-A few updates needed
+Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c} 
 </h1>
 
 </td>
@@ -84,43 +84,52 @@ A few updates needed
 <td class="pad" style="padding:28px 32px 10px;">
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hello {!Account.FirstName},
+Hi {!Account.Name},
 </p>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Thank you for your submission for <strong>{!Account.WCF_Organizational_Name__c}</strong>. Before it moves to review, we need a few items clarified or completed. Our notes are below:
+Thank you for your application for {!Account.WCF_Organizational_Name__c}. We have checked it for completeness, and a few items are missing or need correcting before it can go to review. Your application has not been rejected .
 </p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+What we need
+</p>
+
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
 <tr>
 <td style="padding:16px 20px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
-{!ApplicationReview.Consolidated_Return_Comments__c}
+what we need: {!IndividualApplication.Consalidated__c}
 </td>
 </tr>
 </table>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Please update the highlighted fields and resubmit by <strong>{!Account.Due_Date__c}</strong>. Everything else you've entered has been saved.
+Sign in, update the items listed above, and submit your application again by {!Account.Due_Date__c}. Everything else you entered is saved, so you only need to change these items. 
+</p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+If we do not hear from you, we will send you a reminder after 30 days. If we still have not heard from you 100 days from now, we will close the application, and you would be welcome to apply again.
+</p>
+
+<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
+In case of any queries, please write to us at grants.support@wadhwanifoundation.org
 </p>
 
 <table role="presentation" class="btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/applicant-portal" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
+<a href="https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/wcf/s/login/" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 Update your application
 </a>
 </td>
 </tr>
 </table>
 
-<p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-If anything is unclear, write to us at grants.support@wadhwanifoundation.org — we're glad to help.
-</p>
 
 <p style="margin:18px 0 8px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
-Best regards,<br/>
-{!Account.PL_of_Record__r}<br/>
-Wadhwani Grants
+Kind Regards,<br/>
+Wadhwani Grants, application checks
 </p>
 
 </td>
@@ -141,11 +150,11 @@ Wadhwani Grants
 width="132"alt="Wadhwani Grants" class="logo-ftr" style="display:block;width:132px;height:auto;margin:0 0 12px;"/>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Wadhwani Grants — the grant-making arm of the Wadhwani Foundation.
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-Questions? Just reply to this email — it reaches the Wadhwani Grants team at 
+Questions? Just reply to this email; it reaches me and the Wadhwani Grants team at 
 <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#6D6E71;text-decoration:underline;">grants.support@wadhwanifoundation.org</a>.
 </p>
 

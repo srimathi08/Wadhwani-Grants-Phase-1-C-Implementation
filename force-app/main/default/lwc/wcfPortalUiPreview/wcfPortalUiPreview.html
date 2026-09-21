@@ -1,0 +1,198 @@
+<template>
+    <div class="wg-page">
+
+        <!-- 1. PAGE HEADER + SEARCH + ICON BUTTON -->
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Design system check</p>
+                <h1 class="wg-page-title">Portal UI <span class="wg-page-title-accent">preview</span></h1>
+                <p class="wg-page-subtitle">Every shared pattern from commonStyleTheme + wcfPortalUi</p>
+            </div>
+            <div class="wg-page-actions">
+                <div class="wg-search">
+                    <lightning-icon icon-name="utility:search" size="x-small" alternative-text=""></lightning-icon>
+                    <input type="text" placeholder="Search by ID, account, status…" aria-label="Search" />
+                </div>
+                <button class="wg-icon-btn" title="Refresh" aria-label="Refresh">
+                    <lightning-icon icon-name="utility:refresh" size="x-small" alternative-text=""></lightning-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="wg-page-body">
+
+            <!-- 2. STATS — click to test the active state, Tab to test focus -->
+            <div class="wg-section-head">
+                <div>
+                    <h2 class="wg-section-title">Stats</h2>
+                    <p class="wg-section-subtitle">Click a tile to toggle the active state. Press Tab to see the focus ring.</p>
+                </div>
+            </div>
+            <div class="wg-stat-grid">
+                <template for:each={stats} for:item="s">
+                    <button key={s.id} class={s.cls} data-id={s.id}
+                            aria-pressed={s.pressed} onclick={handleStatClick}>
+                        <span class="wg-stat-head">
+                            <span class="wg-stat-label">{s.label}</span>
+                            <span class={s.dotCls}></span>
+                        </span>
+                        <span class="wg-stat-value">{s.count}</span>
+                        <span class="wg-stat-caption">{s.caption}</span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- 3. TABLE + PILLS + TAGS + BUTTONS + PAGINATION -->
+            <div class="demo-block">
+                <div class="wg-card">
+                    <div class="wg-card-header">
+                        <div>
+                            <h3 class="wg-card-title">Table</h3>
+                            <p class="wg-card-subtitle">Row 2 uses the "attention" state, row 4 the "success" state.</p>
+                        </div>
+                    </div>
+                    <div class="wg-table-wrap">
+                        <table class="wg-table">
+                            <thead>
+                                <tr>
+                                    <th class="wg-col-index">#</th>
+                                    <th>
+                                        <button class="wg-sort wg-sort--active">
+                                            Application ID
+                                            <lightning-icon icon-name="utility:arrowdown" size="xx-small" alternative-text="Sorted descending"></lightning-icon>
+                                        </button>
+                                    </th>
+                                    <th>Account</th>
+                                    <th>Status</th>
+                                    <th>Due date</th>
+                                    <th class="wg-col-action">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={rows} for:item="r">
+                                    <tr key={r.id} class={r.rowCls}>
+                                        <td class="wg-col-index">{r.num}</td>
+                                        <td>
+                                            <a href="#" class="wg-cell-link">{r.appId}</a>
+                                            <div class="wg-cell-sub">{r.name}</div>
+                                            <div class="wg-tag-list">
+                                                <template for:each={r.tags} for:item="t">
+                                                    <span key={t.label} class={t.cls}>{t.label}</span>
+                                                </template>
+                                            </div>
+                                        </td>
+                                        <td>{r.account}</td>
+                                        <td><span class={r.pillCls}>{r.status}</span></td>
+                                        <td class="wg-cell-muted">{r.due}</td>
+                                        <td class="wg-col-action">
+                                            <button class={r.btnCls}>
+                                                <lightning-icon icon-name={r.icon} size="xx-small" alternative-text=""></lightning-icon>
+                                                {r.action}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="wg-pagination">
+                        <span>Showing 1–5 of 42</span>
+                        <div class="wg-pagination-controls">
+                            <button class="wg-icon-btn" aria-label="Previous page" disabled>
+                                <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text=""></lightning-icon>
+                            </button>
+                            <span class="wg-pagination-page">Page 1 of 9</span>
+                            <button class="wg-icon-btn" aria-label="Next page">
+                                <lightning-icon icon-name="utility:chevronright" size="xx-small" alternative-text=""></lightning-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ALL PILLS SIDE BY SIDE -->
+            <div class="demo-block">
+                <div class="wg-card">
+                    <div class="wg-card-header"><h3 class="wg-card-title">Status pills</h3></div>
+                    <div class="wg-card-body demo-row">
+                        <span class="wg-pill wg-pill--info">Awaiting validation</span>
+                        <span class="wg-pill wg-pill--warning">In progress</span>
+                        <span class="wg-pill wg-pill--returned">Returned</span>
+                        <span class="wg-pill wg-pill--success">Validated</span>
+                        <span class="wg-pill wg-pill--error">Rejected</span>
+                        <span class="wg-pill wg-pill--neutral">Draft</span>
+                        <span class="wg-pill wg-pill--returned">Asked for Resubmission by WIN Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. BUTTONS — custom and lightning-button -->
+            <div class="demo-block">
+                <div class="wg-card">
+                    <div class="wg-card-header">
+                        <div>
+                            <h3 class="wg-card-title">Buttons</h3>
+                            <p class="wg-card-subtitle">Top row: custom classes. Bottom row: lightning-button styled by hooks — should match.</p>
+                        </div>
+                    </div>
+                    <div class="wg-card-body">
+                        <div class="demo-row">
+                            <button class="primary-btn">Submit</button>
+                            <button class="ghost-btn">Back to edit</button>
+                            <button class="neutral-btn">Save draft</button>
+                            <button class="success-btn">Approve</button>
+                            <button class="primary-btn" disabled>Disabled</button>
+                        </div>
+                        <div class="demo-row demo-row-spaced">
+                            <lightning-button variant="brand" label="Submit"></lightning-button>
+                            <lightning-button label="Save draft"></lightning-button>
+                            <lightning-button variant="brand" label="Disabled" disabled></lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. BANNERS -->
+            <div class="demo-block demo-stack">
+                <div class="info-banner">
+                    <lightning-icon icon-name="utility:filter" size="xx-small" alternative-text=""></lightning-icon>
+                    <div class="wg-banner-body">Filtered by: <strong>Returned by reviewer</strong></div>
+                    <button class="ghost-btn wg-btn-sm wg-banner-action">Show all</button>
+                </div>
+                <div class="warning-banner">
+                    <div class="wg-banner-body">
+                        <span class="wg-banner-title">Draft in progress</span>
+                        Last saved 5 minutes ago. 60% complete.
+                    </div>
+                </div>
+                <div class="error-banner">
+                    <div class="wg-banner-body">
+                        <span class="wg-banner-title">Returned by reviewer — action required</span>
+                        Please re-check the verification reports.
+                    </div>
+                </div>
+                <div class="success-banner">
+                    <div class="wg-banner-body">Validator record submitted.</div>
+                </div>
+            </div>
+
+            <!-- 7. EMPTY + LOADING STATES -->
+            <div class="demo-block demo-two-col">
+                <div class="wg-card">
+                    <div class="wg-empty">
+                        <lightning-icon icon-name="utility:inbox" size="large" alternative-text=""></lightning-icon>
+                        <p class="wg-empty-title">No applications match your search</p>
+                        <p class="wg-empty-text">Clear the search or pick a different filter.</p>
+                    </div>
+                </div>
+                <div class="wg-card">
+                    <div class="wg-loading">
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                        <p class="wg-loading-text">Loading applications…</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>
