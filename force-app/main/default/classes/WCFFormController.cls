@@ -1521,13 +1521,55 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                 28 => rev.Question_Number_28__c
             };
     
+            // ── Dynamic Track Question Mapping ──
+            String fundingArea = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
+                ? app.Organizational_Area_s_for_Funding_Inves1__c
+                : app.Organizational_Area_s_for_Funding_Inves__c;
+            if (fundingArea == null) fundingArea = '';
+
+            Boolean hasJF = fundingArea.contains('Job Fulfillment') || fundingArea == 'Job Fulfillment Only' || fundingArea == 'Both Job Fulfillment and Job Creation';
+            Boolean hasJC = fundingArea.contains('Job Creation') || fundingArea == 'Job Creation Only' || fundingArea == 'Both Job Fulfillment and Job Creation';
+            Boolean hasLiv = fundingArea.contains('Livelihood');
+
+            Map<String, Integer> qNumMap = new Map<String, Integer>();
+            Integer currNum = 1;
+            for (Integer i = 1; i <= 10; i++) {
+                qNumMap.put('Q' + i, currNum++);
+            }
+            if (hasJF) {
+                qNumMap.put('Q11', currNum++);
+                qNumMap.put('Q12', currNum++);
+                qNumMap.put('Q13', currNum++);
+                qNumMap.put('Q14', currNum++);
+            }
+            if (hasJC) {
+                qNumMap.put('Q15', currNum++);
+                qNumMap.put('Q16', currNum++);
+                qNumMap.put('Q17', currNum++);
+                qNumMap.put('Q18', currNum++);
+            }
+            if (hasLiv) {
+                qNumMap.put('Q19', currNum++);
+                qNumMap.put('Q20', currNum++);
+                qNumMap.put('Q21', currNum++);
+                qNumMap.put('Q22', currNum++);
+                qNumMap.put('Q23', currNum++);
+            }
+            qNumMap.put('Q24', currNum++);
+            qNumMap.put('Q25', currNum++);
+            qNumMap.put('Q26', currNum++);
+            qNumMap.put('Q27', currNum++);
+            qNumMap.put('Q28', currNum++);
+
             result.questionReturnNotes = new List<QuestionReturnNote>();
             
-            for (Integer qNum : qFieldMap.keySet()) {
-                String txt = qFieldMap.get(qNum);
+            for (Integer canonicalNum : qFieldMap.keySet()) {
+                String txt = qFieldMap.get(canonicalNum);
                 if (String.isNotBlank(txt)) {
+                    String canonicalKey = 'Q' + canonicalNum;
+                    Integer displayNum = qNumMap.containsKey(canonicalKey) ? qNumMap.get(canonicalKey) : canonicalNum;
                     result.questionReturnNotes.add(
-                        new QuestionReturnNote(qNum, txt)
+                        new QuestionReturnNote(displayNum, canonicalKey, txt)
                     );
                 }
             }
@@ -1674,10 +1716,18 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
         }
     public class QuestionReturnNote implements Comparable {
         @AuraEnabled public Integer questionNum;
+        @AuraEnabled public String  questionKey;
         @AuraEnabled public String  returnText;
         
         public QuestionReturnNote(Integer n, String t) {
             this.questionNum = n;
+            this.questionKey = 'Q' + n;
+            this.returnText  = t;
+        }
+
+        public QuestionReturnNote(Integer n, String k, String t) {
+            this.questionNum = n;
+            this.questionKey = k;
             this.returnText  = t;
         }
         

@@ -146,6 +146,27 @@ trigger ApplicationReviewTrigger on ApplicationReview (before insert, before upd
                         ar.WG_Reviewer_Name__c = UserInfo.getName();
                     }
                 }
+ // Reviewer completed evaluation
+    Boolean justReviewSubmitted =
+        ar.Status == 'Review Submitted'
+        && (oldRec == null || oldRec.Status != 'Review Submitted');
+
+    if (justReviewSubmitted) {
+
+        // Evaluation Completed Date
+        if (ar.Evaluation_Completed__c == null) {
+            ar.Evaluation_Completed__c = Date.today();
+        }
+
+        // Approver Due Date - 10 working days
+        if (ar.Due_Date_For_Approver__c == null) {
+            ar.Due_Date_For_Approver__c =
+                ApplicationReviewHandler.addWorkingDays(
+                    ar.Evaluation_Completed__c,
+                    10
+                );
+        }
+    }
             }
 
             Boolean justSealed = ar.Status == 'Validated'

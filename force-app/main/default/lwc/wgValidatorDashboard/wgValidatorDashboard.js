@@ -16,20 +16,23 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
     }
 
     // ─── Data loading ─────────────────────────────────────────────
-async loadValidatorCounts() {
-    try {
-        const data = await getActionCounts();
-        const resume    = data?.resume    ?? 0;
-        const validate  = data?.validate  ?? 0;
-        const validated = data?.validated ?? 0;
-        const resubmit  = data?.resubmit  ?? 0;
-        const returnedByReviewer = data?.returnedByReviewer ?? 0;   // ← ADD
+    async loadValidatorCounts() {
+        try {
+            const data = await getActionCounts();
+            const resume             = data?.resume             ?? 0;
+            const awaitingApplicant  = data?.awaitingApplicant  ?? 0;
+            const validate           = data?.validate           ?? 0;
+            const validated          = data?.validated          ?? 0;
+            const resubmit           = data?.resubmit           ?? 0;
+            const returnedByReviewer = data?.returnedByReviewer ?? 0;
+
+            const inValidatorQueueCount = resume + awaitingApplicant;
 
         this.validatorCards = [
-            { /* resume card — unchanged */
+            {
                 id: 'resume', label: 'In Validator Queue',
                 subtitle: 'Draft & resumed proposals awaiting action',
-                count: resume, status: 'resume',
+                count: inValidatorQueueCount, status: 'resume',
                 kpiClass: 'kpi-card', dotClass: 'kpi-dot kpi-dot-red'
             },
             { /* validate card — unchanged */

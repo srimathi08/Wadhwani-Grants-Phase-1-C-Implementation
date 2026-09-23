@@ -302,6 +302,17 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         return map;
     }
 
+    get displayToCanonicalMap() {
+        const q = this.qNum;
+        const reverse = {};
+        for (const [canonicalKey, dispNum] of Object.entries(q)) {
+            if (dispNum != null) {
+                reverse[String(dispNum)] = canonicalKey;
+            }
+        }
+        return reverse;
+    }
+
     get allowedQuestionNumbers() {
         const q = this.qNum;
         if (this._populatedQuestionKeys && this._populatedQuestionKeys.length > 0) {
@@ -414,46 +425,32 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
                 const s3_5Val  = parts[0] || '';
                 const s2_3Val  = parts[1] || '';
 
-                const qTextMap = {
-                    '1':  review.Question_Number_1__c  || '',
-                    '2':  review.Question_Number_2__c  || '',
-                    '3':  review.Question_Number_3__c  || '',
-                    '4':  review.Question_Number_4__c  || '',
-                    '5':  review.Question_Number_5__c  || '',
-                    '6':  review.Question_Number_6__c  || '',
-                    '7':  review.Question_Number_7__c  || '',
-                    '8':  review.Question_Number_8__c  || '',
-                    '9':  review.Question_Number_9__c  || '',
-                    '10': review.Question_Number_10__c || '',
-                    '11': review.Question_Number_11__c || '',
-                    '12': review.Question_Number_12__c || '',
-                    '13': review.Question_Number_13__c || '',
-                    '14': review.Question_Number_14__c || '',
-                    '15': review.Question_Number_15__c || '',
-                    '16': review.Question_Number_16__c || '',
-                    '17': review.Question_Number_17__c || '',
-                    '18': review.Question_Number_18__c || '',
-                    '19': review.Question_Number_19__c || '',
-                    '20': review.Question_Number_20__c || '',
-                    '21': review.Question_Number_21__c || '',
-                    '22': review.Question_Number_22__c || '',
-                    '23': review.Question_Number_23__c || '',
-                    '24': review.Question_Number_24__c || '',
-                    '25': review.Question_Number_25__c || '',
-                    '26': review.Question_Number_26__c || '',
-                    '27': review.Question_Number_27__c || '',
-                    '28': review.Question_Number_28__c || '',
-                };
+                const qMap = this.qNum;
+                const qTextMap = {};
+                const selectedSet = new Set();
 
-                const fromPicklist = review.Question_Number__c
-                    ? review.Question_Number__c.split(';').map(s => s.trim()).filter(Boolean)
-                    : [];
+                for (let i = 1; i <= 28; i++) {
+                    const canonicalKey = `Q${i}`;
+                    const val = review[`Question_Number_${i}__c`];
+                    if (val && val.trim()) {
+                        const dispNum = qMap[canonicalKey] ? String(qMap[canonicalKey]) : String(i);
+                        qTextMap[dispNum] = val;
+                        selectedSet.add(dispNum);
+                    }
+                }
 
-                const fromTexts = Object.keys(qTextMap)
-                    .filter(k => qTextMap[k] && qTextMap[k].trim());
+                if (review.Question_Number__c) {
+                    review.Question_Number__c.split(';').forEach(s => {
+                        const trimmed = s.trim();
+                        if (trimmed) {
+                            const canonicalKey = `Q${trimmed}`;
+                            const dispNum = qMap[canonicalKey] ? String(qMap[canonicalKey]) : trimmed;
+                            selectedSet.add(dispNum);
+                        }
+                    });
+                }
 
-                const selectedNums = [...new Set([...fromPicklist, ...fromTexts])]
-                    .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+                const selectedNums = Array.from(selectedSet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
                 this.formState = {
                     existingReviewId : review.Id,
@@ -1116,10 +1113,15 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             s4_1          : this.formState.s4_1,
             s4_2          : this.formState.s4_2,
             s5_1          : this.formState.s5_1,
-            selectedQuestions : (this.formState.selectedQuestions || []).join(';'),
+            selectedQuestions : (this.formState.selectedQuestions || []).map(dispNum => {
+                const canonicalKey = this.displayToCanonicalMap[String(dispNum)];
+                return canonicalKey ? canonicalKey.replace('Q', '') : String(dispNum);
+            }).join(';'),
             questionTexts : JSON.stringify(
-                (this.formState.selectedQuestions || []).reduce((acc, n) => {
-                    acc[n] = (this.formState.questionTexts || {})[n] || '';
+                (this.formState.selectedQuestions || []).reduce((acc, dispNum) => {
+                    const canonicalKey = this.displayToCanonicalMap[String(dispNum)];
+                    const canonicalNum = canonicalKey ? canonicalKey.replace('Q', '') : String(dispNum);
+                    acc[canonicalNum] = (this.formState.questionTexts || {})[String(dispNum)] || '';
                     return acc;
                 }, {})
             ),

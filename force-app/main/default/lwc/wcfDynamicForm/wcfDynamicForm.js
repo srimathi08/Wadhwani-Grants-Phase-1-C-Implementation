@@ -14,9 +14,9 @@ import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedbac
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
 
 function calculateEndingBalance(startBalance, revenue, expense) {
-    const start = Number(startBalance) || 0;
-    const rev = Number(revenue) || 0;
-    const exp = Number(expense) || 0;
+    const start = Number(String(startBalance).replace(/,/g, '')) || 0;
+    const rev = Number(String(revenue).replace(/,/g, '')) || 0;
+    const exp = Number(String(expense).replace(/,/g, '')) || 0;
     return start + rev - exp;
 }
 
@@ -235,7 +235,306 @@ export default class WcfDynamicForm extends LightningElement {
     @track isDirty = false;
     _beforeUnloadHandler = null;
 
+    @track labels = {};
+    _metadataQuestionsMap = new Map();
+    _metadataSectionsMap = new Map();
+    _customQuestionsDef = {
+        q2: [],
+        q3: [],
+        q4: [],
+        q5: [],
+        q6: [],
+        q7: [],
+        q8: [],
+        aboutOrg: [],
+        jf: [],
+        jc: [],
+        liv: [],
+        why: []
+    };
+    _sectionQuestionsDef = {
+        q2: null,
+        q3: null,
+        q4: null,
+        q4Gov: null,
+        q5: null,
+        q6: null
+    };
+
+    _getDefaultLabels() {
+        return {
+            // Screen 1 & Track Selection
+            TRACK_SELECTION_TITLE: 'Which of these does your work cover?',
+            TRACK_SELECTION_SUBTITLE: 'Select all that apply. Your answer sets which questions you get later in the form.',
+            
+            // Overview & FAQ
+            OVERVIEW_TITLE: 'APPLICATION OVERVIEW · SECTIONS 2 & 3',
+            OVERVIEW_SEC2_TAG: 'SECTION 2',
+            OVERVIEW_SEC2_HEADING: 'What You Do',
+            OVERVIEW_SEC2_DESC: 'Tell us about your work: your top programs, your approach, and what makes it different.',
+            OVERVIEW_SEC3_TAG: 'SECTION 3',
+            OVERVIEW_SEC3_HEADING: 'What You\'ve Delivered',
+            OVERVIEW_SEC3_DESC: 'Tell us what you\'ve achieved: your results for the last three years, plus your estimate for this year.',
+            FAQ_SECTION_TITLE: 'FREQUENTLY ASKED QUESTIONS · WHAT THE TRACKS MEAN',
+            FAQ_JF_TITLE: 'Job Fulfillment (Skilling and Placement)',
+            FAQ_JC_TITLE: 'Job Creation (SME / Enterprise Support)',
+            FAQ_LIV_TITLE: 'Livelihood Upliftment',
+
+            // Section Titles & Subtitles
+            SEC_ABOUT_ORG: '1. About Your Organization',
+            SEC_JOB_FULFILLMENT: '2. What You Do',
+            SEC_JOB_CREATION: '3. Job Creation',
+            SEC_LIVELIHOOD: '4. Livelihood Upliftment',
+            SEC_OUTCOMES: '3. What You Have Delivered',
+            SEC_WHY_WADHWANI: '4. Why Wadhwani Grants',
+            SEC_REVIEW_SUBMIT: '5. Review and Submit',
+
+            // Section Cards (Q2 - Q6)
+            SEC2_TITLE: 'Organizational Identifying Information',
+            SEC2_DESC: 'A few details so we know who we\'re talking to.',
+            SEC3_TITLE: 'Submitter Contact Information',
+            SEC3_DESC: 'Who is filling out this form? You\'ll be the initial point of contact for your organisation.',
+            SEC4_TITLE: 'Legal Structure',
+            SEC4_DESC: 'Tell us how your organisation is legally constituted and where it\'s registered.',
+            SEC5_TITLE: 'Legal and Tax Compliance',
+            SEC5_DESC: 'Wadhwani Grants disburses from a US entity, so cross-border grants require certain compliance credentials. Tell us what your organization holds today. If you hold none yet, the last question simply asks whether you would be open to pursuing an Equivalency Determination (ED), a process Wadhwani Grants supports for selected partners. This is for our compliance planning; it does not affect how we read the rest of your application.',
+            SEC6_TITLE: 'Fiscal Year End Date',
+            SEC6_DESC: 'When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)',
+
+            // Tab 1 / Category 1 Flat Questions
+            Q1_SELECTED_TRACKS: 'Selected Track',
+            Q2_ORG_NAME: 'Organizational Name',
+            Q2_HQ_LOCATION: 'Headquarters City and Country',
+            Q2_PRIMARY_REGIONS: 'Primary Service Regions',
+            Q2_LEADER_NAME: 'Leader Name',
+            Q2_LEADER_TITLE: 'Leader Title',
+            Q2_LEADER_TENURE: 'Leader Tenure (Optional)',
+            
+            Q3_SUBMITTER_NAME: 'Submitter Name',
+            Q3_JOB_TITLE: 'Job Title',
+            Q3_WORK_EMAIL: 'Work Email',
+            Q3_PHONE: 'Phone Number',
+
+            Q4_LEGAL_TYPE: 'Legal Structure',
+            Q4_JURISDICTION: 'Registration Jurisdiction',
+            Q4_INCORP_DATE: 'Incorporation Date',
+            Q4_GOVERNANCE_DESC: 'Describe your governance structure and key governing bodies.',
+            Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).',
+
+            Q5_US_501C3: 'Do you have 501(c)(3) status or equivalent US tax-exempt determination?',
+            Q5_ED_STATUS: 'Do you currently hold an active Equivalency Determination (ED) certificate?',
+            Q5_FCRA_STATUS: 'Do you have a valid FCRA registration?',
+            Q5_WILLING_ED: 'Are you willing to pursue an Equivalency Determination (ED) if selected?',
+
+            Q6_FISCAL_MONTH: 'Fiscal Year End Month',
+            Q6_FISCAL_DAY: 'Fiscal Year End Day',
+            Q6_FISCAL_DATE: 'Fiscal Year End Date',
+
+            Q7_TOP_FUNDERS: 'Top 3 Prominent Funders',
+            Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.',
+            Q8_REFERENCES: 'Reference Contacts for Outreach',
+            Q8_REFERENCES_DESC: 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.',
+
+            // Financials & Outcomes (Q9 & Q10)
+            Q9_HIST_FINANCIALS: 'Historical Financial Performance',
+            Q9_HIST_FINANCIALS_DESC: 'Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.',
+            Q10_CURRENT_FY: 'Current Fiscal Year Budget & Projections',
+            Q10_CURRENT_FY_DESC: 'Your current fiscal year budget, latest projection, and explanation of any deviation.',
+            Q10_EXPLANATION_LABEL: 'Explanation of deviation',
+            Q10_EXPLANATION_DESC: 'Required if total deviation is non-zero (combined revenue + expense; <200 words).',
+
+            // Track Questions
+            Q11_SKILLING_APPROACH: 'Your Skilling Approach',
+            Q11_SKILLING_APPROACH_DESC: 'Tell us about your skilling work in roughly 500 words. If you run named programs, walk us through your top three (names, what they teach, who they serve). Cover your theory of change, the journey from learner enrollment to placement, and what makes your approach different from others.',
+            Q12_SKILLING_DOMAINS: 'Skilling Domains Offered',
+            Q12_SKILLING_DOMAINS_DESC: 'List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.',
+            Q13_JF_HIST_OUTCOMES: 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)',
+            Q13_JF_HIST_OUTCOMES_DESC: 'Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.',
+            Q14_JF_PROJ_OUTCOMES: 'Job Fulfillment Outcomes — Current FY Projections',
+            Q14_JF_PROJ_OUTCOMES_DESC: 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren\'t verifiable at submission.',
+
+            Q15_JOB_CREATION_APPROACH: 'Your Job Creation Approach',
+            Q15_JOB_CREATION_APPROACH_DESC: 'Tell us about your job creation work in roughly 500 words. Cover (i) your support model (capital, mentorship, business advisory, sector-specific TA, market linkages, etc.); (ii) your theory of change, the journey from engagement through to jobs created and sustained; (iii) what makes your approach different from others.',
+            Q16_BUSINESS_SECTORS: 'Business Sectors Served',
+            Q16_BUSINESS_SECTORS_DESC: 'List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.',
+            Q17_JC_HIST_OUTCOMES: 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)',
+            Q17_JC_HIST_OUTCOMES_DESC: 'Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.',
+            Q18_JC_PROJ_OUTCOMES: 'Job Creation Outcomes — Current FY Projections',
+            Q18_JC_PROJ_OUTCOMES_DESC: 'Enter projected business and job-creation numbers for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.',
+
+            Q19_LIVELIHOOD_APPROACH: 'Your Livelihood Upliftment Approach',
+            Q19_LIVELIHOOD_APPROACH_DESC: 'Tell us about this work in roughly 500 words. Cover (i) who the beneficiary is and how they come to you; (ii) Describe your intervention either to help start a new business (and sustain it) or in helping grow their existing business towards helping them get family-sustaining incomes; (iii) the support that continues after any initial training, such as mentoring, market access, credit linkage or aggregation; (iv) what makes your approach different.',
+            Q20_LIVELIHOOD_PROGRAMS: 'Your Key Programs / Initiatives',
+            Q20_LIVELIHOOD_PROGRAMS_DESC: 'Tell us about your flagship programs and the type of interventions you offer. For each program / initative provide a view on what are the different interventions, how many man-hours do you spend with each beneficiary and how many beneficiaries typically enroll each year for each program.',
+            Q21_COMMUNITIES_SERVED: 'Communities that you work in',
+            Q21_COMMUNITIES_SERVED_DESC: 'Tell us where this program runs and how many households it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.',
+            Q22_LIVELIHOOD_ACTUALS: 'Livelihood Outcomes (Actuals)',
+            Q23_LIVELIHOOD_PROJ: 'Livelihood Outcomes, Current FY Projections',
+            Q23_LIVELIHOOD_PROJ_DESC: 'Projected figures for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.',
+
+            // Section 4 & Category 1 Questions (Q24, Q25, Q26, Q27, Q28)
+            Q24_INDEPENDENT_VERIFICATION: 'Independent Verification of Your Outcomes',
+            Q24_INDEPENDENT_VERIFICATION_DESC: 'This applies to every applicant, whichever track you completed. If a third party has independently verified or evaluated the outcomes you reported, sharing the report strengthens your application; it is not required. If not, we will discuss verification together at the next stage.',
+            Q24_OPERATIONAL_SYNERGIES: 'Operational Synergies',
+            Q25_SUSTAINABILITY_PLAN: 'Sustainability Plan',
+            Q25_SUSTAINABILITY_PLAN_DESC: 'How is your organization positioned to sustain its work over time? In about 100 words cover: (1) funding mix, main revenue sources; (2) programmatic resilience, dependence on any single program or contract; (3) funder concentration, reliance on one funder and how you manage that risk. A plain-language picture is all we need.',
+            Q26_ADDITIONAL_FUNDING: 'Direction for Additional Funding',
+            Q26_ADDITIONAL_FUNDING_DESC: 'Then, in words. If you were given a grant of USD 1 million a year, what would you do with it? In about 200 words, tell us how you would deploy it to scale your impact: program expansion, geographic scaling, new offerings, capacity-building, technology investment, and so on. Treat the figure as approximate; scale it to your own situation. We will work out specifics together at the next stage, so no detailed budget or M&E plan is needed here.',
+            Q27_GENIE_AI: 'Operational Synergies with GenieAI (Optional)',
+            Q27_GENIE_AI_DESC: 'GenieAI is Wadhwani Foundation\'s AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying — we want your honest signal. If you\'re open to exploring synergy, tell us how it could fit. If not, that\'s a complete and acceptable answer.',
+            Q28_SUPPORTING_DOCS: 'Supporting Documents (Optional)',
+            Q28_SUPPORTING_DOCS_DESC: 'If there\'s anything else you\'d like to share in support of your application, you may upload it here.',
+
+            // Review & Submit
+            REVIEW_SUBMIT_TITLE: 'Review & Submit',
+            REVIEW_SUBMIT_DESC: 'Take a final look at what you\'ve entered. Go back to any previous section to make edits before submitting.',
+            REVIEW_SEC_ABOUT_ORG: 'ABOUT YOUR ORGANISATION',
+            REVIEW_SEC_JOB_FULFILLMENT: 'JOB FULFILLMENT',
+            REVIEW_SEC_JOB_CREATION: 'JOB CREATION',
+            REVIEW_SEC_LIVELIHOOD: 'LIVELIHOOD UPLIFTMENT',
+            REVIEW_SEC_WHY_WADHWANI: 'WHY WADHWANI GRANTS'
+        };
+    }
+
+    _computeLabels() {
+        const d = this._getDefaultLabels();
+        return {
+            // Screen 1 & Track Selection
+            TRACK_SELECTION_TITLE: this.getQuestionLabel('TRACK_SELECTION_TITLE', d.TRACK_SELECTION_TITLE),
+            TRACK_SELECTION_SUBTITLE: this.getQuestionLabel('TRACK_SELECTION_SUBTITLE', d.TRACK_SELECTION_SUBTITLE),
+            
+            // Overview & FAQ
+            OVERVIEW_TITLE: this.getQuestionLabel('OVERVIEW_TITLE', d.OVERVIEW_TITLE),
+            OVERVIEW_SEC2_TAG: 'SECTION 2',
+            OVERVIEW_SEC2_HEADING: this.getQuestionLabel('OVERVIEW_SEC2_HEADING', d.OVERVIEW_SEC2_HEADING),
+            OVERVIEW_SEC2_DESC: this.getQuestionLabel('OVERVIEW_SEC2_DESC', d.OVERVIEW_SEC2_DESC),
+            OVERVIEW_SEC3_TAG: 'SECTION 3',
+            OVERVIEW_SEC3_HEADING: this.getQuestionLabel('OVERVIEW_SEC3_HEADING', d.OVERVIEW_SEC3_HEADING),
+            OVERVIEW_SEC3_DESC: this.getQuestionLabel('OVERVIEW_SEC3_DESC', d.OVERVIEW_SEC3_DESC),
+            FAQ_SECTION_TITLE: this.getQuestionLabel('FAQ_SECTION_TITLE', d.FAQ_SECTION_TITLE),
+            FAQ_JF_TITLE: this.getQuestionLabel('FAQ_JF_TITLE', d.FAQ_JF_TITLE),
+            FAQ_JC_TITLE: this.getQuestionLabel('FAQ_JC_TITLE', d.FAQ_JC_TITLE),
+            FAQ_LIV_TITLE: this.getQuestionLabel('FAQ_LIV_TITLE', d.FAQ_LIV_TITLE),
+
+            // Section Titles & Subtitles
+            SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', d.SEC_ABOUT_ORG),
+            SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', d.SEC_JOB_FULFILLMENT),
+            SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', d.SEC_JOB_CREATION),
+            SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', d.SEC_LIVELIHOOD),
+            SEC_OUTCOMES: this.getSectionTitle('SEC_OUTCOMES', d.SEC_OUTCOMES),
+            SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', d.SEC_WHY_WADHWANI),
+            SEC_REVIEW_SUBMIT: this.getSectionTitle('SEC_REVIEW_SUBMIT', d.SEC_REVIEW_SUBMIT),
+
+            // Section Cards (Q2 - Q6)
+            SEC2_TITLE: this.getQuestionLabel('SEC2_TITLE', d.SEC2_TITLE),
+            SEC2_DESC: this.getQuestionLabel('SEC2_DESC', d.SEC2_DESC),
+            SEC3_TITLE: this.getQuestionLabel('SEC3_TITLE', d.SEC3_TITLE),
+            SEC3_DESC: this.getQuestionLabel('SEC3_DESC', d.SEC3_DESC),
+            SEC4_TITLE: this.getQuestionLabel('SEC4_TITLE', d.SEC4_TITLE),
+            SEC4_DESC: this.getQuestionLabel('SEC4_DESC', d.SEC4_DESC),
+            SEC5_TITLE: this.getQuestionLabel('SEC5_TITLE', d.SEC5_TITLE),
+            SEC5_DESC: this.getQuestionLabel('SEC5_DESC', d.SEC5_DESC),
+            SEC6_TITLE: this.getQuestionLabel('SEC6_TITLE', d.SEC6_TITLE),
+            SEC6_DESC: this.getQuestionLabel('SEC6_DESC', d.SEC6_DESC),
+
+            // Tab 1 / Category 1 Flat Questions
+            Q1_SELECTED_TRACKS: this.getQuestionLabel('Q1_SELECTED_TRACKS', d.Q1_SELECTED_TRACKS),
+            Q2_ORG_NAME: this.getQuestionLabel('Q2_ORG_NAME', d.Q2_ORG_NAME),
+            Q2_HQ_LOCATION: this.getQuestionLabel('Q2_HQ_LOCATION', d.Q2_HQ_LOCATION),
+            Q2_PRIMARY_REGIONS: this.getQuestionLabel('Q2_PRIMARY_REGIONS', d.Q2_PRIMARY_REGIONS),
+            Q2_LEADER_NAME: this.getQuestionLabel('Q2_LEADER_NAME', d.Q2_LEADER_NAME),
+            Q2_LEADER_TITLE: this.getQuestionLabel('Q2_LEADER_TITLE', d.Q2_LEADER_TITLE),
+            Q2_LEADER_TENURE: this.getQuestionLabel('Q2_LEADER_TENURE', d.Q2_LEADER_TENURE),
+            
+            Q3_SUBMITTER_NAME: this.getQuestionLabel('Q3_SUBMITTER_NAME', d.Q3_SUBMITTER_NAME),
+            Q3_JOB_TITLE: this.getQuestionLabel('Q3_JOB_TITLE', d.Q3_JOB_TITLE),
+            Q3_WORK_EMAIL: this.getQuestionLabel('Q3_WORK_EMAIL', d.Q3_WORK_EMAIL),
+            Q3_PHONE: this.getQuestionLabel('Q3_PHONE', d.Q3_PHONE),
+
+            Q4_LEGAL_TYPE: this.getQuestionLabel('Q4_LEGAL_TYPE', d.Q4_LEGAL_TYPE),
+            Q4_JURISDICTION: this.getQuestionLabel('Q4_JURISDICTION', d.Q4_JURISDICTION),
+            Q4_INCORP_DATE: this.getQuestionLabel('Q4_INCORP_DATE', d.Q4_INCORP_DATE),
+            Q4_GOVERNANCE_DESC: this.getQuestionLabel('Q4_GOVERNANCE_DESC', d.Q4_GOVERNANCE_DESC),
+            Q4_GOVERNANCE_HELPER: this.getQuestionLabel('Q4_GOVERNANCE_HELPER', d.Q4_GOVERNANCE_HELPER),
+
+            Q5_US_501C3: this.getQuestionLabel('Q5_US_501C3', d.Q5_US_501C3),
+            Q5_ED_STATUS: this.getQuestionLabel('Q5_ED_STATUS', d.Q5_ED_STATUS),
+            Q5_FCRA_STATUS: this.getQuestionLabel('Q5_FCRA_STATUS', d.Q5_FCRA_STATUS),
+            Q5_WILLING_ED: this.getQuestionLabel('Q5_WILLING_ED', d.Q5_WILLING_ED),
+
+            Q6_FISCAL_MONTH: this.getQuestionLabel('Q6_FISCAL_MONTH', d.Q6_FISCAL_MONTH),
+            Q6_FISCAL_DAY: this.getQuestionLabel('Q6_FISCAL_DAY', d.Q6_FISCAL_DAY),
+            Q6_FISCAL_DATE: this.getQuestionLabel('Q6_FISCAL_DATE', d.Q6_FISCAL_DATE),
+
+            Q7_TOP_FUNDERS: this.getQuestionLabel('Q7_TOP_FUNDERS', d.Q7_TOP_FUNDERS),
+            Q7_TOP_FUNDERS_DESC: this.getQuestionLabel('Q7_TOP_FUNDERS_DESC', d.Q7_TOP_FUNDERS_DESC),
+            Q8_REFERENCES: this.getQuestionLabel('Q8_REFERENCES', d.Q8_REFERENCES),
+            Q8_REFERENCES_DESC: this.getQuestionLabel('Q8_REFERENCES_DESC', d.Q8_REFERENCES_DESC),
+
+            // Financials & Outcomes (Q9 & Q10)
+            Q9_HIST_FINANCIALS: this.getQuestionLabel('Q9_HIST_FINANCIALS', d.Q9_HIST_FINANCIALS),
+            Q9_HIST_FINANCIALS_DESC: this.getQuestionLabel('Q9_HIST_FINANCIALS_DESC', d.Q9_HIST_FINANCIALS_DESC),
+            Q10_CURRENT_FY: this.getQuestionLabel('Q10_CURRENT_FY', d.Q10_CURRENT_FY),
+            Q10_CURRENT_FY_DESC: this.getQuestionLabel('Q10_CURRENT_FY_DESC', d.Q10_CURRENT_FY_DESC),
+            Q10_EXPLANATION_LABEL: this.getQuestionLabel('Q10_EXPLANATION_LABEL', d.Q10_EXPLANATION_LABEL),
+            Q10_EXPLANATION_DESC: this.getQuestionLabel('Q10_EXPLANATION_DESC', d.Q10_EXPLANATION_DESC),
+
+            // Track Questions
+            Q11_SKILLING_APPROACH: this.getQuestionLabel('Q11_SKILLING_APPROACH', d.Q11_SKILLING_APPROACH),
+            Q11_SKILLING_APPROACH_DESC: this.getQuestionLabel('Q11_SKILLING_APPROACH_DESC', d.Q11_SKILLING_APPROACH_DESC),
+            Q12_SKILLING_DOMAINS: this.getQuestionLabel('Q12_SKILLING_DOMAINS', d.Q12_SKILLING_DOMAINS),
+            Q12_SKILLING_DOMAINS_DESC: this.getQuestionLabel('Q12_SKILLING_DOMAINS_DESC', d.Q12_SKILLING_DOMAINS_DESC),
+            Q13_JF_HIST_OUTCOMES: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES', d.Q13_JF_HIST_OUTCOMES),
+            Q13_JF_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES_DESC', d.Q13_JF_HIST_OUTCOMES_DESC),
+            Q14_JF_PROJ_OUTCOMES: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES', d.Q14_JF_PROJ_OUTCOMES),
+            Q14_JF_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES_DESC', d.Q14_JF_PROJ_OUTCOMES_DESC),
+
+            Q15_JOB_CREATION_APPROACH: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH', d.Q15_JOB_CREATION_APPROACH),
+            Q15_JOB_CREATION_APPROACH_DESC: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH_DESC', d.Q15_JOB_CREATION_APPROACH_DESC),
+            Q16_BUSINESS_SECTORS: this.getQuestionLabel('Q16_BUSINESS_SECTORS', d.Q16_BUSINESS_SECTORS),
+            Q16_BUSINESS_SECTORS_DESC: this.getQuestionLabel('Q16_BUSINESS_SECTORS_DESC', d.Q16_BUSINESS_SECTORS_DESC),
+            Q17_JC_HIST_OUTCOMES: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES', d.Q17_JC_HIST_OUTCOMES),
+            Q17_JC_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES_DESC', d.Q17_JC_HIST_OUTCOMES_DESC),
+            Q18_JC_PROJ_OUTCOMES: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES', d.Q18_JC_PROJ_OUTCOMES),
+            Q18_JC_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES_DESC', d.Q18_JC_PROJ_OUTCOMES_DESC),
+
+            Q19_LIVELIHOOD_APPROACH: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH', d.Q19_LIVELIHOOD_APPROACH),
+            Q19_LIVELIHOOD_APPROACH_DESC: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH_DESC', d.Q19_LIVELIHOOD_APPROACH_DESC),
+            Q20_LIVELIHOOD_PROGRAMS: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS', d.Q20_LIVELIHOOD_PROGRAMS),
+            Q20_LIVELIHOOD_PROGRAMS_DESC: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS_DESC', d.Q20_LIVELIHOOD_PROGRAMS_DESC),
+            Q21_COMMUNITIES_SERVED: this.getQuestionLabel('Q21_COMMUNITIES_SERVED', d.Q21_COMMUNITIES_SERVED),
+            Q21_COMMUNITIES_SERVED_DESC: this.getQuestionLabel('Q21_COMMUNITIES_SERVED_DESC', d.Q21_COMMUNITIES_SERVED_DESC),
+            Q22_LIVELIHOOD_ACTUALS: this.getQuestionLabel('Q22_LIVELIHOOD_ACTUALS', d.Q22_LIVELIHOOD_ACTUALS),
+            Q23_LIVELIHOOD_PROJ: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ', d.Q23_LIVELIHOOD_PROJ),
+            Q23_LIVELIHOOD_PROJ_DESC: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ_DESC', d.Q23_LIVELIHOOD_PROJ_DESC),
+
+            // Section 4 & Category 1 Questions (Q24, Q25, Q26, Q27, Q28)
+            Q24_INDEPENDENT_VERIFICATION: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION', d.Q24_INDEPENDENT_VERIFICATION),
+            Q24_INDEPENDENT_VERIFICATION_DESC: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION_DESC', d.Q24_INDEPENDENT_VERIFICATION_DESC),
+            Q24_OPERATIONAL_SYNERGIES: this.getQuestionLabel('Q24_OPERATIONAL_SYNERGIES', d.Q24_OPERATIONAL_SYNERGIES),
+            Q25_SUSTAINABILITY_PLAN: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN', d.Q25_SUSTAINABILITY_PLAN),
+            Q25_SUSTAINABILITY_PLAN_DESC: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN_DESC', d.Q25_SUSTAINABILITY_PLAN_DESC),
+            Q26_ADDITIONAL_FUNDING: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING', d.Q26_ADDITIONAL_FUNDING),
+            Q26_ADDITIONAL_FUNDING_DESC: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING_DESC', d.Q26_ADDITIONAL_FUNDING_DESC),
+            Q27_GENIE_AI: this.getQuestionLabel('Q27_GENIE_AI', d.Q27_GENIE_AI),
+            Q27_GENIE_AI_DESC: this.getQuestionLabel('Q27_GENIE_AI_DESC', d.Q27_GENIE_AI_DESC),
+            Q28_SUPPORTING_DOCS: this.getQuestionLabel('Q28_SUPPORTING_DOCS', d.Q28_SUPPORTING_DOCS),
+            Q28_SUPPORTING_DOCS_DESC: this.getQuestionLabel('Q28_SUPPORTING_DOCS_DESC', d.Q28_SUPPORTING_DOCS_DESC),
+
+            // Review & Submit
+            REVIEW_SUBMIT_TITLE: this.getQuestionLabel('REVIEW_SUBMIT_TITLE', d.REVIEW_SUBMIT_TITLE),
+            REVIEW_SUBMIT_DESC: this.getQuestionLabel('REVIEW_SUBMIT_DESC', d.REVIEW_SUBMIT_DESC),
+            REVIEW_SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', d.REVIEW_SEC_ABOUT_ORG),
+            REVIEW_SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', d.REVIEW_SEC_JOB_FULFILLMENT),
+            REVIEW_SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', d.REVIEW_SEC_JOB_CREATION),
+            REVIEW_SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', d.REVIEW_SEC_LIVELIHOOD),
+            REVIEW_SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', d.REVIEW_SEC_WHY_WADHWANI)
+        };
+    }
+
     connectedCallback() {
+        this.labels = this._getDefaultLabels();
+        this._partitionSectionQuestions();
         try {
             this._beforeUnloadHandler = (event) => {
                 if (this.isDirty) {
@@ -286,6 +585,153 @@ export default class WcfDynamicForm extends LightningElement {
     @track metadataSections = [];
     @track labelMap = {};
 
+    _buildMetadataLookups() {
+        this._metadataQuestionsMap.clear();
+        if (this.metadataQuestions && this.metadataQuestions.length) {
+            for (let i = 0; i < this.metadataQuestions.length; i++) {
+                const q = this.metadataQuestions[i];
+                if (q.key) this._metadataQuestionsMap.set(q.key, q);
+                if (q.targetField) this._metadataQuestionsMap.set(q.targetField, q);
+                if (q.Question_Code__c) this._metadataQuestionsMap.set(q.Question_Code__c, q);
+                if (q.Field_API_Name__c) this._metadataQuestionsMap.set(q.Field_API_Name__c, q);
+            }
+        }
+        this._metadataSectionsMap.clear();
+        if (this.metadataSections && this.metadataSections.length) {
+            for (let i = 0; i < this.metadataSections.length; i++) {
+                const s = this.metadataSections[i];
+                if (s.code) this._metadataSectionsMap.set(s.code, s);
+            }
+        }
+    }
+
+    _partitionSectionQuestions() {
+        const defaultsQ2 = [
+            { key: 'Q2_ORG_NAME', targetField: 'Organization_Name__c', label: 'Organizational Name', displayType: 'Text', isRequired: true, sequence: 1 },
+            { key: 'Q2_HQ_LOCATION', targetField: 'Headquarters_City_and_Country__c', label: 'Headquarters City and Country', displayType: 'Text', isRequired: true, sequence: 2 },
+            { key: 'Q2_PRIMARY_REGIONS', targetField: 'Primary_Service_Regions__c', label: 'Primary Service Regions', displayType: 'Text', isRequired: true, sequence: 3 },
+            { key: 'Q2_LEADER_NAME', targetField: 'Leader_Name__c', label: 'Leader Name', displayType: 'Text', isRequired: true, sequence: 4 },
+            { key: 'Q2_LEADER_TITLE', targetField: 'Leader_Title__c', label: 'Leader Title', displayType: 'Text', isRequired: true, sequence: 5 },
+            { key: 'Q2_LEADER_TENURE', targetField: 'Leader_Tenure__c', label: 'Leader Tenure (Optional)', displayType: 'Number', isRequired: false, sequence: 6 }
+        ];
+        const defaultsQ3 = [
+            { key: 'Q3_SUBMITTER_NAME', targetField: 'Submitter_Name__c', label: 'Submitter Name', displayType: 'Text', isRequired: true, sequence: 1 },
+            { key: 'Q3_JOB_TITLE', targetField: 'Job_Title__c', label: 'Job Title', displayType: 'Text', isRequired: true, sequence: 2 },
+            { key: 'Q3_PHONE', targetField: 'Phone__c', label: 'Phone Number', displayType: 'Phone', isRequired: true, sequence: 3 },
+            { key: 'Q3_WORK_EMAIL', targetField: 'Work_Email_ID__c', label: 'Work Email', displayType: 'Email', isRequired: true, sequence: 4 }
+        ];
+        const defaultsQ4 = [
+            { key: 'Q4_LEGAL_TYPE', targetField: 'Legal_Type__c', label: 'Legal Structure', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q4_JURISDICTION', targetField: 'Registration_Jurisdiction__c', label: 'Registration Jurisdiction', displayType: 'Picklist', isRequired: true, sequence: 2 },
+            { key: 'Q4_INCORP_DATE', targetField: 'Incorporation_Date__c', label: 'Incorporation Date', displayType: 'Date', isRequired: true, sequence: 3 }
+        ];
+        const defaultsQ4Gov = [
+            { key: 'Q4_GOVERNANCE_DESC', targetField: 'Legal_Structure__c', label: 'Describe your governance structure and key governing bodies.', displayType: 'TextArea', isRequired: true, sequence: 4 }
+        ];
+        const defaultsQ5 = [
+            { key: 'Q5_US_501C3', targetField: 'Has_501c3_Status__c', label: 'Do you have 501(c)(3) status in the US?', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q5_ED_STATUS', targetField: 'Has_Equivalency_Determination__c', label: 'Do you have an Equivalency Determination (ED) in place?', displayType: 'Picklist', isRequired: true, sequence: 2 },
+            { key: 'Q5_FCRA_STATUS', targetField: 'Is_FCRA_Registered__c', label: 'If you operate in India, are you FCRA-registered?', displayType: 'Picklist', isRequired: true, sequence: 3 },
+            { key: 'Q5_WILLING_ED', targetField: 'Willing_to_Pursue_ED__c', label: 'If none of the above apply, would you be willing to pursue ED certification if selected?', displayType: 'Picklist', isRequired: true, sequence: 4 }
+        ];
+        const defaultsQ6 = [
+            { key: 'Q6_FISCAL_MONTH', targetField: 'Fiscal_Month__c', label: 'Month', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q6_FISCAL_DAY', targetField: 'Fiscal_Day__c', label: 'Day', displayType: 'Picklist', isRequired: true, sequence: 2 }
+        ];
+
+        const getList = (sectionCode, keyPrefix, defaults, extraFilterFn) => {
+            let list = [];
+            if (this.metadataQuestions && this.metadataQuestions.length) {
+                const matched = this.metadataQuestions.filter(q => {
+                    const qKey = q.key || q.Question_Code__c || q.DeveloperName || '';
+                    const qSec = q.sectionCode || q.Section_Code__c || '';
+                    const matchesKey = qKey && qKey.toUpperCase().startsWith(keyPrefix.toUpperCase());
+                    const matchesSection = qSec === sectionCode || qSec.toUpperCase() === keyPrefix.toUpperCase();
+                    const passes = matchesKey || matchesSection;
+                    return passes && (extraFilterFn ? extraFilterFn(q) : true);
+                });
+                if (matched.length > 0) {
+                    list = [...matched].sort((a, b) => (a.sequence || 99) - (b.sequence || 99));
+                }
+            }
+            return (list.length > 0) ? list : defaults;
+        };
+
+        this._sectionQuestionsDef = {
+            q2: getList('SEC_ABOUT_ORG', 'Q2_', defaultsQ2),
+            q3: getList('SEC_ABOUT_ORG', 'Q3_', defaultsQ3),
+            q4: getList('SEC_ABOUT_ORG', 'Q4_', defaultsQ4, q => {
+                const k = q.key || q.Question_Code__c || '';
+                const f = q.targetField || q.Field_API_Name__c || '';
+                return k !== 'Q4_GOVERNANCE_DESC' && f !== 'Legal_Structure__c';
+            }),
+            q4Gov: getList('SEC_ABOUT_ORG', 'Q4_GOVERNANCE', defaultsQ4Gov, q => {
+                const k = q.key || q.Question_Code__c || '';
+                const f = q.targetField || q.Field_API_Name__c || '';
+                return k === 'Q4_GOVERNANCE_DESC' || f === 'Legal_Structure__c';
+            }),
+            q5: getList('SEC_ABOUT_ORG', 'Q5_', defaultsQ5),
+            q6: getList('SEC_ABOUT_ORG', 'Q6_', defaultsQ6)
+        };
+    }
+
+    _partitionCustomQuestions() {
+        if (!this.metadataQuestions || !this.metadataQuestions.length) {
+            this._customQuestionsDef = { q2: [], q3: [], q4: [], q5: [], q6: [], q7: [], q8: [], aboutOrg: [], jf: [], jc: [], liv: [], why: [] };
+            return;
+        }
+        const custom = this.metadataQuestions.filter(q => q.isCustom);
+        const q2 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
+        ) && (
+            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
+            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
+        ));
+        const q3 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q3' || q.sectionCode === 'Q3'
+        ) && q.key && q.key.toUpperCase().startsWith('Q3_'));
+        const q4 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q4' || q.sectionCode === 'Q4'
+        ) && q.key && q.key.toUpperCase().startsWith('Q4_'));
+        const q5 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q5' || q.sectionCode === 'Q5'
+        ) && q.key && q.key.toUpperCase().startsWith('Q5_'));
+        const q6 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q6' || q.sectionCode === 'Q6'
+        ) && q.key && q.key.toUpperCase().startsWith('Q6_'));
+        const q7 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q7' || q.sectionCode === 'Q7'
+        ) && q.key && q.key.toUpperCase().startsWith('Q7_'));
+        const q8 = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q8' || q.sectionCode === 'Q8'
+        ) && q.key && q.key.toUpperCase().startsWith('Q8_'));
+
+        const renderedKeySet = new Set();
+        [...q2, ...q3, ...q4, ...q5, ...q6, ...q7, ...q8].forEach(q => {
+            if (q.key) renderedKeySet.add(q.key);
+            if (q.targetField) renderedKeySet.add(q.targetField);
+        });
+
+        const aboutOrg = custom.filter(q => (
+            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'ABOUT_ORG'
+        ) && !renderedKeySet.has(q.key) && !renderedKeySet.has(q.targetField));
+
+        const jf = custom.filter(q => (
+            q.sectionCode === 'SEC_JOB_FULFILLMENT' || q.sectionCode === 'SEC_WHAT_YOU_DO' || q.sectionCode === 'JOB_FULFILLMENT'
+        ));
+        const jc = custom.filter(q => (
+            q.sectionCode === 'SEC_JOB_CREATION' || q.sectionCode === 'JOB_CREATION'
+        ));
+        const liv = custom.filter(q => (
+            q.sectionCode === 'SEC_LIVELIHOOD' || q.sectionCode === 'LIVELIHOOD'
+        ));
+        const why = custom.filter(q => (
+            q.sectionCode === 'SEC_WHY_WADHWANI' || q.sectionCode === 'SEC_WHY_WCF' || q.sectionCode === 'WHY_WADHWANI'
+        ));
+
+        this._customQuestionsDef = { q2, q3, q4, q5, q6, q7, q8, aboutOrg, jf, jc, liv, why };
+    }
+
     loadMetadata() {
         getFormMetadata({
             languageCode: this.selectedLanguage || 'en_US',
@@ -308,6 +754,10 @@ export default class WcfDynamicForm extends LightningElement {
             if (result && result.labelMap) {
                 this.labelMap = result.labelMap;
             }
+            this._buildMetadataLookups();
+            this._partitionSectionQuestions();
+            this._partitionCustomQuestions();
+            this.labels = this._computeLabels();
         })
         .catch(err => {
             console.warn('Metadata load warning:', err);
@@ -318,6 +768,9 @@ export default class WcfDynamicForm extends LightningElement {
         let raw = defaultVal;
         if (this.labelMap && this.labelMap[key]) {
             raw = this.labelMap[key];
+        } else if (this._metadataQuestionsMap.has(key)) {
+            const found = this._metadataQuestionsMap.get(key);
+            if (found && found.label) raw = found.label;
         } else if (this.metadataQuestions && this.metadataQuestions.length) {
             const found = this.metadataQuestions.find(q => q.key === key || q.targetField === key);
             if (found && found.label) raw = found.label;
@@ -329,203 +782,14 @@ export default class WcfDynamicForm extends LightningElement {
         let raw = defaultVal;
         if (this.labelMap && this.labelMap[code]) {
             raw = this.labelMap[code];
+        } else if (this._metadataSectionsMap.has(code)) {
+            const found = this._metadataSectionsMap.get(code);
+            if (found && found.title) raw = found.title;
         } else if (this.metadataSections && this.metadataSections.length) {
             const found = this.metadataSections.find(s => s.code === code);
             if (found && found.title) raw = found.title;
         }
         return cleanTitle(raw);
-    }
-
-
-    get labels() {
-        return {
-            // Screen 1 & Track Selection
-            TRACK_SELECTION_TITLE: this.getQuestionLabel('TRACK_SELECTION_TITLE', 'Which of these does your work cover?'),
-            TRACK_SELECTION_SUBTITLE: this.getQuestionLabel('TRACK_SELECTION_SUBTITLE', 'Select all that apply. Your answer sets which questions you get later in the form.'),
-            
-            // Overview & FAQ
-            OVERVIEW_TITLE: this.getQuestionLabel('OVERVIEW_TITLE', 'APPLICATION OVERVIEW · SECTIONS 2 & 3'),
-            OVERVIEW_SEC2_TAG: 'SECTION 2',
-            OVERVIEW_SEC2_HEADING: this.getQuestionLabel('OVERVIEW_SEC2_HEADING', 'What You Do'),
-            OVERVIEW_SEC2_DESC: this.getQuestionLabel('OVERVIEW_SEC2_DESC', 'Tell us about your work: your top programs, your approach, and what makes it different.'),
-            OVERVIEW_SEC3_TAG: 'SECTION 3',
-            OVERVIEW_SEC3_HEADING: this.getQuestionLabel('OVERVIEW_SEC3_HEADING', 'What You\'ve Delivered'),
-            OVERVIEW_SEC3_DESC: this.getQuestionLabel('OVERVIEW_SEC3_DESC', 'Tell us what you\'ve achieved: your results for the last three years, plus your estimate for this year.'),
-            FAQ_SECTION_TITLE: this.getQuestionLabel('FAQ_SECTION_TITLE', 'FREQUENTLY ASKED QUESTIONS · WHAT THE TRACKS MEAN'),
-            FAQ_JF_TITLE: this.getQuestionLabel('FAQ_JF_TITLE', 'Job Fulfillment (Skilling and Placement)'),
-            FAQ_JC_TITLE: this.getQuestionLabel('FAQ_JC_TITLE', 'Job Creation (SME / Enterprise Support)'),
-            FAQ_LIV_TITLE: this.getQuestionLabel('FAQ_LIV_TITLE', 'Livelihood Upliftment'),
-
-            // Section Titles & Subtitles
-            SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', '1. About Your Organization'),
-            SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', '2. What You Do'),
-            SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', '3. Job Creation'),
-            SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', '4. Livelihood Upliftment'),
-            SEC_OUTCOMES: this.getSectionTitle('SEC_OUTCOMES', '3. What You Have Delivered'),
-            SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', '4. Why Wadhwani Grants'),
-            SEC_REVIEW_SUBMIT: this.getSectionTitle('SEC_REVIEW_SUBMIT', '5. Review and Submit'),
-
-            // Section Cards (Q2 - Q6)
-            SEC2_TITLE: this.getQuestionLabel('SEC2_TITLE', 'Organizational Identifying Information'),
-            SEC2_DESC: this.getQuestionLabel('SEC2_DESC', 'A few details so we know who we\'re talking to.'),
-            SEC3_TITLE: this.getQuestionLabel('SEC3_TITLE', 'Submitter Contact Information'),
-            SEC3_DESC: this.getQuestionLabel('SEC3_DESC', 'Who is filling out this form? You\'ll be the initial point of contact for your organisation.'),
-            SEC4_TITLE: this.getQuestionLabel('SEC4_TITLE', 'Legal Structure'),
-            SEC4_DESC: this.getQuestionLabel('SEC4_DESC', 'Tell us how your organisation is legally constituted and where it\'s registered.'),
-            SEC5_TITLE: this.getQuestionLabel('SEC5_TITLE', 'Legal and Tax Compliance'),
-            SEC5_DESC: this.getQuestionLabel('SEC5_DESC', 'Wadhwani Grants disburses from a US entity, so cross-border grants require certain compliance credentials. Tell us what your organization holds today. If you hold none yet, the last question simply asks whether you would be open to pursuing an Equivalency Determination (ED), a process Wadhwani Grants supports for selected partners. This is for our compliance planning; it does not affect how we read the rest of your application.'),
-            SEC6_TITLE: this.getQuestionLabel('SEC6_TITLE', 'Fiscal Year End Date'),
-            SEC6_DESC: this.getQuestionLabel('SEC6_DESC', 'When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)'),
-
-            // Tab 1 / Category 1 Flat Questions
-            Q1_SELECTED_TRACKS: this.getQuestionLabel('Q1_SELECTED_TRACKS', 'Selected Track'),
-            Q2_ORG_NAME: this.getQuestionLabel('Q2_ORG_NAME', 'Organizational Name'),
-            Q2_HQ_LOCATION: this.getQuestionLabel('Q2_HQ_LOCATION', 'Headquarters City and Country'),
-            Q2_PRIMARY_REGIONS: this.getQuestionLabel('Q2_PRIMARY_REGIONS', 'Primary Service Regions'),
-            Q2_LEADER_NAME: this.getQuestionLabel('Q2_LEADER_NAME', 'Leader Name'),
-            Q2_LEADER_TITLE: this.getQuestionLabel('Q2_LEADER_TITLE', 'Leader Title'),
-            Q2_LEADER_TENURE: this.getQuestionLabel('Q2_LEADER_TENURE', 'Leader Tenure (Optional)'),
-            
-            Q3_SUBMITTER_NAME: this.getQuestionLabel('Q3_SUBMITTER_NAME', 'Submitter Name'),
-            Q3_JOB_TITLE: this.getQuestionLabel('Q3_JOB_TITLE', 'Job Title'),
-            Q3_WORK_EMAIL: this.getQuestionLabel('Q3_WORK_EMAIL', 'Work Email'),
-            Q3_PHONE: this.getQuestionLabel('Q3_PHONE', 'Phone Number'),
-
-            Q4_LEGAL_TYPE: this.getQuestionLabel('Q4_LEGAL_TYPE', 'Legal Structure'),
-            Q4_JURISDICTION: this.getQuestionLabel('Q4_JURISDICTION', 'Registration Jurisdiction'),
-            Q4_INCORP_DATE: this.getQuestionLabel('Q4_INCORP_DATE', 'Incorporation Date'),
-            Q4_GOVERNANCE_DESC: this.getQuestionLabel('Q4_GOVERNANCE_DESC', 'Describe your governance structure and key governing bodies.'),
-            Q4_GOVERNANCE_HELPER: this.getQuestionLabel('Q4_GOVERNANCE_HELPER', 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).'),
-
-            Q5_US_501C3: this.getQuestionLabel('Q5_US_501C3', 'Do you have 501(c)(3) status or equivalent US tax-exempt determination?'),
-            Q5_ED_STATUS: this.getQuestionLabel('Q5_ED_STATUS', 'Do you currently hold an active Equivalency Determination (ED) certificate?'),
-            Q5_FCRA_STATUS: this.getQuestionLabel('Q5_FCRA_STATUS', 'Do you have a valid FCRA registration?'),
-            Q5_WILLING_ED: this.getQuestionLabel('Q5_WILLING_ED', 'Are you willing to pursue an Equivalency Determination (ED) if selected?'),
-
-            Q6_FISCAL_MONTH: this.getQuestionLabel('Q6_FISCAL_MONTH', 'Fiscal Year End Month'),
-            Q6_FISCAL_DAY: this.getQuestionLabel('Q6_FISCAL_DAY', 'Fiscal Year End Day'),
-            Q6_FISCAL_DATE: this.getQuestionLabel('Q6_FISCAL_DATE', 'Fiscal Year End Date'),
-
-            Q7_TOP_FUNDERS: this.getQuestionLabel('Q7_TOP_FUNDERS', 'Top 3 Prominent Funders'),
-            Q7_TOP_FUNDERS_DESC: this.getQuestionLabel('Q7_TOP_FUNDERS_DESC', 'Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.'),
-            Q8_REFERENCES: this.getQuestionLabel('Q8_REFERENCES', 'Reference Contacts for Outreach'),
-            Q8_REFERENCES_DESC: this.getQuestionLabel('Q8_REFERENCES_DESC', 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.'),
-
-            // Financials & Outcomes (Q9 & Q10)
-            Q9_HIST_FINANCIALS: this.getQuestionLabel('Q9_HIST_FINANCIALS', 'Historical Financial Performance'),
-            Q9_HIST_FINANCIALS_DESC: this.getQuestionLabel('Q9_HIST_FINANCIALS_DESC', 'Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.'),
-            Q10_CURRENT_FY: this.getQuestionLabel('Q10_CURRENT_FY', 'Current Fiscal Year Budget & Projections'),
-            Q10_CURRENT_FY_DESC: this.getQuestionLabel('Q10_CURRENT_FY_DESC', 'Your current fiscal year budget, latest projection, and explanation of any deviation.'),
-            Q10_EXPLANATION_LABEL: this.getQuestionLabel('Q10_EXPLANATION_LABEL', 'Explanation of deviation'),
-            Q10_EXPLANATION_DESC: this.getQuestionLabel('Q10_EXPLANATION_DESC', 'Required if total deviation is non-zero (combined revenue + expense; <200 words).'),
-
-            // Track Questions
-            Q11_SKILLING_APPROACH: this.getQuestionLabel('Q11_SKILLING_APPROACH', 'Your Skilling Approach'),
-            Q11_SKILLING_APPROACH_DESC: this.getQuestionLabel('Q11_SKILLING_APPROACH_DESC', 'Tell us about your skilling work in roughly 500 words. If you run named programs, walk us through your top three (names, what they teach, who they serve). Cover your theory of change, the journey from learner enrollment to placement, and what makes your approach different from others.'),
-            Q12_SKILLING_DOMAINS: this.getQuestionLabel('Q12_SKILLING_DOMAINS', 'Skilling Domains Offered'),
-            Q12_SKILLING_DOMAINS_DESC: this.getQuestionLabel('Q12_SKILLING_DOMAINS_DESC', 'List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.'),
-            Q13_JF_HIST_OUTCOMES: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES', 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)'),
-            Q13_JF_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q13_JF_HIST_OUTCOMES_DESC', 'Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.'),
-            Q14_JF_PROJ_OUTCOMES: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES', 'Job Fulfillment Outcomes — Current FY Projections'),
-            Q14_JF_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q14_JF_PROJ_OUTCOMES_DESC', 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren\'t verifiable at submission.'),
-
-            Q15_JOB_CREATION_APPROACH: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH', 'Your Job Creation Approach'),
-            Q15_JOB_CREATION_APPROACH_DESC: this.getQuestionLabel('Q15_JOB_CREATION_APPROACH_DESC', 'Tell us about your job creation work in roughly 500 words. Cover (i) your support model (capital, mentorship, business advisory, sector-specific TA, market linkages, etc.); (ii) your theory of change, the journey from engagement through to jobs created and sustained; (iii) what makes your approach different from others.'),
-            Q16_BUSINESS_SECTORS: this.getQuestionLabel('Q16_BUSINESS_SECTORS', 'Business Sectors Served'),
-            Q16_BUSINESS_SECTORS_DESC: this.getQuestionLabel('Q16_BUSINESS_SECTORS_DESC', 'List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.'),
-            Q17_JC_HIST_OUTCOMES: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES', 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)'),
-            Q17_JC_HIST_OUTCOMES_DESC: this.getQuestionLabel('Q17_JC_HIST_OUTCOMES_DESC', 'Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.'),
-            Q18_JC_PROJ_OUTCOMES: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES', 'Job Creation Outcomes — Current FY Projections'),
-            Q18_JC_PROJ_OUTCOMES_DESC: this.getQuestionLabel('Q18_JC_PROJ_OUTCOMES_DESC', 'Enter projected business and job-creation numbers for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.'),
-
-            Q19_LIVELIHOOD_APPROACH: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH', 'Your Livelihood Upliftment Approach'),
-            Q19_LIVELIHOOD_APPROACH_DESC: this.getQuestionLabel('Q19_LIVELIHOOD_APPROACH_DESC', 'Tell us about this work in roughly 500 words. Cover (i) who the beneficiary is and how they come to you; (ii) Describe your intervention either to help start a new business (and sustain it) or in helping grow their existing business towards helping them get family-sustaining incomes; (iii) the support that continues after any initial training, such as mentoring, market access, credit linkage or aggregation; (iv) what makes your approach different.'),
-            Q20_LIVELIHOOD_PROGRAMS: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS', 'Your Key Programs / Initiatives'),
-            Q20_LIVELIHOOD_PROGRAMS_DESC: this.getQuestionLabel('Q20_LIVELIHOOD_PROGRAMS_DESC', 'Tell us about your flagship programs and the type of interventions you offer. For each program / initative provide a view on what are the different interventions, how many man-hours do you spend with each beneficiary and how many beneficiaries typically enroll each year for each program.'),
-            Q21_COMMUNITIES_SERVED: this.getQuestionLabel('Q21_COMMUNITIES_SERVED', 'Communities that you work in'),
-            Q21_COMMUNITIES_SERVED_DESC: this.getQuestionLabel('Q21_COMMUNITIES_SERVED_DESC', 'Tell us where this program runs and how many households it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.'),
-            Q22_LIVELIHOOD_ACTUALS: this.getQuestionLabel('Q22_LIVELIHOOD_ACTUALS', 'Livelihood Outcomes (Actuals)'),
-            Q23_LIVELIHOOD_PROJ: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ', 'Livelihood Outcomes, Current FY Projections'),
-            Q23_LIVELIHOOD_PROJ_DESC: this.getQuestionLabel('Q23_LIVELIHOOD_PROJ_DESC', 'Projected figures for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.'),
-
-            // Section 4 & Category 1 Questions (Q24, Q25, Q26, Q27, Q28)
-            Q24_INDEPENDENT_VERIFICATION: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION', 'Independent Verification of Your Outcomes'),
-            Q24_INDEPENDENT_VERIFICATION_DESC: this.getQuestionLabel('Q24_INDEPENDENT_VERIFICATION_DESC', 'This applies to every applicant, whichever track you completed. If a third party has independently verified or evaluated the outcomes you reported, sharing the report strengthens your application; it is not required. If not, we will discuss verification together at the next stage.'),
-            Q24_OPERATIONAL_SYNERGIES: this.getQuestionLabel('Q24_OPERATIONAL_SYNERGIES', 'Operational Synergies'),
-            Q25_SUSTAINABILITY_PLAN: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN', 'Sustainability Plan'),
-            Q25_SUSTAINABILITY_PLAN_DESC: this.getQuestionLabel('Q25_SUSTAINABILITY_PLAN_DESC', 'How is your organization positioned to sustain its work over time? In about 100 words cover: (1) funding mix, main revenue sources; (2) programmatic resilience, dependence on any single program or contract; (3) funder concentration, reliance on one funder and how you manage that risk. A plain-language picture is all we need.'),
-            Q26_ADDITIONAL_FUNDING: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING', 'Direction for Additional Funding'),
-            Q26_ADDITIONAL_FUNDING_DESC: this.getQuestionLabel('Q26_ADDITIONAL_FUNDING_DESC', 'Then, in words. If you were given a grant of USD 1 million a year, what would you do with it? In about 200 words, tell us how you would deploy it to scale your impact: program expansion, geographic scaling, new offerings, capacity-building, technology investment, and so on. Treat the figure as approximate; scale it to your own situation. We will work out specifics together at the next stage, so no detailed budget or M&E plan is needed here.'),
-            Q27_GENIE_AI: this.getQuestionLabel('Q27_GENIE_AI', 'Operational Synergies with GenieAI (Optional)'),
-            Q27_GENIE_AI_DESC: this.getQuestionLabel('Q27_GENIE_AI_DESC', 'GenieAI is Wadhwani Foundation\'s AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying — we want your honest signal. If you\'re open to exploring synergy, tell us how it could fit. If not, that\'s a complete and acceptable answer.'),
-            Q28_SUPPORTING_DOCS: this.getQuestionLabel('Q28_SUPPORTING_DOCS', 'Supporting Documents (Optional)'),
-            Q28_SUPPORTING_DOCS_DESC: this.getQuestionLabel('Q28_SUPPORTING_DOCS_DESC', 'If there\'s anything else you\'d like to share in support of your application, you may upload it here.'),
-
-            // Review & Submit
-            REVIEW_SUBMIT_TITLE: this.getQuestionLabel('REVIEW_SUBMIT_TITLE', 'Review & Submit'),
-            REVIEW_SUBMIT_DESC: this.getQuestionLabel('REVIEW_SUBMIT_DESC', 'Take a final look at what you\'ve entered. Go back to any previous section to make edits before submitting.'),
-            REVIEW_SEC_ABOUT_ORG: this.getSectionTitle('SEC_ABOUT_ORG', 'ABOUT YOUR ORGANISATION'),
-            REVIEW_SEC_JOB_FULFILLMENT: this.getSectionTitle('SEC_JOB_FULFILLMENT', 'JOB FULFILLMENT'),
-            REVIEW_SEC_JOB_CREATION: this.getSectionTitle('SEC_JOB_CREATION', 'JOB CREATION'),
-            REVIEW_SEC_LIVELIHOOD: this.getSectionTitle('SEC_LIVELIHOOD', 'LIVELIHOOD UPLIFTMENT'),
-            REVIEW_SEC_WHY_WADHWANI: this.getSectionTitle('SEC_WHY_WADHWANI', 'WHY WADHWANI GRANTS')
-        };
-    }
-
-    loadDraftData() {
-        this.isLoading = true;
-        getDynamicDraft({ recordId: this.recordId })
-            .then(result => {
-                if (result && result.isSuccess) {
-                    if (result.recordId) {
-                        this._recordId = result.recordId;
-                    }
-                    if (result.selectedTracks && result.selectedTracks.length > 0) {
-                        this.selectedTracks = result.selectedTracks;
-                    }
-                    if (result.activeTabId) {
-                        this.activeTabId = result.activeTabId;
-                        this.currentScreen = 'screen2';
-                    }
-                    if (result.formValues) {
-                        this.formValues = {
-                            ...this.formValues,
-                            ...result.formValues
-                        };
-                        if (result.formValues.Headquarters_City_and_Country__c) {
-                            this.hqSearchKey = result.formValues.Headquarters_City_and_Country__c;
-                        }
-                    }
-                    if (result.skillingDomains && result.skillingDomains.length > 0) {
-                        this.skillingDomainRows = result.skillingDomains;
-                    }
-                    if (result.businessSectors && result.businessSectors.length > 0) {
-                        this.businessSectorRows = result.businessSectors;
-                    }
-                    if (result.livelihoodPrograms && result.livelihoodPrograms.length > 0) {
-                        this.livelihoodProgramRows = result.livelihoodPrograms;
-                    }
-                    if (result.communities && result.communities.length > 0) {
-                        this.communityRows = result.communities;
-                    }
-                    if (result.documents && result.documents.length > 0) {
-                        this.docRows = result.documents;
-                    }
-                    if (result.q24Files && result.q24Files.length > 0) {
-                        this.q24UploadedFiles = result.q24Files;
-                    }
-                    if (result.q28Files && result.q28Files.length > 0) {
-                        this.q28UploadedFiles = result.q28Files;
-                    }
-                    this.loadMetadata();
-                }
-            })
-            .catch(err => {
-                console.error('Error loading dynamic draft:', err);
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
     }
 
     _buildQuestionItem(q) {
@@ -627,95 +891,39 @@ export default class WcfDynamicForm extends LightningElement {
         };
     }
 
-    _getSectionQuestionList(sectionCode, keyPrefix, defaults, extraFilterFn) {
-        let list = [];
-        if (this.metadataQuestions && this.metadataQuestions.length) {
-            const matched = this.metadataQuestions.filter(q => {
-                const qKey = q.key || q.Question_Code__c || q.DeveloperName || '';
-                const qSec = q.sectionCode || q.Section_Code__c || '';
-                const matchesKey = qKey && qKey.toUpperCase().startsWith(keyPrefix.toUpperCase());
-                const matchesSection = qSec === sectionCode || qSec.toUpperCase() === keyPrefix.toUpperCase();
-                const passes = matchesKey || matchesSection;
-                return passes && (extraFilterFn ? extraFilterFn(q) : true);
-            });
-            if (matched.length > 0) {
-                list = [...matched].sort((a, b) => (a.sequence || 99) - (b.sequence || 99));
-            }
-        }
-        if (!list.length && defaults) {
-            list = defaults;
-        }
+    get q2Questions() {
+        const list = this._sectionQuestionsDef?.q2 || [];
         return list.map(q => this._buildQuestionItem(q));
     }
 
-    get q2Questions() {
-        const defaults = [
-            { key: 'Q2_ORG_NAME', targetField: 'Organization_Name__c', label: 'Organizational Name', displayType: 'Text', isRequired: true, sequence: 1 },
-            { key: 'Q2_HQ_LOCATION', targetField: 'Headquarters_City_and_Country__c', label: 'Headquarters City and Country', displayType: 'Text', isRequired: true, sequence: 2 },
-            { key: 'Q2_PRIMARY_REGIONS', targetField: 'Primary_Service_Regions__c', label: 'Primary Service Regions', displayType: 'Text', isRequired: true, sequence: 3 },
-            { key: 'Q2_LEADER_NAME', targetField: 'Leader_Name__c', label: 'Leader Name', displayType: 'Text', isRequired: true, sequence: 4 },
-            { key: 'Q2_LEADER_TITLE', targetField: 'Leader_Title__c', label: 'Leader Title', displayType: 'Text', isRequired: true, sequence: 5 },
-            { key: 'Q2_LEADER_TENURE', targetField: 'Leader_Tenure__c', label: 'Leader Tenure (Optional)', displayType: 'Number', isRequired: false, sequence: 6 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q2_', defaults);
-    }
-
     get q3Questions() {
-        const defaults = [
-            { key: 'Q3_SUBMITTER_NAME', targetField: 'Submitter_Name__c', label: 'Submitter Name', displayType: 'Text', isRequired: true, sequence: 1 },
-            { key: 'Q3_JOB_TITLE', targetField: 'Job_Title__c', label: 'Job Title', displayType: 'Text', isRequired: true, sequence: 2 },
-            { key: 'Q3_PHONE', targetField: 'Phone__c', label: 'Phone Number', displayType: 'Phone', isRequired: true, sequence: 3 },
-            { key: 'Q3_WORK_EMAIL', targetField: 'Work_Email_ID__c', label: 'Work Email', displayType: 'Email', isRequired: true, sequence: 4 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q3_', defaults);
+        const list = this._sectionQuestionsDef?.q3 || [];
+        return list.map(q => this._buildQuestionItem(q));
     }
 
     get q4Questions() {
-        const defaults = [
-            { key: 'Q4_LEGAL_TYPE', targetField: 'Legal_Type__c', label: 'Legal Structure', displayType: 'Picklist', isRequired: true, sequence: 1 },
-            { key: 'Q4_JURISDICTION', targetField: 'Registration_Jurisdiction__c', label: 'Registration Jurisdiction', displayType: 'Picklist', isRequired: true, sequence: 2 },
-            { key: 'Q4_INCORP_DATE', targetField: 'Incorporation_Date__c', label: 'Incorporation Date', displayType: 'Date', isRequired: true, sequence: 3 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q4_', defaults, q => {
-            const k = q.key || q.Question_Code__c || '';
-            const f = q.targetField || q.Field_API_Name__c || '';
-            return k !== 'Q4_GOVERNANCE_DESC' && f !== 'Legal_Structure__c';
-        });
+        const list = this._sectionQuestionsDef?.q4 || [];
+        return list.map(q => this._buildQuestionItem(q));
     }
 
     get q4GovernanceQuestions() {
-        const defaults = [
-            { key: 'Q4_GOVERNANCE_DESC', targetField: 'Legal_Structure__c', label: 'Describe your governance structure and key governing bodies.', displayType: 'TextArea', isRequired: true, sequence: 4 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q4_GOVERNANCE', defaults, q => {
-            const k = q.key || q.Question_Code__c || '';
-            const f = q.targetField || q.Field_API_Name__c || '';
-            return k === 'Q4_GOVERNANCE_DESC' || f === 'Legal_Structure__c';
-        });
+        const list = this._sectionQuestionsDef?.q4Gov || [];
+        return list.map(q => this._buildQuestionItem(q));
     }
 
     get q5Questions() {
-        const defaults = [
-            { key: 'Q5_US_501C3', targetField: 'Has_501c3_Status__c', label: 'Do you have 501(c)(3) status in the US?', displayType: 'Picklist', isRequired: true, sequence: 1 },
-            { key: 'Q5_ED_STATUS', targetField: 'Has_Equivalency_Determination__c', label: 'Do you have an Equivalency Determination (ED) in place?', displayType: 'Picklist', isRequired: true, sequence: 2 },
-            { key: 'Q5_FCRA_STATUS', targetField: 'Is_FCRA_Registered__c', label: 'If you operate in India, are you FCRA-registered?', displayType: 'Picklist', isRequired: true, sequence: 3 },
-            { key: 'Q5_WILLING_ED', targetField: 'Willing_to_Pursue_ED__c', label: 'If none of the above apply, would you be willing to pursue ED certification if selected?', displayType: 'Picklist', isRequired: true, sequence: 4 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q5_', defaults);
+        const list = this._sectionQuestionsDef?.q5 || [];
+        return list.map(q => this._buildQuestionItem(q));
     }
 
     get q6Questions() {
-        const defaults = [
-            { key: 'Q6_FISCAL_MONTH', targetField: 'Fiscal_Month__c', label: 'Month', displayType: 'Picklist', isRequired: true, sequence: 1 },
-            { key: 'Q6_FISCAL_DAY', targetField: 'Fiscal_Day__c', label: 'Day', displayType: 'Picklist', isRequired: true, sequence: 2 }
-        ];
-        return this._getSectionQuestionList('SEC_ABOUT_ORG', 'Q6_', defaults);
+        const list = this._sectionQuestionsDef?.q6 || [];
+        return list.map(q => this._buildQuestionItem(q));
     }
 
-    _getCustomQuestions(filterFn, basePrefix) {
-        if (!this.metadataQuestions || !this.metadataQuestions.length) return [];
-        const filtered = this.metadataQuestions.filter(q => q.isCustom && filterFn(q));
-        return filtered.map((q, idx) => {
+    _mapCustomQuestions(items, basePrefix) {
+        if (!items || !items.length) return [];
+        return items.map((q, idx) => {
             let val = undefined;
             if (q.targetField) {
                 val = this.formValues[q.targetField];
@@ -764,132 +972,102 @@ export default class WcfDynamicForm extends LightningElement {
         });
     }
 
+    _getCustomQuestions(filterFn, basePrefix) {
+        if (!this.metadataQuestions || !this.metadataQuestions.length) return [];
+        const filtered = this.metadataQuestions.filter(q => q.isCustom && (filterFn ? filterFn(q) : true));
+        return this._mapCustomQuestions(filtered, basePrefix);
+    }
+
     // Sub-section 2: Organizational Identifying Information (e.g. Q2_VOLUNTEER_COUNT, Annual_Volunteer_Count__c)
     get customQuestionsQ2() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
-        ) && (
-            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
-            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
-        ), '2');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q2, '2');
     }
     get hasCustomQuestionsQ2() {
-        return this.customQuestionsQ2 && this.customQuestionsQ2.length > 0;
+        return (this._customQuestionsDef?.q2?.length || 0) > 0;
     }
 
     // Sub-section 3: Submitter Contact Information
     get customQuestionsQ3() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q3' || q.sectionCode === 'Q3'
-        ) && q.key && q.key.toUpperCase().startsWith('Q3_'), '3');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q3, '3');
     }
     get hasCustomQuestionsQ3() {
-        return this.customQuestionsQ3 && this.customQuestionsQ3.length > 0;
+        return (this._customQuestionsDef?.q3?.length || 0) > 0;
     }
 
     // Sub-section 4: Legal & Governance Structure
     get customQuestionsQ4() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q4' || q.sectionCode === 'Q4'
-        ) && q.key && q.key.toUpperCase().startsWith('Q4_'), '4');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q4, '4');
     }
     get hasCustomQuestionsQ4() {
-        return this.customQuestionsQ4 && this.customQuestionsQ4.length > 0;
+        return (this._customQuestionsDef?.q4?.length || 0) > 0;
     }
 
     // Sub-section 5: Legal & Tax Compliance
     get customQuestionsQ5() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q5' || q.sectionCode === 'Q5'
-        ) && q.key && q.key.toUpperCase().startsWith('Q5_'), '5');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q5, '5');
     }
     get hasCustomQuestionsQ5() {
-        return this.customQuestionsQ5 && this.customQuestionsQ5.length > 0;
+        return (this._customQuestionsDef?.q5?.length || 0) > 0;
     }
 
     // Sub-section 6: Fiscal Year
     get customQuestionsQ6() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q6' || q.sectionCode === 'Q6'
-        ) && q.key && q.key.toUpperCase().startsWith('Q6_'), '6');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q6, '6');
     }
     get hasCustomQuestionsQ6() {
-        return this.customQuestionsQ6 && this.customQuestionsQ6.length > 0;
+        return (this._customQuestionsDef?.q6?.length || 0) > 0;
     }
 
     // Sub-section 7: Top Funders
     get customQuestionsQ7() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q7' || q.sectionCode === 'Q7'
-        ) && q.key && q.key.toUpperCase().startsWith('Q7_'), '7');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q7, '7');
     }
     get hasCustomQuestionsQ7() {
-        return this.customQuestionsQ7 && this.customQuestionsQ7.length > 0;
+        return (this._customQuestionsDef?.q7?.length || 0) > 0;
     }
 
     // Sub-section 8: References
     get customQuestionsQ8() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q8' || q.sectionCode === 'Q8'
-        ) && q.key && q.key.toUpperCase().startsWith('Q8_'), '8');
+        return this._mapCustomQuestions(this._customQuestionsDef?.q8, '8');
     }
     get hasCustomQuestionsQ8() {
-        return this.customQuestionsQ8 && this.customQuestionsQ8.length > 0;
+        return (this._customQuestionsDef?.q8?.length || 0) > 0;
     }
 
     // General Custom Questions for Tab 1 (About Org) - remaining ones
     get customQuestionsAboutOrg() {
-        const renderedKeys = new Set([
-            ...this.customQuestionsQ2.map(x => x.key),
-            ...this.customQuestionsQ3.map(x => x.key),
-            ...this.customQuestionsQ4.map(x => x.key),
-            ...this.customQuestionsQ5.map(x => x.key),
-            ...this.customQuestionsQ6.map(x => x.key),
-            ...this.customQuestionsQ7.map(x => x.key),
-            ...this.customQuestionsQ8.map(x => x.key)
-        ]);
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'ABOUT_ORG'
-        ) && !renderedKeys.has(q.key), '10');
+        return this._mapCustomQuestions(this._customQuestionsDef?.aboutOrg, '10');
     }
     get hasCustomQuestionsAboutOrg() {
-        return this.customQuestionsAboutOrg && this.customQuestionsAboutOrg.length > 0;
+        return (this._customQuestionsDef?.aboutOrg?.length || 0) > 0;
     }
 
     get customQuestionsJobFulfillment() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_JOB_FULFILLMENT' || q.sectionCode === 'SEC_WHAT_YOU_DO' || q.sectionCode === 'JOB_FULFILLMENT'
-        ), `Q${this.qNum?.Q14 || '14'}`);
+        return this._mapCustomQuestions(this._customQuestionsDef?.jf, `Q${this.qNum?.Q14 || '14'}`);
     }
     get hasCustomQuestionsJobFulfillment() {
-        return this.customQuestionsJobFulfillment && this.customQuestionsJobFulfillment.length > 0;
+        return (this._customQuestionsDef?.jf?.length || 0) > 0;
     }
 
     get customQuestionsJobCreation() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_JOB_CREATION' || q.sectionCode === 'JOB_CREATION'
-        ), `Q${this.qNum?.Q18 || '18'}`);
+        return this._mapCustomQuestions(this._customQuestionsDef?.jc, `Q${this.qNum?.Q18 || '18'}`);
     }
     get hasCustomQuestionsJobCreation() {
-        return this.customQuestionsJobCreation && this.customQuestionsJobCreation.length > 0;
+        return (this._customQuestionsDef?.jc?.length || 0) > 0;
     }
 
     get customQuestionsLivelihood() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_LIVELIHOOD' || q.sectionCode === 'LIVELIHOOD'
-        ), `Q${this.qNum?.Q23 || '23'}`);
+        return this._mapCustomQuestions(this._customQuestionsDef?.liv, `Q${this.qNum?.Q23 || '23'}`);
     }
     get hasCustomQuestionsLivelihood() {
-        return this.customQuestionsLivelihood && this.customQuestionsLivelihood.length > 0;
+        return (this._customQuestionsDef?.liv?.length || 0) > 0;
     }
 
     get customQuestionsWhyWadhwani() {
-        return this._getCustomQuestions(q => (
-            q.sectionCode === 'SEC_WHY_WADHWANI' || q.sectionCode === 'SEC_WHY_WCF' || q.sectionCode === 'WHY_WADHWANI'
-        ), `Q${this.qNum?.Q28 || '28'}`);
+        return this._mapCustomQuestions(this._customQuestionsDef?.why, `Q${this.qNum?.Q28 || '28'}`);
     }
     get hasCustomQuestionsWhyWadhwani() {
-        return this.customQuestionsWhyWadhwani && this.customQuestionsWhyWadhwani.length > 0;
+        return (this._customQuestionsDef?.why?.length || 0) > 0;
     }
 
     loadDraftData() {
@@ -1410,6 +1588,60 @@ export default class WcfDynamicForm extends LightningElement {
         return `${d} ${m}`.trim();
     }
 
+    get previewFunder1Amount() {
+        const amt = this.formValues.Funder_1_Amount__c;
+        if (amt === '' || amt === null || amt === undefined) return '';
+        const n = Number(String(amt).replace(/,/g, ''));
+        return isNaN(n) ? amt : n.toLocaleString('en-US');
+    }
+
+    get previewFunder2Amount() {
+        const amt = this.formValues.Funder_2_Amount__c;
+        if (amt === '' || amt === null || amt === undefined) return '';
+        const n = Number(String(amt).replace(/,/g, ''));
+        return isNaN(n) ? amt : n.toLocaleString('en-US');
+    }
+
+    get previewFunder3Amount() {
+        const amt = this.formValues.Funder_3_Amount__c;
+        if (amt === '' || amt === null || amt === undefined) return '';
+        const n = Number(String(amt).replace(/,/g, ''));
+        return isNaN(n) ? amt : n.toLocaleString('en-US');
+    }
+
+    get hasFunder1Period() {
+        return !!(this.formValues.Funder_1_Period_Start__c || this.formValues.Funder_1_Period_End__c);
+    }
+
+    get hasFunder2Period() {
+        return !!(this.formValues.Funder_2_Period_Start__c || this.formValues.Funder_2_Period_End__c);
+    }
+
+    get hasFunder3Period() {
+        return !!(this.formValues.Funder_3_Period_Start__c || this.formValues.Funder_3_Period_End__c);
+    }
+
+    get previewFunder1Period() {
+        const s = this.formValues.Funder_1_Period_Start__c ? this._fmtDateDisplay(this.formValues.Funder_1_Period_Start__c) : '';
+        const e = this.formValues.Funder_1_Period_End__c ? this._fmtDateDisplay(this.formValues.Funder_1_Period_End__c) : '';
+        if (s && e) return `${s} to ${e}`;
+        return s || e || '';
+    }
+
+    get previewFunder2Period() {
+        const s = this.formValues.Funder_2_Period_Start__c ? this._fmtDateDisplay(this.formValues.Funder_2_Period_Start__c) : '';
+        const e = this.formValues.Funder_2_Period_End__c ? this._fmtDateDisplay(this.formValues.Funder_2_Period_End__c) : '';
+        if (s && e) return `${s} to ${e}`;
+        return s || e || '';
+    }
+
+    get previewFunder3Period() {
+        const s = this.formValues.Funder_3_Period_Start__c ? this._fmtDateDisplay(this.formValues.Funder_3_Period_Start__c) : '';
+        const e = this.formValues.Funder_3_Period_End__c ? this._fmtDateDisplay(this.formValues.Funder_3_Period_End__c) : '';
+        if (s && e) return `${s} to ${e}`;
+        return s || e || '';
+    }
+
     get skillingDomainsForReview() {
         return (this.skillingDomainRows || [])
             .filter(r => r && r.name && r.name.trim() !== '')
@@ -1793,13 +2025,16 @@ export default class WcfDynamicForm extends LightningElement {
         }
 
         if (form.Funder_1_Name__c) {
-            labelValue('Funder 1', `${form.Funder_1_Name__c} - ${val$(form.Funder_1_Amount__c)} (${val(form.Funder_1_Type__c)})`, 'Q7');
+            const p1 = (form.Funder_1_Period_Start__c || form.Funder_1_Period_End__c) ? ` · Period: ${this.previewFunder1Period}` : '';
+            labelValue('Funder 1', `${form.Funder_1_Name__c} - ${val$(form.Funder_1_Amount__c)} (${val(form.Funder_1_Type__c)})${p1}`, 'Q7');
         }
         if (form.Funder_2_Name__c) {
-            labelValue('Funder 2', `${form.Funder_2_Name__c} - ${val$(form.Funder_2_Amount__c)} (${val(form.Funder_2_Type__c)})`, 'Q7');
+            const p2 = (form.Funder_2_Period_Start__c || form.Funder_2_Period_End__c) ? ` · Period: ${this.previewFunder2Period}` : '';
+            labelValue('Funder 2', `${form.Funder_2_Name__c} - ${val$(form.Funder_2_Amount__c)} (${val(form.Funder_2_Type__c)})${p2}`, 'Q7');
         }
         if (form.Funder_3_Name__c) {
-            labelValue('Funder 3', `${form.Funder_3_Name__c} - ${val$(form.Funder_3_Amount__c)} (${val(form.Funder_3_Type__c)})`, 'Q7');
+            const p3 = (form.Funder_3_Period_Start__c || form.Funder_3_Period_End__c) ? ` · Period: ${this.previewFunder3Period}` : '';
+            labelValue('Funder 3', `${form.Funder_3_Name__c} - ${val$(form.Funder_3_Amount__c)} (${val(form.Funder_3_Type__c)})${p3}`, 'Q7');
         }
         if (form.Reference_1_Name__c) {
             labelValue('Reference 1', `${form.Reference_1_Name__c} (${val(form.Reference_1_Role__c)}) - ${val(form.Reference_1_Email__c)}`, 'Q8');
@@ -2064,9 +2299,10 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     handleInputChange(event) {
-        const key = event.currentTarget?.dataset?.key || event.target?.dataset?.key || 
-                    event.currentTarget?.dataset?.id || event.target?.dataset?.id ||
-                    event.currentTarget?.dataset?.field || event.target?.dataset?.field;
+        const fldAttr = event.currentTarget?.dataset?.field || event.target?.dataset?.field;
+        const keyAttr = event.currentTarget?.dataset?.key || event.target?.dataset?.key;
+        const idAttr = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
+        const key = fldAttr || keyAttr || idAttr;
         if (!key) return;
 
         this.isDirty = true;
@@ -2093,12 +2329,7 @@ export default class WcfDynamicForm extends LightningElement {
         // Direct property mutation prevents full-component VDOM re-evaluation on each keystroke
         this.formValues[key] = val;
 
-        const fldAttr = event.currentTarget?.dataset?.field || event.target?.dataset?.field;
-        if (fldAttr && fldAttr !== key) {
-            this.formValues[fldAttr] = val;
-        }
-        const idAttr = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
-        if (idAttr && idAttr !== key) {
+        if (idAttr && idAttr !== key && this.formValues[idAttr] !== undefined) {
             this.formValues[idAttr] = val;
         }
 
@@ -2117,38 +2348,66 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     _runLiveFieldValidation(key, val) {
-        // Real-time quality validation for Q2 & Q3 text fields
+        if (!key) return;
+
+        // 1. Text / Name-like fields
         const liveTextValidators = {
-            Organization_Name__c:             v => this._validateNameLikeField(v, 'Organization Name'),
-            Headquarters_City_and_Country__c: v => this._validateHQCityCountry(v),
-            Primary_Service_Regions__c:       v => this._validateRegionsField(v),
-            Leader_Name__c:                   v => this._validateNameLikeField(v, 'Leader Name'),
-            Leader_Title__c:                  v => this._validateNameLikeField(v, 'Leader Title'),
-            Submitter_Name__c:                v => this._validateNameLikeField(v, 'Submitter Name'),
-            Job_Title__c:                      v => this._validateNameLikeField(v, 'Submitter Title')
+            Organization_Name__c:               v => this._validateNameLikeField(v, 'Organization Name'),
+            Headquarters_City_and_Country__c:   v => this._validateHQCityCountry(v),
+            Primary_Service_Regions__c:         v => this._validateRegionsField(v),
+            Leader_Name__c:                     v => this._validateNameLikeField(v, 'Leader Name'),
+            Leader_Title__c:                    v => this._validateNameLikeField(v, 'Leader Title'),
+            Submitter_Name__c:                  v => this._validateNameLikeField(v, 'Submitter Name'),
+            Job_Title__c:                       v => this._validateNameLikeField(v, 'Submitter Title'),
+            Legal_Type_Other__c:                v => this._validateNameLikeField(v, 'Legal Type'),
+            Registration_Jurisdiction_Other__c: v => this._validateNameLikeField(v, 'Registration Jurisdiction'),
+            Funder_1_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
+            Funder_2_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
+            Funder_3_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
+            Reference_1_Name__c:                v => this._validateNameLikeField(v, 'Reference Name'),
+            Reference_1_Role__c:                v => this._validateNameLikeField(v, 'Reference Role / Designation'),
+            Reference_2_Name__c:                v => this._validateNameLikeField(v, 'Reference Name'),
+            Reference_2_Role__c:                v => this._validateNameLikeField(v, 'Reference Role / Designation'),
+            Attesting_User_Name__c:             v => this._validateNameLikeField(v, 'Attesting User Name'),
+            Attesting_User_Title__c:            v => this._validateNameLikeField(v, 'Attesting User Title')
         };
 
-        if (key && liveTextValidators[key]) {
-            if (val) {
+        if (liveTextValidators[key]) {
+            if (val && String(val).trim() !== '') {
                 const err = liveTextValidators[key](val);
                 if (err) this._showLightningError(key, err);
                 else this._clearLightningError(key);
             } else {
                 this._clearLightningError(key);
             }
+            if (key.startsWith('Reference_')) {
+                this._validateReferenceFields();
+            }
+            if (key.startsWith('Funder_')) {
+                this._validateFunderFields();
+            }
+            return;
         }
 
-        if ((key === 'Work_Email_ID__c' || key === 'Leader_Email__c' || key === 'Reference_1_Email__c' || key === 'Reference_2_Email__c') && val) {
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(val)) {
-                this._showLightningError(key, 'Please enter a valid email address.');
+        // 2. Email fields
+        if (key === 'Work_Email_ID__c' || key === 'Leader_Email__c' || key === 'Reference_1_Email__c' || key === 'Reference_2_Email__c') {
+            if (val && String(val).trim() !== '') {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(val)) {
+                    this._showLightningError(key, 'Please enter a valid email address.');
+                } else {
+                    this._clearLightningError(key);
+                }
             } else {
                 this._clearLightningError(key);
             }
-        } else if (key === 'Work_Email_ID__c' || key === 'Leader_Email__c' || key === 'Reference_1_Email__c' || key === 'Reference_2_Email__c') {
-            this._clearLightningError(key);
+            if (key.startsWith('Reference_')) {
+                this._validateReferenceFields();
+            }
+            return;
         }
 
+        // 3. Incorporation Date
         if (key === 'Incorporation_Date__c') {
             if (val) {
                 const todayStr = this.todayDateString;
@@ -2162,12 +2421,45 @@ export default class WcfDynamicForm extends LightningElement {
             } else {
                 this._clearLightningError(key);
             }
+            return;
         }
 
-        if (key && key.startsWith('Funder_')) {
+        // 4. Leader Tenure
+        if (key === 'Leader_Tenure__c') {
+            if (val !== '' && val !== null && val !== undefined) {
+                const n = Number(val);
+                if (!Number.isInteger(n) || n < 0 || n > 99) {
+                    this._showLightningError('Leader_Tenure__c', 'Must be a whole number between 0 and 99.');
+                } else {
+                    this._clearLightningError('Leader_Tenure__c');
+                }
+            } else {
+                this._clearLightningError('Leader_Tenure__c');
+            }
+            return;
+        }
+
+        // 5. Picklists & single selections
+        const picklistKeys = [
+            'Legal_Type__c', 'Registration_Jurisdiction__c',
+            'Has_501c3_Status__c', 'Has_Equivalency_Determination__c',
+            'Is_FCRA_Registered__c', 'Willing_to_Pursue_ED__c',
+            'Fiscal_Month__c', 'Fiscal_Day__c',
+            'Funder_1_Type__c', 'Funder_2_Type__c', 'Funder_3_Type__c',
+            'Q24_VERIFIED', 'GenieAI_Interest_Level__c'
+        ];
+        if (picklistKeys.includes(key)) {
+            if (val) {
+                this._clearLightningError(key);
+            }
+            return;
+        }
+
+        // 6. Funder Dates and Amounts
+        if (key.startsWith('Funder_')) {
             if (key.endsWith('_Amount__c')) {
                 if (val !== '' && val !== null && val !== undefined) {
-                    const n = Number(val);
+                    const n = Number(String(val).replace(/,/g, '').trim());
                     if (isNaN(n) || n < 0) {
                         this._showLightningError(key, 'Please enter a valid positive amount.');
                     } else {
@@ -2182,14 +2474,76 @@ export default class WcfDynamicForm extends LightningElement {
                 const eKey = `${funderPrefix}_Period_End__c`;
                 const sVal = this.formValues[sKey];
                 const eVal = this.formValues[eKey];
-                if (sVal && eVal && eVal < sVal) {
-                    this._showLightningError(eKey, 'Funding end date must be on or after start date.');
+                if (sVal && eVal && eVal <= sVal) {
+                    this._showLightningError(eKey, 'Funding end date must be after start date.');
                 } else {
                     this._clearLightningError(eKey);
+                    this._clearLightningError(sKey);
                 }
+            }
+            return;
+        }
+
+        // 7. Numeric Financial & Outcome fields (Q9, Q10, Q13, Q14, Q17, Q18, Q22, Q23)
+        const numericOutcomeKeys = [
+            // Q9 Historical Financials
+            'START_FY3',
+            'REV_FY3', 'REV_FY2', 'REV_FY1',
+            'CAP_FY3', 'CAP_FY2', 'CAP_FY1',
+            'OP_FY3', 'OP_FY2', 'OP_FY1',
+            // Q10 CFY Financials
+            'CFY_REV_BUDGET', 'CFY_REV_PROJ',
+            'CFY_CAP_BUDGET', 'CFY_CAP_PROJ',
+            'CFY_OP_BUDGET', 'CFY_OP_PROJ',
+            // Q13 & Q14 Job Fulfillment
+            'JF_ENROLL_FY3', 'JF_ENROLL_FY2', 'JF_ENROLL_FY1', 'JF_ENROLL_PROJ',
+            'JF_PLACE_FY3', 'JF_PLACE_FY2', 'JF_PLACE_FY1', 'JF_PLACE_PROJ',
+            'JF_COST_FY3', 'JF_COST_FY2', 'JF_COST_FY1', 'JF_COST_PROJ',
+            // Q17 & Q18 Job Creation
+            'JC_NEW_BIZ_FY3', 'JC_NEW_BIZ_FY2', 'JC_NEW_BIZ_FY1', 'JC_NEW_BIZ_PROJ',
+            'JC_NEW_JOBS_FY3', 'JC_NEW_JOBS_FY2', 'JC_NEW_JOBS_FY1', 'JC_NEW_JOBS_PROJ',
+            'JC_EXIST_BIZ_FY3', 'JC_EXIST_BIZ_FY2', 'JC_EXIST_BIZ_FY1', 'JC_EXIST_BIZ_PROJ',
+            'JC_EXIST_JOBS_FY3', 'JC_EXIST_JOBS_FY2', 'JC_EXIST_JOBS_FY1', 'JC_EXIST_JOBS_PROJ',
+            'JC_COST_FY3', 'JC_COST_FY2', 'JC_COST_FY1', 'JC_COST_PROJ',
+            // Q22 & Q23 Livelihood Upliftment
+            'LIV_SERVED_FY3', 'LIV_SERVED_FY2', 'LIV_SERVED_FY1', 'LIV_SERVED_PROJ',
+            'LIV_ENROLL_FY3', 'LIV_ENROLL_FY2', 'LIV_ENROLL_FY1', 'LIV_ENROLL_PROJ',
+            'LIV_OUTCOME_FY3', 'LIV_OUTCOME_FY2', 'LIV_OUTCOME_FY1', 'LIV_OUTCOME_PROJ',
+            'LIV_COST_FY3', 'LIV_COST_FY2', 'LIV_COST_FY1', 'LIV_COST_PROJ'
+        ];
+
+        if (numericOutcomeKeys.includes(key)) {
+            const clean = (val !== '' && val !== null && val !== undefined) ? String(val).replace(/,/g, '').trim() : '';
+            const label = this._getLabelForFieldKey(key) || 'This field';
+            if (clean === '') {
+                this._showLightningError(key, `${label} is required.`);
+            } else if (isNaN(Number(clean))) {
+                this._showLightningError(key, `${label} must be a number.`);
+            } else if (Number(clean) < 0) {
+                this._showLightningError(key, `${label} cannot be negative.`);
             } else {
                 this._clearLightningError(key);
             }
+            return;
+        }
+
+        // 8. Details_of_Ethical_Received__c
+        if (key === 'Details_of_Ethical_Received__c') {
+            if (val && String(val).trim() !== '') {
+                this._clearLightningError(key);
+            }
+            return;
+        }
+
+        // 9. Operational_Synergies_with_WOF__c
+        if (key === 'Operational_Synergies_with_WOF__c') {
+            const words = (val || '').trim().split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 200) {
+                this._showLightningError('Operational_Synergies_with_WOF__c', `Exceeds 200-word limit (currently ${words.length} words). Please shorten before proceeding.`);
+            } else {
+                this._clearLightningError('Operational_Synergies_with_WOF__c');
+            }
+            return;
         }
     }
 
@@ -2477,7 +2831,7 @@ export default class WcfDynamicForm extends LightningElement {
         const trimmed = String(value).trim();
         if (trimmed === '') return `${fieldLabel} cannot be blank or contain only spaces.`;
 
-        const emojiPattern = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}]/u;
+        const emojiPattern = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F000}-\u{1FFFF}]/u;
         if (emojiPattern.test(trimmed)) {
             return `${fieldLabel} cannot contain emoji characters.`;
         }
@@ -2492,6 +2846,10 @@ export default class WcfDynamicForm extends LightningElement {
 
         if (!/[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/.test(trimmed)) {
             return `${fieldLabel} must contain at least one letter — numbers or symbols alone are not allowed.`;
+        }
+
+        if (!/^[a-zA-Z\u00C0-\u024F\u0400-\u04FF0-9\s.,'()&/\-]+$/.test(trimmed)) {
+            return `${fieldLabel} contains invalid characters or symbols.`;
         }
 
         return null;
@@ -3188,7 +3546,24 @@ export default class WcfDynamicForm extends LightningElement {
             this._clearLightningError('Fiscal_Day__c');
         }
 
-        // Funders (Q7) partial-fill check
+        // Funders (Q7) partial-fill and sequential check
+        const f1Filled = [org.Funder_1_Name__c, org.Funder_1_Amount__c, org.Funder_1_Period_Start__c, org.Funder_1_Period_End__c, org.Funder_1_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+        const f2Filled = this.showFunder2 && [org.Funder_2_Name__c, org.Funder_2_Amount__c, org.Funder_2_Period_Start__c, org.Funder_2_Period_End__c, org.Funder_2_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+        const f3Filled = this.showFunder3 && [org.Funder_3_Name__c, org.Funder_3_Amount__c, org.Funder_3_Period_Start__c, org.Funder_3_Period_End__c, org.Funder_3_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+
+        if (f2Filled && !f1Filled) {
+            ['Funder_1_Name__c', 'Funder_1_Amount__c', 'Funder_1_Period_Start__c', 'Funder_1_Period_End__c', 'Funder_1_Type__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Funder 1 before adding Funder 2.');
+            });
+            isValid = false;
+        }
+        if (f3Filled && !f2Filled) {
+            ['Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c', 'Funder_2_Period_End__c', 'Funder_2_Type__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Funder 2 before adding Funder 3.');
+            });
+            isValid = false;
+        }
+
         const funderSets = [
             {
                 label: 'Funder 1',
@@ -3232,7 +3607,11 @@ export default class WcfDynamicForm extends LightningElement {
             const anyFilled = values.some(v => v !== '' && v !== null && v !== undefined);
 
             if (!anyFilled) {
-                Object.values(f).forEach(key => this._clearLightningError(key));
+                if ((label === 'Funder 1' && f2Filled) || (label === 'Funder 2' && f3Filled)) {
+                    // Retain sequential error
+                } else {
+                    Object.values(f).forEach(key => this._clearLightningError(key));
+                }
                 return;
             }
 
@@ -3247,7 +3626,7 @@ export default class WcfDynamicForm extends LightningElement {
             });
 
             if (org[f.amount] !== '' && org[f.amount] !== null && org[f.amount] !== undefined) {
-                const n = Number(org[f.amount]);
+                const n = Number(String(org[f.amount]).replace(/,/g, '').trim());
                 if (isNaN(n) || n < 0) {
                     this._showLightningError(f.amount, 'Please enter a valid positive amount.');
                     isValid = false;
@@ -3266,7 +3645,19 @@ export default class WcfDynamicForm extends LightningElement {
             }
         });
 
-        // References (Q8) partial-fill check
+        // References (Q8) partial-fill and sequential check
+        const ref1Values = [org.Reference_1_Name__c, org.Reference_1_Role__c, org.Reference_1_Email__c];
+        const hasRef1Data = ref1Values.some(v => v !== '' && v !== null && v !== undefined);
+        const ref2Values = [org.Reference_2_Name__c, org.Reference_2_Role__c, org.Reference_2_Email__c];
+        const hasRef2Data = this.showReference2 && ref2Values.some(v => v !== '' && v !== null && v !== undefined);
+
+        if (hasRef2Data && !hasRef1Data) {
+            ['Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Reference 1 before providing Reference 2.');
+            });
+            isValid = false;
+        }
+
         const refSets = [
             {
                 label: 'Reference 1',
@@ -3295,18 +3686,35 @@ export default class WcfDynamicForm extends LightningElement {
             const anyFilled = values.some(v => v !== '' && v !== null && v !== undefined);
 
             if (!anyFilled) {
-                Object.values(f).forEach(key => this._clearLightningError(key));
+                if (label !== 'Reference 1' || !hasRef2Data) {
+                    Object.values(f).forEach(key => this._clearLightningError(key));
+                }
                 return;
             }
 
             Object.values(f).forEach(key => {
-                if (!org[key]) {
+                if (!org[key] || String(org[key]).trim() === '') {
                     this._showLightningError(key, `${label}: complete all fields or clear this row.`);
                     isValid = false;
                 } else {
                     this._clearLightningError(key);
                 }
             });
+
+            if (org[f.name]) {
+                const nameErr = this._validateNameLikeField(org[f.name], `${label} Name`);
+                if (nameErr) {
+                    this._showLightningError(f.name, nameErr);
+                    isValid = false;
+                }
+            }
+            if (org[f.role]) {
+                const roleErr = this._validateNameLikeField(org[f.role], `${label} Organization / Role`);
+                if (roleErr) {
+                    this._showLightningError(f.role, roleErr);
+                    isValid = false;
+                }
+            }
 
             if (org[f.email]) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -3326,14 +3734,15 @@ export default class WcfDynamicForm extends LightningElement {
         ];
         histNumKeys.forEach(k => {
             const v = org[k];
+            const cleanStr = (v !== '' && v !== null && v !== undefined) ? String(v).replace(/,/g, '').trim() : '';
             const label = this._getLabelForFieldKey(k);
-            if (v === '' || v === null || v === undefined) {
+            if (cleanStr === '') {
                 this._showLightningError(k, `${label} is required.`);
                 isValid = false;
-            } else if (isNaN(Number(v))) {
+            } else if (isNaN(Number(cleanStr))) {
                 this._showLightningError(k, `${label} must be a number.`);
                 isValid = false;
-            } else if (Number(v) < 0) {
+            } else if (Number(cleanStr) < 0) {
                 this._showLightningError(k, 'Amount cannot be negative.');
                 isValid = false;
             } else {
@@ -3349,14 +3758,15 @@ export default class WcfDynamicForm extends LightningElement {
         ];
         cfyNumKeys.forEach(k => {
             const v = org[k];
+            const cleanStr = (v !== '' && v !== null && v !== undefined) ? String(v).replace(/,/g, '').trim() : '';
             const label = this._getLabelForFieldKey(k);
-            if (v === '' || v === null || v === undefined) {
+            if (cleanStr === '') {
                 this._showLightningError(k, `${label} is required.`);
                 isValid = false;
-            } else if (isNaN(Number(v))) {
+            } else if (isNaN(Number(cleanStr))) {
                 this._showLightningError(k, `${label} must be a number.`);
                 isValid = false;
-            } else if (Number(v) < 0) {
+            } else if (Number(cleanStr) < 0) {
                 this._showLightningError(k, 'Amount cannot be negative.');
                 isValid = false;
             } else {
@@ -3388,15 +3798,16 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Q12 Skilling Domains table
         const checkNumber = (el, value, label) => {
-            if (value === '' || value === null || value === undefined) {
+            const clean = (value !== '' && value !== null && value !== undefined) ? String(value).replace(/,/g, '').trim() : '';
+            if (clean === '') {
                 this._showNativeError(el, `${label} is required.`);
                 return false;
             }
-            if (isNaN(Number(value))) {
+            if (isNaN(Number(clean))) {
                 this._showNativeError(el, `${label} must be a number.`);
                 return false;
             }
-            if (Number(value) < 0) {
+            if (Number(clean) < 0) {
                 this._showNativeError(el, `${label} cannot be negative.`);
                 return false;
             }
@@ -3423,6 +3834,12 @@ export default class WcfDynamicForm extends LightningElement {
 
         this.skillingDomainRows.forEach(row => {
             const nameEl = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="name"]`);
+            const isDuplicate = this.skillingDomainRows.some(r =>
+                String(r.id) !== String(row.id) &&
+                r.name &&
+                row.name &&
+                r.name.trim().toLowerCase() === row.name.trim().toLowerCase()
+            );
             if (!row.name || String(row.name).trim() === '') {
                 if (nameEl?.setCustomValidity) {
                     nameEl.setCustomValidity('Domain / Programme Name is required.');
@@ -3435,6 +3852,13 @@ export default class WcfDynamicForm extends LightningElement {
                 if (nameErr) {
                     if (nameEl?.setCustomValidity) {
                         nameEl.setCustomValidity(nameErr);
+                        nameEl.reportValidity();
+                        this._registerInvalid(nameEl);
+                    }
+                    isValid = false;
+                } else if (isDuplicate) {
+                    if (nameEl?.setCustomValidity) {
+                        nameEl.setCustomValidity('Duplicate domain name entered. Please enter a unique domain name.');
                         nameEl.reportValidity();
                         this._registerInvalid(nameEl);
                     }
@@ -3508,15 +3932,16 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Q16 Business Sectors
         const checkNumber = (el, value, label) => {
-            if (value === '' || value === null || value === undefined) {
+            const clean = (value !== '' && value !== null && value !== undefined) ? String(value).replace(/,/g, '').trim() : '';
+            if (clean === '') {
                 this._showNativeError(el, `${label} is required.`);
                 return false;
             }
-            if (isNaN(Number(value))) {
+            if (isNaN(Number(clean))) {
                 this._showNativeError(el, `${label} must be a number.`);
                 return false;
             }
-            if (Number(value) < 0) {
+            if (Number(clean) < 0) {
                 this._showNativeError(el, `${label} cannot be negative.`);
                 return false;
             }
@@ -3669,15 +4094,16 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Q20 Livelihood Programs
         const checkNumber = (el, value, label) => {
-            if (value === '' || value === null || value === undefined) {
+            const clean = (value !== '' && value !== null && value !== undefined) ? String(value).replace(/,/g, '').trim() : '';
+            if (clean === '') {
                 this._showNativeError(el, `${label} is required.`);
                 return false;
             }
-            if (isNaN(Number(value))) {
+            if (isNaN(Number(clean))) {
                 this._showNativeError(el, `${label} must be a number.`);
                 return false;
             }
-            if (Number(value) < 0) {
+            if (Number(clean) < 0) {
                 this._showNativeError(el, `${label} cannot be negative.`);
                 return false;
             }
@@ -3687,6 +4113,12 @@ export default class WcfDynamicForm extends LightningElement {
 
         this.livelihoodProgramRows.forEach(row => {
             const nameEl = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="name"]`);
+            const isDuplicateProgram = this.livelihoodProgramRows.some(r =>
+                String(r.id) !== String(row.id) &&
+                r.name &&
+                row.name &&
+                r.name.trim().toLowerCase() === row.name.trim().toLowerCase()
+            );
             if (!row.name || String(row.name).trim() === '') {
                 if (nameEl?.setCustomValidity) {
                     nameEl.setCustomValidity('Program / Initiative Name is required.');
@@ -3694,10 +4126,27 @@ export default class WcfDynamicForm extends LightningElement {
                     this._registerInvalid(nameEl);
                 }
                 isValid = false;
-            } else if (nameEl?.setCustomValidity) {
-                nameEl.setCustomValidity('');
-                nameEl.reportValidity();
-                this._invalidElements = this._invalidElements.filter(x => x !== nameEl);
+            } else {
+                const nameErr = this._validateNameLikeField(row.name, 'Program / Initiative Name');
+                if (nameErr) {
+                    if (nameEl?.setCustomValidity) {
+                        nameEl.setCustomValidity(nameErr);
+                        nameEl.reportValidity();
+                        this._registerInvalid(nameEl);
+                    }
+                    isValid = false;
+                } else if (isDuplicateProgram) {
+                    if (nameEl?.setCustomValidity) {
+                        nameEl.setCustomValidity('Duplicate program name entered. Please enter a unique program name.');
+                        nameEl.reportValidity();
+                        this._registerInvalid(nameEl);
+                    }
+                    isValid = false;
+                } else if (nameEl?.setCustomValidity) {
+                    nameEl.setCustomValidity('');
+                    nameEl.reportValidity();
+                    this._invalidElements = this._invalidElements.filter(x => x !== nameEl);
+                }
             }
 
             const typeEl = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="supportType"]`);
@@ -3708,10 +4157,20 @@ export default class WcfDynamicForm extends LightningElement {
                     this._registerInvalid(typeEl);
                 }
                 isValid = false;
-            } else if (typeEl?.setCustomValidity) {
-                typeEl.setCustomValidity('');
-                typeEl.reportValidity();
-                this._invalidElements = this._invalidElements.filter(x => x !== typeEl);
+            } else {
+                const typeErr = this._validateNameLikeField(row.supportType, 'Type of Support Provided');
+                if (typeErr) {
+                    if (typeEl?.setCustomValidity) {
+                        typeEl.setCustomValidity(typeErr);
+                        typeEl.reportValidity();
+                        this._registerInvalid(typeEl);
+                    }
+                    isValid = false;
+                } else if (typeEl?.setCustomValidity) {
+                    typeEl.setCustomValidity('');
+                    typeEl.reportValidity();
+                    this._invalidElements = this._invalidElements.filter(x => x !== typeEl);
+                }
             }
 
             const hoursEl = this.template.querySelector(`input[data-id="${row.id}"][data-field="manHours"]`);
@@ -3732,6 +4191,15 @@ export default class WcfDynamicForm extends LightningElement {
             }
 
             const distEl = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="district"]`);
+            const isDuplicateCommunity = this.communityRows.some(r =>
+                String(r.id) !== String(row.id) &&
+                r.state &&
+                row.state &&
+                r.state.trim().toLowerCase() === row.state.trim().toLowerCase() &&
+                r.district &&
+                row.district &&
+                r.district.trim().toLowerCase() === row.district.trim().toLowerCase()
+            );
             if (!row.district || String(row.district).trim() === '') {
                 if (distEl?.setCustomValidity) {
                     distEl.setCustomValidity('District / Area is required.');
@@ -3739,16 +4207,48 @@ export default class WcfDynamicForm extends LightningElement {
                     this._registerInvalid(distEl);
                 }
                 isValid = false;
-            } else if (distEl?.setCustomValidity) {
-                distEl.setCustomValidity('');
-                distEl.reportValidity();
-                this._invalidElements = this._invalidElements.filter(x => x !== distEl);
+            } else {
+                const distErr = this._validateNameLikeField(row.district, 'District / Area');
+                if (distErr) {
+                    if (distEl?.setCustomValidity) {
+                        distEl.setCustomValidity(distErr);
+                        distEl.reportValidity();
+                        this._registerInvalid(distEl);
+                    }
+                    isValid = false;
+                } else if (isDuplicateCommunity) {
+                    if (distEl?.setCustomValidity) {
+                        distEl.setCustomValidity('Duplicate community entry for the same State and District.');
+                        distEl.reportValidity();
+                        this._registerInvalid(distEl);
+                    }
+                    isValid = false;
+                } else if (distEl?.setCustomValidity) {
+                    distEl.setCustomValidity('');
+                    distEl.reportValidity();
+                    this._invalidElements = this._invalidElements.filter(x => x !== distEl);
+                }
             }
 
             ['fy3', 'fy2', 'fy1', 'proj'].forEach(f => {
                 const el = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="${f}"]`);
                 const val = row[f];
-                if (val !== '' && val !== null && val !== undefined && Number(val) < 0) {
+                const clean = (val !== '' && val !== null && val !== undefined) ? String(val).replace(/,/g, '').trim() : '';
+                if (clean === '') {
+                    if (el?.setCustomValidity) {
+                        el.setCustomValidity('This field is required.');
+                        el.reportValidity();
+                        this._registerInvalid(el);
+                    }
+                    isValid = false;
+                } else if (isNaN(Number(clean))) {
+                    if (el?.setCustomValidity) {
+                        el.setCustomValidity('Must be a number.');
+                        el.reportValidity();
+                        this._registerInvalid(el);
+                    }
+                    isValid = false;
+                } else if (Number(clean) < 0) {
                     if (el?.setCustomValidity) {
                         el.setCustomValidity('Value cannot be negative.');
                         el.reportValidity();
@@ -3968,6 +4468,10 @@ export default class WcfDynamicForm extends LightningElement {
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
 
+    get minProgrammeStartDate() {
+        return this.formValues.Incorporation_Date__c || this.savedOrgData?.Incorporation_Date__c || '1900-01-01';
+    }
+
     handleDateKeyDown(event) {
         if (event.key === 'Tab' || event.key === 'Escape' || event.key === 'Enter') {
             return;
@@ -4018,62 +4522,95 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     // ── Q9 Math End Balances & Auto-Chained Start Balances ────────────────
+    _rawEndFY3() {
+        return calculateEndingBalance(this.formValues.START_FY3, this.formValues.REV_FY3, (Number(String(this.formValues.CAP_FY3).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY3).replace(/,/g, ''))||0));
+    }
+    _rawStartFY2() {
+        return this._rawEndFY3();
+    }
+    _rawEndFY2() {
+        return calculateEndingBalance(this._rawStartFY2(), this.formValues.REV_FY2, (Number(String(this.formValues.CAP_FY2).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY2).replace(/,/g, ''))||0));
+    }
+    _rawStartFY1() {
+        return this._rawEndFY2();
+    }
+    _rawEndFY1() {
+        return calculateEndingBalance(this._rawStartFY1(), this.formValues.REV_FY1, (Number(String(this.formValues.CAP_FY1).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY1).replace(/,/g, ''))||0));
+    }
+
     get computedEndFY3() {
-        return calculateEndingBalance(this.formValues.START_FY3, this.formValues.REV_FY3, (Number(this.formValues.CAP_FY3)||0) + (Number(this.formValues.OP_FY3)||0));
+        return this._formatNumberWithCommas(this._rawEndFY3());
     }
     get computedStartFY2() {
         return this.computedEndFY3;
     }
     get computedEndFY2() {
-        return calculateEndingBalance(this.computedStartFY2, this.formValues.REV_FY2, (Number(this.formValues.CAP_FY2)||0) + (Number(this.formValues.OP_FY2)||0));
+        return this._formatNumberWithCommas(this._rawEndFY2());
     }
     get computedStartFY1() {
         return this.computedEndFY2;
     }
     get computedEndFY1() {
-        return calculateEndingBalance(this.computedStartFY1, this.formValues.REV_FY1, (Number(this.formValues.CAP_FY1)||0) + (Number(this.formValues.OP_FY1)||0));
+        return this._formatNumberWithCommas(this._rawEndFY1());
     }
 
     // ── Q10 Math Deviations & Net Position Totals ─────────────────────────
     get computedRevDeviation() {
-        const budget = Number(this.formValues.CFY_REV_BUDGET) || 0;
-        const proj = Number(this.formValues.CFY_REV_PROJ) || 0;
-        return proj - budget;
+        const budget = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        return this._formatNumberWithCommas(proj - budget);
     }
     get computedCapDeviation() {
-        const budget = Number(this.formValues.CFY_CAP_BUDGET) || 0;
-        const proj = Number(this.formValues.CFY_CAP_PROJ) || 0;
-        return proj - budget;
+        const budget = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        return this._formatNumberWithCommas(proj - budget);
     }
     get computedOpDeviation() {
-        const budget = Number(this.formValues.CFY_OP_BUDGET) || 0;
-        const proj = Number(this.formValues.CFY_OP_PROJ) || 0;
-        return proj - budget;
+        const budget = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
+        return this._formatNumberWithCommas(proj - budget);
     }
 
     get computedNetBudget() {
-        const rev = Number(this.formValues.CFY_REV_BUDGET) || 0;
-        const cap = Number(this.formValues.CFY_CAP_BUDGET) || 0;
-        const op  = Number(this.formValues.CFY_OP_BUDGET)  || 0;
-        return rev - (cap + op);
+        const rev = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const cap = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const op  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
+        return this._formatNumberWithCommas(rev - (cap + op));
     }
     get computedNetProjection() {
-        const rev = Number(this.formValues.CFY_REV_PROJ) || 0;
-        const cap = Number(this.formValues.CFY_CAP_PROJ) || 0;
-        const op  = Number(this.formValues.CFY_OP_PROJ)  || 0;
-        return rev - (cap + op);
+        const rev = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        const cap = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        const op  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+        return this._formatNumberWithCommas(rev - (cap + op));
     }
     get computedNetDeviation() {
-        return this.computedNetProjection - this.computedNetBudget;
+        const revBud = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const capBud = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const opBud  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
+        const netBud = revBud - (capBud + opBud);
+
+        const revProj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        const capProj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        const opProj  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+        const netProj = revProj - (capProj + opProj);
+
+        return this._formatNumberWithCommas(netProj - netBud);
     }
 
     get isDeviationExplanationRequired() {
-        return (
-            this.computedRevDeviation !== 0 ||
-            this.computedCapDeviation !== 0 ||
-            this.computedOpDeviation  !== 0 ||
-            this.computedNetDeviation  !== 0
-        );
+        const revBud = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const revProj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        const capBud = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const capProj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        const opBud  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
+        const opProj  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+
+        const revDev = revProj - revBud;
+        const capDev = capProj - capBud;
+        const opDev = opProj - opBud;
+        const netDev = (revProj - (capProj + opProj)) - (revBud - (capBud + opBud));
+
+        return revDev !== 0 || capDev !== 0 || opDev !== 0 || netDev !== 0;
     }
 
     get deviationExplanationCounterClass() {
@@ -4082,23 +4619,23 @@ export default class WcfDynamicForm extends LightningElement {
 
     // ── Q13 & Q14 Placement % Calculations ──────────────────────────────
     get computedJfPlacePctFY3() {
-        const enroll = Number(this.formValues.JF_ENROLL_FY3) || 0;
-        const place = Number(this.formValues.JF_PLACE_FY3) || 0;
+        const enroll = Number(String(this.formValues.JF_ENROLL_FY3).replace(/,/g, '')) || 0;
+        const place = Number(String(this.formValues.JF_PLACE_FY3).replace(/,/g, '')) || 0;
         return enroll > 0 ? ((place / enroll) * 100).toFixed(1) : '0.0';
     }
     get computedJfPlacePctFY2() {
-        const enroll = Number(this.formValues.JF_ENROLL_FY2) || 0;
-        const place = Number(this.formValues.JF_PLACE_FY2) || 0;
+        const enroll = Number(String(this.formValues.JF_ENROLL_FY2).replace(/,/g, '')) || 0;
+        const place = Number(String(this.formValues.JF_PLACE_FY2).replace(/,/g, '')) || 0;
         return enroll > 0 ? ((place / enroll) * 100).toFixed(1) : '0.0';
     }
     get computedJfPlacePctFY1() {
-        const enroll = Number(this.formValues.JF_ENROLL_FY1) || 0;
-        const place = Number(this.formValues.JF_PLACE_FY1) || 0;
+        const enroll = Number(String(this.formValues.JF_ENROLL_FY1).replace(/,/g, '')) || 0;
+        const place = Number(String(this.formValues.JF_PLACE_FY1).replace(/,/g, '')) || 0;
         return enroll > 0 ? ((place / enroll) * 100).toFixed(1) : '0.0';
     }
     get computedJfPlacePctProj() {
-        const enroll = Number(this.formValues.JF_ENROLL_PROJ) || 0;
-        const place = Number(this.formValues.JF_PLACE_PROJ) || 0;
+        const enroll = Number(String(this.formValues.JF_ENROLL_PROJ).replace(/,/g, '')) || 0;
+        const place = Number(String(this.formValues.JF_PLACE_PROJ).replace(/,/g, '')) || 0;
         return enroll > 0 ? ((place / enroll) * 100).toFixed(1) : '0.0';
     }
 
@@ -4110,11 +4647,15 @@ export default class WcfDynamicForm extends LightningElement {
         return num.toLocaleString('en-US');
     }
 
+    get previewFunder1Amount() { return this._formatNumberWithCommas(this.formValues.Funder_1_Amount__c); }
+    get previewFunder2Amount() { return this._formatNumberWithCommas(this.formValues.Funder_2_Amount__c); }
+    get previewFunder3Amount() { return this._formatNumberWithCommas(this.formValues.Funder_3_Amount__c); }
+
     _getPreviewVal(val, defaultZero = '0') {
         if (val === null || val === undefined || String(val).trim() === '') {
             return defaultZero;
         }
-        return val;
+        return this._formatNumberWithCommas(val);
     }
 
     // ── Q9 Preview Getters (Historical Financials) ───────────────────────
@@ -4223,16 +4764,85 @@ export default class WcfDynamicForm extends LightningElement {
     get previewLivCostFY1() { return this._getPreviewVal(this.formValues.LIV_COST_FY1); }
     get previewLivCostProj() { return this._getPreviewVal(this.formValues.LIV_COST_PROJ); }
 
+    // ── Formatted Value Getters (Standard 3-Digit Comma Formatting) ─────────────
+    // Q7 Funders
+    get formattedFunder1Amount() { return this._formatNumberWithCommas(this.formValues.Funder_1_Amount__c); }
+    get formattedFunder2Amount() { return this._formatNumberWithCommas(this.formValues.Funder_2_Amount__c); }
+    get formattedFunder3Amount() { return this._formatNumberWithCommas(this.formValues.Funder_3_Amount__c); }
+
+    // Q9 Historical Financials
+    get formattedStartFY3() { return this._formatNumberWithCommas(this.formValues.START_FY3); }
+    get formattedRevFY3() { return this._formatNumberWithCommas(this.formValues.REV_FY3); }
+    get formattedRevFY2() { return this._formatNumberWithCommas(this.formValues.REV_FY2); }
+    get formattedRevFY1() { return this._formatNumberWithCommas(this.formValues.REV_FY1); }
+    get formattedCapFY3() { return this._formatNumberWithCommas(this.formValues.CAP_FY3); }
+    get formattedCapFY2() { return this._formatNumberWithCommas(this.formValues.CAP_FY2); }
+    get formattedCapFY1() { return this._formatNumberWithCommas(this.formValues.CAP_FY1); }
+    get formattedOpFY3() { return this._formatNumberWithCommas(this.formValues.OP_FY3); }
+    get formattedOpFY2() { return this._formatNumberWithCommas(this.formValues.OP_FY2); }
+    get formattedOpFY1() { return this._formatNumberWithCommas(this.formValues.OP_FY1); }
+
+    // Q10 Current Fiscal Year Data
+    get formattedCfyRevBudget() { return this._formatNumberWithCommas(this.formValues.CFY_REV_BUDGET); }
+    get formattedCfyRevProj() { return this._formatNumberWithCommas(this.formValues.CFY_REV_PROJ); }
+    get formattedCfyCapBudget() { return this._formatNumberWithCommas(this.formValues.CFY_CAP_BUDGET); }
+    get formattedCfyCapProj() { return this._formatNumberWithCommas(this.formValues.CFY_CAP_PROJ); }
+    get formattedCfyOpBudget() { return this._formatNumberWithCommas(this.formValues.CFY_OP_BUDGET); }
+    get formattedCfyOpProj() { return this._formatNumberWithCommas(this.formValues.CFY_OP_PROJ); }
+
+    // Q13 & Q14 Job Fulfillment Outcomes
     get formattedJfEnrollFY3() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_FY3); }
     get formattedJfEnrollFY2() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_FY2); }
     get formattedJfEnrollFY1() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_FY1); }
-
+    get formattedJfEnrollProj() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_PROJ); }
     get formattedJfPlaceFY3() { return this._formatNumberWithCommas(this.formValues.JF_PLACE_FY3); }
     get formattedJfPlaceFY2() { return this._formatNumberWithCommas(this.formValues.JF_PLACE_FY2); }
     get formattedJfPlaceFY1() { return this._formatNumberWithCommas(this.formValues.JF_PLACE_FY1); }
-
-    get formattedJfEnrollProj() { return this._formatNumberWithCommas(this.formValues.JF_ENROLL_PROJ); }
     get formattedJfPlaceProj() { return this._formatNumberWithCommas(this.formValues.JF_PLACE_PROJ); }
+    get formattedJfCostFY3() { return this._formatNumberWithCommas(this.formValues.JF_COST_FY3); }
+    get formattedJfCostFY2() { return this._formatNumberWithCommas(this.formValues.JF_COST_FY2); }
+    get formattedJfCostFY1() { return this._formatNumberWithCommas(this.formValues.JF_COST_FY1); }
+    get formattedJfCostProj() { return this._formatNumberWithCommas(this.formValues.JF_COST_PROJ); }
+
+    // Q17 & Q18 Job Creation Outcomes
+    get formattedJcNewBizFY3() { return this._formatNumberWithCommas(this.formValues.JC_NEW_BIZ_FY3); }
+    get formattedJcNewBizFY2() { return this._formatNumberWithCommas(this.formValues.JC_NEW_BIZ_FY2); }
+    get formattedJcNewBizFY1() { return this._formatNumberWithCommas(this.formValues.JC_NEW_BIZ_FY1); }
+    get formattedJcNewBizProj() { return this._formatNumberWithCommas(this.formValues.JC_NEW_BIZ_PROJ); }
+    get formattedJcNewJobsFY3() { return this._formatNumberWithCommas(this.formValues.JC_NEW_JOBS_FY3); }
+    get formattedJcNewJobsFY2() { return this._formatNumberWithCommas(this.formValues.JC_NEW_JOBS_FY2); }
+    get formattedJcNewJobsFY1() { return this._formatNumberWithCommas(this.formValues.JC_NEW_JOBS_FY1); }
+    get formattedJcNewJobsProj() { return this._formatNumberWithCommas(this.formValues.JC_NEW_JOBS_PROJ); }
+    get formattedJcExistBizFY3() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_BIZ_FY3); }
+    get formattedJcExistBizFY2() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_BIZ_FY2); }
+    get formattedJcExistBizFY1() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_BIZ_FY1); }
+    get formattedJcExistBizProj() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_BIZ_PROJ); }
+    get formattedJcExistJobsFY3() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_JOBS_FY3); }
+    get formattedJcExistJobsFY2() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_JOBS_FY2); }
+    get formattedJcExistJobsFY1() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_JOBS_FY1); }
+    get formattedJcExistJobsProj() { return this._formatNumberWithCommas(this.formValues.JC_EXIST_JOBS_PROJ); }
+    get formattedJcCostFY3() { return this._formatNumberWithCommas(this.formValues.JC_COST_FY3); }
+    get formattedJcCostFY2() { return this._formatNumberWithCommas(this.formValues.JC_COST_FY2); }
+    get formattedJcCostFY1() { return this._formatNumberWithCommas(this.formValues.JC_COST_FY1); }
+    get formattedJcCostProj() { return this._formatNumberWithCommas(this.formValues.JC_COST_PROJ); }
+
+    // Q22 & Q23 Livelihood Upliftment Outcomes
+    get formattedLivServedFY3() { return this._formatNumberWithCommas(this.formValues.LIV_SERVED_FY3); }
+    get formattedLivServedFY2() { return this._formatNumberWithCommas(this.formValues.LIV_SERVED_FY2); }
+    get formattedLivServedFY1() { return this._formatNumberWithCommas(this.formValues.LIV_SERVED_FY1); }
+    get formattedLivServedProj() { return this._formatNumberWithCommas(this.formValues.LIV_SERVED_PROJ); }
+    get formattedLivEnrollFY3() { return this._formatNumberWithCommas(this.formValues.LIV_ENROLL_FY3); }
+    get formattedLivEnrollFY2() { return this._formatNumberWithCommas(this.formValues.LIV_ENROLL_FY2); }
+    get formattedLivEnrollFY1() { return this._formatNumberWithCommas(this.formValues.LIV_ENROLL_FY1); }
+    get formattedLivEnrollProj() { return this._formatNumberWithCommas(this.formValues.LIV_ENROLL_PROJ); }
+    get formattedLivOutcomeFY3() { return this._formatNumberWithCommas(this.formValues.LIV_OUTCOME_FY3); }
+    get formattedLivOutcomeFY2() { return this._formatNumberWithCommas(this.formValues.LIV_OUTCOME_FY2); }
+    get formattedLivOutcomeFY1() { return this._formatNumberWithCommas(this.formValues.LIV_OUTCOME_FY1); }
+    get formattedLivOutcomeProj() { return this._formatNumberWithCommas(this.formValues.LIV_OUTCOME_PROJ); }
+    get formattedLivCostFY3() { return this._formatNumberWithCommas(this.formValues.LIV_COST_FY3); }
+    get formattedLivCostFY2() { return this._formatNumberWithCommas(this.formValues.LIV_COST_FY2); }
+    get formattedLivCostFY1() { return this._formatNumberWithCommas(this.formValues.LIV_COST_FY1); }
+    get formattedLivCostProj() { return this._formatNumberWithCommas(this.formValues.LIV_COST_PROJ); }
 
     get skillingApproachCounterClass() {
         return this.skillingApproachWordCount > 500 ? 'word-count-over' : 'word-count';
@@ -4327,16 +4937,6 @@ export default class WcfDynamicForm extends LightningElement {
         return this.formValues.Q24_VERIFIED === 'Yes';
     }
 
-    // ── Dynamic Grid Rows State ──────────────────────────────────────────
-    @track skillingDomainRows = [{ id: 1, name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '' }];
-    @track businessSectorRows = [{ id: 1, sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', displayWhenBegan: '', enrollment: '' }];
-    @track livelihoodProgramRows = [{ id: 1, name: '', supportType: '', manHours: '', enrollment: '' }];
-    @track communityRows = [{ id: 1, state: '', district: '', fy3: '', fy2: '', fy1: '', proj: '' }];
-    @track docRows = [
-        { id: 1, name: 'Proposal / Concept Note', url: '' },
-        { id: 2, name: 'Annual Report / Audited Financials', url: '' }
-    ];
-
     addSkillingDomainRow() {
         this.skillingDomainRows = [...this.skillingDomainRows, { id: Date.now(), name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '' }];
     }
@@ -4355,12 +4955,52 @@ export default class WcfDynamicForm extends LightningElement {
             return r;
         });
         if (event.target) {
-            if (event.target.setCustomValidity) {
-                event.target.setCustomValidity('');
-                event.target.reportValidity();
+            if (field === 'name') {
+                const nameErr = val ? this._validateNameLikeField(val, 'Domain / Program Name') : null;
+                const isDuplicate = val && this.skillingDomainRows.some(r =>
+                    String(r.id) !== String(rawId) &&
+                    r.name &&
+                    r.name.trim().toLowerCase() === val.trim().toLowerCase()
+                );
+                if (nameErr) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(nameErr);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else if (isDuplicate) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('Duplicate domain name entered. Please enter a unique domain name.');
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else if (field === 'whenStarted') {
+                const incorp = this.formValues.Incorporation_Date__c || this.savedOrgData?.Incorporation_Date__c;
+                const today = this.todayDateString;
+                if (val && incorp && val < incorp) {
+                    this._showNativeError(event.target, `When Started cannot be earlier than your Incorporation Date (${this._fmtDateDisplay(incorp)}).`);
+                } else if (val && val > today) {
+                    this._showNativeError(event.target, 'When Started cannot be a future date.');
+                } else {
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else {
+                if (event.target.setCustomValidity) {
+                    event.target.setCustomValidity('');
+                    event.target.reportValidity();
+                }
+                this._clearNativeError(event.target);
+                this._invalidElements = this._invalidElements.filter(x => x !== event.target);
             }
-            this._clearNativeError(event.target);
-            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
         }
     }
     handleRemoveSkillingDomainRow(event) {
@@ -4397,12 +5037,25 @@ export default class WcfDynamicForm extends LightningElement {
             return r;
         });
         if (event.target) {
-            if (event.target.setCustomValidity) {
-                event.target.setCustomValidity('');
-                event.target.reportValidity();
+            if (field === 'whenBegan') {
+                const incorp = this.formValues.Incorporation_Date__c || this.savedOrgData?.Incorporation_Date__c;
+                const today = this.todayDateString;
+                if (val && incorp && val < incorp) {
+                    this._showNativeError(event.target, `When Programme Started cannot be earlier than your Incorporation Date (${this._fmtDateDisplay(incorp)}).`);
+                } else if (val && val > today) {
+                    this._showNativeError(event.target, 'When Programme Started cannot be a future date.');
+                } else {
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else {
+                if (event.target.setCustomValidity) {
+                    event.target.setCustomValidity('');
+                    event.target.reportValidity();
+                }
+                this._clearNativeError(event.target);
+                this._invalidElements = this._invalidElements.filter(x => x !== event.target);
             }
-            this._clearNativeError(event.target);
-            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
         }
     }
     handleSupportTypeChip(event) {
@@ -4447,12 +5100,57 @@ export default class WcfDynamicForm extends LightningElement {
         const val = event.target?.value ?? '';
         this.livelihoodProgramRows = this.livelihoodProgramRows.map(r => String(r.id) === String(rawId) ? { ...r, [field]: val } : r);
         if (event.target) {
-            if (event.target.setCustomValidity) {
-                event.target.setCustomValidity('');
-                event.target.reportValidity();
+            if (field === 'name') {
+                const nameErr = val ? this._validateNameLikeField(val, 'Program / Initiative Name') : null;
+                const isDuplicate = val && this.livelihoodProgramRows.some(r =>
+                    String(r.id) !== String(rawId) &&
+                    r.name &&
+                    r.name.trim().toLowerCase() === val.trim().toLowerCase()
+                );
+                if (nameErr) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(nameErr);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else if (isDuplicate) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('Duplicate program name entered. Please enter a unique program name.');
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else if (field === 'supportType') {
+                const typeErr = val ? this._validateNameLikeField(val, 'Type of Support Provided') : null;
+                if (typeErr) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(typeErr);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else {
+                if (event.target.setCustomValidity) {
+                    event.target.setCustomValidity('');
+                    event.target.reportValidity();
+                }
+                this._clearNativeError(event.target);
+                this._invalidElements = this._invalidElements.filter(x => x !== event.target);
             }
-            this._clearNativeError(event.target);
-            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
         }
     }
     handleRemoveLivelihoodProgramRow(event) {
@@ -4535,13 +5233,75 @@ export default class WcfDynamicForm extends LightningElement {
         const field = event.target?.dataset?.field || event.currentTarget?.dataset?.field;
         const val = event.detail?.value !== undefined ? event.detail.value : (event.target?.value ?? '');
         this.communityRows = this.communityRows.map(r => String(r.id) === String(rawId) ? { ...r, [field]: val } : r);
+        const currentRow = this.communityRows.find(r => String(r.id) === String(rawId));
         if (event.target) {
-            if (event.target.setCustomValidity) {
-                event.target.setCustomValidity('');
-                event.target.reportValidity();
+            if (field === 'district') {
+                const distErr = val ? this._validateNameLikeField(val, 'District / Area') : null;
+                const isDuplicateCommunity = currentRow?.state && val && this.communityRows.some(r =>
+                    String(r.id) !== String(rawId) &&
+                    r.state &&
+                    r.state.trim().toLowerCase() === currentRow.state.trim().toLowerCase() &&
+                    r.district &&
+                    r.district.trim().toLowerCase() === val.trim().toLowerCase()
+                );
+                if (distErr) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(distErr);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else if (isDuplicateCommunity) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('Duplicate community entry for the same State and District.');
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else if (['fy3', 'fy2', 'fy1', 'proj'].includes(field)) {
+                if (val !== '' && val !== null && val !== undefined) {
+                    if (isNaN(Number(val))) {
+                        if (event.target.setCustomValidity) {
+                            event.target.setCustomValidity('Must be a number.');
+                            event.target.reportValidity();
+                            this._registerInvalid(event.target);
+                        }
+                    } else if (Number(val) < 0) {
+                        if (event.target.setCustomValidity) {
+                            event.target.setCustomValidity('Value cannot be negative.');
+                            event.target.reportValidity();
+                            this._registerInvalid(event.target);
+                        }
+                    } else {
+                        if (event.target.setCustomValidity) {
+                            event.target.setCustomValidity('');
+                            event.target.reportValidity();
+                        }
+                        this._clearNativeError(event.target);
+                        this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else {
+                if (event.target.setCustomValidity) {
+                    event.target.setCustomValidity('');
+                    event.target.reportValidity();
+                }
+                this._clearNativeError(event.target);
+                this._invalidElements = this._invalidElements.filter(x => x !== event.target);
             }
-            this._clearNativeError(event.target);
-            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
         }
     }
     handleRemoveCommunityRow(event) {
@@ -4759,6 +5519,7 @@ export default class WcfDynamicForm extends LightningElement {
         this._clearLightningError('Funder_2_Period_Start__c');
         this._clearLightningError('Funder_2_Period_End__c');
         this._clearLightningError('Funder_2_Type__c');
+        this._validateFunderFields();
     }
 
     handleRemoveFunder3() {
@@ -4773,10 +5534,26 @@ export default class WcfDynamicForm extends LightningElement {
         this._clearLightningError('Funder_3_Period_Start__c');
         this._clearLightningError('Funder_3_Period_End__c');
         this._clearLightningError('Funder_3_Type__c');
+        this._validateFunderFields();
     }
 
     _validateFunderFields() {
         const org = this.formValues;
+        const f1Filled = [org.Funder_1_Name__c, org.Funder_1_Amount__c, org.Funder_1_Period_Start__c, org.Funder_1_Period_End__c, org.Funder_1_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+        const f2Filled = this.showFunder2 && [org.Funder_2_Name__c, org.Funder_2_Amount__c, org.Funder_2_Period_Start__c, org.Funder_2_Period_End__c, org.Funder_2_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+        const f3Filled = this.showFunder3 && [org.Funder_3_Name__c, org.Funder_3_Amount__c, org.Funder_3_Period_Start__c, org.Funder_3_Period_End__c, org.Funder_3_Type__c].some(v => v !== '' && v !== null && v !== undefined);
+
+        if (f2Filled && !f1Filled) {
+            ['Funder_1_Name__c', 'Funder_1_Amount__c', 'Funder_1_Period_Start__c', 'Funder_1_Period_End__c', 'Funder_1_Type__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Funder 1 before adding Funder 2.');
+            });
+        }
+        if (f3Filled && !f2Filled) {
+            ['Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c', 'Funder_2_Period_End__c', 'Funder_2_Type__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Funder 2 before adding Funder 3.');
+            });
+        }
+
         const funderSets = [
             {
                 label: 'Funder 1',
@@ -4821,7 +5598,11 @@ export default class WcfDynamicForm extends LightningElement {
             const anyFilled = values.some(v => v !== '' && v !== null && v !== undefined);
 
             if (!anyFilled) {
-                Object.values(f).forEach(key => this._clearLightningError(key));
+                if ((label === 'Funder 1' && f2Filled) || (label === 'Funder 2' && f3Filled)) {
+                    // Retain sequential error
+                } else {
+                    Object.values(f).forEach(key => this._clearLightningError(key));
+                }
                 return;
             }
 
@@ -4834,8 +5615,15 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             });
 
+            if (org[f.name]) {
+                const nameErr = this._validateNameLikeField(org[f.name], `${label} Name`);
+                if (nameErr) {
+                    this._showLightningError(f.name, nameErr);
+                }
+            }
+
             if (org[f.amount] !== '' && org[f.amount] !== null && org[f.amount] !== undefined) {
-                const n = Number(org[f.amount]);
+                const n = Number(String(org[f.amount]).replace(/,/g, ''));
                 if (isNaN(n) || n < 0) {
                     this._showLightningError(f.amount, 'Please enter a valid positive amount.');
                 }
@@ -4872,10 +5660,22 @@ export default class WcfDynamicForm extends LightningElement {
         this._clearLightningError('Reference_2_Name__c');
         this._clearLightningError('Reference_2_Role__c');
         this._clearLightningError('Reference_2_Email__c');
+        this._validateReferenceFields();
     }
 
     _validateReferenceFields() {
         const org = this.formValues;
+        const ref1Values = [org.Reference_1_Name__c, org.Reference_1_Role__c, org.Reference_1_Email__c];
+        const hasRef1Data = ref1Values.some(v => v !== '' && v !== null && v !== undefined);
+        const ref2Values = [org.Reference_2_Name__c, org.Reference_2_Role__c, org.Reference_2_Email__c];
+        const hasRef2Data = this.showReference2 && ref2Values.some(v => v !== '' && v !== null && v !== undefined);
+
+        if (hasRef2Data && !hasRef1Data) {
+            ['Reference_1_Name__c', 'Reference_1_Role__c', 'Reference_1_Email__c'].forEach(k => {
+                this._showLightningError(k, 'Please complete Reference 1 before providing Reference 2.');
+            });
+        }
+
         const refSets = [
             {
                 label: 'Reference 1',
@@ -4904,17 +5704,32 @@ export default class WcfDynamicForm extends LightningElement {
             const anyFilled = values.some(v => v !== '' && v !== null && v !== undefined);
 
             if (!anyFilled) {
-                Object.values(f).forEach(key => this._clearLightningError(key));
+                if (label !== 'Reference 1' || !hasRef2Data) {
+                    Object.values(f).forEach(key => this._clearLightningError(key));
+                }
                 return;
             }
 
             Object.values(f).forEach(key => {
-                if (!org[key]) {
+                if (!org[key] || String(org[key]).trim() === '') {
                     this._showLightningError(key, `${label}: complete all fields or clear this row.`);
                 } else {
                     this._clearLightningError(key);
                 }
             });
+
+            if (org[f.name]) {
+                const nameErr = this._validateNameLikeField(org[f.name], `${label} Name`);
+                if (nameErr) {
+                    this._showLightningError(f.name, nameErr);
+                }
+            }
+            if (org[f.role]) {
+                const roleErr = this._validateNameLikeField(org[f.role], `${label} Organization / Role`);
+                if (roleErr) {
+                    this._showLightningError(f.role, roleErr);
+                }
+            }
 
             if (org[f.email]) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -5002,17 +5817,6 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     handleKeyDown(event) {
-        const el = event.target;
-        if (el?.isContentEditable) {
-            const text = (el.innerText || '').trim();
-            const words = text.split(/\s+/).filter(w => w.length > 0);
-            const fieldKey = el.dataset?.field || el.dataset?.id;
-            if (fieldKey) {
-                this.formValues[fieldKey] = el.innerHTML;
-                this._updateWordCountForField(fieldKey, words.length);
-            }
-        }
-
         if (event.key === 'Enter') {
             const selection = window.getSelection();
             if (!selection.rangeCount) return;
@@ -5220,13 +6024,36 @@ export default class WcfDynamicForm extends LightningElement {
     handleQ24UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
-            const newFiles = uploaded.map(f => ({
-                name: f.name,
-                documentId: f.documentId,
-                contentVersionId: f.contentVersionId
-            }));
-            this.q24UploadedFiles = [...this.q24UploadedFiles, ...newFiles];
-            this.showBanner('success', 'File Uploaded', 'Verification Report uploaded successfully.');
+            const currentFiles = this.q24UploadedFiles || [];
+            const validFiles = [];
+            const duplicateNames = [];
+
+            uploaded.forEach(f => {
+                const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
+                              validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
+                if (isDup) {
+                    duplicateNames.push(f.name);
+                    if (f.documentId) {
+                        deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
+                            .catch(err => console.warn('Duplicate file cleanup warning:', err));
+                    }
+                } else {
+                    validFiles.push({
+                        name: f.name,
+                        documentId: f.documentId,
+                        contentVersionId: f.contentVersionId
+                    });
+                }
+            });
+
+            if (duplicateNames.length > 0) {
+                this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);
+            }
+
+            if (validFiles.length > 0) {
+                this.q24UploadedFiles = [...currentFiles, ...validFiles];
+                this.showBanner('success', 'File Uploaded', 'Verification Report uploaded successfully.');
+            }
         }
     }
 
@@ -5249,13 +6076,36 @@ export default class WcfDynamicForm extends LightningElement {
     handleQ28UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
-            const newFiles = uploaded.map(f => ({
-                name: f.name,
-                documentId: f.documentId,
-                contentVersionId: f.contentVersionId
-            }));
-            this.q28UploadedFiles = [...this.q28UploadedFiles, ...newFiles];
-            this.showBanner('success', 'File Uploaded', 'Supporting Document uploaded successfully.');
+            const currentFiles = this.q28UploadedFiles || [];
+            const validFiles = [];
+            const duplicateNames = [];
+
+            uploaded.forEach(f => {
+                const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
+                              validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
+                if (isDup) {
+                    duplicateNames.push(f.name);
+                    if (f.documentId) {
+                        deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
+                            .catch(err => console.warn('Duplicate file cleanup warning:', err));
+                    }
+                } else {
+                    validFiles.push({
+                        name: f.name,
+                        documentId: f.documentId,
+                        contentVersionId: f.contentVersionId
+                    });
+                }
+            });
+
+            if (duplicateNames.length > 0) {
+                this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);
+            }
+
+            if (validFiles.length > 0) {
+                this.q28UploadedFiles = [...currentFiles, ...validFiles];
+                this.showBanner('success', 'File Uploaded', 'Supporting Document uploaded successfully.');
+            }
         }
     }
 

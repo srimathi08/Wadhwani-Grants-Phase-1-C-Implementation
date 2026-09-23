@@ -60,9 +60,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <template for:each={applications} for:item="app" for:index="idx">
+                            <template for:each={applications} for:item="app">
                                 <tr key={app.Id} class="table-row">
-                                    <td class="col-num muted">{idx}</td>
+                                    <td class="col-num muted">{app.rowNum}</td>
                                     <td class="name-cell">{app.Name}</td>
                                     <td class="muted">{app.ApplicationId}</td>
                                     <td>

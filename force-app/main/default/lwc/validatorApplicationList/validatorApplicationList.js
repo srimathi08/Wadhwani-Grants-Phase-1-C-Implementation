@@ -29,13 +29,14 @@ export default class ValidatorApplicationList extends NavigationMixin(LightningE
         try {
             this.isLoading = true;
             const data = await getApplicationsByStatus({ status: this.status });
-            // Map correct API field names
-            this.applications = data.map(app => ({
+            // Map correct API field names with 1-based sequential rowNum
+            this.applications = data.map((app, index) => ({
                 Id: app.Id,
                 Name: app.Name,
                 ApplicationId: app.ApplicationId,   // correct field
                 Status: app.Status,
-                DueDate: app.Due_Date__c || '—'                   // correct field (no __c)
+                DueDate: app.Due_Date__c || '—',                   // correct field (no __c)
+                rowNum: index + 1
             }));
         } catch (error) {
             console.error('Error:', error);

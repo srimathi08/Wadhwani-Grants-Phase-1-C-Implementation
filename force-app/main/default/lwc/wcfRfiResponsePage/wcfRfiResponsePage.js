@@ -174,7 +174,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         return (this.selectedTracks || []).includes('LIVELIHOOD');
     }
 
-    // â”€â”€ Dynamic Continuous Question Numbering (1 to N) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Dynamic Continuous Question Numbering (1 to N) ───────────────────
     get qNum() {
         let currentNumber = 1;
         const map = {};
@@ -183,12 +183,12 @@ export default class WcfRfiResponsePage extends LightningElement {
         map.Q2 = currentNumber++; // 2 Org info
         map.Q3 = currentNumber++; // 3 Submitter
         map.Q4 = currentNumber++; // 4 Legal structure
-        map.Q5 = currentNumber++; // 5 FY end date
-        map.Q6 = currentNumber++; // 6 Historical financials
-        map.Q7 = currentNumber++; // 7 Current FY data
-        map.Q8 = currentNumber++; // 8 501c3 & ED
-        map.Q9 = currentNumber++; // 9 FCRA
-        map.Q10 = currentNumber++; // 10 Funders & References
+        map.Q5 = currentNumber++; // 5 Legal and Tax Compliance
+        map.Q6 = currentNumber++; // 6 Fiscal Year End Date
+        map.Q7 = currentNumber++; // 7 Top 3 Most Prominent Funders
+        map.Q8 = currentNumber++; // 8 References for Outreach
+        map.Q9 = currentNumber++; // 9 Historical Financial Data
+        map.Q10 = currentNumber++; // 10 Current Fiscal Year Data
 
         if (this.hasJobFulfillmentTrack) {
             map.Q11 = currentNumber++;
@@ -223,16 +223,16 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get canonicalTitles() {
         return {
-            Q1: 'Track Selection',
+            Q1: 'Organizational Area(s) for Funding/Investment',
             Q2: 'Organizational Identifying Information',
             Q3: 'Submitter Contact Information',
             Q4: 'Legal Structure',
-            Q5: 'Fiscal Year End Date',
-            Q6: 'Historical Financial Data',
-            Q7: 'Current Fiscal Year Data',
-            Q8: '501(c)(3) & Equivalency Determination',
-            Q9: 'FCRA Registration',
-            Q10: 'Top Funders and References for Outreach',
+            Q5: 'Legal and Tax Compliance',
+            Q6: 'Fiscal Year End Date',
+            Q7: 'Top 3 Most Prominent Funders',
+            Q8: 'References for Outreach',
+            Q9: 'Historical Financial Data',
+            Q10: 'Current Fiscal Year Data',
             Q11: 'Your Skilling & Placement Approach',
             Q12: 'Skilling Domains Offered',
             Q13: 'Job Fulfillment Outcomes (Last 3 Fiscal Years)',
@@ -241,16 +241,16 @@ export default class WcfRfiResponsePage extends LightningElement {
             Q16: 'Business Sectors Served',
             Q17: 'Job Creation Outcomes (Last 3 Fiscal Years)',
             Q18: 'Job Creation Outcomes (Current FY Projections)',
-            Q19: 'Livelihood Upliftment Approach',
-            Q20: 'Livelihood Programs Offered',
-            Q21: 'Target Communities & Local Ecosystem Partners',
+            Q19: 'Your Livelihood Upliftment Approach',
+            Q20: 'Your Key Programs / Initiatives',
+            Q21: 'Communities that you work in',
             Q22: 'Livelihood Outcomes (Last 3 Fiscal Years)',
             Q23: 'Livelihood Outcomes (Current FY Projections)',
             Q24: 'Independent Verification of Your Outcomes',
-            Q25: 'Organizational Sustainability',
-            Q26: 'Desired Use of Additional Funding / Investment',
-            Q27: 'Operational Synergies & GenieAI Interest',
-            Q28: 'Additional Supporting Documentation'
+            Q25: 'Sustainability Plan',
+            Q26: 'Direction for Additional Funding',
+            Q27: 'Operational Synergies — GenieAI',
+            Q28: 'Supporting Documents'
         };
     }
 
@@ -333,25 +333,33 @@ export default class WcfRfiResponsePage extends LightningElement {
         return this.flaggedQuestions && this.flaggedQuestions.length > 0;
     }
 
-    // â”€â”€ Input & Field Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    get todayDateString() {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    // ── Input & Field Handlers ────────────────────────────────────────────────
     handleFieldChange(event) {
         const field = event.target.dataset.field || event.currentTarget.dataset.field;
         const value = event.detail?.value !== undefined ? event.detail.value : event.target.value;
         if (field) {
             this.formValues = { ...this.formValues, [field]: value };
         }
+        if (field === 'Incorporation_Date__c') {
+            const today = this.todayDateString;
+            if (value && value > today) {
+                event.target.setCustomValidity?.('Incorporation Date cannot be a future date.');
+                event.target.reportValidity?.();
+            } else {
+                event.target.setCustomValidity?.('');
+                event.target.reportValidity?.();
+            }
+        }
     }
 
     handleTrackToggle(event) {
-        const trackCode = event.currentTarget.dataset.code;
-        if (!trackCode) return;
-        let trks = [...(this.selectedTracks || [])];
-        if (trks.includes(trackCode)) {
-            trks = trks.filter(t => t !== trackCode);
-        } else {
-            trks.push(trackCode);
-        }
-        this.selectedTracks = trks;
+        // Track selection is locked/read-only in the Return Flow
+        return;
     }
 
     get trackCards() {
@@ -447,10 +455,27 @@ export default class WcfRfiResponsePage extends LightningElement {
         this.loadMetadata();
     }
 
-    // â”€â”€ Picklists â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Picklists ────────────────────────────────────────────────────────
+    get yesNoOptions() {
+        return [
+            { label: '— Select —', value: '' },
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' }
+        ];
+    }
+
+    get yesNoNotApplicableOptions() {
+        return [
+            { label: '— Select —', value: '' },
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+            { label: 'Not Applicable', value: 'Not Applicable' }
+        ];
+    }
+
     get legalTypeOptions() {
         return [
-            { label: 'â€” Select â€”', value: '' },
+            { label: '— Select —', value: '' },
             { label: 'Non-profit', value: 'Non-profit' },
             { label: 'For-profit', value: 'For-profit' },
             { label: 'Hybrid', value: 'Hybrid' },
@@ -790,6 +815,24 @@ export default class WcfRfiResponsePage extends LightningElement {
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Validation Error',
                 message: 'Please fill in all required fields before resubmitting.',
+                variant: 'error'
+            }));
+            return;
+        }
+
+        if (this.formValues.Incorporation_Date__c && this.formValues.Incorporation_Date__c > this.todayDateString) {
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Validation Error',
+                message: 'Incorporation Date cannot be a future date.',
+                variant: 'error'
+            }));
+            return;
+        }
+
+        if (!this.selectedTracks || this.selectedTracks.length === 0) {
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Validation Error',
+                message: 'Application must have at least one track selected before resubmitting.',
                 variant: 'error'
             }));
             return;

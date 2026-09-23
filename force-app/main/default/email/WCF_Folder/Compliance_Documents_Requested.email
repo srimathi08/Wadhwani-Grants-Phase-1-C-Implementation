@@ -59,7 +59,7 @@ Documents requested
 </p>
 
 <h1 class="bh" style="margin:0;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;">
-Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c} 
+Application {!WCF_Compliance_Document__c.Application_Number__c} - {!WCF_Compliance_Document__c.Application_Org_Name__c} 
 </h1>
 
 </td>
@@ -129,6 +129,7 @@ Upload documents
 
 <p style="margin:18px 0 8px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;">
 Kind regards,<br/>
+{!WCF_Compliance_Document__c.Application_Reviewer__c}<br/>
 Wadhwani Grants
 </p>
 

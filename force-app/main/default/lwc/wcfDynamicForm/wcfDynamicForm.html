@@ -869,12 +869,11 @@
                                             onchange={handleInputChange}>
                                         </lightning-input>
                                         <lightning-input
-                                            type="number"
+                                            type="text"
                                             label="Approx Annual Amount (USD)"
-                                            value={formValues.Funder_1_Amount__c}
+                                            value={formattedFunder1Amount}
                                             data-id="Funder_1_Amount__c"
                                             data-key="Funder_1_Amount__c"
-                                            min="0"
                                             onchange={handleInputChange}>
                                         </lightning-input>
                                     </div>
@@ -938,12 +937,11 @@
                                                 onchange={handleInputChange}>
                                             </lightning-input>
                                             <lightning-input
-                                                type="number"
+                                                type="text"
                                                 label="Approx Annual Amount (USD)"
-                                                value={formValues.Funder_2_Amount__c}
+                                                value={formattedFunder2Amount}
                                                 data-id="Funder_2_Amount__c"
                                                 data-key="Funder_2_Amount__c"
-                                                min="0"
                                                 onchange={handleInputChange}>
                                             </lightning-input>
                                         </div>
@@ -1008,12 +1006,11 @@
                                                 onchange={handleInputChange}>
                                             </lightning-input>
                                             <lightning-input
-                                                type="number"
+                                                type="text"
                                                 label="Approx Annual Amount (USD)"
-                                                value={formValues.Funder_3_Amount__c}
+                                                value={formattedFunder3Amount}
                                                 data-id="Funder_3_Amount__c"
                                                 data-key="Funder_3_Amount__c"
-                                                min="0"
                                                 onchange={handleInputChange}>
                                             </lightning-input>
                                         </div>
@@ -1176,7 +1173,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q9}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q9_HIST_FINANCIALS}</div>
+                                        <div class="modern-subsection-title">{labels.Q9_HIST_FINANCIALS} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">
                                             {labels.Q9_HIST_FINANCIALS_DESC}
                                         </div>
@@ -1196,36 +1193,36 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <span class="required">*</span> <strong>Balance at Start of Year</strong>
+                                                    <strong>Balance at Start of Year</strong>
                                                     <div class="subtext-muted">Earliest year only — chains forward automatically..</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.START_FY3} onchange={handleInputChange} data-key="START_FY3" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedStartFY3} onchange={handleInputChange} data-key="START_FY3"></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell">{computedStartFY2}</div></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell">{computedStartFY1}</div></div></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Revenue</strong></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY3} onchange={handleInputChange} data-key="REV_FY3" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY2} onchange={handleInputChange} data-key="REV_FY2" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.REV_FY1} onchange={handleInputChange} data-key="REV_FY1" min="0" required></lightning-input></div></td>
+                                                <td><strong>Revenue</strong></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedRevFY3} onchange={handleInputChange} data-key="REV_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedRevFY2} onchange={handleInputChange} data-key="REV_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedRevFY1} onchange={handleInputChange} data-key="REV_FY1"></lightning-input></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <span class="required">*</span> <strong>Capital expenditure</strong>
+                                                    <strong>Capital expenditure</strong>
                                                     <div class="subtext-muted">Capital expenditure: money spent on lasting assets, such as equipment, vehicles, or premises.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY3} onchange={handleInputChange} data-key="CAP_FY3" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY2} onchange={handleInputChange} data-key="CAP_FY2" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CAP_FY1} onchange={handleInputChange} data-key="CAP_FY1" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCapFY3} onchange={handleInputChange} data-key="CAP_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCapFY2} onchange={handleInputChange} data-key="CAP_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCapFY1} onchange={handleInputChange} data-key="CAP_FY1"></lightning-input></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <span class="required">*</span> <strong>Operating expenditure</strong>
+                                                    <strong>Operating expenditure</strong>
                                                     <div class="subtext-muted">Operating expenditure: day-to-day running costs, such as salaries, rent, and program delivery.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY3} onchange={handleInputChange} data-key="OP_FY3" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY2} onchange={handleInputChange} data-key="OP_FY2" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.OP_FY1} onchange={handleInputChange} data-key="OP_FY1" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedOpFY3} onchange={handleInputChange} data-key="OP_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedOpFY2} onchange={handleInputChange} data-key="OP_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedOpFY1} onchange={handleInputChange} data-key="OP_FY1"></lightning-input></div></td>
                                             </tr>
                                             <tr class="end-balance-row">
                                                 <td>
@@ -1247,7 +1244,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q10}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q10_CURRENT_FY}</div>
+                                        <div class="modern-subsection-title">{labels.Q10_CURRENT_FY} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">
                                             {labels.Q10_CURRENT_FY_DESC}
                                         </div>
@@ -1266,27 +1263,27 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Revenue</strong></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_BUDGET} onchange={handleInputChange} data-key="CFY_REV_BUDGET" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_REV_PROJ} onchange={handleInputChange} data-key="CFY_REV_PROJ" min="0" required></lightning-input></div></td>
+                                                <td><strong>Revenue</strong></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyRevBudget} onchange={handleInputChange} data-key="CFY_REV_BUDGET"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyRevProj} onchange={handleInputChange} data-key="CFY_REV_PROJ"></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedRevDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <span class="required">*</span> <strong>Capital expenditure</strong>
+                                                    <strong>Capital expenditure</strong>
                                                     <div class="subtext-muted">Capital expenditure: money spent on lasting assets, such as equipment, vehicles, or premises.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_BUDGET} onchange={handleInputChange} data-key="CFY_CAP_BUDGET" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_CAP_PROJ} onchange={handleInputChange} data-key="CFY_CAP_PROJ" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyCapBudget} onchange={handleInputChange} data-key="CFY_CAP_BUDGET"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyCapProj} onchange={handleInputChange} data-key="CFY_CAP_PROJ"></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedCapDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <span class="required">*</span> <strong>Operating expenditure</strong>
+                                                    <strong>Operating expenditure</strong>
                                                     <div class="subtext-muted">Operating expenditure: day-to-day running costs, such as salaries, rent, and program delivery.</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_BUDGET} onchange={handleInputChange} data-key="CFY_OP_BUDGET" min="0" required></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.CFY_OP_PROJ} onchange={handleInputChange} data-key="CFY_OP_PROJ" min="0" required></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyOpBudget} onchange={handleInputChange} data-key="CFY_OP_BUDGET"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedCfyOpProj} onchange={handleInputChange} data-key="CFY_OP_PROJ"></lightning-input></div></td>
                                                 <td><div class="currency-input-cell"><span class="currency-prefix">$</span><div class="computed-cell"><strong>{computedOpDeviation}</strong></div></div></td>
                                             </tr>
                                             <tr class="end-balance-row">
@@ -1457,7 +1454,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q12}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q12_SKILLING_DOMAINS}</div>
+                                        <div class="modern-subsection-title">{labels.Q12_SKILLING_DOMAINS} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q12_SKILLING_DOMAINS_DESC}</div>
                                     </div>
                                 </div>
@@ -1503,7 +1500,7 @@
                                                                    value={row.whenStarted}
                                                                    data-id={row.id}
                                                                    data-field="whenStarted"
-                                                                   min="1900-01-01"
+                                                                   min={minProgrammeStartDate}
                                                                    max={todayDateString}
                                                                    onkeydown={handleDateKeyDown}
                                                                    onclick={handleDateClick}
@@ -1540,7 +1537,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q13}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q13_JF_HIST_OUTCOMES}</div>
+                                        <div class="modern-subsection-title">{labels.Q13_JF_HIST_OUTCOMES} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q13_JF_HIST_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
@@ -1582,9 +1579,9 @@
                                                     <span class="required">*</span> <strong>Avg Cost per Placement</strong>
                                                     <div class="subtext-muted">Formula: (training + placement expense) ÷ people placed</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JF_COST_FY3} onchange={handleInputChange} data-key="JF_COST_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JF_COST_FY2} onchange={handleInputChange} data-key="JF_COST_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JF_COST_FY1} onchange={handleInputChange} data-key="JF_COST_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJfCostFY3} onchange={handleInputChange} data-key="JF_COST_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJfCostFY2} onchange={handleInputChange} data-key="JF_COST_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJfCostFY1} onchange={handleInputChange} data-key="JF_COST_FY1"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1596,7 +1593,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q14}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q14_JF_PROJ_OUTCOMES}</div>
+                                        <div class="modern-subsection-title">{labels.Q14_JF_PROJ_OUTCOMES} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q14_JF_PROJ_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
@@ -1630,7 +1627,7 @@
                                                     <span class="required">*</span> <strong>Avg Cost per Placement</strong>
                                                     <div class="subtext-muted">Formula: (training + placement expense) ÷ people placed</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JF_COST_PROJ} onchange={handleInputChange} data-key="JF_COST_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJfCostProj} onchange={handleInputChange} data-key="JF_COST_PROJ"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1776,7 +1773,7 @@
                                                            value={sec.whenBegan}
                                                            data-id={sec.id}
                                                            data-field="whenBegan"
-                                                           min="1900-01-01"
+                                                           min={minProgrammeStartDate}
                                                            max={todayDateString}
                                                            onkeydown={handleDateKeyDown}
                                                            onclick={handleDateClick}
@@ -1854,7 +1851,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q17}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q17_JC_HIST_OUTCOMES}</div>
+                                        <div class="modern-subsection-title">{labels.Q17_JC_HIST_OUTCOMES} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q17_JC_HIST_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
@@ -1872,36 +1869,36 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># New Businesses Started</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_BIZ_FY3} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_BIZ_FY2} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_BIZ_FY1} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewBizFY3} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewBizFY2} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewBizFY1} onchange={handleInputChange} data-key="JC_NEW_BIZ_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># jobs created by new businesses</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_JOBS_FY3} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_JOBS_FY2} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_JOBS_FY1} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewJobsFY3} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewJobsFY2} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewJobsFY1} onchange={handleInputChange} data-key="JC_NEW_JOBS_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Existing Businesses Supported</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_BIZ_FY3} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_BIZ_FY2} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_BIZ_FY1} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistBizFY3} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistBizFY2} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistBizFY1} onchange={handleInputChange} data-key="JC_EXIST_BIZ_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># jobs created by existing businesses</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_JOBS_FY3} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_JOBS_FY2} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_JOBS_FY1} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistJobsFY3} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistJobsFY2} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistJobsFY1} onchange={handleInputChange} data-key="JC_EXIST_JOBS_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Total Avg Cost per Job Created</strong>
                                                     <div class="subtext-muted">Formula: program expense ÷ jobs created</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JC_COST_FY3} onchange={handleInputChange} data-key="JC_COST_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JC_COST_FY2} onchange={handleInputChange} data-key="JC_COST_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JC_COST_FY1} onchange={handleInputChange} data-key="JC_COST_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJcCostFY3} onchange={handleInputChange} data-key="JC_COST_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJcCostFY2} onchange={handleInputChange} data-key="JC_COST_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJcCostFY1} onchange={handleInputChange} data-key="JC_COST_FY1"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1913,7 +1910,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q18}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q18_JC_PROJ_OUTCOMES}</div>
+                                        <div class="modern-subsection-title">{labels.Q18_JC_PROJ_OUTCOMES} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q18_JC_PROJ_OUTCOMES_DESC}</div>
                                     </div>
                                 </div>
@@ -1929,26 +1926,26 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># New Businesses Started</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_BIZ_PROJ} onchange={handleInputChange} data-key="JC_NEW_BIZ_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewBizProj} onchange={handleInputChange} data-key="JC_NEW_BIZ_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># jobs created by new businesses</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_NEW_JOBS_PROJ} onchange={handleInputChange} data-key="JC_NEW_JOBS_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcNewJobsProj} onchange={handleInputChange} data-key="JC_NEW_JOBS_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Existing Businesses Supported</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_BIZ_PROJ} onchange={handleInputChange} data-key="JC_EXIST_BIZ_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistBizProj} onchange={handleInputChange} data-key="JC_EXIST_BIZ_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong># jobs created by existing businesses</strong></td>
-                                                <td><lightning-input type="number" value={formValues.JC_EXIST_JOBS_PROJ} onchange={handleInputChange} data-key="JC_EXIST_JOBS_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedJcExistJobsProj} onchange={handleInputChange} data-key="JC_EXIST_JOBS_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Total Avg Cost per Job Created</strong>
                                                     <div class="subtext-muted">Formula: program expense ÷ jobs created</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.JC_COST_PROJ} onchange={handleInputChange} data-key="JC_COST_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedJcCostProj} onchange={handleInputChange} data-key="JC_COST_PROJ"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -2057,7 +2054,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q20}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q20_LIVELIHOOD_PROGRAMS}</div>
+                                        <div class="modern-subsection-title">{labels.Q20_LIVELIHOOD_PROGRAMS} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q20_LIVELIHOOD_PROGRAMS_DESC}</div>
                                     </div>
                                 </div>
@@ -2116,7 +2113,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q21}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q21_COMMUNITIES_SERVED}</div>
+                                        <div class="modern-subsection-title">{labels.Q21_COMMUNITIES_SERVED} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q21_COMMUNITIES_SERVED_DESC}</div>
                                     </div>
                                 </div>
@@ -2175,7 +2172,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q22}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q22_LIVELIHOOD_ACTUALS}</div>
+                                        <div class="modern-subsection-title">{labels.Q22_LIVELIHOOD_ACTUALS} <span class="required">*</span></div>
                                         <div class="modern-subsection-description" style="line-height: 1.5; color: var(--wg-text-muted);">
                                             <p style="margin-bottom: 8px;">A household counts as an outcome when both of these are true:</p>
                                             <ol style="margin-left: 20px; margin-bottom: 8px; list-style-type: decimal;">
@@ -2212,30 +2209,30 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households served during the year</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_SERVED_FY3} onchange={handleInputChange} data-key="LIV_SERVED_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_SERVED_FY2} onchange={handleInputChange} data-key="LIV_SERVED_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_SERVED_FY1} onchange={handleInputChange} data-key="LIV_SERVED_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivServedFY3} onchange={handleInputChange} data-key="LIV_SERVED_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivServedFY2} onchange={handleInputChange} data-key="LIV_SERVED_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivServedFY1} onchange={handleInputChange} data-key="LIV_SERVED_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households newly enrolled during the year</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_ENROLL_FY3} onchange={handleInputChange} data-key="LIV_ENROLL_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_ENROLL_FY2} onchange={handleInputChange} data-key="LIV_ENROLL_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_ENROLL_FY1} onchange={handleInputChange} data-key="LIV_ENROLL_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivEnrollFY3} onchange={handleInputChange} data-key="LIV_ENROLL_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivEnrollFY2} onchange={handleInputChange} data-key="LIV_ENROLL_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivEnrollFY1} onchange={handleInputChange} data-key="LIV_ENROLL_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households meeting outcome criteria</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_OUTCOME_FY3} onchange={handleInputChange} data-key="LIV_OUTCOME_FY3"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_OUTCOME_FY2} onchange={handleInputChange} data-key="LIV_OUTCOME_FY2"></lightning-input></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_OUTCOME_FY1} onchange={handleInputChange} data-key="LIV_OUTCOME_FY1"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivOutcomeFY3} onchange={handleInputChange} data-key="LIV_OUTCOME_FY3"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivOutcomeFY2} onchange={handleInputChange} data-key="LIV_OUTCOME_FY2"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivOutcomeFY1} onchange={handleInputChange} data-key="LIV_OUTCOME_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Avg. cost per outcome (USD)</strong>
                                                     <div class="subtext-muted">Formula: program expense ÷ outcomes achieved</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.LIV_COST_FY3} onchange={handleInputChange} data-key="LIV_COST_FY3" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.LIV_COST_FY2} onchange={handleInputChange} data-key="LIV_COST_FY2" min="0"></lightning-input></div></td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.LIV_COST_FY1} onchange={handleInputChange} data-key="LIV_COST_FY1" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedLivCostFY3} onchange={handleInputChange} data-key="LIV_COST_FY3"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedLivCostFY2} onchange={handleInputChange} data-key="LIV_COST_FY2"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedLivCostFY1} onchange={handleInputChange} data-key="LIV_COST_FY1"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -2247,7 +2244,7 @@
                                 <div class="modern-subsection-header">
                                     <div class="modern-subsection-number">{qNum.Q23}</div>
                                     <div>
-                                        <div class="modern-subsection-title">{labels.Q23_LIVELIHOOD_PROJ}</div>
+                                        <div class="modern-subsection-title">{labels.Q23_LIVELIHOOD_PROJ} <span class="required">*</span></div>
                                         <div class="modern-subsection-description">{labels.Q23_LIVELIHOOD_PROJ_DESC}</div>
                                     </div>
                                 </div>
@@ -2263,22 +2260,22 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households served during the year (projected)</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_SERVED_PROJ} onchange={handleInputChange} data-key="LIV_SERVED_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivServedProj} onchange={handleInputChange} data-key="LIV_SERVED_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households newly enrolled during the year (projected)</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_ENROLL_PROJ} onchange={handleInputChange} data-key="LIV_ENROLL_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivEnrollProj} onchange={handleInputChange} data-key="LIV_ENROLL_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="required">*</span> <strong>Households expected to meet outcome criteria (projected)</strong></td>
-                                                <td><lightning-input type="number" value={formValues.LIV_OUTCOME_PROJ} onchange={handleInputChange} data-key="LIV_OUTCOME_PROJ"></lightning-input></td>
+                                                <td><lightning-input type="text" value={formattedLivOutcomeProj} onchange={handleInputChange} data-key="LIV_OUTCOME_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <span class="required">*</span> <strong>Avg. cost per outcome (USD) - projected</strong>
                                                     <div class="subtext-muted">Formula: program expense ÷ outcomes achieved</div>
                                                 </td>
-                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="number" value={formValues.LIV_COST_PROJ} onchange={handleInputChange} data-key="LIV_COST_PROJ" min="0"></lightning-input></div></td>
+                                                <td><div class="currency-input-cell"><span class="currency-prefix">$</span><lightning-input type="text" value={formattedLivCostProj} onchange={handleInputChange} data-key="LIV_COST_PROJ"></lightning-input></div></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -2807,19 +2804,19 @@
                                 <template if:true={formValues.Funder_1_Name__c}>
                                     <div class="rv-row">
                                         <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 1</div>
-                                        <div class="rv-val">{formValues.Funder_1_Name__c} - ${formValues.Funder_1_Amount__c} ({formValues.Funder_1_Type__c})</div>
+                                        <div class="rv-val">{formValues.Funder_1_Name__c} - ${previewFunder1Amount} ({formValues.Funder_1_Type__c})<template if:true={hasFunder1Period}> · Period: {previewFunder1Period}</template></div>
                                     </div>
                                 </template>
                                 <template if:true={formValues.Funder_2_Name__c}>
                                     <div class="rv-row">
                                         <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 2</div>
-                                        <div class="rv-val">{formValues.Funder_2_Name__c} - ${formValues.Funder_2_Amount__c} ({formValues.Funder_2_Type__c})</div>
+                                        <div class="rv-val">{formValues.Funder_2_Name__c} - ${previewFunder2Amount} ({formValues.Funder_2_Type__c})<template if:true={hasFunder2Period}> · Period: {previewFunder2Period}</template></div>
                                     </div>
                                 </template>
                                 <template if:true={formValues.Funder_3_Name__c}>
                                     <div class="rv-row">
                                         <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 3</div>
-                                        <div class="rv-val">{formValues.Funder_3_Name__c} - ${formValues.Funder_3_Amount__c} ({formValues.Funder_3_Type__c})</div>
+                                        <div class="rv-val">{formValues.Funder_3_Name__c} - ${previewFunder3Amount} ({formValues.Funder_3_Type__c})<template if:true={hasFunder3Period}> · Period: {previewFunder3Period}</template></div>
                                     </div>
                                 </template>
                                 <template if:true={formValues.Reference_1_Name__c}>

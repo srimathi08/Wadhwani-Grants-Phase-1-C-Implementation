@@ -1,4 +1,4 @@
-﻿<template>
+<template>
     <div class="rfi-response-wrapper">
 
         <!--  LOADING SPINNER  -->
@@ -63,12 +63,12 @@
                                 <!-- Question Body / Fields -->
                                 <div class="rfi-field-area">
 
-                                    <!--  Q1: Track Selection  -->
+                                    <!--  Q1: Track Selection (Read-Only in Return Flow)  -->
                                     <template if:true={q.isQ1}>
-                                        <p class="rfi-field-hint">Select the tracks that represent your organization's work:</p>
+                                        <p class="rfi-field-hint">Selected tracks for your organization's application (read-only):</p>
                                         <div class="rfi-grid-three">
                                             <template for:each={trackCards} for:item="trk">
-                                                <div key={trk.code} class={trk.cssClass} onclick={handleTrackToggle} data-code={trk.code}>
+                                                <div key={trk.code} class={trk.cssClass} data-code={trk.code}>
                                                     <div class="custom-checkbox">
                                                         <template if:true={trk.isSelected}></template>
                                                     </div>
@@ -82,7 +82,7 @@
                                     <template if:true={q.isQ2}>
                                         <div class="rfi-grid-two">
                                             <lightning-input label="Organizational Name" value={formValues.Organization_Name__c}
-                                                data-field="Organization_Name__c" onchange={handleFieldChange} required></lightning-input>
+                                                data-field="Organization_Name__c" onchange={handleFieldChange} disabled></lightning-input>
 
                                             <div class="location-autocomplete-container">
                                                 <lightning-input label="Headquarters City and Country"
@@ -121,16 +121,16 @@
                                     <template if:true={q.isQ3}>
                                         <div class="rfi-grid-two">
                                             <lightning-input label="Submitter Name" value={formValues.Submitter_Name__c}
-                                                data-field="Submitter_Name__c" onchange={handleFieldChange} required></lightning-input>
+                                                data-field="Submitter_Name__c" onchange={handleFieldChange} disabled></lightning-input>
 
                                             <lightning-input label="Job Title" value={formValues.Job_Title__c}
                                                 data-field="Job_Title__c" onchange={handleFieldChange} required></lightning-input>
 
                                             <lightning-input type="email" label="Work Email Address" value={formValues.Work_Email_ID__c}
-                                                data-field="Work_Email_ID__c" onchange={handleFieldChange} required></lightning-input>
+                                                data-field="Work_Email_ID__c" onchange={handleFieldChange} disabled></lightning-input>
 
                                             <lightning-input type="tel" label="Phone number" value={formValues.Phone__c}
-                                                data-field="Phone__c" onchange={handleFieldChange} required></lightning-input>
+                                                data-field="Phone__c" onchange={handleFieldChange} disabled></lightning-input>
                                         </div>
                                     </template>
 
@@ -146,7 +146,7 @@
                                                 onchange={handleFieldChange} required></lightning-combobox>
 
                                             <lightning-input type="date" label="Incorporation Date" value={formValues.Incorporation_Date__c}
-                                                data-field="Incorporation_Date__c" onchange={handleFieldChange} required></lightning-input>
+                                                data-field="Incorporation_Date__c" max={todayDateString} onchange={handleFieldChange} required></lightning-input>
 
                                             <template if:true={isLegalTypeOther}>
                                                 <lightning-input label="Please specify your legal structure type"
@@ -174,8 +174,29 @@
                                         </div>
                                     </template>
 
-                                    <!--  Q5: Fiscal Year End Date  -->
+                                    <!--  Q5: Legal and Tax Compliance  -->
                                     <template if:true={q.isQ5}>
+                                        <div class="rfi-grid-two">
+                                            <lightning-combobox label="501(c)(3) Status in US" value={formValues.Has_501c3_Status__c}
+                                                options={yesNoOptions} data-field="Has_501c3_Status__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+
+                                            <lightning-combobox label="Equivalency Determination (ED)" value={formValues.Has_Equivalency_Determination__c}
+                                                options={yesNoOptions} data-field="Has_Equivalency_Determination__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+
+                                            <lightning-combobox label="FCRA Registered in India" value={formValues.Is_FCRA_Registered__c}
+                                                options={yesNoNotApplicableOptions} data-field="Is_FCRA_Registered__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+
+                                            <lightning-combobox label="Willing to Pursue ED Certification" value={formValues.Willing_to_Pursue_ED__c}
+                                                options={yesNoOptions} data-field="Willing_to_Pursue_ED__c"
+                                                onchange={handleFieldChange} required></lightning-combobox>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q6: Fiscal Year End Date  -->
+                                    <template if:true={q.isQ6}>
                                         <div class="rfi-grid-two">
                                             <lightning-combobox label="Fiscal Year End Month" value={formValues.Fiscal_Month__c}
                                                 options={fiscalMonthOptions} onchange={handleFiscalMonthChange} required></lightning-combobox>
@@ -188,8 +209,69 @@
                                         </div>
                                     </template>
 
-                                    <!--  Q6: Historical Financial Data  -->
-                                    <template if:true={q.isQ6}>
+                                    <!--  Q7: Top 3 Most Prominent Funders  -->
+                                    <template if:true={q.isQ7}>
+                                        <h3 class="rfi-section-subtitle">Top 3 Most Prominent Funders</h3>
+                                        <!-- Funder 1 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 1</span></div>
+                                            <div class="rfi-grid-two">
+                                                <lightning-input label="Funder Name" value={formValues.Funder_1_Name__c} data-field="Funder_1_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_1_Amount__c} data-field="Funder_1_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
+                                                <lightning-input type="date" label="Funding Period Start" value={formValues.Funder_1_Period_Start__c} data-field="Funder_1_Period_Start__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="date" label="Funding Period End" value={formValues.Funder_1_Period_End__c} data-field="Funder_1_Period_End__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-combobox label="Funding Type" value={formValues.Funder_1_Type__c} options={funderTypeOptions} data-field="Funder_1_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                            </div>
+                                        </div>
+                                        <!-- Funder 2 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 2</span></div>
+                                            <div class="rfi-grid-two">
+                                                <lightning-input label="Funder Name" value={formValues.Funder_2_Name__c} data-field="Funder_2_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_2_Amount__c} data-field="Funder_2_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
+                                                <lightning-input type="date" label="Funding Period Start" value={formValues.Funder_2_Period_Start__c} data-field="Funder_2_Period_Start__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="date" label="Funding Period End" value={formValues.Funder_2_Period_End__c} data-field="Funder_2_Period_End__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-combobox label="Funding Type" value={formValues.Funder_2_Type__c} options={funderTypeOptions} data-field="Funder_2_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                            </div>
+                                        </div>
+                                        <!-- Funder 3 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 3</span></div>
+                                            <div class="rfi-grid-two">
+                                                <lightning-input label="Funder Name" value={formValues.Funder_3_Name__c} data-field="Funder_3_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_3_Amount__c} data-field="Funder_3_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
+                                                <lightning-input type="date" label="Funding Period Start" value={formValues.Funder_3_Period_Start__c} data-field="Funder_3_Period_Start__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="date" label="Funding Period End" value={formValues.Funder_3_Period_End__c} data-field="Funder_3_Period_End__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-combobox label="Funding Type" value={formValues.Funder_3_Type__c} options={funderTypeOptions} data-field="Funder_3_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q8: References for Outreach  -->
+                                    <template if:true={q.isQ8}>
+                                        <h3 class="rfi-section-subtitle">References for Outreach</h3>
+                                        <!-- Reference 1 -->
+                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Reference 1</span></div>
+                                            <div class="rfi-grid-three">
+                                                <lightning-input label="Name" value={formValues.Reference_1_Name__c} data-field="Reference_1_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input label="Role / Title" value={formValues.Reference_1_Role__c} data-field="Reference_1_Role__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="email" label="Email" value={formValues.Reference_1_Email__c} data-field="Reference_1_Email__c" onchange={handleFieldChange}></lightning-input>
+                                            </div>
+                                        </div>
+                                        <!-- Reference 2 -->
+                                        <div class="rfi-inner-card">
+                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Reference 2</span></div>
+                                            <div class="rfi-grid-three">
+                                                <lightning-input label="Name" value={formValues.Reference_2_Name__c} data-field="Reference_2_Name__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input label="Role / Title" value={formValues.Reference_2_Role__c} data-field="Reference_2_Role__c" onchange={handleFieldChange}></lightning-input>
+                                                <lightning-input type="email" label="Email" value={formValues.Reference_2_Email__c} data-field="Reference_2_Email__c" onchange={handleFieldChange}></lightning-input>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!--  Q9: Historical Financial Data  -->
+                                    <template if:true={q.isQ9}>
                                         <p class="rfi-field-hint">All amounts in USD. Balance End rows are auto-computed.</p>
                                         <div class="rfi-table-scroll">
                                             <table class="rfi-table">
@@ -237,8 +319,8 @@
                                         </div>
                                     </template>
 
-                                    <!--  Q7: Current Fiscal Year Data  -->
-                                    <template if:true={q.isQ7}>
+                                    <!--  Q10: Current Fiscal Year Data  -->
+                                    <template if:true={q.isQ10}>
                                         <p class="rfi-field-hint">All amounts in USD for Current FY ({fiscalYears.cfyYear}). Variances are auto-computed.</p>
                                         <div class="rfi-table-scroll">
                                             <table class="rfi-table">
@@ -289,74 +371,6 @@
                                             <div class="modern-richtext-area" contenteditable="true"
                                                 data-field="Revenue_Explanation__c"
                                                 oninput={handleRichTextInput}></div>
-                                        </div>
-                                    </template>
-
-                                    <!--  Q8: 501(c)(3) & Equivalency Determination  -->
-                                    <template if:true={q.isQ8}>
-                                        <div class="rfi-grid-two">
-                                            <div>
-                                                <label class="rfi-field-label">Do you hold 501(c)(3) status?</label>
-                                                <div class="rfi-radio-group">
-                                                    <label><input type="radio" name="501c3" value="Yes" checked={formValues.Has_501c3_Status__c} data-field="Has_501c3_Status__c" onchange={handleFieldChange}/> Yes</label>
-                                                    <label><input type="radio" name="501c3" value="No" data-field="Has_501c3_Status__c" onchange={handleFieldChange}/> No</label>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label class="rfi-field-label">Do you have an Equivalency Determination (ED)?</label>
-                                                <div class="rfi-radio-group">
-                                                    <label><input type="radio" name="ed" value="Yes" checked={formValues.Has_Equivalency_Determination__c} data-field="Has_Equivalency_Determination__c" onchange={handleFieldChange}/> Yes</label>
-                                                    <label><input type="radio" name="ed" value="No" data-field="Has_Equivalency_Determination__c" onchange={handleFieldChange}/> No</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-
-                                    <!--  Q9: FCRA Registration  -->
-                                    <template if:true={q.isQ9}>
-                                        <div>
-                                            <label class="rfi-field-label">Is your organization FCRA registered in India?</label>
-                                            <div class="rfi-radio-group">
-                                                <label><input type="radio" name="fcra" value="Yes" checked={formValues.Is_FCRA_Registered__c} data-field="Is_FCRA_Registered__c" onchange={handleFieldChange}/> Yes</label>
-                                                <label><input type="radio" name="fcra" value="No" data-field="Is_FCRA_Registered__c" onchange={handleFieldChange}/> No</label>
-                                            </div>
-                                        </div>
-                                    </template>
-
-                                    <!--  Q10: Top Funders & References  -->
-                                    <template if:true={q.isQ10}>
-                                        <h3 class="rfi-section-subtitle">Top 3 Most Prominent Funders</h3>
-                                        <!-- Funder 1 -->
-                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
-                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 1</span></div>
-                                            <div class="rfi-grid-two">
-                                                <lightning-input label="Funder Name" value={formValues.Funder_1_Name__c} data-field="Funder_1_Name__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_1_Amount__c} data-field="Funder_1_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
-                                                <lightning-input type="date" label="Period Start" value={formValues.Funder_1_Period_Start__c} data-field="Funder_1_Period_Start__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input type="date" label="Period End" value={formValues.Funder_1_Period_End__c} data-field="Funder_1_Period_End__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-combobox label="Funding Type" value={formValues.Funder_1_Type__c} options={funderTypeOptions} data-field="Funder_1_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
-                                            </div>
-                                        </div>
-                                        <!-- Funder 2 -->
-                                        <div class="rfi-inner-card" style="margin-bottom:12px;">
-                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Funder 2</span></div>
-                                            <div class="rfi-grid-two">
-                                                <lightning-input label="Funder Name" value={formValues.Funder_2_Name__c} data-field="Funder_2_Name__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input type="number" label="Approx. Annual Amount ($)" value={formValues.Funder_2_Amount__c} data-field="Funder_2_Amount__c" onchange={handleFieldChange} min="0"></lightning-input>
-                                                <lightning-input type="date" label="Period Start" value={formValues.Funder_2_Period_Start__c} data-field="Funder_2_Period_Start__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input type="date" label="Period End" value={formValues.Funder_2_Period_End__c} data-field="Funder_2_Period_End__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-combobox label="Funding Type" value={formValues.Funder_2_Type__c} options={funderTypeOptions} data-field="Funder_2_Type__c" onchange={handleFieldChange} class="rfi-full-width"></lightning-combobox>
-                                            </div>
-                                        </div>
-
-                                        <h3 class="rfi-section-subtitle" style="margin-top:20px;">References for Outreach</h3>
-                                        <div class="rfi-inner-card">
-                                            <div class="rfi-inner-header"><span class="rfi-inner-label">Reference 1</span></div>
-                                            <div class="rfi-grid-three">
-                                                <lightning-input label="Name" value={formValues.Reference_1_Name__c} data-field="Reference_1_Name__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input label="Role / Title" value={formValues.Reference_1_Role__c} data-field="Reference_1_Role__c" onchange={handleFieldChange}></lightning-input>
-                                                <lightning-input type="email" label="Email" value={formValues.Reference_1_Email__c} data-field="Reference_1_Email__c" onchange={handleFieldChange}></lightning-input>
-                                            </div>
                                         </div>
                                     </template>
 
