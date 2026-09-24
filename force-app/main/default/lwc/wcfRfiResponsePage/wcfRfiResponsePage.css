@@ -351,6 +351,29 @@
     cursor: pointer;
 }
 
+/* ── Chip Selectors ── */
+.rfi-chip {
+    background: #F4F6F9;
+    border: 1px solid #D8DDE6;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4A5568;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.rfi-chip:hover {
+    background: #EDF2F7;
+    border-color: #CBD5E0;
+}
+.rfi-chip.selected {
+    background: #990000;
+    border-color: #990000;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
 /* â”€â”€ File Upload List â”€â”€ */
 .rfi-upload-container {
     margin-top: 10px;

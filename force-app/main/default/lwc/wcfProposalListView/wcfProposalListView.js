@@ -29,16 +29,16 @@ const STATUS_OPTIONS = [
 ];
 
 const VALID_REVIEW_FILTERS = ['total', 'reviewed', 'inProgress', 'notStarted', 'all',
-    'flagged', 'rejected', 'returnedByApprover', 'acceptedApplications'];
+    'flagged', 'returnedByApprover', 'acceptedApplications'];
 
 // ── Readable labels for every filter token (banner + tiles) ──────
 const FILTER_LABELS = {
-    total               : 'Validated Proposals',
+    total               : 'Total Assigned',
+    all                 : 'Total Assigned',
     reviewed            : 'Reviewed',
     inProgress          : 'In Progress',
     notStarted          : 'Not Started',
     flagged             : 'Flagged',
-    rejected            : 'Rejected',
     returnedByApprover  : 'Returned by Approver',
     acceptedApplications: 'Accepted Applications'
 };
@@ -51,8 +51,7 @@ const SUMMARY_TILES = [
     { id: 'reviewed',             countGetter: 'reviewedCount',           tone: 'success' },
     { id: 'returnedByApprover',   countGetter: 'returnedByApproverCount', tone: 'brand', alertWhenPositive: true },
     { id: 'acceptedApplications', countGetter: 'acceptedCount',           tone: 'success' },
-    { id: 'flagged',              countGetter: 'flaggedCount',            tone: 'returned' },
-    { id: 'rejected',             countGetter: 'rejectedCount',           tone: 'error' }
+    { id: 'flagged',              countGetter: 'flaggedCount',            tone: 'returned' }
 ];
 
 export default class WcfProposalListView extends NavigationMixin(LightningElement) {
@@ -141,6 +140,11 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         }
     }
 
+    // Options for the native rows-per-page <select>
+    get pageSizeChoices() {
+        return this.pageSizeOptions.map(o => ({ ...o, selected: o.value === this.pageSizeStr }));
+    }
+
     get pageSize() {
         return parseInt(this.pageSizeStr, 10);
     }
@@ -153,26 +157,20 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             result = result.filter(p => {
                 const info = this.reviewStatusMap[p.Id] || {};
 
-                if (this.activeReviewFilter === 'total') {
-                    return this._isEligibleForQueue(p);
+                if (this.activeReviewFilter === 'total' || this.activeReviewFilter === 'all') {
+                    return true;
                 }
                 if (this.activeReviewFilter === 'reviewed') {
-                    return this._isEligibleForQueue(p) &&
-                           (info.isSubmitted || info.status === 'Review Submitted');
+                    return info.isSubmitted || info.status === 'Review Submitted';
                 }
                 if (this.activeReviewFilter === 'inProgress') {
-                    return this._isEligibleForQueue(p) &&
-                           !info.isSubmitted && info.status === 'In Progress';
+                    return !info.isSubmitted && info.status === 'In Progress';
                 }
                 if (this.activeReviewFilter === 'notStarted') {
-                    return this._isEligibleForQueue(p) &&
-                           !info.isSubmitted && info.status !== 'In Progress';
+                    return !info.isSubmitted && info.status !== 'In Progress' && p.Status !== 'Returned by Approver';
                 }
                 if (this.activeReviewFilter === 'flagged') {
                     return !!info.isFlagged;
-                }
-                if (this.activeReviewFilter === 'rejected') {
-                    return p.Status === 'Reviewer Rejected';
                 }
                 if (this.activeReviewFilter === 'returnedByApprover') {
                     return p.Status === 'Returned by Approver';
@@ -229,19 +227,17 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     _isEligibleForQueue(p) {
         const info = this.reviewStatusMap[p.Id] || {};
         return !info.isFlagged &&
-               p.Status !== 'Reviewer Rejected' &&
                p.Status !== 'Returned by Approver';
     }
 
     get totalCount() {
-        return this.proposals.filter(p => this._isEligibleForQueue(p)).length;
+        return (this.proposals || []).length;
     }
     get hasProposals()  { return this.filteredCount > 0; }
 
     // ── Summary counters (always based on ALL proposals, not filtered) ──
     get reviewedCount() {
         return this.proposals.filter(p => {
-            if (!this._isEligibleForQueue(p)) return false;
             const info = this.reviewStatusMap[p.Id] || {};
             return info.isSubmitted || info.status === 'Review Submitted';
         }).length;
@@ -249,7 +245,6 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
     get inProgressCount() {
         return this.proposals.filter(p => {
-            if (!this._isEligibleForQueue(p)) return false;
             const info = this.reviewStatusMap[p.Id] || {};
             return !info.isSubmitted && info.status === 'In Progress';
         }).length;
@@ -257,9 +252,8 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
     get notStartedCount() {
         return this.proposals.filter(p => {
-            if (!this._isEligibleForQueue(p)) return false;
             const info = this.reviewStatusMap[p.Id] || {};
-            return !info.isSubmitted && info.status !== 'In Progress';
+            return !info.isSubmitted && info.status !== 'In Progress' && p.Status !== 'Returned by Approver';
         }).length;
     }
 
@@ -267,13 +261,6 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         return this.proposals.filter(p => !!(this.reviewStatusMap[p.Id] || {}).isFlagged).length;
     }
 
-    get rejectedCount() {
-        return this.proposals.filter(p => p.Status === 'Reviewer Rejected').length;
-    }
-
-    // NEW (display only): same rules the existing filters already use,
-    // so the dashboard's "Returned by Approver" / "Accepted" tiles now
-    // have a matching tile and count here.
     get returnedByApproverCount() {
         return this.proposals.filter(p => p.Status === 'Returned by Approver').length;
     }
@@ -313,7 +300,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     get subtitle() {
         const all   = (this.proposals || []).length;
         const shown = this.filteredCount;
-        const noun  = all === 1 ? 'validated proposal' : 'validated proposals';
+        const noun  = all === 1 ? 'assigned proposal' : 'assigned proposals';
         return shown === all ? `${all} ${noun}` : `Showing ${shown} of ${all} ${noun}`;
     }
 
@@ -426,6 +413,11 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 actionBtnClass = 'success-btn' + SM;
                 actionIcon     = 'utility:new';
                 reviewAction   = 'complianceRequest';
+            } else if (p.Status === 'Returned by Approver') {
+                actionLabel    = 'Review Decision';
+                actionBtnClass = 'primary-btn' + SM;
+                actionIcon     = 'utility:reply';
+                reviewAction   = 'approverReturn';
             } else if (isSubmitted || reviewStatus === 'Review Submitted') {
                 actionLabel    = 'View Review';
                 actionBtnClass = 'neutral-btn' + SM;
@@ -534,7 +526,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     handlePageClick(evt) { this.currentPage = parseInt(evt.currentTarget.dataset.page, 10); }
 
     handlePageSizeChange(evt) {
-        this.pageSizeStr = evt.detail.value;
+        this.pageSizeStr = evt.target.value;   // native <select> (was lightning-combobox)
         this.currentPage = 1;
     }
 
@@ -567,7 +559,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     }
 
     async _navigateReviewer(proposalId, appName, reviewId, action, headquarters, track) {
-        if ((action === 'resume' || action === 'view') && reviewId) {
+        if ((action === 'resume' || action === 'view' || action === 'approverReturn') && reviewId) {
             this[NavigationMixin.Navigate]({
                 type: 'standard__webPage',
                 attributes: {

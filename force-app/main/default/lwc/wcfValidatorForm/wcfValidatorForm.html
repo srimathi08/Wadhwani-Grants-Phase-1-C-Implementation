@@ -495,20 +495,19 @@
                     </template>
                     <div class="wcf-footer-status">{footerStatus}</div>
                 </div>
+                <!-- Same buttons as the Reviewer form footer: grey outline "Save draft",
+                     solid red "Submit" (was two lightning-buttons that the theme turned red) -->
                 <div class="wcf-footer-actions">
-                    <lightning-button
-                        label={saveDraftLabel}
-                        onclick={handleSaveDraft}
-                        disabled={isSaving}
-                        class="wcf-draft-btn">
-                    </lightning-button>
-                    <lightning-button
-                        label="Submit"
-                        variant="brand"
-                        onclick={handleSeal}
-                        disabled={isSealDisabled}
-                        class="wcf-seal-btn">
-                    </lightning-button>
+                    <button class="neutral-btn wcf-footer-btn"
+                            onclick={handleSaveDraft}
+                            disabled={isSaving}>
+                        {saveDraftLabel}
+                    </button>
+                    <button class="primary-btn wcf-footer-btn"
+                            onclick={handleSeal}
+                            disabled={isSealDisabled}>
+                        Submit
+                    </button>
                 </div>
             </div>
 

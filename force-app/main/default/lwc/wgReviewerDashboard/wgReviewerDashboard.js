@@ -1,16 +1,26 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-// ── NEW: resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
+// ── resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
 import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getValidatedProposals from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
 import getReviewStatusMap    from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
 import getReviewerPreview    from '@salesforce/apex/ReviewSummaryController.getReviewerPreview';
 import getApproverReturnQueueCount from '@salesforce/apex/WCFProposalListController.getApproverReturnQueueCount';
-
 import getAcceptedApplicationsCount from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsCount';
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
 
-export default class WcfReviewerDashboard extends NavigationMixin(LightningElement) {
+// ── KPI tiles — same order, labels and colors as the Reviewer Queue tiles ──
+// filter = token passed to the queue page (wcfProposalListView reads it).
+const TILE_DEFS = [
+    { id: 'all',                  label: 'Total Assigned',        subtitle: 'All proposals assigned to you',               countKey: 'reviewerTotal',              tone: 'info' },
+    { id: 'notStarted',           label: 'Not Started',           subtitle: 'Awaiting your first action',                  countKey: 'reviewerNotStarted',         tone: 'neutral' },
+    { id: 'inProgress',           label: 'In Progress',           subtitle: 'Reviews started but not submitted',           countKey: 'reviewerInProgress',         tone: 'warning' },
+    { id: 'reviewed',             label: 'Reviewed',              subtitle: 'Submitted review forms',                      countKey: 'reviewerReviewed',           tone: 'success' },
+    { id: 'returnedByApprover',   label: 'Returned by Approver',  subtitle: 'Awaiting your Approve / Return decision',     countKey: 'reviewerReturnedByApprover', tone: 'brand', alertWhenPositive: true },
+    { id: 'acceptedApplications', label: 'Accepted Applications', subtitle: 'Approver-accepted, ready for compliance docs', countKey: 'reviewerAcceptedCount',      tone: 'success' }
+];
+
+export default class WgReviewerDashboard extends NavigationMixin(LightningElement) {
 
     // ─── State ────────────────────────────────────────────────────
     @track reviewerTotal      = 0;
@@ -20,27 +30,16 @@ export default class WcfReviewerDashboard extends NavigationMixin(LightningEleme
     @track reviewerReturnedByApprover = 0;
     @track reviewerPreviewRows = [];
 
-    // ── add to @track state ──
-@track reviewerAcceptedCount     = 0;
-@track acceptedApplicationRows   = [];
+    @track reviewerAcceptedCount   = 0;
+    @track acceptedApplicationRows = [];
 
     // ─────────────────────────────────────────────────────────────
     // SITE BASE PATH (environment-independent navigation)
     // ─────────────────────────────────────────────────────────────
-    // Same fix as wcfProposalListView: never hardcode '/reviewersite/s'.
-    // Experience Cloud prefixes the site base path onto a standard__webPage
-    // URL unless the URL already starts with it — which is why the literal
-    // worked in sandbox ('/reviewersite/s') and produced
-    // '/internal/s/reviewersite/s/...' => "Invalid Page" in production.
     get sitePath() {
         return COMMUNITY_BASE_PATH || '';
     }
 
-    /**
-     * Build a site-relative URL.
-     * @param {string} page   page URL name, e.g. 'review-forms'
-     * @param {object} params optional query params (values are URI-encoded)
-     */
     _siteUrl(page, params) {
         const path = String(page || '').replace(/^\/+/, '');
         let url    = `${this.sitePath}/${path}`;
@@ -59,50 +58,66 @@ export default class WcfReviewerDashboard extends NavigationMixin(LightningEleme
         this.loadReviewerCounts();
         this.loadReviewerPreview();
         this.loadApproverReturnCount();
-         this.loadAcceptedApplications(); 
+        this.loadAcceptedApplications();
+    }
+
+    // ─── KPI tiles for the template ───────────────────────────────
+    get reviewerCards() {
+        return TILE_DEFS.map(t => {
+            const count   = this[t.countKey] || 0;
+            const isAlert = t.alertWhenPositive && count > 0;
+            return {
+                id      : t.id,
+                label   : t.label,
+                subtitle: t.subtitle,
+                count,
+                kpiClass: 'wg-stat' + (isAlert ? ' wg-stat--alert' : ''),
+                dotClass: 'wg-stat-dot wg-stat-dot--' + t.tone
+            };
+        });
     }
 
     async loadAcceptedApplications() {
-    try {
-        this.reviewerAcceptedCount = await getAcceptedApplicationsCount();
-        const rows = await getAcceptedApplicationsQueue();
-        this.acceptedApplicationRows = (rows || []).map((r, i) => ({
-            id: r.applicationId,
-            rowNum: i + 1,
-            applicationId: r.applicationId,
-            appName: r.appName,
-            organizationName: r.organizationName || '—',
-            approverComment: r.approverComment,
-            decisionDateFormatted: r.decisionDate
-                ? new Date(r.decisionDate).toLocaleDateString('en-GB', {
-                    day: '2-digit', month: 'short', year: 'numeric'
-                  })
-                : '—'
-        }));
-    } catch (e) {
-        console.error('Accepted applications error:', e);
-    }
-}
-
-handleCreateComplianceRequest(event) {
-    const applicationId = event.currentTarget.dataset.id;
-    const appName       = event.currentTarget.dataset.appname;
-    this[NavigationMixin.Navigate]({
-        type: 'standard__webPage',
-        attributes: {
-            // CHANGED: was `/reviewersite/s/wg-compliance-documents?...`
-            url: this._siteUrl('wg-compliance-documents', {
-                applicationId : applicationId,
-                appName       : appName
-            })
+        try {
+            this.reviewerAcceptedCount = await getAcceptedApplicationsCount();
+            const rows = await getAcceptedApplicationsQueue();
+            this.acceptedApplicationRows = (rows || []).map((r, i) => ({
+                id: r.applicationId,
+                rowNum: i + 1,
+                applicationId: r.applicationId,
+                appName: r.appName,
+                organizationName: r.organizationName || '—',
+                approverComment: r.approverComment,
+                decisionDateFormatted: r.decisionDate
+                    ? new Date(r.decisionDate).toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                      })
+                    : '—'
+            }));
+        } catch (e) {
+            console.error('Accepted applications error:', e);
         }
-    });
-}
+    }
 
-get noAcceptedApplicationRows() {
-    return !this.acceptedApplicationRows || this.acceptedApplicationRows.length === 0;
-}
-    // ─── Data loading ─────────────────────────────────────────────
+    handleCreateComplianceRequest(event) {
+        const applicationId = event.currentTarget.dataset.id;
+        const appName       = event.currentTarget.dataset.appname;
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: this._siteUrl('wg-compliance-documents', {
+                    applicationId : applicationId,
+                    appName       : appName
+                })
+            }
+        });
+    }
+
+    get noAcceptedApplicationRows() {
+        return !this.acceptedApplicationRows || this.acceptedApplicationRows.length === 0;
+    }
+
+    // ─── Data loading (unchanged) ─────────────────────────────────
     async loadReviewerCounts() {
         try {
             const [proposals, reviewMap] = await Promise.all([
@@ -113,8 +128,6 @@ get noAcceptedApplicationRows() {
             const map = reviewMap || {};
             let reviewed = 0, inProgress = 0, notStarted = 0;
 
-            // Every proposal — whether the Validator passed it or flagged it —
-            // is counted the same way: by the reviewer's own progress on it.
             for (const p of (proposals || [])) {
                 const info = map[p.Id] || {};
 
@@ -122,12 +135,12 @@ get noAcceptedApplicationRows() {
                     reviewed++;
                 } else if (info.status === 'In Progress') {
                     inProgress++;
-                } else {
+                } else if (p.Status !== 'Returned by Approver') {
                     notStarted++;
                 }
             }
 
-            this.reviewerTotal      = reviewed + inProgress + notStarted;
+            this.reviewerTotal      = (proposals || []).length;
             this.reviewerReviewed   = reviewed;
             this.reviewerInProgress = inProgress;
             this.reviewerNotStarted = notStarted;
@@ -163,6 +176,8 @@ get noAcceptedApplicationRows() {
                     headquarters: r.headquarters || '',
                     account:      r.accountName || '—',
                     track,
+                    // Display only — same track colors as the queue
+                    trackTags:    this._trackTags(track),
                     dueDateRaw,
                     dueDate: dueDateRaw
                         ? this._parseDate(dueDateRaw).toLocaleDateString('en-GB', {
@@ -171,8 +186,9 @@ get noAcceptedApplicationRows() {
                         : '—',
                     dueDateClass: this._computeDueDateClass(dueDateRaw),
                     status:       isInProgress ? 'In Progress' : 'Not Started',
-                    statusClass:  isInProgress ? 'status-pill status-inprogress' : 'status-pill status-notstarted',
+                    statusClass:  isInProgress ? 'wg-pill wg-pill--warning' : 'wg-pill wg-pill--neutral',
                     action:       isInProgress ? 'Resume Review' : 'Start Review',
+                    actionIcon:   isInProgress ? 'utility:edit' : 'utility:play',
                     reviewAction: isInProgress ? 'resume' : 'start'
                 };
             });
@@ -190,7 +206,17 @@ get noAcceptedApplicationRows() {
         }
     }
 
-    // ─── Handlers ─────────────────────────────────────────────────
+    _trackTags(track) {
+        const TAGS = {
+            JF: { code: 'JF', label: 'Job Fulfillment', cls: 'wg-tag wg-tag--info' },
+            JC: { code: 'JC', label: 'Job Creation',    cls: 'wg-tag wg-tag--warning' }
+        };
+        return String(track || '')
+            .split('/')
+            .map(code => TAGS[code] || { code, label: code, cls: 'wg-tag' });
+    }
+
+    // ─── Handlers (unchanged) ─────────────────────────────────────
     handleReviewerTileClick(event) {
         const filter = event.currentTarget.dataset.filter;
         this[NavigationMixin.Navigate]({
@@ -235,7 +261,7 @@ get noAcceptedApplicationRows() {
         });
     }
 
-    // ─── Navigation helper ────────────────────────────────────────
+    // ─── Navigation helper (unchanged) ────────────────────────────
     _navigateReviewer(proposalId, appName, reviewId, action, headquarters, track) {
         const hq = (headquarters || '').toLowerCase();
         const isNonEnglish = hq.includes('mexico') || hq.includes('brazil');
@@ -244,7 +270,6 @@ get noAcceptedApplicationRows() {
             this[NavigationMixin.Navigate]({
                 type: 'standard__webPage',
                 attributes: {
-                    // CHANGED: was `/reviewersite/s/individualapplication/...`
                     url: this._siteUrl(
                         `individualapplication/${proposalId}/${(appName || '').toLowerCase()}`
                     )
@@ -257,7 +282,6 @@ get noAcceptedApplicationRows() {
             this[NavigationMixin.Navigate]({
                 type: 'standard__webPage',
                 attributes: {
-                    // CHANGED: was `/reviewersite/s/review-forms?...`
                     url: this._siteUrl('review-forms', {
                         recordId      : reviewId,
                         applicationId : proposalId
@@ -270,7 +294,6 @@ get noAcceptedApplicationRows() {
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
-                // CHANGED: was `/reviewersite/s/review-forms?recordId=new...`
                 url: this._siteUrl('review-forms', {
                     recordId      : 'new',
                     applicationId : proposalId,

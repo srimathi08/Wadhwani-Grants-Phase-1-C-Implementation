@@ -1,6 +1,7 @@
 import { LightningElement, track, wire } from 'lwc';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getValidatorFlagInfo  from '@salesforce/apex/WCFProposalListController.getValidatorFlagInfo';
 import getIndividualApplication from '@salesforce/apex/WCF_ReviewFormJFController.getIndividualApplication';
 import getApproverReturnInfo         from '@salesforce/apex/WCFProposalListController.getApproverReturnInfo';
@@ -12,6 +13,7 @@ export default class WcfReviewerContainer extends NavigationMixin(LightningEleme
     @track currentRecordId         = null;
     @track currentApplicationId    = null;
     @track currentRecordName       = '';
+    @track applicationName         = '';
     @track showPreview             = true;   // split view (RFI + form) is the default
     @track isReady                 = false;
     @track outcomeDeveloperName    = 'WCF_Job_Fulfillment_Job_Creation';
@@ -271,8 +273,10 @@ export default class WcfReviewerContainer extends NavigationMixin(LightningEleme
             // eslint-disable-next-line @lwc/lwc/no-async-operation
             setTimeout(() => {
                 this[NavigationMixin.Navigate]({
-                    type:       'comm__namedPage',
-                    attributes: { name: 'Home' }
+                    type: 'standard__webPage',
+                    attributes: {
+                        url: `${COMMUNITY_BASE_PATH || ''}/wg-reviewer-dashboard`
+                    }
                 });
             }, 1500);
         } catch (e) {
@@ -308,8 +312,10 @@ export default class WcfReviewerContainer extends NavigationMixin(LightningEleme
             // eslint-disable-next-line @lwc/lwc/no-async-operation
             setTimeout(() => {
                 this[NavigationMixin.Navigate]({
-                    type:       'comm__namedPage',
-                    attributes: { name: 'Home' }
+                    type: 'standard__webPage',
+                    attributes: {
+                        url: `${COMMUNITY_BASE_PATH || ''}/wg-reviewer-dashboard`
+                    }
                 });
             }, 1500);
         } catch (e) {
@@ -334,8 +340,13 @@ export default class WcfReviewerContainer extends NavigationMixin(LightningEleme
     async _loadOutcomeTrack() {
         try {
             const result = await getIndividualApplication({ recordId: this.currentApplicationId });
-            if (result?.track) {
-                this.outcomeDeveloperName = result.track;
+            if (result) {
+                if (result.track) {
+                    this.outcomeDeveloperName = result.track;
+                }
+                if (result.applicationName) {
+                    this.applicationName = result.applicationName;
+                }
             }
         } catch (e) {
             console.error('Error loading outcome track:', e);
@@ -414,26 +425,22 @@ export default class WcfReviewerContainer extends NavigationMixin(LightningEleme
     }
 
     _navigateBackToApplication() {
-        if (this.currentApplicationId) {
-            this[NavigationMixin.Navigate]({
-                type       : 'standard__recordPage',
-                attributes : {
-                    recordId   : this.currentApplicationId,
-                    actionName : 'view'
-                }
-            });
-        } else {
-            this[NavigationMixin.Navigate]({
-                type       : 'comm__namedPage',
-                attributes : { name: 'Proposals__c' }
-            });
+        if (typeof window !== 'undefined' && window.history && window.history.length > 1) {
+            window.history.back();
+            return;
         }
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: `${COMMUNITY_BASE_PATH || ''}/wcf-reviewer-application-list`
+            }
+        });
     }
 
     handleBack() { this._navigateBackToApplication(); }
 
     get showReviewPreview() {
-        return this.initialAction === 'view';
+        return this.initialAction === 'view' || this.isReturnedByApprover;
     }
 
     get approverRejectionReasonItems() {

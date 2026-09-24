@@ -17,7 +17,7 @@
 
     /* Height of the site header above this component. The screen fills
        the rest of the viewport. Raise this if the action bar is cut off. */
-    --ac-offset: 0px;
+    --ac-offset: 110px;   /* same as the Reviewer container (--rc-offset) */
 }
 
 .ac-shell {
@@ -418,6 +418,30 @@
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: var(--wg-space-2);
+}
+
+/* Same compact size as the Reviewer / Validator footer buttons.
+   The extra class outranks the site theme's global button styles. */
+.action-bar .btn-group button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wg-space-2);
+    min-width: 128px;
+    height: var(--wg-control-height);
+    min-height: 0;
+    margin: 0;
+    padding: 0 var(--wg-space-4);
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    box-shadow: none;
+    box-sizing: border-box;
 }
 
 /* Rejection reason tiles — same selection language as the forms */

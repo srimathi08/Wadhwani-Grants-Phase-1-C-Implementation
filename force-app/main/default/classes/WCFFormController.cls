@@ -1388,7 +1388,7 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                 }
             } else if (sfStatus == 'Under Review' || sfStatus == 'In Review') {
                 normalized = 'UnderReview';
-            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Onboarded') {
+            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Onboarded' || sfStatus == 'Doc Revision Request'|| sfStatus == 'Doc Resubmitteed'|| sfStatus == 'Onboarding Suspended') {
                 normalized = 'Approved';
             } else if (sfStatus == 'Not Recommend for Fund'
                     || sfStatus == 'Rejected - Level 1'

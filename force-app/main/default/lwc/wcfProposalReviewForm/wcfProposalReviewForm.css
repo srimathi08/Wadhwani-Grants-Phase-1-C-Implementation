@@ -947,6 +947,61 @@
     gap: var(--wg-space-3);
 }
 
+.upload-control-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.upload-dropzone {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-3);
+    padding: var(--wg-space-2) var(--wg-space-3);
+    border: var(--wg-border-width-thin) dashed var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    background: var(--wg-surface-subtle);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.upload-dropzone:hover {
+    border-color: var(--wg-red);
+    background: var(--wg-white);
+}
+
+.upload-trigger-btn {
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wg-space-1);
+}
+
+.upload-icon-prefix {
+    --slds-c-icon-color-foreground-default: inherit;
+}
+
+.upload-dropzone-label {
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+}
+
+.upload-loading-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    margin-top: var(--wg-space-2);
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+    position: relative;
+    padding-left: var(--wg-space-6);
+    min-height: 24px;
+}
+
+.upload-loading-text {
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+}
+
 .uploaded-list {
     display: flex;
     flex-direction: column;

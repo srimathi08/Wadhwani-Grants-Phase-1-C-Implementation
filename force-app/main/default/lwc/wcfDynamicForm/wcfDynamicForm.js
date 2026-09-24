@@ -1585,7 +1585,20 @@ export default class WcfDynamicForm extends LightningElement {
         const m = this.formValues.Fiscal_Month__c || '';
         const d = this.formValues.Fiscal_Day__c || '';
         if (!m && !d) return '—';
-        return `${d} ${m}`.trim();
+        const monthNames = {
+            '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+            '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+            '09': 'September', '10': 'October', '11': 'November', '12': 'December',
+            '1': 'January', '2': 'February', '3': 'March', '4': 'April',
+            '5': 'May', '6': 'June', '7': 'July', '8': 'August',
+            '9': 'September'
+        };
+        const mLabel = monthNames[String(m).trim()] || m;
+        return `${d} ${mLabel}`.trim() || '—';
+    }
+
+    _fmtDateDisplay(v) {
+        return this._formatDateDDMMYYYY(v);
     }
 
     get previewFunder1Amount() {
@@ -1640,6 +1653,114 @@ export default class WcfDynamicForm extends LightningElement {
         const e = this.formValues.Funder_3_Period_End__c ? this._fmtDateDisplay(this.formValues.Funder_3_Period_End__c) : '';
         if (s && e) return `${s} to ${e}`;
         return s || e || '';
+    }
+
+    get reviewFunder1Display() {
+        const f = this.formValues;
+        if (!f.Funder_1_Name__c) return '—';
+        const amt = this.previewFunder1Amount ? ` - $${this.previewFunder1Amount}` : '';
+        const type = f.Funder_1_Type__c ? ` (${f.Funder_1_Type__c})` : '';
+        const period = this.previewFunder1Period ? ` · Period: ${this.previewFunder1Period}` : '';
+        return `${f.Funder_1_Name__c}${amt}${type}${period}`;
+    }
+
+    get reviewFunder2Display() {
+        const f = this.formValues;
+        if (!f.Funder_2_Name__c) return '—';
+        const amt = this.previewFunder2Amount ? ` - $${this.previewFunder2Amount}` : '';
+        const type = f.Funder_2_Type__c ? ` (${f.Funder_2_Type__c})` : '';
+        const period = this.previewFunder2Period ? ` · Period: ${this.previewFunder2Period}` : '';
+        return `${f.Funder_2_Name__c}${amt}${type}${period}`;
+    }
+
+    get reviewFunder3Display() {
+        const f = this.formValues;
+        if (!f.Funder_3_Name__c) return '—';
+        const amt = this.previewFunder3Amount ? ` - $${this.previewFunder3Amount}` : '';
+        const type = f.Funder_3_Type__c ? ` (${f.Funder_3_Type__c})` : '';
+        const period = this.previewFunder3Period ? ` · Period: ${this.previewFunder3Period}` : '';
+        return `${f.Funder_3_Name__c}${amt}${type}${period}`;
+    }
+
+    get reviewReference1Display() {
+        const f = this.formValues;
+        if (!f.Reference_1_Name__c) return '—';
+        const role = f.Reference_1_Role__c ? ` (${f.Reference_1_Role__c})` : '';
+        const email = f.Reference_1_Email__c ? ` - ${f.Reference_1_Email__c}` : '';
+        return `${f.Reference_1_Name__c}${role}${email}`;
+    }
+
+    get reviewReference2Display() {
+        const f = this.formValues;
+        if (!f.Reference_2_Name__c) return '—';
+        const role = f.Reference_2_Role__c ? ` (${f.Reference_2_Role__c})` : '';
+        const email = f.Reference_2_Email__c ? ` - ${f.Reference_2_Email__c}` : '';
+        return `${f.Reference_2_Name__c}${role}${email}`;
+    }
+
+    get reviewLeaderTenure() {
+        const v = this.formValues.Leader_Tenure__c;
+        return (v !== undefined && v !== null && String(v).trim() !== '') ? `${String(v).trim()} years` : '—';
+    }
+
+    get reviewLegalType() {
+        const lt = this.formValues.Legal_Type__c;
+        if (!lt) return '—';
+        if (lt === 'Other' && this.formValues.Legal_Type_Other__c) return `Other: ${this.formValues.Legal_Type_Other__c}`;
+        return lt;
+    }
+
+    get reviewRegistrationJurisdiction() {
+        const rj = this.formValues.Registration_Jurisdiction__c;
+        if (!rj) return '—';
+        if (rj === 'Other' && this.formValues.Registration_Jurisdiction_Other__c) return `Other: ${this.formValues.Registration_Jurisdiction_Other__c}`;
+        return rj;
+    }
+
+    get reviewHas501c3() {
+        return this.formValues.Has_501c3_Status__c || '—';
+    }
+
+    get reviewHasED() {
+        return this.formValues.Has_Equivalency_Determination__c || '—';
+    }
+
+    get reviewIsFCRA() {
+        return this.formValues.Is_FCRA_Registered__c || '—';
+    }
+
+    get reviewWillingED() {
+        return this.formValues.Willing_to_Pursue_ED__c || '—';
+    }
+
+    get reviewQ24Verified() {
+        return this.formValues.Q24_VERIFIED || '—';
+    }
+
+    get reviewDetailsOfEthicalReceived() {
+        return this.formValues.Details_of_Ethical_Received__c || '—';
+    }
+
+    get reviewGenieInterestLevel() {
+        return this.formValues.GenieAI_Interest_Level__c || '—';
+    }
+
+    get reviewOperationalSynergies() {
+        return this.formValues.Operational_Synergies_with_WOF__c || '—';
+    }
+
+    get reviewSupportingDocumentsDisplay() {
+        if (this.q28UploadedFiles && this.q28UploadedFiles.length > 0) {
+            return this.q28UploadedFiles.map(f => f.name).join(', ');
+        }
+        return '—';
+    }
+
+    get reviewVerificationReportsDisplay() {
+        if (this.q24UploadedFiles && this.q24UploadedFiles.length > 0) {
+            return this.q24UploadedFiles.map(f => f.name).join(', ');
+        }
+        return '—';
     }
 
     get skillingDomainsForReview() {
@@ -1783,9 +1904,18 @@ export default class WcfDynamicForm extends LightningElement {
         const val = v => (v === null || v === undefined || v === '') ? '—' : String(v);
         const val$ = v => {
             if (v === null || v === undefined || v === '') return '—';
-            const n = Number(v);
+            const clean = String(v).replace(/,/g, '').trim();
+            if (clean === '') return '—';
+            const n = Number(clean);
             if (isNaN(n)) return `$${v}`;
             return `$${n.toLocaleString('en-US')}`;
+        };
+        const valNum = v => {
+            if (v === null || v === undefined || v === '') return '—';
+            const clean = String(v).replace(/,/g, '').trim();
+            if (clean === '') return '—';
+            const n = Number(clean);
+            return isNaN(n) ? String(v) : n.toLocaleString('en-US');
         };
 
         const parseHtml = (html) => {
@@ -1900,7 +2030,7 @@ export default class WcfDynamicForm extends LightningElement {
         };
 
         const labelValue = (label, value, qNum = null) => {
-            if (value === null || value === undefined || value === '') return;
+            const displayVal = (value === null || value === undefined || value === '') ? '—' : value;
             checkPage(16);
 
             let labelX = 15;
@@ -1924,7 +2054,7 @@ export default class WcfDynamicForm extends LightningElement {
             doc.setFontSize(9.5);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(...TEXT_DARK);
-            printLines(parseHtml(String(value)), labelX);
+            printLines(parseHtml(String(displayVal)), labelX);
 
             checkPage(4);
             doc.setDrawColor(...LINE_GRAY);
@@ -1974,12 +2104,10 @@ export default class WcfDynamicForm extends LightningElement {
         labelValue('Primary Service Regions', form.Primary_Service_Regions__c, 'Q2');
         labelValue('Leader Name', form.Leader_Name__c, 'Q2');
         labelValue('Leader Title', form.Leader_Title__c, 'Q2');
-        labelValue('Leader Tenure', form.Leader_Tenure__c ? `${form.Leader_Tenure__c} years` : '', 'Q2');
+        labelValue('Leader Tenure', this.reviewLeaderTenure, 'Q2');
         if (this.hasCustomQuestionsQ2) {
             this.customQuestionsQ2.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
         labelValue('Submitter Name', form.Submitter_Name__c, 'Q3');
@@ -1988,60 +2116,39 @@ export default class WcfDynamicForm extends LightningElement {
         labelValue('Phone number', form.Phone__c, 'Q3');
         if (this.hasCustomQuestionsQ3) {
             this.customQuestionsQ3.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
-        labelValue('Legal Type', form.Legal_Type__c, 'Q4');
-        labelValue('Registration Jurisdiction', form.Registration_Jurisdiction__c, 'Q4');
+        labelValue('Legal Type', this.reviewLegalType, 'Q4');
+        labelValue('Registration Jurisdiction', this.reviewRegistrationJurisdiction, 'Q4');
         labelValue('Incorporation Date', this.formattedIncorporationDate, 'Q4');
-        labelValue('Brief Description', form.Legal_Structure__c, 'Q4');
+        labelValue('Brief Description', form.Legal_Structure__c || '—', 'Q4');
         if (this.hasCustomQuestionsQ4) {
             this.customQuestionsQ4.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
-        labelValue('501(c)(3) Status in US', form.Has_501c3_Status__c, 'Q5');
-        labelValue('Equivalency Determination (ED)', form.Has_Equivalency_Determination__c, 'Q5');
-        labelValue('FCRA Registered (India)', form.Is_FCRA_Registered__c, 'Q5');
-        labelValue('Willing to Pursue ED', form.Willing_to_Pursue_ED__c, 'Q5');
+        labelValue('501(c)(3) Status in US', this.reviewHas501c3, 'Q5');
+        labelValue('Equivalency Determination (ED)', this.reviewHasED, 'Q5');
+        labelValue('FCRA Registered (India)', this.reviewIsFCRA, 'Q5');
+        labelValue('Willing to Pursue ED', this.reviewWillingED, 'Q5');
         if (this.hasCustomQuestionsQ5) {
             this.customQuestionsQ5.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
         labelValue('Fiscal Year End Date', this.formattedFiscalYearEndReview, 'Q6');
         if (this.hasCustomQuestionsQ6) {
             this.customQuestionsQ6.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
 
-        if (form.Funder_1_Name__c) {
-            const p1 = (form.Funder_1_Period_Start__c || form.Funder_1_Period_End__c) ? ` · Period: ${this.previewFunder1Period}` : '';
-            labelValue('Funder 1', `${form.Funder_1_Name__c} - ${val$(form.Funder_1_Amount__c)} (${val(form.Funder_1_Type__c)})${p1}`, 'Q7');
-        }
-        if (form.Funder_2_Name__c) {
-            const p2 = (form.Funder_2_Period_Start__c || form.Funder_2_Period_End__c) ? ` · Period: ${this.previewFunder2Period}` : '';
-            labelValue('Funder 2', `${form.Funder_2_Name__c} - ${val$(form.Funder_2_Amount__c)} (${val(form.Funder_2_Type__c)})${p2}`, 'Q7');
-        }
-        if (form.Funder_3_Name__c) {
-            const p3 = (form.Funder_3_Period_Start__c || form.Funder_3_Period_End__c) ? ` · Period: ${this.previewFunder3Period}` : '';
-            labelValue('Funder 3', `${form.Funder_3_Name__c} - ${val$(form.Funder_3_Amount__c)} (${val(form.Funder_3_Type__c)})${p3}`, 'Q7');
-        }
-        if (form.Reference_1_Name__c) {
-            labelValue('Reference 1', `${form.Reference_1_Name__c} (${val(form.Reference_1_Role__c)}) - ${val(form.Reference_1_Email__c)}`, 'Q8');
-        }
-        if (form.Reference_2_Name__c) {
-            labelValue('Reference 2', `${form.Reference_2_Name__c} (${val(form.Reference_2_Role__c)}) - ${val(form.Reference_2_Email__c)}`, 'Q8');
-        }
+        labelValue('Funder 1', this.reviewFunder1Display, 'Q7');
+        labelValue('Funder 2', this.reviewFunder2Display, 'Q7');
+        labelValue('Funder 3', this.reviewFunder3Display, 'Q7');
+        labelValue('Reference 1', this.reviewReference1Display, 'Q8');
+        labelValue('Reference 2', this.reviewReference2Display, 'Q8');
 
         subHead('Q9', 'Historical Financial Data (Three Prior Fiscal Years)');
         table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
@@ -2059,21 +2166,17 @@ export default class WcfDynamicForm extends LightningElement {
             ['Operating Expenditure', val$(form.CFY_OP_BUDGET), val$(form.CFY_OP_PROJ), val$(this.computedOpDeviation)],
             ['Revenue - Expense Net', val$(this.computedNetBudget), val$(this.computedNetProjection), val$(this.computedNetDeviation)]
         ]);
-        if (this.isDeviationExplanationRequired) {
-            labelValue('Explanation of Deviation', form.Revenue_Explanation__c, 'Q10');
-        }
+        labelValue('Explanation of Deviation', form.Revenue_Explanation__c || '—', 'Q10');
         if (this.hasCustomQuestionsAboutOrg) {
             this.customQuestionsAboutOrg.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
 
         // ══ SECTION 2 — Job Fulfillment ══
         if (this.hasJobFulfillmentTrack) {
             section('2. JOB FULFILLMENT');
-            labelValue('Your Skilling Approach', form.Skilling_Approach__c, 'Q11');
+            labelValue('Your Skilling Approach', form.Skilling_Approach__c || '—', 'Q11');
 
             if (this.hasSkillingDomainsForReview) {
                 subHead('Q12', 'Skilling Domains Offered');
@@ -2083,25 +2186,23 @@ export default class WcfDynamicForm extends LightningElement {
 
             subHead('Q13', 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)');
             table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['# Learner Enrolments', val(this.formattedJfEnrollFY3), val(this.formattedJfEnrollFY2), val(this.formattedJfEnrollFY1)],
-                ['# of learner placements', val(this.formattedJfPlaceFY3), val(this.formattedJfPlaceFY2), val(this.formattedJfPlaceFY1)],
+                ['# Learner Enrolments', valNum(form.JF_ENROLL_FY3), valNum(form.JF_ENROLL_FY2), valNum(form.JF_ENROLL_FY1)],
+                ['# of learner placements', valNum(form.JF_PLACE_FY3), valNum(form.JF_PLACE_FY2), valNum(form.JF_PLACE_FY1)],
                 ['Placement %', `${val(this.computedJfPlacePctFY3)}%`, `${val(this.computedJfPlacePctFY2)}%`, `${val(this.computedJfPlacePctFY1)}%`],
                 ['Avg Cost per Placement', val$(form.JF_COST_FY3), val$(form.JF_COST_FY2), val$(form.JF_COST_FY1)]
             ]);
 
             subHead('Q14', 'Job Fulfillment Outcomes — Current FY Projections');
             table(['ITEM', 'FY-2026 (CFY) — PROJECTION'], [
-                ['# Learner Enrolments', val(this.formattedJfEnrollProj)],
-                ['# of learner placements', val(this.formattedJfPlaceProj)],
+                ['# Learner Enrolments', valNum(form.JF_ENROLL_PROJ)],
+                ['# of learner placements', valNum(form.JF_PLACE_PROJ)],
                 ['Placement %', `${val(this.computedJfPlacePctProj)}%`],
                 ['Avg Cost per Placement', val$(form.JF_COST_PROJ)]
             ]);
 
             if (this.hasCustomQuestionsJobFulfillment) {
                 this.customQuestionsJobFulfillment.forEach(cq => {
-                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                        labelValue(cq.label, String(cq.value), cq.displayNumber);
-                    }
+                    labelValue(cq.label, cq.value, cq.displayNumber);
                 });
             }
         }
@@ -2109,7 +2210,7 @@ export default class WcfDynamicForm extends LightningElement {
         // ══ SECTION 3 — Job Creation ══
         if (this.hasJobCreationTrack) {
             section('3. JOB CREATION');
-            labelValue('Your Job Creation Approach', form.Job_Creation_Approach__c, 'Q15');
+            labelValue('Your Job Creation Approach', form.Job_Creation_Approach__c || '—', 'Q15');
 
             if (this.hasBusinessSectorsForReview) {
                 subHead('Q16', 'Business Sectors Served');
@@ -2119,27 +2220,25 @@ export default class WcfDynamicForm extends LightningElement {
 
             subHead('Q17', 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)');
             table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['# New Businesses Started', val(form.JC_NEW_BIZ_FY3), val(form.JC_NEW_BIZ_FY2), val(form.JC_NEW_BIZ_FY1)],
-                ['# jobs created by new businesses', val(form.JC_NEW_JOBS_FY3), val(form.JC_NEW_JOBS_FY2), val(form.JC_NEW_JOBS_FY1)],
-                ['Existing Businesses Supported', val(form.JC_EXIST_BIZ_FY3), val(form.JC_EXIST_BIZ_FY2), val(form.JC_EXIST_BIZ_FY1)],
-                ['# jobs created by existing businesses', val(form.JC_EXIST_JOBS_FY3), val(form.JC_EXIST_JOBS_FY2), val(form.JC_EXIST_JOBS_FY1)],
+                ['# New Businesses Started', valNum(form.JC_NEW_BIZ_FY3), valNum(form.JC_NEW_BIZ_FY2), valNum(form.JC_NEW_BIZ_FY1)],
+                ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_FY3), valNum(form.JC_NEW_JOBS_FY2), valNum(form.JC_NEW_JOBS_FY1)],
+                ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_FY3), valNum(form.JC_EXIST_BIZ_FY2), valNum(form.JC_EXIST_BIZ_FY1)],
+                ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_FY3), valNum(form.JC_EXIST_JOBS_FY2), valNum(form.JC_EXIST_JOBS_FY1)],
                 ['Total Avg Cost per Job Created', val$(form.JC_COST_FY3), val$(form.JC_COST_FY2), val$(form.JC_COST_FY1)]
             ]);
 
             subHead('Q18', 'Job Creation Outcomes — Current FY Projections');
             table(['ITEM', 'CFY (PROJECTED)'], [
-                ['# New Businesses Started', val(form.JC_NEW_BIZ_PROJ)],
-                ['# jobs created by new businesses', val(form.JC_NEW_JOBS_PROJ)],
-                ['Existing Businesses Supported', val(form.JC_EXIST_BIZ_PROJ)],
-                ['# jobs created by existing businesses', val(form.JC_EXIST_JOBS_PROJ)],
+                ['# New Businesses Started', valNum(form.JC_NEW_BIZ_PROJ)],
+                ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_PROJ)],
+                ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_PROJ)],
+                ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_PROJ)],
                 ['Total Avg Cost per Job Created', val$(form.JC_COST_PROJ)]
             ]);
 
             if (this.hasCustomQuestionsJobCreation) {
                 this.customQuestionsJobCreation.forEach(cq => {
-                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                        labelValue(cq.label, String(cq.value), cq.displayNumber);
-                    }
+                    labelValue(cq.label, cq.value, cq.displayNumber);
                 });
             }
         }
@@ -2147,7 +2246,7 @@ export default class WcfDynamicForm extends LightningElement {
         // ══ SECTION 4 — Livelihood Upliftment ══
         if (this.hasLivelihoodTrack) {
             section('4. LIVELIHOOD UPLIFTMENT');
-            labelValue('Your Livelihood Upliftment Approach', form.Livelihood_Approach__c, 'Q19');
+            labelValue('Your Livelihood Upliftment Approach', form.Livelihood_Approach__c || '—', 'Q19');
 
             if (this.hasLivelihoodProgramsForReview) {
                 subHead('Q20', 'Key Programs / Initiatives');
@@ -2163,49 +2262,41 @@ export default class WcfDynamicForm extends LightningElement {
 
             subHead('Q22', 'Livelihood Outcomes (Actuals)');
             table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['Households served during the year', val(form.LIV_SERVED_FY3), val(form.LIV_SERVED_FY2), val(form.LIV_SERVED_FY1)],
-                ['Households newly enrolled during the year', val(form.LIV_ENROLL_FY3), val(form.LIV_ENROLL_FY2), val(form.LIV_ENROLL_FY1)],
-                ['Households meeting outcome criteria', val(form.LIV_OUTCOME_FY3), val(form.LIV_OUTCOME_FY2), val(form.LIV_OUTCOME_FY1)],
+                ['Households served during the year', valNum(form.LIV_SERVED_FY3), valNum(form.LIV_SERVED_FY2), valNum(form.LIV_SERVED_FY1)],
+                ['Households newly enrolled during the year', valNum(form.LIV_ENROLL_FY3), valNum(form.LIV_ENROLL_FY2), valNum(form.LIV_ENROLL_FY1)],
+                ['Households meeting outcome criteria', valNum(form.LIV_OUTCOME_FY3), valNum(form.LIV_OUTCOME_FY2), valNum(form.LIV_OUTCOME_FY1)],
                 ['Avg. cost per outcome (USD)', val$(form.LIV_COST_FY3), val$(form.LIV_COST_FY2), val$(form.LIV_COST_FY1)]
             ]);
 
             subHead('Q23', 'Livelihood Outcomes (Projections)');
             table(['ITEM', 'CFY (PROJECTED)'], [
-                ['Households served during the year (projected)', val(form.LIV_SERVED_PROJ)],
-                ['Households newly enrolled during the year (projected)', val(form.LIV_ENROLL_PROJ)],
-                ['Households expected to meet outcome criteria', val(form.LIV_OUTCOME_PROJ)],
+                ['Households served during the year (projected)', valNum(form.LIV_SERVED_PROJ)],
+                ['Households newly enrolled during the year (projected)', valNum(form.LIV_ENROLL_PROJ)],
+                ['Households expected to meet outcome criteria', valNum(form.LIV_OUTCOME_PROJ)],
                 ['Avg. cost per outcome (USD) - projected', val$(form.LIV_COST_PROJ)]
             ]);
 
             if (this.hasCustomQuestionsLivelihood) {
                 this.customQuestionsLivelihood.forEach(cq => {
-                    if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                        labelValue(cq.label, String(cq.value), cq.displayNumber);
-                    }
+                    labelValue(cq.label, cq.value, cq.displayNumber);
                 });
             }
         }
 
         // ══ SECTION 5 — Why Wadhwani Grants ══
         section('5. WHY WADHWANI GRANTS');
-        labelValue('Outcomes Verified by Third Party', form.Q24_VERIFIED, 'Q24');
-        labelValue('Verification Details', form.Details_of_Ethical_Received__c, 'Q24');
-        if (this.q24UploadedFiles && this.q24UploadedFiles.length > 0) {
-            labelValue('Verification Reports', this.q24UploadedFiles.map(f => f.name).join(', '), 'Q24');
-        }
-        labelValue('Organizational Sustainability', form.Organizational_Sustainability__c, 'Q25');
-        labelValue('Desired Use of Additional Funding / Investment', form.Use_of_Additional_Funding__c, 'Q26');
-        labelValue('Operational Synergies - Interest Level', form.GenieAI_Interest_Level__c, 'Q27');
-        labelValue('Operational Synergies - Description', form.GenieAI_Synergies_Description__c, 'Q27');
-        if (this.q28UploadedFiles && this.q28UploadedFiles.length > 0) {
-            labelValue('Supporting Documents', this.q28UploadedFiles.map(f => f.name).join(', '), 'Q28');
-        }
+        labelValue('Outcomes Verified by Third Party', this.reviewQ24Verified, 'Q24');
+        labelValue('Verification Details', this.reviewDetailsOfEthicalReceived, 'Q24');
+        labelValue('Verification Reports', this.reviewVerificationReportsDisplay, 'Q24');
+        labelValue('Organizational Sustainability', form.Organizational_Sustainability__c || '—', 'Q25');
+        labelValue('Desired Use of Additional Funding / Investment', form.Use_of_Additional_Funding__c || '—', 'Q26');
+        labelValue('Operational Synergies - Interest Level', this.reviewGenieInterestLevel, 'Q27');
+        labelValue('Operational Synergies - Description', form.GenieAI_Synergies_Description__c || '—', 'Q27');
+        labelValue('Supporting Documents', this.reviewSupportingDocumentsDisplay, 'Q28');
 
         if (this.hasCustomQuestionsWhyWadhwani) {
             this.customQuestionsWhyWadhwani.forEach(cq => {
-                if (cq.value !== null && cq.value !== undefined && cq.value !== '') {
-                    labelValue(cq.label, String(cq.value), cq.displayNumber);
-                }
+                labelValue(cq.label, cq.value, cq.displayNumber);
             });
         }
 
@@ -4455,6 +4546,29 @@ export default class WcfDynamicForm extends LightningElement {
 
     handleFiscalMonthChange(event) {
         this.handleInputChange(event);
+        const newMonth = event.detail.value;
+        let m = parseInt(newMonth, 10);
+        if (isNaN(m) && newMonth) {
+            const monthMap = {
+                january: 1, jan: 1, february: 2, feb: 2, march: 3, mar: 3,
+                april: 4, apr: 4, may: 5, june: 6, jun: 6,
+                july: 7, jul: 7, august: 8, aug: 8, september: 9, sep: 9, sept: 9,
+                october: 10, oct: 10, november: 11, nov: 11, december: 12, dec: 12
+            };
+            m = monthMap[String(newMonth).toLowerCase().trim()] || 3;
+        }
+
+        let maxDays = 31;
+        if ([4, 6, 9, 11].includes(m)) {
+            maxDays = 30;
+        } else if (m === 2) {
+            maxDays = 29;
+        }
+
+        const currentDay = parseInt(this.formValues.Fiscal_Day__c, 10);
+        if (currentDay > maxDays) {
+            this.formValues = { ...this.formValues, Fiscal_Day__c: String(maxDays) };
+        }
         this.loadMetadata();
     }
 
@@ -5429,8 +5543,29 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     get fiscalDayOptions() {
+        const rawMonth = this.formValues.Fiscal_Month__c;
+        let m = parseInt(rawMonth, 10);
+        if (isNaN(m) && rawMonth) {
+            const monthMap = {
+                january: 1, jan: 1, february: 2, feb: 2, march: 3, mar: 3,
+                april: 4, apr: 4, may: 5, june: 6, jun: 6,
+                july: 7, jul: 7, august: 8, aug: 8, september: 9, sep: 9, sept: 9,
+                october: 10, oct: 10, november: 11, nov: 11, december: 12, dec: 12
+            };
+            m = monthMap[String(rawMonth).toLowerCase().trim()] || 3;
+        }
+
+        let maxDays = 31;
+        if ([4, 6, 9, 11].includes(m)) {
+            maxDays = 30;
+        } else if (m === 2) {
+            maxDays = 29;
+        } else {
+            maxDays = 31;
+        }
+
         const opts = [];
-        for (let d = 1; d <= 31; d++) {
+        for (let d = 1; d <= maxDays; d++) {
             const val = String(d);
             const label = String(d).padStart(2, '0');
             opts.push({ label: label, value: val });
@@ -6024,14 +6159,23 @@ export default class WcfDynamicForm extends LightningElement {
     handleQ24UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
+            const MAX_Q24_SIZE = 10 * 1024 * 1024; // 10 MB
             const currentFiles = this.q24UploadedFiles || [];
             const validFiles = [];
             const duplicateNames = [];
+            const oversizedNames = [];
 
             uploaded.forEach(f => {
+                const size = f.size || f.sizeInBytes || 0;
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
                               validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
-                if (isDup) {
+                if (size > MAX_Q24_SIZE) {
+                    oversizedNames.push(f.name);
+                    if (f.documentId) {
+                        deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
+                            .catch(err => console.warn('Oversized file cleanup warning:', err));
+                    }
+                } else if (isDup) {
                     duplicateNames.push(f.name);
                     if (f.documentId) {
                         deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
@@ -6045,6 +6189,10 @@ export default class WcfDynamicForm extends LightningElement {
                     });
                 }
             });
+
+            if (oversizedNames.length > 0) {
+                this.showBanner('error', 'File Size Limit Exceeded', `File "${oversizedNames.join(', ')}" exceeds the 10 MB limit. Please upload a file smaller than 10 MB.`);
+            }
 
             if (duplicateNames.length > 0) {
                 this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);
@@ -6076,14 +6224,23 @@ export default class WcfDynamicForm extends LightningElement {
     handleQ28UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
+            const MAX_Q28_SIZE = 50 * 1024 * 1024; // 50 MB
             const currentFiles = this.q28UploadedFiles || [];
             const validFiles = [];
             const duplicateNames = [];
+            const oversizedNames = [];
 
             uploaded.forEach(f => {
+                const size = f.size || f.sizeInBytes || 0;
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
                               validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
-                if (isDup) {
+                if (size > MAX_Q28_SIZE) {
+                    oversizedNames.push(f.name);
+                    if (f.documentId) {
+                        deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
+                            .catch(err => console.warn('Oversized file cleanup warning:', err));
+                    }
+                } else if (isDup) {
                     duplicateNames.push(f.name);
                     if (f.documentId) {
                         deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
@@ -6097,6 +6254,10 @@ export default class WcfDynamicForm extends LightningElement {
                     });
                 }
             });
+
+            if (oversizedNames.length > 0) {
+                this.showBanner('error', 'File Size Limit Exceeded', `File "${oversizedNames.join(', ')}" exceeds the 50 MB limit. Please upload a file smaller than 50 MB.`);
+            }
 
             if (duplicateNames.length > 0) {
                 this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);

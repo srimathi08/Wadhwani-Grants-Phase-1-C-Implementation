@@ -241,13 +241,13 @@
                 </div>
 
                 <!-- Q7: Top 3 Most Prominent Funders -->
-                <template if:true={hasFunders}>
-                    <div class="rv-row">
-                        <div class="rv-lbl">
-                            <span class="rv-q-num">{qNum.Q7}</span>
-                            <span class="rv-lbl-text">Top 3 Most Prominent Funders <span class="rv-opt-tag">Optional</span></span>
-                        </div>
-                        <div class="rv-val">
+                <div class="rv-row">
+                    <div class="rv-lbl">
+                        <span class="rv-q-num">{qNum.Q7}</span>
+                        <span class="rv-lbl-text">Top 3 Most Prominent Funders <span class="rv-opt-tag">Optional</span></span>
+                    </div>
+                    <div class="rv-val">
+                        <template if:true={hasFunders}>
                             <template for:each={funders} for:item="funder">
                                 <div key={funder.key} class="rv-funder-block">
                                     <div class="rv-funder-header">{funder.header}</div>
@@ -271,18 +271,21 @@
                                     </div>
                                 </div>
                             </template>
-                        </div>
+                        </template>
+                        <template if:false={hasFunders}>
+                            <div class="rv-val-bold">—</div>
+                        </template>
                     </div>
-                </template>
+                </div>
 
                 <!-- Q8: References for Outreach -->
-                <template if:true={hasReferences}>
-                    <div class="rv-row">
-                        <div class="rv-lbl">
-                            <span class="rv-q-num">{qNum.Q8}</span>
-                            <span class="rv-lbl-text">References for Outreach <span class="rv-opt-tag">Optional</span></span>
-                        </div>
-                        <div class="rv-val">
+                <div class="rv-row">
+                    <div class="rv-lbl">
+                        <span class="rv-q-num">{qNum.Q8}</span>
+                        <span class="rv-lbl-text">References for Outreach <span class="rv-opt-tag">Optional</span></span>
+                    </div>
+                    <div class="rv-val">
+                        <template if:true={hasReferences}>
                             <template for:each={references} for:item="ref">
                                 <div key={ref.key} class="rv-funder-block">
                                     <div class="rv-funder-header">{ref.header}</div>
@@ -302,9 +305,12 @@
                                     </div>
                                 </div>
                             </template>
-                        </div>
+                        </template>
+                        <template if:false={hasReferences}>
+                            <div class="rv-val-bold">—</div>
+                        </template>
                     </div>
-                </template>
+                </div>
 
                 <!-- Q9: Historical Financial Data -->
                 <div class="rv-row">
@@ -943,13 +949,13 @@
                 </div>
 
                 <!-- Q28: Supporting Documents -->
-                <template if:true={hasSupportingDocuments}>
-                    <div class="rv-row">
-                        <div class="rv-lbl">
-                            <span class="rv-q-num">{qNum.Q28}</span>
-                            <span class="rv-lbl-text">Supporting Documents <span class="rv-opt-tag">Optional</span></span>
-                        </div>
-                        <div class="rv-val">
+                <div class="rv-row">
+                    <div class="rv-lbl">
+                        <span class="rv-q-num">{qNum.Q28}</span>
+                        <span class="rv-lbl-text">Supporting Documents <span class="rv-opt-tag">Optional</span></span>
+                    </div>
+                    <div class="rv-val">
+                        <template if:true={hasSupportingDocuments}>
                             <template for:each={supportingDocuments} for:item="f">
                                 <div key={f.documentId} class="rv-doc-row">
                                     <lightning-icon icon-name="utility:attach" size="x-small" alternative-text=""></lightning-icon>
@@ -967,9 +973,12 @@
                                     </lightning-button>
                                 </div>
                             </template>
-                        </div>
+                        </template>
+                        <template if:false={hasSupportingDocuments}>
+                            <div class="rv-val-bold">—</div>
+                        </template>
                     </div>
-                </template>
+                </div>
 
                 <!-- Dynamic Custom Questions for Why Wadhwani -->
                 <template if:true={hasCustomQuestionsWhyWadhwani}>

@@ -8,6 +8,19 @@ public without sharing class WCFProposalListController {
     
         @AuraEnabled
         public static List<IndividualApplication> getValidatedProposals() {
+            Set<Id> acceptedAppIds = new Set<Id>();
+            for (ApplicationDecision ad : [
+                SELECT ApplicationId
+                FROM ApplicationDecision
+                WHERE ApplicationDecision = 'Accept'
+                AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
+                WITH SYSTEM_MODE
+            ]) {
+                if (ad.ApplicationId != null) {
+                    acceptedAppIds.add(ad.ApplicationId);
+                }
+            }
+
             return [
                 SELECT
                     Id,
@@ -22,14 +35,16 @@ public without sharing class WCFProposalListController {
                     CreatedDate,
                     Validated__c
                 FROM IndividualApplication
-               WHERE Status IN (
-        'Under Review',
-        'Review Completed - Recommended',
-        'Review Completed - Not Recommended',
-                   'Reviewer Rejected',
-                   'Returned by Approver',
-                   'Recommend for Fund'  
-    )
+                WHERE Status IN (
+                    'Under Review',
+                    'Review Completed - Recommended',
+                    'Review Completed - Not Recommended',
+                    'Reviewer Rejected',
+                    'Returned by Approver',
+                    'Recommend for Fund',
+                    'Not Recommend for Fund'
+                )
+                OR Id IN :acceptedAppIds
                 WITH SYSTEM_MODE
                 ORDER BY CreatedDate DESC
             ];
@@ -40,17 +55,7 @@ public without sharing class WCFProposalListController {
             Map<String, ReviewInfo> resultMap = new Map<String, ReviewInfo>();
     
             Set<Id> underReviewIds = new Set<Id>();
-            for (IndividualApplication ia : [
-                SELECT Id FROM IndividualApplication WHERE Status IN (
-                    'Under Review',
-                    'Review Completed - Recommended',
-                    'Review Completed - Not Recommended',
-                    'Reviewer Rejected',
-                    'Returned by Approver',
-                    'Recommend for Fund'   
-                )
-                WITH SYSTEM_MODE
-            ]) {
+            for (IndividualApplication ia : getValidatedProposals()) {
                 underReviewIds.add(ia.Id);
             }
             if (underReviewIds.isEmpty()) return resultMap;
@@ -351,6 +356,16 @@ public without sharing class WCFProposalListController {
     
     @AuraEnabled(cacheable=false)
     public static ApproverReturnInfo getApproverReturnInfo(Id applicationId) {
+        // Only return if the application is currently in 'Returned by Approver' status
+        List<IndividualApplication> apps = [
+            SELECT Id, Status FROM IndividualApplication
+            WHERE Id = :applicationId
+            AND Status = 'Returned by Approver'
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (apps.isEmpty()) return null;
+
         List<ApplicationDecision> decisions = [
             SELECT Id, Comment, Decision_Date__c, ApplicationDecision, Rejection_Reasons__c
             FROM ApplicationDecision
@@ -367,7 +382,7 @@ public without sharing class WCFProposalListController {
         info.decisionId    = decisions[0].Id;
         info.comment        = decisions[0].Comment;
         info.decisionDate   = decisions[0].Decision_Date__c;
-            info.rejectionReasons   = decisions[0].Rejection_Reasons__c;   // ← NEW
+        info.rejectionReasons   = decisions[0].Rejection_Reasons__c;
         return info;
     }
     
@@ -381,32 +396,32 @@ public without sharing class WCFProposalListController {
 
 @AuraEnabled(cacheable=false)
 public static Integer getAcceptedApplicationsCount() {
-    Integer count = 0;
+    Set<Id> appIds = new Set<Id>();
     for (ApplicationDecision ad : [
-        SELECT Comment
+        SELECT ApplicationId
         FROM ApplicationDecision
         WHERE ApplicationDecision = 'Accept'
         AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
         WITH SYSTEM_MODE
     ]) {
-        if (String.isNotBlank(ad.Comment)) {
-            count++;
+        if (ad.ApplicationId != null) {
+            appIds.add(ad.ApplicationId);
         }
     }
-    return count;
+    return appIds.size();
 }
     
-    @AuraEnabled(cacheable=false)
+@AuraEnabled(cacheable=false)
 public static List<Id> getAcceptedApplicationIds() {
     Set<Id> ids = new Set<Id>();
     for (ApplicationDecision ad : [
-        SELECT ApplicationId, Comment
+        SELECT ApplicationId
         FROM ApplicationDecision
         WHERE ApplicationDecision = 'Accept'
         AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
         WITH SYSTEM_MODE
     ]) {
-        if (String.isNotBlank(ad.Comment)) {
+        if (ad.ApplicationId != null) {
             ids.add(ad.ApplicationId);
         }
     }
@@ -426,33 +441,33 @@ public static List<AcceptedApplicationItem> getAcceptedApplicationsQueue() {
     ];
     if (decisions.isEmpty()) return new List<AcceptedApplicationItem>();
 
-    // ── Filter out blank comments in Apex, since Comment can't be filtered in SOQL ──
-    List<ApplicationDecision> withComment = new List<ApplicationDecision>();
-    Set<Id> appIds = new Set<Id>();
+    // ── Keep only the latest decision per application ──
+    List<ApplicationDecision> uniqueDecisions = new List<ApplicationDecision>();
+    Set<Id> seenAppIds = new Set<Id>();
     for (ApplicationDecision ad : decisions) {
-        if (String.isNotBlank(ad.Comment)) {
-            withComment.add(ad);
-            appIds.add(ad.ApplicationId);
+        if (ad.ApplicationId != null && !seenAppIds.contains(ad.ApplicationId)) {
+            seenAppIds.add(ad.ApplicationId);
+            uniqueDecisions.add(ad);
         }
     }
-    if (withComment.isEmpty()) return new List<AcceptedApplicationItem>();
+    if (uniqueDecisions.isEmpty()) return new List<AcceptedApplicationItem>();
 
     Map<Id, IndividualApplication> appMap = new Map<Id, IndividualApplication>([
         SELECT Id, Name, Organization_Name__c, Submitter_Name__c
         FROM IndividualApplication
-        WHERE Id IN :appIds
+        WHERE Id IN :seenAppIds
         WITH SYSTEM_MODE
     ]);
 
     List<AcceptedApplicationItem> result = new List<AcceptedApplicationItem>();
-    for (ApplicationDecision ad : withComment) {
+    for (ApplicationDecision ad : uniqueDecisions) {
         IndividualApplication app = appMap.get(ad.ApplicationId);
         if (app == null) continue;
         AcceptedApplicationItem item = new AcceptedApplicationItem();
         item.applicationId    = ad.ApplicationId;
         item.appName          = app.Name;
         item.organizationName = app.Organization_Name__c;
-        item.approverComment  = ad.Comment;
+        item.approverComment  = String.isNotBlank(ad.Comment) ? ad.Comment : '—';
         item.decisionDate     = ad.Decision_Date__c;
         result.add(item);
     }

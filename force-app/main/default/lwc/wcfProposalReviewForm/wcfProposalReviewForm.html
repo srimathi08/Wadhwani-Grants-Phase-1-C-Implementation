@@ -94,7 +94,7 @@
 
                         <!-- Questions in this category -->
                         <template for:each={currentQuestions} for:item="q">
-                            <div key={q.questionId} class={q.cardClass}>
+                            <div key={q.questionId} class={q.cardClass} data-qid={q.questionId}>
                                 <div class="subq-top">
                                     <div class="subq-q">
                                         <div class="qtext">
@@ -377,15 +377,30 @@
                                 <span class="upload-title">Supporting documents</span>
                                 <span class="upload-sub">Optional — attach any notes, spreadsheets, or memos to support your review</span>
                             </div>
-                            <template if:true={reviewRecordId}>
-                                <lightning-file-upload
-                                    label="Attach files"
-                                    name="supportingDocs"
-                                    accept={acceptedFormats}
-                                    record-id={reviewRecordId}
-                                    multiple
-                                    onuploadfinished={handleUploadFinished}
-                                ></lightning-file-upload>
+                            <template if:true={uploadTargetRecordId}>
+                                <div class="upload-control-wrap">
+                                    <input
+                                        type="file"
+                                        accept={acceptedFormatsString}
+                                        multiple
+                                        onchange={handleCustomFileUpload}
+                                        data-id="fileInput"
+                                        style="display: none;"
+                                    />
+                                    <div class="upload-dropzone" onclick={handleTriggerFileInput} ondragover={handleDragOver} ondrop={handleFileDrop}>
+                                        <button class="btn btn-secondary upload-trigger-btn" type="button">
+                                            <lightning-icon icon-name="utility:upload" size="x-small" class="upload-icon-prefix"></lightning-icon>
+                                            Upload Files
+                                        </button>
+                                        <span class="upload-dropzone-label">Or drop files</span>
+                                    </div>
+                                </div>
+                                <template if:true={isUploadingFile}>
+                                    <div class="upload-loading-bar">
+                                        <lightning-spinner alternative-text="Uploading file..." size="small"></lightning-spinner>
+                                        <span class="upload-loading-text">Uploading file(s)...</span>
+                                    </div>
+                                </template>
                                 <template if:true={uploadedFiles.length}>
                                     <div class="uploaded-list">
                                         <template for:each={uploadedFiles} for:item="f">
@@ -407,12 +422,6 @@
                                         </template>
                                     </div>
                                 </template>
-                            </template>
-                            <template if:false={reviewRecordId}>
-                                <div class="upload-hint">
-                                    <span>Save a draft first to enable file upload.</span>
-                                    <button class="btn btn-secondary btn-sm" type="button" onclick={handleSaveDraft}>Save draft now</button>
-                                </div>
                             </template>
                         </div>
                     </template>

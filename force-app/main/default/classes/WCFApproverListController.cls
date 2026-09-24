@@ -168,6 +168,15 @@ public static Integer getApproverQueueCount() {
     return appIds.size();
 }
 
+public static String saveDecision(
+    Id applicationId,
+    Id reviewId,
+    String decision,
+    String comment
+) {
+    return saveDecision(applicationId, reviewId, decision, comment, null);
+}
+
 @AuraEnabled
 public static String saveDecision(
     Id applicationId,
@@ -424,8 +433,9 @@ public static DecisionWrapper getExistingDecision(Id applicationId) {
                    Rejection_Comment__c,
                    ReviewedById
             FROM ApplicationReview
-            WHERE Id = :reviewId
+            WHERE Id = :reviewId OR ApplicationId = :reviewId
             WITH SYSTEM_MODE
+            ORDER BY LastModifiedDate DESC
             LIMIT 1
         ];
         return reviews.isEmpty() ? null : reviews[0];

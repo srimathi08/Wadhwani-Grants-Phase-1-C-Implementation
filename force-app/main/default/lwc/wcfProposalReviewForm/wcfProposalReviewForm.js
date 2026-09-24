@@ -11,7 +11,9 @@ import getDraftReviewRecord from '@salesforce/apex/WCF_ReviewFormJFController.ge
 import saveDraftReview from '@salesforce/apex/WCF_ReviewFormJFController.saveDraftReview';
 import deleteUploadedFile from '@salesforce/apex/WCF_ReviewFormJFController.deleteUploadedFile';
 import getAttachedFiles from '@salesforce/apex/WCF_ReviewFormJFController.getAttachedFiles';
+import uploadSupportingDocument from '@salesforce/apex/WCF_ReviewFormJFController.uploadSupportingDocument';
 import getRejectionReasonOptions from '@salesforce/apex/WCF_ReviewFormJFController.getRejectionReasonOptions';
+import createReviewRecord from '@salesforce/apex/WCFProposalListController.createReviewRecord';
 
 const RATING_LABEL = { 5: 'Very strong', 4: 'Strong', 3: 'Adequate', 2: 'Weak', 1: 'Very weak' };
 
@@ -35,12 +37,15 @@ function storedRecValue(choice) {
 const MAX_WORDS = 200;
 
 function countWords(text) {
-    const trimmed = (text || '').trim();
-    return trimmed === '' ? 0 : trimmed.split(/\s+/).length;
+    if (!text) return 0;
+    const cleanText = String(text).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+    if (!cleanText) return 0;
+    return cleanText.split(/\s+/).filter(Boolean).length;
 }
 
 function truncateToWordLimit(text, limit) {
-    const words = (text || '').trim().split(/\s+/);
+    if (!text) return '';
+    const words = String(text).replace(/&nbsp;/g, ' ').trim().split(/\s+/).filter(Boolean);
     if (words.length <= limit) return text;
     return words.slice(0, limit).join(' ');
 }
@@ -68,24 +73,24 @@ function resolvePhysicalFields(qId, track) {
 
     if (qId === '2.1') return { rating: 'D2_ProgramAlignment_Rating__c', comment: 'D2_ProgramAlignment_Comment__c' };
     if (qId === '2.2') {
-        if (isLU) return { rating: 'D2_LU_Distinctiveness_Rating__c', comment: 'D2_LU_Distinctiveness_Comment__c' };
+        if (isLU) return { rating: 'D2_LU_Distinctiveness_Rating__c', comment: null };
         if (isJC) return { rating: 'D2_JC_Distinctiveness_Rating__c', comment: 'D2_JC_Distinctiveness_Comment__c' };
         return { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' };
     }
     if (qId === '2.3') return { rating: 'D2_OperationalDepth_Rating__c', comment: 'D2_OperationalDepth_Comment__c' };
 
     if (qId === '3.1') {
-        if (isLU) return { rating: 'D3_LU_ScaleRecord_Rating__c', comment: 'D3_LU_ScaleRecord_Comment__c' };
+        if (isLU) return { rating: 'D3_LU_ScaleRecord_Rating__c', comment: null };
         if (isJC) return { rating: 'D3_JC_ScaleRecord_Rating__c', comment: 'D3_JC_ScaleRecord_Comment__c' };
         return { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' };
     }
     if (qId === '3.2') {
-        if (isLU) return { rating: 'D3_LU_ConversionRate_Rating__c', comment: 'D3_LU_ConversionRate_Comment__c' };
+        if (isLU) return { rating: 'D3_LU_ConversionRate_Rating__c', comment: null };
         if (isJC) return { rating: 'D3_JC_ConversionRate_Rating__c', comment: 'D3_JC_ConversionRate_Comment__c' };
         return { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' };
     }
     if (qId === '3.3') {
-        if (isLU) return { rating: 'D3_LU_CostPerOutcome_Rating__c', comment: 'D3_LU_CostPerOutcome_Comment__c' };
+        if (isLU) return { rating: 'D3_LU_CostPerOutcome_Rating__c', comment: null };
         if (isJC) return { rating: 'D3_JC_CostPerJob_Rating__c', comment: 'D3_JC_CostPerJob_Comment__c' };
         return { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' };
     }
@@ -159,14 +164,26 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
     }
 
+    @track isUploadingFile = false;
+
     get acceptedFormats() {
         return ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
                 '.txt', '.csv', '.png', '.jpg', '.jpeg'];
     }
 
+    get acceptedFormatsString() {
+        return this.acceptedFormats.join(',');
+    }
+
     get reviewRecordId() {
         return this.reviewData.Id || null;
     }
+
+    get uploadTargetRecordId() {
+        return this.reviewData.Id || null;
+    }
+
+    _cachedDraftReview = null;
 
     @track reviewData = {
         ApplicationId: '',
@@ -189,7 +206,11 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             this._incomingTrack  = currentPageReference.state.track || null;
 
             this.recordId = (rawRecordId === 'new') ? null : rawRecordId;
-            this.reviewData = { ...this.reviewData, ApplicationId: this._applicationId };
+            this.reviewData = { 
+                ...this.reviewData, 
+                ApplicationId: this._applicationId,
+                Id: this.recordId || this.reviewData.Id
+            };
 
             this.checkIfAlreadyReviewed();
             this.fetchIndividualApplication();
@@ -207,6 +228,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             .then(res => {
                 if (res && res.success && res.categories && res.categories.length > 0) {
                     this.categories = res.categories;
+                    if (this._cachedDraftReview) {
+                        this.applyDraftReviewData(this._cachedDraftReview);
+                    }
                 }
                 this.isLoadingMetadata = false;
             })
@@ -250,78 +274,117 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     loadDraftReview() {
+        if (!this._applicationId) return;
         getDraftReviewRecord({ applicationId: this._applicationId })
             .then(review => {
-                if (!review) return;
-
-                // 1. Restore ratings and comments from physical fields
-                const activeTrack = this.outcomeDeveloperName || this._incomingTrack || '';
-                const allQuestions = (this.categories || []).flatMap(c => c.questions || []);
-                allQuestions.forEach(q => {
-                    const mapping = resolvePhysicalFields(q.questionId, activeTrack);
-                    if (mapping) {
-                        if (review[mapping.rating] != null && review[mapping.rating] !== '') {
-                            this.ratings = { ...this.ratings, [q.questionId]: parseInt(review[mapping.rating], 10) };
-                        }
-                        if (review[mapping.comment]) {
-                            this.comments = { ...this.comments, [q.questionId]: review[mapping.comment] };
-                        }
-                    }
-                });
-
-                // 2. Also check if structured JSON answers exist in Decision_Rationale__c
-                if (review.Decision_Rationale__c) {
-                    try {
-                        const parsed = JSON.parse(review.Decision_Rationale__c);
-                        if (Array.isArray(parsed)) {
-                            parsed.forEach(item => {
-                                if (item.questionId && item.rating != null) {
-                                    this.ratings = { ...this.ratings, [item.questionId]: parseInt(item.rating, 10) };
-                                }
-                                if (item.questionId && item.comment) {
-                                    this.comments = { ...this.comments, [item.questionId]: item.comment };
-                                }
-                            });
-                        }
-                    } catch (e) {
-                        // ignore JSON parse error
-                    }
-                }
-
-                this.strengths  = this._parseSW(review.Top_3_proposal_strengths_ranked__c);
-                this.weaknesses = this._parseSW(review.Top_3_proposal_weaknesses_ranked__c);
-
-                if (review.Recommend_for_CEO_review__c === 'Yes') {
-                    this.recChoice = REC_RECOMMEND;
-                } else if (review.Recommend_for_CEO_review__c === 'No') {
-                    this.recChoice = REC_DO_NOT;
+                if (review && review.Id) {
+                    this._cachedDraftReview = review;
+                    this.applyDraftReviewData(review);
                 } else {
-                    this.recChoice = null;
-                }
-
-                this.recStrength = review.Strength_of_recommendation__c
-                                ? parseInt(review.Strength_of_recommendation__c, 10)
-                                : null;
-
-                this.rejectionReasons = (review.Rejection_Reasons__c || '')
-                    .split(';')
-                    .map(v => v.trim())
-                    .filter(v => v);
-
-                this.reviewData = { ...this.reviewData, ...review };
-
-                if (review.Id) {
-                    getAttachedFiles({ reviewRecordId: review.Id })
-                        .then(files => {
-                            this.uploadedFiles = files.map(f => ({
-                                documentId: f.documentId,
-                                name:       f.name
-                            }));
+                    const trackParam = this.outcomeDeveloperName || this._incomingTrack || 'Both';
+                    createReviewRecord({ applicationId: this._applicationId, track: trackParam })
+                        .then(newReviewId => {
+                            if (newReviewId) {
+                                this.reviewData = { ...this.reviewData, Id: newReviewId };
+                            }
                         })
-                        .catch(err => console.error('Error loading attached files:', err));
+                        .catch(err => {
+                            console.error('Error auto-creating review record:', err);
+                        });
                 }
             })
             .catch(error => console.error('Error loading draft:', error));
+    }
+
+    applyDraftReviewData(review) {
+        if (!review) return;
+
+        // 1. Restore ratings and comments from physical fields
+        const activeTrack = this.outcomeDeveloperName || this._incomingTrack || '';
+        const allQuestions = (this.categories || []).flatMap(c => c.questions || []);
+        allQuestions.forEach(q => {
+            const mapping = resolvePhysicalFields(q.questionId, activeTrack);
+            if (mapping) {
+                if (review[mapping.rating] != null && review[mapping.rating] !== '') {
+                    this.ratings = { ...this.ratings, [q.questionId]: parseInt(review[mapping.rating], 10) };
+                }
+                if (review[mapping.comment]) {
+                    this.comments = { ...this.comments, [q.questionId]: review[mapping.comment] };
+                }
+            }
+        });
+
+        // 2. Also check if structured JSON answers exist in Decision_rationale__c / Decision_Rationale__c
+        const rationaleRaw = review.Decision_rationale__c || review.Decision_Rationale__c;
+        if (rationaleRaw) {
+            try {
+                const parsed = typeof rationaleRaw === 'string' ? JSON.parse(rationaleRaw) : rationaleRaw;
+                if (Array.isArray(parsed)) {
+                    parsed.forEach(item => {
+                        if (item.questionId && item.rating != null) {
+                            this.ratings = { ...this.ratings, [item.questionId]: parseInt(item.rating, 10) };
+                        }
+                        if (item.questionId && item.comment) {
+                            this.comments = { ...this.comments, [item.questionId]: item.comment };
+                        }
+                    });
+                } else if (typeof parsed === 'object' && parsed !== null) {
+                    if (parsed.recChoice) {
+                        this.recChoice = parsed.recChoice;
+                    }
+                    if (parsed.currentStep != null && typeof parsed.currentStep === 'number') {
+                        this.currentStep = parsed.currentStep;
+                    }
+                    if (Array.isArray(parsed.structuredAnswers)) {
+                        parsed.structuredAnswers.forEach(item => {
+                            if (item.questionId && item.rating != null) {
+                                this.ratings = { ...this.ratings, [item.questionId]: parseInt(item.rating, 10) };
+                            }
+                            if (item.questionId && item.comment) {
+                                this.comments = { ...this.comments, [item.questionId]: item.comment };
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Error parsing draft decision rationale:', e);
+            }
+        }
+
+        this.strengths  = this._parseSW(review.Top_3_proposal_strengths_ranked__c);
+        this.weaknesses = this._parseSW(review.Top_3_proposal_weaknesses_ranked__c);
+
+        if (!this.recChoice) {
+            if (review.Recommend_for_CEO_review__c === 'Yes') {
+                this.recChoice = REC_RECOMMEND;
+            } else if (review.Recommend_for_CEO_review__c === 'No') {
+                this.recChoice = REC_DO_NOT;
+            } else {
+                this.recChoice = null;
+            }
+        }
+
+        this.recStrength = review.Strength_of_recommendation__c
+                        ? parseInt(review.Strength_of_recommendation__c, 10)
+                        : null;
+
+        this.rejectionReasons = (review.Rejection_Reasons__c || '')
+            .split(';')
+            .map(v => v.trim())
+            .filter(v => v);
+
+        this.reviewData = { ...this.reviewData, ...review };
+
+        if (review.Id) {
+            getAttachedFiles({ reviewRecordId: review.Id })
+                .then(files => {
+                    this.uploadedFiles = (files || []).map(f => ({
+                        documentId: f.documentId,
+                        name:       f.name
+                    }));
+                })
+                .catch(err => console.error('Error loading attached files:', err));
+        }
     }
 
     _parseSW(val) {
@@ -872,10 +935,16 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     _scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const head = this.template.querySelector('.formhead');
-    if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const formInner = document.querySelector('.rc-form-inner') || document.querySelector('.rf-shell') || document.querySelector('.rf-body');
+        if (formInner) {
+            formInner.scrollTop = 0;
+        }
+        const head = this.template.querySelector('.formhead') || this.template.querySelector('.step-intro');
+        if (head) {
+            head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 
     // Previous button handler
     prevStep() {
@@ -883,7 +952,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             this.currentStep -= 1;
             this.validationError = '';
             this.rubricOpen = false;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            this._scrollToTop();
         }
     }
     handlePrev() {
@@ -902,11 +971,15 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 const r = this.ratings[q.questionId];
                 if (r == null) {
                     this.validationError = `Please select a rating for question ${q.questionId}.`;
+                    this.showToast('Validation Error', this.validationError, 'error');
+                    this._scrollToQuestion(q.questionId);
                     return;
                 }
                 const c = (this.comments[q.questionId] || '').trim();
                 if (!c) {
                     this.validationError = `Please enter a justification comment for question ${q.questionId}.`;
+                    this.showToast('Validation Error', this.validationError, 'error');
+                    this._scrollToQuestion(q.questionId);
                     return;
                 }
             }
@@ -916,10 +989,12 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         if (this.isSwStep) {
             if (!(this.strengths[0] || '').trim()) {
                 this.validationError = 'Please provide at least your #1 primary strength.';
+                this.showToast('Validation Error', this.validationError, 'error');
                 return;
             }
             if (!(this.weaknesses[0] || '').trim()) {
                 this.validationError = 'Please provide at least your #1 primary weakness / concern.';
+                this.showToast('Validation Error', this.validationError, 'error');
                 return;
             }
         }
@@ -928,25 +1003,30 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         if (this.isRecStep) {
             if (!this.recChoice) {
                 this.validationError = 'Please select a final recommendation decision.';
+                this.showToast('Validation Error', this.validationError, 'error');
                 return;
             }
             if (this.showCeoRecommendationYes) {
                 if (this.recStrength == null) {
                     this.validationError = 'Please select a recommendation strength level (1 to 5).';
+                    this.showToast('Validation Error', this.validationError, 'error');
                     return;
                 }
                 if (!(this.reviewData.Recommendation_Strength_Comments__c || '').trim()) {
                     this.validationError = 'Please provide recommendation strength comments.';
+                    this.showToast('Validation Error', this.validationError, 'error');
                     return;
                 }
             }
             if (this.showCeoRecommendationNo) {
                 if (!this.rejectionReasons || this.rejectionReasons.length === 0) {
                     this.validationError = 'Please select at least one rejection reason.';
+                    this.showToast('Validation Error', this.validationError, 'error');
                     return;
                 }
                 if (!(this.reviewData.Rejection_Comment__c || '').trim()) {
                     this.validationError = 'Please provide a detailed rejection comment.';
+                    this.showToast('Validation Error', this.validationError, 'error');
                     return;
                 }
             }
@@ -961,8 +1041,20 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         // Advance to next step
         this.currentStep += 1;
         this.rubricOpen = false;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this._scrollToTop();
     }
+
+    _scrollToQuestion(qId) {
+        setTimeout(() => {
+            const el = this.template.querySelector(`.subq[data-qid="${qId}"]`)
+                    || this.template.querySelector('.error-banner.validate')
+                    || this.template.querySelector('.rating-row');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
+
     handleNext() {
         this.nextStep();
     }
@@ -989,6 +1081,120 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 this.saveStateClass = 'save-error';
                 this.showToast('Error', 'Failed to save draft.', 'error');
             });
+    }
+
+    handleTriggerFileInput() {
+        const input = this.template.querySelector('input[data-id="fileInput"]');
+        if (input) {
+            input.click();
+        }
+    }
+
+    handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    handleFileDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const files = event.dataTransfer?.files;
+        if (files && files.length > 0) {
+            this.handleCustomFileUpload({ target: { files: files, value: '' } });
+        }
+    }
+
+    async handleCustomFileUpload(event) {
+        const files = event.target?.files;
+        if (!files || files.length === 0) return;
+
+        let targetReviewId = this.reviewData.Id;
+        if (!targetReviewId && this._applicationId) {
+            try {
+                const trackParam = this.outcomeDeveloperName || this._incomingTrack || 'Both';
+                targetReviewId = await createReviewRecord({ applicationId: this._applicationId, track: trackParam });
+                if (targetReviewId) {
+                    this.reviewData = { ...this.reviewData, Id: targetReviewId };
+                }
+            } catch (err) {
+                console.error('Error creating review record for upload:', err);
+            }
+        }
+
+        if (!targetReviewId) {
+            this.showToast('Error', 'Review record is not ready. Please save a draft first.', 'error');
+            return;
+        }
+
+        this.isUploadingFile = true;
+        const uploadPromises = [];
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // Validate file size (max 25MB)
+            if (file.size > 25 * 1024 * 1024) {
+                this.showToast('File Too Large', `${file.name} exceeds the 25MB file size limit.`, 'error');
+                continue;
+            }
+
+            uploadPromises.push(
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const resultStr = reader.result;
+                        const base64Data = resultStr.includes(',') ? resultStr.split(',')[1] : resultStr;
+                        uploadSupportingDocument({
+                            reviewId: targetReviewId,
+                            fileName: file.name,
+                            base64Data: base64Data
+                        })
+                        .then(res => {
+                            if (res && res.documentId) {
+                                resolve(res);
+                            } else {
+                                reject(new Error('Invalid response from server'));
+                            }
+                        })
+                        .catch(err => reject(err));
+                    };
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                })
+            );
+        }
+
+        try {
+            const results = await Promise.allSettled(uploadPromises);
+            let successCount = 0;
+            const newFiles = [];
+
+            results.forEach(res => {
+                if (res.status === 'fulfilled') {
+                    newFiles.push({
+                        documentId: res.value.documentId,
+                        name: res.value.name
+                    });
+                    successCount++;
+                } else {
+                    console.error('File upload error:', res.reason);
+                    this.showToast('Upload Error', res.reason?.body?.message || res.reason?.message || 'Failed to upload file', 'error');
+                }
+            });
+
+            if (newFiles.length > 0) {
+                this.uploadedFiles = [...this.uploadedFiles, ...newFiles];
+                this.showToast('Success', `${successCount} file(s) attached successfully`, 'success');
+            }
+        } catch (e) {
+            console.error('Upload processing error:', e);
+            this.showToast('Error', 'An error occurred while uploading files.', 'error');
+        } finally {
+            this.isUploadingFile = false;
+            if (event.target) {
+                event.target.value = '';
+            }
+        }
     }
 
     handleUploadFinished(event) {
@@ -1031,7 +1237,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
-                url: `${COMMUNITY_BASE_PATH || ''}/wcf-reviewer-application-list?role=reviewer`
+                url: `${COMMUNITY_BASE_PATH || ''}/wg-reviewer-dashboard`
             }
         });
     }
@@ -1040,15 +1246,26 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     buildReviewPayload(isFinalSubmit) {
         const activeTrack = this.outcomeDeveloperName || this._incomingTrack || '';
         const payload = {
-            ...this.reviewData,
             ApplicationId: this._applicationId,
-            RecordTypeId:  this._resolvedRecordTypeId,
             Recommend_for_CEO_review__c: storedRecValue(this.recChoice),
             Strength_of_recommendation__c: this.recStrength ? String(this.recStrength) : null,
             Top_3_proposal_strengths_ranked__c: this.strengths.filter(s => s && s.trim()).join('\n'),
             Top_3_proposal_weaknesses_ranked__c: this.weaknesses.filter(w => w && w.trim()).join('\n'),
             Rejection_Reasons__c: this.rejectionReasons.join(';')
         };
+
+        if (this.reviewData.Id) {
+            payload.Id = this.reviewData.Id;
+        }
+        if (this._resolvedRecordTypeId) {
+            payload.RecordTypeId = this._resolvedRecordTypeId;
+        }
+        if (this.reviewData.Recommendation_Strength_Comments__c) {
+            payload.Recommendation_Strength_Comments__c = this.reviewData.Recommendation_Strength_Comments__c;
+        }
+        if (this.reviewData.Rejection_Comment__c) {
+            payload.Rejection_Comment__c = this.reviewData.Rejection_Comment__c;
+        }
 
         // Populate physical fields dynamically based on active track
         const structuredAnswers = [];
@@ -1082,8 +1299,14 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             });
         });
 
-        // Pack full structured answers in Decision_Rationale__c for zero-loss persistence
-        payload.Decision_Rationale__c = JSON.stringify(structuredAnswers);
+        // Pack full structured answers in Decision_rationale__c / Decision_Rationale__c for zero-loss persistence
+        const rationaleJson = JSON.stringify({
+            recChoice: this.recChoice,
+            currentStep: this.currentStep,
+            structuredAnswers: structuredAnswers
+        });
+        payload.Decision_rationale__c = rationaleJson;
+        payload.Decision_Rationale__c = rationaleJson;
 
         return payload;
     }

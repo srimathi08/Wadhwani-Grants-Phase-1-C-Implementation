@@ -20,15 +20,58 @@ public without sharing class WCF_ReviewFormJFController {
             SELECT Id, Status, ReviewedById, AssignedUserId, RecordTypeId
             FROM   ApplicationReview
             WHERE  ApplicationId  = :applicationId
-              AND  (
-                      ReviewedById  = :userId
-                   OR AssignedUserId = :userId
-                  )
-              AND  IsSubmitted = false
+              AND  (IsSubmitted = false OR IsSubmitted = null)
+              AND  Status != 'Review Submitted'
+            WITH SYSTEM_MODE
             ORDER BY LastModifiedDate DESC
             LIMIT 1
         ];
         return existing.isEmpty() ? null : existing[0];
+    }
+
+    private static ApplicationReview sanitizeReviewForSave(ApplicationReview input) {
+        ApplicationReview clean = new ApplicationReview();
+        if (input.Id != null) {
+            clean.Id = input.Id;
+        }
+        if (input.ApplicationId != null) {
+            clean.ApplicationId = input.ApplicationId;
+        }
+        if (input.RecordTypeId != null) {
+            clean.RecordTypeId = input.RecordTypeId;
+        }
+        if (input.ReviewedById != null) {
+            clean.ReviewedById = input.ReviewedById;
+        }
+        if (input.IsSubmitted != null) {
+            clean.IsSubmitted = input.IsSubmitted;
+        }
+        if (input.Status != null) {
+            clean.Status = input.Status;
+        }
+        if (input.Form_Template_Version__c != null) {
+            clean.Form_Template_Version__c = input.Form_Template_Version__c;
+        }
+
+        Map<String, Object> populatedFields = input.getPopulatedFieldsAsMap();
+        Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.ApplicationReview.fields.getMap();
+
+        for (String fieldName : populatedFields.keySet()) {
+            Schema.SObjectField sField = fieldMap.get(fieldName);
+            if (sField != null) {
+                Schema.DescribeFieldResult dfr = sField.getDescribe();
+                if (!dfr.isCalculated() && !dfr.isAutoNumber() &&
+                    fieldName != 'CreatedDate' &&
+                    fieldName != 'CreatedById' &&
+                    fieldName != 'LastModifiedDate' &&
+                    fieldName != 'LastModifiedById' &&
+                    fieldName != 'SystemModstamp' &&
+                    fieldName != 'Id') {
+                    clean.put(fieldName, populatedFields.get(fieldName));
+                }
+            }
+        }
+        return clean;
     }
 
     @AuraEnabled
@@ -58,24 +101,30 @@ public without sharing class WCF_ReviewFormJFController {
 
             calculateCategoryScores(review);
 
+            ApplicationReview cleanReview = sanitizeReviewForSave(review);
+
             ApplicationReview existing = findExistingReview(
                 review.ApplicationId, userId, review.RecordTypeId
             );
 
             if (existing != null) {
-                review.Id = existing.Id;
-                update review;
+                cleanReview.Id = existing.Id;
+                update cleanReview;
+            } else if (cleanReview.Id != null) {
+                update cleanReview;
             } else {
-                insert review;
+                insert cleanReview;
             }
 
             // Populate reviewer name on IndividualApplication during draft
-            update as system new IndividualApplication(
-                Id                  = review.ApplicationId,
-                WG_Reviewer_Name__c = UserInfo.getName()
-            );
+            if (review.ApplicationId != null) {
+                update as system new IndividualApplication(
+                    Id                  = review.ApplicationId,
+                    WG_Reviewer_Name__c = UserInfo.getName()
+                );
+            }
 
-            return review;
+            return cleanReview;
 
         } catch (AuraHandledException e) {
             throw e;
@@ -119,31 +168,37 @@ public without sharing class WCF_ReviewFormJFController {
 
             calculateCategoryScores(review);
 
+            ApplicationReview cleanReview = sanitizeReviewForSave(review);
+
             ApplicationReview existing = findExistingReview(
                 review.ApplicationId, userId, review.RecordTypeId
             );
 
             if (existing != null) {
-                review.Id = existing.Id;
-                update review;
+                cleanReview.Id = existing.Id;
+                update cleanReview;
+            } else if (cleanReview.Id != null) {
+                update cleanReview;
             } else {
-                insert review;
+                insert cleanReview;
             }
 
             // Route to Approver based on recommendation
-            String appStatus = (review.Recommend_for_CEO_review__c == 'Yes')
+            String appStatus = (cleanReview.Recommend_for_CEO_review__c == 'Yes')
                 ? 'Review Completed - Recommended'
                 : 'Review Completed - Not Recommended';
 
-            IndividualApplication app = new IndividualApplication(
-                Id                  = review.ApplicationId,
-                Status              = appStatus,
-                WG_Reviewer_Name__c = UserInfo.getName()
-            );
-            update as system app;
+            if (review.ApplicationId != null) {
+                IndividualApplication app = new IndividualApplication(
+                    Id                  = review.ApplicationId,
+                    Status              = appStatus,
+                    WG_Reviewer_Name__c = UserInfo.getName()
+                );
+                update as system app;
+            }
 
             result.isSuccess = true;
-            result.reviewId = review.Id;
+            result.reviewId = cleanReview.Id;
             result.applicationStatus = appStatus;
             return result;
 
@@ -168,15 +223,27 @@ public without sharing class WCF_ReviewFormJFController {
         // 1. Dynamic calculation from Decision_Rationale__c JSON if present
         if (String.isNotBlank(r.Decision_Rationale__c)) {
             try {
-                List<Object> parsed = (List<Object>) JSON.deserializeUntyped(r.Decision_Rationale__c);
-                for (Object itemObj : parsed) {
-                    Map<String, Object> item = (Map<String, Object>) itemObj;
-                    Integer catNum = item.get('categoryNumber') != null ? Integer.valueOf(item.get('categoryNumber')) : null;
-                    Object rateVal = item.get('rating');
-                    if (catNum != null && rateVal != null) {
-                        Decimal dVal = Decimal.valueOf(String.valueOf(rateVal));
-                        if (scoresByCat.containsKey(catNum)) {
-                            scoresByCat.get(catNum).add(dVal);
+                Object rawJson = JSON.deserializeUntyped(r.Decision_Rationale__c);
+                List<Object> parsedList = null;
+                if (rawJson instanceof List<Object>) {
+                    parsedList = (List<Object>) rawJson;
+                } else if (rawJson instanceof Map<String, Object>) {
+                    Map<String, Object> rootMap = (Map<String, Object>) rawJson;
+                    if (rootMap.containsKey('structuredAnswers') && rootMap.get('structuredAnswers') instanceof List<Object>) {
+                        parsedList = (List<Object>) rootMap.get('structuredAnswers');
+                    }
+                }
+
+                if (parsedList != null) {
+                    for (Object itemObj : parsedList) {
+                        Map<String, Object> item = (Map<String, Object>) itemObj;
+                        Integer catNum = item.get('categoryNumber') != null ? Integer.valueOf(item.get('categoryNumber')) : null;
+                        Object rateVal = item.get('rating');
+                        if (catNum != null && rateVal != null) {
+                            Decimal dVal = Decimal.valueOf(String.valueOf(rateVal));
+                            if (scoresByCat.containsKey(catNum)) {
+                                scoresByCat.get(catNum).add(dVal);
+                            }
                         }
                     }
                 }
@@ -319,26 +386,21 @@ public without sharing class WCF_ReviewFormJFController {
 
     @AuraEnabled(cacheable=false)
     public static ApplicationReview getDraftReviewRecord(Id applicationId) {
-        Id userId = UserInfo.getUserId();
-
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.ApplicationReview.fields.getMap();
         List<String> selectFields = new List<String>();
         for (String fieldName : fieldMap.keySet()) {
-            Schema.DescribeFieldResult dfr = fieldMap.get(fieldName).getDescribe();
-            if (dfr.isAccessible()) {
-                selectFields.add(dfr.getName());
-            }
+            selectFields.add(fieldName);
         }
 
         String query = 'SELECT ' + String.join(selectFields, ', ') + 
                        ' FROM ApplicationReview' +
-                       ' WHERE ApplicationId = :applicationId' +
-                       '   AND IsSubmitted   = false' +
-                       '   AND (ReviewedById = :userId OR AssignedUserId = :userId)' +
+                       ' WHERE (ApplicationId = :applicationId OR Id = :applicationId)' +
+                       '   AND (IsSubmitted = false OR IsSubmitted = null)' +
+                       '   AND Status != \'Review Submitted\'' +
                        ' ORDER BY LastModifiedDate DESC' +
                        ' LIMIT 1';
 
-        List<ApplicationReview> reviews = Database.query(query);
+        List<ApplicationReview> reviews = Database.query(query, AccessLevel.SYSTEM_MODE);
         return reviews.isEmpty() ? null : reviews[0];
     }
 
@@ -501,6 +563,39 @@ public without sharing class WCF_ReviewFormJFController {
             result.add(f);
         }
         return result;
+    }
+
+    @AuraEnabled
+    public static Map<String, String> uploadSupportingDocument(Id reviewId, String fileName, String base64Data) {
+        if (reviewId == null || String.isBlank(fileName) || String.isBlank(base64Data)) {
+            throw new AuraHandledException('Missing required file upload parameters.');
+        }
+        try {
+            ContentVersion cv = new ContentVersion();
+            cv.Title = fileName;
+            cv.PathOnClient = fileName;
+            cv.VersionData = EncodingUtil.base64Decode(base64Data);
+            cv.IsMajorVersion = true;
+            insert cv;
+
+            Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+
+            ContentDocumentLink cdl = new ContentDocumentLink();
+            cdl.ContentDocumentId = docId;
+            cdl.LinkedEntityId = reviewId;
+            cdl.ShareType = 'V';
+            cdl.Visibility = 'AllUsers';
+            insert cdl;
+
+            Map<String, String> res = new Map<String, String>();
+            res.put('documentId', docId);
+            res.put('name', fileName);
+            return res;
+        } catch (AuraHandledException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error uploading file: ' + e.getMessage());
+        }
     }
 
     @AuraEnabled(cacheable=false)

@@ -432,6 +432,15 @@ export default class WcfFormPreview extends LightningElement {
         return `${str}%`;
     }
 
+    _fmtNumber(v) {
+        if (v == null || v === '' || v === '—') return '—';
+        const str = String(v).replace(/,/g, '').trim();
+        if (str === '') return '—';
+        const num = Number(str);
+        if (isNaN(num)) return String(v);
+        return num.toLocaleString('en-US');
+    }
+
     _val(v) { return (v != null && v !== '') ? v : '—'; }
 
     // ── Multi-Track Detection & Dynamic Section Labels ───────────────────────
@@ -727,7 +736,7 @@ export default class WcfFormPreview extends LightningElement {
     // ── Outcome Data Grid (All Tracks) ───────────────────────────────────────
     get outcomeData() {
         const o = this._outcome;
-        const f = v => this._val(v);
+        const f = v => this._fmtNumber(v);
         const c = v => this._fmtCurrency(v);
         return {
             // Track 1: Job Fulfillment
@@ -1394,10 +1403,10 @@ export default class WcfFormPreview extends LightningElement {
             };
 
             const simpleQRow = (num, label, value, bold = false) => {
-                if (value === null || value === undefined || value === '' || value === '—') return;
+                const valStr = (value === null || value === undefined || value === '') ? '—' : String(value);
                 doc.setFontSize(9.5);
                 doc.setFont(undefined, bold ? 'bold' : 'normal');
-                const lines = doc.splitTextToSize(String(value), valueW);
+                const lines = doc.splitTextToSize(valStr, valueW);
                 const labelLines = doc.splitTextToSize(label, labelW - 10);
                 const rowH = Math.max(lines.length * 4.6, labelLines.length * 4.2) + 8;
                 checkPage(rowH + 4);
@@ -1412,7 +1421,10 @@ export default class WcfFormPreview extends LightningElement {
             };
 
             const gridQRow = (num, label, fields, cols = 2) => {
-                const items = fields.filter(f => f.value && f.value !== '—');
+                const items = fields.map(f => ({
+                    label: f.label,
+                    value: (f.value !== null && f.value !== undefined && f.value !== '') ? String(f.value) : '—'
+                }));
                 if (items.length === 0) return;
 
                 const cellW = (valueW - (cols - 1) * 8) / cols;
@@ -1461,8 +1473,7 @@ export default class WcfFormPreview extends LightningElement {
             };
 
             const richBoxUnder = (label, value) => {
-                if (value === null || value === undefined || value === '' || value === '—') return;
-                const text = parseHtml(String(value));
+                const text = (value === null || value === undefined || value === '' || value === '—') ? '—' : parseHtml(String(value));
                 doc.setFontSize(9.3);
                 const lines = doc.splitTextToSize(text, valueW - 8);
                 const boxH = lines.length * 4.4 + 10;
@@ -1565,6 +1576,8 @@ export default class WcfFormPreview extends LightningElement {
                 y = topFundersTop + 10;
                 table(['Funder', 'Amount (USD)', 'Period', 'Type'],
                     this.funders.map(f => [f.name, f.amount, f.period, f.type]));
+            } else {
+                simpleQRow(q.Q7, 'Top 3 Most Prominent Funders', '—');
             }
 
             // Q8: References for Outreach
@@ -1575,6 +1588,8 @@ export default class WcfFormPreview extends LightningElement {
                 y = refTop + 10;
                 table(['Name', 'Organisation / Role', 'Email'],
                     this.references.map(r => [r.name, r.organisation, r.email]));
+            } else {
+                simpleQRow(q.Q8, 'References for Outreach', '—');
             }
 
             // Q9: Historical Financial Data
@@ -1826,6 +1841,8 @@ export default class WcfFormPreview extends LightningElement {
                 drawQLabel(q.Q28, 'Supporting Documents', docTop);
                 y = docTop + 10;
                 table(['File Name'], this.supportingDocuments.map(f => [f.name]));
+            } else {
+                simpleQRow(q.Q28, 'Supporting Documents', '—');
             }
 
             if (this.hasCustomQuestionsWhyWadhwani) {

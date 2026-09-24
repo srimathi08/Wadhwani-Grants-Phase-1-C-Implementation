@@ -321,7 +321,7 @@ public without sharing class WCFFormEngineController {
 
             // Map Last_Page__c to activeTabId
             if (app.Last_Page__c == 2) wrapper.activeTabId = 'tabJobFulfillment';
-            else if (app.Last_Page__c == 4) wrapper.activeTabId = 'tabJobCreation';
+            else if (app.Last_Page__c == 3 || app.Last_Page__c == 4) wrapper.activeTabId = 'tabJobCreation';
             else if (app.Last_Page__c == 5) wrapper.activeTabId = 'tabLivelihood';
             else if (app.Last_Page__c == 6) wrapper.activeTabId = 'tabWhyWadhwani';
             else if (app.Last_Page__c == 7) wrapper.activeTabId = 'tabReviewSubmit';
@@ -546,29 +546,41 @@ public without sharing class WCFFormEngineController {
             }
 
             // 4. Outcomes_Data__c
-            List<Outcomes_Data__c> outcomes = [
-                SELECT Id, Projected_Learner_Enrollments_FY_3__c, Projected_Learner_Enrollments_FY_2__c, Projected_Learner_Enrollments_FY_1__c, Projected_Learner_Enrollments_CFY__c,
-                       Projected_Learner_Placements_FY_3__c, Projected_Learner_Placements_FY_2__c, Projected_Learner_Placements_FY_1__c, Projected_Learner_Placements_CFY__c,
-                       Avg_Cost_per_Placement_FY_3__c, Avg_Cost_per_Placement_FY_2__c, Avg_Cost_per_Placement_FY_1__c, Avg_Cost_per_Placement_CFY__c,
-                       Projected_New_Businesses_FY_3__c, Projected_New_Businesses_FY_2__c, Projected_New_Businesses_FY_1__c, Projected_New_Businesses_CFY__c,
-                       Projected_Jobs_from_New_Businesses_FY3__c, Projected_Jobs_from_New_Businesses_FY2__c, Projected_Jobs_from_New_Businesses_FY1__c, Projected_Jobs_from_New_Businesses_CFY__c,
-                       Growing_Businesses_Supported_FY_3__c, Growing_Businesses_Supported_FY_2__c, Growing_Businesses_Supported_FY_1__c, Growing_Businesses_Supported_CFY__c,
-                       Jobs_from_Growing_Businesses_FY_3__c, Jobs_from_Growing_Businesses_FY_2__c, Jobs_from_Growing_Businesses_FY_1__c, Jobs_from_Growing_Businesses_CFY__c,
-                       Avg_Cost_per_Job_FY_3__c, Avg_Cost_per_Job_FY_2__c, Avg_Cost_per_Job_FY_1__c, Avg_Cost_per_Job_CFY__c,
-                       Job_Verification_3rd_Party_CFY__c, Outcome_Tracking_Details_CFY__c
-                FROM Outcomes_Data__c 
-                WHERE Proposal__c = :appId 
-                WITH SYSTEM_MODE 
-                ORDER BY CreatedDate DESC LIMIT 1
-            ];
+            Map<String, Schema.SObjectField> outcomeFieldMap = Schema.SObjectType.Outcomes_Data__c.fields.getMap();
+            List<String> validOutcomeFields = new List<String>();
+            for (String ofn : outcomeFieldMap.keySet()) {
+                validOutcomeFields.add(outcomeFieldMap.get(ofn).getDescribe().getName());
+            }
+            String outcomeSoql = 'SELECT ' + String.join(validOutcomeFields, ', ') + ' FROM Outcomes_Data__c WHERE Proposal__c = :appId WITH SYSTEM_MODE ORDER BY CreatedDate DESC LIMIT 1';
+            List<Outcomes_Data__c> outcomes = Database.query(outcomeSoql);
             if (!outcomes.isEmpty()) {
                 Outcomes_Data__c o = outcomes[0];
+                Map<String, Object> outPopMap = o.getPopulatedFieldsAsMap();
+                for (String ofld : outPopMap.keySet()) {
+                    Object oval = outPopMap.get(ofld);
+                    if (oval != null) {
+                        fv.put(ofld, String.valueOf(oval));
+                        if (ofld.endsWith('__c')) {
+                            String noSuffix = ofld.substring(0, ofld.length() - 3);
+                            if (!fv.containsKey(noSuffix)) {
+                                fv.put(noSuffix, String.valueOf(oval));
+                            }
+                        }
+                    }
+                }
+
                 if (String.isNotBlank(o.Outcome_Tracking_Details_CFY__c)) {
                     try {
                         Map<String, Object> extraMap = (Map<String, Object>) JSON.deserializeUntyped(o.Outcome_Tracking_Details_CFY__c);
                         for (String k : extraMap.keySet()) {
                             if (!fv.containsKey(k) || fv.get(k) == null || String.isBlank(String.valueOf(fv.get(k)))) {
                                 fv.put(k, extraMap.get(k));
+                            }
+                            if (k.startsWith('LIV_') && !k.endsWith('__c')) {
+                                String withSuffix = k + '__c';
+                                if (!fv.containsKey(withSuffix) || fv.get(withSuffix) == null) {
+                                    fv.put(withSuffix, extraMap.get(k));
+                                }
                             }
                         }
                     } catch (Exception jsonEx) {
@@ -589,7 +601,7 @@ public without sharing class WCFFormEngineController {
                 fv.put('JF_COST_FY1', o.Avg_Cost_per_Placement_FY_1__c != null ? String.valueOf(o.Avg_Cost_per_Placement_FY_1__c) : '');
 
                 fv.put('JF_ENROLL_PROJ', o.Projected_Learner_Enrollments_CFY__c != null ? String.valueOf(o.Projected_Learner_Enrollments_CFY__c) : '');
-                fv.put('JF_PLACE_PROJ', o.Projected_Learner_Placements_CFY__c != null ? String.valueOf(o.Projected_Learner_Placements_CFY__c) : '');
+                fv.put('JF_PLACE_PROJ', o.Projected_Learner_Placements_CFY__c != null ? String.valueOf(o.Projected_Learner_Placements_CFY__c) : (o.Projected_Learner_placement_CFY__c != null ? String.valueOf(o.Projected_Learner_placement_CFY__c) : ''));
                 fv.put('JF_COST_PROJ', o.Avg_Cost_per_Placement_CFY__c != null ? String.valueOf(o.Avg_Cost_per_Placement_CFY__c) : '');
 
                 // Job Creation aliases (Q17 & Q18)
@@ -616,6 +628,22 @@ public without sharing class WCFFormEngineController {
                 fv.put('JC_EXIST_BIZ_PROJ', o.Growing_Businesses_Supported_CFY__c != null ? String.valueOf(o.Growing_Businesses_Supported_CFY__c) : '');
                 fv.put('JC_EXIST_JOBS_PROJ', o.Jobs_from_Growing_Businesses_CFY__c != null ? String.valueOf(o.Jobs_from_Growing_Businesses_CFY__c) : '');
                 fv.put('JC_COST_PROJ', o.Avg_Cost_per_Job_CFY__c != null ? String.valueOf(o.Avg_Cost_per_Job_CFY__c) : '');
+
+                // Ensure Livelihood outcome aliases (Q22 & Q23)
+                List<String> livKeys = new List<String>{
+                    'LIV_SERVED_FY3', 'LIV_SERVED_FY2', 'LIV_SERVED_FY1', 'LIV_SERVED_PROJ',
+                    'LIV_ENROLL_FY3', 'LIV_ENROLL_FY2', 'LIV_ENROLL_FY1', 'LIV_ENROLL_PROJ',
+                    'LIV_OUTCOME_FY3', 'LIV_OUTCOME_FY2', 'LIV_OUTCOME_FY1', 'LIV_OUTCOME_PROJ',
+                    'LIV_COST_FY3', 'LIV_COST_FY2', 'LIV_COST_FY1', 'LIV_COST_PROJ'
+                };
+                for (String lk : livKeys) {
+                    String lkSuff = lk + '__c';
+                    if (fv.containsKey(lkSuff) && (!fv.containsKey(lk) || String.isBlank(String.valueOf(fv.get(lk))))) {
+                        fv.put(lk, fv.get(lkSuff));
+                    } else if (fv.containsKey(lk) && (!fv.containsKey(lkSuff) || String.isBlank(String.valueOf(fv.get(lkSuff))))) {
+                        fv.put(lkSuff, fv.get(lk));
+                    }
+                }
 
                 if (String.isNotBlank(o.Job_Verification_3rd_Party_CFY__c)) {
                     if (!fv.containsKey('Q24_VERIFIED__c') || String.isBlank(String.valueOf(fv.get('Q24_VERIFIED__c')))) {

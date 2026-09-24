@@ -85,6 +85,11 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
         }
     }
 
+    // Options for the native rows-per-page <select>
+    get pageSizeChoices() {
+        return this.pageSizeOptions.map(o => ({ ...o, selected: o.value === this.pageSizeStr }));
+    }
+
     get pageSize() { return parseInt(this.pageSizeStr, 10); }
 
     // ── Shared row-state rules (used by counts, filters and rows) ─
@@ -318,7 +323,8 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
     handlePrevPage()          { if (!this.isFirstPage) this.currentPage--; }
     handleNextPage()          { if (!this.isLastPage)  this.currentPage++; }
     handlePageClick(evt)      { this.currentPage = parseInt(evt.currentTarget.dataset.page, 10); }
-    handlePageSizeChange(evt) { this.pageSizeStr = evt.detail.value; this.currentPage = 1; }
+    // Rows per page — native <select> (was lightning-combobox), so read evt.target.value
+    handlePageSizeChange(evt) { this.pageSizeStr = evt.target.value; this.currentPage = 1; }
 
     handleStartApprove(evt) {
         const applicationId = evt.currentTarget.dataset.id;

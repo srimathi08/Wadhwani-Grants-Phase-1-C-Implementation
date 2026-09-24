@@ -2705,7 +2705,7 @@
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q2}</span>{labels.Q2_LEADER_TENURE}</div>
-                                    <div class="rv-val">{formValues.Leader_Tenure__c}</div>
+                                    <div class="rv-val">{reviewLeaderTenure}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ2}>
                                     <template for:each={customQuestionsQ2} for:item="cq">
@@ -2741,11 +2741,11 @@
                                 </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_LEGAL_TYPE}</div>
-                                    <div class="rv-val">{formValues.Legal_Type__c}</div>
+                                    <div class="rv-val">{reviewLegalType}</div>
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_JURISDICTION}</div>
-                                    <div class="rv-val">{formValues.Registration_Jurisdiction__c}</div>
+                                    <div class="rv-val">{reviewRegistrationJurisdiction}</div>
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_INCORP_DATE}</div>
@@ -2754,7 +2754,12 @@
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q4}</span>{labels.Q4_GOVERNANCE_DESC}</div>
                                     <div class="rv-val">
-                                        <lightning-formatted-rich-text value={formValues.Legal_Structure__c}></lightning-formatted-rich-text>
+                                        <template if:true={formValues.Legal_Structure__c}>
+                                            <lightning-formatted-rich-text value={formValues.Legal_Structure__c}></lightning-formatted-rich-text>
+                                        </template>
+                                        <template if:false={formValues.Legal_Structure__c}>
+                                            —
+                                        </template>
                                     </div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ4}>
@@ -2767,19 +2772,19 @@
                                 </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_US_501C3}</div>
-                                    <div class="rv-val">{formValues.Has_501c3_Status__c}</div>
+                                    <div class="rv-val">{reviewHas501c3}</div>
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_ED_STATUS}</div>
-                                    <div class="rv-val">{formValues.Has_Equivalency_Determination__c}</div>
+                                    <div class="rv-val">{reviewHasED}</div>
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_FCRA_STATUS}</div>
-                                    <div class="rv-val">{formValues.Is_FCRA_Registered__c}</div>
+                                    <div class="rv-val">{reviewIsFCRA}</div>
                                 </div>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q5}</span>{labels.Q5_WILLING_ED}</div>
-                                    <div class="rv-val">{formValues.Willing_to_Pursue_ED__c}</div>
+                                    <div class="rv-val">{reviewWillingED}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ5}>
                                     <template for:each={customQuestionsQ5} for:item="cq">
@@ -2801,36 +2806,26 @@
                                         </div>
                                     </template>
                                 </template>
-                                <template if:true={formValues.Funder_1_Name__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 1</div>
-                                        <div class="rv-val">{formValues.Funder_1_Name__c} - ${previewFunder1Amount} ({formValues.Funder_1_Type__c})<template if:true={hasFunder1Period}> · Period: {previewFunder1Period}</template></div>
-                                    </div>
-                                </template>
-                                <template if:true={formValues.Funder_2_Name__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 2</div>
-                                        <div class="rv-val">{formValues.Funder_2_Name__c} - ${previewFunder2Amount} ({formValues.Funder_2_Type__c})<template if:true={hasFunder2Period}> · Period: {previewFunder2Period}</template></div>
-                                    </div>
-                                </template>
-                                <template if:true={formValues.Funder_3_Name__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 3</div>
-                                        <div class="rv-val">{formValues.Funder_3_Name__c} - ${previewFunder3Amount} ({formValues.Funder_3_Type__c})<template if:true={hasFunder3Period}> · Period: {previewFunder3Period}</template></div>
-                                    </div>
-                                </template>
-                                <template if:true={formValues.Reference_1_Name__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 1</div>
-                                        <div class="rv-val">{formValues.Reference_1_Name__c} ({formValues.Reference_1_Role__c}) - {formValues.Reference_1_Email__c}</div>
-                                    </div>
-                                </template>
-                                <template if:true={formValues.Reference_2_Name__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 2</div>
-                                        <div class="rv-val">{formValues.Reference_2_Name__c} ({formValues.Reference_2_Role__c}) - {formValues.Reference_2_Email__c}</div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 1</div>
+                                    <div class="rv-val">{reviewFunder1Display}</div>
+                                </div>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 2</div>
+                                    <div class="rv-val">{reviewFunder2Display}</div>
+                                </div>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 3</div>
+                                    <div class="rv-val">{reviewFunder3Display}</div>
+                                </div>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 1</div>
+                                    <div class="rv-val">{reviewReference1Display}</div>
+                                </div>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 2</div>
+                                    <div class="rv-val">{reviewReference2Display}</div>
+                                </div>
 
                                 <!-- Q9 Historical Financial Data Table -->
                                 <div class="rv-sub-head" style="margin-top: 20px;">
@@ -2924,14 +2919,17 @@
                                     </table>
                                 </div>
 
-                                <template if:true={isDeviationExplanationRequired}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q10}</span>{labels.Q10_EXPLANATION_LABEL}</div>
-                                        <div class="rv-val">
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q10}</span>{labels.Q10_EXPLANATION_LABEL}</div>
+                                    <div class="rv-val">
+                                        <template if:true={formValues.Revenue_Explanation__c}>
                                             <lightning-formatted-rich-text value={formValues.Revenue_Explanation__c}></lightning-formatted-rich-text>
-                                        </div>
+                                        </template>
+                                        <template if:false={formValues.Revenue_Explanation__c}>
+                                            —
+                                        </template>
                                     </div>
-                                </template>
+                                </div>
                                 <template if:true={hasCustomQuestionsAboutOrg}>
                                     <template for:each={customQuestionsAboutOrg} for:item="cq">
                                         <div key={cq.key} class="rv-row">
@@ -2948,14 +2946,17 @@
                                     <div class="rv-section-head">
                                         <span>{labels.REVIEW_SEC_JOB_FULFILLMENT}</span>
                                     </div>
-                                    <template if:true={formValues.Skilling_Approach__c}>
-                                        <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q11}</span>{labels.Q11_SKILLING_APPROACH}</div>
-                                            <div class="rv-val">
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q11}</span>{labels.Q11_SKILLING_APPROACH}</div>
+                                        <div class="rv-val">
+                                            <template if:true={formValues.Skilling_Approach__c}>
                                                 <lightning-formatted-rich-text value={formValues.Skilling_Approach__c}></lightning-formatted-rich-text>
-                                            </div>
+                                            </template>
+                                            <template if:false={formValues.Skilling_Approach__c}>
+                                                —
+                                            </template>
                                         </div>
-                                    </template>
+                                    </div>
 
                                     <!-- Q12 Skilling Domains Table -->
                                     <template if:true={hasSkillingDomainsForReview}>
@@ -3080,14 +3081,17 @@
                                     <div class="rv-section-head">
                                         <span>{labels.REVIEW_SEC_JOB_CREATION}</span>
                                     </div>
-                                    <template if:true={formValues.Job_Creation_Approach__c}>
-                                        <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q15}</span>{labels.Q15_JOB_CREATION_APPROACH}</div>
-                                            <div class="rv-val">
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q15}</span>{labels.Q15_JOB_CREATION_APPROACH}</div>
+                                        <div class="rv-val">
+                                            <template if:true={formValues.Job_Creation_Approach__c}>
                                                 <lightning-formatted-rich-text value={formValues.Job_Creation_Approach__c}></lightning-formatted-rich-text>
-                                            </div>
+                                            </template>
+                                            <template if:false={formValues.Job_Creation_Approach__c}>
+                                                —
+                                            </template>
                                         </div>
-                                    </template>
+                                    </div>
 
                                     <!-- Q16 Business Sectors Served Table -->
                                     <template if:true={hasBusinessSectorsForReview}>
@@ -3220,14 +3224,17 @@
                                     <div class="rv-section-head">
                                         <span>{labels.REVIEW_SEC_LIVELIHOOD}</span>
                                     </div>
-                                    <template if:true={formValues.Livelihood_Approach__c}>
-                                        <div class="rv-row">
-                                            <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q19}</span>{labels.Q19_LIVELIHOOD_APPROACH}</div>
-                                            <div class="rv-val">
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q19}</span>{labels.Q19_LIVELIHOOD_APPROACH}</div>
+                                        <div class="rv-val">
+                                            <template if:true={formValues.Livelihood_Approach__c}>
                                                 <lightning-formatted-rich-text value={formValues.Livelihood_Approach__c}></lightning-formatted-rich-text>
-                                            </div>
+                                            </template>
+                                            <template if:false={formValues.Livelihood_Approach__c}>
+                                                —
+                                            </template>
                                         </div>
-                                    </template>
+                                    </div>
 
                                     <!-- Q20 Key Programs / Initiatives Table -->
                                     <template if:true={hasLivelihoodProgramsForReview}>
@@ -3383,75 +3390,66 @@
                                     <span>{labels.REVIEW_SEC_WHY_WADHWANI}</span>
                                 </div>
 
-                                <template if:true={formValues.Q24_VERIFIED}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>{labels.Q24_INDEPENDENT_VERIFICATION}</div>
-                                        <div class="rv-val">{formValues.Q24_VERIFIED}</div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>{labels.Q24_INDEPENDENT_VERIFICATION}</div>
+                                    <div class="rv-val">{reviewQ24Verified}</div>
+                                </div>
 
-                                <template if:true={formValues.Details_of_Ethical_Received__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>Verification Details</div>
-                                        <div class="rv-val">{formValues.Details_of_Ethical_Received__c}</div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>Verification Details</div>
+                                    <div class="rv-val">{reviewDetailsOfEthicalReceived}</div>
+                                </div>
 
-                                <template if:true={q24UploadedFiles.length}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>Verification Reports</div>
-                                        <div class="rv-val">
-                                            <template for:each={q24UploadedFiles} for:item="file">
-                                                <div key={file.documentId}>📄 {file.name}</div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q24}</span>Verification Reports</div>
+                                    <div class="rv-val">{reviewVerificationReportsDisplay}</div>
+                                </div>
 
-                                <template if:true={formValues.Organizational_Sustainability__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q25}</span>{labels.Q25_SUSTAINABILITY_PLAN}</div>
-                                        <div class="rv-val">
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q25}</span>{labels.Q25_SUSTAINABILITY_PLAN}</div>
+                                    <div class="rv-val">
+                                        <template if:true={formValues.Organizational_Sustainability__c}>
                                             <lightning-formatted-rich-text value={formValues.Organizational_Sustainability__c}></lightning-formatted-rich-text>
-                                        </div>
+                                        </template>
+                                        <template if:false={formValues.Organizational_Sustainability__c}>
+                                            —
+                                        </template>
                                     </div>
-                                </template>
+                                </div>
 
-                                <template if:true={formValues.Use_of_Additional_Funding__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q26}</span>{labels.Q26_ADDITIONAL_FUNDING}</div>
-                                        <div class="rv-val">
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q26}</span>{labels.Q26_ADDITIONAL_FUNDING}</div>
+                                    <div class="rv-val">
+                                        <template if:true={formValues.Use_of_Additional_Funding__c}>
                                             <lightning-formatted-rich-text value={formValues.Use_of_Additional_Funding__c}></lightning-formatted-rich-text>
-                                        </div>
+                                        </template>
+                                        <template if:false={formValues.Use_of_Additional_Funding__c}>
+                                            —
+                                        </template>
                                     </div>
-                                </template>
+                                </div>
 
-                                <template if:true={formValues.GenieAI_Interest_Level__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Interest Level</div>
-                                        <div class="rv-val">{formValues.GenieAI_Interest_Level__c}</div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Interest Level</div>
+                                    <div class="rv-val">{reviewGenieInterestLevel}</div>
+                                </div>
 
-                                <template if:true={formValues.GenieAI_Synergies_Description__c}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Description</div>
-                                        <div class="rv-val">
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q27}</span>{labels.Q27_GENIE_AI} - Description</div>
+                                    <div class="rv-val">
+                                        <template if:true={formValues.GenieAI_Synergies_Description__c}>
                                             <lightning-formatted-rich-text value={formValues.GenieAI_Synergies_Description__c}></lightning-formatted-rich-text>
-                                        </div>
+                                        </template>
+                                        <template if:false={formValues.GenieAI_Synergies_Description__c}>
+                                            —
+                                        </template>
                                     </div>
-                                </template>
+                                </div>
 
-                                <template if:true={q28UploadedFiles.length}>
-                                    <div class="rv-row">
-                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q28}</span>{labels.Q28_SUPPORTING_DOCS}</div>
-                                        <div class="rv-val">
-                                            <template for:each={q28UploadedFiles} for:item="file">
-                                                <div key={file.documentId}>📎 {file.name}</div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </template>
+                                <div class="rv-row">
+                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q28}</span>{labels.Q28_SUPPORTING_DOCS}</div>
+                                    <div class="rv-val">{reviewSupportingDocumentsDisplay}</div>
+                                </div>
                                 <template if:true={hasCustomQuestionsWhyWadhwani}>
                                     <template for:each={customQuestionsWhyWadhwani} for:item="cq">
                                         <div key={cq.key} class="rv-row">

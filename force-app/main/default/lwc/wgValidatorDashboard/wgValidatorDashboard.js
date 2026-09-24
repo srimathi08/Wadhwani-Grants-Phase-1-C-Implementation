@@ -1,9 +1,30 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import getActionCounts    from '@salesforce/apex/WCFValidatorController.getActionCounts';
+import getActionCounts     from '@salesforce/apex/WCFValidatorController.getActionCounts';
 import getValidatorPreview from '@salesforce/apex/WCFValidatorController.getValidatorPreview';
 
-export default class WcfValidatorDashboard extends NavigationMixin(LightningElement) {
+/*
+ * MERGED VERSION (23-09)
+ *  - Tile set, labels, counts and order: from the colleague's update
+ *      · "In Validator Queue" = resume + awaitingApplicant (combined)
+ *      · "My Active Reviews", "Validated", "Resubmissions", "Returned by Reviewer"
+ *  - Styling / display classes: from the portal design system (wcfPortalUi)
+ *  - Row states: colleague's labels + the Awaiting Applicant / Returned by
+ *    Reviewer states (rows show "No action" / "Review return" instead of
+ *    a Validate button that does not apply)
+ */
+
+// tone → dot color (wcfPortalUi): info = blue, warning = amber, success = green,
+// brand/error = red, neutral = grey. half = tile takes half a row (row 2 of 3 + 2).
+const TILE_DEFS = [
+    { id: 'resume',             label: 'In Validator Queue',   subtitle: 'Draft & resumed proposals awaiting action',        tone: 'warning' },
+    { id: 'validate',           label: 'My Active Reviews',    subtitle: 'Submitted proposals ready to validate',            tone: 'info' },
+    { id: 'validated',          label: 'Validated',            subtitle: 'Completed & finalised records',                    tone: 'success' },
+    { id: 'resubmit',           label: 'Resubmissions',        subtitle: 'Applications resubmitted after return',            tone: 'brand', alertWhenPositive: true, half: true },
+    { id: 'returnedByReviewer', label: 'Returned by Reviewer', subtitle: 'Sent back by the Reviewer — needs your decision',   tone: 'error', alertWhenPositive: true, half: true }
+];
+
+export default class WgValidatorDashboard extends NavigationMixin(LightningElement) {
 
     // ─── State ────────────────────────────────────────────────────
     @track validatorCards       = [];
@@ -26,48 +47,34 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
             const resubmit           = data?.resubmit           ?? 0;
             const returnedByReviewer = data?.returnedByReviewer ?? 0;
 
-            const inValidatorQueueCount = resume + awaitingApplicant;
+            // Colleague's logic: drafts and awaiting-applicant share one tile
+            const counts = {
+                resume            : resume + awaitingApplicant,
+                validate,
+                validated,
+                resubmit,
+                returnedByReviewer
+            };
 
-        this.validatorCards = [
-            {
-                id: 'resume', label: 'In Validator Queue',
-                subtitle: 'Draft & resumed proposals awaiting action',
-                count: inValidatorQueueCount, status: 'resume',
-                kpiClass: 'kpi-card', dotClass: 'kpi-dot kpi-dot-red'
-            },
-            { /* validate card — unchanged */
-                id: 'validate', label: 'My Active Reviews',
-                subtitle: 'Submitted proposals ready to validate',
-                count: validate, status: 'validate',
-                kpiClass: 'kpi-card', dotClass: 'kpi-dot kpi-dot-blue'
-            },
-            { /* validated card — unchanged */
-                id: 'validated', label: 'Validated',
-                subtitle: 'Completed & finalised records',
-                count: validated, status: 'validated',
-                kpiClass: 'kpi-card', dotClass: 'kpi-dot kpi-dot-amber'
-            },
-            { /* resubmit card — unchanged */
-                id: 'resubmit', label: 'Resubmissions',
-                subtitle: 'Applications resubmitted after return',
-                count: resubmit, status: 'resubmit',
-                kpiClass: resubmit > 0 ? 'kpi-card kpi-card-alert' : 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-red'
-            },
-            {
-                id:       'returnedByReviewer',
-                label:    'Returned by Reviewer',
-                subtitle: 'Sent back by the Reviewer — needs your decision',
-                count:    returnedByReviewer,
-                status:   'returnedByReviewer',
-                kpiClass: returnedByReviewer > 0 ? 'kpi-card kpi-card-alert' : 'kpi-card',
-                dotClass: 'kpi-dot kpi-dot-red'
-            }
-        ];
-    } catch (e) {
-        console.error('Validator counts error:', e);
+            this.validatorCards = TILE_DEFS.map(t => {
+                const count   = counts[t.id] ?? 0;
+                const isAlert = t.alertWhenPositive && count > 0;
+                return {
+                    id      : t.id,
+                    label   : t.label,
+                    subtitle: t.subtitle,
+                    count,
+                    status  : t.id,
+                    kpiClass: 'wg-stat'
+                              + (t.half   ? ' wg-stat--half'  : '')
+                              + (isAlert  ? ' wg-stat--alert' : ''),
+                    dotClass: 'wg-stat-dot wg-stat-dot--' + t.tone
+                };
+            });
+        } catch (e) {
+            console.error('Validator counts error:', e);
+        }
     }
-}
 
     async loadValidatorPreview() {
         try {
@@ -90,26 +97,11 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
                               })
                             : '—',
                         dueDateClass: this._computeDueDateClass(dueDateRaw),
-                        status: w.isResubmission
-                            ? 'Application Resubmitted'
-                            : w.hasDraft
-                            ? 'Resume Validation'
-                            : 'Awaiting Validation',
-                        statusClass: w.isResubmission
-                            ? 'status-pill status-resubmission'
-                            : w.hasDraft
-                            ? 'status-pill status-inprogress'
-                            : 'status-pill status-awaiting',
-                        action: w.isResubmission ? 'Revalidate' : w.hasDraft ? 'Resume' : 'Validate',
-                        actionClass: w.isResubmission
-                            ? 'action-btn-revalidate'
-                            : w.hasDraft
-                            ? 'action-btn-resume'
-                            : 'action-btn-validate'
+                        ...this._rowState(w)
                     };
                 });
 
-            // Sort: resubmissions first → soonest due date → Resume before Validate → nulls last
+            // Sort (unchanged): resubmissions first → soonest due date → Resume before Validate → nulls last
             mapped.sort((a, b) => {
                 if (a.isResubmission !== b.isResubmission) return a.isResubmission ? -1 : 1;
                 if (a.dueDateRaw && b.dueDateRaw) {
@@ -130,13 +122,52 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
         }
     }
 
-    // ─── Handlers ─────────────────────────────────────────────────
-
     /**
-     * KPI tile click → navigate to Validator Queue page,
-     * passing statusFilter in URL state so wcfValidatorContainer
-     * can pre-filter on arrival (same behaviour as the parent).
+     * Display state for a preview row.
+     * Labels follow the colleague's update ("Application Resubmitted" /
+     * "Revalidate", "Resume Validation" / "Resume", "Awaiting Validation" /
+     * "Validate"). isReturnedByReviewer / isAwaitingApplicant are read only
+     * if the Apex wrapper provides them (undefined → false).
      */
+    _rowState(w) {
+        const SM = ' wg-btn-sm';
+        if (w.isReturnedByReviewer) {
+            return {
+                status: 'Returned by Reviewer', statusClass: 'wg-pill wg-pill--returned',
+                showAction: true, action: 'Review return', actionIcon: 'utility:reply',
+                actionClass: 'primary-btn' + SM, rowClass: 'wg-row--attention'
+            };
+        }
+        if (w.isResubmission) {
+            return {
+                status: 'Application Resubmitted', statusClass: 'wg-pill wg-pill--returned',
+                showAction: true, action: 'Revalidate', actionIcon: 'utility:redo',
+                actionClass: 'primary-btn' + SM, rowClass: ''
+            };
+        }
+        if (w.isAwaitingApplicant) {
+            return {
+                status: 'Awaiting Applicant', statusClass: 'wg-pill wg-pill--warning',
+                showAction: false, rowClass: ''
+            };
+        }
+        if (w.hasDraft) {
+            return {
+                status: 'Resume Validation', statusClass: 'wg-pill wg-pill--warning',
+                showAction: true, action: 'Resume', actionIcon: 'utility:edit',
+                actionClass: 'neutral-btn' + SM, rowClass: ''
+            };
+        }
+        return {
+            status: 'Awaiting Validation', statusClass: 'wg-pill wg-pill--info',
+            showAction: true, action: 'Validate', actionIcon: 'utility:shield',
+            actionClass: 'primary-btn' + SM, rowClass: ''
+        };
+    }
+
+    // ─── Handlers (unchanged) ─────────────────────────────────────
+
+    /** KPI tile → Validator Queue page, pre-filtered via URL state */
     handleValidatorTileClick(event) {
         const status = event.currentTarget.dataset.status;
         if (!status) return;
@@ -147,10 +178,7 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
         });
     }
 
-    /**
-     * "View all in Queue →" link / preview-footer link
-     * → navigate to the standalone Validator Queue page.
-     */
+    /** "View full queue" → Validator Queue page, unfiltered */
     handleViewAllValidatorQueue() {
         this[NavigationMixin.Navigate]({
             type: 'comm__namedPage',
@@ -158,11 +186,7 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
         });
     }
 
-    /**
-     * Per-row Validate / Resume button in the preview table
-     * → navigate to Validator Queue page and auto-open the record
-     * (same state params as handleDashboardPreviewValidate in the parent).
-     */
+    /** Row action → Validator Queue page with the record auto-opened */
     handlePreviewValidate(event) {
         const recordId   = event.currentTarget.dataset.id;
         const recordName = event.currentTarget.dataset.appname;
@@ -192,7 +216,7 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
         });
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────
+    // ─── Helpers (unchanged) ──────────────────────────────────────
 
     /** Treat "YYYY-MM-DD" as LOCAL time, not UTC (avoids off-by-one on due dates) */
     _parseDate(dateStr) {

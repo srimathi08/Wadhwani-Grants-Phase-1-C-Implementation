@@ -1,0 +1,534 @@
+﻿[
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Not Startedthe account exists, flag 0Applicant signs up, before activation",
+                      "E-15 Verify your email addressFix firstUnbranded plain text; replace with E-15_OTPContent reference: E-15",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Not Startedthe account is switched on, flag 0Account activated",
+                      "E-01 Welcome to Wadhwani GrantsContent fixCommunity wording, RFI phrasing, preferences linkContent reference: E-01",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "In progressfrom Not Started, flag 0 to flag 1First save of the application draft, called the Request for Information",
+                      "E-02 Your draft has been savedContent fixGreeting prints the full org name; no reference lineOne send per application, first save onlyContent reference: E-02",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Completeness checkfrom In progress, flag 1 to flag 2Applicant submits the RFI",
+                      "E-03 We have received your applicationContent fixThird person, â€œwe checksâ€, next-step punctuationContent reference: E-03",
+                      "E-17 New application to checkContent fixGreets the applicant org; button label; preferences linkContent reference: E-17E-18 Validation due soonContent fixNo time-remaining line; greets the applicantReminder at 80% of the limit, same stateContent reference: E-18",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Being reviewedfrom Completeness check, flag 2 to flag 3Validator passes the application",
+                      "E-05 Your application is now being reviewedContent fixâ€œGood news:â€ reads as an early approval signalContent reference: E-05",
+                      "-",
+                      "E-06 New evaluation assignedContent fixScreenshot identical to E-07; greets the applicantContent reference: E-06E-46 Passed to review, with a flagged concernBuilt, not configuredThe validatorâ€™s concern never reaches the reviewerOnly when the validator flags it. Invisible to the applicantContent reference: E-46E-07 Your evaluation is due soonContent fixNo time-remaining line; greets the applicantReminder at 80% of the limit, same stateContent reference: E-07",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Approval in Progressfrom Being reviewed, flag 3 to flag 4Reviewer completes the review and shares the recommendation",
+                      "Silent by design",
+                      "-",
+                      "-",
+                      "E-22 Ready for decisionBuilt, not configuredFlag 4 waits on one person who is never toldContent reference: E-22E-47 Decline recommended, with reasonsBuilt, not configuredThe approver never sees the reviewerâ€™s reasoningOnly on a decline recommendationContent reference: E-47E-55 A decision is overdueBuilt, not configuredNothing enforces the decision windowFires when the decision sits past its windowContent reference: E-55"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Application Approvedfrom Approval in Progress, flag 4 to flag 5Approver approves. Surfaces at the seven-day buffer expiry",
+                      "E-08 Application approvedFix firstPromises a named contact, then signs â€œWadhwani Grantsâ€Content reference: E-08",
+                      "-",
+                      "E-31 Decision recordedBuilt, not configuredCloses the loop internally and cues the requestContent reference: E-31",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Onboarding initiatedfrom Application Approved, flag 5 to flag 6Reviewer sends the compliance request by hand. This is a manual reviewer action with no timed window behind it",
+                      "E-12 Compliance documents requestedBuilt, not configuredNothing asks an approved applicant for a documentContent reference: E-12",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Onboarding in Progressfrom Onboarding initiated, flag 6 to flag 7First save of the compliance upload",
+                      "E-62 Your document upload has startedNew, not configuredOne send per application, like E-02Content reference: E-62",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Compliance Reviewfrom Onboarding in Progress, flag 7 to flag 8Applicant submits all compliance documents",
+                      "E-25 We have received your documentsBuilt, not configuredNo confirmation that anything arrivedContent reference: E-25",
+                      "-",
+                      "E-36 Compliance documents submitted for reviewBuilt, not configuredNothing internally starts the compliance reviewContent reference: E-36",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Onboarding Approvedfrom Compliance Review, flag 8 to flag 9Reviewer approves the compliance documents",
+                      "E-63 Your compliance documents are approvedNew, not configuredNeeds a reviewer-name fieldContent reference: E-63",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Onboardedfrom Onboarding Approved, flag 9 to flag 10Reviewer uploads the executed grant agreement",
+                      "E-23 Your onboarding is completeBuilt, not configuredFlag 10 is 1Bâ€™s finish line and is unreachableContent reference: E-23",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Returned for fixesfrom Completeness check, flag 2Validator returns the application",
+                      "E-04 Action required: update your applicationFix firstDue-date field nothing populates; unsignedContent reference: E-04",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Returned for fixesno response, flag 2At 30, 60 and 90 days",
+                      "E-52 Reminder on a pending returnBuilt, not configuredA silent applicant is never nudged. 90 vs 100 daysContent reference: E-52",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Completeness checkback from Returned for fixes, flag 2Applicant resubmits",
+                      "E-28 Your updated application is inContent fixThird person; stray space before the exclamationContent reference: E-28",
+                      "E-17 New application to checkContent fixGreets the applicant org; button label; preferences linkThe same template as a first submissionContent reference: E-17",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Being reviewedthe state holds, flag 3Reviewer returns the application to the validator",
+                      "Silent by design",
+                      "E-48 The reviewer needs more informationBuilt, not configuredThe internal return loop has no notification at allContent reference: E-48",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Being reviewedthe state resumes, flag 3Validator resolves the query",
+                      "Silent by design",
+                      "-",
+                      "E-49 Information located, review can resumeBuilt, not configuredThe reviewer is not told the answer is on fileContent reference: E-49",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Being reviewedback from Approval in Progress, flag 4 to flag 3, or the flag 4 state holds if only a question is raisedApprover sends the evaluation back for more detail, or asks a question while the decision is still open",
+                      "Silent by design",
+                      "-",
+                      "E-51 Returned for additional detailBuilt, not configuredThe reviewer is not told the approver sent it backAlso covers a question raised while the decision is open. E-32 is merged into this template and no longer exists separatelyContent reference: E-51",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Approval in Progressthe state resumes, flag 4Someone answers the approverâ€™s request",
+                      "Silent by design",
+                      "-",
+                      "-",
+                      "E-50 The detail you asked forBuilt, not configuredThe approver never learns the question was answeredContent reference: E-50"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Compliance Reviewthe state holds, flag 8A submitted document needs redoing",
+                      "E-24 Compliance document updates neededBuilt, not configuredAssumes a redo loop the spec does not haveContent reference: E-24",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Onboarding in Progressdocuments outstanding, flag 7At 30, 60 and 90 days",
+                      "E-56 Reminder on compliance documentsBuilt, not configuredSame gap on the onboarding sideContent reference: E-56",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Rejectedfrom Approval in Progress, flag 4 to flag 11Approver declines. Surfaces at the seven-day buffer expiry",
+                      "E-10 Application declinedFix firstReason panel has no field bound - sends blankContent reference: E-10",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Rejectedfrom Compliance Review, flag 8 to flag 11Reviewer rejects the compliance documents",
+                      "E-10 Application declinedFix firstReason panel has no field bound - sends blankThe same template. Trigger wiring to confirm with QuadrobayContent reference: E-10",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Rejectedfrom any state waiting on the applicant, flag 11Day 100 with no response, before approval",
+                      "E-53 We are closing your applicationBuilt, not configuredNothing closes anything. 90 vs 100 daysContent reference: E-53",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Suspendedfrom any approved or onboarded state, flag 12A concern is raised on an approved or onboarded account",
+                      "E-59 Your account is suspendedNew, not configuredSet by hand. Needs a reviewer-name fieldContent reference: E-59",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Suspendedfrom any onboarding state, flag 12Day 100 with no compliance response, after approval",
+                      "E-60 We have paused your onboardingNew, not configuredDay 100 after approval. Warmer than E-53Content reference: E-60",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsA user changes their password",
+                      "E-39 Your password was changedFix firstThree placeholders print as literal textAny user, applicant or internalContent reference: E-39",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsA user requests a password reset",
+                      "E-16 Reset your passwordBuilt, not configuredConfirm whether a Salesforce default is standing inAny userContent reference: E-16",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsAn account locks after failed sign-ins",
+                      "E-38 Your account is lockedBuilt, not configuredSame open question as E-16The affected userContent reference: E-38",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsA new internal user account is created",
+                      "-",
+                      "-",
+                      "E-27 Activate your platform accountBuilt, not configuredInternal users were added by hand on 6 AugustAny new internal userContent reference: E-27",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsA post-submission email bounces",
+                      "-",
+                      "E-57 An email to the applicant bouncedBuilt, not configuredA bounced approval or request is silentContent reference: E-57",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "No state changeaccount and security eventsA new application may match an existing organization",
+                      "-",
+                      "E-58 This organization may already be on recordBuilt, not configuredDuplicate detection has no alertContent reference: E-58",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "State change",
+                      "Partner",
+                      "Validator",
+                      "Reviewer",
+                      "Approver"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Approval in Progressthe state holds, flag 4Approver revokes a decision inside the seven-day buffer",
+                      "E-11 Your decision is under reviewRetiredLive today. Switch off and confirmTells the applicant a decision they never received is under reviewContent reference: E-11",
+                      "-",
+                      "-",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "Being reviewedthe state holds, flag 3A reviewer submits their evaluation",
+                      "-",
+                      "-",
+                      "E-29 Evaluation submittedRetiredNot wired. Do not build. Returns in Phase 2The same moment as E-22 while there is one reviewerContent reference: E-29",
+                      "-"
+                  ],
+        "Count":  5
+    },
+    {
+        "value":  [
+                      "View",
+                      "Roles who see it",
+                      "Emails that link here"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 1In-progress application, including a blank one",
+                      "Applicant",
+                      "E-01, E-02"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 2Submitted application",
+                      "Applicant, validator",
+                      "E-03, E-28, E-57"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 3Re-submission request",
+                      "Applicant, validator",
+                      "E-04, E-52"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 4Compliance document upload in progress",
+                      "Applicant",
+                      "E-12, E-24, E-56, E-62"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 5Compliance upload submitted",
+                      "Applicant, reviewer",
+                      "E-23, E-25, E-36"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 6Validator form, application in progress",
+                      "Applicant, validator",
+                      "E-17, E-18"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 7Validator form, application resubmitted",
+                      "Applicant, validator",
+                      "E-48"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 8Validator form submitted for review",
+                      "Reviewer, validator",
+                      "-"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 9Review form in progress",
+                      "Reviewer",
+                      "E-06, E-07, E-46, E-49"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 10Review form resubmitted",
+                      "Approver, reviewer",
+                      "E-51"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 11Reviewer form submitted for approval",
+                      "Approver, reviewer",
+                      "E-22, E-47, E-50, E-55"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "View 12Application form approved",
+                      "Applicant, approver, reviewer",
+                      "-"
+                  ],
+        "Count":  3
+    },
+    {
+        "value":  [
+                      "NewPossible duplicate match",
+                      "Validator",
+                      "E-58"
+                  ],
+        "Count":  3
+    }
+]

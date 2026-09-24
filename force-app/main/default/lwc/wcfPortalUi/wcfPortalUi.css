@@ -404,8 +404,20 @@
 
 .wg-col-action {
     width: 1%;
-    text-align: right;
+    text-align: center;      /* header, equal-size buttons and "No action" share one center line */
     white-space: nowrap;
+}
+
+/* "No action" placeholder — same width as the action buttons, text centered,
+   so it sits exactly under the buttons in the rows above/below */
+.wg-col-action .wg-no-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 196px;
+    height: var(--wg-control-height);
+    color: var(--wg-text-muted);
+    font-size: var(--wg-font-size-label);
 }
 
 .wg-cell-id {
@@ -731,6 +743,128 @@
 .wg-pagination .wg-icon-btn {
     width: var(--wg-control-height);
     height: var(--wg-control-height);
+}
+
+/* ============================================================
+   DASHBOARD TILE GRID — one definition for all three dashboards
+   (Validator, Reviewer, Approver), so tile size, spacing and
+   background are identical everywhere.
+   Desktop: 3 tiles per row (built on a 6-column track so rows can
+   also hold 1 full-width or 2 half-width tiles):
+     .wg-stat--wide  → full row   (Approver: 1 + 3 + 3 for 7 tiles)
+     .wg-stat--half  → half row   (Validator: 3 + 2 for 5 tiles)
+   Tablet: 2 per row · Phone: 1 per row.
+   ============================================================ */
+.wg-dash-stats {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    margin-bottom: var(--wg-space-8);
+}
+
+.wg-dash-stats > .wg-stat          { grid-column: span 2; }
+.wg-dash-stats > .wg-stat--half    { grid-column: span 3; }
+.wg-dash-stats > .wg-stat--wide    { grid-column: 1 / -1; }
+
+@media (max-width: 1024px) {
+    .wg-dash-stats                     { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .wg-dash-stats > .wg-stat,
+    .wg-dash-stats > .wg-stat--half    { grid-column: span 1; }
+    .wg-dash-stats > .wg-stat--wide    { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+    .wg-dash-stats                     { grid-template-columns: 1fr; }
+    .wg-dash-stats > .wg-stat,
+    .wg-dash-stats > .wg-stat--half,
+    .wg-dash-stats > .wg-stat--wide    { grid-column: 1 / -1; }
+}
+
+/* Rows-per-page selector (native <select>, so its menu is never
+   clipped by the card's overflow:hidden) */
+.wg-pagesize {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-space-2);
+    white-space: nowrap;
+}
+
+.wg-pagesize-select {
+    height: var(--wg-control-height);
+    min-width: 72px;
+    margin: 0;
+    padding: 0 32px 0 var(--wg-space-3);
+    background-color: var(--wg-white);
+    /* chevron drawn with a gradient pair, so no image or hex is needed */
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--wg-gray) 50%),
+        linear-gradient(135deg, var(--wg-gray) 50%, transparent 50%);
+    background-position:
+        calc(100% - 16px) 50%,
+        calc(100% - 11px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    border: var(--wg-border-width-thin) solid var(--wg-input-border);
+    border-radius: var(--wg-radius-sm);
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-gray);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+}
+
+.wg-pagesize-select:hover { border-color: var(--wg-text-muted); }
+
+.wg-pagesize-select:focus {
+    outline: none;
+    border-color: var(--wg-orange);
+    box-shadow: var(--wg-focus-ring);
+}
+
+/* ============================================================
+   TABLE ACTION BUTTONS — one fixed size everywhere
+   Start / Resume / View / Request Compliance / Start Approve …
+   all get the same width and height so the action column lines
+   up neatly. The extra class in each selector also outranks the
+   site theme's global button styles that leak into Aura sites.
+   ============================================================ */
+.wg-col-action .primary-btn,
+.wg-col-action .ghost-btn,
+.wg-col-action .neutral-btn,
+.wg-col-action .success-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wg-space-2);
+    width: 196px;       /* fits the longest label: "Request Compliance" + icon */
+    min-width: 196px;
+    height: var(--wg-control-height);
+    min-height: 0;
+    margin: 0;
+    padding: 0 var(--wg-space-3);
+    border-radius: 0;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+/* Keep outline buttons the same outer size as filled ones */
+.wg-col-action .primary-btn,
+.wg-col-action .success-btn {
+    border: var(--wg-border-width-thin) solid transparent;
+}
+
+.wg-col-action .primary-btn lightning-icon,
+.wg-col-action .ghost-btn lightning-icon,
+.wg-col-action .neutral-btn lightning-icon,
+.wg-col-action .success-btn lightning-icon {
+    flex-shrink: 0;
 }
 
 /* ============================================================

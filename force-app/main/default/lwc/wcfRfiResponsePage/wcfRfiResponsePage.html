@@ -70,7 +70,9 @@
                                             <template for:each={trackCards} for:item="trk">
                                                 <div key={trk.code} class={trk.cssClass} data-code={trk.code}>
                                                     <div class="custom-checkbox">
-                                                        <template if:true={trk.isSelected}></template>
+                                                        <template if:true={trk.isSelected}>
+                                                            <lightning-icon icon-name="utility:check" size="xx-small" variant="error"></lightning-icon>
+                                                        </template>
                                                     </div>
                                                     <span class="track-label-text">{trk.label}</span>
                                                 </div>
@@ -202,10 +204,6 @@
                                                 options={fiscalMonthOptions} onchange={handleFiscalMonthChange} required></lightning-combobox>
                                             <lightning-combobox label="Fiscal Year End Day" value={formValues.Fiscal_Day__c}
                                                 options={fiscalDayOptions} onchange={handleFiscalDayChange} required></lightning-combobox>
-                                            <lightning-input type="date" label="Current Fiscal Year End Date"
-                                                value={formValues.Current_fiscal_year_s_end_date__c}
-                                                data-field="Current_fiscal_year_s_end_date__c"
-                                                onchange={handleFieldChange} class="rfi-full-width"></lightning-input>
                                         </div>
                                     </template>
 
@@ -389,13 +387,15 @@
                                         </div>
                                     </template>
 
-                                    <!--  Q12: Skilling Domains (JF)  -->
+                                    <!--  Q12: Skilling Domains Offered (JF)  -->
                                     <template if:true={q.isQ12}>
                                         <template for:each={skillingDomainRows} for:item="row">
                                             <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
                                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                                     <span class="rfi-inner-label">Domain {row.id}</span>
-                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveSkillingDomain}> Remove</button>
+                                                    <template if:true={canRemoveSkillingDomainRow}>
+                                                        <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveSkillingDomain}> Remove</button>
+                                                    </template>
                                                 </div>
                                                 <div style="margin-bottom:10px;">
                                                     <label class="rfi-field-label">Domain / Programme Name <span class="required">*</span></label>
@@ -403,19 +403,19 @@
                                                 </div>
                                                 <div class="rfi-grid-four">
                                                     <div>
-                                                        <label class="rfi-field-label">Training Hours</label>
+                                                        <label class="rfi-field-label">Training Hours <span class="required">*</span></label>
                                                         <input type="number" class="rfi-number-input" value={row.hours} data-id={row.id} data-field="hours" onchange={handleSkillingDomainChange} min="0" />
                                                     </div>
                                                     <div>
-                                                        <label class="rfi-field-label">Duration (Months)</label>
+                                                        <label class="rfi-field-label">Duration (Months) <span class="required">*</span></label>
                                                         <input type="number" class="rfi-number-input" value={row.duration} data-id={row.id} data-field="duration" onchange={handleSkillingDomainChange} min="0" />
                                                     </div>
                                                     <div>
-                                                        <label class="rfi-field-label">When Started</label>
-                                                        <input type="date" class="rfi-date-input" value={row.whenStarted} data-id={row.id} data-field="whenStarted" onchange={handleSkillingDomainChange} />
+                                                        <label class="rfi-field-label">When Started <span class="required">*</span></label>
+                                                        <input type="date" class="rfi-date-input" value={row.whenStarted} data-id={row.id} data-field="whenStarted" max={todayDateString} onchange={handleSkillingDomainChange} />
                                                     </div>
                                                     <div>
-                                                        <label class="rfi-field-label">Annual Enrollment</label>
+                                                        <label class="rfi-field-label">Annual Enrollment <span class="required">*</span></label>
                                                         <input type="number" class="rfi-number-input" value={row.enrollment} data-id={row.id} data-field="enrollment" onchange={handleSkillingDomainChange} min="0" />
                                                     </div>
                                                 </div>
@@ -438,19 +438,25 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="rfi-td-label">Learner Enrollments</td>
+                                                        <td class="rfi-td-label">Learner Enrollments <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY3} data-field="JF_ENROLL_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY2} data-field="JF_ENROLL_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_FY1} data-field="JF_ENROLL_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Learner Placements</td>
+                                                        <td class="rfi-td-label">Learner Placements <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY3} data-field="JF_PLACE_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY2} data-field="JF_PLACE_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_FY1} data-field="JF_PLACE_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Avg Cost per Placement ($)</td>
+                                                        <td class="rfi-td-label">Placement % (Auto-computed)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJfPlacePctFY3} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJfPlacePctFY2} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJfPlacePctFY1} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Avg Cost per Placement ($) <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY3} data-field="JF_COST_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY2} data-field="JF_COST_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_FY1} data-field="JF_COST_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
@@ -462,10 +468,33 @@
 
                                     <!--  Q14: JF Outcomes Projections (JF)  -->
                                     <template if:true={q.isQ14}>
-                                        <div class="rfi-grid-three">
-                                            <lightning-input type="number" label="Projected Learner Enrollments (CFY)" value={formValues.JF_ENROLL_PROJ} data-field="JF_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Learner Placements (CFY)" value={formValues.JF_PLACE_PROJ} data-field="JF_PLACE_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Cost per Placement ($)" value={formValues.JF_COST_PROJ} data-field="JF_COST_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Current FY ({fiscalYears.cfyYear} Projections)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Learner Enrollments <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_ENROLL_PROJ} data-field="JF_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Learner Placements <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_PLACE_PROJ} data-field="JF_PLACE_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Placement % (Auto-computed)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJfPlacePctProj} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Cost per Placement ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JF_COST_PROJ} data-field="JF_COST_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </template>
 
@@ -486,24 +515,51 @@
 
                                     <!--  Q16: Business Sectors Served (JC)  -->
                                     <template if:true={q.isQ16}>
-                                        <template for:each={businessSectorRows} for:item="row">
+                                        <template for:each={businessSectorRowsIndexed} for:item="row">
                                             <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
                                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                                                    <span class="rfi-inner-label">Sector {row.id}</span>
-                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveBusinessSector}> Remove</button>
+                                                    <span class="rfi-inner-label">Sector {row.displayIdx}</span>
+                                                    <template if:true={canRemoveBusinessSectorRow}>
+                                                        <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveBusinessSector}>✕ Remove</button>
+                                                    </template>
                                                 </div>
                                                 <div class="rfi-grid-two" style="margin-bottom:10px;">
                                                     <div>
-                                                        <label class="rfi-field-label">Business Sector</label>
+                                                        <label class="rfi-field-label">Business Sector <span class="required">*</span></label>
                                                         <input type="text" class="rfi-text-input" value={row.sector} data-id={row.id} data-field="sector" onchange={handleBusinessSectorChange} />
                                                     </div>
                                                     <div>
-                                                        <label class="rfi-field-label">When Did Support Begin</label>
-                                                        <input type="date" class="rfi-date-input" value={row.whenBegan} data-id={row.id} data-field="whenBegan" onchange={handleBusinessSectorChange} />
+                                                        <label class="rfi-field-label">When Did Support Begin <span class="required">*</span></label>
+                                                        <input type="date" class="rfi-date-input" value={row.whenBegan} data-id={row.id} data-field="whenBegan" max={todayDateString} onchange={handleBusinessSectorChange} />
                                                     </div>
                                                 </div>
+
+                                                <div style="margin-bottom: 12px;">
+                                                    <label class="rfi-field-label">Type of Support Provided <span class="required">*</span></label>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;">
+                                                        <template for:each={row.supportTypeChips} for:item="chip">
+                                                            <button
+                                                                key={chip.value}
+                                                                type="button"
+                                                                class={chip.chipClass}
+                                                                data-id={row.id}
+                                                                data-chip={chip.value}
+                                                                onclick={handleSupportTypeChip}>
+                                                                {chip.label}
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                </div>
+
+                                                <template if:true={row.showSupportTypeOther}>
+                                                    <div style="margin-bottom: 12px;">
+                                                        <label class="rfi-field-label">Please specify the type of support <span class="required">*</span></label>
+                                                        <input type="text" class="rfi-text-input" value={row.supportTypeOther} data-id={row.id} data-field="supportTypeOther" onchange={handleBusinessSectorChange} />
+                                                    </div>
+                                                </template>
+
                                                 <div style="max-width:240px;">
-                                                    <label class="rfi-field-label">Annual Enterprises Supported</label>
+                                                    <label class="rfi-field-label">Annual Enterprises Supported <span class="required">*</span></label>
                                                     <input type="number" class="rfi-number-input" value={row.enrollment} data-id={row.id} data-field="enrollment" onchange={handleBusinessSectorChange} min="0" />
                                                 </div>
                                             </div>
@@ -525,28 +581,40 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="rfi-td-label">New Businesses Started</td>
+                                                        <td class="rfi-td-label">New Businesses Started <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY3} data-field="JC_NEW_BIZ_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY2} data-field="JC_NEW_BIZ_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_FY1} data-field="JC_NEW_BIZ_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Jobs Created from New Businesses</td>
+                                                        <td class="rfi-td-label">Jobs Created from New Businesses <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY3} data-field="JC_NEW_JOBS_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY2} data-field="JC_NEW_JOBS_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_FY1} data-field="JC_NEW_JOBS_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Existing Businesses Supported</td>
+                                                        <td class="rfi-td-label">Existing Businesses Supported <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY3} data-field="JC_EXIST_BIZ_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY2} data-field="JC_EXIST_BIZ_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_FY1} data-field="JC_EXIST_BIZ_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Jobs Created from Existing Businesses</td>
+                                                        <td class="rfi-td-label">Jobs Created from Existing Businesses <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY3} data-field="JC_EXIST_JOBS_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY2} data-field="JC_EXIST_JOBS_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_FY1} data-field="JC_EXIST_JOBS_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Total Jobs Created (Auto-computed)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJcTotalJobsFY3} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJcTotalJobsFY2} /></td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJcTotalJobsFY1} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Avg Cost per Job ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_COST_FY3} data-field="JC_COST_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_COST_FY2} data-field="JC_COST_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_COST_FY1} data-field="JC_COST_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -555,11 +623,41 @@
 
                                     <!--  Q18: JC Outcomes Projections (JC)  -->
                                     <template if:true={q.isQ18}>
-                                        <div class="rfi-grid-two">
-                                            <lightning-input type="number" label="Projected New Businesses (CFY)" value={formValues.JC_NEW_BIZ_PROJ} data-field="JC_NEW_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Jobs from New Businesses (CFY)" value={formValues.JC_NEW_JOBS_PROJ} data-field="JC_NEW_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Existing Businesses Supported (CFY)" value={formValues.JC_EXIST_BIZ_PROJ} data-field="JC_EXIST_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Jobs from Existing Businesses (CFY)" value={formValues.JC_EXIST_JOBS_PROJ} data-field="JC_EXIST_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Current FY ({fiscalYears.cfyYear} Projections)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected New Businesses <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_BIZ_PROJ} data-field="JC_NEW_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Jobs from New Businesses <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_NEW_JOBS_PROJ} data-field="JC_NEW_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Existing Businesses Supported <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_BIZ_PROJ} data-field="JC_EXIST_BIZ_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Jobs from Existing Businesses <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_EXIST_JOBS_PROJ} data-field="JC_EXIST_JOBS_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Total Jobs Created (Auto-computed)</td>
+                                                        <td><input class="rfi-computed-cell" type="text" readonly value={computedJcTotalJobsProj} /></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Total Avg Cost per Job Created ($) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.JC_COST_PROJ} data-field="JC_COST_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </template>
 
@@ -580,56 +678,76 @@
 
                                     <!--  Q20: Livelihood Programs (Liv)  -->
                                     <template if:true={q.isQ20}>
-                                        <template for:each={livelihoodProgramRows} for:item="row">
-                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
-                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                                                    <span class="rfi-inner-label">Program {row.id}</span>
-                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveLivelihoodProgram}> Remove</button>
-                                                </div>
-                                                <div class="rfi-grid-two" style="margin-bottom:10px;">
-                                                    <div>
-                                                        <label class="rfi-field-label">Program Name</label>
-                                                        <input type="text" class="rfi-text-input" value={row.programName} data-id={row.id} data-field="programName" onchange={handleLivelihoodProgramChange} />
-                                                    </div>
-                                                    <div>
-                                                        <label class="rfi-field-label">Intervention Type</label>
-                                                        <input type="text" class="rfi-text-input" value={row.interventionType} data-id={row.id} data-field="interventionType" onchange={handleLivelihoodProgramChange} />
-                                                    </div>
-                                                    <div>
-                                                        <label class="rfi-field-label">Target Population</label>
-                                                        <input type="text" class="rfi-text-input" value={row.targetPopulation} data-id={row.id} data-field="targetPopulation" onchange={handleLivelihoodProgramChange} />
-                                                    </div>
-                                                    <div>
-                                                        <label class="rfi-field-label">Annual Households</label>
-                                                        <input type="number" class="rfi-number-input" value={row.annualHouseholds} data-id={row.id} data-field="annualHouseholds" onchange={handleLivelihoodProgramChange} min="0" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </template>
-                                        <button type="button" class="rfi-add-btn" onclick={handleAddLivelihoodProgram}>+ Add Program</button>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Program / Initiative Name <span class="required">*</span></th>
+                                                        <th>Type of Support Provided <span class="required">*</span></th>
+                                                        <th>Duration in Man-Hours <span class="required">*</span></th>
+                                                        <th>Annual Enrollment <span class="required">*</span></th>
+                                                        <th style="width: 45px; text-align: center;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={livelihoodProgramRows} for:item="row">
+                                                        <tr key={row.id}>
+                                                            <td><input type="text" class="rfi-text-input" value={row.name} data-id={row.id} data-field="name" onchange={handleLivelihoodProgramChange} /></td>
+                                                            <td><input type="text" class="rfi-text-input" value={row.supportType} data-id={row.id} data-field="supportType" onchange={handleLivelihoodProgramChange} /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.manHours} data-id={row.id} data-field="manHours" onchange={handleLivelihoodProgramChange} min="0" /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.enrollment} data-id={row.id} data-field="enrollment" onchange={handleLivelihoodProgramChange} min="0" /></td>
+                                                            <td style="text-align: center; vertical-align: middle;">
+                                                                <template if:true={canRemoveLivelihoodProgramRow}>
+                                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveLivelihoodProgram}>✕</button>
+                                                                </template>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div style="margin-top: 12px;">
+                                            <button type="button" class="rfi-add-btn" onclick={handleAddLivelihoodProgram}>+ Add Program Row</button>
+                                        </div>
                                     </template>
 
                                     <!--  Q21: Communities & Partners (Liv)  -->
                                     <template if:true={q.isQ21}>
-                                        <template for:each={communityRows} for:item="row">
-                                            <div key={row.id} class="rfi-domain-card" style="margin-bottom:12px;padding:14px;border:1px solid #e0e0e0;border-radius:8px;">
-                                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                                                    <span class="rfi-inner-label">Partner / Community {row.id}</span>
-                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveCommunity}> Remove</button>
-                                                </div>
-                                                <div class="rfi-grid-two">
-                                                    <div>
-                                                        <label class="rfi-field-label">Partner / Community Name</label>
-                                                        <input type="text" class="rfi-text-input" value={row.partnerName} data-id={row.id} data-field="partnerName" onchange={handleCommunityChange} />
-                                                    </div>
-                                                    <div>
-                                                        <label class="rfi-field-label">Geography</label>
-                                                        <input type="text" class="rfi-text-input" value={row.geography} data-id={row.id} data-field="geography" onchange={handleCommunityChange} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </template>
-                                        <button type="button" class="rfi-add-btn" onclick={handleAddCommunity}>+ Add Partner</button>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>State <span class="required">*</span></th>
+                                                        <th>District / Area <span class="required">*</span></th>
+                                                        <th>FY-3 ({fiscalYears.fy3Year}) <span class="required">*</span></th>
+                                                        <th>FY-2 ({fiscalYears.fy2Year}) <span class="required">*</span></th>
+                                                        <th>FY-1 ({fiscalYears.fy1Year}) <span class="required">*</span></th>
+                                                        <th>CFY (projected) <span class="required">*</span></th>
+                                                        <th style="width: 45px; text-align: center;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={communityRows} for:item="row">
+                                                        <tr key={row.id}>
+                                                            <td><input type="text" class="rfi-text-input" value={row.state} data-id={row.id} data-field="state" onchange={handleCommunityChange} /></td>
+                                                            <td><input type="text" class="rfi-text-input" value={row.district} data-id={row.id} data-field="district" onchange={handleCommunityChange} /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.fy3} data-id={row.id} data-field="fy3" onchange={handleCommunityChange} min="0" /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.fy2} data-id={row.id} data-field="fy2" onchange={handleCommunityChange} min="0" /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.fy1} data-id={row.id} data-field="fy1" onchange={handleCommunityChange} min="0" /></td>
+                                                            <td><input type="number" class="rfi-number-input" value={row.proj} data-id={row.id} data-field="proj" onchange={handleCommunityChange} min="0" /></td>
+                                                            <td style="text-align: center; vertical-align: middle;">
+                                                                <template if:true={canRemoveCommunityRow}>
+                                                                    <button type="button" class="rfi-remove-btn" data-id={row.id} onclick={handleRemoveCommunity}>✕</button>
+                                                                </template>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div style="margin-top: 12px;">
+                                            <button type="button" class="rfi-add-btn" onclick={handleAddCommunity}>+ Add Community Row</button>
+                                        </div>
                                     </template>
 
                                     <!--  Q22: Livelihood Outcomes Actuals (Liv)  -->
@@ -646,16 +764,28 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="rfi-td-label">Households Served</td>
+                                                        <td class="rfi-td-label">Households Served <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY3} data-field="LIV_SERVED_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY2} data-field="LIV_SERVED_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_FY1} data-field="LIV_SERVED_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                     <tr>
-                                                        <td class="rfi-td-label">Households Enrolled</td>
+                                                        <td class="rfi-td-label">Households Enrolled <span class="required">*</span></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY3} data-field="LIV_ENROLL_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY2} data-field="LIV_ENROLL_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                         <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_FY1} data-field="LIV_ENROLL_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Households meeting outcome criteria <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_OUTCOME_FY3} data-field="LIV_OUTCOME_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_OUTCOME_FY2} data-field="LIV_OUTCOME_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_OUTCOME_FY1} data-field="LIV_OUTCOME_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Avg. cost per outcome (USD) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_COST_FY3} data-field="LIV_COST_FY3" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_COST_FY2} data-field="LIV_COST_FY2" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_COST_FY1} data-field="LIV_COST_FY1" onchange={handleFieldChange} min="0"></lightning-input></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -664,23 +794,44 @@
 
                                     <!--  Q23: Livelihood Outcomes Projections (Liv)  -->
                                     <template if:true={q.isQ23}>
-                                        <div class="rfi-grid-two">
-                                            <lightning-input type="number" label="Projected Households Served (CFY)" value={formValues.LIV_SERVED_PROJ} data-field="LIV_SERVED_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
-                                            <lightning-input type="number" label="Projected Households Enrolled (CFY)" value={formValues.LIV_ENROLL_PROJ} data-field="LIV_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input>
+                                        <div class="rfi-table-scroll">
+                                            <table class="rfi-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Current FY ({fiscalYears.cfyYear} Projections)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Households Served <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_SERVED_PROJ} data-field="LIV_SERVED_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Projected Households Enrolled <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_ENROLL_PROJ} data-field="LIV_ENROLL_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Households expected to meet outcome criteria (projected) <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_OUTCOME_PROJ} data-field="LIV_OUTCOME_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="rfi-td-label">Avg. cost per outcome (USD) - projected <span class="required">*</span></td>
+                                                        <td><lightning-input type="number" variant="label-hidden" value={formValues.LIV_COST_PROJ} data-field="LIV_COST_PROJ" onchange={handleFieldChange} min="0"></lightning-input></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </template>
 
                                     <!--  Q24: Independent Verification of Outcomes  -->
                                     <template if:true={q.isQ24}>
-                                        <div class="rfi-grid-two" style="margin-bottom:16px;">
-                                            <div>
-                                                <label class="rfi-field-label">Do you have third-party verified outcome data?</label>
-                                                <div class="rfi-radio-group">
-                                                    <label><input type="radio" name="q24_ver" value="Yes" checked={isQ24VerifiedYes} data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> Yes</label>
-                                                    <label><input type="radio" name="q24_ver" value="No" data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> No</label>
-                                                </div>
+                                        <div style="margin-bottom:16px;">
+                                            <label class="rfi-field-label">Do you have third-party verified outcome data?</label>
+                                            <div class="rfi-radio-group">
+                                                <label><input type="radio" name="q24_ver" value="Yes" checked={isQ24VerifiedYes} data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> Yes</label>
+                                                <label><input type="radio" name="q24_ver" value="No" data-field="Q24_VERIFIED__c" onchange={handleFieldChange}/> No</label>
                                             </div>
-                                            <lightning-input label="Report URL / Link (Optional)" value={formValues.Q24_REPORT_URL__c} data-field="Q24_REPORT_URL__c" onchange={handleFieldChange}></lightning-input>
                                         </div>
 
                                         <template if:true={isQ24VerifiedYes}>

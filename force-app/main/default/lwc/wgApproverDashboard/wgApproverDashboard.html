@@ -13,7 +13,7 @@
         <div class="wg-page-body">
 
             <!-- KPI TILES — click opens the queue filtered to that bucket -->
-            <div class="wg-stat-grid ad-stats" role="group" aria-label="Open the queue filtered by">
+            <div class="wg-stat-grid wg-dash-stats" role="group" aria-label="Open the queue filtered by">
                 <template for:each={approverCards} for:item="c">
                     <button key={c.id}
                             class={c.kpiClass}

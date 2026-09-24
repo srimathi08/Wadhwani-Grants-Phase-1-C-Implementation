@@ -1,99 +1,94 @@
 <template>
-    <div class="vd-page">
+    <div class="wg-page vd-page">
 
         <!-- PAGE HEADER -->
-        <div class="page-header">
-            <div class="greeting-block">
-                <div class="greeting-meta">VALIDATOR PORTAL</div>
-                <h1 class="greeting-title">{greeting}, <span class="accent">Validator</span></h1>
-                <p class="greeting-sub">{todayDate}</p>
+        <div class="wg-page-header">
+            <div class="wg-page-heading">
+                <p class="wg-page-eyebrow">Validator portal</p>
+                <h1 class="wg-page-title">{greeting}, <span class="wg-page-title-accent">Validator</span></h1>
+                <p class="wg-page-subtitle">{todayDate}</p>
             </div>
         </div>
 
-        <!-- KPI TILES -->
-        <div class="kpi-row kpi-row-5">
-            <template for:each={validatorCards} for:item="c">
-                <div key={c.id}
-                     class={c.kpiClass}
-                     data-status={c.status}
-                     onclick={handleValidatorTileClick}>
-                    <div class="kpi-header">
-                        <span class="kpi-label">{c.label}</span>
-                        <span class={c.dotClass}></span>
+        <div class="wg-page-body">
+
+            <!-- KPI TILES — click opens the queue filtered to that bucket -->
+            <div class="wg-stat-grid wg-dash-stats" role="group" aria-label="Open the queue filtered by">
+                <template for:each={validatorCards} for:item="c">
+                    <button key={c.id}
+                            class={c.kpiClass}
+                            data-status={c.status}
+                            onclick={handleValidatorTileClick}>
+                        <span class="wg-stat-head">
+                            <span class="wg-stat-label">{c.label}</span>
+                            <span class={c.dotClass}></span>
+                        </span>
+                        <span class="wg-stat-value">{c.count}</span>
+                        <span class="wg-stat-caption">{c.subtitle}</span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- DUE SOON PREVIEW -->
+            <div class="vd-queue">
+                <div class="wg-section-head">
+                    <div>
+                        <h2 class="wg-section-title">Due soon</h2>
+                        <p class="wg-section-subtitle">Proposals awaiting validation, nearest due date first</p>
                     </div>
-                    <div class="kpi-count">{c.count}</div>
-                    <div class="kpi-sub">{c.subtitle}</div>
+                    <button class="wg-link" onclick={handleViewAllValidatorQueue}>View full queue →</button>
                 </div>
-            </template>
-        </div>
 
-        <!-- DUE SOON PREVIEW TABLE -->
-        <div class="queue-preview-section">
-            <div class="qp-header">
-                <div>
-                    <div class="qp-title">Due Soon — Validator Queue</div>
-                    <div class="qp-sub">Proposals awaiting validation, nearest due date first</div>
+                <div class="wg-card">
+                    <div class="wg-table-wrap">
+                        <table class="wg-table vd-table">
+                            <thead>
+                                <tr>
+                                    <th class="wg-col-index" scope="col">#</th>
+                                    <th scope="col">Application ID</th>
+                                    <th scope="col">Account</th>
+                                    <th scope="col">Due date</th>
+                                    <th scope="col">Status</th>
+                                    <th class="wg-col-action" scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={validatorPreviewRows} for:item="row">
+                                    <tr key={row.id} class={row.rowClass}>
+                                        <td class="wg-col-index">{row.rowNum}</td>
+                                        <td class="wg-cell-id">{row.appId}</td>
+                                        <td>{row.account}</td>
+                                        <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
+                                        <td><span class={row.statusClass}>{row.status}</span></td>
+                                        <td class="wg-col-action">
+                                            <template lwc:if={row.showAction}>
+                                                <button class={row.actionClass}
+                                                        data-id={row.id}
+                                                        data-appname={row.appId}
+                                                        onclick={handlePreviewValidate}>
+                                                    <lightning-icon icon-name={row.actionIcon} size="xx-small" alternative-text=""></lightning-icon>
+                                                    {row.action}
+                                                </button>
+                                            </template>
+                                            <template lwc:else>
+                                                <span class="wg-no-action">No action</span>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template lwc:if={noValidatorPreviewRows}>
+                                    <tr>
+                                        <td colspan="6" class="wg-table-empty">
+                                            No proposals awaiting validation
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <!--  <div class="qp-link" onclick={handleViewAllValidatorQueue}>
-                    View all in Queue →
-                </div>  -->
             </div>
 
-            <div class="workspace-card workspace-card-full">
-                <table class="preview-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>APPLICATION ID</th>
-                            <th>ACCOUNT</th>
-                            <th>DUE DATE</th>
-                            <th>STATUS</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={validatorPreviewRows} for:item="row">
-                            <tr key={row.id}>
-                                <td>{row.rowNum}</td>
-                                <td class="cell-id">{row.appId}</td>
-                                <td>{row.account}</td>
-                                <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
-                                <td><span class={row.statusClass}>{row.status}</span></td>
-                                <td>
-                                    <template if:true={row.hasDraft}>
-                                        <button class="preview-action-btn preview-action-resume"
-                                                data-id={row.id}
-                                                data-appname={row.appId}
-                                                onclick={handlePreviewValidate}>
-                                            ✎ Resume
-                                        </button>
-                                    </template>
-                                    <template if:false={row.hasDraft}>
-                                        <button class="preview-action-btn preview-action-validate"
-                                                data-id={row.id}
-                                                data-appname={row.appId}
-                                                onclick={handlePreviewValidate}>
-                                            Validate
-                                        </button>
-                                    </template>
-                                </td>
-                            </tr>
-                        </template>
-                        <template if:true={noValidatorPreviewRows}>
-                            <tr>
-                                <td colspan="6" class="preview-empty">
-                                    No proposals awaiting validation
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="preview-footer" onclick={handleViewAllValidatorQueue}>
-                View full queue →
-            </div>
         </div>
-
     </div>
 </template>

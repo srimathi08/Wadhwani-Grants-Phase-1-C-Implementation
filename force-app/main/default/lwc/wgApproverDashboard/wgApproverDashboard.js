@@ -3,7 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getApproverQueue   from '@salesforce/apex/WCFApproverListController.getApproverQueue';
 import getApproverSummary from '@salesforce/apex/WCFApproverListController.getApproverSummary';
 
-export default class WcfApproverDashboard extends NavigationMixin(LightningElement) {
+export default class WgApproverDashboard extends NavigationMixin(LightningElement) {
 
     @track approverCards       = [];
     @track approverPreviewRows = [];
@@ -51,7 +51,11 @@ export default class WcfApproverDashboard extends NavigationMixin(LightningEleme
             subtitle: d.subtitle,
             count   : d.count,
             status  : d.id,
-            kpiClass: 'wg-stat' + (d.alertWhenPositive && d.count > 0 ? ' wg-stat--alert' : ''),
+            // All tiles are the same size — 3 per row, like the Validator and
+            // Reviewer dashboards (7 tiles → 3 + 3 + 1). Pending Decisions stays
+            // first and keeps its pale-red alert highlight when > 0.
+            kpiClass: 'wg-stat'
+                      + (d.alertWhenPositive && d.count > 0 ? ' wg-stat--alert' : ''),
             dotClass: 'wg-stat-dot wg-stat-dot--' + d.tone
         }));
     }

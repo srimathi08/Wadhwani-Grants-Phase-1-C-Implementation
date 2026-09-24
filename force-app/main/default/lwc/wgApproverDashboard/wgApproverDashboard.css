@@ -17,15 +17,8 @@
     min-height: 100vh;
 }
 
-/* Seven tiles: wrap on smaller screens, one row on wide screens */
-.ad-stats {
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    margin-bottom: var(--wg-space-8);
-}
-
-@media (min-width: 1600px) {
-    .ad-stats { grid-template-columns: repeat(7, 1fr); }
-}
+/* Tile grid comes from wcfPortalUi (.wg-dash-stats) — identical on all dashboards:
+   3 equal tiles per row (7 tiles → 3 + 3 + 1) */
 
 .ad-table {
     min-width: 760px;

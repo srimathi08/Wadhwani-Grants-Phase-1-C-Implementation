@@ -160,17 +160,18 @@
                                     <lightning-icon icon-name="utility:chevronright" size="xx-small" alternative-text=""></lightning-icon>
                                 </button>
                             </div>
-                            <div class="wcf-rq-pagesize">
+                            <div class="wcf-rq-pagesize wg-pagesize">
                                 <span>Rows per page</span>
-                                <lightning-combobox
-                                    name="pageSize"
-                                    label="Rows per page"
-                                    variant="label-hidden"
-                                    value={pageSizeStr}
-                                    options={pageSizeOptions}
-                                    onchange={handlePageSizeChange}
-                                    class="wcf-rq-pagesize-combo">
-                                </lightning-combobox>
+                                <!-- FIX: native select — its menu is drawn by the browser above the
+                                     page, so the card's rounded-corner clipping can't cut it off
+                                     (the lightning-combobox menu was hidden inside the card). -->
+                                <select class="wg-pagesize-select"
+                                        aria-label="Rows per page"
+                                        onchange={handlePageSizeChange}>
+                                    <template for:each={pageSizeChoices} for:item="opt">
+                                        <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                    </template>
+                                </select>
                             </div>
                         </div>
                     </template>

@@ -18,9 +18,15 @@
 
             <!-- ══ TOP BAR ═════════════════════════════════════════ -->
             <div class="rc-topbar">
-                <div class="rc-topbar-title">
-                    <lightning-icon icon-name="utility:rating" size="x-small" alternative-text=""></lightning-icon>
-                    <span>Proposal review</span>
+                <div class="rc-topbar-left">
+                    <button class="ghost-btn wg-btn-sm" onclick={handleBack} title="Back to Proposals Queue">
+                        <lightning-icon icon-name="utility:back" size="xx-small" alternative-text=""></lightning-icon>
+                        Back to Proposals
+                    </button>
+                    <div class="rc-topbar-title">
+                        <lightning-icon icon-name="utility:rating" size="x-small" alternative-text=""></lightning-icon>
+                        <span>Proposal review</span>
+                    </div>
                 </div>
 
                 <template if:false={showPreview}>
@@ -205,6 +211,9 @@
                             <div class="rc-pane-label-left">
                                 <lightning-icon icon-name="utility:file" size="x-small" alternative-text="" class="rc-pane-label-text"></lightning-icon>
                                 <span class="rc-pane-label-text">RFI application</span>
+                                <template if:true={applicationName}>
+                                    <span class="wg-tag wg-tag--brand rc-pane-label-text">{applicationName}</span>
+                                </template>
                                 <span class="wg-tag rc-pane-label-text">Read-only</span>
                             </div>
                             <div class="rc-pane-label-right">
