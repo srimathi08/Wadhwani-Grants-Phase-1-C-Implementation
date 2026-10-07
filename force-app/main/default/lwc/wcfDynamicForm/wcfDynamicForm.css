@@ -116,6 +116,19 @@
        map them onto cleanly — reusing --wg-border felt too dark/flat
        for some of these (several are blue-tinted, not gray). Left as-is
        pending a decision on whether to add such a token.
+
+   FIFTH PASS — unified orange focus color across ALL form fields
+   (per explicit follow-up): lightning-combobox (every picklist) and
+   lightning-file-upload ("Upload Files" button) were still showing the
+   SLDS default blue focus ring, and comboboxes sometimes showed a mixed
+   orange/blue ring. Cause: the orange focus hooks were only set on
+   lightning-input, and the combobox reads styling hooks for :focus but
+   --lwc design tokens for its .slds-has-focus state. Fix: the hooks AND
+   the --lwc token fallbacks are now set once on :host (see "Unified
+   orange focus color" below) so they inherit into every base
+   component's shadow tree. Native .sector-chip and .attest-checkbox
+   controls also got an orange :focus-visible state. CSS-only change;
+   no JS/HTML logic was modified.
    ──────────────────────────────────────────────────────────────────── */
 
 /* ==========================================================================
@@ -785,6 +798,53 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     border-radius: 0 0 10px 10px;
     background: var(--wg-white);
     overflow-y: auto;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.modern-richtext-area:focus {
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
+}
+
+/* ── Unified orange focus color for EVERY field on the form ──
+   Set on :host (not just lightning-input) so the values inherit into all
+   base components' shadow trees: lightning-input, lightning-combobox,
+   lightning-textarea, lightning-file-upload and checkbox inputs. This
+   matches the orange focus ring already used by the native inputs
+   (.wcf-native-input, .wcf-number-input, .date-native-input,
+   .rfi-select-input, .phone-input-group, .modern-richtext-area).
+   Both the component styling hooks AND the --lwc design-token fallbacks
+   are set, because the combobox uses hooks for :focus but tokens for its
+   .slds-has-focus state; setting only one gave the mixed orange/blue look. */
+:host {
+    /* Input, combobox and textarea border + glow */
+    --slds-c-input-color-border-focus: var(--wg-orange);
+    --sds-c-input-color-border-focus: var(--wg-orange);
+    --slds-c-input-shadow-focus: 0 0 3px var(--wg-orange);
+    --sds-c-input-shadow-focus: 0 0 3px var(--wg-orange);
+
+    /* Buttons rendered inside base components ("Upload Files") */
+    --slds-c-button-color-border-focus: var(--wg-orange);
+    --sds-c-button-color-border-focus: var(--wg-orange);
+    --slds-c-button-neutral-color-border-focus: var(--wg-orange);
+    --sds-c-button-neutral-color-border-focus: var(--wg-orange);
+    --slds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
+    --sds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
+
+    /* Design-token fallbacks: combobox .slds-has-focus state,
+       file-upload drop zone, and checkbox focus */
+    --lwc-colorBorderInputActive: var(--wg-orange);
+    --lwc-shadowButtonFocus: 0 0 3px var(--wg-orange);
+}
+
+/* lightning-textarea keeps its host-level :focus-within glow as a
+   fallback. lightning-combobox and lightning-file-upload now get the
+   orange focus color from the :host hooks/tokens above, so they no
+   longer need (or use) a :focus-within workaround — which would also
+   have highlighted their label along with the control. */
+lightning-textarea:focus-within {
+    border-radius: 4px;
+    box-shadow: 0 0 3px var(--wg-orange);
 }
 
 .modern-richtext-footer {
@@ -1564,6 +1624,14 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     font-weight: var(--wg-weight-semibold);
 }
 
+/* Native field controls: same orange focus as the inputs (keyboard focus
+   only, via :focus-visible, so a mouse click doesn't leave a ring behind) */
+.sector-chip:focus-visible {
+    outline: none;
+    border-color: var(--wg-orange);
+    box-shadow: 0 0 3px var(--wg-orange);
+}
+
 /* ── Review & Submit Section Styles (Matching Image & wcfForm) ── */
 .rv-section {
     background: var(--wg-white);
@@ -1696,6 +1764,13 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     width: 18px;
     height: 18px;
     cursor: pointer;
+}
+
+/* Native attestation checkbox: orange keyboard-focus ring instead of the
+   browser's default blue outline */
+.attest-checkbox:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
 }
 
 .attest-checkbox-label {

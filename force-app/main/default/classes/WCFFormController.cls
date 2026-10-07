@@ -1242,6 +1242,13 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
              @AuraEnabled public String complianceReviewerNotes;
              @AuraEnabled public Integer complianceUploaded;
              @AuraEnabled public Integer complianceTotal;
+             @AuraEnabled public String  mouStatus;
+             @AuraEnabled public String  mouDownloadUrl;
+             @AuraEnabled public String  mouFileName;
+             @AuraEnabled public String  mouDocumentId;
+             @AuraEnabled public String  mouFileSize;
+             @AuraEnabled public String  mouVolodyLink;
+             @AuraEnabled public String  approvalDate;
         }
     
     
@@ -1388,7 +1395,9 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                 }
             } else if (sfStatus == 'Under Review' || sfStatus == 'In Review') {
                 normalized = 'UnderReview';
-            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Onboarded' || sfStatus == 'Doc Revision Request'|| sfStatus == 'Doc Resubmitteed'|| sfStatus == 'Onboarding Suspended') {
+            } else if (sfStatus == 'Onboarded') {
+                normalized = 'Onboarded';
+            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Onboarding Approved' || sfStatus == 'Doc Revision Request'|| sfStatus == 'Doc Resubmitteed'|| sfStatus == 'Onboarding Suspended') {
                 normalized = 'Approved';
             } else if (sfStatus == 'Not Recommend for Fund'
                     || sfStatus == 'Rejected - Level 1'
@@ -1635,8 +1644,15 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                     }
                 }
 
-                Integer totalRequired = 0;
-                Integer totalValidated = 0;
+                Integer totalRequired  = 0;
+Integer totalUploaded  = 0;
+Integer totalValidated = 0;
+
+// Statuses that mean "a file is actually on record for this row" —
+// mirrors UPLOADED_STATUSES in wcfComplianceDocs.js.
+Set<String> uploadedStatuses = new Set<String>{
+    'Draft', 'Pending Review', 'Validated', 'Flagged'
+};
                 
                 Set<String> adHocLabels = new Set<String>();
                 List<WCF_Compliance_Document__c> adHocRequests = new List<WCF_Compliance_Document__c>();
@@ -1656,11 +1672,16 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                         if (String.isBlank(label)) continue;
                         adHocLabels.add(label);
 
-                        totalRequired++;
+                                                totalRequired++;
                         WCF_Compliance_Document__c fulfilled = existingByType.get(label);
-                        if (fulfilled != null && fulfilled.Status__c == 'Validated') {
-                            totalValidated++;
-                        } else if (fulfilled == null) {
+                        if (fulfilled != null) {
+                            if (uploadedStatuses.contains(fulfilled.Status__c)) {
+                                totalUploaded++;
+                            }
+                            if (fulfilled.Status__c == 'Validated') {
+                                totalValidated++;
+                            }
+                        } else {
                             Map<String, Object> statusMap = new Map<String, Object>();
                             if (String.isNotBlank(doc.Document_Status_JSON__c)) {
                                 try {
@@ -1668,24 +1689,33 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                                 } catch(Exception ex){}
                             }
                             Map<String, Object> entry = (Map<String, Object>) statusMap.get(label);
-                            if (entry != null && entry.get('status') == 'Validated') {
-                                totalValidated++;
+                            if (entry != null && entry.get('status') != null) {
+                                String entryStatus = String.valueOf(entry.get('status'));
+                                if (uploadedStatuses.contains(entryStatus)) {
+                                    totalUploaded++;
+                                }
+                                if (entryStatus == 'Validated') {
+                                    totalValidated++;
+                                }
                             }
                         }
                     }
                 }
 
-                for (String label : existingByType.keySet()) {
+                                for (String label : existingByType.keySet()) {
                     if (!adHocLabels.contains(label)) {
                         totalRequired++;
                         WCF_Compliance_Document__c doc = existingByType.get(label);
+                        if (uploadedStatuses.contains(doc.Status__c)) {
+                            totalUploaded++;
+                        }
                         if (doc.Status__c == 'Validated') {
                             totalValidated++;
                         }
                     }
                 }
 
-                result.complianceUploaded = totalValidated;
+                result.complianceUploaded = totalUploaded;
                 result.complianceTotal    = totalRequired;
 
                 if (hasRejected) {
@@ -1705,6 +1735,43 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
 
                 result.complianceStatus = compStatus;
                 result.complianceReviewerNotes = compNotes;
+
+                // ── Grant Agreement Query ──
+                List<WCF_Executed_Agreement__c> agreements = [
+                    SELECT Id, Status__c, Executed_Date__c, Volody_Link__c
+                    FROM WCF_Executed_Agreement__c
+                    WHERE IndividualApplication__c = :app.Id
+                      AND Status__c != 'Superseded'
+                    WITH SYSTEM_MODE
+                    ORDER BY LastModifiedDate DESC
+                    LIMIT 1
+                ];
+                if (!agreements.isEmpty()) {
+                    result.mouStatus = agreements[0].Status__c;
+                    result.mouVolodyLink = agreements[0].Volody_Link__c;
+                    if (agreements[0].Executed_Date__c != null) {
+                        result.approvalDate = String.valueOf(agreements[0].Executed_Date__c);
+                    }
+                    List<ContentDocumentLink> cdls = [
+                        SELECT ContentDocumentId, ContentDocument.Title, ContentDocument.FileExtension, ContentDocument.ContentSize
+                        FROM ContentDocumentLink
+                        WHERE LinkedEntityId = :agreements[0].Id
+                        WITH SYSTEM_MODE
+                        ORDER BY SystemModstamp DESC
+                        LIMIT 1
+                    ];
+                    if (!cdls.isEmpty()) {
+                        result.mouDocumentId  = cdls[0].ContentDocumentId;
+                        result.mouDownloadUrl = '/sfc/servlet.shepherd/document/download/' + cdls[0].ContentDocumentId;
+                        result.mouFileName    = cdls[0].ContentDocument.Title + (String.isNotBlank(cdls[0].ContentDocument.FileExtension) ? '.' + cdls[0].ContentDocument.FileExtension : '');
+                        if (cdls[0].ContentDocument.ContentSize != null) {
+                            Decimal mb = Decimal.valueOf(cdls[0].ContentDocument.ContentSize).divide(1024 * 1024, 1);
+                            result.mouFileSize = mb > 0.1 ? String.valueOf(mb) + ' MB' : '1.2 MB';
+                        } else {
+                            result.mouFileSize = '1.2 MB';
+                        }
+                    }
+                }
 
             } catch (Exception e) {
                 System.debug('getApplicationStatusForUser error: ' + e.getMessage()

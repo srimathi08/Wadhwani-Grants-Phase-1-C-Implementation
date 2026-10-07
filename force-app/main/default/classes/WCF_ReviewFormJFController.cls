@@ -5,6 +5,23 @@ public without sharing class WCF_ReviewFormJFController {
     private static final String OUTCOME_LU   = 'WCF_Livelihood_Upliftment';
     private static final String OUTCOME_BOTH = 'WCF_Job_Fulfillment_Job_Creation';
 
+    // ── Recommend_for_CEO_review__c: values that mean "recommended" ──
+    // Legacy 'Yes' is kept so existing records keep working.
+    public static final Set<String> POSITIVE_RECOMMENDATION_VALUES = new Set<String>{
+        'Yes',
+        'Yes - Strongly recommend',
+        'Yes - Recommend',
+        'Yes - Recommend with reservations'
+    };
+
+    /**
+     * True for 'Yes' and every 'Yes - ...' value. Used everywhere the code
+     * previously checked Recommend_for_CEO_review__c == 'Yes'.
+     */
+    public static Boolean isPositiveRecommendation(String value) {
+        return String.isNotBlank(value) && value.trim().startsWithIgnoreCase('Yes');
+    }
+
     public class ReviewSubmitResult {
         @AuraEnabled public Boolean isSuccess { get; set; }
         @AuraEnabled public String  reviewId { get; set; }
@@ -184,7 +201,8 @@ public without sharing class WCF_ReviewFormJFController {
             }
 
             // Route to Approver based on recommendation
-            String appStatus = (cleanReview.Recommend_for_CEO_review__c == 'Yes')
+            // UPDATED: any 'Yes - ...' value (and legacy 'Yes') routes as Recommended
+            String appStatus = isPositiveRecommendation(cleanReview.Recommend_for_CEO_review__c)
                 ? 'Review Completed - Recommended'
                 : 'Review Completed - Not Recommended';
 

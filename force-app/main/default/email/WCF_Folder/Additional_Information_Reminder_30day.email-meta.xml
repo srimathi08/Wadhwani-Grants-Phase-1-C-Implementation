@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Fires when: An application sent back has had no response at thirty days</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Additional Information Reminder- 30day</name>
+    <style>none</style>
+    <subject>{!IndividualApplication.Organization_Name__c}  Your application is waiting for your updates</subject>
+    <textOnly>Subject: [Reminder] [{{{org_name}}}] Additional information requested
+
+Hello {{{contact_first_name}}},
+
+This is a friendly reminder that our request for additional information regarding {{{org_name}}}&apos;s application is still awaiting your response.
+
+Request:
+{{{clarification_text}}}
+
+Response Due:
+{{{due_date}}}
+
+If you have already responded, thank you — please disregard this message.
+
+Otherwise, submit your response here:
+{{{clarification_link}}}
+
+Need more time or have questions?
+Reply to: [grants.support@wadhwanifoundation.org](mailto:grants.support@wadhwanifoundation.org)
+
+Warm regards,
+The Wadhwani Grants Team
+
+© {{{year}}} Wadhwani Charitable Foundation</textOnly>
+    <type>custom</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

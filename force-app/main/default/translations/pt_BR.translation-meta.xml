@@ -2100,6 +2100,10 @@ Calcule isso como despesa anual da organização / total # de empregos criados.<
         <name>CL_Your_Latest_Changes</name>
     </customLabels>
     <customLabels>
+        <label><!-- CL Your Livelihood Approach --></label>
+        <name>CL_Your_Livelihood_Approach</name>
+    </customLabels>
+    <customLabels>
         <label>Seu Líder do Programa</label>
         <name>CL_Your_Programme_Lead</name>
     </customLabels>
@@ -19436,7 +19440,17 @@ Para ser considerada bem qualificada, a organização deve demonstrar o seguinte
         <fullName>Requested_Support_Document_Milestone</fullName>
     </flowDefinitions>
     <flowDefinitions>
-        <flows/>
+        <flows>
+            <textTemplates>
+                <name>EvaluationDueSoon</name>
+            </textTemplates>
+            <textTemplates>
+                <name>New_Evaluation_Assinged</name>
+            </textTemplates>
+            <textTemplates>
+                <name>Passed_toreview</name>
+            </textTemplates>
+        </flows>
         <fullName>Reviewer_Email_Alert_Wadhwani_Grants</fullName>
     </flowDefinitions>
     <flowDefinitions>
@@ -20132,6 +20146,28 @@ Para ser considerada bem qualificada, a organização deve demonstrar o seguinte
     </flowDefinitions>
     <flowDefinitions>
         <flows>
+            <textTemplates>
+                <name>DecisionRecorded</name>
+            </textTemplates>
+        </flows>
+        <fullName>WCF_Application_Decision_Flow</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows>
+            <textTemplates>
+                <name>Approver_ReadyForDecision</name>
+            </textTemplates>
+            <textTemplates>
+                <name>DeclineRecommended_Email</name>
+            </textTemplates>
+            <textTemplates>
+                <name>Overdue_decision</name>
+            </textTemplates>
+        </flows>
+        <fullName>WCF_Approver_Email_Alert_Flow</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows>
             <screens>
                 <fields>
                     <name>Sendemailtoreviewers</name>
@@ -20304,6 +20340,10 @@ Para ser considerada bem qualificada, a organização deve demonstrar o seguinte
     <flowDefinitions>
         <flows/>
         <fullName>WCF_User_Account_Update</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows/>
+        <fullName>WF_Compliance_Document_flow</fullName>
     </flowDefinitions>
     <flowDefinitions>
         <flows/>
@@ -20834,6 +20874,15 @@ Para ser considerada bem qualificada, a organização deve demonstrar o seguinte
         <sections>
             <label><!-- Proposals --></label>
             <name>Proposals</name>
+        </sections>
+    </reportTypes>
+    <reportTypes>
+        <description><!-- User with License Info --></description>
+        <label><!-- User with License Info --></label>
+        <name>User_with_License_Info</name>
+        <sections>
+            <label><!-- Users --></label>
+            <name>Users</name>
         </sections>
     </reportTypes>
     <reportTypes>

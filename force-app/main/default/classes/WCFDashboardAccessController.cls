@@ -13,6 +13,11 @@ public without sharing class WCFDashboardAccessController {
         access.isValidator = false;
         access.isReviewer  = false;
         access.isApprover  = false;
+        
+         // Guest users have no Contact, and can't query User.ContactId
+    if (UserInfo.getUserType() == 'Guest') {
+        return access;
+    }
 
         User usr = [
             SELECT Id, ContactId

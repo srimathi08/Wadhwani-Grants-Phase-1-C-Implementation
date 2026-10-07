@@ -1,75 +1,136 @@
+@import "c/commonStyleTheme";
+
+/* wcfComplianceDocs.css
+   Uses the shared c/commonStyleTheme tokens (--wg-*) for fonts, font sizes,
+   colors, borders, radii and spacing — same set as wcfDynamicForm.
+   Class names are unchanged (the JS builds them), so the logic is untouched. */
+
+:host {
+    display: block;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+
+    /* lightning-button / lightning-input styling hooks → brand look
+       (square red buttons, orange focus), same as the form's buttons */
+    --slds-c-button-brand-color-background: var(--wg-red);
+    --slds-c-button-brand-color-border: var(--wg-red);
+    --slds-c-button-brand-color-background-hover: var(--wg-red-deep);
+    --slds-c-button-brand-color-border-hover: var(--wg-red-deep);
+    --slds-c-button-brand-text-color: var(--wg-white);
+    --slds-c-button-neutral-color-border: var(--wg-red);
+    --slds-c-button-neutral-color-background-hover: var(--wg-error-bg);
+    --slds-c-button-text-color: var(--wg-red);
+    --slds-c-button-text-color-hover: var(--wg-red-deep);
+    --slds-c-button-radius-border: 0;
+    --slds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
+    --sds-c-button-brand-color-background: var(--wg-red);
+    --sds-c-button-brand-color-border: var(--wg-red);
+    --sds-c-button-brand-color-background-hover: var(--wg-red-deep);
+    --sds-c-button-brand-color-border-hover: var(--wg-red-deep);
+    --sds-c-button-neutral-color-border: var(--wg-red);
+    --sds-c-button-text-color: var(--wg-red);
+    --sds-c-button-radius-border: 0;
+    --sds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
+}
+
+lightning-input {
+    --slds-c-input-color-border-focus: var(--wg-orange);
+    --slds-c-input-shadow-focus: 0 0 3px var(--wg-orange);
+    --sds-c-input-color-border-focus: var(--wg-orange);
+    --sds-c-input-shadow-focus: 0 0 3px var(--wg-orange);
+}
+
 .comp-loading {
     display: flex;
     justify-content: center;
-    padding: 2rem;
+    padding: var(--wg-space-8);
 }
 
+/* Load error — theme error banner style */
 .comp-error-banner {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background-color: #fdecea;
-    border-left: 4px solid #c23934;
-    margin: 0 1rem 1rem;
+    gap: var(--wg-space-2);
+    padding: var(--wg-padding-banner);
+    background-color: var(--wg-error-bg);
+    border-left: var(--wg-border-width-banner) solid var(--wg-error);
+    border-radius: var(--wg-radius-sm);
+    color: var(--wg-gray);
+    font-size: var(--wg-font-size-body);
+    margin: 0 var(--wg-space-4) var(--wg-space-4);
 }
 
+/* ── Overall progress ── */
 .comp-summary {
-    padding: 0 1rem 1.25rem;
+    padding: 0 var(--wg-space-4) var(--wg-space-5);
 }
 
 .comp-summary-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--wg-space-2);
 }
 
 .comp-geography {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-sub-heading);
+    color: var(--wg-gray);
 }
 
 .comp-overall-progress-bar {
+    display: flex;
     height: 8px;
     border-radius: 4px;
-    background-color: #ecebea;
+    background-color: var(--wg-border);
     overflow: hidden;
 }
 
+/* Validated segment (green). Width comes from the inline style binding. */
 .comp-overall-progress-fill {
     height: 100%;
-    width: 0%;
-    background-color: #04844b;
+    flex: 0 0 auto;
+    background-color: var(--wg-success);
     transition: width 0.3s ease;
 }
 
-.comp-summary-label {
-    font-size: 0.8rem;
-    color: #5c5c5c;
-    margin-top: 0.35rem;
+/* Uploaded, awaiting review segment (blue) */
+.comp-overall-progress-fill--uploaded {
+    background-color: var(--wg-info);
 }
 
+.comp-summary-label {
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+    margin-top: 6px;
+}
+
+/* Overall status pill */
 .comp-overall-badge {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
     letter-spacing: 0.04em;
-    padding: 0.25rem 0.6rem;
-    border-radius: 999px;
+    padding: var(--wg-padding-tag);
+    border-radius: var(--wg-radius-badge);
     text-transform: uppercase;
 }
-.comp-overall-badge--complete   { background-color: #d4f4e2; color: #04844b; }
-.comp-overall-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
-.comp-overall-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
-.comp-overall-badge--pending    { background-color: #ecebea; color: #514f4d; }
-.comp-overall-badge--refresh    { background-color: #fdecea; color: #c23934; }
-.comp-overall-badge--rejected   { background-color: #fdecea; color: #c23934; }
-.comp-overall-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
-.comp-overall-badge--returned   { background-color: #fff4e5; color: #93540a; }
+.comp-overall-badge--complete   { background-color: var(--wg-success-bg); color: var(--wg-success); }
+.comp-overall-badge--inprogress { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.comp-overall-badge--draft      { background-color: var(--wg-info-bg);    color: var(--wg-info-text); }
+.comp-overall-badge--pending    { background-color: var(--wg-border);     color: var(--wg-text-muted); }
+.comp-overall-badge--refresh    { background-color: var(--wg-error-bg);   color: var(--wg-error); }
+.comp-overall-badge--rejected   { background-color: var(--wg-error-bg);   color: var(--wg-error); }
+.comp-overall-badge--suspended  { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.comp-overall-badge--returned   { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
 
+/* ── One row per document ── */
 .comp-row {
-    border-top: 1px solid #e5e5e5;
-    padding: 1rem;
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
+    padding: var(--wg-space-4);
 }
 
 .comp-row-header {
@@ -79,71 +140,91 @@
 }
 
 .comp-doc-label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-right: 0.5rem;
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+    font-size: var(--wg-font-size-sub-heading);
+    color: var(--wg-gray);
+    margin-right: var(--wg-space-2);
 }
 
 .comp-required-tag {
-    font-size: 0.65rem;
-    color: #706e6b;
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-error);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
 .comp-doc-desc {
-    font-size: 0.8rem;
-    color: #5c5c5c;
-    margin: 0.35rem 0 0.75rem;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
+    margin: 6px 0 var(--wg-space-3);
 }
 
+/* Row status pill */
 .comp-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-family: var(--wg-font-body);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-bold);
     letter-spacing: 0.03em;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
+    padding: var(--wg-padding-tag);
+    border-radius: var(--wg-radius-badge);
     text-transform: uppercase;
     white-space: nowrap;
 }
-.comp-badge--pending    { background-color: #ecebea; color: #514f4d; }
-.comp-badge--draft      { background-color: #e8f0fe; color: #1a73e8; }
-.comp-badge--inprogress { background-color: #fff3cd; color: #8a6d00; }
-.comp-badge--active     { background-color: #d4f4e2; color: #04844b; }
-.comp-badge--returned   { background-color: #fdecea; color: #c23934; }
-.comp-badge--flagged    { background-color: #e3e1fb; color: #4b3fb0; }
-.comp-badge--expired    { background-color: #fdecea; color: #c23934; }
+.comp-badge--pending    { background-color: var(--wg-border);     color: var(--wg-text-muted); }
+.comp-badge--draft      { background-color: var(--wg-info-bg);    color: var(--wg-info-text); }
+.comp-badge--inprogress { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
+.comp-badge--active     { background-color: var(--wg-success-bg); color: var(--wg-success); }
+.comp-badge--returned   { background-color: var(--wg-error-bg);   color: var(--wg-error); }
+.comp-badge--flagged    { background-color: #e3e1fb;              color: #4b3fb0; } /* distinct purple — no theme token */
+.comp-badge--expired    { background-color: var(--wg-error-bg);   color: var(--wg-error); }
+.comp-badge--rejected   { background-color: var(--wg-error-bg);   color: var(--wg-error); }
+.comp-badge--suspended  { background-color: var(--wg-warning-bg); color: var(--wg-warning-text); }
 
+/* ── Row-level banners (theme status-banner look) ── */
 .comp-return-banner {
     display: flex;
     align-items: flex-start;
-    gap: 0.4rem;
-    background-color: #fdecea;
-    border-left: 3px solid #c23934;
-    padding: 0.5rem 0.75rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.8rem;
+    gap: 6px;
+    background-color: var(--wg-error-bg);
+    border-left: var(--wg-border-width-banner) solid var(--wg-error);
+    border-radius: var(--wg-radius-sm);
+    padding: var(--wg-padding-banner);
+    margin-bottom: var(--wg-space-3);
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-gray);
 }
-.comp-return-banner--refresh { background-color: #fdecea; border-left-color: #c23934; }
-.comp-return-banner--warning { background-color: #fff3cd; border-left-color: #8a6d00; }
+.comp-return-banner p { margin: 0; }
+.comp-return-banner--refresh   { background-color: var(--wg-error-bg);   border-left-color: var(--wg-error); }
+.comp-return-banner--warning   { background-color: var(--wg-warning-bg); border-left-color: var(--wg-warning); color: var(--wg-warning-text); }
+.comp-return-banner--rejected  { background-color: var(--wg-error-bg);   border-left-color: var(--wg-error); }
+.comp-return-banner--suspended { background-color: var(--wg-warning-bg); border-left-color: var(--wg-warning); color: var(--wg-warning-text); }
 
+/* ── File on record ── */
 .comp-file-row {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    margin-bottom: 0.75rem;
+    gap: 6px;
+    font-size: var(--wg-font-size-label);
+    margin-bottom: var(--wg-space-3);
     flex-wrap: wrap;
 }
+.comp-file-row a {
+    color: var(--wg-red);
+    font-weight: var(--wg-weight-semibold);
+    text-decoration: underline;
+}
+.comp-file-row a:hover { color: var(--wg-red-deep); }
 
 .comp-file-meta {
-    color: #706e6b;
+    color: var(--wg-text-muted);
 }
 
 .comp-upload-row {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--wg-space-2);
     max-width: 22rem;
 }
 
@@ -152,132 +233,235 @@
 }
 
 .comp-replace-btn {
-    margin-top: 0.25rem;
+    margin-top: var(--wg-space-1);
 }
 
-/* Compliance Decision Banners */
+/* ── Compliance decision banners (legacy classes) ── */
 .decision-banner {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    margin: 0 1rem 1.5rem;
-    border-radius: 6px;
-    border-left: 4px solid;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    gap: var(--wg-space-4);
+    padding: var(--wg-space-4) var(--wg-space-5);
+    margin: 0 var(--wg-space-4) var(--wg-space-6);
+    border-radius: var(--wg-radius-sm);
+    border-left: var(--wg-border-width-banner) solid;
+    font-size: var(--wg-font-size-body);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .decision-content strong {
-    font-size: 1rem;
-    color: #1b1b1b;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    color: var(--wg-gray);
     display: block;
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--wg-space-1);
 }
 
 .decision-content p {
-    color: #2b2b2b;
+    color: var(--wg-gray);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--wg-line-height-base);
 }
 
-/* Passed (Green) */
-.decision-banner--passed {
-    background-color: #eaf8f0;
-    border-color: #2e7d32;
-    border-left-width: 5px;
-}
+.decision-banner--passed    { background-color: var(--wg-success-bg); border-color: var(--wg-success); }
+.decision-banner--rejected  { background-color: var(--wg-error-bg);   border-color: var(--wg-error); }
+.decision-banner--suspended { background-color: var(--wg-warning-bg); border-color: var(--wg-warning); }
+.decision-icon-suspended    { --sds-c-icon-color-foreground: var(--wg-warning); }
+.decision-banner--returned  { background-color: var(--wg-warning-bg); border-color: var(--wg-warning); }
+.decision-icon-returned     { --sds-c-icon-color-foreground: var(--wg-warning); }
 
-/* Rejected (Red) */
-.decision-banner--rejected {
-    background-color: #fdf2f2;
-    border-color: #d32f2f;
-    border-left-width: 5px;
-}
-
-/* Suspended (Yellow) */
-.decision-banner--suspended {
-    background-color: #fffde7;
-    border-color: #fbc02d;
-    border-left-width: 5px;
-}
-.decision-icon-suspended {
-    --sds-c-icon-color-foreground: #fbc02d;
-}
-
-/* Returned (Orange/Warning) */
-.decision-banner--returned {
-    background-color: #fff3e0;
-    border-color: #f57c00;
-    border-left-width: 5px;
-}
-.decision-icon-returned {
-    --sds-c-icon-color-foreground: #f57c00;
-}
-
-/* Returned Comments Box */
 .comments-section {
     background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid #ffe0b2;
+    border: var(--wg-border-width-thin) solid var(--wg-warning);
     border-radius: 4px;
-    padding: 0.75rem 1rem;
-    margin: 0.75rem 0;
+    padding: var(--wg-space-3) var(--wg-space-4);
+    margin: var(--wg-space-3) 0;
 }
 
 .comments-section strong {
-    font-size: 0.85rem;
-    color: #e65100;
-    margin-bottom: 0.25rem;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-warning-text);
+    margin-bottom: var(--wg-space-1);
 }
 
 .reviewer-comments {
     font-style: italic;
-    color: #4e342e !important;
+    color: var(--wg-gray) !important;
 }
 
 .footer-note {
-    font-weight: 500;
-    margin-top: 0.5rem !important;
+    font-weight: var(--wg-weight-semibold);
+    margin-top: var(--wg-space-2) !important;
 }
 
-/* Bottom Action Footer (Save Draft & Submit) */
+/* ── Bottom action footer (Save Draft & Submit) ── */
 .comp-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 1.25rem;
-    margin: 1.25rem 0 0 0;
-    border-top: 1px solid #dddbda;
+    padding: var(--wg-space-5);
+    margin: var(--wg-space-5) 0 0 0;
+    border-top: var(--wg-border-width-thin) solid var(--wg-border);
     background-color: #fbfbfb;
     border-radius: 0 0 4px 4px;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--wg-space-4);
 }
 
 .comp-footer-status {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: var(--wg-space-1);
 }
 
 .comp-footer-count {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #181818;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    color: var(--wg-gray);
 }
 
 .comp-footer-hint {
-    font-size: 0.8rem;
-    color: #706e6b;
+    font-size: var(--wg-font-size-label);
+    color: var(--wg-text-muted);
 }
 
 .comp-footer-hint--ready {
-    color: #04844b;
-    font-weight: 600;
+    color: var(--wg-success);
+    font-weight: var(--wg-weight-semibold);
 }
 
 .comp-footer-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--wg-space-3);
     align-items: center;
+}
+
+/* ── Card-level decision banner (Pass · Reject · Suspend) ── */
+.comp-decision-banner {
+    display: flex;
+    gap: var(--wg-space-3);
+    align-items: flex-start;
+    margin: 0 var(--wg-space-4) var(--wg-space-4);
+    padding: var(--wg-padding-banner);
+    border-radius: var(--wg-radius-sm);
+    border: var(--wg-border-width-thin) solid transparent;
+    border-left-width: var(--wg-border-width-banner);
+    font-size: var(--wg-font-size-label);
+    line-height: var(--wg-line-height-base);
+    color: var(--wg-gray);
+}
+
+.comp-decision-banner p { margin: 0; }
+
+.comp-decision-title {
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    margin-bottom: 2px !important;
+}
+
+.comp-decision-notes { margin-top: 6px !important; }
+
+.comp-decision-banner--validated {
+    background: var(--wg-success-bg);
+    border-color: var(--wg-success);
+    --slds-c-icon-color-foreground-default: var(--wg-success);
+}
+
+.comp-decision-banner--rejected {
+    background: var(--wg-error-bg);
+    border-color: var(--wg-error);
+    --slds-c-icon-color-foreground-default: var(--wg-error);
+}
+
+.comp-decision-banner--suspended {
+    background: var(--wg-warning-bg);
+    border-color: var(--wg-warning);
+    color: var(--wg-warning-text);
+    --slds-c-icon-color-foreground-default: var(--wg-warning);
+}
+
+.comp-locked-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 0;
+    font-size: var(--wg-font-size-caption);
+    color: var(--wg-text-muted);
+    --slds-c-icon-color-foreground-default: var(--wg-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════
+   In-page status banner — replaces the platform toast.
+   Base look (tinted background, 4px left accent, radius, padding,
+   Open Sans 14px) comes from commonStyleTheme's .error-banner /
+   .warning-banner / .success-banner / .info-banner. This block only
+   adds the toast behaviour (fixed at the top, shadow, close button)
+   and the colored text from the brand banner spec.
+   ══════════════════════════════════════════════════════════ */
+.wg-toast-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99998;
+    width: min(640px, calc(100vw - 32px));
+    box-sizing: border-box;
+    align-items: center;
+    gap: var(--wg-space-3);
+    padding: 14px var(--wg-space-4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+/* Text color per status (brand banner spec) */
+.wg-toast-banner.error-banner   { color: var(--wg-error); }
+.wg-toast-banner.warning-banner { color: var(--wg-warning-text); }
+.wg-toast-banner.success-banner { color: var(--wg-success); }
+.wg-toast-banner.info-banner    { color: var(--wg-info); }
+
+.wg-toast-icon {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+    font-family: var(--wg-font-heading);
+    font-size: var(--wg-font-size-sub-heading);
+    font-weight: var(--wg-weight-bold);
+    line-height: 1;
+}
+
+.wg-toast-body {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: var(--wg-font-size-body);
+    line-height: var(--wg-line-height-base);
+}
+
+.wg-toast-title {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-bold);
+    margin-right: 4px;
+}
+
+.wg-toast-close {
+    flex-shrink: 0;
+    margin-left: auto;
+    background: none;
+    border: none;
+    padding: 0 2px;
+    cursor: pointer;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.65;
+}
+
+.wg-toast-close:hover { opacity: 1; }
+
+@media (max-width: 600px) {
+    .wg-toast-banner {
+        top: 10px;
+        width: calc(100vw - 20px);
+    }
 }

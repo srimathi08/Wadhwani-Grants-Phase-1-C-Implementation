@@ -82,6 +82,9 @@ public without sharing class WFGrantsSignUpController {
             if (!Pattern.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', email)) {
                 return err(result, 'Enter a valid email address.');
             }
+		String orgError = validateOrganizationName(organizationName);
+if (orgError != null) return err(result, orgError);
+organizationName = organizationName.trim().replaceAll('\\s+', ' ');
 
             // Terms of Use + Privacy Policy consent is mandatory (compendium §12).
             // Enforced server-side too so signup can't complete unchecked even if
@@ -233,28 +236,6 @@ public without sharing class WFGrantsSignUpController {
             String email, String phone, String organizationName,
             Boolean acceptedTerms, String language) {
 
-        // Idempotent: a resend / retry re-enters initiateSignUp before the user
-        // is verified. Reuse the Person Account created on the first attempt
-        // instead of inserting a duplicate every time (which also prevents a
-        // duplicate/matching-rule exception from silently aborting the resend).
-        List<Account> existingPa = [
-            SELECT PersonContactId FROM Account
-            WHERE PersonEmail = :email AND IsPersonAccount = true
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate DESC LIMIT 1
-        ];
-        if (!existingPa.isEmpty() && existingPa[0].PersonContactId != null) {
-            return existingPa[0].PersonContactId;
-        }
-
-        Id personRtId = null;
-        for (RecordType rt : [
-                SELECT Id FROM RecordType
-                WHERE SObjectType = 'Account' AND IsPersonType = true
-                WITH SYSTEM_MODE
-                ORDER BY DeveloperName LIMIT 1]) {
-            personRtId = rt.Id;
-        }
 
         // Owner assigned directly on insert (rather than a separate update)
         // avoids a moment where the guest user owns the record.
@@ -272,6 +253,46 @@ public without sharing class WFGrantsSignUpController {
             throw new AuraHandledException(
                 'Registration is temporarily unavailable. Please contact support.');
         }
+
+        // Idempotent: a resend / retry re-enters initiateSignUp before the user
+        // is verified. Reuse the Person Account created on the first attempt
+        // instead of inserting a duplicate every time (which also prevents a
+        // duplicate/matching-rule exception from silently aborting the resend).
+        Datetime windowStart = System.now().addHours(-2);
+        List<Account> existingPa = [
+            SELECT Id, PersonContactId FROM Account
+            WHERE IsPersonAccount = true
+              AND OwnerId = :owner.Id
+              AND CreatedDate >= :windowStart
+              AND (PersonEmail = :email OR PersonMobilePhone = :phone)
+              AND PersonContactId NOT IN
+                  (SELECT ContactId FROM User WHERE ContactId != null)
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate DESC LIMIT 1
+        ];
+        if (!existingPa.isEmpty() && existingPa[0].PersonContactId != null) {
+            Account existing = existingPa[0];
+            existing.FirstName                  = firstName;
+            existing.LastName                   = lastName;
+            existing.PersonEmail                = email;
+            existing.PersonMobilePhone          = phone;
+            existing.WCF_Organizational_Name__c = organizationName;
+            existing.Concern__c                 = (acceptedTerms == true);
+            existing.Preferred_Laungage__c      = resolveLanguage(language);
+            update existing;
+            return existing.PersonContactId;
+        }
+
+        Id personRtId = null;
+        for (RecordType rt : [
+                SELECT Id FROM RecordType
+                WHERE SObjectType = 'Account' AND IsPersonType = true
+                WITH SYSTEM_MODE
+                ORDER BY DeveloperName LIMIT 1]) {
+            personRtId = rt.Id;
+        }
+
+
 
         Account pa = new Account(
             FirstName                    = firstName,
@@ -360,4 +381,30 @@ public without sharing class WFGrantsSignUpController {
         result.put('message', message);
         return result;
     }
+private static final Set<String> FAKE_ORG_NAMES = new Set<String>{
+    'test','testing','demo','sample','asdf','qwerty','abc','xyz',
+    'na','n/a','none','null','nil','nothing','unknown','dummy','fake'
+};
+
+private static String validateOrganizationName(String name) {
+    String v = String.isBlank(name) ? '' : name.trim().replaceAll('\\s+', ' ');
+    if (v.length() < 2 || v.length() > 80) {
+        return 'Organization name must be between 2 and 80 characters.';
+    }
+    if (v.containsAny('@$#')) {
+        return 'Organization name cannot contain @, $, # or emojis.';
+    }
+    // Letters/marks/digits/space and . , & ' ( ) / -  (emojis fail this check)
+    if (!Pattern.matches('^[\\p{L}\\p{M}\\p{N} .,&\'()/\\-]+$', v)) {
+        return 'Organization name contains unsupported characters.';
+    }
+    if (!Pattern.compile('.*\\p{L}.*\\p{L}.*').matcher(v).matches()) {
+        return 'Enter a valid organization name.';
+    }
+    if (Pattern.compile('.*(.)\\1{3,}.*').matcher(v).matches()
+            || FAKE_ORG_NAMES.contains(v.toLowerCase())) {
+        return 'Enter your real organization name.';
+    }
+    return null;
+}
 }

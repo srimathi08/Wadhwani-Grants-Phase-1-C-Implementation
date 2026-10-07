@@ -1,5 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getComplianceSummary   from '@salesforce/apex/ComplianceDocumentController.getComplianceSummary';
 import getComplianceRows      from '@salesforce/apex/ComplianceDocumentController.getComplianceRows';
 import saveComplianceRequest  from '@salesforce/apex/ComplianceDocumentController.saveComplianceRequest';
@@ -8,6 +10,9 @@ import getLinkedApplication   from '@salesforce/apex/ComplianceDocumentControlle
 import getComplianceDocumentReviewItems from '@salesforce/apex/ComplianceDocumentController.getComplianceDocumentReviewItems';
 import saveComplianceRequestDecision from '@salesforce/apex/ComplianceDocumentController.saveComplianceRequestDecision';
 import getFileBase64 from '@salesforce/apex/WCFValidatorController.getFileBase64';
+import getLatestReviewId from '@salesforce/apex/ComplianceDocumentController.getLatestReviewId';
+import getGrantAgreementDetails from '@salesforce/apex/ComplianceDocumentController.getGrantAgreementDetails';
+import saveGrantAgreementFile from '@salesforce/apex/ComplianceDocumentController.saveGrantAgreementFile';
 
 const GEO_DOC_TYPES = {
     India:  ['80G Certificate', '12A Certificate', 'FCRA Certificate',
@@ -55,9 +60,29 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     @track reviewRequestId      = '';
     _reviewNotesByLabel = {};
 
+    // ── Dedicated Grant Agreement Modal State ──
+    @track showAgreementModal             = false;
+    @track isReplacingAgreement           = false;
+    @track agreementRequestId             = null;
+    @track agreementOrgId                 = '';
+    @track agreementOrgName               = '';
+    @track agreementAppId                 = '';
+    @track agreementAppName               = '';
+    @track uploadedAgreementFile          = null;
+    @track agreementExecutionDate         = '';
+    @track agreementEffectiveDate         = '';
+    @track agreementRemarks               = '';
+    @track isOfflineVerificationComplete  = false;
+    @track agreementModalError            = null;
+    @track isSavingAgreement              = false;
+
     @track selectedReturnLabels = [];
     _decisionNotes = '';
     @track pendingDecision = null;
+    @track isDeciding = false;
+    @track searchTerm = '';
+
+    _isOpeningApplication = false;
 
     @track currentPage = 1;
     pageSize = 10;
@@ -123,16 +148,73 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
         return pathParts.length > 1 ? pathParts[0] : '';
     }
 
+    // ── NEW: site-relative URL builder (environment independent) ─────────
+    _siteUrl(page, params) {
+        const base = COMMUNITY_BASE_PATH || this.sitePrefix + '/s';
+        const path = String(page || '').replace(/^\/+/, '');
+        let url = `${base}/${path}`;
+        if (params) {
+            const qs = Object.keys(params)
+                .filter(k => params[k] !== undefined && params[k] !== null && params[k] !== '')
+                .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+                .join('&');
+            if (qs) url += `?${qs}`;
+        }
+        return url;
+    }
+
+    // ── NEW: Application Number link → read-only proposal + review view ──
+    async handleViewApplication(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this._isOpeningApplication) return;
+
+        const applicationId = event.currentTarget.dataset.id;
+        if (!applicationId) return;
+
+        this._isOpeningApplication = true;
+        try {
+            const reviewId = await getLatestReviewId({ applicationId });
+            if (!reviewId) {
+                this.dispatchEvent(new ShowToastEvent({
+                    title: 'No review found',
+                    message: 'There is no review record for this application yet.',
+                    variant: 'warning'
+                }));
+                return;
+            }
+            this[NavigationMixin.Navigate]({
+                type: 'standard__webPage',
+                attributes: {
+                    url: this._siteUrl('review-forms', {
+                        recordId      : reviewId,
+                        applicationId : applicationId,
+                        action        : 'view'
+                    })
+                }
+            });
+        } catch (e) {
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Could not open application',
+                message: e?.body?.message || e?.message || 'Unknown error',
+                variant: 'error'
+            }));
+        } finally {
+            this._isOpeningApplication = false;
+        }
+    }
+
     async loadReviewItems() {
         this.isLoadingReviewItems = true;
         try {
             const items = await getComplianceDocumentReviewItems({ recordId: this.reviewRecordId });
-            this.reviewItems = (items || []).map(d => {
-                return {
-                    ...d,
-                    statusPillClass: this._decisionStatusClass(d.status)
-                };
-            });
+           const closed = ['Validated', 'Returned', 'Rejected', 'Suspended'];
+this.reviewItems = (items || []).map(d => ({
+    ...d,
+    statusPillClass: this._decisionStatusClass(d.status),
+    isOpen: !!d.hasFile && !closed.includes(d.status),
+    isAwaitingReupload: d.status === 'Returned'
+}));
         } catch (e) {
             console.error('loadReviewItems error:', e);
             this.reviewItems = [];
@@ -193,7 +275,10 @@ handleReviewNoteInput(event) {
     this._reviewNotesByLabel[event.target.dataset.label] = event.target.value;
 }
 
-
+handleSearchInput(event) {
+    this.searchTerm = event.target.value.toLowerCase().trim();
+    this.currentPage = 1;
+}
     
 closeReviewModal() {
     this.showReviewModal = false;
@@ -202,6 +287,8 @@ closeReviewModal() {
     this.selectedReturnLabels = [];
     this._decisionNotes = '';
     this.pendingDecision = null;
+    this.isDeciding = false;
+this.formError = null;
 }
 handleReviewBackdropClick() { this.closeReviewModal(); }
     // ── Auto-fetch linked proposal ────────────────────────────────────────
@@ -245,7 +332,8 @@ _displayDate(iso) {
     today.setHours(0, 0, 0, 0);
     return rawRows.map((r, i) => {
         const dueDateRaw = this._parseIso(r.dueDate);
-        const isOverdue  = dueDateRaw && dueDateRaw < today && r.status !== 'Received';
+        const settled   = ['Received', 'Validated', 'Rejected', 'Suspended'];
+const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status);
         const isUrgent   = dueDateRaw && !isOverdue &&
                            Math.ceil((dueDateRaw - today) / 86400000) <= 3;
         const effectiveStatus = isOverdue ? 'Overdue' : r.status;
@@ -257,6 +345,7 @@ _displayDate(iso) {
             orgId:           r.orgId    || '',
             applicationId:   r.applicationId   || '',
             applicationName: r.applicationName || '',
+            hasApplication:  !!r.applicationId,
             documents:       r.documents || [],
             requestedDateIso: r.requestedDate || '',
             dueDateIso:       r.dueDate || '',
@@ -271,7 +360,15 @@ _displayDate(iso) {
             statusClass:     this._statusClass(effectiveStatus),
             geography:       r.geography || '—',
             notes:           r.notes || '',
-            isOverdue
+            isOverdue,
+            agreementStatus: r.agreementStatus || 'Locked',
+            isAgreementLocked: !!r.isAgreementLocked,
+            isAwaitingAgreement: !!r.isAwaitingAgreement,
+            isAgreementExecuted: !!r.isAgreementExecuted,
+            agreementContentDocumentId: r.agreementContentDocumentId || '',
+            agreementFileName: r.agreementFileName || '',
+            executedDate:    r.executedDate || '',
+            effectiveDate:   r.effectiveDate || ''
         };
     });
 }
@@ -283,25 +380,34 @@ _displayDate(iso) {
     }
 
     _statusClass(s) {
-        if (s === 'Received')     return 'status-pill status-validated';
-        if (s === 'Overdue')      return 'status-pill status-awaiting';
-        if (s === 'Under Review') return 'status-pill status-inprogress';
-        if (s === 'Submitted')    return 'status-pill status-inprogress';
-        return 'status-pill status-notstarted';
-    }
+    if (s === 'Received' || s === 'Validated') return 'status-pill status-validated';
+    if (s === 'Overdue'  || s === 'Returned')  return 'status-pill status-awaiting';
+    if (s === 'Rejected')                      return 'status-pill status-rejected';
+    if (s === 'Suspended')                     return 'status-pill status-suspended';
+    if (s === 'Under Review' || s === 'Submitted' || s === 'Pending Review')
+                                               return 'status-pill status-inprogress';
+    return 'status-pill status-notstarted';
+}
 
     // ── KPI filter ────────────────────────────────────────────────────────
-    get filteredRows() {
-        let src = this.rows;
-        if (this.activeFilter === 'pending') {
-            src = src.filter(r => r.status !== 'Received' && !r.isOverdue);
-        } else if (this.activeFilter === 'overdue') {
-            src = src.filter(r => r.isOverdue);
-        } else if (this.activeFilter === 'received') {
-            src = src.filter(r => r.status === 'Received');
-        }
-        return src.map((r, i) => ({ ...r, rowNum: i + 1 }));
+   get filteredRows() {
+    let src = this.rows;
+   if (this.activeFilter === 'pending') {
+    src = src.filter(r => !['Received','Validated','Rejected','Suspended'].includes(r.status) && !r.isOverdue);
+} else if (this.activeFilter === 'overdue') {
+    src = src.filter(r => r.isOverdue);
+} else if (this.activeFilter === 'received') {
+    src = src.filter(r => ['Received','Validated'].includes(r.status));
+}
+    if (this.searchTerm) {
+        src = src.filter(r =>
+            (r.requestId       || '').toLowerCase().includes(this.searchTerm) ||
+            (r.applicationName || '').toLowerCase().includes(this.searchTerm) ||
+            (r.orgName         || '').toLowerCase().includes(this.searchTerm)
+        );
     }
+    return src.map((r, i) => ({ ...r, rowNum: i + 1 }));
+}
 
     get pagedRows() {
         const start = (this.currentPage - 1) * this.pageSize;
@@ -443,16 +549,178 @@ _displayDate(iso) {
     stopProp(event)       { event.stopPropagation(); }
 
     handleOpenReview(event) {
-    const id = event.currentTarget.dataset.id;
-    const row = this.rows.find(r => r.recordId === id);
-    if (!row) return;
+        const id = event.currentTarget.dataset.id;
+        const row = this.rows.find(r => r.recordId === id);
+        if (!row) return;
 
-    this.reviewRecordId  = id;
-    this.reviewRequestId = row.requestId;
-    this.formError       = null;
-    this.showReviewModal = true;
-    this.loadReviewItems();
-}
+        this.reviewRecordId  = id;
+        this.reviewRequestId = row.requestId;
+        this.formError       = null;
+        this.showReviewModal = true;
+        this.loadReviewItems();
+    }
+
+    // ── Dedicated Grant Agreement Modal Getters & Handlers ──────────────────
+    get agreementModalTitle() {
+        return this.isReplacingAgreement ? 'Replace signed Grant Agreement' : 'Upload signed Grant Agreement';
+    }
+
+    get isSaveAgreementDisabled() {
+        return !this.uploadedAgreementFile || !this.agreementExecutionDate || !this.isOfflineVerificationComplete || this.isSavingAgreement;
+    }
+
+    handleOpenUploadAgreement(event) {
+        const id = event.currentTarget.dataset.id;
+        const row = this.rows.find(r => r.recordId === id);
+        if (!row) return;
+
+        this.isReplacingAgreement = false;
+        this.agreementRequestId   = row.recordId;
+        this.agreementOrgId       = row.orgId;
+        this.agreementOrgName     = row.orgName;
+        this.agreementAppId       = row.applicationId;
+        this.agreementAppName     = row.applicationName;
+        this.uploadedAgreementFile = null;
+        this.agreementExecutionDate = new Date().toISOString().split('T')[0];
+        this.agreementEffectiveDate = '';
+        this.agreementRemarks     = '';
+        this.isOfflineVerificationComplete = false;
+        this.agreementModalError  = null;
+        this.showAgreementModal   = true;
+    }
+
+    handleOpenReplaceAgreement(event) {
+        const id = event.currentTarget.dataset.id;
+        const row = this.rows.find(r => r.recordId === id);
+        if (!row) return;
+
+        this.isReplacingAgreement = true;
+        this.agreementRequestId   = row.recordId;
+        this.agreementOrgId       = row.orgId;
+        this.agreementOrgName     = row.orgName;
+        this.agreementAppId       = row.applicationId;
+        this.agreementAppName     = row.applicationName;
+        this.uploadedAgreementFile = null;
+        this.agreementExecutionDate = new Date().toISOString().split('T')[0];
+        this.agreementEffectiveDate = '';
+        this.agreementRemarks     = '';
+        this.isOfflineVerificationComplete = false;
+        this.agreementModalError  = null;
+        this.showAgreementModal   = true;
+    }
+
+    closeAgreementModal() {
+        this.showAgreementModal = false;
+        this.uploadedAgreementFile = null;
+        this.agreementModalError = null;
+        this.isSavingAgreement = false;
+    }
+
+    handleAgreementBackdropClick() {
+        this.closeAgreementModal();
+    }
+
+    handleAgreementFieldChange(event) {
+        const field = event.currentTarget.dataset.field;
+        if (field === 'executionDate') {
+            this.agreementExecutionDate = event.target.value;
+        } else if (field === 'effectiveDate') {
+            this.agreementEffectiveDate = event.target.value;
+        } else if (field === 'remarks') {
+            this.agreementRemarks = event.target.value;
+        }
+    }
+
+    handleVerificationCheckboxChange(event) {
+        this.isOfflineVerificationComplete = event.target.checked;
+    }
+
+    handleAgreementFileUploaded(event) {
+        const files = event.detail.files;
+        if (!files || files.length === 0) return;
+        const f = files[0];
+        this.uploadedAgreementFile = {
+            documentId: f.documentId,
+            name: f.name || 'Grant_Agreement_signed.pdf',
+            size: '1.2 MB'
+        };
+        this.agreementModalError = null;
+    }
+
+    async handleSaveAndNotifyAgreement() {
+        if (this.isSaveAgreementDisabled) return;
+
+        this.isSavingAgreement = true;
+        this.agreementModalError = null;
+        try {
+            await saveGrantAgreementFile({
+                complianceRequestId: this.agreementRequestId,
+                contentDocumentId:   this.uploadedAgreementFile.documentId,
+                executionDate:       this.agreementExecutionDate,
+                effectiveDate:       this.agreementEffectiveDate || null,
+                remarks:             this.agreementRemarks || null,
+                isReplace:           this.isReplacingAgreement
+            });
+
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Success',
+                message: this.isReplacingAgreement
+                    ? 'Grant Agreement replaced successfully. Previous version marked Superseded.'
+                    : 'Grant Agreement uploaded and linked successfully. Application is now Onboarded.',
+                variant: 'success'
+            }));
+
+            this.closeAgreementModal();
+            await this.loadData();
+        } catch (e) {
+            console.error('Error saving Grant Agreement:', e);
+            this.agreementModalError = e?.body?.message || e?.message || 'Error saving Grant Agreement.';
+        } finally {
+            this.isSavingAgreement = false;
+        }
+    }
+
+    async handlePreviewGrantAgreement(event) {
+        const docId = event.currentTarget.dataset.docId;
+        if (!docId) return;
+        try {
+            const result = await getFileBase64({ contentVersionId: docId });
+            const extension = (result.fileType || 'pdf').toLowerCase();
+            const mimeType = (extension === 'pdf') ? 'application/pdf'
+                           : (extension === 'png') ? 'image/png'
+                           : (extension === 'jpg' || extension === 'jpeg') ? 'image/jpeg'
+                           : 'application/octet-stream';
+
+            const byteChars   = atob(result.base64);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+                byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob      = new Blob([byteArray], { type: mimeType });
+            const blobUrl   = URL.createObjectURL(blob);
+
+            const newTab = window.open(blobUrl, '_blank');
+            if (!newTab) {
+                const a = document.createElement('a');
+                a.href     = blobUrl;
+                a.download = (result.title || 'Grant_Agreement_signed') + '.' + extension;
+                a.click();
+            }
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+        } catch (e) {
+            console.error('Error previewing grant agreement:', e);
+            this[NavigationMixin.Navigate]({
+                type: 'standard__namedPage',
+                attributes: {
+                    pageName: 'filePreview'
+                },
+                state: {
+                    selectedRecordId: docId
+                }
+            });
+        }
+    }
 
     // ── Form handlers ─────────────────────────────────────────────────────
 handleFieldChange(event) {
@@ -490,15 +758,20 @@ _validateDates() {
         this.form = { ...this.form, documentTypes: types };
     }
 
-    get hasUploadedDocs() {
-    return this.reviewItems.some(i => i.hasFile);
-}
 
+get hasUploadedDocs()     { return this.reviewItems.some(i => i.hasFile); }
+get hasOpenDocs()         { return this.reviewItems.some(i => i.isOpen); }
+get hasAwaitingReupload() { return this.reviewItems.some(i => i.isAwaitingReupload); }
+get isAwaitingApplicant() { return !this.isLoadingReviewItems && this.hasAwaitingReupload; }
+get isDecisionLocked()    { return this.hasUploadedDocs && !this.hasOpenDocs && !this.hasAwaitingReupload; }
+get showDecisionButtons() { return this.hasOpenDocs && !this.hasAwaitingReupload; }
+get noDocsToReview()      { return !this.isLoadingReviewItems && !this.hasUploadedDocs; }
 get isReturnDecision() {
     return this.pendingDecision === 'Return';
 }
 
 handleChooseDecision(event) {
+    if (!this.showDecisionButtons) return;
     this.pendingDecision = event.currentTarget.dataset.decision;
     this.formError = null;
 }
@@ -526,6 +799,7 @@ handleReturnCheckboxChange(event) {
 }
 
 async handleConfirmDecision() {
+        if (this.isDeciding || !this.showDecisionButtons) return;
     const decision = this.pendingDecision;
 
     if (!this._decisionNotes.trim()) {
@@ -537,6 +811,7 @@ async handleConfirmDecision() {
         return;
     }
 
+    this.isDeciding = true;
     try {
         await saveComplianceRequestDecision({
             recordId: this.reviewRecordId,
@@ -547,11 +822,15 @@ async handleConfirmDecision() {
         this.pendingDecision = null;
         this.selectedReturnLabels = [];
         this._decisionNotes = '';
+        this.formError = null;
         await this.loadReviewItems();
         await this.loadData();
-    } catch (e) {
-        console.error('saveComplianceRequestDecision error:', e);
-        this.formError = e.body?.message || 'Could not save decision.';
+     } catch (e) {
+    this.formError = e.body?.message || 'Could not save decision.';
+    this.pendingDecision = null;
+    await this.loadReviewItems();   // a stale modal refreshes and locks itself
+} finally {
+        this.isDeciding = false;
     }
 }
 

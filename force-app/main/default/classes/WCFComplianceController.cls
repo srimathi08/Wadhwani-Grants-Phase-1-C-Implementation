@@ -1,28 +1,109 @@
 public without sharing class WCFComplianceController {
 
     // ─────────────────────────────────────────────────────────────────
+    // EDIT RULES (single source of truth — the LWC mirrors these)
+    //
+    //   Reviewer decision   | Applicant can…
+    //   ────────────────────┼──────────────────────────────────────────
+    //   Pass / Validated    | view & download only (locked)
+    //   Reject              | nothing — whole checklist frozen
+    //   Suspend             | nothing — whole checklist frozen
+    //   Return              | replace the returned file (not delete)
+    //   Refresh Required    | replace the expired file (not delete)
+    //   Pending Review /    | view only — it is with the reviewer
+    //   Flagged             |
+    //   Not Started /       | upload, replace, delete, submit
+    //   Pending Submission /|
+    //   Draft               |
+    //
+    // Raw statuses (dedicated Status__c or ad hoc JSON entry.status) are
+    // normalised first, so 'Pass', 'Approved', 'Reject', 'Suspend',
+    // 'Return', 'Submitted', 'Under Review', 'Received' all map onto the
+    // canonical values above.
+    // ─────────────────────────────────────────────────────────────────
+
+    private static final Map<String, String> STATUS_ALIASES = new Map<String, String>{
+        'pass'               => 'Validated',
+        'approved'           => 'Validated',
+        'validated'          => 'Validated',
+        'reject'             => 'Rejected',
+        'rejected'           => 'Rejected',
+        'suspend'            => 'Suspended',
+        'suspended'          => 'Suspended',
+        'return'             => 'Returned',
+        'returned'           => 'Returned',
+        'submitted'          => 'Pending Review',
+        'under review'       => 'Pending Review',
+        'received'           => 'Pending Review',
+        'pending review'     => 'Pending Review',
+        'draft'              => 'Draft',
+        'not started'        => 'Not Started',
+        'pending submission' => 'Pending Submission',
+        'refresh required'   => 'Refresh Required',
+        'flagged'            => 'Flagged'
+    };
+
+    /** Statuses in which the applicant may upload / replace a file. */
+    private static final Set<String> EDITABLE_STATUSES = new Set<String>{
+        'Not Started', 'Pending Submission', 'Draft', 'Returned', 'Refresh Required'
+    };
+
+    /** Statuses in which the applicant may delete the file on record. */
+    private static final Set<String> DELETABLE_STATUSES = new Set<String>{
+        'Not Started', 'Pending Submission', 'Draft'
+    };
+
+    /** Reviewer sent the row back: a new file is required before resubmission. */
+    private static final Set<String> REUPLOAD_REQUIRED_STATUSES = new Set<String>{
+        'Returned', 'Refresh Required'
+    };
+
+    /** Statuses that represent a reviewer decision on a row. */
+    private static final Set<String> REVIEWER_DECISION_STATUSES = new Set<String>{
+        'Validated', 'Rejected', 'Suspended', 'Returned', 'Refresh Required', 'Flagged'
+    };
+
+    /** A decision in this set freezes the whole checklist for the applicant. */
+    private static final Set<String> FREEZE_STATUSES = new Set<String>{
+        'Rejected', 'Suspended'
+    };
+
+    /** Rows already with (or decided by) the reviewer — Submit leaves them alone. */
+    private static final Set<String> WITH_REVIEWER_STATUSES = new Set<String>{
+        'Pending Review', 'Validated', 'Flagged'
+    };
+
+    /** Raw record statuses that mean "the applicant has submitted at least once". */
+    private static final Set<String> SUBMITTED_STATUSES = new Set<String>{
+        'Pending Review', 'Validated', 'Flagged'
+    };
+
+    // ─────────────────────────────────────────────────────────────────
     // Wrapper classes
     // ─────────────────────────────────────────────────────────────────
 
     public class ComplianceChecklistItem {
-        @AuraEnabled public Id     recordId;
-        @AuraEnabled public String documentType;
-        @AuraEnabled public String documentLabel;
-        @AuraEnabled public String description;
+        @AuraEnabled public Id      recordId;
+        @AuraEnabled public String  documentType;
+        @AuraEnabled public String  documentLabel;
+        @AuraEnabled public String  description;
         @AuraEnabled public Boolean required;
-        @AuraEnabled public String status;
-        @AuraEnabled public String contentDocumentId;
-        @AuraEnabled public String fileName;
-        @AuraEnabled public String issueDate;
-        @AuraEnabled public String expiryDate;
-        @AuraEnabled public String returnReason;
-        @AuraEnabled public String submittedDate;
-        @AuraEnabled public Id adHocParentId;
+        @AuraEnabled public String  status;
+        @AuraEnabled public String  contentDocumentId;
+        @AuraEnabled public String  fileName;
+        @AuraEnabled public String  issueDate;
+        @AuraEnabled public String  expiryDate;
+        @AuraEnabled public String  returnReason;
+        @AuraEnabled public String  submittedDate;
+        @AuraEnabled public String  dueDate;
+        @AuraEnabled public Id      adHocParentId;
+        @AuraEnabled public Boolean isEditable;   // applicant may upload / replace
+        @AuraEnabled public Boolean canDelete;    // applicant may delete the file
     }
 
     public class ComplianceChecklistResult {
-        @AuraEnabled public Id     applicationId;
-        @AuraEnabled public String geography;
+        @AuraEnabled public Id      applicationId;
+        @AuraEnabled public String  geography;
         @AuraEnabled public List<ComplianceChecklistItem> items;
         @AuraEnabled public Integer totalRequired;
         @AuraEnabled public Integer totalValidated;
@@ -31,6 +112,8 @@ public without sharing class WCFComplianceController {
         @AuraEnabled public String  overallStatus;
         @AuraEnabled public String  complianceStatus;
         @AuraEnabled public String  reviewerNotes;
+        @AuraEnabled public Boolean isLocked;     // nothing on the checklist is editable
+        @AuraEnabled public String  lockReason;   // 'Rejected' | 'Suspended' | 'Validated' | null
     }
 
     private class DocTypeTemplate {
@@ -46,11 +129,19 @@ public without sharing class WCFComplianceController {
         }
     }
 
+    public class DocStatusEntry {
+        public String status;
+        public String contentDocumentId;
+        public String fileName;
+        public String issueDate;
+        public String expiryDate;
+        public String uploadedDate;
+        public String reviewerNotes;
+    }
+
     // ─────────────────────────────────────────────────────────────────
     // Geography → checklist template
-    // BRD B.4: "Compliance Checklist is geography-driven. The required
-    // documents for India differ from Brazil, Mexico, Indonesia, and
-    // Philippines. Each geography has its own checklist template."
+    // BRD B.4: "Compliance Checklist is geography-driven."
     // ─────────────────────────────────────────────────────────────────
     private static List<DocTypeTemplate> getTemplateForGeography(String geography) {
         return new List<DocTypeTemplate>();
@@ -68,50 +159,26 @@ public without sharing class WCFComplianceController {
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // NEW METHOD — getOrCreateComplianceRecord
-    //
-    // Called by handlePrepareUpload in the LWC when a "Not Started" row
-    // has no existing WCF_Compliance_Document__c record yet.
-    //
-    // Returns the Id of the (existing or newly created) shell record so
-    // lightning-file-upload has a valid, community-user-accessible record-id.
-    //
-    // The record is created with Status__c = 'Not Started'. Once the
-    // donee uploads a file, handleUploadFinished calls saveComplianceDocument
-    // which upserts the same record with the file details and flips status
-    // to 'Draft'.
+    // Prepare upload — shell record so lightning-file-upload has a
+    // community-accessible record-id.
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static Id getOrCreateComplianceRecord(Id applicationId, String documentType) {
         if (applicationId == null || String.isBlank(documentType)) {
             throw new AuraHandledException('Missing application or document type.');
         }
-
         validateOwnership(applicationId);
 
-        // Check if a record already exists
-        List<WCF_Compliance_Document__c> existing = [
-            SELECT Id,
-                   Document_Type__c,
-                   ContentDocumentId__c,
-                   File_Name__c,
-                   Status__c,
-                   Issue_Date__c,
-                   Expiry_Date__c,
-                   Uploaded_Date__c,
-                   Reviewer_Notes__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            AND    Document_Type__c         = :documentType
-            WITH   SYSTEM_MODE
-            LIMIT  1
-        ];
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+        assertEditable(items, findItem(items, documentType, null), false);
 
-        if (!existing.isEmpty()) {
-            return existing[0].Id;
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (doc.Document_Type__c == documentType) {
+                return doc.Id;
+            }
         }
 
-        // Create the shell record — status Not Started, no file yet
         WCF_Compliance_Document__c shell = new WCF_Compliance_Document__c(
             IndividualApplication__c = applicationId,
             Document_Type__c         = documentType,
@@ -123,7 +190,6 @@ public without sharing class WCFComplianceController {
 
     // ─────────────────────────────────────────────────────────────────
     // READ — full checklist
-    // BRD B.4: geography-driven document set, status per row
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static ComplianceChecklistResult getComplianceChecklist(Id applicationId) {
@@ -133,206 +199,59 @@ public without sharing class WCFComplianceController {
 
         IndividualApplication app = validateOwnership(applicationId);
 
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        Boolean isSubmitted = computeIsSubmitted(allDocs);
+        List<ComplianceChecklistItem> items = buildItems(allDocs, isSubmitted);
+
         ComplianceChecklistResult result = new ComplianceChecklistResult();
         result.applicationId = applicationId;
         result.geography     = resolveGeography(app.Headquarters_City_and_Country__c);
-        result.items         = new List<ComplianceChecklistItem>();
+        result.items         = items;
 
-        Map<String, WCF_Compliance_Document__c> existingByType =
-            new Map<String, WCF_Compliance_Document__c>();
-        List<WCF_Compliance_Document__c> adHocRequests = new List<WCF_Compliance_Document__c>();
+        Integer totalRequired  = 0;
+        Integer totalValidated = 0;
+        Integer totalUploaded  = 0;
+        Boolean anyRefresh     = false;
+        Boolean anyDraft       = false;
+        Boolean hasRejected    = false;
+        Boolean hasSuspended   = false;
+        Boolean hasReturned    = false;
+        List<String> rejectedNotes  = new List<String>();
+        List<String> suspendedNotes = new List<String>();
+        List<String> returnedNotes  = new List<String>();
 
-        List<WCF_Compliance_Document__c> allDocs = [
-            SELECT Id, OwnerId, Document_Type__c, Document_Types__c, Status__c,
-                   ContentDocumentId__c, File_Name__c, Issue_Date__c, Expiry_Date__c,
-                   Reviewer_Notes__c, Uploaded_Date__c, Due_Date__c, Document_Status_JSON__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            WITH   SYSTEM_MODE
-            ORDER BY LastModifiedDate DESC
-        ];
-
-        Boolean isSubmitted = false;
-
-        for (WCF_Compliance_Document__c doc : allDocs) {
-            if (String.isNotBlank(doc.Document_Type__c)) {
-                existingByType.put(doc.Document_Type__c, doc);
-            } else if (String.isNotBlank(doc.Document_Types__c)) {
-                adHocRequests.add(doc); // reviewer-raised ad hoc request
-            }
-
-            if (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
-                    || doc.Status__c == 'Under Review' || doc.Status__c == 'Received'
-                    || doc.Status__c == 'Pending Review' || doc.Status__c == 'Pass'
-                    || doc.Status__c == 'Approved') {
-                isSubmitted = true;
-            }
-        }
-
-        // ── Pre-process ad-hoc requests into a map to prevent duplicates ───────
-        Map<String, ComplianceChecklistItem> adHocItemsByLabel = new Map<String, ComplianceChecklistItem>();
-        for (WCF_Compliance_Document__c doc : adHocRequests) {
-            Boolean docIsSubmitted = (doc.Status__c == 'Submitted' || doc.Status__c == 'Validated'
-                || doc.Status__c == 'Under Review' || doc.Status__c == 'Received'
-                || doc.Status__c == 'Pending Review' || doc.Status__c == 'Pass');
-
-            for (String label : doc.Document_Types__c.split(';')) {
-                label = label.trim();
-                if (String.isBlank(label)) continue;
-
-                WCF_Compliance_Document__c fulfilled = existingByType.get(label);
-                ComplianceChecklistItem item = new ComplianceChecklistItem();
-                item.documentType  = label;
-                item.documentLabel = label;
-                item.description   = 'Requested by the compliance team'
-                    + (doc.Due_Date__c != null ? ' — due ' + doc.Due_Date__c.format() : '') + '.';
-                item.required = true;
-
-                if (fulfilled != null) {
-                    item.recordId          = fulfilled.Id;
-                    item.status            = (fulfilled.Status__c == 'Pending Submission' && String.isNotBlank(fulfilled.ContentDocumentId__c) && !isSubmitted)
-                                             ? 'Draft' : fulfilled.Status__c;
-                    item.contentDocumentId = fulfilled.ContentDocumentId__c;
-                    item.fileName          = fulfilled.File_Name__c;
-                    item.returnReason      = fulfilled.Reviewer_Notes__c;
-                    item.issueDate         = fulfilled.Issue_Date__c  != null ? String.valueOf(fulfilled.Issue_Date__c)  : null;
-                    item.expiryDate        = fulfilled.Expiry_Date__c != null ? String.valueOf(fulfilled.Expiry_Date__c) : null;
-                    item.submittedDate     = fulfilled.Uploaded_Date__c != null ? String.valueOf(fulfilled.Uploaded_Date__c.date()) : null;
-                } else {
-                    Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-                    DocStatusEntry entry = statusMap.get(label);
-
-                    item.recordId          = doc.Id;
-                    item.adHocParentId     = doc.Id;
-
-                    if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
-                        if (String.isNotBlank(entry.status)) {
-                            item.status = entry.status;
-                        } else {
-                            item.status = docIsSubmitted ? 'Pending Review' : 'Draft';
-                        }
-                    } else {
-                        item.status = (doc.Status__c == 'Draft') ? 'Draft' : 'Pending Submission';
-                    }
-
-                    item.contentDocumentId = entry != null ? entry.contentDocumentId : null;
-                    item.fileName          = entry != null ? entry.fileName          : null;
-                    item.returnReason      = (entry != null && String.isNotBlank(entry.reviewerNotes))
-                                             ? entry.reviewerNotes : doc.Reviewer_Notes__c;
-                    item.issueDate         = entry != null ? entry.issueDate         : null;
-                    item.expiryDate        = entry != null ? entry.expiryDate        : null;
-                    item.submittedDate     = entry != null ? entry.uploadedDate      : null;
-                }
-                adHocItemsByLabel.put(label, item);
-            }
-        }
-
-        // ── Add all ad-hoc requested items ──────────────────────────────
-        for (ComplianceChecklistItem item : adHocItemsByLabel.values()) {
-            result.items.add(item);
-        }
-
-        // ── Add remaining existing dedicated documents not in ad-hoc ─────
-        for (String label : existingByType.keySet()) {
-            if (!adHocItemsByLabel.containsKey(label)) {
-                WCF_Compliance_Document__c doc = existingByType.get(label);
-                ComplianceChecklistItem item = new ComplianceChecklistItem();
-                item.documentType      = label;
-                item.documentLabel     = label;
-                item.description       = 'Compliance Document.';
-                item.required          = true;
-                item.recordId          = doc.Id;
-                item.status            = (doc.Status__c == 'Pending Submission' && String.isNotBlank(doc.ContentDocumentId__c) && !isSubmitted)
-                                         ? 'Draft' : doc.Status__c;
-                item.contentDocumentId = doc.ContentDocumentId__c;
-                item.fileName          = doc.File_Name__c;
-                item.returnReason      = doc.Reviewer_Notes__c;
-                item.issueDate         = doc.Issue_Date__c != null ? String.valueOf(doc.Issue_Date__c) : null;
-                item.expiryDate        = doc.Expiry_Date__c != null ? String.valueOf(doc.Expiry_Date__c) : null;
-                item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date()) : null;
-                
-                result.items.add(item);
-            }
-        }
-
-        // ── Calculate progress and metrics ────────────────────────────────────
-        Integer totalRequired      = 0;
-        Integer totalValidated     = 0;
-        Integer totalUploaded      = 0;
-        Boolean anyRefreshRequired = false;
-        Boolean anyDraft           = false;
-
-        for (ComplianceChecklistItem item : result.items) {
+        for (ComplianceChecklistItem item : items) {
             if (item.required) {
                 totalRequired++;
-                if (item.status == 'Validated' || item.status == 'Pass') {
-                    totalValidated++;
-                }
-                if (String.isNotBlank(item.contentDocumentId)) {
+                if (item.status == 'Validated') totalValidated++;
+                if (String.isNotBlank(item.contentDocumentId)
+                        && !REUPLOAD_REQUIRED_STATUSES.contains(item.status)) {
                     totalUploaded++;
                 }
             }
-            if (item.status == 'Refresh Required') {
-                anyRefreshRequired = true;
-            }
-            if (item.status == 'Draft') {
-                anyDraft = true;
-            }
+            if (item.status == 'Refresh Required') anyRefresh = true;
+            if (item.status == 'Draft')            anyDraft   = true;
+            if (item.status == 'Rejected')  { hasRejected  = true; addNote(rejectedNotes,  item.returnReason); }
+            if (item.status == 'Suspended') { hasSuspended = true; addNote(suspendedNotes, item.returnReason); }
+            if (item.status == 'Returned')  { hasReturned  = true; addNote(returnedNotes,  item.returnReason); }
         }
 
-        for (WCF_Compliance_Document__c doc : allDocs) {
-            if (doc.Status__c == 'Draft') {
-                anyDraft = true;
-            }
-        }
+        Boolean allValidated = totalRequired > 0 && totalValidated >= totalRequired;
 
         result.totalRequired  = totalRequired;
         result.totalValidated = totalValidated;
         result.totalUploaded  = totalUploaded;
         result.isSubmitted    = isSubmitted;
 
-        // Calculate decision status and notes
-        String compStatus = 'Pending';
-        String reviewerNotes = '';
-
-        Boolean hasRejected = false;
-        Boolean hasSuspended = false;
-        Boolean hasReturned = false;
-        String returnedNotes = '';
-        String rejectedNotes = '';
-        String suspendedNotes = '';
-
-        for (WCF_Compliance_Document__c doc : allDocs) {
-            if (doc.Status__c == 'Rejected' || doc.Status__c == 'Reject') {
-                hasRejected = true;
-                if (String.isNotBlank(doc.Reviewer_Notes__c)) {
-                    rejectedNotes = doc.Reviewer_Notes__c;
-                }
-            } else if (doc.Status__c == 'Suspended' || doc.Status__c == 'Suspend') {
-                hasSuspended = true;
-                if (String.isNotBlank(doc.Reviewer_Notes__c)) {
-                    suspendedNotes = doc.Reviewer_Notes__c;
-                }
-            } else if (doc.Status__c == 'Returned' || doc.Status__c == 'Return') {
-                hasReturned = true;
-                if (String.isNotBlank(doc.Reviewer_Notes__c)) {
-                    if (String.isNotBlank(returnedNotes)) {
-                        returnedNotes += '; ' + doc.Reviewer_Notes__c;
-                    } else {
-                        returnedNotes = doc.Reviewer_Notes__c;
-                    }
-                }
-            }
-        }
-
-        if (anyRefreshRequired) {
-            result.overallStatus = 'Refresh Required';
-        } else if (totalRequired > 0 && totalValidated >= totalRequired) {
-            result.overallStatus = 'Complete';
-        } else if (hasRejected) {
+        // Overall (row-driven) status — final decisions first.
+        if (hasRejected) {
             result.overallStatus = 'Rejected';
         } else if (hasSuspended) {
             result.overallStatus = 'Suspended';
+        } else if (allValidated) {
+            result.overallStatus = 'Complete';
+        } else if (anyRefresh) {
+            result.overallStatus = 'Refresh Required';
         } else if (hasReturned) {
             result.overallStatus = 'Returned';
         } else if (isSubmitted) {
@@ -343,33 +262,45 @@ public without sharing class WCFComplianceController {
             result.overallStatus = 'Pending Submission';
         }
 
+        // Compliance decision + the notes that go with it.
         if (hasRejected) {
-            compStatus = 'Rejected';
-            reviewerNotes = rejectedNotes;
+            result.complianceStatus = 'Rejected';
+            result.reviewerNotes    = String.join(rejectedNotes, '; ');
         } else if (hasSuspended) {
-            compStatus = 'Suspended';
-            reviewerNotes = suspendedNotes;
+            result.complianceStatus = 'Suspended';
+            result.reviewerNotes    = String.join(suspendedNotes, '; ');
         } else if (hasReturned) {
-            compStatus = 'Returned';
-            reviewerNotes = returnedNotes;
-        } else if (totalRequired > 0 && totalValidated >= totalRequired) {
-            compStatus = 'Validated';
+            result.complianceStatus = 'Returned';
+            result.reviewerNotes    = String.join(returnedNotes, '; ');
+        } else if (allValidated) {
+            result.complianceStatus = 'Validated';
+            result.reviewerNotes    = '';
         } else if (isSubmitted) {
-            compStatus = 'Pending Review';
+            result.complianceStatus = 'Pending Review';
+            result.reviewerNotes    = '';
         } else if (totalUploaded > 0 || anyDraft) {
-            compStatus = 'Draft';
+            result.complianceStatus = 'Draft';
+            result.reviewerNotes    = '';
         } else {
-            compStatus = 'In Progress';
+            result.complianceStatus = 'In Progress';
+            result.reviewerNotes    = '';
         }
 
-        result.complianceStatus = compStatus;
-        result.reviewerNotes = reviewerNotes;
+        // Lock state for the applicant.
+        if (hasRejected) {
+            result.lockReason = 'Rejected';
+        } else if (hasSuspended) {
+            result.lockReason = 'Suspended';
+        } else if (allValidated) {
+            result.lockReason = 'Validated';
+        }
+        result.isLocked = result.lockReason != null;
 
         return result;
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // WRITE — donee uploads or re-uploads a document (saves as Draft)
+    // WRITE — upload / re-upload a dedicated document (lands as Draft)
     // ─────────────────────────────────────────────────────────────────
     @AuraEnabled
     public static ComplianceChecklistItem saveComplianceDocument(
@@ -388,60 +319,48 @@ public without sharing class WCFComplianceController {
 
         validateOwnership(applicationId);
 
-        WCF_Compliance_Document__c doc;
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+        assertEditable(items, findItem(items, documentType, null), false);
 
+        // Resolve the target record only from this application's documents
+        // (so a foreign existingRecordId can never be written to), and never
+        // turn an ad hoc request record into a dedicated one.
+        WCF_Compliance_Document__c doc;
         if (existingRecordId != null) {
-            List<WCF_Compliance_Document__c> byId = [
-                SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
-                       Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
-                FROM   WCF_Compliance_Document__c
-                WHERE  Id = :existingRecordId
-                WITH   SYSTEM_MODE LIMIT 1
-            ];
-            if (!byId.isEmpty()) {
-                if (byId[0].Document_Type__c == documentType 
-                        || String.isBlank(byId[0].Document_Type__c)) {
-                    doc = byId[0];
-                    if (String.isBlank(doc.Document_Type__c)) {
-                        doc.Document_Type__c = documentType;
-                    }
+            for (WCF_Compliance_Document__c d : allDocs) {
+                if (d.Id == existingRecordId
+                        && String.isBlank(d.Document_Types__c)
+                        && (d.Document_Type__c == documentType || String.isBlank(d.Document_Type__c))) {
+                    doc = d;
+                    break;
                 }
             }
         }
         if (doc == null) {
-            List<WCF_Compliance_Document__c> existing = [
-                SELECT Id, Document_Type__c, ContentDocumentId__c, File_Name__c, Status__c,
-                       Issue_Date__c, Expiry_Date__c, Uploaded_Date__c, Reviewer_Notes__c
-                FROM   WCF_Compliance_Document__c
-                WHERE  IndividualApplication__c = :applicationId
-                AND    Document_Type__c         = :documentType
-                WITH   SYSTEM_MODE
-                LIMIT  1
-            ];
-            doc = existing.isEmpty()
-                ? new WCF_Compliance_Document__c(
-                      IndividualApplication__c = applicationId,
-                      Document_Type__c         = documentType)
-                : existing[0];
+            for (WCF_Compliance_Document__c d : allDocs) {   // newest first
+                if (d.Document_Type__c == documentType) {
+                    doc = d;
+                    break;
+                }
+            }
+        }
+        if (doc == null) {
+            doc = new WCF_Compliance_Document__c(IndividualApplication__c = applicationId);
+        }
+        if (String.isBlank(doc.Document_Type__c)) {
+            doc.Document_Type__c = documentType;
         }
 
         String previousContentDocumentId = doc.ContentDocumentId__c;
 
         doc.ContentDocumentId__c = contentDocumentId;
         doc.File_Name__c         = fileName;
-        // Keep as Draft upon upload — only explicit submit flips to Pending Review
-        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review' && doc.Status__c != 'Validated' && doc.Status__c != 'Pass' && doc.Status__c != 'Approved') {
-            doc.Status__c = 'Draft';
-        }
+        // Every permitted upload (first upload, or re-upload after Return /
+        // Refresh Required) lands as Draft. Only Submit moves it on.
+        doc.Status__c            = 'Draft';
         doc.Uploaded_Date__c     = DateTime.now();
-        doc.Reviewer_Notes__c    = null; // clear on re-upload
-
-        if (String.isNotBlank(previousContentDocumentId)
-                && previousContentDocumentId != contentDocumentId) {
-            try {
-                delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
-            } catch (Exception e) { }
-        }  
+        doc.Reviewer_Notes__c    = null;
 
         if (String.isNotBlank(issueDate))  { try { doc.Issue_Date__c  = Date.valueOf(issueDate);  } catch (Exception e) {} }
         if (String.isNotBlank(expiryDate)) { try { doc.Expiry_Date__c = Date.valueOf(expiryDate); } catch (Exception e) {} }
@@ -449,21 +368,710 @@ public without sharing class WCFComplianceController {
         upsert doc;
         linkFileIfNeeded(doc.Id, contentDocumentId);
 
+        if (String.isNotBlank(previousContentDocumentId)
+                && previousContentDocumentId != contentDocumentId) {
+            try {
+                delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
+            } catch (Exception e) { }
+        }
+
         ComplianceChecklistItem item = new ComplianceChecklistItem();
         item.recordId          = doc.Id;
         item.documentType      = doc.Document_Type__c;
-        item.status            = (doc.Status__c == 'Pending Submission' || doc.Status__c == 'Not Started' || doc.Status__c == 'Draft') ? 'Draft' : doc.Status__c;
+        item.status            = 'Draft';
         item.contentDocumentId = doc.ContentDocumentId__c;
         item.fileName          = doc.File_Name__c;
-        item.issueDate         = doc.Issue_Date__c   != null ? String.valueOf(doc.Issue_Date__c)        : null;
-        item.expiryDate        = doc.Expiry_Date__c  != null ? String.valueOf(doc.Expiry_Date__c)       : null;
-        item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date()) : null;
+        item.issueDate         = doc.Issue_Date__c    != null ? String.valueOf(doc.Issue_Date__c)             : null;
+        item.expiryDate        = doc.Expiry_Date__c   != null ? String.valueOf(doc.Expiry_Date__c)            : null;
+        item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date())   : null;
+        item.isEditable        = true;
+        item.canDelete         = true;
         return item;
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // Helper — link uploaded file to the compliance record
+    // WRITE — delete the file on a dedicated document (Draft only)
     // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void deleteComplianceDocumentFile(Id recordId) {
+        if (recordId == null) {
+            throw new AuraHandledException('Missing document record.');
+        }
+
+        List<WCF_Compliance_Document__c> docs = [
+            SELECT Id, IndividualApplication__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  Id = :recordId
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
+        if (docs.isEmpty()) {
+            throw new AuraHandledException('Document not found.');
+        }
+        Id applicationId = docs[0].IndividualApplication__c;
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+
+        ComplianceChecklistItem target;
+        for (ComplianceChecklistItem i : items) {
+            if (i.recordId == recordId && i.adHocParentId == null) { target = i; break; }
+        }
+        assertEditable(items, target, true);
+
+        WCF_Compliance_Document__c doc;
+        for (WCF_Compliance_Document__c d : allDocs) {
+            if (d.Id == recordId) { doc = d; break; }
+        }
+
+        if (String.isNotBlank(doc.ContentDocumentId__c)) {
+            try {
+                delete [SELECT Id FROM ContentDocument WHERE Id = :doc.ContentDocumentId__c];
+            } catch (Exception e) {
+                throw new AuraHandledException('Could not delete the file: ' + e.getMessage());
+            }
+        }
+
+        doc.ContentDocumentId__c = null;
+        doc.File_Name__c         = null;
+        doc.Issue_Date__c        = null;
+        doc.Expiry_Date__c       = null;
+        doc.Uploaded_Date__c     = null;
+        doc.Status__c            = 'Pending Submission';
+        update doc;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — upload / replace a file for one ad hoc document type
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static ComplianceChecklistItem saveAdHocComplianceDocument(
+        Id     adHocRecordId,
+        String documentLabel,
+        String contentDocumentId,
+        String fileName,
+        String issueDate,
+        String expiryDate
+    ) {
+        if (adHocRecordId == null || String.isBlank(documentLabel) || String.isBlank(contentDocumentId)) {
+            throw new AuraHandledException('Missing required upload details.');
+        }
+
+        Id applicationId = applicationIdOf(adHocRecordId);
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        WCF_Compliance_Document__c doc = findAdHocRequest(allDocs, adHocRecordId, documentLabel);
+
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+        assertEditable(items, findItem(items, documentLabel, adHocRecordId), false);
+
+        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+        pinParentDecision(doc, statusMap);
+
+        DocStatusEntry entry = statusMap.get(documentLabel);
+        String previousContentDocumentId = entry != null ? entry.contentDocumentId : null;
+        if (entry == null) entry = new DocStatusEntry();
+
+        entry.status            = 'Draft';   // only Submit moves it to Pending Review
+        entry.contentDocumentId = contentDocumentId;
+        entry.fileName          = fileName;
+        entry.uploadedDate      = String.valueOf(Date.today());
+        entry.reviewerNotes     = null;
+        if (String.isNotBlank(issueDate))  entry.issueDate  = issueDate;
+        if (String.isNotBlank(expiryDate)) entry.expiryDate = expiryDate;
+        statusMap.put(documentLabel, entry);
+
+        doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+        doc.Status__c = aggregateAdHocStatus(doc, statusMap, dedicatedByType(allDocs).keySet());
+        update doc;
+
+        linkFileIfNeeded(doc.Id, contentDocumentId);
+
+        if (String.isNotBlank(previousContentDocumentId)
+                && previousContentDocumentId != contentDocumentId) {
+            try {
+                delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
+            } catch (Exception e) { }
+        }
+
+        ComplianceChecklistItem item = new ComplianceChecklistItem();
+        item.recordId          = doc.Id;
+        item.adHocParentId     = doc.Id;
+        item.documentType      = documentLabel;
+        item.status            = entry.status;
+        item.contentDocumentId = entry.contentDocumentId;
+        item.fileName          = entry.fileName;
+        item.issueDate         = entry.issueDate;
+        item.expiryDate        = entry.expiryDate;
+        item.submittedDate     = entry.uploadedDate;
+        item.isEditable        = true;
+        item.canDelete         = true;
+        return item;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — delete an ad hoc document file (Draft only)
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void deleteAdHocComplianceDocumentFile(Id adHocRecordId, String documentLabel) {
+        if (adHocRecordId == null || String.isBlank(documentLabel)) {
+            throw new AuraHandledException('Missing document reference.');
+        }
+
+        Id applicationId = applicationIdOf(adHocRecordId);
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        WCF_Compliance_Document__c doc = findAdHocRequest(allDocs, adHocRecordId, documentLabel);
+
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+        assertEditable(items, findItem(items, documentLabel, adHocRecordId), true);
+
+        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+        pinParentDecision(doc, statusMap);
+
+        DocStatusEntry entry = statusMap.get(documentLabel);
+        if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
+            try {
+                delete [SELECT Id FROM ContentDocument WHERE Id = :entry.contentDocumentId];
+            } catch (Exception e) {
+                throw new AuraHandledException('Could not delete the file: ' + e.getMessage());
+            }
+        }
+        statusMap.remove(documentLabel);
+
+        doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+        doc.Status__c = aggregateAdHocStatus(doc, statusMap, dedicatedByType(allDocs).keySet());
+        update doc;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — clean up a file that lightning-file-upload stored but the
+    // save was refused for (e.g. the reviewer locked the row while the
+    // applicant had the page open). Only deletes a file the current user
+    // owns, that is linked to this application's compliance records and
+    // that is NOT on record for any compliance document.
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void discardUploadedFile(Id applicationId, String contentDocumentId) {
+        if (applicationId == null || String.isBlank(contentDocumentId)) return;
+        validateOwnership(applicationId);
+
+        Id cdId;
+        try {
+            cdId = Id.valueOf(contentDocumentId);
+        } catch (Exception e) {
+            return;
+        }
+        String key = String.valueOf(cdId).left(15);
+
+        Set<Id> complianceIds = new Set<Id>();
+        for (WCF_Compliance_Document__c doc : queryDocs(applicationId)) {
+            complianceIds.add(doc.Id);
+            if (String.isNotBlank(doc.ContentDocumentId__c)
+                    && doc.ContentDocumentId__c.left(15).equals(key)) {
+                return; // on record — never delete
+            }
+            if (String.isNotBlank(doc.Document_Status_JSON__c)
+                    && doc.Document_Status_JSON__c.contains(key)) {
+                return; // on record in an ad hoc entry — never delete
+            }
+        }
+        if (complianceIds.isEmpty()) return;
+
+        List<ContentDocumentLink> links = [
+            SELECT Id FROM ContentDocumentLink
+            WHERE  ContentDocumentId = :cdId
+            AND    LinkedEntityId IN :complianceIds
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
+        if (links.isEmpty()) return;
+
+        List<ContentDocument> files = [
+            SELECT Id, OwnerId FROM ContentDocument
+            WHERE  Id = :cdId
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
+        if (!files.isEmpty() && files[0].OwnerId == UserInfo.getUserId()) {
+            try { delete files; } catch (Exception e) { /* best effort */ }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — explicit Save Draft. Only promotes uploaded rows that have
+    // not been touched by the reviewer; never downgrades a decision.
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void saveDraftComplianceDocuments(Id applicationId) {
+        if (applicationId == null) {
+            throw new AuraHandledException('Missing application ID.');
+        }
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        if (allDocs.isEmpty()) return;
+
+        List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
+        for (ComplianceChecklistItem i : items) {
+            if (FREEZE_STATUSES.contains(i.status)) return; // frozen — nothing to save
+        }
+
+        Set<String> dedicatedTypes = dedicatedByType(allDocs).keySet();
+        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
+
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (String.isNotBlank(doc.Document_Type__c)) {
+                String s = normalizeStatus(doc.Status__c);
+                if (String.isNotBlank(doc.ContentDocumentId__c)
+                        && (s == null || s == 'Not Started' || s == 'Pending Submission')) {
+                    doc.Status__c = 'Draft';
+                    docsToUpdate.add(doc);
+                }
+            } else if (String.isNotBlank(doc.Document_Types__c)) {
+                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+                pinParentDecision(doc, statusMap);
+                Boolean changed = false;
+                for (String label : splitLabels(doc.Document_Types__c)) {
+                    if (dedicatedTypes.contains(label)) continue;
+                    DocStatusEntry entry = statusMap.get(label);
+                    if (entry == null || String.isBlank(entry.contentDocumentId)) continue;
+                    String s = normalizeStatus(entry.status);
+                    if (s == null || s == 'Not Started' || s == 'Pending Submission') {
+                        entry.status = 'Draft';
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+                    doc.Status__c = aggregateAdHocStatus(doc, statusMap, dedicatedTypes);
+                    docsToUpdate.add(doc);
+                }
+            }
+        }
+
+        if (!docsToUpdate.isEmpty()) {
+            update docsToUpdate;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // WRITE — Submit. Moves only the applicant's open rows (Draft /
+    // re-uploaded) to Pending Review. Rows already Validated, Pending
+    // Review or Flagged are left exactly as the reviewer set them.
+    // ─────────────────────────────────────────────────────────────────
+    @AuraEnabled
+    public static void submitComplianceDocuments(Id applicationId) {
+        if (applicationId == null) {
+            throw new AuraHandledException('Missing application ID.');
+        }
+        validateOwnership(applicationId);
+
+        List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
+        if (allDocs.isEmpty()) {
+            throw new AuraHandledException('No compliance request found for this application.');
+        }
+
+        Boolean isSubmitted = computeIsSubmitted(allDocs);
+        List<ComplianceChecklistItem> items = buildItems(allDocs, isSubmitted);
+        for (ComplianceChecklistItem i : items) {
+            if (FREEZE_STATUSES.contains(i.status)) {
+                throw new AuraHandledException(lockedMessage(i.status, false));
+            }
+        }
+
+        Map<String, WCF_Compliance_Document__c> dedicated = dedicatedByType(allDocs);
+        Set<String> dedicatedTypes = dedicated.keySet();
+
+        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
+        List<String> missingDocs = new List<String>();
+        Integer movedToReview = 0;
+
+        // Case 1: ad hoc requests (Document_Types__c)
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (String.isNotBlank(doc.Document_Type__c) || String.isBlank(doc.Document_Types__c)) continue;
+
+            Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+            pinParentDecision(doc, statusMap);
+            Integer movedHere = 0;
+
+            for (String label : splitLabels(doc.Document_Types__c)) {
+                if (dedicatedTypes.contains(label)) continue; // handled as a dedicated record below
+                DocStatusEntry entry = statusMap.get(label);
+                String s = resolveAdHocStatus(doc, entry);
+
+                if (WITH_REVIEWER_STATUSES.contains(s)) continue;
+
+                if (entry == null || String.isBlank(entry.contentDocumentId)) {
+                    missingDocs.add(label);
+                } else if (REUPLOAD_REQUIRED_STATUSES.contains(s)) {
+                    missingDocs.add(label + ' (new copy requested)');
+                } else {
+                    entry.status = 'Pending Review';
+                    movedHere++;
+                }
+            }
+
+            String newParentStatus = aggregateAdHocStatus(doc, statusMap, dedicatedTypes);
+            if (movedHere > 0 || newParentStatus != normalizeStatus(doc.Status__c)) {
+                doc.Document_Status_JSON__c = JSON.serialize(statusMap);
+                doc.Status__c = newParentStatus;
+                if (movedHere > 0) doc.Uploaded_Date__c = DateTime.now();
+                docsToUpdate.add(doc);
+            }
+            movedToReview += movedHere;
+        }
+
+        // Case 2: dedicated records (newest record per type)
+        for (WCF_Compliance_Document__c doc : dedicated.values()) {
+            String s = dedicatedStatus(doc, isSubmitted);
+            if (WITH_REVIEWER_STATUSES.contains(s)) continue;
+
+            if (String.isBlank(doc.ContentDocumentId__c)) {
+                missingDocs.add(doc.Document_Type__c);
+            } else if (REUPLOAD_REQUIRED_STATUSES.contains(s)) {
+                missingDocs.add(doc.Document_Type__c + ' (new copy requested)');
+            } else {
+                doc.Status__c        = 'Pending Review';
+                doc.Uploaded_Date__c = DateTime.now();
+                docsToUpdate.add(doc);
+                movedToReview++;
+            }
+        }
+
+        if (!missingDocs.isEmpty()) {
+            throw new AuraHandledException(
+                'Please upload all required compliance documents before submitting. Missing: '
+                + String.join(missingDocs, ', '));
+        }
+        if (movedToReview == 0) {
+            throw new AuraHandledException(
+                'There is nothing new to submit. Your documents are already with the compliance team.');
+        }
+
+        update docsToUpdate;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Onboarding stage (used elsewhere)
+    // ─────────────────────────────────────────────────────────────────
+    public static String computeOnboardingStage(Id applicationId) {
+        if (applicationId == null) return 'Pending';
+
+        List<WCF_Compliance_Document__c> docs = queryDocs(applicationId);
+        List<ComplianceChecklistItem> items = buildItems(docs, computeIsSubmitted(docs));
+
+        Integer totalRequired  = 0;
+        Integer totalValidated = 0;
+        for (ComplianceChecklistItem item : items) {
+            if (!item.required) continue;
+            totalRequired++;
+            if (item.status == 'Validated') totalValidated++;
+        }
+        return (totalRequired > 0 && totalValidated >= totalRequired) ? 'Onboarding Approved' : 'In Progress';
+    }
+
+    // ═════════════════════════════════════════════════════════════════
+    // Internals
+    // ═════════════════════════════════════════════════════════════════
+
+    private static String normalizeStatus(String status) {
+        if (String.isBlank(status)) return null;
+        String s = status.trim();
+        String canonical = STATUS_ALIASES.get(s.toLowerCase());
+        return canonical != null ? canonical : s;
+    }
+
+    private static List<WCF_Compliance_Document__c> queryDocs(Id applicationId) {
+        return [
+            SELECT Id, IndividualApplication__c, Document_Type__c, Document_Types__c, Status__c,
+                   ContentDocumentId__c, File_Name__c, Issue_Date__c, Expiry_Date__c,
+                   Reviewer_Notes__c, Uploaded_Date__c, Due_Date__c, Document_Status_JSON__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  IndividualApplication__c = :applicationId
+            WITH   SYSTEM_MODE
+            ORDER BY LastModifiedDate DESC
+        ];
+    }
+
+    private static Id applicationIdOf(Id complianceDocId) {
+        List<WCF_Compliance_Document__c> docs = [
+            SELECT Id, IndividualApplication__c
+            FROM   WCF_Compliance_Document__c
+            WHERE  Id = :complianceDocId
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
+        if (docs.isEmpty()) {
+            throw new AuraHandledException('Compliance request not found.');
+        }
+        return docs[0].IndividualApplication__c;
+    }
+
+    private static WCF_Compliance_Document__c findAdHocRequest(
+            List<WCF_Compliance_Document__c> allDocs, Id adHocRecordId, String documentLabel) {
+        for (WCF_Compliance_Document__c d : allDocs) {
+            if (d.Id == adHocRecordId) {
+                if (String.isBlank(d.Document_Types__c)
+                        || !splitLabels(d.Document_Types__c).contains(documentLabel)) {
+                    throw new AuraHandledException('This document is not part of the compliance request.');
+                }
+                return d;
+            }
+        }
+        throw new AuraHandledException('Compliance request not found.');
+    }
+
+    private static Boolean computeIsSubmitted(List<WCF_Compliance_Document__c> docs) {
+        for (WCF_Compliance_Document__c doc : docs) {
+            if (SUBMITTED_STATUSES.contains(normalizeStatus(doc.Status__c))) return true;
+        }
+        return false;
+    }
+
+    /** Newest dedicated record per Document_Type__c (docs are ordered newest first). */
+    private static Map<String, WCF_Compliance_Document__c> dedicatedByType(List<WCF_Compliance_Document__c> allDocs) {
+        Map<String, WCF_Compliance_Document__c> byType = new Map<String, WCF_Compliance_Document__c>();
+        for (WCF_Compliance_Document__c doc : allDocs) {
+            if (String.isNotBlank(doc.Document_Type__c) && !byType.containsKey(doc.Document_Type__c)) {
+                byType.put(doc.Document_Type__c, doc);
+            }
+        }
+        return byType;
+    }
+
+    private static List<String> splitLabels(String multi) {
+        List<String> labels = new List<String>();
+        if (String.isBlank(multi)) return labels;
+        for (String part : multi.split(';')) {
+            String label = part.trim();
+            if (String.isNotBlank(label) && !labels.contains(label)) labels.add(label);
+        }
+        return labels;
+    }
+
+    private static String dedicatedStatus(WCF_Compliance_Document__c doc, Boolean isSubmitted) {
+        String s = normalizeStatus(doc.Status__c);
+        if (String.isBlank(s)) s = 'Not Started';
+        if (s == 'Pending Submission' && String.isNotBlank(doc.ContentDocumentId__c) && !isSubmitted) {
+            s = 'Draft';
+        }
+        return s;
+    }
+
+    /**
+     * Effective status of one label inside an ad hoc request.
+     * Precedence:
+     *   1. a row-level reviewer decision on an uploaded file
+     *   2. a request-level Reject / Suspend (freezes every row)
+     *   3. no file yet → requested (or returned, if the reviewer said so)
+     *   4. a fresh Draft (applicant re-uploaded after the decision)
+     *   5. a request-level decision for rows still awaiting review
+     *   6. whatever the entry says, else Pending Review / Draft
+     */
+    private static String resolveAdHocStatus(WCF_Compliance_Document__c parent, DocStatusEntry entry) {
+        String  parentStatus = normalizeStatus(parent.Status__c);
+        Boolean hasFile      = entry != null && String.isNotBlank(entry.contentDocumentId);
+        String  entryStatus  = entry != null ? normalizeStatus(entry.status) : null;
+
+        if (hasFile && REVIEWER_DECISION_STATUSES.contains(entryStatus)) return entryStatus;
+        if (FREEZE_STATUSES.contains(parentStatus))                      return parentStatus;
+        if (!hasFile) {
+            return REUPLOAD_REQUIRED_STATUSES.contains(entryStatus) ? entryStatus : 'Pending Submission';
+        }
+        if (entryStatus == 'Draft')                                      return 'Draft';
+        //if (REVIEWER_DECISION_STATUSES.contains(parentStatus))           return parentStatus;
+        if (parentStatus == 'Validated' || parentStatus == 'Flagged')    return parentStatus;
+        if (String.isNotBlank(entryStatus))                              return entryStatus;
+        return parentStatus == 'Pending Review' ? 'Pending Review' : 'Draft';
+    }
+
+    /**
+     * Before the parent status is rewritten, copy a request-level decision
+     * onto the entries that were inheriting it, so changing one row never
+     * silently changes another row's status.
+     */
+    private static void pinParentDecision(WCF_Compliance_Document__c parent, Map<String, DocStatusEntry> statusMap) {
+        for (String label : splitLabels(parent.Document_Types__c)) {
+            DocStatusEntry entry = statusMap.get(label);
+            if (entry == null || String.isBlank(entry.contentDocumentId)) continue;
+            String effective = resolveAdHocStatus(parent, entry);
+            if (effective != normalizeStatus(entry.status)) {
+                  if (REUPLOAD_REQUIRED_STATUSES.contains(effective)) continue; // never spread Return/Refresh
+                entry.status = effective;
+                if (String.isBlank(entry.reviewerNotes)
+                        && REVIEWER_DECISION_STATUSES.contains(effective)) {
+                    entry.reviewerNotes = parent.Reviewer_Notes__c;
+                }
+            }
+        }
+    }
+
+    /** Request-level status derived from its rows (after pinParentDecision). */
+    private static String aggregateAdHocStatus(
+            WCF_Compliance_Document__c parent, Map<String, DocStatusEntry> statusMap, Set<String> skipLabels) {
+        Boolean anyCounted   = false;
+        Boolean anyReturned  = false;
+        Boolean anyOpen      = false;
+        Boolean allValidated = true;
+
+        for (String label : splitLabels(parent.Document_Types__c)) {
+            if (skipLabels != null && skipLabels.contains(label)) continue;
+            anyCounted = true;
+            String s = resolveAdHocStatus(parent, statusMap.get(label));
+            if (FREEZE_STATUSES.contains(s)) return s;
+            if (REUPLOAD_REQUIRED_STATUSES.contains(s)) {
+                anyReturned = true;
+            } else if (s == 'Draft' || s == 'Not Started' || s == 'Pending Submission') {
+                anyOpen = true;
+            }
+            if (s != 'Validated') allValidated = false;
+        }
+
+        if (!anyCounted)  return parent.Status__c;
+        if (anyReturned)  return 'Returned';
+        if (anyOpen)      return 'Draft';
+        if (allValidated) return 'Validated';
+        return 'Pending Review';
+    }
+
+    /** Builds the checklist rows and stamps isEditable / canDelete on each. */
+    private static List<ComplianceChecklistItem> buildItems(
+            List<WCF_Compliance_Document__c> allDocs, Boolean isSubmitted) {
+
+        Map<String, WCF_Compliance_Document__c> dedicated = dedicatedByType(allDocs);
+        Map<String, ComplianceChecklistItem> adHocByLabel = new Map<String, ComplianceChecklistItem>();
+        List<ComplianceChecklistItem> items = new List<ComplianceChecklistItem>();
+
+        // Reviewer-raised ad hoc requests (newest request wins per label)
+        for (WCF_Compliance_Document__c req : allDocs) {
+            if (String.isNotBlank(req.Document_Type__c) || String.isBlank(req.Document_Types__c)) continue;
+
+            Map<String, DocStatusEntry> statusMap = parseStatusMap(req.Document_Status_JSON__c);
+
+            for (String label : splitLabels(req.Document_Types__c)) {
+                if (adHocByLabel.containsKey(label)) continue;
+
+                ComplianceChecklistItem item = new ComplianceChecklistItem();
+                item.documentType  = label;
+                item.documentLabel = label;
+                item.description   = 'Requested by the compliance team';
+                item.dueDate       = req.Due_Date__c != null ? String.valueOf(req.Due_Date__c) : null;
+                item.required      = true;
+
+                WCF_Compliance_Document__c fulfilled = dedicated.get(label);
+                if (fulfilled != null) {
+                    fillFromDedicated(item, fulfilled, isSubmitted);
+                } else {
+                    DocStatusEntry entry = statusMap.get(label);
+                    item.recordId          = req.Id;
+                    item.adHocParentId     = req.Id;
+                    item.status            = resolveAdHocStatus(req, entry);
+                    item.contentDocumentId = entry != null ? entry.contentDocumentId : null;
+                    item.fileName          = entry != null ? entry.fileName          : null;
+                    item.returnReason = (entry != null && String.isNotBlank(entry.reviewerNotes))
+    ? entry.reviewerNotes
+    : ((FREEZE_STATUSES.contains(item.status) || REUPLOAD_REQUIRED_STATUSES.contains(item.status))
+        ? req.Reviewer_Notes__c : null);
+                    item.issueDate         = entry != null ? entry.issueDate    : null;
+                    item.expiryDate        = entry != null ? entry.expiryDate   : null;
+                    item.submittedDate     = entry != null ? entry.uploadedDate : null;
+                }
+                adHocByLabel.put(label, item);
+                items.add(item);
+            }
+        }
+
+        // Dedicated documents not covered by an ad hoc request
+        for (String label : dedicated.keySet()) {
+            if (adHocByLabel.containsKey(label)) continue;
+            ComplianceChecklistItem item = new ComplianceChecklistItem();
+            item.documentType  = label;
+            item.documentLabel = label;
+            item.description   = 'Compliance Document.';
+            item.required      = true;
+            fillFromDedicated(item, dedicated.get(label), isSubmitted);
+            items.add(item);
+        }
+
+        // Edit rules
+        Boolean frozen = false;
+        for (ComplianceChecklistItem item : items) {
+            if (FREEZE_STATUSES.contains(item.status)) { frozen = true; break; }
+        }
+        for (ComplianceChecklistItem item : items) {
+            item.isEditable = !frozen && EDITABLE_STATUSES.contains(item.status);
+            item.canDelete  = item.isEditable
+                && DELETABLE_STATUSES.contains(item.status)
+                && String.isNotBlank(item.contentDocumentId);
+        }
+        return items;
+    }
+
+    private static void fillFromDedicated(
+            ComplianceChecklistItem item, WCF_Compliance_Document__c doc, Boolean isSubmitted) {
+        item.recordId          = doc.Id;
+        item.status            = dedicatedStatus(doc, isSubmitted);
+        item.contentDocumentId = doc.ContentDocumentId__c;
+        item.fileName          = doc.File_Name__c;
+        item.returnReason      = doc.Reviewer_Notes__c;
+        item.issueDate         = doc.Issue_Date__c    != null ? String.valueOf(doc.Issue_Date__c)           : null;
+        item.expiryDate        = doc.Expiry_Date__c   != null ? String.valueOf(doc.Expiry_Date__c)          : null;
+        item.submittedDate     = doc.Uploaded_Date__c != null ? String.valueOf(doc.Uploaded_Date__c.date()) : null;
+    }
+
+    private static ComplianceChecklistItem findItem(
+            List<ComplianceChecklistItem> items, String documentType, Id adHocParentId) {
+        for (ComplianceChecklistItem i : items) {
+            if (i.documentType == documentType
+                    && (adHocParentId == null || i.adHocParentId == adHocParentId)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    /** Throws a friendly AuraHandledException when the change isn't allowed. */
+    private static void assertEditable(
+            List<ComplianceChecklistItem> items, ComplianceChecklistItem target, Boolean isDelete) {
+        for (ComplianceChecklistItem i : items) {
+            if (FREEZE_STATUSES.contains(i.status)) {
+                throw new AuraHandledException(lockedMessage(i.status, false));
+            }
+        }
+        if (target == null) return; // brand-new document type, nothing on record yet
+        Set<String> allowed = isDelete ? DELETABLE_STATUSES : EDITABLE_STATUSES;
+        if (!allowed.contains(target.status)) {
+            throw new AuraHandledException(lockedMessage(target.status, isDelete));
+        }
+    }
+
+    private static String lockedMessage(String status, Boolean isDelete) {
+        if (status == 'Rejected') {
+            return 'The compliance team has rejected this compliance submission, so documents can no longer be changed.';
+        }
+        if (status == 'Suspended') {
+            return 'This compliance submission is suspended pending further review. Documents cannot be changed until the compliance team lifts the suspension.';
+        }
+        if (status == 'Validated') {
+            return 'This document has been validated by the compliance team and can no longer be changed.';
+        }
+        if (status == 'Pending Review' || status == 'Flagged') {
+            return 'This document is with the compliance team for review and cannot be changed right now. You will be able to update it if the team returns it to you.';
+        }
+        if (isDelete && REUPLOAD_REQUIRED_STATUSES.contains(status)) {
+            return 'A returned document can be replaced but not deleted. Please upload a corrected copy instead.';
+        }
+        return 'This document cannot be changed in its current status (' + status + ').';
+    }
+
+    private static void addNote(List<String> notes, String note) {
+        if (String.isNotBlank(note) && !notes.contains(note)) notes.add(note);
+    }
+
     private static void linkFileIfNeeded(Id complianceDocId, Id contentDocumentId) {
         List<ContentDocumentLink> existingLinks = [
             SELECT Id FROM ContentDocumentLink
@@ -482,9 +1090,7 @@ public without sharing class WCFComplianceController {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
     // Security — community user's Account must match the application
-    // ─────────────────────────────────────────────────────────────────
     private static IndividualApplication validateOwnership(Id applicationId) {
         User currentUser = [
             SELECT Id, AccountId FROM User WHERE Id = :UserInfo.getUserId()
@@ -506,302 +1112,6 @@ public without sharing class WCFComplianceController {
         return app;
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    // WRITE — applicant removes a previously uploaded file without
-    // immediately re-uploading. Resets the row back to "requested".
-    // ─────────────────────────────────────────────────────────────────
-    @AuraEnabled
-    public static void deleteComplianceDocumentFile(Id recordId) {
-        if (recordId == null) {
-            throw new AuraHandledException('Missing document record.');
-        }
-
-        List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, ContentDocumentId__c, IndividualApplication__c, Status__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  Id = :recordId
-            WITH   SYSTEM_MODE
-            LIMIT  1
-        ];
-        if (docs.isEmpty()) {
-            throw new AuraHandledException('Document not found.');
-        }
-
-        WCF_Compliance_Document__c doc = docs[0];
-        validateOwnership(doc.IndividualApplication__c);
-
-        if (String.isNotBlank(doc.ContentDocumentId__c)) {
-            try {
-                delete [SELECT Id FROM ContentDocument WHERE Id = :doc.ContentDocumentId__c];
-            } catch (Exception e) {
-                throw new AuraHandledException('Could not delete the file: ' + e.getMessage());
-            }
-        }
-
-        doc.ContentDocumentId__c = null;
-        doc.File_Name__c         = null;
-        doc.Issue_Date__c        = null;
-        doc.Expiry_Date__c       = null;
-        doc.Uploaded_Date__c     = null;
-        doc.Status__c            = 'Pending Submission';
-        update doc;
-    }
-
-    // ─────────────────────────────────────────────────────────────────
-    // WRITE — upload/replace a file for one ad hoc document type.
-    // Saves the document in Draft state without flipping record status to
-    // Partially Submitted or Submitted for the Reviewer.
-    // ─────────────────────────────────────────────────────────────────
-    @AuraEnabled
-    public static ComplianceChecklistItem saveAdHocComplianceDocument(
-        Id     adHocRecordId,
-        String documentLabel,
-        String contentDocumentId,
-        String fileName,
-        String issueDate,
-        String expiryDate
-    ) {
-        if (adHocRecordId == null || String.isBlank(documentLabel) || String.isBlank(contentDocumentId)) {
-            throw new AuraHandledException('Missing required upload details.');
-        }
-
-        List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, IndividualApplication__c, Document_Status_JSON__c, Document_Types__c, Status__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  Id = :adHocRecordId
-            WITH   SYSTEM_MODE
-            LIMIT  1
-        ];
-        if (docs.isEmpty()) {
-            throw new AuraHandledException('Compliance request not found.');
-        }
-
-        WCF_Compliance_Document__c doc = docs[0];
-        validateOwnership(doc.IndividualApplication__c);
-
-        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-        DocStatusEntry entry = statusMap.get(documentLabel);
-        String previousContentDocumentId = entry != null ? entry.contentDocumentId : null;
-
-        if (entry == null) entry = new DocStatusEntry();
-        // Save as Draft — only explicit submit moves to Pending Review
-        entry.status             = 'Draft';
-        entry.contentDocumentId  = contentDocumentId;
-        entry.fileName           = fileName;
-        entry.uploadedDate       = String.valueOf(Date.today());
-        entry.reviewerNotes      = null; // clear on re-upload
-        if (String.isNotBlank(issueDate))  entry.issueDate  = issueDate;
-        if (String.isNotBlank(expiryDate)) entry.expiryDate = expiryDate;
-
-        statusMap.put(documentLabel, entry);
-        doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-        
-        // Keep doc.Status__c in Draft / Returned until explicit submit
-        if (doc.Status__c != 'Returned' && doc.Status__c != 'Submitted' && doc.Status__c != 'Pending Review' && doc.Status__c != 'Validated' && doc.Status__c != 'Pass' && doc.Status__c != 'Approved') {
-            doc.Status__c = 'Draft';
-        }
-        update doc;
-
-        // Attach the file to the parent record's Notes & Attachments
-        linkFileIfNeeded(doc.Id, contentDocumentId);
-
-        // Clean up old file on replace
-        if (String.isNotBlank(previousContentDocumentId)
-                && previousContentDocumentId != contentDocumentId) {
-            try {
-                delete [SELECT Id FROM ContentDocument WHERE Id = :previousContentDocumentId];
-            } catch (Exception e) { }
-        }
-
-        ComplianceChecklistItem item = new ComplianceChecklistItem();
-        item.recordId          = doc.Id;
-        item.documentType      = documentLabel;
-        item.status            = entry.status;
-        item.contentDocumentId = entry.contentDocumentId;
-        item.fileName          = entry.fileName;
-        item.issueDate         = entry.issueDate;
-        item.expiryDate        = entry.expiryDate;
-        item.submittedDate     = entry.uploadedDate;
-        return item;
-    }
-
-    // ─────────────────────────────────────────────────────────────────
-    // WRITE — applicant removes an ad hoc document file.
-    // ─────────────────────────────────────────────────────────────────
-    @AuraEnabled
-    public static void deleteAdHocComplianceDocumentFile(Id adHocRecordId, String documentLabel) {
-        if (adHocRecordId == null || String.isBlank(documentLabel)) {
-            throw new AuraHandledException('Missing document reference.');
-        }
-        List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, IndividualApplication__c, Document_Status_JSON__c, Document_Types__c, Status__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  Id = :adHocRecordId
-            WITH   SYSTEM_MODE
-            LIMIT  1
-        ];
-        if (docs.isEmpty()) throw new AuraHandledException('Compliance request not found.');
-        WCF_Compliance_Document__c doc = docs[0];
-        validateOwnership(doc.IndividualApplication__c);
-
-        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-        DocStatusEntry entry = statusMap.get(documentLabel);
-        if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
-            try {
-                delete [SELECT Id FROM ContentDocument WHERE Id = :entry.contentDocumentId];
-            } catch (Exception e) {
-                throw new AuraHandledException('Could not delete the file: ' + e.getMessage());
-            }
-        }
-        statusMap.remove(documentLabel);
-        doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-        update doc;
-    }
-
-    // ─────────────────────────────────────────────────────────────────
-    // WRITE — Explicit Save Draft of all Compliance Documents
-    // Updates active unsubmitted compliance document records to Status__c = 'Draft'
-    // ─────────────────────────────────────────────────────────────────
-    @AuraEnabled
-    public static void saveDraftComplianceDocuments(Id applicationId) {
-        if (applicationId == null) {
-            throw new AuraHandledException('Missing application ID.');
-        }
-
-        validateOwnership(applicationId);
-
-        List<WCF_Compliance_Document__c> allDocs = [
-            SELECT Id, Document_Type__c, Document_Types__c, Status__c,
-                   ContentDocumentId__c, Document_Status_JSON__c, Uploaded_Date__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            WITH   SYSTEM_MODE
-        ];
-
-        if (allDocs.isEmpty()) {
-            return;
-        }
-
-        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
-
-        for (WCF_Compliance_Document__c doc : allDocs) {
-            // Do not override terminal/decision statuses
-            if (doc.Status__c == 'Validated' || doc.Status__c == 'Pass' 
-                    || doc.Status__c == 'Approved' || doc.Status__c == 'Rejected' 
-                    || doc.Status__c == 'Suspended' || doc.Status__c == 'Pending Review'
-                    || doc.Status__c == 'Submitted') {
-                continue;
-            }
-
-            Boolean isChanged = false;
-
-            if (String.isNotBlank(doc.Document_Types__c)) {
-                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-                for (String label : statusMap.keySet()) {
-                    DocStatusEntry entry = statusMap.get(label);
-                    if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
-                        if (entry.status != 'Validated' && entry.status != 'Pass' && entry.status != 'Approved' && entry.status != 'Rejected' && entry.status != 'Suspended' && entry.status != 'Pending Review') {
-                            entry.status = 'Draft';
-                            isChanged = true;
-                        }
-                    }
-                }
-                if (isChanged) {
-                    doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-                }
-            }
-
-            if (doc.Status__c != 'Draft') {
-                doc.Status__c = 'Draft';
-                isChanged = true;
-            }
-
-            if (isChanged) {
-                doc.Uploaded_Date__c = (doc.Uploaded_Date__c != null) ? doc.Uploaded_Date__c : DateTime.now();
-                docsToUpdate.add(doc);
-            }
-        }
-
-        if (!docsToUpdate.isEmpty()) {
-            update docsToUpdate;
-        }
-    }
-
-    // ─────────────────────────────────────────────────────────────────
-    // WRITE — Explicit Final Submit of all Compliance Documents
-    // Validates that all requested documents have been uploaded, sets
-    // internal statuses to Pending Review, and updates Status__c to Pending Review.
-    // ─────────────────────────────────────────────────────────────────
-    @AuraEnabled
-    public static void submitComplianceDocuments(Id applicationId) {
-        if (applicationId == null) {
-            throw new AuraHandledException('Missing application ID.');
-        }
-
-        validateOwnership(applicationId);
-
-        List<WCF_Compliance_Document__c> allDocs = [
-            SELECT Id, Document_Type__c, Document_Types__c, Status__c,
-                   ContentDocumentId__c, Document_Status_JSON__c, Uploaded_Date__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            WITH   SYSTEM_MODE
-        ];
-
-        if (allDocs.isEmpty()) {
-            throw new AuraHandledException('No compliance request found for this application.');
-        }
-
-        List<WCF_Compliance_Document__c> docsToUpdate = new List<WCF_Compliance_Document__c>();
-        List<String> missingDocs = new List<String>();
-
-        for (WCF_Compliance_Document__c doc : allDocs) {
-            // Case 1: Ad-hoc request with multiple Document_Types__c
-            if (String.isNotBlank(doc.Document_Types__c)) {
-                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-                List<String> requiredLabels = new List<String>();
-                for (String s : doc.Document_Types__c.split(';')) {
-                    if (String.isNotBlank(s)) requiredLabels.add(s.trim());
-                }
-
-                for (String label : requiredLabels) {
-                    DocStatusEntry entry = statusMap.get(label);
-                    if (entry == null || String.isBlank(entry.contentDocumentId)) {
-                        missingDocs.add(label);
-                    } else {
-                        // Flip draft item to Pending Review upon submit
-                        if (entry.status == 'Draft' || String.isBlank(entry.status) || entry.status == 'Pending Submission') {
-                            entry.status = 'Pending Review';
-                        }
-                    }
-                }
-
-                doc.Document_Status_JSON__c = JSON.serialize(statusMap);
-                doc.Status__c = 'Pending Review';
-                doc.Uploaded_Date__c = DateTime.now();
-                docsToUpdate.add(doc);
-            } 
-            // Case 2: Dedicated compliance document record
-            else if (String.isNotBlank(doc.Document_Type__c)) {
-                if (String.isBlank(doc.ContentDocumentId__c)) {
-                    missingDocs.add(doc.Document_Type__c);
-                } else {
-                    doc.Status__c = 'Pending Review';
-                    doc.Uploaded_Date__c = DateTime.now();
-                    docsToUpdate.add(doc);
-                }
-            }
-        }
-
-        if (!missingDocs.isEmpty()) {
-            throw new AuraHandledException('Please upload all required compliance documents before submitting. Missing: ' + String.join(missingDocs, ', '));
-        }
-
-        if (!docsToUpdate.isEmpty()) {
-            update docsToUpdate;
-        }
-    }
-
     private static Map<String, DocStatusEntry> parseStatusMap(String jsonStr) {
         Map<String, DocStatusEntry> result = new Map<String, DocStatusEntry>();
         if (String.isBlank(jsonStr)) return result;
@@ -809,76 +1119,5 @@ public without sharing class WCFComplianceController {
             result = (Map<String, DocStatusEntry>) JSON.deserialize(jsonStr, Map<String, DocStatusEntry>.class);
         } catch (Exception e) { }
         return result;
-    }
-
-    public class DocStatusEntry {
-        public String status;
-        public String contentDocumentId;
-        public String fileName;
-        public String issueDate;
-        public String expiryDate;
-        public String uploadedDate;
-        public String reviewerNotes;
-    }
-
-    public static String computeOnboardingStage(Id applicationId) {
-        if (applicationId == null) return 'Pending';
-        
-        List<WCF_Compliance_Document__c> docs = [
-            SELECT Id, Document_Type__c, Document_Types__c, Status__c, Document_Status_JSON__c
-            FROM   WCF_Compliance_Document__c
-            WHERE  IndividualApplication__c = :applicationId
-            WITH   SYSTEM_MODE
-        ];
-
-        Map<String, WCF_Compliance_Document__c> existingByType = new Map<String, WCF_Compliance_Document__c>();
-        List<WCF_Compliance_Document__c> adHocRequests = new List<WCF_Compliance_Document__c>();
-
-        for (WCF_Compliance_Document__c doc : docs) {
-            if (String.isNotBlank(doc.Document_Type__c)) {
-                existingByType.put(doc.Document_Type__c, doc);
-            } else if (String.isNotBlank(doc.Document_Types__c)) {
-                adHocRequests.add(doc);
-            }
-        }
-
-        Integer totalRequired = 0;
-        Integer totalValidated = 0;
-
-        Set<String> adHocLabels = new Set<String>();
-        for (WCF_Compliance_Document__c doc : adHocRequests) {
-            for (String label : doc.Document_Types__c.split(';')) {
-                label = label.trim();
-                if (String.isBlank(label)) continue;
-                adHocLabels.add(label);
-
-                totalRequired++;
-                WCF_Compliance_Document__c fulfilled = existingByType.get(label);
-                if (fulfilled != null && fulfilled.Status__c == 'Validated') {
-                    totalValidated++;
-                } else if (fulfilled == null) {
-                    Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-                    DocStatusEntry entry = statusMap.get(label);
-                    if (entry != null && entry.status == 'Validated') {
-                        totalValidated++;
-                    }
-                }
-            }
-        }
-
-        for (String label : existingByType.keySet()) {
-            if (!adHocLabels.contains(label)) {
-                totalRequired++;
-                WCF_Compliance_Document__c doc = existingByType.get(label);
-                if (doc.Status__c == 'Validated') {
-                    totalValidated++;
-                }
-            }
-        }
-
-        if (totalRequired > 0 && totalValidated >= totalRequired) {
-            return 'Onboarded';
-        }
-        return 'In Progress';
     }
 }

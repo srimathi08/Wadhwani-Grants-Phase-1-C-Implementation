@@ -1,5 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 // ── resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
 import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getValidatedProposals from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
@@ -8,6 +9,7 @@ import getReviewerPreview    from '@salesforce/apex/ReviewSummaryController.getR
 import getApproverReturnQueueCount from '@salesforce/apex/WCFProposalListController.getApproverReturnQueueCount';
 import getAcceptedApplicationsCount from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsCount';
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
+import getLatestReviewId from '@salesforce/apex/ComplianceDocumentController.getLatestReviewId';
 
 // ── KPI tiles — same order, labels and colors as the Reviewer Queue tiles ──
 // filter = token passed to the queue page (wcfProposalListView reads it).
@@ -32,6 +34,8 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
 
     @track reviewerAcceptedCount   = 0;
     @track acceptedApplicationRows = [];
+
+    _isOpeningApplication = false;
 
     // ─────────────────────────────────────────────────────────────
     // SITE BASE PATH (environment-independent navigation)
@@ -111,6 +115,46 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                 })
             }
         });
+    }
+
+    // ─── NEW: Application link → read-only proposal + review view ─
+    async handleViewApplication(event) {
+        event.preventDefault();
+        if (this._isOpeningApplication) return;
+
+        const applicationId = event.currentTarget.dataset.id;
+        if (!applicationId) return;
+
+        this._isOpeningApplication = true;
+        try {
+            const reviewId = await getLatestReviewId({ applicationId });
+            if (!reviewId) {
+                this.dispatchEvent(new ShowToastEvent({
+                    title: 'No review found',
+                    message: 'There is no review record for this application yet.',
+                    variant: 'warning'
+                }));
+                return;
+            }
+            this[NavigationMixin.Navigate]({
+                type: 'standard__webPage',
+                attributes: {
+                    url: this._siteUrl('review-forms', {
+                        recordId      : reviewId,
+                        applicationId : applicationId,
+                        action        : 'view'
+                    })
+                }
+            });
+        } catch (e) {
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Could not open application',
+                message: e?.body?.message || e?.message || 'Unknown error',
+                variant: 'error'
+            }));
+        } finally {
+            this._isOpeningApplication = false;
+        }
     }
 
     get noAcceptedApplicationRows() {

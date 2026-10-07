@@ -273,7 +273,9 @@ public static String saveDecision(
     if (decision == 'Accept') {
         // Condition 1: Recommend=Yes  -> Recommend for Fund
         // Condition 4: Recommend=No   -> Not Recommend for Fund
-        app.Status = (recommendForCEO == 'Yes') ? 'Recommend for Fund' : 'Not Recommend for Fund';
+        // UPDATED: any 'Yes - ...' value (and legacy 'Yes') counts as recommended
+        app.Status = WCF_ReviewFormJFController.isPositiveRecommendation(recommendForCEO)
+            ? 'Recommend for Fund' : 'Not Recommend for Fund';
     } else if (decision == 'Conditionally Approve') {
         app.Status = 'Recommend for Fund';
     } else if (decision == 'Decline') {

@@ -1434,4 +1434,48 @@ private class WCFFormControllerTest {
             System.debug('testGetAIFeedbackRecordAllFields expected fail: ' + e.getMessage());
         }
     }
+
+    /** Covers getApplicationStatusForUser when WCF_Executed_Agreement__c is present. */
+    @IsTest
+    static void testGrantAgreementStatusForUser() {
+        User activeSysAdmin = [SELECT Id FROM User WHERE Profile.Name = 'System Administrator' AND IsActive = true LIMIT 1];
+        System.runAs(activeSysAdmin) {
+            PortalCtx ctx = buildPortalContext('Recommend for Fund', 'agr');
+            
+            // Create Executed Agreement
+            WCF_Executed_Agreement__c agreement = new WCF_Executed_Agreement__c(
+                IndividualApplication__c = ctx.app.Id,
+                Agreement_Type__c        = 'Master MoU',
+                Status__c                = 'Active',
+                Has_Signed_PDF__c        = true,
+                Executed_Date__c         = Date.today(),
+                Expiry_Date__c           = Date.today().addYears(1)
+            );
+            insert agreement;
+
+            // Link a ContentDocument
+            ContentVersion cv = new ContentVersion(
+                Title = 'Executed_Agreement_Doc',
+                PathOnClient = 'Executed_Agreement_Doc.pdf',
+                VersionData = Blob.valueOf('Agreement PDF data'),
+                IsMajorVersion = true
+            );
+            insert cv;
+            Id conDocId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+
+            insert new ContentDocumentLink(
+                ContentDocumentId = conDocId,
+                LinkedEntityId    = agreement.Id,
+                ShareType         = 'V',
+                Visibility        = 'AllUsers'
+            );
+
+            System.runAs(ctx.portalUser) {
+                WCFFormController.ApplicationStatusWrapper s = WCFFormController.getApplicationStatusForUser();
+                System.assertEquals('Active', s.mouStatus);
+                System.assertNotEquals(null, s.mouDocumentId);
+                System.assertNotEquals(null, s.mouDownloadUrl);
+            }
+        }
+    }
 }

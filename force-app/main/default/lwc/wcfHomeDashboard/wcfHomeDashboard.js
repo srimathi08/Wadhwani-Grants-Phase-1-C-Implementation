@@ -41,7 +41,7 @@ const TILES = [
         variant: '',
         role: ROLES.VALIDATOR,
         page: 'ValidatorPortal__c',
-        state: { statusFilter: 'validate' }
+        state: { statusFilter: 'validated' }
     },
     {
         key: 'flagged',
@@ -52,8 +52,8 @@ const TILES = [
         dotClass: 'ps-dot ps-dot--red',
         variant: 'flag',
         role: ROLES.REVIEWER,
-        page: 'wg_Reviewer_Queue__c',
-        state: { statusFilter: 'flagged' }
+        page: 'WCF_Reviewer_Application_List__c',
+        state: { reviewFilter: 'flagged', statusFilter: 'flagged' }
     },
     {
         key: 'review',
@@ -64,13 +64,13 @@ const TILES = [
         dotClass: 'ps-dot ps-dot--blue',
         variant: '',
         role: ROLES.REVIEWER,
-        page: 'wg_Reviewer_Queue__c',
-        state: {}
+        page: 'WCF_Reviewer_Application_List__c',
+        state: { reviewFilter: 'reviewed', statusFilter: 'reviewed' }
     },
     {
         key: 'approved',
         row: 'evaluation',
-        label: 'Approved',
+        label: 'Accept',
         sub: 'Funded',
         icon: 'utility:check',
         dotClass: 'ps-dot ps-dot--green',

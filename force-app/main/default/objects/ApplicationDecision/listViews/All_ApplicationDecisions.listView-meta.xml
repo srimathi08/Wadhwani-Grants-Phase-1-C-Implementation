@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>All_ApplicationDecisions</fullName>
+    <columns>Name</columns>
+    <columns>Application</columns>
+    <columns>ApplicationDecision</columns>
+    <columns>DecisionAuthority</columns>
     <filterScope>Everything</filterScope>
+    <filters>
+        <field>ApplicationDecision</field>
+        <operation>equals</operation>
+        <value>Approved for Funding</value>
+    </filters>
     <label>All Application Decisions</label>
 </ListView>

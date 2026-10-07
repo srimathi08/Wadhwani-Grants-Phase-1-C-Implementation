@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>Send_Decision_Recorded_Email_to_Reviewer</name>
-        <label>Decision recorded (E-31)</label>
+        <name>Decision_Email_to_Reviewer</name>
+        <label>Decision Email to Reviewer</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -31,17 +31,30 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>useEmailTemplate</name>
+            <name>composeEmailContent</name>
             <value>
                 <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailTemplateName</name>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>Subject</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Decision_Recorded_PL_Alert</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
+                <stringValue>{!DecisionRecorded}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
@@ -110,13 +123,26 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Decision_Recorded_Email_to_Reviewer</targetReference>
+                <targetReference>Decision_Email_to_Reviewer</targetReference>
             </connector>
             <label>Reviewer Found</label>
         </rules>
     </decisions>
     <description>WCF Application Decision Flow for Reviewer Email Alerts (E-31)</description>
     <environments>Default</environments>
+    <formulas>
+        <name>CurrentYear</name>
+        <dataType>String</dataType>
+        <expression>TEXT(YEAR(TODAY()))</expression>
+    </formulas>
+    <formulas>
+        <name>Subject</name>
+        <dataType>String</dataType>
+        <expression>&quot;Decision recorded on &quot; &amp;
+$Record.Application.Name &amp;
+&quot; : &quot; &amp;
+TEXT($Record.Proposal_Review__r.Recommend_for_CEO_review__c)</expression>
+    </formulas>
     <interviewLabel>WCF Application Decision Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>WCF Application Decision Flow</label>
     <processMetadataValues>
@@ -138,6 +164,27 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Appln_Review</name>
+        <label>Get Appln Review</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Decision_Outcome</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Proposal_Review__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ApplicationReview</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordLookups>
         <name>Get_Reviewer_Account</name>
         <label>Get Reviewer Account</label>
@@ -163,7 +210,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Check_Decision_Outcome</targetReference>
+            <targetReference>Get_Appln_Review</targetReference>
         </connector>
         <filterLogic>or</filterLogic>
         <filters>
@@ -185,4 +232,9 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <textTemplates>
+        <name>DecisionRecorded</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;table class=&quot;container&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;&lt;tbody&gt;&lt;tr bgcolor=&quot;#BF2026&quot;&gt;&lt;td align=&quot;left&quot; valign=&quot;middle&quot; style=&quot;padding:24px 0 24px 32px;border-radius:8px 0 0 0;&quot;&gt;&lt;p style=&quot;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;&quot;&gt;Decision recorded&lt;/p&gt;&lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;Application {!$Record.Application.Name} - {!$Record.Application.Organization_Name__c}&lt;/h1&gt;&lt;/td&gt;&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding:24px 32px 24px 16px;border-radius:0 8px 0 0;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Foundation&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot; bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot; class=&quot;pad&quot; style=&quot;padding:14px 32px 10px;&quot;&gt;&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;Hi {!Get_Reviewer_Account.FirstName},&lt;/p&gt;&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;The approver has decided on application {!$Record.Application.Name} from {!$Record.Application.Organization_Name__c}. You evaluated this application.&lt;/p&gt;&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;The decision:&lt;/p&gt;&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;&lt;strong&gt;The decision:&lt;/strong&gt;&lt;br&gt;&lt;br&gt;&lt;strong&gt;Outcome:&lt;/strong&gt; {!$Record.Proposal_Review__r.Recommend_for_CEO_review__c}&lt;br&gt;&lt;strong&gt;Recorded:&lt;/strong&gt; {!$Record.Proposal_Review__r.Evaluation_Completed__c}&lt;br&gt;&lt;strong&gt;Application:&lt;/strong&gt; {!$Record.Application.Name}&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;No action is needed from you on this application.&lt;/p&gt;&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;The applicant is told separately, once the 7 day window that follows a recorded decision closes. Do not contact them in the meantime.&lt;/p&gt;&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;Kind regards,&lt;br&gt;Wadhwani Grants Platform&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot; class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot; class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot; width=&quot;132&quot; alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;&gt;&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.&lt;/p&gt;&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;You are receiving this because you evaluated application {{application_number}}.&lt;/p&gt;&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email.&lt;/p&gt;&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</text>
+    </textTemplates>
 </Flow>

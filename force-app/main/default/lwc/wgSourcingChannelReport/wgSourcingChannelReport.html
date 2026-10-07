@@ -12,29 +12,97 @@
 
         <div class="sc-page-body">
 
-            <!-- SUMMARY STRIP -->
-            <template if:true={sourceChannelData}>
-                <div class="sc-summary-strip">
-                    <div class="sc-summary-cell sc-summary-total">
-                        <div class="sc-summary-cell-label">Total Applications</div>
-                        <div class="sc-summary-cell-count">{scTotal}</div>
-                        <div class="sc-summary-cell-pct">All channels</div>
-                    </div>
-                    <template for:each={sourceChannelData} for:item="tile">
-                        <div key={tile.id} class="sc-summary-cell">
-                            <div class="sc-summary-cell-label">{tile.label}</div>
-                            <div class="sc-summary-cell-count">{tile.count}</div>
-                            <div class="sc-summary-cell-pct">{tile.pct}%</div>
-                        </div>
-                    </template>
+            <!-- FILTER BAR -->
+            <div class="sc-filter-bar">
+                <div class="sc-filter-field">
+                    <lightning-combobox
+                        name="geography"
+                        label="Geography"
+                        value={filters.geography}
+                        options={geographyOptions}
+                        onchange={handleFilterChange}
+                        variant="label-stacked">
+                    </lightning-combobox>
                 </div>
-            </template>
+                <div class="sc-filter-field">
+                    <lightning-combobox
+                        name="timeRange"
+                        label="Time Range"
+                        value={filters.timeRange}
+                        options={timeRangeOptions}
+                        onchange={handleFilterChange}
+                        variant="label-stacked">
+                    </lightning-combobox>
+                </div>
+                <template if:true={isCustomRange}>
+                    <div class="sc-filter-field sc-filter-date">
+                        <lightning-input
+                            type="date"
+                            name="startDate"
+                            label="From"
+                            value={filters.startDate}
+                            onchange={handleFilterChange}
+                            variant="label-stacked">
+                        </lightning-input>
+                    </div>
+                    <div class="sc-filter-field sc-filter-date">
+                        <lightning-input
+                            type="date"
+                            name="endDate"
+                            label="To"
+                            value={filters.endDate}
+                            onchange={handleFilterChange}
+                            variant="label-stacked">
+                        </lightning-input>
+                    </div>
+                </template>
+                <div class="sc-filter-field">
+                    <lightning-combobox
+                        name="stage"
+                        label="Stage"
+                        value={filters.stage}
+                        options={stageOptions}
+                        onchange={handleFilterChange}
+                        variant="label-stacked">
+                    </lightning-combobox>
+                </div>
+                <div class="sc-filter-actions">
+                    <button type="button" class="sc-reset-btn" onclick={handleReset}>Reset</button>
+                </div>
+            </div>
+
+            <!-- SUMMARY STRIP -->
+            <div class="sc-section-wrap">
+                <template if:true={isChannelLoading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+
+                <template if:true={sourceChannelData}>
+                    <div class="sc-summary-strip">
+                        <div class="sc-summary-cell sc-summary-total">
+                            <div class="sc-summary-cell-label">Total Applications</div>
+                            <div class="sc-summary-cell-count">{scTotal}</div>
+                            <div class="sc-summary-cell-pct">All channels</div>
+                        </div>
+                        <template for:each={sourceChannelData} for:item="tile">
+                            <div key={tile.id} class="sc-summary-cell">
+                                <div class="sc-summary-cell-label">{tile.label}</div>
+                                <div class="sc-summary-cell-count">{tile.count}</div>
+                                <div class="sc-summary-cell-pct">{tile.pct}%</div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
 
             <!-- BAR CHARTS -->
             <div class="sc-charts-row">
 
                 <!-- Source Channel bars -->
-                <div class="sc-chart-card">
+                <div class="sc-chart-card sc-relative">
+                    <template if:true={isChannelLoading}>
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </template>
                     <div class="sc-chart-title">Source Channel</div>
                     <div class="sc-chart-sub">Application volume by intake channel</div>
                     <template if:true={sourceChannelBars}>
@@ -48,10 +116,16 @@
                             </div>
                         </template>
                     </template>
+                    <template if:true={noChannelBars}>
+                        <div class="preview-empty">No source channel data for the selected filters</div>
+                    </template>
                 </div>
 
-                <!-- Budget Range bars -->
-                <div class="sc-chart-card">
+                <!-- Budget Range bars (independent dataset) -->
+                <div class="sc-chart-card sc-relative">
+                    <template if:true={isBudgetLoading}>
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </template>
                     <div class="sc-chart-title">Budget Range Distribution</div>
                     <div class="sc-chart-sub">Application volume by annual budget bracket</div>
                     <template if:true={budgetRangeBars}>
@@ -66,14 +140,17 @@
                         </template>
                     </template>
                     <template if:true={noBudgetRangeBars}>
-                        <div class="preview-empty">No budget range data available</div>
+                        <div class="preview-empty">No budget range data for the selected filters</div>
                     </template>
                 </div>
 
             </div>
 
             <!-- ORGANISATION DETAIL TABLE -->
-            <div class="sc-detail-card">
+            <div class="sc-detail-card sc-relative">
+                <template if:true={isChannelLoading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
                 <div class="sc-detail-header">
                     <div class="sc-detail-title">Organisation Detail</div>
                     <div class="sc-detail-sub">

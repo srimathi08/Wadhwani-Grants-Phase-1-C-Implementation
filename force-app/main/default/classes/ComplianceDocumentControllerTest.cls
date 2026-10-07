@@ -117,6 +117,52 @@ private class ComplianceDocumentControllerTest {
         System.assertEquals('Suspended', request.Status__c);
     }
 
+    @IsTest static void testGrantAgreementWorkflow() {
+        User adminUser = getAdminUser();
+        Account acc;
+        IndividualApplication app;
+        String requestId;
+
+        System.runAs(adminUser) {
+            acc = createTestPersonAccount();
+            app = WCF_TestDataFactory.createApplication(acc.Id, acc.PersonContactId, 'Recommend for Fund', false);
+            insert app;
+
+            requestId = ComplianceDocumentController.saveComplianceRequest(
+                null, acc.Id, app.Id, '80G Certificate', 
+                String.valueOf(Date.today()), String.valueOf(Date.today().addDays(5)), 'Normal', 'India', 'Test request'
+            );
+
+            // Create a dummy ContentVersion/ContentDocument
+            ContentVersion cv = new ContentVersion(
+                Title = 'Test Agreement',
+                PathOnClient = 'Test_Agreement.pdf',
+                VersionData = Blob.valueOf('Test Content'),
+                IsMajorVersion = true
+            );
+            insert cv;
+            Id conDocId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+
+            // Test getGrantAgreementDetails before upload
+            ComplianceDocumentController.GrantAgreementDTO dtoBefore = ComplianceDocumentController.getGrantAgreementDetails(requestId);
+            System.assertNotEquals(null, dtoBefore);
+
+            // Test saveGrantAgreementFile
+            ComplianceDocumentController.saveGrantAgreementFile(
+                requestId, conDocId, String.valueOf(Date.today()), String.valueOf(Date.today().addYears(1)), 'Test remarks', false
+            );
+
+            // Test getGrantAgreementDetails after upload
+            ComplianceDocumentController.GrantAgreementDTO dtoAfter = ComplianceDocumentController.getGrantAgreementDetails(requestId);
+            System.assertNotEquals(null, dtoAfter);
+
+            // Test replace
+            ComplianceDocumentController.saveGrantAgreementFile(
+                requestId, conDocId, String.valueOf(Date.today()), String.valueOf(Date.today().addYears(1)), 'Replace remarks', true
+            );
+        }
+    }
+
     @IsTest static void testExceptions() {
         // Test validation exceptions on invalid parameters
         try {

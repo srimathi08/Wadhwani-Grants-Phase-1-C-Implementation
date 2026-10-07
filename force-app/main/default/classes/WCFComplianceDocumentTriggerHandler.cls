@@ -3,7 +3,7 @@ public without sharing class WCFComplianceDocumentTriggerHandler {
     // ─────────────────────────────────────────────────────────────
     // When every required compliance document for an application has
     // been marked 'Pass', flip IndividualApplication.Status to
-    // 'Onboarded'. Runs after any compliance doc status change.
+    // 'Onboarding Approved'. Runs after any compliance doc status change.
     // ─────────────────────────────────────────────────────────────
     public static void syncOnboardedStatus(Set<Id> applicationIds) {
         List<IndividualApplication> toUpdate = new List<IndividualApplication>();
@@ -16,13 +16,13 @@ public without sharing class WCFComplianceDocumentTriggerHandler {
         ];
 
         for (IndividualApplication app : apps) {
-            if (app.Status == 'Onboarded') continue; // already done, skip
+            if (app.Status == 'Onboarding Approved' || app.Status == 'Onboarded') continue; // already done, skip
 
             String stage = WCFComplianceController.computeOnboardingStage(app.Id);
-            if (stage == 'Onboarded') {
+            if (stage == 'Onboarding Approved' || stage == 'Onboarded') {
                 toUpdate.add(new IndividualApplication(
                     Id     = app.Id,
-                    Status = 'Onboarded'
+                    Status = 'Onboarding Approved'
                 ));
             }
         }

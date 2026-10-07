@@ -2727,9 +2727,9 @@
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_WORK_EMAIL}</div>
                                     <div class="rv-val">{formValues.Work_Email_ID__c}</div>
                                 </div>
-                                <div class="rv-row">
+                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q3}</span>{labels.Q3_PHONE}</div>
-                                    <div class="rv-val">{formValues.Phone__c}</div>
+                                    <div class="rv-val">{reviewPhoneWithCode}</div>
                                 </div>
                                 <template if:true={hasCustomQuestionsQ3}>
                                     <template for:each={customQuestionsQ3} for:item="cq">
@@ -2806,27 +2806,32 @@
                                         </div>
                                     </template>
                                 </template>
-                                <div class="rv-row">
+                                                              <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 1</div>
                                     <div class="rv-val">{reviewFunder1Display}</div>
                                 </div>
-                                <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 2</div>
-                                    <div class="rv-val">{reviewFunder2Display}</div>
-                                </div>
-                                <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 3</div>
-                                    <div class="rv-val">{reviewFunder3Display}</div>
-                                </div>
+                                <template if:true={showFunder2InReview}>
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 2</div>
+                                        <div class="rv-val">{reviewFunder2Display}</div>
+                                    </div>
+                                </template>
+                                <template if:true={showFunder3InReview}>
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q7}</span>Funder 3</div>
+                                        <div class="rv-val">{reviewFunder3Display}</div>
+                                    </div>
+                                </template>
                                 <div class="rv-row">
                                     <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 1</div>
                                     <div class="rv-val">{reviewReference1Display}</div>
                                 </div>
-                                <div class="rv-row">
-                                    <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 2</div>
-                                    <div class="rv-val">{reviewReference2Display}</div>
-                                </div>
-
+                                <template if:true={showReference2InReview}>
+                                    <div class="rv-row">
+                                        <div class="rv-lbl"><span class="rv-q-num">Q{qNum.Q8}</span>Reference 2</div>
+                                        <div class="rv-val">{reviewReference2Display}</div>
+                                    </div>
+                                </template>
                                 <!-- Q9 Historical Financial Data Table -->
                                 <div class="rv-sub-head" style="margin-top: 20px;">
                                     <span class="rv-q-num">Q{qNum.Q9}</span>{labels.Q9_HIST_FINANCIALS}

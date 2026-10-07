@@ -1,7 +1,7 @@
 import { LightningElement, api, track, wire } from 'lwc';
-import getWCFFullPreviewData       from '@salesforce/apex/WCFValidatorController.getWCFFullPreviewData';
-import getApplicationAttachments   from '@salesforce/apex/WCFValidatorController.getApplicationAttachments';
-import getFormMetadata             from '@salesforce/apex/WCFFormMetadataController.getFormMetadata';
+import { refreshApex } from '@salesforce/apex'; import getWCFFullPreviewData from '@salesforce/apex/WCFValidatorController.getWCFFullPreviewData';
+import getApplicationAttachments from '@salesforce/apex/WCFValidatorController.getApplicationAttachments';
+import getFormMetadata from '@salesforce/apex/WCFFormMetadataController.getFormMetadata';
 import WCF_LOGO from '@salesforce/resourceUrl/WIN_Logo';
 import getFileBase64 from '@salesforce/apex/WCFValidatorController.getFileBase64';
 import { loadScript } from 'lightning/platformResourceLoader';
@@ -25,6 +25,8 @@ const MONTH_NAMES = {
     '11': 'November', '11': 'November', 'november': 'November', 'nov': 'November',
     '12': 'December', '12': 'December', 'december': 'December', 'dec': 'December'
 };
+
+const NUMBER_LOCALE = 'en-US';   // 1,234,567 grouping. Keep in sync with wcfRfiResponsePage.
 
 function getFieldValue(obj, fieldName) {
     if (!obj || !fieldName) return undefined;
@@ -52,7 +54,7 @@ function getFieldValue(obj, fieldName) {
                 }
             }
         }
-    } catch (e) {}
+    } catch (e) { }
 
     for (const key in obj) {
         const kLower = key.toLowerCase();
@@ -89,15 +91,17 @@ export default class WcfFormPreview extends LightningElement {
     @track isPdfGenerating = false;
 
     @track isLoading = true;
-    @track _app      = null;
-    @track _hist     = null;
-    @track _fiscal   = null;
-    @track _outcome  = null;
+    @track _app = null;
+    @track _hist = null;
+    @track _fiscal = null;
+    @track _outcome = null;
 
     @track isPreviewLoading = false;
     @track _skillingDomains = [];
     @track _businessSectors = [];
-    @track _attachments     = [];
+    @track _livelihoodPrograms = [];
+    @track _communities = [];
+    @track _attachments = [];
     @track _additionalInfoFiles = [];
 
     @track isOfficePreviewOpen = false;
@@ -105,30 +109,34 @@ export default class WcfFormPreview extends LightningElement {
     _officeLibsLoaded = false;
     _pendingOfficeRender = null;
 
-    MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // ── Imperative: full preview data (always fresh, no wire cache) ──────────
+    _loadSeq = 0;
+
     async _loadPreviewData() {
         if (!this.recordId) return;
+        const seq = ++this._loadSeq;
         this.isLoading = true;
         try {
             const data = await getWCFFullPreviewData({ applicationId: this.recordId });
+            if (seq !== this._loadSeq) return;   // a newer load superseded this one
             if (data) {
-                this._app     = data.applicationData ? { ...data.applicationData } : (data.application ? { ...data.application } : null);
-                this._hist    = data.historicalData ? { ...data.historicalData } : (data.historical ? { ...data.historical } : null);
-                this._fiscal  = data.fiscalData ? { ...data.fiscalData } : (data.fiscal ? { ...data.fiscal } : null);
+                this._app = data.applicationData ? { ...data.applicationData } : (data.application ? { ...data.application } : null);
+                this._hist = data.historicalData ? { ...data.historicalData } : (data.historical ? { ...data.historical } : null);
+                this._fiscal = data.fiscalData ? { ...data.fiscalData } : (data.fiscal ? { ...data.fiscal } : null);
                 this._outcome = data.outcomeData ? { ...data.outcomeData } : (data.outcome ? { ...data.outcome } : null);
                 await this._loadMetadata();
 
                 if (data.skillingDomains?.length > 0) {
                     this._skillingDomains = data.skillingDomains.map((r, i) => ({
-                        idx            : i,
-                        domain         : r.Domain_Programme_Name__c || '—',
-                        hours          : (r.Hours_of_Training__c != null && r.Hours_of_Training__c !== '') ? r.Hours_of_Training__c : '—',
-                        duration       : (r.Duration_Months__c != null && r.Duration_Months__c !== '') ? r.Duration_Months__c : '—',
-                        startDate      : r.Programme_Start_Date__c
-                                           ? this._fmtDate(r.Programme_Start_Date__c) : '—',
-                        yearlyEnrolment: (r.Yearly_Enrolment__c != null && r.Yearly_Enrolment__c !== '') ? r.Yearly_Enrolment__c : '—'
+                        idx: i,
+                        domain: r.Domain_Programme_Name__c || '—',
+                        hours: this._fmtNumber(r.Hours_of_Training__c),
+                        duration: this._fmtNumber(r.Duration_Months__c),
+                        startDate: r.Programme_Start_Date__c
+                            ? this._fmtDate(r.Programme_Start_Date__c) : '—',
+                        yearlyEnrolment: this._fmtNumber(r.Yearly_Enrolment__c)
                     }));
                 } else {
                     this._skillingDomains = [];
@@ -138,40 +146,71 @@ export default class WcfFormPreview extends LightningElement {
                     this._businessSectors = data.businessSectors.map((r, i) => {
                         const typesLabel = r.Support_Types__c
                             ? r.Support_Types__c.split(';')
-                                .map(t => (t.trim() === 'Other' && r.Support_Type_Other__c)
-                                    ? `Other: ${r.Support_Type_Other__c}`
+                                .map(t => (t.trim() === 'Other' && r.Business_Sector_Other__c)
+                                    ? `Other: ${r.Business_Sector_Other__c}`
                                     : t.trim())
                                 .join(', ')
                             : '—';
                         return {
-                            idx              : i,
-                            sector           : (r.Sector_c__c === 'Other' && r.Business_Sector_Other__c)
-                                                   ? `Other: ${r.Business_Sector_Other__c}`
-                                                   : (r.Sector_c__c || '—'),
-                            supportBegin     : r.Support_Begin_Date__c
-                                                   ? this._fmtDate(r.Support_Begin_Date__c) : '—',
+                            idx: i,
+                            sector: (r.Sector_c__c === 'Other' && r.Business_Sector_Other__c)
+                                ? `Other: ${r.Business_Sector_Other__c}`
+                                : (r.Sector_c__c || '—'),
+                            supportBegin: r.Support_Begin_Date__c
+                                ? this._fmtDate(r.Support_Begin_Date__c) : '—',
                             supportTypesLabel: typesLabel,
-                            yearlyEnrolment  : (r.Yearly_Enrolment__c != null && r.Yearly_Enrolment__c !== '') ? r.Yearly_Enrolment__c : '—'
+                            yearlyEnrolment: this._fmtNumber(r.Yearly_Enrolment__c)
                         };
                     });
                 } else {
                     this._businessSectors = [];
+                }
+
+                if (data.livelihoodPrograms?.length > 0) {
+                    this._livelihoodPrograms = data.livelihoodPrograms.map((r, i) => ({
+                        idx: i,
+                        name: r.Program_Name__c || '—',
+                        supportType: r.Support_Type_Provided__c || '—',
+                        manHours: this._fmtNumber(r.Duration_Man_Hours__c),
+                        enrollment: this._fmtNumber(r.Annual_Enrollment__c)
+                    }));
+                } else {
+                    this._livelihoodPrograms = [];
+                }
+
+                if (data.communities?.length > 0) {
+                    this._communities = data.communities.map((r, i) => ({
+                        idx: i,
+                        state: r.State__c || '—',
+                        district: r.District_Area__c || '—',
+                        fy3: this._fmtNumber(r.Households_FY3__c),
+                        fy2: this._fmtNumber(r.Households_FY2__c),
+                        fy1: this._fmtNumber(r.Households_FY1__c),
+                        proj: this._fmtNumber(r.Households_Projected__c)
+                    }));
+                } else {
+                    this._communities = [];
                 }
             } else {
                 this._app = null;
                 console.error('WcfFormPreview load error: no data returned');
             }
         } catch (error) {
+            if (seq !== this._loadSeq) return;
             this._app = null;
             console.error('WcfFormPreview load error:', error);
         } finally {
-            this.isLoading = false;
+            if (seq === this._loadSeq) this.isLoading = false;
         }
     }
 
     // ── Wire: attachments ────────────────────────────────────────────────────
+    _wiredAttachmentsResult;
+
     @wire(getApplicationAttachments, { applicationId: '$recordId' })
-    wiredAttachments({ data, error }) {
+    wiredAttachments(result) {
+        this._wiredAttachmentsResult = result;
+        const { data, error } = result;
         if (data) {
             this._attachments = data;
         }
@@ -194,8 +233,8 @@ export default class WcfFormPreview extends LightningElement {
                 }
                 return {
                     documentId: a.contentDocumentId,
-                    versionId : a.contentVersionId,
-                    name      : fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
+                    versionId: a.contentVersionId,
+                    name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
                 };
             });
     }
@@ -206,12 +245,14 @@ export default class WcfFormPreview extends LightningElement {
 
     connectedCallback() {
         this._loadPdfLibraries();
-        this._loadPreviewData();
+        if (this.recordId && !this._loadSeq) this._loadPreviewData();
     }
 
     @api
-    refreshPreview() {
-        return this._loadPreviewData();
+    async refreshPreview() {
+        const tasks = [this._loadPreviewData()];
+        if (this._wiredAttachmentsResult) tasks.push(refreshApex(this._wiredAttachmentsResult));
+        await Promise.all(tasks);
     }
 
     async _loadMetadata() {
@@ -238,7 +279,7 @@ export default class WcfFormPreview extends LightningElement {
         return filtered.map((q, idx) => {
             let val = undefined;
             const targetSources = [this._app, this._hist, this._fiscal, this._outcome].filter(Boolean);
-            
+
             for (const src of targetSources) {
                 if (q.targetField) {
                     val = getFieldValue(src, q.targetField);
@@ -272,9 +313,9 @@ export default class WcfFormPreview extends LightningElement {
         return this._getCustomQuestions(q => (
             q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
         ) && (
-            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
-            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
-        ), '2');
+                (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
+                (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
+            ), '2');
     }
     get hasCustomQuestionsQ2() {
         return this.customQuestionsQ2 && this.customQuestionsQ2.length > 0;
@@ -388,15 +429,25 @@ export default class WcfFormPreview extends LightningElement {
     get hasRecord() { return !!this._app; }
     handleLogoError(event) { event.target.style.display = 'none'; }
 
+    _toNumber(v) {
+        if (v == null) return null;
+        if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+        const s = String(v).replace(/[,\s$]/g, '');
+        if (s === '' || s === '—') return null;
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+    }
+
     _fmtCurrency(v) {
-        if (v == null || v === '') return '—';
-        const n = Number(v);
-        if (isNaN(n)) return '—';
-        const hasCents = Math.round(n * 100) % 100 !== 0;
-        return '$' + n.toLocaleString('en-US', {
+        const n = this._toNumber(v);
+        if (n === null) return '—';
+        const abs = Math.abs(n);
+        const hasCents = Math.round(abs * 100) % 100 !== 0;
+        const body = abs.toLocaleString(NUMBER_LOCALE, {
             minimumFractionDigits: hasCents ? 2 : 0,
             maximumFractionDigits: 2
         });
+        return `${n < 0 ? '-' : ''}$${body}`;
     }
 
     _fmtDate(d) {
@@ -434,19 +485,16 @@ export default class WcfFormPreview extends LightningElement {
 
     _fmtNumber(v) {
         if (v == null || v === '' || v === '—') return '—';
-        const str = String(v).replace(/,/g, '').trim();
-        if (str === '') return '—';
-        const num = Number(str);
-        if (isNaN(num)) return String(v);
-        return num.toLocaleString('en-US');
+        const n = this._toNumber(v);
+        return n === null ? String(v) : n.toLocaleString(NUMBER_LOCALE, { maximumFractionDigits: 2 });
     }
 
     _val(v) { return (v != null && v !== '') ? v : '—'; }
 
     // ── Multi-Track Detection & Dynamic Section Labels ───────────────────────
     get _orgArea() {
-        return this._app?.Organizational_Area_s_for_Funding_Inves1__c 
-            || this._app?.Organizational_Area_s_for_Funding_Inves__c 
+        return this._app?.Organizational_Area_s_for_Funding_Inves1__c
+            || this._app?.Organizational_Area_s_for_Funding_Inves__c
             || '';
     }
 
@@ -468,8 +516,8 @@ export default class WcfFormPreview extends LightningElement {
     get selectedTrackBadges() {
         const badges = [];
         if (this.isJobFulfillment) badges.push({ label: 'Job Fulfillment', class: 'rv-tag rv-tag-jf' });
-        if (this.isJobCreation)    badges.push({ label: 'Job Creation', class: 'rv-tag rv-tag-jc' });
-        if (this.isLivelihood)     badges.push({ label: 'Livelihood Upliftment', class: 'rv-tag rv-tag-liv' });
+        if (this.isJobCreation) badges.push({ label: 'Job Creation', class: 'rv-tag rv-tag-jc' });
+        if (this.isLivelihood) badges.push({ label: 'Livelihood Upliftment', class: 'rv-tag rv-tag-liv' });
         if (badges.length === 0 && this.orgArea && this.orgArea !== '—') {
             badges.push({ label: this.orgArea, class: 'rv-tag' });
         }
@@ -570,44 +618,59 @@ export default class WcfFormPreview extends LightningElement {
     }
 
     // ── Section 1: About Your Organisation Getters ───────────────────────────
-    get orgArea()               { return this._val(this._orgArea); }
-    get orgName()               { return this._val(this._app?.Organization_Name__c); }
-    get hqCity()                { return this._val(this._app?.Headquarters_City_and_Country__c); }
+    get orgArea() { return this._val(this._orgArea); }
+    get orgName() { return this._val(this._app?.Organization_Name__c); }
+    get hqCity() { return this._val(this._app?.Headquarters_City_and_Country__c); }
     get primaryServiceRegions() { return this._val(this._app?.Primary_Service_Regions__c); }
-    get leaderName()            { return this._val(this._app?.Leader_Name__c); }
-    get leaderTitle()           { return this._val(this._app?.Leader_Title__c); }
+    get leaderName() { return this._val(this._app?.Leader_Name__c); }
+    get leaderTitle() { return this._val(this._app?.Leader_Title__c); }
     get leaderTenure() {
         const v = this._app?.Leader_Tenure__c;
         return (v != null && v !== '') ? `${v} years` : '—';
     }
-    get piName()                { return this._val(this._app?.Submitter_Name__c); }
-    get piDesignation()         { return this._val(this._app?.Job_Title__c); }
-    get piEmail()               { return this._val(this._app?.Work_Email_ID__c); }
+    get piName() { return this._val(this._app?.Submitter_Name__c); }
+    get piDesignation() { return this._val(this._app?.Job_Title__c); }
+    get piEmail() { return this._val(this._app?.Work_Email_ID__c); }
     get phoneCountryCode() {
         const val = this._app?.WG_Phone_Country_Code__c || this._app?.Phone_Country_Code__c;
         if (!val) return '';
         const match = String(val).match(/^\+\d+/);
         return match ? match[0] : val;
     }
-    get piPhone()               { return this._val(this._app?.Phone__c); }
+    get piPhone() {
+        let raw = this._app?.Phone__c;
+        if (raw === null || raw === undefined || raw === '') return this._val(raw);
+        raw = String(raw).trim();
+
+        // Strip a duplicate of the stored country code if it's already baked into Phone__c
+        const code = this.phoneCountryCode;
+        if (code) {
+            const escapedCode = code.replace(/\+/g, '\\+');
+            raw = raw.replace(new RegExp('^' + escapedCode + '\\s*'), '');
+        }
+        // Fallback: strip any generic leading +<digits> prefix regardless of code match
+        raw = raw.replace(/^\+\d{1,4}\s*/, '').trim();
+
+        return this._val(raw);
+    }
     get phoneDisplay() {
         const code = this.phoneCountryCode ? `${this.phoneCountryCode} ` : '';
         return this.piPhone !== '—' ? `${code}${this.piPhone}`.trim() : '—';
     }
 
-    get legalType()             { return this._val(this._app?.Legal_Type__c); }
-    get showLegalTypeOther()    { return this._app?.Legal_Type__c === 'Other'; }
+    get legalType() { return this._val(this._app?.Legal_Type__c); }
+    get showLegalTypeOther() { return this._app?.Legal_Type__c === 'Other'; }
     get legalTypeOtherSpecified() { return this._val(this._app?.Legal_Type_Other__c); }
     get registrationJurisdiction() { return this._val(this._app?.Registration_Jurisdiction__c); }
     get showRegistrationJurisdictionOther() { return this._app?.Registration_Jurisdiction__c === 'Other'; }
     get registrationJurisdictionOtherSpecified() { return this._val(this._app?.Registration_Jurisdiction_Other__c); }
-    get incorporationDate()     { return this._fmtDate(this._app?.Incorporation_Date__c); }
-    get legalDescription()      { return this._app?.Legal_Structure__c; }
+    get incorporationDate() { return this._fmtDate(this._app?.Incorporation_Date__c); }
+    get legalDescription() { return this._app?.Legal_Structure__c; }
 
     // Q5 Getters
-    get has501c3()              { return this._val(this._app?.Has_501c3_Status__c); }
+    get has501c3() { return this._val(this._app?.Has_501c3_Status__c); }
     get hasEquivalencyDetermination() { return this._val(this._app?.Has_Equivalency_Determination__c); }
-    get isFcraRegistered()      { return this._val(this._app?.Is_FCRA_Registered__c); }
+    get isFcraRegistered() { return this._val(this._app?.Is_FCRA_Registered__c); }
     get openToEquivalencyDetermination() { return this._val(this._app?.Willing_to_Pursue_ED__c || this._app?.Open_to_Equivalency_Determination__c); }
 
     // Q6 Getters - Human Readable Date
@@ -633,12 +696,12 @@ export default class WcfFormPreview extends LightningElement {
             const name = this._app?.[`Funder_${n}_Name__c`];
             if (name) {
                 result.push({
-                    key   : n,
+                    key: n,
                     header: `FUNDER ${n}`,
                     name,
                     amount: this._fmtCurrency(this._app?.[`Funder_${n}_Amount__c`]),
                     period: `${this._fmtDate(this._app?.[`Funder_${n}_Period_Start__c`])} – ${this._fmtDate(this._app?.[`Funder_${n}_Period_End__c`])}`,
-                    type  : this._val(this._app?.[`Funder_${n}_Type__c`]),
+                    type: this._val(this._app?.[`Funder_${n}_Type__c`]),
                 });
             }
         });
@@ -653,11 +716,11 @@ export default class WcfFormPreview extends LightningElement {
             const name = this._app?.[`Reference_${n}_Name__c`];
             if (name) {
                 result.push({
-                    key         : n,
-                    header      : `REFERENCE ${n}`,
+                    key: n,
+                    header: `REFERENCE ${n}`,
                     name,
                     organisation: this._val(this._app?.[`Reference_${n}_Role__c`]),
-                    email       : this._val(this._app?.[`Reference_${n}_Email__c`]),
+                    email: this._val(this._app?.[`Reference_${n}_Email__c`]),
                 });
             }
         });
@@ -669,21 +732,21 @@ export default class WcfFormPreview extends LightningElement {
     get historicalData() {
         const h = this._hist;
         return {
-            balanceStartFY3 : this._fmtCurrency(h?.CY3_Balance_Start_CFY_3__c),
-            balanceStartFY2 : this._fmtCurrency(h?.CY2_Balance_Start_CFY_2__c),
-            balanceStartFY1 : this._fmtCurrency(h?.CY1_Balance_Start_CFY_1__c),
-            revenueFY3      : this._fmtCurrency(h?.CY3_Revenue__c),
-            revenueFY2      : this._fmtCurrency(h?.CY2_Revenue__c),
-            revenueFY1      : this._fmtCurrency(h?.CY1_Revenue__c),
-            capitalExpFY3   : this._fmtCurrency(h?.CY3_Capital_Expenditure__c),
-            capitalExpFY2   : this._fmtCurrency(h?.CY2_Capital_Expenditure__c),
-            capitalExpFY1   : this._fmtCurrency(h?.CY1_Capital_Expenditure__c),
-            operatingExpFY3 : this._fmtCurrency(h?.CY3_Operating_Expenditure__c),
-            operatingExpFY2 : this._fmtCurrency(h?.CY2_Operating_Expenditure__c),
-            operatingExpFY1 : this._fmtCurrency(h?.CY1_Operating_Expenditure__c),
-            balanceEndFY3   : this._fmtCurrency(h?.CY3_Balance_End__c),
-            balanceEndFY2   : this._fmtCurrency(h?.CY2_Balance_End__c),
-            balanceEndFY1   : this._fmtCurrency(h?.CY1_Balance_End__c),
+            balanceStartFY3: this._fmtCurrency(h?.CY3_Balance_Start_CFY_3__c),
+            balanceStartFY2: this._fmtCurrency(h?.CY2_Balance_Start_CFY_2__c),
+            balanceStartFY1: this._fmtCurrency(h?.CY1_Balance_Start_CFY_1__c),
+            revenueFY3: this._fmtCurrency(h?.CY3_Revenue__c),
+            revenueFY2: this._fmtCurrency(h?.CY2_Revenue__c),
+            revenueFY1: this._fmtCurrency(h?.CY1_Revenue__c),
+            capitalExpFY3: this._fmtCurrency(h?.CY3_Capital_Expenditure__c),
+            capitalExpFY2: this._fmtCurrency(h?.CY2_Capital_Expenditure__c),
+            capitalExpFY1: this._fmtCurrency(h?.CY1_Capital_Expenditure__c),
+            operatingExpFY3: this._fmtCurrency(h?.CY3_Operating_Expenditure__c),
+            operatingExpFY2: this._fmtCurrency(h?.CY2_Operating_Expenditure__c),
+            operatingExpFY1: this._fmtCurrency(h?.CY1_Operating_Expenditure__c),
+            balanceEndFY3: this._fmtCurrency(h?.CY3_Balance_End__c),
+            balanceEndFY2: this._fmtCurrency(h?.CY2_Balance_End__c),
+            balanceEndFY1: this._fmtCurrency(h?.CY1_Balance_End__c),
         };
     }
 
@@ -691,29 +754,29 @@ export default class WcfFormPreview extends LightningElement {
     get fiscalData() {
         const fc = this._fiscal;
         return {
-            revenueBudget         : this._fmtCurrency(fc?.Revenue_Budget__c),
-            revenueProjection     : this._fmtCurrency(fc?.Revenue_Projection__c),
-            revenueVariance       : this._fmtCurrency(fc?.Revenue_Variance__c),
-            capitalExpBudget      : this._fmtCurrency(fc?.Capital_Expenditure_Budget__c),
-            capitalExpProjection  : this._fmtCurrency(fc?.Capital_Expenditure_Projection__c),
-            capitalExpVariance    : this._fmtCurrency(fc?.Capital_Expenditure_Variance__c),
-            operatingExpBudget    : this._fmtCurrency(fc?.Operating_Expenditure_Budget__c),
+            revenueBudget: this._fmtCurrency(fc?.Revenue_Budget__c),
+            revenueProjection: this._fmtCurrency(fc?.Revenue_Projection__c),
+            revenueVariance: this._fmtCurrency(fc?.Revenue_Variance__c),
+            capitalExpBudget: this._fmtCurrency(fc?.Capital_Expenditure_Budget__c),
+            capitalExpProjection: this._fmtCurrency(fc?.Capital_Expenditure_Projection__c),
+            capitalExpVariance: this._fmtCurrency(fc?.Capital_Expenditure_Variance__c),
+            operatingExpBudget: this._fmtCurrency(fc?.Operating_Expenditure_Budget__c),
             operatingExpProjection: this._fmtCurrency(fc?.Operating_Expenditure_Projection__c),
-            operatingExpVariance  : this._fmtCurrency(fc?.Operating_Expenditure_Variance__c),
-            netBudget             : this._fmtCurrency(fc?.Net_Budget__c),
-            netProjection         : this._fmtCurrency(fc?.Net_Projection__c),
-            netVariance           : this._fmtCurrency(fc?.Net_Variance__c),
+            operatingExpVariance: this._fmtCurrency(fc?.Operating_Expenditure_Variance__c),
+            netBudget: this._fmtCurrency(fc?.Net_Budget__c),
+            netProjection: this._fmtCurrency(fc?.Net_Projection__c),
+            netVariance: this._fmtCurrency(fc?.Net_Variance__c),
         };
     }
 
     get showCFYExplanation() {
-        const rBudget   = Number(this._fiscal?.Revenue_Budget__c) || 0;
+        const rBudget = Number(this._fiscal?.Revenue_Budget__c) || 0;
         const capBudget = Number(this._fiscal?.Capital_Expenditure_Budget__c) || 0;
-        const opBudget  = Number(this._fiscal?.Operating_Expenditure_Budget__c) || 0;
+        const opBudget = Number(this._fiscal?.Operating_Expenditure_Budget__c) || 0;
 
-        const rPct   = rBudget   ? Math.abs((Number(this._fiscal?.Revenue_Variance__c)||0) / rBudget) * 100   : 0;
-        const capPct = capBudget ? Math.abs((Number(this._fiscal?.Capital_Expenditure_Variance__c)||0) / capBudget) * 100 : 0;
-        const opPct  = opBudget  ? Math.abs((Number(this._fiscal?.Operating_Expenditure_Variance__c)||0) / opBudget) * 100  : 0;
+        const rPct = rBudget ? Math.abs((Number(this._fiscal?.Revenue_Variance__c) || 0) / rBudget) * 100 : 0;
+        const capPct = capBudget ? Math.abs((Number(this._fiscal?.Capital_Expenditure_Variance__c) || 0) / capBudget) * 100 : 0;
+        const opPct = opBudget ? Math.abs((Number(this._fiscal?.Operating_Expenditure_Variance__c) || 0) / opBudget) * 100 : 0;
 
         const THRESHOLD = 10;
         return rPct > THRESHOLD || capPct > THRESHOLD || opPct > THRESHOLD || !!this._fiscal?.Revenue_Explanation__c;
@@ -721,17 +784,22 @@ export default class WcfFormPreview extends LightningElement {
     get cfyVarianceExplanation() { return this._val(this._fiscal?.Revenue_Explanation__c); }
 
     // ── Track 1: Job Fulfillment Getters (Q11 - Q14) ─────────────────────────
-    get skillingApproach()    { return this._val(this._app?.Skilling_Approach__c); }
-    get skillingDomains()     { return this._skillingDomains; }
-    get hasSkillingDomains()  { return this._skillingDomains.length > 0; }
+    get skillingApproach() { return this._val(this._app?.Skilling_Approach__c); }
+    get skillingDomains() { return this._skillingDomains; }
+    get hasSkillingDomains() { return this._skillingDomains.length > 0; }
 
     // ── Track 2: Job Creation Getters (Q15 - Q18) ────────────────────────────
     get jobCreationApproach() { return this._val(this._app?.Job_Creation_Approach__c); }
-    get businessSectors()     { return this._businessSectors; }
-    get hasBusinessSectors()  { return this._businessSectors.length > 0; }
+    get businessSectors() { return this._businessSectors; }
+    get hasBusinessSectors() { return this._businessSectors.length > 0; }
 
     // ── Track 3: Livelihood Upliftment Getters (Q19 - Q23) ───────────────────
-    get livelihoodApproach()         { return this._val(this._app?.Livelihood_Approach__c); }
+    // ── Track 3: Livelihood Upliftment Getters (Q19 - Q23) ───────────────────
+    get livelihoodApproach() { return this._val(this._app?.Livelihood_Approach__c); }
+    get livelihoodPrograms() { return this._livelihoodPrograms; }
+    get hasLivelihoodPrograms() { return this._livelihoodPrograms.length > 0; }
+    get communities() { return this._communities; }
+    get hasCommunities() { return this._communities.length > 0; }
 
     // ── Outcome Data Grid (All Tracks) ───────────────────────────────────────
     get outcomeData() {
@@ -740,23 +808,23 @@ export default class WcfFormPreview extends LightningElement {
         const c = v => this._fmtCurrency(v);
         return {
             // Track 1: Job Fulfillment
-            learnerEnrolFY3 : f(o?.Projected_Learner_Enrollments_FY_3__c),
-            learnerEnrolFY2 : f(o?.Projected_Learner_Enrollments_FY_2__c),
-            learnerEnrolFY1 : f(o?.Projected_Learner_Enrollments_FY_1__c),
-            learnerEnrolCFY : f(o?.Projected_Learner_Enrollments_CFY__c),
-            learnerPlaceFY3 : f(o?.Projected_Learner_Placements_FY_3__c),
-            learnerPlaceFY2 : f(o?.Projected_Learner_Placements_FY_2__c),
-            learnerPlaceFY1 : f(o?.Projected_Learner_Placements_FY_1__c),
-            learnerPlaceCFY : f(o?.Projected_Learner_Placements_CFY__c),
-            placePctFY3     : this._fmtPct(o?.Projected_Learner_placement_FY_3__c),
-            placePctFY2     : this._fmtPct(o?.Projected_Learner_placement_FY_2__c),
-            placePctFY1     : this._fmtPct(o?.Projected_Learner_placement_FY_1__c),
-            placePctCFY     : this._fmtPct(o?.Projected_Learner_placement_CFY__c),
+            learnerEnrolFY3: f(o?.Projected_Learner_Enrollments_FY_3__c),
+            learnerEnrolFY2: f(o?.Projected_Learner_Enrollments_FY_2__c),
+            learnerEnrolFY1: f(o?.Projected_Learner_Enrollments_FY_1__c),
+            learnerEnrolCFY: f(o?.Projected_Learner_Enrollments_CFY__c),
+            learnerPlaceFY3: f(o?.Projected_Learner_Placements_FY_3__c),
+            learnerPlaceFY2: f(o?.Projected_Learner_Placements_FY_2__c),
+            learnerPlaceFY1: f(o?.Projected_Learner_Placements_FY_1__c),
+            learnerPlaceCFY: f(o?.Projected_Learner_Placements_CFY__c),
+            placePctFY3: this._fmtPct(o?.Projected_Learner_placement_FY_3__c),
+            placePctFY2: this._fmtPct(o?.Projected_Learner_placement_FY_2__c),
+            placePctFY1: this._fmtPct(o?.Projected_Learner_placement_FY_1__c),
+            placePctCFY: this._fmtPct(o?.Projected_Learner_placement_CFY__c),
 
-            costPerPlaceFY3 : c(o?.Avg_Cost_per_Placement_FY_3__c),
-            costPerPlaceFY2 : c(o?.Avg_Cost_per_Placement_FY_2__c),
-            costPerPlaceFY1 : c(o?.Avg_Cost_per_Placement_FY_1__c),
-            costPerPlaceCFY : c(o?.Avg_Cost_per_Placement_CFY__c),
+            costPerPlaceFY3: c(o?.Avg_Cost_per_Placement_FY_3__c),
+            costPerPlaceFY2: c(o?.Avg_Cost_per_Placement_FY_2__c),
+            costPerPlaceFY1: c(o?.Avg_Cost_per_Placement_FY_1__c),
+            costPerPlaceCFY: c(o?.Avg_Cost_per_Placement_CFY__c),
 
             manualCostPerPlaceFY3: c(o?.Manual_Avg_Cost_per_Placement_FY_3__c || o?.Avg_Cost_per_Placement_FY_3__c),
             manualCostPerPlaceFY2: c(o?.Manual_Avg_Cost_per_Placement_FY_2__c || o?.Avg_Cost_per_Placement_FY_2__c),
@@ -764,27 +832,27 @@ export default class WcfFormPreview extends LightningElement {
             manualCostPerPlaceCFY: c(o?.Manual_Avg_Cost_per_Placement_CFY__c || o?.Avg_Cost_per_Placement_CFY__c),
 
             // Track 2: Job Creation
-            newBizFY3      : f(o?.Projected_New_Businesses_FY_3__c),
-            newBizFY2      : f(o?.Projected_New_Businesses_FY_2__c),
-            newBizFY1      : f(o?.Projected_New_Businesses_FY_1__c),
-            newBizCFY      : f(o?.Projected_New_Businesses_CFY__c),
-            jobsNewBizFY3  : f(o?.Projected_Jobs_from_New_Businesses_FY3__c),
-            jobsNewBizFY2  : f(o?.Projected_Jobs_from_New_Businesses_FY2__c),
-            jobsNewBizFY1  : f(o?.Projected_Jobs_from_New_Businesses_FY1__c),
-            jobsNewBizCFY  : f(o?.Projected_Jobs_from_New_Businesses_CFY__c),
-            growBizFY3     : f(o?.Growing_Businesses_Supported_FY_3__c),
-            growBizFY2     : f(o?.Growing_Businesses_Supported_FY_2__c),
-            growBizFY1     : f(o?.Growing_Businesses_Supported_FY_1__c),
-            growBizCFY     : f(o?.Growing_Businesses_Supported_CFY__c),
-            jobsGrowBizFY3 : f(o?.Jobs_from_Growing_Businesses_FY_3__c),
-            jobsGrowBizFY2 : f(o?.Jobs_from_Growing_Businesses_FY_2__c),
-            jobsGrowBizFY1 : f(o?.Jobs_from_Growing_Businesses_FY_1__c),
-            jobsGrowBizCFY : f(o?.Jobs_from_Growing_Businesses_CFY__c),
+            newBizFY3: f(o?.Projected_New_Businesses_FY_3__c),
+            newBizFY2: f(o?.Projected_New_Businesses_FY_2__c),
+            newBizFY1: f(o?.Projected_New_Businesses_FY_1__c),
+            newBizCFY: f(o?.Projected_New_Businesses_CFY__c),
+            jobsNewBizFY3: f(o?.Projected_Jobs_from_New_Businesses_FY3__c),
+            jobsNewBizFY2: f(o?.Projected_Jobs_from_New_Businesses_FY2__c),
+            jobsNewBizFY1: f(o?.Projected_Jobs_from_New_Businesses_FY1__c),
+            jobsNewBizCFY: f(o?.Projected_Jobs_from_New_Businesses_CFY__c),
+            growBizFY3: f(o?.Growing_Businesses_Supported_FY_3__c),
+            growBizFY2: f(o?.Growing_Businesses_Supported_FY_2__c),
+            growBizFY1: f(o?.Growing_Businesses_Supported_FY_1__c),
+            growBizCFY: f(o?.Growing_Businesses_Supported_CFY__c),
+            jobsGrowBizFY3: f(o?.Jobs_from_Growing_Businesses_FY_3__c),
+            jobsGrowBizFY2: f(o?.Jobs_from_Growing_Businesses_FY_2__c),
+            jobsGrowBizFY1: f(o?.Jobs_from_Growing_Businesses_FY_1__c),
+            jobsGrowBizCFY: f(o?.Jobs_from_Growing_Businesses_CFY__c),
 
-            costPerJobFY3  : c(o?.Avg_Cost_per_Job_FY_3__c),
-            costPerJobFY2  : c(o?.Avg_Cost_per_Job_FY_2__c),
-            costPerJobFY1  : c(o?.Avg_Cost_per_Job_FY_1__c),
-            costPerJobCFY  : c(o?.Avg_Cost_per_Job_CFY__c),
+            costPerJobFY3: c(o?.Avg_Cost_per_Job_FY_3__c),
+            costPerJobFY2: c(o?.Avg_Cost_per_Job_FY_2__c),
+            costPerJobFY1: c(o?.Avg_Cost_per_Job_FY_1__c),
+            costPerJobCFY: c(o?.Avg_Cost_per_Job_CFY__c),
 
             manualCostPerJobFY3: c(o?.Manual_Avg_Cost_per_Job_FY_3__c || o?.Avg_Cost_per_Job_FY_3__c),
             manualCostPerJobFY2: c(o?.Manual_Avg_Cost_per_Job_FY_2__c || o?.Avg_Cost_per_Job_FY_2__c),
@@ -792,29 +860,40 @@ export default class WcfFormPreview extends LightningElement {
             manualCostPerJobCFY: c(o?.Manual_Avg_Cost_per_Job_CFY__c || o?.Avg_Cost_per_Job_CFY__c),
 
             // Track 3: Livelihood Upliftment
-            livServedFY3       : f(o?.LIV_SERVED_FY3__c),
-            livServedFY2       : f(o?.LIV_SERVED_FY2__c),
-            livServedFY1       : f(o?.LIV_SERVED_FY1__c),
-            livServedProj      : f(o?.LIV_SERVED_PROJ__c),
-            livEnrollFY3       : f(o?.LIV_ENROLL_FY3__c),
-            livEnrollFY2       : f(o?.LIV_ENROLL_FY2__c),
-            livEnrollFY1       : f(o?.LIV_ENROLL_FY1__c),
-            livEnrollProj      : f(o?.LIV_ENROLL_PROJ__c),
-            livOutcomeFY3      : f(o?.LIV_OUTCOME_FY3__c),
-            livOutcomeFY2      : f(o?.LIV_OUTCOME_FY2__c),
-            livOutcomeFY1      : f(o?.LIV_OUTCOME_FY1__c),
-            livOutcomeProj     : f(o?.LIV_OUTCOME_PROJ__c),
-            livCostManualFY3   : c(o?.LIV_COST_FY3__c),
-            livCostManualFY2   : c(o?.LIV_COST_FY2__c),
-            livCostManualFY1   : c(o?.LIV_COST_FY1__c),
-            livCostManualProj  : c(o?.LIV_COST_PROJ__c),
+            livServedFY3: f(o?.LIV_SERVED_FY3__c),
+            livServedFY2: f(o?.LIV_SERVED_FY2__c),
+            livServedFY1: f(o?.LIV_SERVED_FY1__c),
+            livServedProj: f(o?.LIV_SERVED_PROJ__c),
+            livEnrollFY3: f(o?.LIV_ENROLL_FY3__c),
+            livEnrollFY2: f(o?.LIV_ENROLL_FY2__c),
+            livEnrollFY1: f(o?.LIV_ENROLL_FY1__c),
+            livEnrollProj: f(o?.LIV_ENROLL_PROJ__c),
+            livOutcomeFY3: f(o?.LIV_OUTCOME_FY3__c),
+            livOutcomeFY2: f(o?.LIV_OUTCOME_FY2__c),
+            livOutcomeFY1: f(o?.LIV_OUTCOME_FY1__c),
+            livOutcomeProj: f(o?.LIV_OUTCOME_PROJ__c),
+            livCostManualFY3: c(o?.LIV_COST_FY3__c),
+            livCostManualFY2: c(o?.LIV_COST_FY2__c),
+            livCostManualFY1: c(o?.LIV_COST_FY1__c),
+            livCostManualProj: c(o?.LIV_COST_PROJ__c),
         };
     }
 
     // ── Section 5: Why Wadhwani Grants & Supporting Docs (Q24 - Q28) ─────────
     get q24Verified() {
+        let jsonVal = null;
+        if (this._outcome?.Outcome_Tracking_Details_CFY__c) {
+            try {
+                const parsed = typeof this._outcome.Outcome_Tracking_Details_CFY__c === 'string'
+                    ? JSON.parse(this._outcome.Outcome_Tracking_Details_CFY__c)
+                    : this._outcome.Outcome_Tracking_Details_CFY__c;
+                jsonVal = parsed?.Q24_VERIFIED__c || parsed?.Q24_VERIFIED;
+            } catch (e) { }
+        }
         return this._val(
             this._app?.Q24_VERIFIED__c ||
+            jsonVal ||
+            this._outcome?.X3rd_Party_Placement_Verification_CFY__c ||
             this._outcome?.Job_Verification_3rd_Party_CFY__c ||
             this._outcome?.X3rd_Party_Placement_Verification_FY_1__c ||
             this._outcome?.Job_Verification_3rd_Party_FY1__c
@@ -846,8 +925,8 @@ export default class WcfFormPreview extends LightningElement {
             }
             return {
                 documentId: a.contentDocumentId,
-                versionId : a.contentVersionId,
-                name      : fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
+                versionId: a.contentVersionId,
+                name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
             };
         });
     }
@@ -870,9 +949,9 @@ export default class WcfFormPreview extends LightningElement {
     get genieInterestBadgeClass() { return (this.showSynergies && this.genieInterestLevel !== '—') ? 'rv-badge rv-badge-green' : 'rv-badge rv-badge-grey'; }
     get synergiesValue() {
         if (!this._app) return '';
-        return this._app.Operational_Synergies_with_WOF__c 
-            || this._app.GenieAI_Synergies__c 
-            || this._app.Operational_Synergies_with_WOF_JC__c 
+        return this._app.Operational_Synergies_with_WOF__c
+            || this._app.GenieAI_Synergies__c
+            || this._app.Operational_Synergies_with_WOF_JC__c
             || this._app.Operational_Synergies_with_WOF_Both__c
             || '';
     }
@@ -888,8 +967,8 @@ export default class WcfFormPreview extends LightningElement {
                 }
                 return {
                     documentId: a.contentDocumentId,
-                    versionId : a.contentVersionId,
-                    name      : fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
+                    versionId: a.contentVersionId,
+                    name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
                 };
             });
     }
@@ -898,13 +977,13 @@ export default class WcfFormPreview extends LightningElement {
     }
 
     // ── Attestation ──────────────────────────────────────────────────────────
-    get attestingName()  {
+    get attestingName() {
         return this._val(this._app?.Attesting_User_Name__c || this._app?.Submitter_Name__c || this._app?.CreatedBy?.Name);
     }
     get attestingTitle() {
         return this._val(this._app?.Attesting_User_Title__c || this._app?.Job_Title__c || this._app?.CreatedBy?.Title);
     }
-    get attestingDate()  {
+    get attestingDate() {
         return this._fmtDateTime(this._app?.Attestation_Date__c || this._app?.Initial_Submission_Date__c || this._app?.LastModifiedDate || this._app?.CreatedDate);
     }
 
@@ -985,17 +1064,17 @@ export default class WcfFormPreview extends LightningElement {
                         // We do NOT create a Blob here, which avoids LWS "Unsupported MIME type" errors.
                         this.officePreviewTitle = fileName;
                         this.isOfficePreviewOpen = true;
-                        this._currentOfficeFile = { 
-                            fileName, 
-                            ext, 
+                        this._currentOfficeFile = {
+                            fileName,
+                            ext,
                             base64: fileData.base64,
                             versionId: currentVerId,
                             documentId: currentDocId
                         };
-                        this._pendingOfficeRender = { 
-                            extension: ext, 
-                            base64Data: fileData.base64, 
-                            title: fileName 
+                        this._pendingOfficeRender = {
+                            extension: ext,
+                            base64Data: fileData.base64,
+                            title: fileName
                         };
 
                         // If container is already in DOM, render immediately
@@ -1039,7 +1118,7 @@ export default class WcfFormPreview extends LightningElement {
             document.body.removeChild(a);
             return;
         }
-        
+
         if (base64) {
             const a = document.createElement('a');
             a.href = 'data:application/octet-stream;base64,' + base64;
@@ -1284,10 +1363,10 @@ export default class WcfFormPreview extends LightningElement {
             const jsPDFLib = window.jspdf?.jsPDF;
             if (!jsPDFLib) return;
 
-            const RED    = [153, 0, 0];       // #990000
-            const NAVY   = [27, 42, 74];      // #1B2A4A
-            const LIGHT  = [253, 246, 244];  // soft tint
-            const GREY   = [112, 110, 107];
+            const RED = [153, 0, 0];       // #990000
+            const NAVY = [27, 42, 74];      // #1B2A4A
+            const LIGHT = [253, 246, 244];  // soft tint
+            const GREY = [112, 110, 107];
             const BORDER = [240, 232, 230];
 
             const parseHtml = (html) => {
@@ -1311,13 +1390,13 @@ export default class WcfFormPreview extends LightningElement {
             };
 
             const doc = new jsPDFLib();
-            const pageWidth  = doc.internal.pageSize.getWidth();
+            const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            const marginX    = 15;
-            const contentW   = pageWidth - marginX * 2;
-            const labelW     = 50;
-            const valueX     = marginX + labelW + 4;
-            const valueW     = contentW - labelW - 4;
+            const marginX = 15;
+            const contentW = pageWidth - marginX * 2;
+            const labelW = 50;
+            const valueX = marginX + labelW + 4;
+            const valueW = contentW - labelW - 4;
             let y = 20;
             let pageCount = 1;
 
@@ -1472,27 +1551,7 @@ export default class WcfFormPreview extends LightningElement {
                 rowDivider();
             };
 
-            const richBoxUnder = (label, value) => {
-                const text = (value === null || value === undefined || value === '' || value === '—') ? '—' : parseHtml(String(value));
-                doc.setFontSize(9.3);
-                const lines = doc.splitTextToSize(text, valueW - 8);
-                const boxH = lines.length * 4.4 + 10;
-                checkPage(boxH + 4);
-                doc.setFillColor(...LIGHT);
-                doc.rect(valueX, y, valueW, boxH, 'F');
-                doc.setFillColor(...RED);
-                doc.rect(valueX, y, 1, boxH, 'F');
-                doc.setFontSize(7.8);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(...RED);
-                doc.text(label.toUpperCase(), valueX + 5, y + 5.5);
-                doc.setFontSize(9.3);
-                doc.setFont(undefined, 'normal');
-                doc.setTextColor(...NAVY);
-                lines.forEach((l, i) => doc.text(l, valueX + 5, y + 10.5 + i * 4.4));
-                y += boxH + 4;
-                rowDivider();
-            };
+
 
             const table = (head, body) => {
                 checkPage(40);
@@ -1508,6 +1567,245 @@ export default class WcfFormPreview extends LightningElement {
                     columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY } }
                 });
                 y = doc.lastAutoTable.finalY + 8;
+            };
+
+            // ── Rich text (HTML) → styled PDF text: bold / italic / underline / strike / lists ──
+            const PDF_BOTTOM = pageHeight - 18;
+            const LIST_INDENT = 5;   // mm per list nesting level
+            const BULLET_W = 4;   // mm reserved for "•" or "1."
+            const PLAIN = { bold: false, italic: false, underline: false, strike: false };
+            const BLOCK_TAGS = new Set(['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'TABLE', 'TR', 'SECTION']);
+
+            const newPage = () => { doc.addPage(); pageCount++; addHeader(); };
+            const fontStyleOf = r => (r.bold && r.italic) ? 'bolditalic' : r.bold ? 'bold' : r.italic ? 'italic' : 'normal';
+            const sameStyle = (a, b) => a.bold === b.bold && a.italic === b.italic && a.underline === b.underline && a.strike === b.strike;
+
+            // 1) HTML → paragraphs of styled runs
+            const htmlToParagraphs = (html) => {
+                const raw = (html === null || html === undefined) ? '' : String(html);
+                const dash = [{ prefix: null, level: 0, runs: [{ ...PLAIN, text: '—' }] }];
+                if (!raw.trim() || raw.trim() === '—') return dash;
+
+                const paragraphs = [];
+                let current = null;
+                const openPara = (prefix, level) => { current = { prefix, level, runs: [] }; paragraphs.push(current); };
+                const closeParaIfUsed = () => { if (current && current.runs.length) current = null; };
+
+                const styleOf = (el, parent) => {
+                    const s = { ...parent };
+                    const tag = el.nodeName;
+                    if (tag === 'B' || tag === 'STRONG' || /^H[1-6]$/.test(tag)) s.bold = true;
+                    if (tag === 'I' || tag === 'EM') s.italic = true;
+                    if (tag === 'U' || tag === 'INS') s.underline = true;
+                    if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') s.strike = true;
+                    const st = el.style;   // editors sometimes use <span style="...">
+                    if (st) {
+                        const fw = String(st.fontWeight || '');
+                        if (fw === 'bold' || fw === 'bolder' || parseInt(fw, 10) >= 600) s.bold = true;
+                        if (st.fontStyle === 'italic' || st.fontStyle === 'oblique') s.italic = true;
+                        const deco = `${st.textDecoration || ''} ${st.textDecorationLine || ''}`;
+                        if (deco.includes('underline')) s.underline = true;
+                        if (deco.includes('line-through')) s.strike = true;
+                    }
+                    return s;
+                };
+
+                const walk = (node, style, level, listCtx) => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = node.nodeValue.replace(/\u00a0/g, ' ').replace(/[\r\n\t]+/g, ' ');
+                        const atParaStart = !current || current.runs.length === 0;
+                        if (!text || (atParaStart && !text.trim())) return;
+                        if (!current) openPara(null, level);
+                        current.runs.push({ ...style, text });
+                        return;
+                    }
+                    if (node.nodeType !== Node.ELEMENT_NODE) return;
+                    const tag = node.nodeName;
+
+                    if (tag === 'BR') {
+                        if (!current) openPara(null, level);
+                        current.runs.push({ ...style, br: true });
+                        return;
+                    }
+                    const s = styleOf(node, style);
+
+                    if (tag === 'UL' || tag === 'OL') {
+                        closeParaIfUsed();
+                        const ctx = { ordered: tag === 'OL', index: 0 };
+                        node.childNodes.forEach(ch => walk(ch, s, level + 1, ctx));
+                        current = null;
+                        return;
+                    }
+                    if (tag === 'LI') {
+                        const lvl = Math.max(level, 1);
+                        let prefix = '•';
+                        if (listCtx) { listCtx.index++; if (listCtx.ordered) prefix = `${listCtx.index}.`; }
+                        openPara(prefix, lvl);
+                        node.childNodes.forEach(ch => walk(ch, s, lvl, null));
+                        current = null;
+                        return;
+                    }
+                    if (BLOCK_TAGS.has(tag)) {
+                        closeParaIfUsed();
+                        node.childNodes.forEach(ch => walk(ch, s, level, listCtx));
+                        closeParaIfUsed();
+                        return;
+                    }
+                    node.childNodes.forEach(ch => walk(ch, s, level, listCtx));   // inline: b, i, u, span, a…
+                };
+
+                new DOMParser().parseFromString(raw, 'text/html').body
+                    .childNodes.forEach(ch => walk(ch, PLAIN, 0, null));
+
+                const result = paragraphs.filter(p => p.runs.length);
+                return result.length ? result : dash;
+            };
+
+            // 2) Paragraphs → wrapped lines of styled segments
+            const layoutRichText = (html, maxWidth, fontSize) => {
+                doc.setFontSize(fontSize);
+                const measure = (text, run) => { doc.setFont(undefined, fontStyleOf(run)); return doc.getTextWidth(text); };
+                const out = [];
+
+                htmlToParagraphs(html).forEach(p => {
+                    const prefixX = p.level > 0 ? (p.level - 1) * LIST_INDENT : 0;
+                    const textX = p.level > 0 ? prefixX + BULLET_W : 0;
+                    const avail = Math.max(maxWidth - textX, 20);
+                    const lines = [];
+                    let line;
+
+                    const startLine = () => {
+                        line = { segs: [], width: 0, textX, prefixX, prefix: lines.length ? null : p.prefix };
+                        lines.push(line);
+                    };
+                    const pushSeg = (text, run) => {
+                        const w = measure(text, run);
+                        const last = line.segs[line.segs.length - 1];
+                        if (last && sameStyle(last.run, run)) last.text += text;
+                        else line.segs.push({ text, run });
+                        line.width += w;
+                    };
+
+                    // Tokenise; a word may span several styled runs, e.g. "bo<b>ld</b>"
+                    const items = [];
+                    let word = null;
+                    p.runs.forEach(r => {
+                        if (r.br) { word = null; items.push({ type: 'br' }); return; }
+                        r.text.split(/(\s+)/).forEach(part => {
+                            if (!part) return;
+                            if (/^\s+$/.test(part)) {
+                                word = null;
+                                if (items.length && items[items.length - 1].type === 'space') return;
+                                items.push({ type: 'space', run: r });
+                            } else {
+                                if (!word) { word = { type: 'word', pieces: [] }; items.push(word); }
+                                word.pieces.push({ text: part, run: r });
+                            }
+                        });
+                    });
+
+                    startLine();
+                    let space = null;
+                    items.forEach(it => {
+                        if (it.type === 'br') { startLine(); space = null; return; }
+                        if (it.type === 'space') { if (line.segs.length) space = it; return; }
+
+                        const wordW = it.pieces.reduce((sum, pc) => sum + measure(pc.text, pc.run), 0);
+                        const spaceW = space ? measure(' ', space.run) : 0;
+                        if (line.segs.length && line.width + spaceW + wordW > avail) { startLine(); space = null; }
+                        if (space && line.segs.length) pushSeg(' ', space.run);   // space keeps its style → continuous underline
+                        space = null;
+
+                        it.pieces.forEach(pc => {
+                            if (wordW <= avail) { pushSeg(pc.text, pc.run); return; }
+                            for (const ch of pc.text) {                              // very long word → hard break
+                                if (line.segs.length && line.width + measure(ch, pc.run) > avail) startLine();
+                                pushSeg(ch, pc.run);
+                            }
+                        });
+                    });
+                    if (lines.length > 1 && !lines[lines.length - 1].segs.length) lines.pop();   // trailing <br>
+                    out.push(...lines);
+                });
+                return out;
+            };
+
+            // 3) Draw one line: font style per segment + manual underline / strike-through
+            const drawRichLine = (line, x, baseY, fontSize, color) => {
+                doc.setFontSize(fontSize);
+                doc.setTextColor(...color);
+                if (line.prefix) {
+                    doc.setFont(undefined, 'normal');
+                    doc.text(line.prefix, x + line.prefixX, baseY);
+                }
+                let cx = x + line.textX;
+                line.segs.forEach(seg => {
+                    doc.setFont(undefined, fontStyleOf(seg.run));
+                    doc.text(seg.text, cx, baseY);
+                    const w = doc.getTextWidth(seg.text);
+                    if (seg.run.underline || seg.run.strike) {
+                        doc.setDrawColor(...color);
+                        doc.setLineWidth(0.2);
+                        if (seg.run.underline) doc.line(cx, baseY + 0.8, cx + w, baseY + 0.8);
+                        if (seg.run.strike) doc.line(cx, baseY - fontSize * 0.11, cx + w, baseY - fontSize * 0.11);
+                    }
+                    cx += w;
+                });
+                doc.setFont(undefined, 'normal');
+            };
+
+            // 4) Question row whose answer is rich text (breaks across pages if long)
+            const richQRow = (num, label, html) => {
+                const FS = 9.5, LH = 4.6;
+                const lines = layoutRichText(html, valueW, FS);
+                doc.setFontSize(9.3);
+                doc.setFont(undefined, 'bold');
+                const labelH = doc.splitTextToSize(label, labelW - 10).length * 4.2 + 4;
+
+                checkPage(Math.max(labelH, Math.min(lines.length, 3) * LH) + 8);
+                const top = y;
+                drawQLabel(num, label, top);
+
+                let ly = top + 2, broke = false;
+                lines.forEach(line => {
+                    if (ly > PDF_BOTTOM - 1) { newPage(); ly = y + 2; broke = true; }
+                    drawRichLine(line, valueX, ly, FS, [0, 0, 0]);
+                    ly += LH;
+                });
+                y = broke ? ly + 6 : Math.max(ly + 6, top + labelH + 4);
+                rowDivider();
+            };
+
+            // 5) Shaded box with rich text (replaces the old richBoxUnder; splits across pages)
+            const richBoxUnder = (label, html) => {
+                const FS = 9.3, LH = 4.4;
+                const textX = valueX + 5;
+                const lines = layoutRichText(html, valueW - 8, FS);
+                let i = 0, first = true;
+
+                while (i < lines.length) {
+                    const headH = first ? 10.5 : 6;                 // first chunk carries the label
+                    const fit = Math.floor((PDF_BOTTOM - y - headH - 4) / LH) + 1;
+                    const minFit = first ? Math.min(2, lines.length) : 1;
+                    if (fit < minFit) { newPage(); continue; }
+
+                    const n = Math.min(fit, lines.length - i);
+                    const boxH = headH + (n - 1) * LH + 4;
+                    doc.setFillColor(...LIGHT); doc.rect(valueX, y, valueW, boxH, 'F');
+                    doc.setFillColor(...RED); doc.rect(valueX, y, 1, boxH, 'F');
+                    if (first) {
+                        doc.setFontSize(7.8);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(...RED);
+                        doc.text(label.toUpperCase(), textX, y + 5.5);
+                    }
+                    for (let j = 0; j < n; j++) drawRichLine(lines[i + j], textX, y + headH + j * LH, FS, NAVY);
+
+                    y += boxH; i += n; first = false;
+                    if (i < lines.length) newPage();
+                }
+                y += 4;
+                rowDivider();
             };
 
             addHeader();
@@ -1642,8 +1940,7 @@ export default class WcfFormPreview extends LightningElement {
             if (this.isJobFulfillment) {
                 sectionHeader('Track 1: Job Fulfillment', this.sectionJfStepLabel);
 
-                simpleQRow(q.Q11, 'Your Skilling Approach', parseHtml(this.skillingApproach));
-
+                richQRow(q.Q11, 'Your Skilling Approach', this.skillingApproach);
                 if (this.hasSkillingDomains) {
                     checkPage(10);
                     const t = y;
@@ -1703,7 +2000,7 @@ export default class WcfFormPreview extends LightningElement {
             if (this.isJobCreation) {
                 sectionHeader('Track 2: Job Creation / Entrepreneurship', this.sectionJcStepLabel);
 
-                simpleQRow(q.Q15, 'Your Job Creation Approach', parseHtml(this.jobCreationApproach));
+                richQRow(q.Q15, 'Your Job Creation Approach', this.jobCreationApproach);
 
                 if (this.hasBusinessSectors) {
                     checkPage(10);
@@ -1763,16 +2060,34 @@ export default class WcfFormPreview extends LightningElement {
             }
 
             // ══ SECTION 4 — Track 3: Livelihood Upliftment (Q19 - Q23) ══
+            // ══ SECTION 4 — Track 3: Livelihood Upliftment (Q19 - Q23) ══
             if (this.isLivelihood) {
                 sectionHeader('Track 3: Livelihood Upliftment', this.sectionLivStepLabel);
 
-                simpleQRow(q.Q19, 'Your Livelihood Upliftment Approach', parseHtml(this.livelihoodApproach));
+                richQRow(q.Q19, 'Your Livelihood Upliftment Approach', this.livelihoodApproach);
+
+                if (this.hasLivelihoodPrograms) {
+                    checkPage(10);
+                    const t20 = y;
+                    drawQLabel(q.Q20, 'Key Programs / Initiatives', t20);
+                    y = t20 + 10;
+                    table(['Program / Initiative Name', 'Type of Support Provided', 'Duration (Man-Hours)', 'Annual Enrollment'],
+                        this.livelihoodPrograms.map(r => [r.name, r.supportType, r.manHours, r.enrollment]));
+                }
+
+                if (this.hasCommunities) {
+                    checkPage(10);
+                    const t21 = y;
+                    drawQLabel(q.Q21, 'Communities that you work in', t21);
+                    y = t21 + 10;
+                    table(['State', 'District / Area', this.fyLabel3, this.fyLabel2, this.fyLabel1, 'CFY (projected)'],
+                        this.communities.map(r => [r.state, r.district, r.fy3, r.fy2, r.fy1, r.proj]));
+                }
 
                 const o = this.outcomeData;
                 checkPage(10);
                 const t22 = y;
-                drawQLabel(q.Q22, 'Livelihood Outcomes (Actuals)', t22);
-                y = t22 + 10;
+                drawQLabel(q.Q22, 'Livelihood Outcomes (Actuals)', t22); y = t22 + 10;
 
                 doc.setFontSize(8.5);
                 doc.setFont(undefined, 'bold');
@@ -1825,10 +2140,9 @@ export default class WcfFormPreview extends LightningElement {
             ], 1);
 
             // Q25: Sustainability Plan
-            simpleQRow(q.Q25, 'Sustainability Plan', parseHtml(this.orgSustainability));
-
+            richQRow(q.Q25, 'Sustainability Plan', this.orgSustainability);
             // Q26: Direction for Additional Funding
-            simpleQRow(q.Q26, 'Direction for Additional Funding', parseHtml(this.additionalFunding));
+            richQRow(q.Q26, 'Direction for Additional Funding', this.additionalFunding);
 
             // Q27: Operational Synergies — GenieAI
             simpleQRow(q.Q27, 'Operational Synergies — GenieAI', this.genieInterestLevel, true);

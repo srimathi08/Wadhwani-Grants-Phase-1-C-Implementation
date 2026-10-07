@@ -1,61 +1,152 @@
 import { LightningElement, track } from 'lwc';
 import getSourceChannelReport from '@salesforce/apex/WCFValidatorController.getSourceChannelReport';
+import getBudgetRangeDistribution from '@salesforce/apex/WCFValidatorController.getBudgetRangeDistribution';
+import getSourceChannelFilterOptions from '@salesforce/apex/WCFValidatorController.getSourceChannelFilterOptions';
+
+const ALL = 'ALL';
+
+const TIME_RANGE_OPTIONS = [
+    { label: 'All time',        value: ALL },
+    { label: 'Last 30 days',    value: 'LAST_30' },
+    { label: 'Last 90 days',    value: 'LAST_90' },
+    { label: 'Last 6 months',   value: 'LAST_180' },
+    { label: 'Last 12 months',  value: 'LAST_365' },
+    { label: 'This year',       value: 'THIS_YEAR' },
+    { label: 'Custom range',    value: 'CUSTOM' }
+];
+
+const DEFAULT_FILTERS = {
+    geography: ALL,
+    timeRange: ALL,
+    stage:     ALL,
+    startDate: null,
+    endDate:   null
+};
 
 export default class WcfSourcingChannelReport extends LightningElement {
 
     // ─── State ────────────────────────────────────────────────────
-    @track sourceChannelData = null;
-    @track sourceChannelRows = [];
+    @track filters = { ...DEFAULT_FILTERS };
+
+    @track sourceChannelData = null;   // KPI tiles + source channel bars
+    @track sourceChannelRows = [];     // detail table
+    @track budgetRangeData   = null;   // independent budget dataset
+
+    geographyOptions = [{ label: 'All geographies', value: ALL }];
+    stageOptions     = [{ label: 'All stages', value: ALL }];
+    timeRangeOptions = TIME_RANGE_OPTIONS;
+
+    isChannelLoading = false;
+    isBudgetLoading  = false;
+
+    // Stale-response guards (one per independent request)
+    _channelReqId = 0;
+    _budgetReqId  = 0;
 
     // ─── Lifecycle ────────────────────────────────────────────────
     connectedCallback() {
-        this.loadSourceChannelReport();
+        this.loadFilterOptions();
+        this.refreshAll();
+    }
+
+    // ─── Filter handling ──────────────────────────────────────────
+    handleFilterChange(event) {
+        const field = event.target.name;
+        const value = event.detail.value;
+
+        this.filters = { ...this.filters, [field]: value };
+
+        // Clear custom dates when leaving custom mode
+        if (field === 'timeRange' && value !== 'CUSTOM') {
+            this.filters = { ...this.filters, startDate: null, endDate: null };
+        }
+
+        // Invalid custom range (from > to): wait until corrected
+        const { startDate, endDate } = this.filters;
+        if (startDate && endDate && startDate > endDate) return;
+
+        this.refreshAll();
+    }
+
+    handleReset() {
+        this.filters = { ...DEFAULT_FILTERS };
+        this.refreshAll();
+    }
+
+    get isCustomRange() {
+        return this.filters.timeRange === 'CUSTOM';
+    }
+
+    get requestParams() {
+        return {
+            geography: this.filters.geography,
+            timeRange: this.filters.timeRange,
+            stage:     this.filters.stage,
+            startDate: this.filters.startDate || null,
+            endDate:   this.filters.endDate || null
+        };
     }
 
     // ─── Data loading ─────────────────────────────────────────────
-    async loadSourceChannelReport() {
+    refreshAll() {
+        // Independent requests: run in parallel, each handles its own state
+        this.loadSourceChannelReport();
+        this.loadBudgetRangeDistribution();
+    }
+
+    async loadFilterOptions() {
         try {
-            const d = await getSourceChannelReport();
-            if (!d) return;
+            const o = await getSourceChannelFilterOptions();
+            if (!o) return;
+            this.geographyOptions = [
+                { label: 'All geographies', value: ALL },
+                ...(o.geographies || []).map(g => ({ label: g, value: g }))
+            ];
+            this.stageOptions = [
+                { label: 'All stages', value: ALL },
+                ...(o.stages || []).map(s => ({ label: s, value: s }))
+            ];
+        } catch (e) {
+            console.error('Filter options error:', e);
+        }
+    }
+
+    async loadSourceChannelReport() {
+        const reqId = ++this._channelReqId;
+        this.isChannelLoading = true;
+        try {
+            const d = await getSourceChannelReport(this.requestParams);
+            if (reqId !== this._channelReqId) return; // newer request in flight
+
+            if (!d) {
+                this.sourceChannelData = null;
+                this.sourceChannelRows = [];
+                return;
+            }
 
             const total = d.total || 1;
+            const pct = n => Math.round(((n || 0) / total) * 100);
 
             this.sourceChannelData = [
                 {
-                    id:    'wsn',
-                    label: 'WSN/WEN Nomination',
-                    count: d.wsnWen,
-                    pct:   Math.round((d.wsnWen / total) * 100),
-                    chipClass: 'sc-chip sc-chip-wsn',
-                    dotClass:  'kpi-dot kpi-dot-red',
-                    barStyle:  `width: ${Math.round((d.wsnWen / total) * 100)}%`
+                    id: 'wsn', label: 'WSN/WEN Nomination',
+                    count: d.wsnWen || 0, pct: pct(d.wsnWen),
+                    chipClass: 'sc-chip sc-chip-wsn'
                 },
                 {
-                    id:    'wcf',
-                    label: 'WCF Direct Research',
-                    count: d.wcfDirect,
-                    pct:   Math.round((d.wcfDirect / total) * 100),
-                    chipClass: 'sc-chip sc-chip-wcf',
-                    dotClass:  'kpi-dot kpi-dot-blue',
-                    barStyle:  `width: ${Math.round((d.wcfDirect / total) * 100)}%`
+                    id: 'wcf', label: 'WCF Direct Research',
+                    count: d.wcfDirect || 0, pct: pct(d.wcfDirect),
+                    chipClass: 'sc-chip sc-chip-wcf'
                 },
                 {
-                    id:    'self',
-                    label: 'Self-Signup',
-                    count: d.selfSignup,
-                    pct:   Math.round((d.selfSignup / total) * 100),
-                    chipClass: 'sc-chip sc-chip-self',
-                    dotClass:  'kpi-dot kpi-dot-green',
-                    barStyle:  `width: ${Math.round((d.selfSignup / total) * 100)}%`
+                    id: 'self', label: 'Self-Signup',
+                    count: d.selfSignup || 0, pct: pct(d.selfSignup),
+                    chipClass: 'sc-chip sc-chip-self'
                 },
                 {
-                    id:    'unk',
-                    label: 'Unknown / TBD',
-                    count: d.unknown,
-                    pct:   Math.round((d.unknown / total) * 100),
-                    chipClass: 'sc-chip sc-chip-unk',
-                    dotClass:  'kpi-dot kpi-dot-grey',
-                    barStyle:  `width: ${Math.round((d.unknown / total) * 100)}%`
+                    id: 'unk', label: 'Unknown / TBD',
+                    count: d.unknown || 0, pct: pct(d.unknown),
+                    chipClass: 'sc-chip sc-chip-unk'
                 }
             ];
 
@@ -65,9 +156,29 @@ export default class WcfSourcingChannelReport extends LightningElement {
                 channelClass:  this._channelClass(r.sourceChannel),
                 decisionClass: this._decisionClass(r.decision)
             }));
-
         } catch (e) {
+            if (reqId !== this._channelReqId) return;
             console.error('Source channel report error:', e);
+            this.sourceChannelData = null;
+            this.sourceChannelRows = [];
+        } finally {
+            if (reqId === this._channelReqId) this.isChannelLoading = false;
+        }
+    }
+
+    async loadBudgetRangeDistribution() {
+        const reqId = ++this._budgetReqId;
+        this.isBudgetLoading = true;
+        try {
+            const list = await getBudgetRangeDistribution(this.requestParams);
+            if (reqId !== this._budgetReqId) return;
+            this.budgetRangeData = list || [];
+        } catch (e) {
+            if (reqId !== this._budgetReqId) return;
+            console.error('Budget range distribution error:', e);
+            this.budgetRangeData = [];
+        } finally {
+            if (reqId === this._budgetReqId) this.isBudgetLoading = false;
         }
     }
 
@@ -78,7 +189,7 @@ export default class WcfSourcingChannelReport extends LightningElement {
     }
 
     get sourceChannelBars() {
-        if (!this.sourceChannelData) return null;
+        if (!this.sourceChannelData || this.scTotal === 0) return null;
         const max = Math.max(...this.sourceChannelData.map(t => t.count || 0), 1);
         const barClasses = [
             'sc-bar-inner',
@@ -95,14 +206,12 @@ export default class WcfSourcingChannelReport extends LightningElement {
         }));
     }
 
-    get budgetRangeBars() {
-        if (!this.sourceChannelRows || this.sourceChannelRows.length === 0) return null;
+    get noChannelBars() {
+        return !this.isChannelLoading && !this.sourceChannelBars;
+    }
 
-        const tally = {};
-        for (const row of this.sourceChannelRows) {
-            const br = row.budgetRange && row.budgetRange !== '—' ? row.budgetRange : 'Unknown';
-            tally[br] = (tally[br] || 0) + 1;
-        }
+    get budgetRangeBars() {
+        if (!this.budgetRangeData || this.budgetRangeData.length === 0) return null;
 
         const barColorClasses = [
             'sc-bar-inner',
@@ -114,20 +223,22 @@ export default class WcfSourcingChannelReport extends LightningElement {
             'sc-bar-inner sc-bar-inner-grey'
         ];
 
-        const entries = Object.entries(tally).sort((a, b) => b[1] - a[1]);
-        const max     = entries[0]?.[1] || 1;
+        const entries = [...this.budgetRangeData]
+            .map(e => ({ label: e.label || 'Unknown', count: e.count || 0 }))
+            .sort((a, b) => b.count - a.count);
+        const max = entries[0]?.count || 1;
 
-        return entries.map(([label, count], i) => ({
+        return entries.map((e, i) => ({
             id:       `br-${i}`,
-            label,
-            count,
+            label:    e.label,
+            count:    e.count,
             barClass: barColorClasses[i % barColorClasses.length],
-            barStyle: `width: ${Math.round((count / max) * 100)}%`
+            barStyle: `width: ${Math.round((e.count / max) * 100)}%`
         }));
     }
 
     get noBudgetRangeBars() {
-        return !this.budgetRangeBars || this.budgetRangeBars.length === 0;
+        return !this.isBudgetLoading && !this.budgetRangeBars;
     }
 
     get noSourceChannelRows() {

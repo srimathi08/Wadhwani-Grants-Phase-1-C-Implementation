@@ -7,6 +7,19 @@ import getValidatedProposals  from '@salesforce/apex/WCFProposalListController.g
 import getReviewStatusMap     from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
 
+// ── Recommend_for_CEO_review__c helpers ─────────────────────────────
+// Legacy 'Yes' and the new 'Yes - Strongly recommend' / 'Yes - Recommend' /
+// 'Yes - Recommend with reservations' values all mean "recommended".
+function isRecYes(value) {
+    return typeof value === 'string' && value.trim().toLowerCase().startsWith('yes');
+}
+// Display text for a stored value. 'No' reads as 'No - Do not recommend' so it
+// matches the 'Yes - ...' wording; the record itself still holds 'No'.
+function recDisplayLabel(value) {
+    if (!value) return '';
+    return value === 'No' ? 'No - Do not recommend' : value;
+}
+
 const PAGE_SIZE_OPTIONS = [
     { label: '10', value: '10' },
     { label: '20', value: '20' },
@@ -98,7 +111,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     @wire(CurrentPageReference)
     setCurrentPageReference(pageRef) {
         if (!pageRef) return;
-        const filter = pageRef.state?.reviewFilter || '';
+        const filter = pageRef.state?.reviewFilter || pageRef.state?.statusFilter || '';
 
         if (VALID_REVIEW_FILTERS.includes(filter)) {
             this.activeReviewFilter = filter === 'all' ? '' : filter;
@@ -391,8 +404,11 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             let reviewBadgeLabel = 'Not Started';
             let reviewBadgeClass = 'wg-pill wg-pill--neutral';
             if (isSubmitted || reviewStatus === 'Review Submitted') {
-                reviewBadgeLabel = 'Reviewed';
-                reviewBadgeClass = 'wg-pill wg-pill--success';
+                // UPDATED: show the reviewer's recommendation (e.g. "Yes - Strongly
+                // recommend"); falls back to "Reviewed" when none is stored
+                const rec = reviewInfo.recommendation;
+                reviewBadgeLabel = rec ? recDisplayLabel(rec) : 'Reviewed';
+                reviewBadgeClass = rec === 'No' ? 'wg-pill wg-pill--error' : 'wg-pill wg-pill--success';
             } else if (reviewId && reviewStatus === 'In Progress') {
                 reviewBadgeLabel = 'In Progress';
                 reviewBadgeClass = 'wg-pill wg-pill--warning';

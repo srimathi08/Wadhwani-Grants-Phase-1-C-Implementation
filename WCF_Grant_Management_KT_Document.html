@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wadhwani Grants (WCF) System - Master Technical & Functional KT Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --secondary: #0f172a;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        aside.sidebar {
+            width: var(--sidebar-width);
+            background: #0b1329;
+            color: #f8fafc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+            z-index: 100;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem 1.5rem 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-brand h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-brand span {
+            color: var(--primary);
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.8rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .nav-item a.active {
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Main Content Container */
+        main.main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 1400px;
+        }
+
+        /* Header Bar */
+        .doc-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 3rem;
+            color: #ffffff;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(2,132,199,0.2) 0%, rgba(2,132,199,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .doc-badge {
+            display: inline-block;
+            background: rgba(2, 132, 199, 0.25);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .doc-title {
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .doc-subtitle {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .meta-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-item .val {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-print {
+            background: #ffffff;
+            color: #0f172a;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-print:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        /* Content Sections */
+        section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        h2.sec-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h3.sub-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 1.75rem 0 1rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        /* Modern Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Badges & Pills */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-blue { background: #e0f2fe; color: #0369a1; }
+        .badge-green { background: #dcfce7; color: #15803d; }
+        .badge-amber { background: #fef3c7; color: #b45309; }
+        .badge-red { background: #fee2e2; color: #b91c1c; }
+        .badge-purple { background: #f3e8ff; color: #7e22ce; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+
+        /* Code Blocks */
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.825rem;
+            overflow-x: auto;
+            margin: 1.25rem 0;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            background: #f1f5f9;
+            color: #0369a1;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Component Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px -2px rgba(2, 132, 199, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+        }
+
+        /* Workflow Step Cards */
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #0f172a;
+        }
+
+        .step-content p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+
+        /* Print Optimization */
+        @media print {
+            aside.sidebar { display: none; }
+            main.main-content { margin-left: 0; padding: 0; max-width: 100%; }
+            .action-bar { display: none; }
+            section { border: 1px solid #ccc; page-break-inside: avoid; }
+            .doc-header { background: #0f172a !important; color: #fff !important; }
+        }
+
+        @media (max-width: 1024px) {
+            aside.sidebar { display: none; }
+            main.main-content { margin-left: 0; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h2>Wadhwani<span>Grants</span> KT</h2>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="#overview">1. Solution Overview</a></li>
+            <li class="nav-item"><a href="#record-types">2. Record Types & RBAC</a></li>
+            <li class="nav-item"><a href="#lifecycle">3. Lifecycle State Machine</a></li>
+            <li class="nav-item"><a href="#lwc-catalog">4. All 28 LWC Components</a></li>
+            <li class="nav-item"><a href="#apex-controllers">5. Apex Classes & Services</a></li>
+            <li class="nav-item"><a href="#flows-deepdive">6. All 8 Salesforce Flows</a></li>
+            <li class="nav-item"><a href="#active-triggers">7. Active Apex Triggers</a></li>
+            <li class="nav-item"><a href="#static-resources">8. Static Resources</a></li>
+            <li class="nav-item"><a href="#data-model">9. Data Model & Dictionary</a></li>
+            <li class="nav-item"><a href="#email-matrix">10. 36+ Email Templates Matrix</a></li>
+            <li class="nav-item"><a href="#integrations">11. Third-Party Integrations</a></li>
+            <li class="nav-item"><a href="#admin-guide">12. Admin & Troubleshooting</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- Master Document Header -->
+        <header class="doc-header">
+            <span class="doc-badge">Enterprise Documentation Release 3.1</span>
+            <h1 class="doc-title">Wadhwani Grants (WCF) Grant Management System</h1>
+            <p class="doc-subtitle">Master Technical & Functional Architecture, Component Catalog, Flows & Email Templates Specification for Salesforce Developers, Architects & Administrators.</p>
+            
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="label">Organization</div>
+                    <div class="val">Wadhwani Foundation</div>
+                </div>
+                <div class="meta-item">
+                    <div class="label">Application</div>
+                    <div class="val">WCF Grant Management</div>
+                </div>
+                <div class="meta-item">
+                    <div class="label">Approver Decisions</div>
+                    <div class="val">Accept & Reject Only</div>
+                </div>
+                <div class="meta-item">
+                    <div class="label">Email Templates</div>
+                    <div class="val">36 Templates + 6 Flow Tpl</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-print" onclick="window.print()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
+                    Print / Save as PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- 1. Executive Overview -->
+        <section id="overview">
+            <h2 class="sec-title">1. Executive Overview & Solution Architecture</h2>
+            <p>The <strong>WCF Grant Management System</strong> is an end-to-end platform automating multi-million dollar grant disbursements. It supports dynamic applicant intakes across three funding tracks (<em>Job Fulfillment, Job Creation, Livelihood Upliftment</em>), two-tier evaluation (Quantitative Validator Screening & Qualitative Multi-Reviewer Scoring), Executive Grant Committee deliberations (Accept / Reject), and automated compliance onboarding.</p>
+        </section>
+
+        <!-- 2. Record Types & RBAC -->
+        <section id="record-types">
+            <h2 class="sec-title">2. Record Types & Persona Role-Based Access Control (RBAC)</h2>
+            <p>Access control is managed through <code>RecordTypeHelper.cls</code> and Account-level role flags. Unauthorized access is prevented via server-side assertions in <code>WCFPortalUserController.assertRole()</code>.</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SObject</th>
+                            <th>Developer Name</th>
+                            <th>UI Label</th>
+                            <th>Description & Usage Context</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>IndividualApplication</code></td>
+                            <td><span class="badge badge-blue">Wadhwani_Grants</span></td>
+                            <td>Wadhwani Grants</td>
+                            <td>Primary proposal intake record type for all grant tracks.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ApplicationReview</code></td>
+                            <td><span class="badge badge-purple">WCF_Validator</span></td>
+                            <td>WCF Validator</td>
+                            <td>Stage 1: Quantitative screening and document verification review.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ApplicationReview</code></td>
+                            <td><span class="badge badge-purple">WG_Reviewer</span></td>
+                            <td>WG Reviewer</td>
+                            <td>Stage 2: Master qualitative proposal scoring (7 categories, 22 criteria).</td>
+                        </tr>
+                        <tr>
+                            <td><code>ApplicationDecision</code></td>
+                            <td><span class="badge badge-green">WG_Approver</span></td>
+                            <td>WG Approver</td>
+                            <td>Stage 3: Executive grant committee deliberation & final sign-off.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. Lifecycle State Machine -->
+        <section id="lifecycle">
+            <h2 class="sec-title">3. End-to-End Lifecycle State Machine</h2>
+            
+            <div class="workflow-steps">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>Draft Creation & Intake</h4>
+                        <p>Applicant fills dynamic 28-question RFI (<code>wcfDynamicForm</code>). Draft auto-saves on blur. Initial draft save triggers <code>Draft_Saved</code> email notification.</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Submission & Validator Screening (10-Day SLA)</h4>
+                        <p>Submission sets <code>Submission_Round__c = 1</code>. Alerts Validator queue (<code>New_Application_Validator_Queue</code>) and Applicant (<code>Application_Received</code>). Validator performs quantitative screening in <code>wcfValidatorForm</code>.</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Reviewer Qualitative Evaluation (10-Day SLA)</h4>
+                        <p>When Validator passes screening (<code>Validated__c = true</code>), application moves to <code>Under Review</code>. Reviewer scores 22 criteria across 7 categories using <code>wcfProposalReviewForm</code> powered by <code>WCF_ReviewFormJFController.cls</code>. Assigned reviewer receives in-flow email <code>New_Evaluation_Assinged</code>.</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h4>Executive Committee Deliberation (Accept / Reject)</h4>
+                        <p>When review is submitted, Approver receives in-flow alert <code>Approver_ReadyForDecision</code>. Committee records one of <strong>2 decisions: Accept or Reject</strong> in <code>wcfApproverContainer</code>. Decision dispatches <code>Application_Approved</code> or <code>Application_Decision_Declined</code>.</p>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <h4>Compliance Onboarding</h4>
+                        <p>Applicant uploads mandatory certificates (80G, 12A, FCRA, MoU) in <code>wcfComplianceDocs</code>. When all reach <code>Validated</code>, <code>WCFComplianceDocumentTrigger</code> automatically flips status to <code>Onboarded</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LWC Catalog -->
+        <section id="lwc-catalog">
+            <h2 class="sec-title">4. Deep-Dive Catalog of All 28 Lightning Web Components</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApplicantDashboard</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Main applicant hub displaying proposal cards, status badges, progress bars, and RFI action triggers.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFProposalListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApplicantWelcomeDashboard</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Hero landing page for newly registered organizations with grant track guidelines and eligibility triggers.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Navigation Service</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApplicationFaqModal</span>
+                        <span class="badge badge-gray">Shared</span>
+                    </div>
+                    <p class="card-desc">Searchable accordion modal answering RFI grant process, eligibility, and budgeting FAQs.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">wcfApplicationFaqController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApplicationList</span>
+                        <span class="badge badge-purple">Staff</span>
+                    </div>
+                    <p class="card-desc">Tabular list of submissions with multi-column filtering, search, and pagination for foundation staff.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFProposalListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApplicationTimeline</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Visual chevron stepper showing lifecycle progression (Draft ➔ Screening ➔ Review ➔ Decision ➔ Onboarded).</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">IndividualApplication.Status</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApproverContainer</span>
+                        <span class="badge badge-green">Approver</span>
+                    </div>
+                    <p class="card-desc">Split-pane executive workbench embedding proposal preview and decision buttons for <strong>Accept</strong> and <strong>Reject</strong> only.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFApproverListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfApproverListView</span>
+                        <span class="badge badge-green">Approver</span>
+                    </div>
+                    <p class="card-desc">Approver queue listing proposals where reviewer evaluations have finished and are ready for committee sign-off.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFApproverListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfComplianceDocs</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Applicant compliance upload interface for 80G, 12A, FCRA, Audited Financials, and Master MoU files.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFComplianceController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfComplianceDocuments</span>
+                        <span class="badge badge-purple">Staff</span>
+                    </div>
+                    <p class="card-desc">Programme Lead console to issue compliance requests, verify certificates, and record verification decisions.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">ComplianceDocumentController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfDynamicForm</span>
+                        <span class="badge badge-blue">Intake</span>
+                    </div>
+                    <p class="card-desc">28-question dynamic intake form driven by Custom Metadata, multi-language switching, and live balance calculations.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFFormEngineController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfEligibilityModal</span>
+                        <span class="badge badge-gray">Shared</span>
+                    </div>
+                    <p class="card-desc">5-point institutional eligibility verification checklist modal displayed prior to application creation.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Client-Side Modal</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfFormPreview</span>
+                        <span class="badge badge-gray">Shared</span>
+                    </div>
+                    <p class="card-desc">Universal read-only proposal viewer rendering complete responses, financial tables, and file attachments.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFValidatorController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfHomeDashboard</span>
+                        <span class="badge badge-gray">Router</span>
+                    </div>
+                    <p class="card-desc">Smart role routing switchboard evaluating Person Account flags to redirect users to their assigned workspace.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFPortalUserController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfPortalHeader</span>
+                        <span class="badge badge-gray">Shared</span>
+                    </div>
+                    <p class="card-desc">Experience Cloud global header with WCF logo, notifications bell, user avatar, and session logout.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Static Resource: wcfLogos</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfPortalSidebar</span>
+                        <span class="badge badge-gray">Shared</span>
+                    </div>
+                    <p class="card-desc">Collapsible side navigation bar with role-specific links for Applicants, Validators, Reviewers, and Approvers.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Dynamic Navigation</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfProposalListView</span>
+                        <span class="badge badge-purple">Reviewer</span>
+                    </div>
+                    <p class="card-desc">Reviewer assigned proposal queue table showing scoring completion percentage, track, and SLA countdowns.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFProposalListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfReturnBanner</span>
+                        <span class="badge badge-amber">Applicant</span>
+                    </div>
+                    <p class="card-desc">Prominent alert banner displaying consolidated feedback notes when an application is returned for revisions.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Consolidated_Return_Comments__c</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfProposalReviewForm</span>
+                        <span class="badge badge-purple">Reviewer</span>
+                    </div>
+                    <p class="card-desc">22-question qualitative evaluation scoring rubric across 7 categories with 5-point scoring ladders.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCF_ReviewFormJFController.cls / WCFReviewerMetadataController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfReviewerContainer</span>
+                        <span class="badge badge-purple">Reviewer</span>
+                    </div>
+                    <p class="card-desc">Reviewer host container embedding proposal preview on the left and qualitative scoring form on the right.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFProposalListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfRfiResponsePage</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Dedicated revision response workspace highlighting specifically flagged questions returned by staff.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFFormEngineController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfRfiWelcomePage</span>
+                        <span class="badge badge-blue">Applicant</span>
+                    </div>
+                    <p class="card-desc">Grant track onboarding guide outlining required materials before launching the dynamic intake form.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">Static Resource: wcfImages</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfValidatorContainer</span>
+                        <span class="badge badge-purple">Validator</span>
+                    </div>
+                    <p class="card-desc">Validator workspace featuring a draggable split divider between proposal preview and screening form.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFValidatorController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wcfValidatorForm</span>
+                        <span class="badge badge-purple">Validator</span>
+                    </div>
+                    <p class="card-desc">5-section quantitative screening form covering Completeness, Alignment, Governance, and Decision recording.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFValidatorController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wfGrantsSignup</span>
+                        <span class="badge badge-blue">Intake</span>
+                    </div>
+                    <p class="card-desc">Public registration portal capturing organization and submitter info, provisioning Person Accounts and Users.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WFGrantsSignUpController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wgApproverDashboard</span>
+                        <span class="badge badge-green">Approver</span>
+                    </div>
+                    <p class="card-desc">Executive dashboard displaying KPI metrics: Ready for Decision, Approved Grants, and Returned Items.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFApproverListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wgReviewerDashboard</span>
+                        <span class="badge badge-purple">Reviewer</span>
+                    </div>
+                    <p class="card-desc">Reviewer workload metrics tracking assigned evaluations, completed reviews, and SLA deadlines.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFProposalListController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wgSourcingChannelReport</span>
+                        <span class="badge badge-gray">Analytics</span>
+                    </div>
+                    <p class="card-desc">Analytical report segmenting applications by sourcing channel (WSN/WEN, Direct, Self-Signup) and budget bands.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFValidatorController.cls</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">wgValidatorDashboard</span>
+                        <span class="badge badge-purple">Validator</span>
+                    </div>
+                    <p class="card-desc">Validator action queue tracking applications To Validate, In Progress, Revalidations, and Validated.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-gray">WCFValidatorController.cls</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Apex Controllers -->
+        <section id="apex-controllers">
+            <h2 class="sec-title">5. Apex Classes & Services Architecture</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Apex Class Name</th>
+                            <th>Layer / Type</th>
+                            <th>Core Responsibilities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>WCFFormController.cls</code></td>
+                            <td>Master Intake Engine</td>
+                            <td>Core 2,160-line dynamic intake controller: Multi-track draft persistence, AI narrative coaching feedback (<code>AI_Feedback__c</code>), multi-lingual picklist resolution, cell-level file attachments, and submission orchestration.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFFormEngineController.cls</code></td>
+                            <td>Form Engine</td>
+                            <td>Deserializes JSON form payloads, maps fields across tracks, and upserts <code>IndividualApplication</code>, <code>Historical_Data__c</code>, <code>Current_fiscal_year_data__c</code>, and <code>Outcomes_Data__c</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFFormMetadataController.cls</code></td>
+                            <td>Metadata Service</td>
+                            <td>Loads active tracks, sections, questions, and dependency rules from <code>RFI_Track__mdt</code> and <code>RFI_Question__mdt</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFValidatorController.cls</code></td>
+                            <td>Screening Engine</td>
+                            <td>Provides preview data, manages screening checklist reviews, and saves validator screening decisions (Pass, Flag, Return).</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCF_ReviewFormJFController.cls</code></td>
+                            <td>Evaluation Engine</td>
+                            <td>Primary reviewer evaluation controller powering <code>wcfProposalReviewForm</code>, calculating weighted category scores, saving draft reviews, and managing rubric submissions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFReviewerMetadataController.cls</code></td>
+                            <td>Metadata Service</td>
+                            <td>Loads 22 evaluation criteria and 5-point scoring ladders from <code>Reviewer_Category_v5__mdt</code> and <code>Reviewer_Question_v5__mdt</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFApproverListController.cls</code></td>
+                            <td>Approver Controller</td>
+                            <td>Queries proposals ready for committee review and records executive decisions (<strong>Accept</strong> or <strong>Reject</strong>) with comments and rejection reasons.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFComplianceController.cls</code></td>
+                            <td>Compliance Service</td>
+                            <td>Generates geography-specific compliance checklists and manages file uploads/deletions for <code>WCF_Compliance_Document__c</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ComplianceDocumentController.cls</code></td>
+                            <td>Compliance Admin</td>
+                            <td>Internal console for Programme Leads to issue compliance requests and record verification decisions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFProposalListController.cls</code></td>
+                            <td>Queue Controller</td>
+                            <td>Aggregates proposals for Applicant, Reviewer, and Validator queues and computes business day SLA countdowns.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFPortalUserController.cls</code></td>
+                            <td>Security / RBAC</td>
+                            <td>Enforces server-side role validation (<code>assertRole</code>) and retrieves logged-in contact information.</td>
+                        </tr>
+                        <tr>
+                            <td><code>RecordTypeHelper.cls</code></td>
+                            <td>Architecture Helper</td>
+                            <td>Caches and resolves SObject RecordType DeveloperNames into IDs to avoid repeated describe calls.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ApplicationReviewHandler.cls</code></td>
+                            <td>Trigger Handler</td>
+                            <td>Calculates working day SLAs (10 days) and aggregates consolidated feedback comments from Q1–Q28.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCFComplianceDocumentTriggerHandler.cls</code></td>
+                            <td>Trigger Handler</td>
+                            <td>Rolls up compliance status and updates <code>IndividualApplication.Status = 'Onboarded'</code> when all documents pass.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ProposalAIUpdater_WCF.cls</code></td>
+                            <td>GenAI Action</td>
+                            <td>Parses Einstein GenAI prompt output and updates proposal scoring fields.</td>
+                        </tr>
+                        <tr>
+                            <td><code>OpenStreetMapService.cls</code></td>
+                            <td>Integration Service</td>
+                            <td>Executes real-time geocoding queries against OpenStreetMap Nominatim API for HQ address validation.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem; background: #f8fafc; border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 8px; padding: 1.25rem;">
+                <h4 style="color: #0f172a; margin-bottom: 0.5rem; font-weight: 700;">Deep Dive: WCFFormController.cls (Intake Architecture Backbone)</h4>
+                <p style="font-size: 0.88rem; color: #475569; margin-bottom: 0.75rem;"><code>WCFFormController.cls</code> (2,160 lines) is the foundational backend controller powering the dynamic RFI applicant intake experience across all grant tracks:</p>
+                <ul style="font-size: 0.85rem; color: #334155; margin-bottom: 0; padding-left: 1.25rem; line-height: 1.6;">
+                    <li><strong>Active Funding Opportunity Discovery</strong> (<code>getActiveFundingOpportunityId</code>): Automatically detects and binds applications to the active <code>FundingOpportunity</code> record.</li>
+                    <li><strong>Real-Time AI Narrative Coaching Feedback</strong> (<code>upsertAIFeedback</code>, <code>getAIFeedbackRecord</code>, <code>getFieldFeedback</code>): Dynamically manages applicant coaching feedback stored in <code>AI_Feedback__c</code> across legal, sustainability, funding, synergies, job creation, and skilling.</li>
+                    <li><strong>Dynamic Multi-Lingual Picklist Resolution</strong> (<code>getPicklistValuesForField</code>): Inspects SObject field describes and metadata translations to dynamically render picklists in English, French, Portuguese, and Hindi.</li>
+                    <li><strong>Multi-Object Draft & Submission Engine</strong> (<code>saveWCFDraftApplication</code>, <code>submitWCFApplication</code>): Ingests structured JSON payloads and orchestrates transactional writes across <code>IndividualApplication</code> and all 8 core child entities.</li>
+                    <li><strong>Draft Reconstitution</strong> (<code>getDraftWCFApplication</code>): Rebuilds the complete <code>WCFDraftWrapper</code> data graph upon portal reload, restoring multi-year financial statements, outcome metrics, and uploaded files.</li>
+                    <li><strong>RFI Revision Persistence</strong> (<code>saveRfiResponse</code>): Updates specifically flagged fields when an applicant responds to revision requests from <code>wcfRfiResponsePage</code>.</li>
+                    <li><strong>Granular File Cell Mapping & Validation</strong> (<code>getOutcomeFilesByCell</code>, <code>setFileCellKey</code>, <code>getApplicationAttachments</code>, <code>deleteUploadedFile</code>, <code>validateUploadedFile</code>): Manages cell-specific attachment mappings for placement verification reports (Q24) and financial audits (Q28).</li>
+                    <li><strong>Applicant Progress Snapshot</strong> (<code>getApplicationStatusForUser</code>): Returns stage completion flags, submission round numbers, and pending action items for the logged-in user.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 6. Flows Deep-Dive -->
+        <section id="flows-deepdive">
+            <h2 class="sec-title">6. Detailed Analysis of All 8 Core Salesforce Flows</h2>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flow Name / Developer Name</th>
+                            <th>Trigger Type</th>
+                            <th>Primary Action & Email Mechanism</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Wadhwani Grants - Email</strong><br><code>Wadhwani_Grants_Email</code></td>
+                            <td>Record-Triggered<br>(<code>IndividualApplication</code>)</td>
+                            <td>Lifecycle email notifications: 14 EmailTemplate actions from <code>WCF_Folder/</code> (Submission, Screening alerts, Revision requests, Approval, Decline).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Update Submission Round Value</strong><br><code>Update_Submission_Round_Value</code></td>
+                            <td>Record-Triggered<br>(<code>IndividualApplication</code>)</td>
+                            <td>Before-save versioning: sets <code>Submission_Round__c = 1</code> on submit, and increments <code>+1</code> on subsequent resubmissions. (No email actions).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reviewer Email Alert - Wadhwani Grants</strong><br><code>Reviewer_Email_Alert_Wadhwani_Grants</code></td>
+                            <td>Record-Triggered<br>(<code>ApplicationReview</code>)</td>
+                            <td>Review assignment and reminders using <strong>3 In-Flow Rich HTML Text Templates</strong> (<code>New_Evaluation_Assinged</code>, <code>EvaluationDueSoon</code>, <code>Passed_toreview</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WCF Application Decision Flow</strong><br><code>WCF_Application_Decision_Flow</code></td>
+                            <td>Record-Triggered<br>(<code>ApplicationDecision</code>)</td>
+                            <td>Decision notification (Accept / Reject) sent to assigned reviewer using <strong>1 In-Flow Rich HTML Text Template</strong> (<code>DecisionRecorded</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WCF Approver Email Alert Flow</strong><br><code>WCF_Approver_Email_Alert_Flow</code></td>
+                            <td>Record-Triggered<br>(<code>ApplicationReview</code>)</td>
+                            <td>Approver alerts using <strong>3 In-Flow Rich HTML Text Templates</strong> (<code>Approver_ReadyForDecision</code>, <code>DeclineRecommended_Email</code>, <code>Overdue_decision</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WF Compliance Document flow</strong><br><code>WF_Compliance_Document_flow</code></td>
+                            <td>Record-Triggered<br>(<code>WCF_Compliance_Document__c</code>)</td>
+                            <td>Compliance document notifications: 12 EmailTemplate actions from <code>WCF_Folder/</code> (Document requested, 30/60/90d reminders, Approval, Account suspended).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI Feedback to Prompt</strong><br><code>AI_Feedback_to_Prompt</code></td>
+                            <td>Autolaunched / Screen Flow</td>
+                            <td>Prepares question data across Legal, Skilling, and Finance to construct Einstein GenAI prompt payloads.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AI Feedback Update in Proposal</strong><br><code>AI_Feedback_Update_in_Proposal</code></td>
+                            <td>Record-Triggered<br>(<code>IndividualApplication</code>)</td>
+                            <td>Parses GenAI responses via <code>ProposalAIUpdater_WCF.cls</code> and populates governance, legal, and impact scores on the proposal.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 7. Active Triggers -->
+        <section id="active-triggers">
+            <h2 class="sec-title">7. Apex Triggers & Handlers (Active Architecture Only)</h2>
+            <p>Only <strong>2 active triggers</strong> are used in the core WCF grant management process. All unused legacy triggers have been excluded from the active architecture.</p>
+
+            <h3 class="sub-title">7.1. ApplicationReviewTrigger (on ApplicationReview)</h3>
+            <p><strong>Events</strong>: <code>before insert</code>, <code>before update</code>, <code>after insert</code>, <code>after update</code><br>
+            <strong>Handler</strong>: <code>ApplicationReviewHandler.cls</code></p>
+            <ul>
+                <li><strong>Consolidated Return Comments</strong>: Calls <code>ApplicationReviewHandler.populateConsolidatedComments()</code> to compile feedback from <code>Question_Number_1__c</code> through <code>28</code> into <code>Consolidated_Return_Comments__c</code>.</li>
+                <li><strong>10-Day SLA Working Days Calculation</strong>: When Validator marks <code>Validated</code>, sets <code>Validator_Submission_Date__c = Date.today()</code> and computes <code>DueDate = addWorkingDays(Date.today(), 10)</code> (excluding weekends).</li>
+                <li><strong>Reviewer Stamping & Completion</strong>: Automatically stamps <code>WG_Reviewer_Name__c = UserInfo.getName()</code> and sets <code>Due_Date_For_Approver__c = addWorkingDays(Date.today(), 10)</code> upon submission.</li>
+                <li><strong>Status Synchronization</strong>:
+                    <ul>
+                        <li>Validator Decision <code>Return</code> ➔ Sets <code>IndividualApplication.Status = 'Revision Requested'</code>.</li>
+                        <li>Validator Decision <code>Pass</code> ➔ Sets <code>IndividualApplication.Validated__c = true</code>.</li>
+                        <li>Validator Decision <code>Flag</code> ➔ Sets <code>IndividualApplication.Flagged__c = true</code>.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3 class="sub-title">7.2. WCFComplianceDocumentTrigger (on WCF_Compliance_Document__c)</h3>
+            <p><strong>Events</strong>: <code>after insert</code>, <code>after update</code><br>
+            <strong>Handler</strong>: <code>WCFComplianceDocumentTriggerHandler.cls</code></p>
+            <ul>
+                <li>Monitors status updates across compliance records.</li>
+                <li>Calls <code>WCFComplianceDocumentTriggerHandler.syncOnboardedStatus()</code>.</li>
+                <li>Invokes <code>WCFComplianceController.computeOnboardingStage()</code> to verify all required certificates for the organization's geography (80G, 12A, FCRA, Audited Financials, MoU).</li>
+                <li>When all mandatory documents reach <code>Status__c = 'Validated'</code>, automatically transitions <code>IndividualApplication.Status = 'Onboarded'</code>.</li>
+            </ul>
+        </section>
+
+        <!-- 8. Static Resources -->
+        <section id="static-resources">
+            <h2 class="sec-title">8. Static Resources Catalog & Third-Party Client Libraries</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Resource Name</th>
+                            <th>Type</th>
+                            <th>Description & Key Libraries Included</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>wcfPortalStyles</code></td>
+                            <td>CSS</td>
+                            <td>Global Experience Cloud stylesheet defining brand typography, SLDS overrides, and glassmorphic UI tokens.</td>
+                        </tr>
+                        <tr>
+                            <td><code>wcfFormFocusStyles</code></td>
+                            <td>CSS</td>
+                            <td>Accessibility stylesheet providing high-visibility outlines on active input elements.</td>
+                        </tr>
+                        <tr>
+                            <td><code>wcfLogos</code></td>
+                            <td>ZIP / Images</td>
+                            <td>Wadhwani Foundation brand logos, icons, and SVG assets.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WIN_Logo</code></td>
+                            <td>PNG</td>
+                            <td>High-resolution header logo displayed across forms and preview pages.</td>
+                        </tr>
+                        <tr>
+                            <td><code>flagTelpicker</code></td>
+                            <td>JS / CSS</td>
+                            <td>International telephone input library with country dial codes and country flags.</td>
+                        </tr>
+                        <tr>
+                            <td><code>downloadjs</code></td>
+                            <td>JS Library</td>
+                            <td>Client-side file download trigger library for dynamic PDF and summary exports.</td>
+                        </tr>
+                        <tr>
+                            <td><code>autotable</code></td>
+                            <td>JS Plugin</td>
+                            <td>jsPDF AutoTable plugin for generating structured proposal PDF tables.</td>
+                        </tr>
+                        <tr>
+                            <td><code>mammoth</code></td>
+                            <td>JS Library</td>
+                            <td>In-browser <code>.docx</code> to HTML conversion engine for live attachment previews.</td>
+                        </tr>
+                        <tr>
+                            <td><code>xlsx</code></td>
+                            <td>JS Library</td>
+                            <td>SheetJS library enabling Excel budget sheet parsing and preview rendering.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ChartJS</code></td>
+                            <td>JS Library</td>
+                            <td>Client-side charting engine powering the sourcing channel and dashboard KPI graphs.</td>
+                        </tr>
+                        <tr>
+                            <td><code>PapaParse</code></td>
+                            <td>JS Library</td>
+                            <td>High-performance CSV parsing library used in bulk data import utilities.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 9. Data Model -->
+        <section id="data-model">
+            <h2 class="sec-title">9. Complete Data Model & Field Dictionary</h2>
+            
+            <h3 class="sub-title">9.1. Core SObjects Architecture & <code>IndividualApplication</code> Dictionary</h3>
+            <p>The master grant proposal object <code>IndividualApplication</code> (RecordType: <code>Wadhwani_Grants</code>) serves as the core system anchor, linked to standard review objects and 18+ custom child objects:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">A. Lifecycle, Status & Routing</span>
+                        <span class="badge badge-blue">Core Workflow</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Status</code> (Draft, Submitted, Under Review, Revision Requested, Resubmitted, Approved for Funding, Not Approved, Onboarded, Closed)<br>
+                        <code>Submission_Round__c</code> (Number: 1 on submit, +1 on resubmit)<br>
+                        <code>Validated__c</code> (Checkbox: screening pass)<br>
+                        <code>Flagged__c</code> (Checkbox: screening concern flagged)<br>
+                        <code>SavedApplicationRefId</code> (Lookup -> SavedApplication)<br>
+                        <code>WasReturned</code> (Checkbox audit flag)<br>
+                        <code>Resubmitted_Approved_for_Funding__c</code> (Checkbox)<br>
+                        <code>RequirementsCompleteDate</code> (DateTime)<br>
+                        <code>Submitted_notes__c</code> (Text)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">B. Staff & Persona Stamps</span>
+                        <span class="badge badge-purple">Audit Stamps</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>WG_Validator_Name__c</code> (Text: Validator Name)<br>
+                        <code>WG_Reviewer_Name__c</code> (Text: Reviewer Name)<br>
+                        <code>WG_Approver_Name__c</code> (Text: Approver Name)<br>
+                        <code>Submitter_Name__c</code> (Text: Submitter Full Name)<br>
+                        <code>Work_Email_ID__c</code> (Email: SPOC Work Email)<br>
+                        <code>WG_Phone_Country_Code__c</code> (Text: Dialing Code)<br>
+                        <code>AccountId</code> / <code>ContactId</code> (Lookup -> Account / Contact)<br>
+                        <code>Application_Approver__c</code> (Lookup -> User)<br>
+                        <code>Rejected_by_COE_on__c</code> (Date)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">C. Track & Categorization</span>
+                        <span class="badge badge-green">Intake Tracks</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Organizational_Area_s_for_Funding_Inves__c</code> (Picklist: Job Fulfillment, Job Creation, Livelihood Upliftment)<br>
+                        <code>Organizational_Area_s_for_Funding_Inves1__c</code> (Picklist)<br>
+                        <code>Selected_Funding_Tracks__c</code> (Text)<br>
+                        <code>Sub_Focus_Area__c</code> (Multiselect Picklist)<br>
+                        <code>Sub_Focus_Area_2__c</code> / <code>Sub_Focus_Area_3__c</code> (Multiselect)<br>
+                        <code>Sub_Focus_Area_Other__c</code> (Text)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">D. Legal Entity & Demographics</span>
+                        <span class="badge badge-gray">Statutory / Legal</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Legal_Structure__c</code> / <code>Legal_Structure_Other__c</code><br>
+                        <code>Applicant_Type__c</code> (Non-Profit, Social Enterprise, Academic)<br>
+                        <code>Date_of_Incorporation_Registration__c</code> (Date)<br>
+                        <code>Registration_Jurisdiction__c</code> / <code>Registration_Jurisdiction_Other__c</code><br>
+                        <code>Are_you_FCRA_registered__c</code> / <code>FCRA_Registration_Number__c</code> / <code>FCRA_Valid_Till__c</code><br>
+                        <code>Do_you_have_12A_registration__c</code> / <code>X12A_Registration_Number__c</code> / <code>X12A_Registration_Valid_Till__c</code><br>
+                        <code>Do_you_have_80G_registration__c</code> / <code>X80G_Registration_Number__c</code> / <code>X80G_Registration_Valid_Till__c</code><br>
+                        <code>Do_you_have_a_valid_501_c_3_in_the_US__c</code> / <code>X501_c_3_Valid_Till__c</code><br>
+                        <code>Equivalency_Determination_Certified__c</code> / <code>Equivalency_Determination_Expiry_Date__c</code> / <code>Willing_to_Pursue_ED__c</code><br>
+                        <code>Startup_Name__c</code> / <code>Startup_Registration_No__c</code> / <code>Startup_Registration_Date__c</code>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">E. Financials & Funding Strategy</span>
+                        <span class="badge badge-amber">Budgets & Currency</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Total_Budget__c</code> / <code>Total_Project_Budget_INR__c</code> / <code>Total_Project_Budget_in_USD__c</code> (Currency)<br>
+                        <code>RequestedAmount</code> (Currency: Grant Requested)<br>
+                        <code>Project_Duration__c</code> (Number of Months)<br>
+                        <code>Project_Start_Date__c</code> / <code>Project_End_Date__c</code> (Date)<br>
+                        <code>Target_Completion_Month_c__c</code> (Number)<br>
+                        <code>Proposed_WIN_Grant_Utilization__c</code> (Rich Text HTML)<br>
+                        <code>Project_Revenue_Strategy__c</code> (Rich Text HTML)<br>
+                        <code>Revenue_Explanation__c</code> (Long Text Area)<br>
+                        <code>Use_of_Additional_Funding__c</code> / <code>Use_of_Additional_Funding_JC__c</code> (HTML)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">F. Technical Narratives & Synergies</span>
+                        <span class="badge badge-blue">Project Content</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Project_Title__c</code> / <code>Project_Summary__c</code> / <code>Proposed_Solution__c</code><br>
+                        <code>Project_Approach_and_Work_Plan__c</code> / <code>Proposed_Outcomes_Deliverables_under_t__c</code><br>
+                        <code>Target_Market_Industry_Application__c</code><br>
+                        <code>Job_Creation_Approach__c</code> / <code>Skilling_Approach__c</code> / <code>Livelihood_Approach__c</code><br>
+                        <code>Operational_Synergies_with_WOF__c</code> / <code>Operational_Synergies_with_WOF_JC__c</code><br>
+                        <code>Relevant_Partnerships__c</code> / <code>Project_Team_Members__c</code><br>
+                        <code>Current_Technology_Readiness_Level_TRL__c</code> / <code>Work_undertaken_supporting_current_TRL__c</code><br>
+                        <code>Strategy_for_raising_funds_from_Investor__c</code> / <code>Strategy_for_transfer_of_technology__c</code><br>
+                        <code>Project_Website_if_any__c</code> / <code>WIN_Support__c</code>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">G. References & Outcome Verification</span>
+                        <span class="badge badge-purple">Verification</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>Reference_1_Name__c</code> / <code>Reference_1_Role__c</code> / <code>Reference_1_Email__c</code><br>
+                        <code>Reference_2_Name__c</code> / <code>Reference_2_Role__c</code> / <code>Reference_2_Email__c</code><br>
+                        <code>Q24_VERIFIED__c</code> (Picklist: Third-Party Verified Yes/No)<br>
+                        <code>Q24_REPORT_URL__c</code> (URL: Cloud Link to Verification Report)<br>
+                        <code>Requested_Support_Documents_Portal_c__c</code> (Long Text Area)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">H. Einstein GenAI Automated Ratings</span>
+                        <span class="badge badge-green">GenAI Scoring</span>
+                    </div>
+                    <p class="card-desc" style="font-size: 0.8rem; line-height: 1.5;">
+                        <code>AI_Rating__c</code> / <code>Governance_Rating__c</code> / <code>Legal_Rating__c</code> (Number: 1–5)<br>
+                        <code>Job_Creation_Approach_Rating__c</code> / <code>Job_Creation_Approach_Strength__c</code> / <code>Job_Creation_Approach_Summary__c</code> / <code>Job_Creation_Approach_Weakness__c</code><br>
+                        <code>Skilling_Approach_Rating__c</code> / <code>Skilling_Approach_Strength__c</code> / <code>Skilling_Approach_Summary__c</code> / <code>Skilling_Approach_Weakness__c</code><br>
+                        <code>Livelihood_Approach_Rating__c</code> / <code>Livelihood_Approach_Strength__c</code> / <code>Livelihood_Approach_Summary__c</code> / <code>Livelihood_Approach_Weakness__c</code><br>
+                        <code>Use_of_Funds_Rating__c</code> / <code>Use_of_Funds_Strength__c</code> / <code>Use_of_Funds_Summary__c</code> / <code>Use_of_Funds_Weakness__c</code> / <code>Use_of_Funds_AI_Feedback__c</code>
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="sub-title">9.2. Custom Objects & Child Data Entities Architecture</h3>
+            <p>The WCF architecture incorporates <strong>13 active custom objects and data tables</strong> child-linked or supporting <code>IndividualApplication</code>:</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Custom Object API Name</th>
+                            <th>Relationship Type</th>
+                            <th>Parent Link Field</th>
+                            <th>Key Functional Purpose & Core Fields</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><code>Historical_Data__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Trailing 3-Year Audited Financial Statements</strong>: Balance sheet and income statements across FY-1, FY-2, and FY-3 (<code>Financial_Year__c</code>, <code>Starting_Balance__c</code>, <code>Total_Revenues_Excl_Grants__c</code>, <code>Total_Grants__c</code>, <code>Total_Expenses__c</code>, <code>Ending_Balance__c</code>, <code>Surplus_Deficit__c</code>, <code>Donation_Grant_INR__c</code>, <code>Government_Grant_INR__c</code>, <code>Other_Revenues__c</code>, <code>Financial_Year_Status__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code>Current_fiscal_year_data__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Current Fiscal Year (CFY) Operational Budget</strong>: Current year annualized budget, run-rate expenses, and projected revenue (<code>Starting_Balance__c</code>, <code>Total_Revenues_Excl_Grants__c</code>, <code>Total_Grants__c</code>, <code>Total_Expenses__c</code>, <code>Ending_Balance__c</code>, <code>Donation_Grant_INR__c</code>, <code>Government_Grant_INR__c</code>, <code>Other_Revenues__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code>Outcomes_Data__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Multi-Year Beneficiary & Outcome Metrics</strong>: Skilling, placement, wage uplift, enterprise creation, and livelihood impact across FY-1, FY-2, FY-3, and CFY (<code>Enrolled_Trained_FY_1__c</code>–<code>3__c</code>, <code>Placed_FY_1__c</code>–<code>3__c</code>, <code>Retained_Jobs_6Mo_FY_1__c</code>–<code>3__c</code>, <code>Avg_Wage_Uplift_FY_1__c</code>–<code>3__c</code>, <code>Projected_New_Businesses_FY_1__c</code>–<code>3__c</code>, <code>Projected_Jobs_from_New_Businesses_FY1__c</code>–<code>3__c</code>, <code>LIV_SERVED_FY1__c</code>–<code>3__c</code>, <code>LIV_OUTCOME_FY1__c</code>–<code>3__c</code>, <code>LIV_HH_INCOME_INCR_FY1__c</code>–<code>3__c</code>, <code>Manual_Avg_Cost_per_Placement_FY_1__c</code>–<code>3__c</code>, <code>Manual_Avg_Cost_per_Job_FY_1__c</code>–<code>3__c</code>, <code>X3rd_Party_Placement_Verification_FY_1__c</code>–<code>3__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><code>WCF_Business_Sector__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Job Creation Sector Breakdown</strong>: Focus sectors supported under Job Creation track (<code>Sector_c__c</code>, <code>Business_Sector_Other__c</code>, <code>Support_Types__c</code>, <code>Support_Type_Other__c</code>, <code>Yearly_Enrolment__c</code>, <code>Support_Begin_Date__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><code>WCF_Skilling_Domain__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Job Fulfillment Vocational Domains</strong>: Training programs under Job Fulfillment track (<code>Domain_Programme_Name__c</code>, <code>Duration_Months__c</code>, <code>Hours_of_Training__c</code>, <code>Yearly_Enrolment__c</code>, <code>Programme_Start_Date__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td><code>WCF_Livelihood_Program__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Livelihood Upliftment Initiatives</strong>: Community programs and cluster initiatives (<code>Program_Name__c</code>, <code>Support_Type_Provided__c</code>, <code>Duration_Man_Hours__c</code>, <code>Annual_Enrollment__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td><code>WCF_Community__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Target Communities & Geographies</strong>: Geographic reach and household counts (<code>District_Area__c</code>, <code>State__c</code>, <code>Households_FY1__c</code>, <code>Households_FY2__c</code>, <code>Households_FY3__c</code>, <code>Households_Projected__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td><code>WCF_Supporting_Document__c</code></td>
+                            <td><span class="badge badge-blue">Master-Detail</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Outcome Verification & Audit Attachments</strong>: Stores external audit links and verification reports (<code>Document_Name__c</code>, <code>Cloud_Storage_Link__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td><code>WCF_Compliance_Document__c</code></td>
+                            <td><span class="badge badge-purple">Lookup</span></td>
+                            <td><code>IndividualApplication__c</code></td>
+                            <td><strong>Regulatory Compliance Certificates</strong>: Tracks statutory documents required for onboarding (<code>Document_Type__c</code>: 80G, 12A, FCRA, Audited Statements, Master MoU; <code>Status__c</code>: Not Started, Draft Saved, Pending Review, Validated, Action Needed; <code>File_Name__c</code>, <code>Issue_Date__c</code>, <code>Expiry_Date__c</code>, <code>Geography__c</code>, <code>Organisation__c</code>, <code>Notes__c</code>, <code>Reviewer_Notes__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td><code>WCF_Executed_Agreement_c__c</code></td>
+                            <td><span class="badge badge-purple">Lookup</span></td>
+                            <td><code>IndividualApplication__c</code></td>
+                            <td><strong>Grant Agreement & Legal Contracts</strong>: Tracks executed grant agreements and counter-signatures (<code>AgreementmType__c</code>, <code>Executed_Date__c</code>, <code>Expiry_Date__c</code>, <code>Has_Signed_PDF__c</code>, <code>Status__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td><code>AI_Feedback__c</code></td>
+                            <td><span class="badge badge-amber">AI Store</span></td>
+                            <td><code>Submitter_Name__c</code></td>
+                            <td><strong>Real-Time GenAI Narrative Cache</strong>: Persists AI-generated applicant coaching feedback on field blur (<code>Submitter_Name__c</code>, <code>Legal_Structure__c</code>, <code>Organizational_Sustainability__c</code>, <code>Use_of_Additional_Funding__c</code>, <code>Operational_Synergies_with_WOF__c</code>, <code>Job_Creation_Approach__c</code>, <code>Skilling_Approach__c</code>, <code>Livelihood_Approach__c</code>, <code>Revenue_Explanation__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td><code>Application_FAQ__c</code></td>
+                            <td><span class="badge badge-gray">Standalone</span></td>
+                            <td>N/A</td>
+                            <td><strong>Applicant Knowledge Base & FAQs</strong>: Searchable help articles rendered in <code>wcfApplicationFaqModal</code> (<code>Question__c</code>, <code>Description__c</code>, <code>Category__c</code>, <code>Sort_Order__c</code>).</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td><code>Translated_*</code> Mirrors</td>
+                            <td><span class="badge badge-purple">Lookup</span></td>
+                            <td><code>Proposal__c</code></td>
+                            <td><strong>Localized Multi-Language Mirrors</strong>: Stores localized translations for non-English applications (<code>Translated_Proposal__c</code>, <code>Translated_Historical_Data__c</code>, <code>Translated_Current_Fiscal_Year_Data__c</code>, <code>Translated_Outcome_Data__c</code>, <code>Translated_Business_Sector__c</code>, <code>Translated_Skilling_Domain__c</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="sub-title">9.3. Custom Metadata Types (<code>__mdt</code>)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Custom Metadata Type</th>
+                            <th>Description & Architecture Functionality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>RFI_Track__mdt</code></td>
+                            <td>Configures available tracks (<em>Job Fulfillment, Job Creation, Livelihood Upliftment</em>), descriptions, and icon mappings.</td>
+                        </tr>
+                        <tr>
+                            <td><code>RFI_Section__mdt</code></td>
+                            <td>Defines the 6 major intake sections and their sequential workflow.</td>
+                        </tr>
+                        <tr>
+                            <td><code>RFI_Question__mdt</code></td>
+                            <td>Master metadata for questions Q1–Q28 (Field API types, validation regex, help text, track dependencies).</td>
+                        </tr>
+                        <tr>
+                            <td><code>RFI_Validation_Rule__mdt</code> &amp; <code>RFI_Dependency_Rule__mdt</code></td>
+                            <td>Conditional visibility rules and multi-field validation constraints.</td>
+                        </tr>
+                        <tr>
+                            <td><code>RFI_Translation__mdt</code></td>
+                            <td>Multi-lingual label and prompt dictionary for Spanish, French, Portuguese, and Hindi.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Validator_Section__mdt</code> &amp; <code>Validator_Question__mdt</code></td>
+                            <td>5 screening sections and quantitative checklist criteria.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Reviewer_Category_v5__mdt</code></td>
+                            <td>7 qualitative evaluation categories with relative percentage weights.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Reviewer_Question_v5__mdt</code></td>
+                            <td>22 qualitative evaluation criteria with 5-point scoring rubrics.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Country_State_Mapping__mdt</code></td>
+                            <td>Hierarchical country-to-state dropdown dependencies.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Form_Label__mdt</code></td>
+                            <td>Dynamic UI labels and portal guidance messages.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 10. Email Templates Matrix -->
+        <section id="email-matrix">
+            <h2 class="sec-title">10. Email Templates & Notification Matrix</h2>
+            <p>Comprehensive catalog of all <strong>36 core email templates</strong> in <code>email/WCF_Folder/</code> and <strong>in-flow rich text templates</strong>:</p>
+
+            <h3 class="sub-title">10.1. In-Flow Rich HTML Text Templates</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flow Name</th>
+                            <th>Text Template Name</th>
+                            <th>Recipient</th>
+                            <th>Subject Line & Business Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Reviewer_Email_Alert_Wadhwani_Grants</code></td>
+                            <td><span class="badge badge-purple">New_Evaluation_Assinged</span></td>
+                            <td>Reviewer</td>
+                            <td><code>New Evaluation Assigned: {!$Record.Application.Name}</code><br>Sent upon assignment with proposal summary and 10-day SLA deadline.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Reviewer_Email_Alert_Wadhwani_Grants</code></td>
+                            <td><span class="badge badge-purple">EvaluationDueSoon</span></td>
+                            <td>Reviewer</td>
+                            <td><code>Reminder: Evaluation Due Soon for {!$Record.Application.Name}</code><br>Scheduled path reminder sent 3 working days before review <code>DueDate</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Reviewer_Email_Alert_Wadhwani_Grants</code></td>
+                            <td><span class="badge badge-purple">Passed_toreview</span></td>
+                            <td>Reviewer</td>
+                            <td><code>Application passed to you with a flagged concern</code><br>Sent when Validator passes screening with <code>Flagged__c = true</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCF_Application_Decision_Flow</code></td>
+                            <td><span class="badge badge-green">DecisionRecorded</span></td>
+                            <td>Reviewer</td>
+                            <td><code>Decision Recorded on Proposal: {!$Record.Application.Name}</code><br>Informs assigned reviewer that executive committee recorded the final funding decision (Accept / Reject).</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCF_Approver_Email_Alert_Flow</code></td>
+                            <td><span class="badge badge-green">Approver_ReadyForDecision</span></td>
+                            <td>Approver</td>
+                            <td><code>{!$Record.Application.Name} — all evaluations complete, ready for decision</code><br>Alerts Approver that reviews are completed and proposal is ready for decision.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCF_Approver_Email_Alert_Flow</code></td>
+                            <td><span class="badge badge-green">DeclineRecommended_Email</span></td>
+                            <td>Approver</td>
+                            <td><code>Decline recommended: your decision by {!$Record.Due_Date_For_Approver__c}</code><br>Alerts Approver that reviewer recommended decline with justification.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WCF_Approver_Email_Alert_Flow</code></td>
+                            <td><span class="badge badge-green">Overdue_decision</span></td>
+                            <td>Approver</td>
+                            <td><code>Overdue: your funding decision on this application</code><br>Escalation notice sent when committee decision exceeds 10-day SLA window.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="sub-title">10.2. WCF_Folder Email Templates Catalog</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Developer Name</th>
+                            <th>UI Label</th>
+                            <th>Recipient</th>
+                            <th>Trigger Flow / Event</th>
+                            <th>Business Event & SLA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Application_Received</code></td>
+                            <td>Application Received</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Immediate acknowledgement sent upon proposal submission.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Draft_Saved</code></td>
+                            <td>Draft Saved</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Sent when applicant saves initial draft application.</td>
+                        </tr>
+                        <tr>
+                            <td><code>New_Application_Validator_Queue</code></td>
+                            <td>New Application Validator Queue</td>
+                            <td>Validator Queue</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Alerts Validator team of a new proposal pending quantitative screening.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Validation_Due_Soon</code></td>
+                            <td>Validation Due Soon</td>
+                            <td>Validator Queue</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Reminder before validator 10-day SLA expires.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Action_Required_Update_Application</code></td>
+                            <td>Action Required Update Application</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Fired when Validator returns proposal with consolidated question feedback.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Resubmission_Received_Partner</code></td>
+                            <td>Resubmission Received Partner</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Confirms receipt of revised proposal submission.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Additional_Information_Requested</code></td>
+                            <td>Additional Information Requested</td>
+                            <td>Validator / Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Fired when Reviewer returns application requesting further clarifications (E-48).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Additional_Information_Reminder</code></td>
+                            <td>Additional Information Reminder</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>30-day scheduled reminder if revisions remain pending.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Additional_Information_Reminder_30day</code></td>
+                            <td>Additional Information Reminder- 30day</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Flow</td>
+                            <td>30-day milestone revision reminder.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Additional_Information_Reminder_60days</code></td>
+                            <td>Additional Information Reminder- 60days</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Flow</td>
+                            <td>60-day milestone revision reminder.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Additional_Information_Reminder_90days</code></td>
+                            <td>Additional Information Reminder- 90days</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Flow</td>
+                            <td>90-day final warning revision reminder.</td>
+                        </tr>
+                        <tr>
+                            <td><code>We_are_closing_your_application_for_now</code></td>
+                            <td>We are closing your application for now</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>100-day automated application closure due to applicant inactivity.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Application_Validated_Under_Review</code></td>
+                            <td>Application Validated Under Review</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Fired when Validator approves screening and routes to reviewers.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Information_Located_Review_Can_Resume</code></td>
+                            <td>Information Located Review Can Resume</td>
+                            <td>Reviewer</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Alerts Reviewer that applicant has furnished requested clarifications (E-49).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Approver_Further_Detail_Request_PL</code></td>
+                            <td>Approver Further Detail Request PL</td>
+                            <td>Reviewer / PL</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Approver returns proposal back to reviewer for technical clarification (E-51).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Application_Approved</code></td>
+                            <td>Application Approved</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Official grant committee approval notice with onboarding instructions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Application_Decision_Declined</code></td>
+                            <td>Application Decision Declined</td>
+                            <td>Applicant</td>
+                            <td><code>Wadhwani_Grants_Email</code></td>
+                            <td>Formal decline notification with reasons.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Application_Conditionally_Approved</code></td>
+                            <td>Application Conditionally Approved</td>
+                            <td>Applicant</td>
+                            <td>Decision Flow</td>
+                            <td>Formal conditional approval subject to stipulations.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Requested</code></td>
+                            <td>Compliance Documents Requested</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Dispatches initial compliance document request checklist (E-12).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_your_document_upload_has_started</code></td>
+                            <td>Compliance - your document upload has started</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Sent when applicant uploads initial draft compliance certificate (E-62).</td>
+                        </tr>
+                        <tr>
+                            <td><code>We_have_received_your_compliance_documents</code></td>
+                            <td>We have received your compliance documents</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Confirms receipt of full compliance file submission (E-25).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_documents_submitted_for_review</code></td>
+                            <td>Compliance documents submitted for review</td>
+                            <td>Reviewer / Staff</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Alerts Compliance Lead that partner has submitted compliance files.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Revision_Requested</code></td>
+                            <td>Compliance Revision Requested</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Fired when compliance officer rejects an expired/invalid certificate (E-24).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Reminder</code></td>
+                            <td>Compliance Documents Reminder</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Periodic compliance checklist submission reminder.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Reminder_30_days</code></td>
+                            <td>Compliance Documents Reminder 30 days</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>30-day compliance document submission reminder (E-56).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Reminder_60_days</code></td>
+                            <td>Compliance Documents Reminder 60 days</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>60-day compliance document escalation reminder (E-56).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Reminder_90_days</code></td>
+                            <td>Compliance Documents Reminder 90 days</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>90-day final compliance warning reminder (E-56).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Your_account_is_suspended</code></td>
+                            <td>Your account is suspended</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Sent when partner fails to submit compliance within 100 days (E-59).</td>
+                        </tr>
+                        <tr>
+                            <td><code>We_have_paused_your_onboarding</code></td>
+                            <td>We have paused your onboarding</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Administrative onboarding pause notification.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Documents_Approved</code></td>
+                            <td>Compliance Documents Approved</td>
+                            <td>Applicant</td>
+                            <td><code>WF_Compliance_Document_flow</code></td>
+                            <td>Fired when all compliance documents reach <code>Validated</code> (E-63).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Onboarding_Complete_Partner</code></td>
+                            <td>Onboarding Complete Partner</td>
+                            <td>Applicant</td>
+                            <td>Trigger Handler</td>
+                            <td>Final onboarding milestone completion notice.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Master_MoU_Renewal_Reminder</code></td>
+                            <td>Master MoU Renewal Reminder</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Compliance</td>
+                            <td>60-day notice prior to Master MoU expiration.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Master_MoU_Renewal_Reminder_Mail</code></td>
+                            <td>Master MoU Renewal Reminder Mail</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Compliance</td>
+                            <td>Milestone MoU renewal notification.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Compliance_Document_Expiry</code></td>
+                            <td>Compliance Document Expiry</td>
+                            <td>Applicant</td>
+                            <td>Scheduled Compliance</td>
+                            <td>30-day notice before FCRA / 80G certificate expires.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Decision_Recorded_PL_Alert</code></td>
+                            <td>Decision Recorded PL Alert</td>
+                            <td>Programme Lead</td>
+                            <td>Decision Alert</td>
+                            <td>Alerts Programme Lead when executive committee finalizes decision.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Welcome_to_Wadhwani_Grants_your_account_is_ready</code></td>
+                            <td>Welcome to Wadhwani Grants</td>
+                            <td>Applicant</td>
+                            <td>Self-Registration</td>
+                            <td>Sent upon successful public registration and Community User activation.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 11. Third-Party Integrations -->
+        <section id="integrations">
+            <h2 class="sec-title">11. Third-Party Integrations & External Systems</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Integration System</th>
+                            <th>Protocol / Service</th>
+                            <th>Apex Service / Endpoints</th>
+                            <th>Integration Workflow</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpenStreetMap Nominatim</strong></td>
+                            <td>REST HTTPS API</td>
+                            <td>
+                                <code>OpenStreetMapService.cls</code><br>
+                                <code>https://nominatim.openstreetmap.org/search</code>
+                            </td>
+                            <td>
+                                Provides real-time address autocomplete and coordinates geocoding in <code>wcfDynamicForm</code> without Google Maps API cost.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Einstein GenAI Models</strong></td>
+                            <td>Invocable Apex & Prompt Templates</td>
+                            <td>
+                                <code>ProposalAIUpdater_WCF.cls</code><br>
+                                <code>Proposal_AI_Feedback_Update_Prompt</code>
+                            </td>
+                            <td>
+                                Automatically analyzes proposal text submissions, computes automated governance/impact ratings, and extracts strengths and operational risks.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 12. Admin & Troubleshooting -->
+        <section id="admin-guide">
+            <h2 class="sec-title">12. Admin Guide & Troubleshooting Manual</h2>
+            
+            <h3 class="sub-title">12.1. Managing User Roles</h3>
+            <p>To grant or revoke portal access for a user:</p>
+            <ol style="margin-left: 1.5rem; margin-bottom: 1.5rem; font-size: 0.95rem; color: #334155;">
+                <li>Navigate to the user's <strong>Person Account</strong> record in Salesforce Lightning.</li>
+                <li>Toggle the appropriate role checkbox:
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><code>WCFs_Validator__c = true</code> ➔ Grants Validator screening access.</li>
+                        <li><code>WCF_Reviewer__c = true</code> ➔ Grants Reviewer evaluation access.</li>
+                        <li><code>WCF_Approver__c = true</code> ➔ Grants Approver committee deliberation access.</li>
+                    </ul>
+                </li>
+                <li><code>WCFDashboardAccessController.cls</code> dynamically evaluates these flags on the user's next session login.</li>
+            </ol>
+
+            <h3 class="sub-title">12.2. Common Troubleshooting Solutions</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symptom</th>
+                            <th>Likely Cause</th>
+                            <th>Resolution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Applicant cannot edit returned application</td>
+                            <td>Proposal <code>Status</code> is not set to <code>Revision Requested</code></td>
+                            <td>Verify <code>ApplicationReview.Decision_Final_Decision_from_Sec_1_2__c = 'Return'</code> and status is updated.</td>
+                        </tr>
+                        <tr>
+                            <td>Proposal does not advance to <code>Onboarded</code></td>
+                            <td>Not all mandatory compliance items are marked <code>Validated</code></td>
+                            <td>Inspect <code>wcfComplianceDocuments</code> and ensure all required geography certificates have <code>Status__c = 'Validated'</code>.</td>
+                        </tr>
+                        <tr>
+                            <td>Reviewer cannot see assigned proposal</td>
+                            <td>Missing Account role flag or Contact mismatch</td>
+                            <td>Ensure <code>Account.WCF_Reviewer__c = true</code> and <code>ApplicationReview.Contact__c</code> matches the reviewer.</td>
+                        </tr>
+                        <tr>
+                            <td>Approver cannot record decision</td>
+                            <td>Decision comment or rejection reasons not filled</td>
+                            <td>When rejecting, select at least one rejection reason tile and provide decision comments.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

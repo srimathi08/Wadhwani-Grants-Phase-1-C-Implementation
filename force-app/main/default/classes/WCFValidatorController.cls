@@ -126,30 +126,34 @@ public without sharing class WCFValidatorController {
         Set<Id> linkedEntityIds = new Set<Id>{ applicationId };
 
         for (Outcomes_Data__c o : [
-            SELECT Id, Job_Verification_3rd_Party_CFY__c, X3rd_Party_Placement_Verification_FY_1__c, Job_Verification_3rd_Party_FY1__c
-            FROM Outcomes_Data__c
+            SELECT Id, Job_Verification_3rd_Party_CFY__c, X3rd_Party_Placement_Verification_FY_1__c, X3rd_Party_Placement_Verification_CFY__c, Job_Verification_3rd_Party_FY1__c, Outcome_Tracking_Details_CFY__c
+                       FROM Outcomes_Data__c
             WHERE Proposal__c = :applicationId
             WITH SYSTEM_MODE
-            LIMIT 1
+            ORDER BY LastModifiedDate DESC
         ]) {
             linkedEntityIds.add(o.Id);
             if (q24v1 == 'N/A') {
-                if (String.isNotBlank(o.Job_Verification_3rd_Party_CFY__c)) {
+                if (String.isNotBlank(o.X3rd_Party_Placement_Verification_CFY__c)) {
+                    q24v1 = o.X3rd_Party_Placement_Verification_CFY__c;
+                } else if (String.isNotBlank(o.Job_Verification_3rd_Party_CFY__c)) {
                     q24v1 = o.Job_Verification_3rd_Party_CFY__c;
-                } else if (String.isNotBlank(o.Job_Verification_3rd_Party_FY1__c)) {
-                    q24v1 = o.Job_Verification_3rd_Party_FY1__c;
                 } else if (String.isNotBlank(o.X3rd_Party_Placement_Verification_FY_1__c)) {
                     q24v1 = o.X3rd_Party_Placement_Verification_FY_1__c;
+                } else if (String.isNotBlank(o.Job_Verification_3rd_Party_FY1__c)) {
+                    q24v1 = o.Job_Verification_3rd_Party_FY1__c;
                 }
             }
         }
 
         for (Historical_Data__c h : [
-            SELECT Id FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+            //SELECT Id FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+                        SELECT Id FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE
         ]) { linkedEntityIds.add(h.Id); }
 
         for (Current_fiscal_year_data__c f : [
-            SELECT Id FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+            //SELECT Id FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+                        SELECT Id FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE
         ]) { linkedEntityIds.add(f.Id); }
 
         for (WCF_Business_Sector__c bs : [
@@ -886,7 +890,8 @@ public without sharing class WCFValidatorController {
                    CY1_Capital_Expenditure__c, CY2_Capital_Expenditure__c, CY3_Capital_Expenditure__c,
                    CY1_Operating_Expenditure__c, CY2_Operating_Expenditure__c, CY3_Operating_Expenditure__c,
                    CY1_Balance_End__c, CY2_Balance_End__c, CY3_Balance_End__c
-            FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+                      FROM Historical_Data__c WHERE Proposal__c = :applicationId
+            WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1
         ];
         wrapper.historical = hists.isEmpty() ? null : hists[0];
         if (wrapper.historical != null) {
@@ -899,7 +904,8 @@ public without sharing class WCFValidatorController {
                    Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_Expenditure_Variance__c,
                    Net_Budget__c, Net_Projection__c, Net_Variance__c,
                    Revenue_Explanation__c
-            FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+                       FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId
+            WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1
         ];
         wrapper.fiscal = fiscals.isEmpty() ? null : fiscals[0];
         if (wrapper.fiscal != null) {
@@ -926,9 +932,9 @@ public without sharing class WCFValidatorController {
                    Jobs_from_Growing_Businesses_FY_2__c, Jobs_from_Growing_Businesses_FY_3__c,
                    Avg_Cost_per_Job_CFY__c, Avg_Cost_per_Job_FY_1__c,
                    Avg_Cost_per_Job_FY_2__c, Avg_Cost_per_Job_FY_3__c,
-                   X3rd_Party_Placement_Verification_FY_1__c, X3rd_Party_Verification_Description_CFY__c, X3rd_Party_Verification_Description_FY_1__c, X3rd_Party_Verification_Description_FY_2__c, X3rd_Party_Verification_Description_FY_3__c,
+                   X3rd_Party_Placement_Verification_CFY__c, X3rd_Party_Placement_Verification_FY_1__c, X3rd_Party_Verification_Description_CFY__c, X3rd_Party_Verification_Description_FY_1__c, X3rd_Party_Verification_Description_FY_2__c, X3rd_Party_Verification_Description_FY_3__c,
                    X3rd_party_verification_details_CFY__c, X3rd_party_verification_details_FY1__c, X3rd_party_verification_details_FY2__c, X3rd_party_verification_details_FY3__c,
-                   Job_Verification_3rd_Party_CFY__c, Job_Verification_3rd_Party_FY1__c, Manual_Avg_Cost_per_Placement_CFY__c,
+                   Job_Verification_3rd_Party_CFY__c, Job_Verification_3rd_Party_FY1__c, Outcome_Tracking_Details_CFY__c, Manual_Avg_Cost_per_Placement_CFY__c,
                    Manual_Avg_Cost_per_Placement_FY_1__c,
                    Manual_Avg_Cost_per_Placement_FY_2__c,
                    Manual_Avg_Cost_per_Placement_FY_3__c,
@@ -940,7 +946,8 @@ public without sharing class WCFValidatorController {
                    LIV_ENROLL_FY3__c, LIV_ENROLL_FY2__c, LIV_ENROLL_FY1__c, LIV_ENROLL_PROJ__c,
                    LIV_OUTCOME_FY3__c, LIV_OUTCOME_FY2__c, LIV_OUTCOME_FY1__c, LIV_OUTCOME_PROJ__c,
                    LIV_COST_FY3__c, LIV_COST_FY2__c, LIV_COST_FY1__c, LIV_COST_PROJ__c
-            FROM Outcomes_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE LIMIT 1
+                      FROM Outcomes_Data__c WHERE Proposal__c = :applicationId
+            WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1
         ];
         wrapper.outcome = outcomes.isEmpty() ? null : outcomes[0];
         if (wrapper.outcome != null) {
@@ -1154,6 +1161,9 @@ public without sharing class WCFValidatorController {
         return result;
     }
 
+        // ─────────────────────────────────────────────────────────────
+    // SOURCING CHANNEL REPORT
+    // ─────────────────────────────────────────────────────────────
     public class SourceChannelWrapper {
         @AuraEnabled public Integer wsnWen     { get; set; }
         @AuraEnabled public Integer wcfDirect  { get; set; }
@@ -1173,32 +1183,165 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public String recordId      { get; set; }
     }
 
+    public class BudgetBucket {
+        @AuraEnabled public String  label { get; set; }
+        @AuraEnabled public Integer count { get; set; }
+        public BudgetBucket(String label, Integer count) {
+            this.label = label;
+            this.count = count;
+        }
+    }
+
+    public class SourceChannelFilterOptions {
+        @AuraEnabled public List<String> geographies { get; set; }
+        @AuraEnabled public List<String> stages      { get; set; }
+    }
+
+    // Shared WHERE builder: used by BOTH the channel report and the budget chart
+    // so the two always apply identical geography / time / stage filters.
+    private static String buildSourceChannelWhere(
+        String geography, String timeRange, String stage,
+        Date startDate, Date endDate, Map<String, Object> binds
+    ) {
+        List<String> clauses = new List<String>{
+            'RecordTypeId = :validatorRtId',
+            'Source_Channel_Source_of_Application__c != null'
+        };
+        binds.put('validatorRtId', getWCFValidatorRecordTypeId());
+
+        // Geography (lives on the application)
+        if (String.isNotBlank(geography) && geography != 'ALL') {
+            clauses.add('ApplicationId IN (SELECT Id FROM IndividualApplication WHERE Primary_Focus_Area__c = :geography)');
+            binds.put('geography', geography);
+        }
+
+        // Stage (review status: Draft / Validated / Flagged)
+        if (String.isNotBlank(stage) && stage != 'ALL') {
+            clauses.add('Status = :stage');
+            binds.put('stage', stage);
+        }
+
+        // Time range (on the validator review's CreatedDate)
+        Date today    = Date.today();
+        Date fromDate = null;
+        Date toDate   = null;
+
+        switch on (String.isBlank(timeRange) ? 'ALL' : timeRange) {
+            when 'LAST_30'   { fromDate = today.addDays(-30); }
+            when 'LAST_90'   { fromDate = today.addDays(-90); }
+            when 'LAST_180'  { fromDate = today.addDays(-180); }
+            when 'LAST_365'  { fromDate = today.addDays(-365); }
+            when 'THIS_YEAR' { fromDate = Date.newInstance(today.year(), 1, 1); }
+            when 'CUSTOM'    { fromDate = startDate; toDate = endDate; }
+            when else        { }
+        }
+
+        if (fromDate != null) {
+            binds.put('fromDt', Datetime.newInstance(fromDate, Time.newInstance(0, 0, 0, 0)));
+            clauses.add('CreatedDate >= :fromDt');
+        }
+        if (toDate != null) {
+            binds.put('toDt', Datetime.newInstance(toDate.addDays(1), Time.newInstance(0, 0, 0, 0)));
+            clauses.add('CreatedDate < :toDt');
+        }
+
+        return ' WHERE ' + String.join(clauses, ' AND ');
+    }
+
+    // Dropdown values for the filter bar
     @AuraEnabled(cacheable=true)
-    public static SourceChannelWrapper getSourceChannelReport() {
+    public static SourceChannelFilterOptions getSourceChannelFilterOptions() {
+        SourceChannelFilterOptions o = new SourceChannelFilterOptions();
+        o.geographies = new List<String>();
+        o.stages      = new List<String>();
+
+        Id validatorRtId = getWCFValidatorRecordTypeId();
+
+        Set<Id> reviewedAppIds = new Set<Id>();
+        for (AggregateResult ar : [
+            SELECT ApplicationId a
+            FROM ApplicationReview
+            WHERE RecordTypeId = :validatorRtId
+            AND Source_Channel_Source_of_Application__c != null
+            AND ApplicationId != null
+            WITH SYSTEM_MODE
+            GROUP BY ApplicationId
+        ]) {
+            reviewedAppIds.add((Id) ar.get('a'));
+        }
+
+        if (!reviewedAppIds.isEmpty()) {
+            for (AggregateResult ar : [
+                SELECT Primary_Focus_Area__c g
+                FROM IndividualApplication
+                WHERE Id IN :reviewedAppIds
+                AND Primary_Focus_Area__c != null
+                WITH SYSTEM_MODE
+                GROUP BY Primary_Focus_Area__c
+                ORDER BY Primary_Focus_Area__c
+            ]) {
+                o.geographies.add((String) ar.get('g'));
+            }
+        }
+
+        for (AggregateResult ar : [
+            SELECT Status s
+            FROM ApplicationReview
+            WHERE RecordTypeId = :validatorRtId
+            AND Source_Channel_Source_of_Application__c != null
+            AND Status != null
+            WITH SYSTEM_MODE
+            GROUP BY Status
+            ORDER BY Status
+        ]) {
+            o.stages.add((String) ar.get('s'));
+        }
+        return o;
+    }
+
+    // KPI cards + Source Channel bars + detail table
+    @AuraEnabled(cacheable=false)
+    public static SourceChannelWrapper getSourceChannelReport(
+        String geography, String timeRange, String stage, Date startDate, Date endDate
+    ) {
         SourceChannelWrapper result = new SourceChannelWrapper();
         result.wsnWen     = 0;
         result.wcfDirect  = 0;
         result.selfSignup = 0;
         result.unknown    = 0;
+        result.total      = 0;
         result.rows       = new List<SourceChannelRow>();
 
-        Id validatorRtId = getWCFValidatorRecordTypeId();
-        List<ApplicationReview> reviews = [
-            SELECT Id,
-                   Source_Channel_Source_of_Application__c,
-                   Budget_Range_Annual_Budget_Range__c,
-                   Status,
-                   Decision_Final_Decision_from_Sec_1_2__c,
-                   ApplicationId
-            FROM ApplicationReview
-            WHERE Source_Channel_Source_of_Application__c != null
-            AND RecordTypeId = :validatorRtId
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate DESC
-            LIMIT 200
-        ];
+        Map<String, Object> binds = new Map<String, Object>();
+        String whereClause = buildSourceChannelWhere(geography, timeRange, stage, startDate, endDate, binds);
 
-        if (reviews.isEmpty()) return result;
+        // Aggregate counts (not capped by the table limit)
+        String countSoql =
+            'SELECT Source_Channel_Source_of_Application__c ch, COUNT(Id) c FROM ApplicationReview'
+            + whereClause + ' GROUP BY Source_Channel_Source_of_Application__c';
+
+        for (SObject so : Database.queryWithBinds(countSoql, binds, AccessLevel.SYSTEM_MODE)) {
+            AggregateResult ar = (AggregateResult) so;
+            String  ch = (String) ar.get('ch');
+            Integer c  = (Integer) ar.get('c');
+            if (ch == 'WSN/WEN Nomination')       result.wsnWen     += c;
+            else if (ch == 'WCF Direct Research') result.wcfDirect  += c;
+            else if (ch == 'Self-Signup')         result.selfSignup += c;
+            else                                  result.unknown    += c;
+        }
+        result.total = result.wsnWen + result.wcfDirect + result.selfSignup + result.unknown;
+
+        if (result.total == 0) return result;
+
+        // Detail rows
+        String rowSoql =
+            'SELECT Id, Source_Channel_Source_of_Application__c, Budget_Range_Annual_Budget_Range__c, '
+            + 'Status, Decision_Final_Decision_from_Sec_1_2__c, ApplicationId '
+            + 'FROM ApplicationReview'
+            + whereClause + ' ORDER BY CreatedDate DESC LIMIT 500';
+
+        List<ApplicationReview> reviews =
+            (List<ApplicationReview>) Database.queryWithBinds(rowSoql, binds, AccessLevel.SYSTEM_MODE);
 
         Set<Id> appIds = new Set<Id>();
         for (ApplicationReview r : reviews) {
@@ -1210,7 +1353,7 @@ public without sharing class WCFValidatorController {
         for (IndividualApplication app : [
             SELECT Id, Name, Account.Name
             FROM IndividualApplication
-            WHERE Id IN :appIds 
+            WHERE Id IN :appIds
             WITH SYSTEM_MODE
         ]) {
             appIdToAppName.put(app.Id, app.Name);
@@ -1218,19 +1361,13 @@ public without sharing class WCFValidatorController {
         }
 
         for (ApplicationReview r : reviews) {
-            String ch = r.Source_Channel_Source_of_Application__c;
-            if (ch == 'WSN/WEN Nomination')       result.wsnWen++;
-            else if (ch == 'WCF Direct Research') result.wcfDirect++;
-            else if (ch == 'Self-Signup')         result.selfSignup++;
-            else                                  result.unknown++;
-
             SourceChannelRow row = new SourceChannelRow();
             row.recordId      = r.Id;
             row.appName       = appIdToAppName.containsKey(r.ApplicationId)
                                 ? appIdToAppName.get(r.ApplicationId) : '—';
             row.orgName       = appIdToOrgName.containsKey(r.ApplicationId)
                                 ? appIdToOrgName.get(r.ApplicationId) : '—';
-            row.sourceChannel = ch;
+            row.sourceChannel = r.Source_Channel_Source_of_Application__c;
             row.budgetRange   = r.Budget_Range_Annual_Budget_Range__c != null
                                 ? r.Budget_Range_Annual_Budget_Range__c : '—';
             row.stage         = r.Status != null ? r.Status : '—';
@@ -1239,8 +1376,35 @@ public without sharing class WCFValidatorController {
             result.rows.add(row);
         }
 
-        result.total = result.wsnWen + result.wcfDirect + result.selfSignup + result.unknown;
         return result;
+    }
+
+    // Budget Range chart: its own query, same filters, not derived from the table rows
+    @AuraEnabled(cacheable=false)
+    public static List<BudgetBucket> getBudgetRangeDistribution(
+        String geography, String timeRange, String stage, Date startDate, Date endDate
+    ) {
+        Map<String, Object> binds = new Map<String, Object>();
+        String whereClause = buildSourceChannelWhere(geography, timeRange, stage, startDate, endDate, binds);
+
+        String soql =
+            'SELECT Budget_Range_Annual_Budget_Range__c br, COUNT(Id) c FROM ApplicationReview'
+            + whereClause + ' GROUP BY Budget_Range_Annual_Budget_Range__c';
+
+        Map<String, Integer> tally = new Map<String, Integer>();
+        for (SObject so : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
+            AggregateResult ar = (AggregateResult) so;
+            String label = (String) ar.get('br');
+            if (String.isBlank(label)) label = 'Unknown';
+            Integer c = (Integer) ar.get('c');
+            tally.put(label, (tally.containsKey(label) ? tally.get(label) : 0) + c);
+        }
+
+        List<BudgetBucket> out = new List<BudgetBucket>();
+        for (String label : tally.keySet()) {
+            out.add(new BudgetBucket(label, tally.get(label)));
+        }
+        return out;
     }
 
     @AuraEnabled(cacheable=false)

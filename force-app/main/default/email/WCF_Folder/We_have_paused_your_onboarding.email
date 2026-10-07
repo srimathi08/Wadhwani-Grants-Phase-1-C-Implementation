@@ -48,7 +48,7 @@ We have paused your onboarding
 </p>
 
 <h1 class="hdr-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;">
-Application {!IndividualApplication.Name} - {!IndividualApplication.Organization_Name__c}
+Application {!WCF_Compliance_Document__c.Application_Number__c} - {!WCF_Compliance_Document__c.Application_Org_Name__c}
 </h1>
 </td>
 
@@ -103,6 +103,7 @@ To take this forward, write to us at <a href="mailto:grants.support@wadhwanifoun
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
 Kind Regards,<br/>
+{!WCF_Compliance_Document__c.Application_Reviewer__c}<br/>
 Wadhwani Grants
 </p>
 

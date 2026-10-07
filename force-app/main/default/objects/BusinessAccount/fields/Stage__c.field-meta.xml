@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stage__c</fullName>
+    <label>Stage</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>COE Registration</fullName>
+                <default>false</default>
+                <label>COE Registration</label>
+            </value>
+            <value>
+                <fullName>COE Proposal Submission</fullName>
+                <default>false</default>
+                <label>COE Proposal Submission</label>
+            </value>
+            <value>
+                <fullName>COE Proposal Evaluation</fullName>
+                <default>false</default>
+                <label>COE Proposal Evaluation</label>
+            </value>
+            <value>
+                <fullName>COE Onboarding</fullName>
+                <default>false</default>
+                <label>COE Onboarding</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,70 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>Send_Decline_Recommended_Email_to_Approver</name>
-        <label>Decline recommended, with reasons (E-47)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>Get_Approver_Account.PersonEmail</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Decline_recommended_with_reasons</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>Get_Approver_Account.PersonContactId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.ApplicationId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Send_Decision_Overdue_Email_to_Approver</name>
-        <label>A decision is overdue (E-55)</label>
+        <name>Decision_OVerdue_Email</name>
+        <label>Decision OVerdue Email</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -93,17 +31,30 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>useEmailTemplate</name>
+            <name>composeEmailContent</name>
             <value>
                 <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailTemplateName</name>
+            <name>emailSubject</name>
+            <value>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+                <stringValue>Overdue: your funding decision on this application</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/A_decision_is_overdue</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
+                <stringValue>{!Overdue_decision}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
@@ -125,8 +76,8 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>Send_Ready_for_Decision_Email_to_Approver</name>
-        <label>Ready for decision (E-22)</label>
+        <name>Decline_Recommended_Email</name>
+        <label>Decline Recommended Email</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -155,17 +106,105 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>useEmailTemplate</name>
+            <name>composeEmailContent</name>
             <value>
                 <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailTemplateName</name>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>Subject_Decline</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Ready_for_decision</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
+                <stringValue>{!DeclineRecommended_Email}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_Approver_Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.ApplicationId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Ready_for_Decision_Email_Alert</name>
+        <label>Ready for Decision Email Alert</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>Get_Approver_Account.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>composeEmailContent</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>Subject_Ready</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>{!Approver_ReadyForDecision}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
@@ -205,7 +244,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Decision_Overdue_Email_to_Approver</targetReference>
+                <targetReference>Decision_OVerdue_Email</targetReference>
             </connector>
             <label>Approver Found (Scheduled)</label>
         </rules>
@@ -256,7 +295,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Ready_for_Decision_Email_to_Approver</targetReference>
+                <targetReference>Ready_for_Decision_Email_Alert</targetReference>
             </connector>
             <label>Recommend for CEO (Yes)</label>
         </rules>
@@ -278,13 +317,143 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Decline_Recommended_Email_to_Approver</targetReference>
+                <targetReference>Decline_Recommended_Email</targetReference>
             </connector>
             <label>Recommend for CEO (No)</label>
         </rules>
     </decisions>
     <description>WCF Approver Email Alert Flow for Ready for Decision (E-22), Decline Recommended (E-47), and Decision Overdue (E-55)</description>
     <environments>Default</environments>
+    <formulas>
+        <name>currentyear</name>
+        <dataType>String</dataType>
+        <expression>TEXT(YEAR(TODAY()))</expression>
+    </formulas>
+    <formulas>
+        <name>Days_Waiting</name>
+        <dataType>Number</dataType>
+        <expression>IF(
+    ISBLANK({!$Record.Evaluation_Completed__c}),
+    0,
+    IF(
+        TODAY() &lt;= {!$Record.Evaluation_Completed__c},
+        0,
+        5 * FLOOR(
+            (TODAY() - {!$Record.Evaluation_Completed__c}) / 7
+        )
+        +
+        CASE(
+            WEEKDAY({!$Record.Evaluation_Completed__c}),
+
+            1,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 1,
+                2, 2,
+                3, 3,
+                4, 4,
+                5, 5,
+                6, 5,
+                0
+            ),
+
+            2,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 1,
+                2, 2,
+                3, 3,
+                4, 4,
+                5, 4,
+                6, 4,
+                0
+            ),
+
+            3,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 1,
+                2, 2,
+                3, 3,
+                4, 3,
+                5, 3,
+                6, 4,
+                0
+            ),
+
+            4,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 1,
+                1, 1,
+                2, 2,
+                3, 2,
+                4, 2,
+                5, 3,
+                6, 4,
+                0
+            ),
+
+            5,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 1,
+                2, 1,
+                3, 1,
+                4, 2,
+                5, 3,
+                6, 4,
+                0
+            ),
+
+            6,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 0,
+                2, 0,
+                3, 1,
+                4, 2,
+                5, 3,
+                6, 4,
+                0
+            ),
+
+            7,
+            CASE(
+                MOD(TODAY() - {!$Record.Evaluation_Completed__c}, 7),
+                0, 0,
+                1, 0,
+                2, 1,
+                3, 2,
+                4, 3,
+                5, 4,
+                6, 5,
+                0
+            ),
+
+            0
+        )
+    )
+)</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <name>Subject_Decline</name>
+        <dataType>String</dataType>
+        <expression>&quot;Decline recommended: your decision by &quot; &amp;
+TEXT({!$Record.Due_Date_For_Approver__c})</expression>
+    </formulas>
+    <formulas>
+        <name>Subject_Ready</name>
+        <dataType>String</dataType>
+        <expression>&quot;Evaluation complete: your funding decision by &quot; &amp;
+TEXT({!$Record.Due_Date_For_Approver__c})</expression>
+    </formulas>
     <interviewLabel>WCF Approver Email Alert Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>WCF Approver Email Alert Flow</label>
     <processMetadataValues>
@@ -399,4 +568,501 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>
+    <textTemplates>
+        <name>Approver_ReadyForDecision</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;/&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;/&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;/&gt;
+&lt;title&gt;Evaluation complete: your funding decision by {!$Record.Due_Date_For_Approver__c}&lt;/title&gt;
+
+&lt;style&gt;
+html,body{margin:0 !important;padding:0 !important;width:100% !important;}
+body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table{border-collapse:collapse !important;}
+img{border:0;outline:none;text-decoration:none;}
+a{color:#BF2026;}
+
+@media only screen and (max-width:620px){
+.container{width:100% !important;max-width:100% !important;}
+.pad{padding-left:22px !important;padding-right:22px !important;}
+.logo-hdr{width:100px !important;}
+.logo-ftr{width:114px !important;}
+.hdr-text{font-size:19px !important;}
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body style=&quot;margin:0;padding:0;background-color:#F4F4F5;&quot;&gt;
+&lt;center style=&quot;width:100%;background-color:#F4F4F5;&quot;&gt;
+
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; style=&quot;padding:24px 12px;&quot;&gt;
+
+&lt;table class=&quot;container&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;
+
+&lt;!-- HEADER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:24px 32px;border-radius:8px 8px 0 0;&quot;&gt;
+
+&lt;!-- two-column layout: text left, logo right --&gt;
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+&lt;tr&gt;
+
+&lt;!-- LEFT: text --&gt;
+&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;
+&lt;p style=&quot;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;&quot;&gt;
+Ready for your decision
+&lt;/p&gt;
+
+&lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
+Application {!$Record.Application.Name} · {!$Record.Application.Organization_Name__c}
+
+&lt;/h1&gt;
+&lt;/td&gt;
+
+&lt;!-- RIGHT: logo --&gt;
+&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding-left:16px;&quot;&gt;
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;
+&lt;/td&gt;
+
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- ORANGE DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+
+
+&lt;!-- BODY --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:14px 32px 10px;&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Hi {!Get_Approver_Account.FirstName},
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+The evaluation of this application is finished. The decision to fund it or decline it is now yours.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+What the reviewers have put on record:
+&lt;/p&gt;
+
+&lt;!-- PANEL --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
+&lt;strong&gt;What the reviewers have put on record:&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;strong&gt;Evaluation completed:&lt;/strong&gt; {!$Record.Evaluation_Completed__c}&lt;br/&gt;
+&lt;strong&gt;Recommendation:&lt;/strong&gt; {!$Record.Recommend_for_CEO_review__c}&lt;br/&gt;
+&lt;strong&gt;Basis for the recommendation:&lt;/strong&gt; {!$Record.Recommendation_Strength_Comments__c}&lt;br/&gt;
+{!$Record.Non_Recommendation_Strength_Comments__c}&lt;br/&gt;
+&lt;strong&gt;Decision due:&lt;/strong&gt; {!$Record.Due_Date_For_Approver__c}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Can you please record your decision by {!$Record.Due_Date_For_Approver__c}? Open for decision takes you to the application, where the full evaluation sits and where you record fund or decline.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+If nothing is recorded by {!$Record.Due_Date_For_Approver__c}, the application stays open, the applicant continues to wait, and the decision is flagged back to you as overdue.
+&lt;/p&gt;
+
+&lt;table role=&quot;presentation&quot; class=&quot;btn&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:8px 0 6px;&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;border-radius:4px;&quot;&gt;
+&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite/s/approverlistview?role=approver&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:13px 30px;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;&quot;&gt;
+Open for decision
+&lt;/a&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Kind regards,&lt;br/&gt;
+Wadhwani Grants Platform
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;
+&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;/&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- FOOTER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot;
+width=&quot;132&quot;alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;/&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+&amp;copy; {!currentyear} Wadhwani Charitable Foundation. All rights reserved.
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>DeclineRecommended_Email</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;/&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;/&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;/&gt;
+&lt;title&gt;Decline recommended: your decision by {!$Record.Due_Date_For_Approver__c}&lt;/title&gt;
+
+&lt;style&gt;
+html,body{margin:0 !important;padding:0 !important;width:100% !important;}
+body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table{border-collapse:collapse !important;}
+img{border:0;outline:none;text-decoration:none;}
+a{color:#BF2026;}
+
+@media only screen and (max-width:620px){
+.container{width:100% !important;max-width:100% !important;}
+.pad{padding-left:22px !important;padding-right:22px !important;}
+.logo-hdr{width:100px !important;}
+.logo-ftr{width:114px !important;}
+.hdr-text{font-size:19px !important;}
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body style=&quot;margin:0;padding:0;background-color:#F4F4F5;&quot;&gt;
+&lt;center style=&quot;width:100%;background-color:#F4F4F5;&quot;&gt;
+
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; style=&quot;padding:24px 12px;&quot;&gt;
+
+&lt;table class=&quot;container&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;
+
+&lt;!-- HEADER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:24px 32px;border-radius:8px 8px 0 0;&quot;&gt;
+
+&lt;!-- two-column layout: text left, logo right --&gt;
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+&lt;tr&gt;
+
+&lt;!-- LEFT: text --&gt;
+&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;
+&lt;p style=&quot;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;&quot;&gt;
+Decline recommended
+&lt;/p&gt;
+
+&lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
+Application {!$Record.Application.Name} &amp;middot; {{org_name}}
+&lt;/h1&gt;
+&lt;/td&gt;
+
+&lt;!-- RIGHT: logo --&gt;
+&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding-left:16px;&quot;&gt;
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;
+&lt;/td&gt;
+
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- ORANGE DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- BODY --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:14px 32px 10px;&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Hi {!Get_Approver_Account.FirstName},
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+{!$Record.Application.WG_Reviewer_Name__c} recommends declining this application. This is a recommendation, not a decision. You can accept it, or send the evaluation back to the reviewer for more detail.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+The reasons given:
+&lt;/p&gt;
+
+&lt;!-- PANEL --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
+&lt;strong&gt;The reasons given:&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;
+{!$Record.Non_Recommendation_Strength_Comments__c}&lt;br/&gt;&lt;br/&gt;
+&lt;strong&gt;Decision due:&lt;/strong&gt; {!$Record.Due_Date_For_Approver__c}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Can you please record your decision by {!$Record.Due_Date_For_Approver__c}? Open for decision takes you to the application, where the full evaluation sits and where you record fund or decline.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+If nothing is recorded by {!$Record.Due_Date_For_Approver__c}, the application stays open, the applicant continues to wait, and the decision is flagged back to you as overdue.
+&lt;/p&gt;
+
+&lt;table role=&quot;presentation&quot; class=&quot;btn&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:8px 0 6px;&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;border-radius:4px;&quot;&gt;
+&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite/s/approverdashboard?role=approver}&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:13px 30px;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;&quot;&gt;
+Open for decision
+&lt;/a&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Kind regards,&lt;br/&gt;
+Wadhwani Grants Platform
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;
+&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;/&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- FOOTER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot;
+width=&quot;132&quot;alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;/&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+&amp;copy; {!currentyear} Wadhwani Charitable Foundation. All rights reserved.
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Overdue_decision</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;/&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;/&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;/&gt;
+&lt;title&gt;Overdue: your funding decision on this application&lt;/title&gt;
+
+&lt;style&gt;
+html,body{margin:0 !important;padding:0 !important;width:100% !important;}
+body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table{border-collapse:collapse !important;}
+img{border:0;outline:none;text-decoration:none;}
+a{color:#BF2026;}
+
+@media only screen and (max-width:620px){
+.container{width:100% !important;max-width:100% !important;}
+.pad{padding-left:22px !important;padding-right:22px !important;}
+.logo-hdr{width:100px !important;}
+.logo-ftr{width:114px !important;}
+.hdr-text{font-size:19px !important;}
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body style=&quot;margin:0;padding:0;background-color:#F4F4F5;&quot;&gt;
+&lt;center style=&quot;width:100%;background-color:#F4F4F5;&quot;&gt;
+
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; style=&quot;padding:24px 12px;&quot;&gt;
+
+&lt;table class=&quot;container&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;
+
+&lt;!-- HEADER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:24px 32px;border-radius:8px 8px 0 0;&quot;&gt;
+
+&lt;!-- two-column layout: text left, logo right --&gt;
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+&lt;tr&gt;
+
+&lt;!-- LEFT: text --&gt;
+&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;
+&lt;p style=&quot;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;&quot;&gt;
+Decision overdue
+&lt;/p&gt;
+
+&lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
+Application {!$Record.Application.Name}  &amp;middot; {!$Record.Application.Organization_Name__c}&lt;/h1&gt;
+&lt;/td&gt;
+
+&lt;!-- RIGHT: logo --&gt;
+&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding-left:16px;&quot;&gt;
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;
+&lt;/td&gt;
+
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- ORANGE DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- BODY --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:14px 32px 10px;&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Hi {!Get_Approver_Account_Scheduled.FirstName},
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+A decision on this application is past its date. The evaluation was finished and handed to you to fund it or decline it.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Where it stands:
+&lt;/p&gt;
+
+&lt;!-- PANEL --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
+&lt;strong&gt;Ready for your decision since:&lt;/strong&gt;{!$Record.Evaluation_Completed__c} &lt;br/&gt;
+&lt;strong&gt;Days waiting:&lt;/strong&gt; {!Days_Waiting}&lt;br/&gt;
+&lt;strong&gt;Decision was due:&lt;/strong&gt; {!$Record.Due_Date_For_Approver__c}&lt;br/&gt;
+&lt;strong&gt;Recommendation on file:&lt;/strong&gt; {!$Record.Recommend_for_CEO_review__c}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Can you please record your decision today? Open for decision takes you to the application, where the full evaluation sits and where you record fund or decline.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Nothing moves until you do. The applicant stays waiting and hears nothing from us in the meantime.
+&lt;/p&gt;
+
+&lt;table role=&quot;presentation&quot; class=&quot;btn&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:8px 0 6px;&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;border-radius:4px;&quot;&gt;
+&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite/s/approverlistview?role=approver&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:13px 30px;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;&quot;&gt;
+Open for decision
+&lt;/a&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Kind regards,&lt;br/&gt;
+Wadhwani Grants Platform
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;
+&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;/&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- FOOTER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot;
+width=&quot;132&quot;alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;/&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+&amp;copy; {!currentyear} Wadhwani Charitable Foundation. All rights reserved.
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+    </textTemplates>
 </Flow>

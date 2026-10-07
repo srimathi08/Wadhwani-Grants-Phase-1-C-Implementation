@@ -3,12 +3,32 @@
     <label>S1.4 Substantive Content Gap</label>
     <protected>false</protected>
     <values>
-        <field>Section_Code__c</field>
-        <value xsi:type="xsd:string">SEC_COMPLETENESS</value>
+        <field>Applicable_Tracks__c</field>
+        <value xsi:nil="true"/>
     </values>
     <values>
-        <field>Section_Number__c</field>
-        <value xsi:type="xsd:double">1.0</value>
+        <field>Conditional_Parent_Key__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Conditional_Parent_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Display_Type__c</field>
+        <value xsi:type="xsd:string">TextArea</value>
+    </values>
+    <values>
+        <field>Hint_Text__c</field>
+        <value xsi:type="xsd:string">Note any field that is technically populated but effectively empty — placeholder text, single-word responses to narrative questions, etc.</value>
+    </values>
+    <values>
+        <field>Is_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Is_Required__c</field>
+        <value xsi:type="xsd:boolean">false</value>
     </values>
     <values>
         <field>Question_Key__c</field>
@@ -19,31 +39,23 @@
         <value xsi:type="xsd:string">Substantive content gap</value>
     </values>
     <values>
-        <field>Hint_Text__c</field>
-        <value xsi:type="xsd:string">Note any field that is technically populated but effectively empty — placeholder text, single-word responses to narrative questions, etc.</value>
+        <field>Section_Code__c</field>
+        <value xsi:type="xsd:string">SEC_COMPLETENESS</value>
     </values>
     <values>
-        <field>Display_Type__c</field>
-        <value xsi:type="xsd:string">TextArea</value>
-    </values>
-    <values>
-        <field>Target_Field_API_Name__c</field>
-        <value xsi:type="xsd:string">Substantive_content_gap__c</value>
-    </values>
-    <values>
-        <field>Is_Required__c</field>
-        <value xsi:type="xsd:boolean">false</value>
-    </values>
-    <values>
-        <field>Word_Limit__c</field>
-        <value xsi:type="xsd:double">200.0</value>
+        <field>Section_Number__c</field>
+        <value xsi:type="xsd:double">1.0</value>
     </values>
     <values>
         <field>Sequence__c</field>
         <value xsi:type="xsd:double">4.0</value>
     </values>
     <values>
-        <field>Is_Active__c</field>
-        <value xsi:type="xsd:boolean">true</value>
+        <field>Target_Field_API_Name__c</field>
+        <value xsi:type="xsd:string">Substantive_content_gap__c</value>
+    </values>
+    <values>
+        <field>Word_Limit__c</field>
+        <value xsi:type="xsd:double">200.0</value>
     </values>
 </CustomMetadata>

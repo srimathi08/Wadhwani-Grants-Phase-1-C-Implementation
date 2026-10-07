@@ -3,6 +3,19 @@ import { NavigationMixin } from 'lightning/navigation';
 import { CurrentPageReference } from 'lightning/navigation';
 import getApproverQueue from '@salesforce/apex/WCFApproverListController.getApproverQueue';
 
+// ── Recommend_for_CEO_review__c helpers ─────────────────────────────
+// Legacy 'Yes' and the new 'Yes - Strongly recommend' / 'Yes - Recommend' /
+// 'Yes - Recommend with reservations' values all mean "recommended".
+function isRecYes(value) {
+    return typeof value === 'string' && value.trim().toLowerCase().startsWith('yes');
+}
+// Display text for a stored value. 'No' reads as 'No - Do not recommend' so it
+// matches the 'Yes - ...' wording; the record itself still holds 'No'.
+function recDisplayLabel(value) {
+    if (!value) return '';
+    return value === 'No' ? 'No - Do not recommend' : value;
+}
+
 const PAGE_SIZE_OPTIONS = [
     { label: '10', value: '10' },
     { label: '20', value: '20' },
@@ -16,7 +29,7 @@ const FILTER_LABELS = {
     returned        : 'Returned to Reviewer',
     recYes          : 'Recommended',
     recNo           : 'Not Recommended',
-    approved        : 'Approved',
+    approved        : 'Accept',      // UPDATED: tile + filter banner label (was 'Approved')
     declined        : 'Declined'
 };
 
@@ -28,7 +41,7 @@ const SUMMARY_TILES = [
     { id: 'recYes',           countGetter: 'recommendedCount',      tone: 'info' },
     { id: 'recNo',            countGetter: 'notRecommendedCount',   tone: 'neutral' },
     { id: 'approved',         countGetter: 'approvedCount',         tone: 'success' },
-    { id: 'declined',         countGetter: 'declinedCount',         tone: 'error' }
+    //{ id: 'declined',         countGetter: 'declinedCount',         tone: 'error' }
 ];
 
 export default class WcfApproverListView extends NavigationMixin(LightningElement) {
@@ -113,9 +126,10 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
     get pendingCount()          { return this.items.filter(r => this._isPending(r)).length; }
     get backFromReviewerCount() { return this.items.filter(r => this._isBackFromReviewer(r)).length; }
     get returnedCount()         { return this.items.filter(r => this._isReturnedToReviewer(r)).length; }
-    get recommendedCount()      { return this.items.filter(r => r.recommendation === 'Yes').length; }
+    get recommendedCount()      { return this.items.filter(r => isRecYes(r.recommendation)).length; }
     get notRecommendedCount()   { return this.items.filter(r => r.recommendation === 'No').length; }
-    get approvedCount()         { return this.items.filter(r => r.existingDecision === 'Approve').length; }
+    // UPDATED: counts 'Accept' — the value the decision screen saves (was 'Approve')
+    get approvedCount()         { return this.items.filter(r => r.existingDecision === 'Accept').length; }
     get declinedCount()         { return this.items.filter(r => r.existingDecision === 'Decline').length; }
 
     get summaryItems() {
@@ -160,13 +174,14 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
                     result = result.filter(r => this._isPending(r));
                     break;
                 case 'recYes':
-                    result = result.filter(r => r.recommendation === 'Yes');
+                    result = result.filter(r => isRecYes(r.recommendation));
                     break;
                 case 'recNo':
                     result = result.filter(r => r.recommendation === 'No');
                     break;
                 case 'approved':
-                    result = result.filter(r => r.existingDecision === 'Approve');
+                    // UPDATED: Accept tile shows decisions saved as 'Accept' (was 'Approve')
+                    result = result.filter(r => r.existingDecision === 'Accept');
                     break;
                 case 'declined':
                     result = result.filter(r => r.existingDecision === 'Decline');
@@ -254,7 +269,7 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
             // Recommendation pill
             const rec = row.recommendation || '';
             let recBadgeClass = 'wg-pill wg-pill--neutral';
-            if      (rec === 'Yes') recBadgeClass = 'wg-pill wg-pill--success';
+            if      (isRecYes(rec)) recBadgeClass = 'wg-pill wg-pill--success';
             else if (rec === 'No')  recBadgeClass = 'wg-pill wg-pill--error';
 
             // Decision pill
@@ -306,7 +321,7 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
                 rowClass: isBackFromReviewer ? 'wg-row--attention' : '',
                 trackBadges,
                 recBadgeClass,
-                recommendationLabel: rec || '—',
+                recommendationLabel: rec ? recDisplayLabel(rec) : '—',
                 decisionBadgeClass,
                 decisionLabel,
                 actionLabel,

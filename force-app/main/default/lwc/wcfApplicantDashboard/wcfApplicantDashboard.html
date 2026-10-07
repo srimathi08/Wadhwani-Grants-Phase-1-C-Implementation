@@ -58,7 +58,7 @@
                             <div class="dash-progress-fill"></div>
                         </div>
                         <p class="dash-progress-label">
-                            Step {currentStepNumber} of {totalSteps} &middot; {labels.CL_Auto_saves_on_every_field_blur}
+                            Step {currentStepNumber} of {totalSteps}
                         </p>
                     </div>
                 </div>
@@ -453,7 +453,7 @@
                     <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}</h2>
                     <p class="dash-meta" style="margin-bottom: 20px;">Approved {approvalDateFormatted} &middot; {labels.CL_Three_steps_to_activate_your_partnership}</p>
 
-                    <!-- Track 1: Master MoU -->
+                    <!-- Track 1: Master MoU / Grant Agreement -->
                     <div class="dash-track-row">
                         <div class="dash-track-icon dash-track-icon--mou">
                             <lightning-icon icon-name="doctype:pdf" size="small"></lightning-icon>
@@ -466,13 +466,28 @@
                             <p class="dash-track-desc">
                                 {labels.CL_Your_Grant_Agreement_of_Understanding_will_be_shared_via_Volody_for_e_signatu}
                             </p>
-                            <template if:true={hasMouLink}>
-                                <a href={mouVolodyLink} target="_blank" class="dash-track-link">
-                                    Open in Volody →
-                                </a>
+                            <template if:true={hasSignedGrantAgreement}>
+                                <div class="dash-agreement-file-card">
+                                    <div class="dash-agreement-file-info">
+                                        <span class="dash-agreement-file-icon">📄</span>
+                                        <span class="dash-agreement-file-name">{mouFileName}</span>
+                                        <span class="dash-agreement-file-size">{mouFileSize}</span>
+                                    </div>
+                                    <div class="dash-agreement-file-actions">
+                                        <button class="dash-btn-view-doc" onclick={handleViewSignedAgreement}>View</button>
+                                        <button class="dash-btn-download-doc" onclick={handleDownloadSignedAgreement}>Download</button>
+                                    </div>
+                                </div>
                             </template>
-                            <template if:false={hasMouLink}>
-                                <p class="dash-track-pending-note">{labels.CL_Grant_Agreement_will_be_shared_by_your_Programme_Lead_shortly}</p>
+                            <template if:false={hasSignedGrantAgreement}>
+                                <template if:true={hasMouLink}>
+                                    <a href={mouVolodyLink} target="_blank" class="dash-track-link">
+                                        Open in Volody →
+                                    </a>
+                                </template>
+                                <template if:false={hasMouLink}>
+                                    <p class="dash-track-pending-note">{labels.CL_Grant_Agreement_will_be_shared_by_your_Programme_Lead_shortly}</p>
+                                </template>
                             </template>
                         </div>
                     </div>
@@ -510,15 +525,20 @@
 
                     <div class="dash-track-divider"></div>
 
-                    <!-- Track 3: Programme Setup (Phase 2 — locked) -->
-                    <div class="dash-track-row dash-track-row--locked">
+                    <!-- Track 3: Programme Setup -->
+                    <div class={programmeSetupRowClass}>
                         <div class="dash-track-icon dash-track-icon--programme">
                             <lightning-icon icon-name="utility:settings" size="small"></lightning-icon>
                         </div>
                         <div class="dash-track-body">
                             <div class="dash-track-header">
                                 <span class="dash-track-title">{labels.CL_Programme_Setup}</span>
-                                <span class="dash-track-badge dash-track-badge--pending">{labels.CL_COMING_SOON}</span>
+                                <template if:true={isOnboarded}>
+                                    <span class="dash-track-badge dash-track-badge--active">In progress</span>
+                                </template>
+                                <template if:false={isOnboarded}>
+                                    <span class="dash-track-badge dash-track-badge--pending">{labels.CL_COMING_SOON}</span>
+                                </template>
                             </div>
                             <p class="dash-track-desc">
                                 {labels.CL_Your_Programme_Lead_will_configure_your_programme_details_funding_model_and}
@@ -529,12 +549,14 @@
 
                 <!-- ── Side card: Timeline ── -->
                 <c-wcf-application-timeline
-                    class="dash-card dash-card--side"
-                    current-status={normalizedStatus}
-                     compliance-doc-status={complianceDocStatus}
-                    compliance-has-uploads={complianceHasUploads}
-                     oncomplianceaction={handleOpenComplianceDocs}>
-                </c-wcf-application-timeline>
+    class="dash-card dash-card--side"
+    current-status={normalizedStatus}
+    compliance-doc-status={timelineComplianceStatus}
+    compliance-has-uploads={timelineHasUploads}
+    programme-lead-name={programmeLeadName}
+    programme-lead-email={programmeLeadEmail}
+    oncomplianceaction={handleOpenComplianceDocs}>
+</c-wcf-application-timeline>
             </div>
 
 

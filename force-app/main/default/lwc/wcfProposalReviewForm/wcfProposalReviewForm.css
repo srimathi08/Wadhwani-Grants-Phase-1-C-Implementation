@@ -1530,3 +1530,55 @@
     .lwc-textarea,
     .btn { transition: none; }
 }
+
+/* Remove this old rule — the bottom banner element is gone:
+.validate {
+    margin: 0 var(--rf-pad-x) var(--wg-space-3);
+}
+*/
+
+/* ═══════════════════════════════════════════
+   INLINE FIELD VALIDATION
+   Replaces the old bottom "Cannot continue" banner.
+   Highlights the specific control in red and shows
+   a short message directly beneath it.
+═══════════════════════════════════════════ */
+.field-error-text {
+    margin-top: var(--wg-space-2);
+    margin-bottom: var(--wg-space-2);
+    font-size: var(--wg-font-size-caption);
+    font-weight: var(--wg-weight-semibold);
+    color: var(--wg-error);
+}
+
+.field-error-indent {
+    margin-left: 44px;
+}
+
+.segmented-error {
+    border-color: var(--wg-error);
+    box-shadow: 0 0 0 1px var(--wg-error);
+}
+
+.lwc-textarea-error {
+    border-color: var(--wg-error) !important;
+    box-shadow: 0 0 0 1px var(--wg-error);
+}
+
+/* lightning-input doesn't accept normal border overrides from outside
+   its shadow DOM — use its SLDS styling hooks instead */
+.ranked-row-error lightning-input,
+lightning-input.wcf-input-error {
+    --slds-c-input-color-border: var(--wg-error);
+    --slds-c-input-shadow-focus: 0 0 0 1px var(--wg-error);
+}
+
+.yesno-row-error .yesno button {
+    border-color: var(--wg-error);
+}
+
+.checkbox-grid-error {
+    outline: 1px solid var(--wg-error);
+    outline-offset: 4px;
+    border-radius: var(--wg-radius-sm);
+}

@@ -48,7 +48,7 @@ Compliance documents submitted
 </p>
 
 <h1 class="hdr-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;">
-Application {{application_number}} &middot; {{org_name}}
+Application {!WCF_Compliance_Document__c.Application_Number__c} - {!WCF_Compliance_Document__c.Application_Org_Name__c} 
 </h1>
 </td>
 
@@ -73,11 +73,11 @@ Application {{application_number}} &middot; {{org_name}}
 <td class="pad" style="padding:14px 32px 10px;">
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Hi {{reviewer_first_name}},
+Hi {!WCF_Compliance_Document__c.Application_Reviewer__c},
 </p>
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-{{org_name}} has submitted the compliance documents you requested on application {{application_number}}.
+{!WCF_Compliance_Document__c.Application_Org_Name__c} has submitted the compliance documents you requested on application {!WCF_Compliance_Document__c.Application_Number__c}.
 </p>
 
 <p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
@@ -89,15 +89,15 @@ What has come in:
 <tr>
 <td style="padding:16px 20px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;">
 <strong>What has come in:</strong><br/><br/>
-{{document_list}}<br/><br/>
-<strong>Application:</strong> {{application_number}}<br/>
-<strong>Your review due:</strong> {{sla_due_date}}
+{!WCF_Compliance_Document__c.Document_Types__c}<br/><br/>
+<strong>Application:</strong> {!WCF_Compliance_Document__c.Application_Number__c}<br/>
+<strong>Your review due:</strong> {!WCF_Compliance_Document__c.Due_Date__c}
 </td>
 </tr>
 </table>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-Can you please open each document and either accept it or return it with a reason by {{sla_due_date}}?
+Can you please open each document and either accept it or return it with a reason by {!WCF_Compliance_Document__c.Due_Date__c}?
 </p>
 
 <p style="margin:0 0 15px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">

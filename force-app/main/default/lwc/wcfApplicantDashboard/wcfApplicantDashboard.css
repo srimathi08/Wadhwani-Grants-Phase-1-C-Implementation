@@ -506,3 +506,84 @@
     font-weight: 500;
     margin-top: 0.5rem !important;
 }
+
+/* ── Signed Grant Agreement File Card (Matching Image 5) ── */
+.dash-agreement-file-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dash-agreement-file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.dash-agreement-file-icon {
+    font-size: 16px;
+}
+
+.dash-agreement-file-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash-agreement-file-size {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.dash-agreement-file-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.dash-btn-view-doc {
+    background: #ffffff;
+    color: var(--wg-red, #c8102e);
+    border: 1px solid var(--wg-red, #c8102e);
+    border-radius: 3px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dash-btn-view-doc:hover {
+    background: #fff5f5;
+}
+
+.dash-btn-download-doc {
+    background: var(--wg-red, #c8102e);
+    color: #ffffff;
+    border: 1px solid var(--wg-red, #c8102e);
+    border-radius: 3px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.dash-btn-download-doc:hover {
+    background: #a30d25;
+    border-color: #a30d25;
+}

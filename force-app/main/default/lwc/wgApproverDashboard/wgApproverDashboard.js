@@ -3,6 +3,19 @@ import { NavigationMixin } from 'lightning/navigation';
 import getApproverQueue   from '@salesforce/apex/WCFApproverListController.getApproverQueue';
 import getApproverSummary from '@salesforce/apex/WCFApproverListController.getApproverSummary';
 
+// ── Recommend_for_CEO_review__c helpers ─────────────────────────────
+// Legacy 'Yes' and the new 'Yes - Strongly recommend' / 'Yes - Recommend' /
+// 'Yes - Recommend with reservations' values all mean "recommended".
+function isRecYes(value) {
+    return typeof value === 'string' && value.trim().toLowerCase().startsWith('yes');
+}
+// Display text for a stored value. 'No' reads as 'No - Do not recommend' so it
+// matches the 'Yes - ...' wording; the record itself still holds 'No'.
+function recDisplayLabel(value) {
+    if (!value) return '';
+    return value === 'No' ? 'No - Do not recommend' : value;
+}
+
 export default class WgApproverDashboard extends NavigationMixin(LightningElement) {
 
     @track approverCards       = [];
@@ -32,8 +45,10 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
      *  - recYes / recNo are client-computed from the queue rows (unchanged)
      */
     _buildCards(rows, summary) {
-        const recYes = rows.filter(r => r.recommendation === 'Yes').length;
+        const recYes = rows.filter(r => isRecYes(r.recommendation)).length;
         const recNo  = rows.filter(r => r.recommendation === 'No').length;
+        // UPDATED: Accept tile counts the same rows the Approver Queue's Accept filter shows
+        const accepted = rows.filter(r => r.existingDecision === 'Accept').length;
 
         const defs = [
             { id: 'pending',          label: 'Pending Decisions',    subtitle: 'Reviewed proposals awaiting your decision',   count: summary.pending || 0,          tone: 'brand',    alertWhenPositive: true },
@@ -41,8 +56,8 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
             { id: 'returned',         label: 'Returned to Reviewer', subtitle: 'Sent back to the Reviewer for clarification', count: summary.returned || 0,         tone: 'returned' },
             { id: 'recYes',           label: 'Recommended',          subtitle: 'Proposals recommended for approval',          count: recYes,                        tone: 'info' },
             { id: 'recNo',            label: 'Not Recommended',      subtitle: 'Proposals not recommended for approval',      count: recNo,                         tone: 'neutral' },
-            { id: 'approved',         label: 'Approved',             subtitle: 'Proposals approved and finalised',            count: summary.approved || 0,         tone: 'success' },
-            { id: 'declined',         label: 'Declined',             subtitle: 'Proposals declined after review',             count: summary.declined || 0,         tone: 'error' }
+            { id: 'approved',         label: 'Accept',               subtitle: 'Proposals accepted and finalised',            count: accepted,                      tone: 'success' },
+            //{ id: 'declined',         label: 'Declined',             subtitle: 'Proposals declined after review',             count: summary.declined || 0,         tone: 'error' }
         ];
 
         this.approverCards = defs.map(d => ({
@@ -85,7 +100,7 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
 
             const rec = row.recommendation || '';
             let recPillClass = 'wg-pill wg-pill--neutral';
-            if      (rec === 'Yes') recPillClass = 'wg-pill wg-pill--success';
+            if      (isRecYes(rec)) recPillClass = 'wg-pill wg-pill--success';
             else if (rec === 'No')  recPillClass = 'wg-pill wg-pill--error';
 
             // Status pill (same meaning-colors as the queue)
@@ -95,7 +110,7 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
                 // FIX (display): 'Accept' — the value the decision screen sends —
                 // previously fell through to "Pending Decision".
                 statusPillClass = 'wg-pill wg-pill--success';
-                decisionLabel   = 'Approved';
+                decisionLabel   = row.existingDecision === 'Accept' ? 'Accept' : 'Approved';   // UPDATED: label only
             } else if (row.existingDecision === 'Decline') {
                 statusPillClass = 'wg-pill wg-pill--error';
                 decisionLabel   = 'Declined';
@@ -147,7 +162,8 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
                 actionIcon,
                 actionDisabled,
                 rowClass: isClearedReturn ? 'wg-row--attention' : '',
-                recommendation: rec || '—'
+                isRecYes: isRecYes(rec),                                 // used by the sort below
+                recommendation: rec ? recDisplayLabel(rec) : '—'
             };
         });
 
@@ -158,8 +174,8 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
             if (aPending !== bPending) return aPending ? -1 : 1;
 
             if (aPending && bPending) {
-                if (a.recommendation === 'Yes' && b.recommendation !== 'Yes') return -1;
-                if (a.recommendation !== 'Yes' && b.recommendation === 'Yes') return 1;
+                if (a.isRecYes && !b.isRecYes) return -1;
+                if (!a.isRecYes && b.isRecYes) return 1;
                 return 0;
             }
 

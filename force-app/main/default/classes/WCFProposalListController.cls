@@ -1,5 +1,9 @@
 public without sharing class WCFProposalListController {
     
+        // Recommend_for_CEO_review__c values that mean "recommended" (single source of truth)
+        private static final Set<String> POSITIVE_RECS =
+            WCF_ReviewFormJFController.POSITIVE_RECOMMENDATION_VALUES;
+
         private static final Set<String> WCF_REVIEW_RECORD_TYPES = new Set<String>{
             'WCF_Job_Creation_Review',
             'WCF_Job_Fulfillment',
@@ -13,7 +17,7 @@ public without sharing class WCFProposalListController {
                 SELECT ApplicationId
                 FROM ApplicationDecision
                 WHERE ApplicationDecision = 'Accept'
-                AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
+                AND Proposal_Review__r.Recommend_for_CEO_review__c IN :POSITIVE_RECS
                 WITH SYSTEM_MODE
             ]) {
                 if (ad.ApplicationId != null) {
@@ -65,7 +69,8 @@ public without sharing class WCFProposalListController {
 
             // ── Pass 1: WCF review record types → status, reviewId, DueDate if present ──
             for (ApplicationReview ar : [
-                SELECT Id, ApplicationId, Status, IsSubmitted, DueDate
+                SELECT Id, ApplicationId, Status, IsSubmitted, DueDate,
+                       Recommend_for_CEO_review__c
                 FROM ApplicationReview
                 WHERE ApplicationId IN :underReviewIds
                 AND RecordTypeId IN :reviewerRtIds
@@ -80,6 +85,7 @@ public without sharing class WCFProposalListController {
                     info.isSubmitted = ar.IsSubmitted;
                     info.dueDate     = ar.DueDate != null ? String.valueOf(ar.DueDate) : null;
                     info.isFlagged   = false;
+                    info.recommendation = ar.Recommend_for_CEO_review__c;   // NEW
                     resultMap.put(appId, info);
                 } else if (ar.DueDate != null && resultMap.get(appId).dueDate == null) {
                     resultMap.get(appId).dueDate = String.valueOf(ar.DueDate);
@@ -139,6 +145,7 @@ public without sharing class WCFProposalListController {
      @AuraEnabled public Boolean isFlagged;
             @AuraEnabled public String  flagRationale;
             @AuraEnabled public String  decisionRationale;
+            @AuraEnabled public String  recommendation;   // NEW: Recommend_for_CEO_review__c
         }
     
     // ── NEW: Update Flag__c on the validator's ApplicationReview ──
@@ -401,7 +408,7 @@ public static Integer getAcceptedApplicationsCount() {
         SELECT ApplicationId
         FROM ApplicationDecision
         WHERE ApplicationDecision = 'Accept'
-        AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
+        AND Proposal_Review__r.Recommend_for_CEO_review__c IN :POSITIVE_RECS
         WITH SYSTEM_MODE
     ]) {
         if (ad.ApplicationId != null) {
@@ -418,7 +425,7 @@ public static List<Id> getAcceptedApplicationIds() {
         SELECT ApplicationId
         FROM ApplicationDecision
         WHERE ApplicationDecision = 'Accept'
-        AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
+        AND Proposal_Review__r.Recommend_for_CEO_review__c IN :POSITIVE_RECS
         WITH SYSTEM_MODE
     ]) {
         if (ad.ApplicationId != null) {
@@ -434,7 +441,7 @@ public static List<AcceptedApplicationItem> getAcceptedApplicationsQueue() {
         SELECT Id, ApplicationId, Comment, Decision_Date__c
         FROM ApplicationDecision
         WHERE ApplicationDecision = 'Accept'
-        AND Proposal_Review__r.Recommend_for_CEO_review__c = 'Yes'
+        AND Proposal_Review__r.Recommend_for_CEO_review__c IN :POSITIVE_RECS
         WITH SYSTEM_MODE
         ORDER BY Decision_Date__c DESC
         LIMIT 200

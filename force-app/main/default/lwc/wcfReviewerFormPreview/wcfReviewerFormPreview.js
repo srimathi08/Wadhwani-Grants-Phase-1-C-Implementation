@@ -2,6 +2,19 @@ import { LightningElement, api, track, wire } from 'lwc';
 import getReviewData from '@salesforce/apex/WCFApproverListController.getReviewData';
 import getReviewerFormV5Metadata from '@salesforce/apex/WCFReviewerMetadataController.getReviewerFormV5Metadata';
 
+// ── Recommend_for_CEO_review__c helpers ─────────────────────────────
+// Legacy 'Yes' and the new 'Yes - Strongly recommend' / 'Yes - Recommend' /
+// 'Yes - Recommend with reservations' values all mean "recommended".
+function isRecYes(value) {
+    return typeof value === 'string' && value.trim().toLowerCase().startsWith('yes');
+}
+// Display text for a stored value. 'No' reads as 'No - Do not recommend' so it
+// matches the 'Yes - ...' wording; the record itself still holds 'No'.
+function recDisplayLabel(value) {
+    if (!value) return '';
+    return value === 'No' ? 'No - Do not recommend' : value;
+}
+
 const RATING_LABEL = { 5: 'Very strong', 4: 'Strong', 3: 'Adequate', 2: 'Weak', 1: 'Very weak' };
 
 const QUESTION_FIELD_MAP = {
@@ -90,15 +103,18 @@ export default class WcfReviewerFormPreview extends LightningElement {
     get hasData() { return !!this.reviewRecord; }
 
     get reviewName()     { return this.reviewRecord?.Name || ''; }
-    get recommendation() { return this.reviewRecord?.Recommend_for_CEO_review__c || '—'; }
+    get recommendation() {
+        const r = this.reviewRecord?.Recommend_for_CEO_review__c;
+        return r ? recDisplayLabel(r) : '—';
+    }
 
     get recClass() {
         const r = this.reviewRecord?.Recommend_for_CEO_review__c;
-        return r === 'Yes' ? 'rec-pill rec-yes' : r === 'No' ? 'rec-pill rec-no' : 'rec-pill';
+        return isRecYes(r) ? 'rec-pill rec-yes' : r === 'No' ? 'rec-pill rec-no' : 'rec-pill';
     }
     get recIcon() {
         const r = this.reviewRecord?.Recommend_for_CEO_review__c;
-        return r === 'Yes' ? '✓' : r === 'No' ? '✕' : '';
+        return isRecYes(r) ? '✓' : r === 'No' ? '✕' : '';
     }
 
     get recStrengthNum() {

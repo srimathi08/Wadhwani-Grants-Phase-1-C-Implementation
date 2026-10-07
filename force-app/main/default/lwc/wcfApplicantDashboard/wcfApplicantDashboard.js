@@ -1,5 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import getApplicationStatusForUser from '@salesforce/apex/WCFFormController.getApplicationStatusForUser';
+import getComplianceChecklist from '@salesforce/apex/WCFComplianceController.getComplianceChecklist';
+import getFileBase64 from '@salesforce/apex/WCFValidatorController.getFileBase64';
 import { NavigationMixin } from 'lightning/navigation';
 
 // ── Custom Labels (grouped by the status sections in your notepad) ─────────
@@ -94,6 +96,24 @@ import CL_For_any_queries from '@salesforce/label/c.CL_For_any_queries';
 //    three-track Approved card.
 //
 // 5. Added showComplianceView flag and its handlers.
+//
+// 6. Draft progress ("Step X of Y") now follows the tracks the applicant
+//    selected in wcfDynamicForm, so the step shown here matches the step
+//    in the form's tracker when the draft was saved. See
+//    activePageSequence / currentStepNumber / totalSteps.
+//
+// 7. FIX (outer status — Application Timeline / compliance track lagging
+//    behind the compliance overlay's own live count):
+//    handleComplianceUpdate previously only copied `uploaded` and `total`
+//    out of the uploadcomplete event, so the two properties that feed the
+//    Application Timeline side card — complianceHasUploads and
+//    complianceDocStatus — were never refreshed while the overlay was
+//    open. They stayed at whatever the last loadStatus() (Apex) call had
+//    set, so the timeline only ever "caught up" after the user backed
+//    fully out and loadStatus() re-fetched. handleComplianceUpdate now
+//    derives complianceHasUploads/complianceDocStatus from the same
+//    event so all three surfaces (compliance track row, its progress
+//    bar, and the timeline) move together, live.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default class WcfApplicantDashboard extends NavigationMixin(LightningElement) {
@@ -125,12 +145,16 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     @track approvalDate;
     @track mouStatus       = 'Pending';   // Pending | Active | Expired
     @track mouVolodyLink;
+    @track mouDownloadUrl;
+    @track mouFileName;
+    @track mouDocumentId;
+    @track mouFileSize     = '1.2 MB';
     @track complianceUploaded = 0;
     @track complianceTotal    = 6;        // Default; overridden from Apex
     @track complianceStatus;
     @track complianceReviewerNotes;
-    @track complianceDocStatus;              // ← ADD
-@track complianceHasUploads = false;     // ← ADD
+    @track complianceDocStatus;
+    @track complianceHasUploads = false;
 
     // ── View flags ────────────────────────────────────────────────────
     @track showWelcomeView    = false;
@@ -147,6 +171,8 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     @track rawStatus;
     @track reviewerReturnComment;   
 
+    // Fallback page order, used only when the selected tracks can't be read
+    // from selectedFundingArea (see activePageSequence).
     pageSequence = [1, 2, 4, 6, 7];
 
     // ── Custom Labels exposed to the template ──────────────────────────
@@ -299,13 +325,18 @@ resolvePageUrls() {
                 if (result.approvalDate)       { this.approvalDate       = result.approvalDate; }
                 if (result.mouStatus)          { this.mouStatus          = result.mouStatus; }
                 if (result.mouVolodyLink)      { this.mouVolodyLink      = result.mouVolodyLink; }
+                if (result.mouDownloadUrl)     { this.mouDownloadUrl     = result.mouDownloadUrl; }
+                if (result.mouFileName)        { this.mouFileName        = result.mouFileName; }
+                if (result.mouDocumentId)      { this.mouDocumentId      = result.mouDocumentId; }
+                if (result.mouFileSize)        { this.mouFileSize        = result.mouFileSize; }
                 if (result.complianceUploaded != null) { this.complianceUploaded = result.complianceUploaded; }
                 if (result.complianceTotal    != null) { this.complianceTotal    = result.complianceTotal; }
                 this.complianceStatus = result.complianceStatus;
                 this.complianceReviewerNotes = result.complianceReviewerNotes;
-                this.complianceDocStatus     = result.complianceDocStatus;              // ← ADD
-this.complianceHasUploads    = result.complianceHasUploads === true;    // ← ADD
-            })
+                this.complianceDocStatus     = result.complianceDocStatus;
+                this.complianceHasUploads    = result.complianceHasUploads === true;
+                        })
+            .then(() => this.syncComplianceFromChecklist())
             .catch(error => {
                 console.error('Error loading application status', error);
                 this.normalizedStatus = 'NotStarted';
@@ -318,7 +349,29 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
             }
             });
     }
-
+    // The compliance screen's own Apex is the source of truth for compliance
+    // status, so the timeline always agrees with what the applicant sees there.
+    syncComplianceFromChecklist() {
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        const family = ['approved', 'onboardinginitiated', 'onboardinginprogress',
+            'compliancereview', 'onboardingapproved', 'onboarded'];
+        if (!this.recordId || !family.includes(s)) {
+            return Promise.resolve();
+        }
+        return getComplianceChecklist({ applicationId: this.recordId })
+            .then(c => {
+                // eslint-disable-next-line no-console
+                console.log('CHECKLIST STATUS:', c.complianceStatus, '| overall:', c.overallStatus);
+                if (c.complianceStatus) {
+                    this.complianceStatus = c.complianceStatus;
+                    this.complianceReviewerNotes = c.reviewerNotes;
+                }
+            })
+            .catch(e => {
+                // eslint-disable-next-line no-console
+                console.warn('Could not read compliance checklist', e);
+            });
+    }
     // ─────────────────────────────────────────────────────────────────
     // Status getters
     // ─────────────────────────────────────────────────────────────────
@@ -379,8 +432,11 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
     }
 
     get isApproved() {
-        return this.normalizedStatus === 'Approved' && !this.isOverlayOpen;
-    }
+    const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+    const approvedFamily = ['approved', 'onboardinginitiated', 'onboardinginprogress',
+        'compliancereview', 'onboardingapproved', 'onboarded'];
+    return approvedFamily.includes(s) && !this.isOverlayOpen;
+}
 
     get isDecided() {
         return this.normalizedStatus === 'Decided' && !this.isOverlayOpen;
@@ -413,14 +469,46 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
         return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
+    // ── Draft progress — mirrors the step tracker in wcfDynamicForm ──────
+    // Last_Page__c values saved by WCFFormEngineController for each tab:
+    //   1 About Your Organization   2 Job Fulfillment
+    //   4 Job Creation (3 on older drafts)   5 Livelihood Upliftment
+    //   6 Why Wadhwani Grants       7 Review & Submit
+    // The form only shows the track tabs the applicant selected, so the
+    // step list here is built from the same selection.
+    get activePageSequence() {
+        const area = String(this.selectedFundingArea || '').toUpperCase();
+        const hasJobFulfillment = area.includes('FULFILLMENT') || area.includes('FULFILMENT');
+        const hasJobCreation    = area.includes('CREATION');
+        const hasLivelihood     = area.includes('LIVELIHOOD');
+
+        if (!hasJobFulfillment && !hasJobCreation && !hasLivelihood) {
+            return this.pageSequence;
+        }
+
+        const sequence = [1];
+        if (hasJobFulfillment) sequence.push(2);
+        if (hasJobCreation)    sequence.push(4);
+        if (hasLivelihood)     sequence.push(5);
+        sequence.push(6, 7);
+        return sequence;
+    }
+
     get currentStepNumber() {
         if (!this.lastPage) return 1;
-        const idx = this.pageSequence.indexOf(Number(this.lastPage));
-        return idx === -1 ? 1 : idx + 1;
+        let page = Number(this.lastPage);
+        if (page === 3) page = 4; // older drafts saved Job Creation as 3
+        const sequence = this.activePageSequence;
+        const idx = sequence.indexOf(page);
+        if (idx !== -1) return idx + 1;
+        // Saved page belongs to a track that is no longer selected:
+        // count the steps up to that point instead of dropping to step 1.
+        const stepsBefore = sequence.filter(p => p <= page).length;
+        return Math.max(stepsBefore, 1);
     }
 
     get totalSteps() {
-        return this.pageSequence.length;
+        return this.activePageSequence.length;
     }
 
     get progressPercent() {
@@ -458,6 +546,19 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
 
     get hasMouLink() {
         return !!this.mouVolodyLink;
+    }
+
+    get hasSignedGrantAgreement() {
+        return (this.mouStatus === 'Active' || this.mouStatus === 'Signed') && !!this.mouDownloadUrl;
+    }
+
+    get isOnboarded() {
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        return s === 'onboarded' || s === 'onboardingapproved';
+    }
+
+    get programmeSetupRowClass() {
+        return this.isOnboarded ? 'dash-track-row' : 'dash-track-row dash-track-row--locked';
     }
 
     get hasProgrammeLead() {
@@ -537,7 +638,20 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
     get showReturnedBanner() {
         return this.complianceStatus === 'Returned';
     }
+        // Values fed to the Application Timeline. They fall back to the same data
+    // the compliance card uses, so both always agree.
+   get timelineComplianceStatus() {
+    // complianceStatus is the aggregate over all documents (same field the
+    // banners use). Fall back to the request-level value when it is blank
+    // or only says "In Progress".
+    const live = this.complianceStatus;
+    if (live && live !== 'In Progress') return live;
+    return this.complianceDocStatus || live;
+}
 
+    get timelineHasUploads() {
+    return this.complianceHasUploads;
+}
     // Inline style for compliance progress bar fill
     get complianceProgressStyle() {
         if (this.complianceTotal === 0) return 'width: 0%';
@@ -613,9 +727,24 @@ this.complianceHasUploads    = result.complianceHasUploads === true;    // ← A
     }
 
     handleComplianceUpdate(event) {
-        if (event.detail) {
-            this.complianceUploaded = event.detail.uploaded ?? this.complianceUploaded;
-            this.complianceTotal    = event.detail.total    ?? this.complianceTotal;
+        if (!event.detail) {
+            return;
+        }
+
+        const { uploaded, total, status } = event.detail;
+
+        this.complianceUploaded = uploaded ?? this.complianceUploaded;
+        this.complianceTotal    = total    ?? this.complianceTotal;
+
+        // FIX: these two drive the Application Timeline side card
+        // (compliance-doc-status / compliance-has-uploads props) and
+        // previously only got refreshed by the next full loadStatus()
+        // call, so the timeline lagged behind the compliance overlay's
+        // own live, per-upload count. Derive them from the same event
+        // so every surface moves together.
+        //this.complianceHasUploads = (uploaded ?? 0) > 0;
+        if (status) {
+            this.complianceDocStatus = status;
         }
     }
 
@@ -653,5 +782,60 @@ handleCloseFaq() {
     handleBeginForm() {
         this.showWelcomeView = false;
         this.showFormView = true;
+    }
+
+    // ── Signed Grant Agreement View & Download Handlers ──────────────────
+    async handleViewSignedAgreement(event) {
+        if (event) event.preventDefault();
+        const docId = this.mouDocumentId || this._extractDocId(this.mouDownloadUrl);
+        if (!docId) return;
+        await this._openOrDownloadSignedDoc(docId, this.mouFileName, 'view');
+    }
+
+    async handleDownloadSignedAgreement(event) {
+        if (event) event.preventDefault();
+        const docId = this.mouDocumentId || this._extractDocId(this.mouDownloadUrl);
+        if (!docId) return;
+        await this._openOrDownloadSignedDoc(docId, this.mouFileName, 'download');
+    }
+
+    _extractDocId(url) {
+        if (!url) return '';
+        const parts = url.split('/');
+        return parts[parts.length - 1];
+    }
+
+    async _openOrDownloadSignedDoc(docId, fileName, mode) {
+        try {
+            const result = await getFileBase64({ contentVersionId: docId });
+            const extension = (result.fileType || 'pdf').toLowerCase();
+            const mimeType = (extension === 'pdf') ? 'application/pdf'
+                           : (extension === 'png') ? 'image/png'
+                           : (extension === 'jpg' || extension === 'jpeg') ? 'image/jpeg'
+                           : 'application/octet-stream';
+
+            const byteChars   = atob(result.base64);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+                byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob      = new Blob([byteArray], { type: mimeType });
+            const blobUrl   = URL.createObjectURL(blob);
+
+            if (mode === 'view') {
+                window.open(blobUrl, '_blank');
+            } else {
+                const a = document.createElement('a');
+                a.href     = blobUrl;
+                a.download = fileName || ((result.title || 'Grant_Agreement_signed') + '.' + extension);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+        } catch (e) {
+            console.error('Error opening/downloading signed agreement:', e);
+        }
     }
 }

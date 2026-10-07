@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sub_Stage__c</fullName>
+    <label>Sub Stage</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Stage__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Registration pending</fullName>
+                <default>false</default>
+                <label>Registration pending</label>
+            </value>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
+            </value>
+            <value>
+                <fullName>Yet to Start</fullName>
+                <default>false</default>
+                <label>Yet to Start</label>
+            </value>
+            <value>
+                <fullName>In Progress</fullName>
+                <default>false</default>
+                <label>In Progress</label>
+            </value>
+            <value>
+                <fullName>Submitted</fullName>
+                <default>false</default>
+                <label>Submitted</label>
+            </value>
+            <value>
+                <fullName>Rejected</fullName>
+                <default>false</default>
+                <label>Rejected</label>
+            </value>
+            <value>
+                <fullName>Approved</fullName>
+                <default>false</default>
+                <label>Approved</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>COE Registration</controllingFieldValue>
+            <valueName>Registration pending</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Registration</controllingFieldValue>
+            <controllingFieldValue>COE Onboarding</controllingFieldValue>
+            <valueName>Completed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Proposal Submission</controllingFieldValue>
+            <controllingFieldValue>COE Proposal Evaluation</controllingFieldValue>
+            <controllingFieldValue>COE Onboarding</controllingFieldValue>
+            <valueName>Yet to Start</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Proposal Submission</controllingFieldValue>
+            <controllingFieldValue>COE Proposal Evaluation</controllingFieldValue>
+            <controllingFieldValue>COE Onboarding</controllingFieldValue>
+            <valueName>In Progress</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Proposal Submission</controllingFieldValue>
+            <valueName>Submitted</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Proposal Evaluation</controllingFieldValue>
+            <valueName>Rejected</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>COE Proposal Evaluation</controllingFieldValue>
+            <valueName>Approved</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

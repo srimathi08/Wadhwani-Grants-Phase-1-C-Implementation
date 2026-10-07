@@ -1,4 +1,20 @@
 <template>
+
+<!-- ── In-page status banner (branded replacement for the platform toast) ── -->
+<template if:true={bannerVisible}>
+    <div class={bannerClass} role={bannerRole} aria-live="polite">
+        <template if:true={isBannerError}><span class="wg-toast-icon error-icon" aria-hidden="true">!</span></template>
+        <template if:true={isBannerWarning}><span class="wg-toast-icon warning-icon" aria-hidden="true">&#9650;</span></template>
+        <template if:true={isBannerSuccess}><span class="wg-toast-icon success-icon" aria-hidden="true">&#10003;</span></template>
+        <template if:true={isBannerInfo}><span class="wg-toast-icon info-icon" aria-hidden="true">i</span></template>
+        <p class="wg-toast-body">
+            <template if:true={bannerTitleDisplay}><strong class="wg-toast-title">{bannerTitleDisplay}</strong></template>
+            {bannerMessage}
+        </p>
+        <button type="button" class="wg-toast-close" aria-label="Close" onclick={closeBanner}>&#10005;</button>
+    </div>
+</template>
+
 <lightning-card title="Compliance Documents" icon-name="standard:document">
 
     <template if:true={isLoading}>
@@ -23,11 +39,31 @@
                     <span class="comp-geography">Checklist for {geography}</span>
                     <span class={overallStatusBadgeClass}>{overallStatusDisplay}</span>
                 </div>
-                <div class="comp-overall-progress-bar">
-                    <div class="comp-overall-progress-fill" style={overallProgressStyle}></div>
+                <div class="comp-overall-progress-bar"
+                     role="progressbar"
+                     aria-valuemin="0"
+                     aria-valuemax="100"
+                     aria-valuenow={uploadedProgressPercent}
+                     aria-label={progressSummaryLabel}>
+                    <div class="comp-overall-progress-fill comp-fill-validated"></div>
+                    <div class="comp-overall-progress-fill comp-overall-progress-fill--uploaded comp-fill-uploaded"></div>
                 </div>
                 <p class="comp-summary-label">{progressSummaryLabel}</p>
             </div>
+
+            <!-- ── Final / on-hold reviewer decision (Pass · Reject · Suspend) ── -->
+            <template if:true={decisionBanner}>
+                <div class={decisionBanner.cssClass} role="status">
+                    <lightning-icon icon-name={decisionBanner.icon} size="small"></lightning-icon>
+                    <div>
+                        <p class="comp-decision-title">{decisionBanner.title}</p>
+                        <p>{decisionBanner.message}</p>
+                        <template if:true={decisionBanner.notes}>
+                            <p class="comp-decision-notes"><strong>Reviewer notes:</strong> {decisionBanner.notes}</p>
+                        </template>
+                    </div>
+                </div>
+            </template>
 
             <!-- ── One row per required document type ── -->
             <template for:each={checklistItems} for:item="item">
@@ -45,45 +81,43 @@
 
                     <p class="comp-doc-desc">{item.description}</p>
 
-                    <!-- Returned by the Compliance Reviewer -->
+                    <!-- Returned: the only reviewer decision that reopens the row -->
                     <template if:true={item.isReturned}>
                         <div class="comp-return-banner">
                             <lightning-icon icon-name="utility:warning" size="x-small"></lightning-icon>
-                            <p><strong>Returned by the compliance team:</strong> {item.returnReason}</p>
+                            <p><strong>Returned by the compliance team:</strong> {item.reasonText}</p>
                         </div>
                     </template>
 
-                    <!-- Expired, needs refresh -->
                     <template if:true={item.isRefreshRequired}>
                         <div class="comp-return-banner comp-return-banner--refresh">
                             <lightning-icon icon-name="utility:refresh" size="x-small"></lightning-icon>
-                            <p>This document has expired and needs to be re-uploaded.</p>
+                            <p>This document has expired. Please upload a renewed copy below.</p>
                         </div>
                     </template>
 
                     <template if:true={item.isRejected}>
-    <div class="comp-return-banner comp-return-banner--rejected">
-        <lightning-icon icon-name="utility:ban" size="x-small"></lightning-icon>
-        <p><strong>Rejected by the compliance team:</strong> {item.returnReason}</p>
-    </div>
-</template>
-
-<template if:true={item.isSuspended}>
-    <div class="comp-return-banner comp-return-banner--suspended">
-        <lightning-icon icon-name="utility:pause" size="x-small"></lightning-icon>
-        <p><strong>Suspended pending further review:</strong> {item.returnReason}</p>
-    </div>
-</template>
-
-                    <!-- Expiring soon, not yet flagged -->
-                    <template if:true={item.isExpiringSoon}>
-                        <div class="comp-return-banner comp-return-banner--warning">
-                            <lightning-icon icon-name="utility:clock" size="x-small"></lightning-icon>
-                            <p>This document expires on {item.expiryDateFormatted}. Consider uploading a renewed copy soon.</p>
+                        <div class="comp-return-banner comp-return-banner--rejected">
+                            <lightning-icon icon-name="utility:ban" size="x-small"></lightning-icon>
+                            <p><strong>Rejected by the compliance team:</strong> {item.reasonText}</p>
                         </div>
                     </template>
 
-                    <!-- Already-submitted file -->
+                    <template if:true={item.isSuspended}>
+                        <div class="comp-return-banner comp-return-banner--suspended">
+                            <lightning-icon icon-name="utility:pause" size="x-small"></lightning-icon>
+                            <p><strong>Suspended pending further review:</strong> {item.reasonText}</p>
+                        </div>
+                    </template>
+
+                    <template if:true={item.isExpiringSoon}>
+                        <div class="comp-return-banner comp-return-banner--warning">
+                            <lightning-icon icon-name="utility:clock" size="x-small"></lightning-icon>
+                            <p>This document expires on {item.expiryDateFormatted}. {item.expiryHint}</p>
+                        </div>
+                    </template>
+
+                    <!-- File on record (always viewable, even when locked) -->
                     <template if:true={item.hasFile}>
                         <div class="comp-file-row">
                             <lightning-icon icon-name="doctype:attachment" size="x-small"></lightning-icon>
@@ -97,14 +131,15 @@
                         </div>
                     </template>
 
-                    <!-- Upload controls -->
-                    <!-- 
-                        FIX: record-id now uses item.uploadRecordId (the WCF_Compliance_Document__c Id)
-                        NOT the IndividualApplication Id. Community users can access the compliance
-                        doc record directly; they cannot access IndividualApplication via lightning-file-upload.
-                        item.uploadRecordId is pre-created by getOrCreateComplianceRecord in Apex
-                        before the uploader renders, so it is always a valid Id.
-                    -->
+                    <!-- Why this row can't be changed -->
+                    <template if:true={item.lockedHint}>
+                        <p class="comp-locked-hint">
+                            <lightning-icon icon-name="utility:lock" size="xx-small"></lightning-icon>
+                            <span>{item.lockedHint}</span>
+                        </p>
+                    </template>
+
+                    <!-- Upload controls (editable rows only) -->
                     <template if:true={item.canUpload}>
                         <template if:true={item.uploadRecordId}>
                             <div class="comp-upload-row">
@@ -121,13 +156,20 @@
                                     accept=".pdf,.png,.jpg,.jpeg"
                                     record-id={item.uploadRecordId}
                                     data-doctype={item.documentType}
-                                     data-record-id={item.uploadRecordId}
+                                    data-record-id={item.uploadRecordId}
                                     onuploadfinished={handleUploadFinished}>
                                 </lightning-file-upload>
+                                <template if:true={item.isReplacing}>
+                                    <lightning-button
+                                        variant="base"
+                                        label="Cancel"
+                                        data-doctype={item.documentType}
+                                        onclick={handleCancelReplace}>
+                                    </lightning-button>
+                                </template>
                             </div>
                         </template>
                         <template if:false={item.uploadRecordId}>
-                            <!-- Shell record not yet created — show a prepare button -->
                             <div class="comp-upload-row">
                                 <lightning-button
                                     variant="brand"
@@ -143,6 +185,7 @@
                         </template>
                     </template>
 
+                    <!-- Replace / Delete: saved drafts only -->
                     <template if:true={item.showReplace}>
                         <div class="comp-replace-row">
                             <lightning-button
@@ -152,14 +195,16 @@
                                 onclick={handleReplaceClick}
                                 class="comp-replace-btn">
                             </lightning-button>
-                            <lightning-button
-                                variant="destructive-text"
-                                label="Delete document"
-                                data-doctype={item.documentType}
-                                data-record-id={item.recordId}
-                                onclick={handleDeleteClick}
-                                class="comp-delete-btn">
-                            </lightning-button>
+                            <template if:true={item.showDelete}>
+                                <lightning-button
+                                    variant="destructive-text"
+                                    label="Delete document"
+                                    data-doctype={item.documentType}
+                                    data-record-id={item.recordId}
+                                    onclick={handleDeleteClick}
+                                    class="comp-delete-btn">
+                                </lightning-button>
+                            </template>
                         </div>
                     </template>
 
@@ -169,7 +214,7 @@
                 </div>
             </template>
 
-            <!-- ── Draft & Submission Footer ── -->
+            <!-- ── Draft & Submission Footer (hidden once Pass / Reject / Suspend) ── -->
             <template if:true={showActionFooter}>
                 <div class="comp-footer">
                     <div class="comp-footer-status">

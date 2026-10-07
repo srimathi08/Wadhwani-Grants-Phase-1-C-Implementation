@@ -193,7 +193,9 @@ public without sharing class wcfHomeDashboardController {
         }
     }
 
-    @AuraEnabled(cacheable=true)
+    // UPDATED: cacheable=false (was true) so the strip always shows live
+    // counts, the same way the Validator / Reviewer / Approver queues load.
+    @AuraEnabled(cacheable=false)
     public static PipelineCounts getPipelineCounts() {
 
         PipelineCounts result = new PipelineCounts();
@@ -204,17 +206,15 @@ public without sharing class wcfHomeDashboardController {
         Set<Id> reviewerRTIds = RecordTypeHelper.applicationReviewReviewerAllowedIds();
         Set<Id> decisionRTIds = RecordTypeHelper.applicationDecisionAllowedIds();
 
-        // Submitted
-        result.submitted = [
-            SELECT COUNT()
-            FROM IndividualApplication
-            WHERE Status = 'Submitted'
-            AND RecordTypeId IN :applicationRTIds
-            WITH SYSTEM_MODE
-        ];
+        // Submitted — UPDATED: same number as the Validator Queue's
+        // "To Validate" tile (the page this tile opens with statusFilter=validate).
+        // Previously counted every Status = 'Submitted' application, which also
+        // included rows the queue puts under In Progress / Revalidate.
+        Map<String, Integer> validatorCounts = WCFValidatorController.getActionCounts();
+        result.submitted = (validatorCounts != null && validatorCounts.containsKey('validate'))
+            ? validatorCounts.get('validate') : 0;
 
-        // Validated
-       Map<String, Integer> validatorCounts = WCFValidatorController.getActionCounts();
+        // Validated (unchanged)
         result.validation = validatorCounts.containsKey('validated')
             ? validatorCounts.get('validated') : 0;
 
@@ -222,11 +222,39 @@ public without sharing class wcfHomeDashboardController {
 // so the Home strip and the queue can't drift apart.
 Map<String, Integer> queue = WCFProposalListController.getQueueSummary();
 result.flagged = queue.get('flagged');
-result.review  = queue.get('reviewed');
 
-        // Approved — matches Approved Dashboard count
-        WCFApproverListController.ApproverSummary approverSummary = WCFApproverListController.getApproverSummary();
-        result.approved = approverSummary != null ? approverSummary.approved : 0;
+        // Reviewed — UPDATED: same rule the Reviewer Queue's "Reviewed" tile
+        // uses (every proposal whose review is submitted). getQueueSummary()
+        // additionally skips flagged / Reviewer Rejected / Returned by Approver
+        // rows, which is why the Home strip showed a lower number.
+        Integer reviewedCount = 0;
+        Map<String, WCFProposalListController.ReviewInfo> reviewMap =
+            WCFProposalListController.getReviewStatusMap();
+        for (IndividualApplication ia : WCFProposalListController.getValidatedProposals()) {
+            WCFProposalListController.ReviewInfo info =
+                reviewMap != null ? reviewMap.get(String.valueOf(ia.Id)) : null;
+            if (info != null && (info.isSubmitted == true || info.status == 'Review Submitted')) {
+                reviewedCount++;
+            }
+        }
+        result.review = reviewedCount;
+
+        // Accept — UPDATED: counts decisions saved as 'Accept' from the same
+        // rows the Approver Queue / Approver Dashboard "Accept" tile uses, so
+        // the Home strip always shows the same number as those pages.
+        // (Previously used getApproverSummary().approved, which counts the
+        // legacy 'Approve' value and missed every 'Accept' decision.)
+        Integer accepted = 0;
+        List<WCFApproverListController.ApproverQueueItem> approverRows =
+            WCFApproverListController.getApproverQueue();
+        if (approverRows != null) {
+            for (WCFApproverListController.ApproverQueueItem row : approverRows) {
+                if (row.existingDecision == 'Accept') {
+                    accepted++;
+                }
+            }
+        }
+        result.approved = accepted;
 
         // Approval tile not used
         result.approval = 0;

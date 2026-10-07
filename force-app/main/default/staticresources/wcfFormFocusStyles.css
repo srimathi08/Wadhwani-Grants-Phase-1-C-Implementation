@@ -1,0 +1,74 @@
+/* ==========================================================================
+   wcfFormFocusStyles — Static Resource (Content Type: text/css)
+   --------------------------------------------------------------------------
+   Loaded by wcfDynamicForm via loadStyle(). Makes the focus color of the
+   Salesforce base components (lightning-combobox, lightning-file-upload,
+   lightning-input, lightning-textarea, checkboxes) match the orange focus
+   ring used by the form's own input fields.
+
+   Why this lives in a static resource and not in wcfDynamicForm.css:
+   component CSS is scoped and cannot reach the internal markup of base
+   components. A stylesheet loaded with loadStyle() is global, so it can.
+   Every selector below is prefixed with c-wcf-dynamic-form so it only
+   affects this form and nothing else on the site.
+
+   var(--wg-orange) and var(--wg-error) resolve because commonStyleTheme
+   sets them on the wcfDynamicForm host, and they inherit downward.
+   ========================================================================== */
+
+/* ── Picklists (lightning-combobox) ── */
+c-wcf-dynamic-form .slds-combobox__input:focus,
+c-wcf-dynamic-form .slds-combobox__input:active,
+c-wcf-dynamic-form .slds-combobox__input.slds-has-focus,
+c-wcf-dynamic-form .slds-is-open .slds-combobox__input {
+    border-color: var(--wg-orange) !important;
+    box-shadow: 0 0 3px var(--wg-orange) !important;
+    outline: none !important;
+}
+
+/* ── Text / number / email / date inputs and textareas ── */
+c-wcf-dynamic-form .slds-input:focus,
+c-wcf-dynamic-form .slds-input:active,
+c-wcf-dynamic-form .slds-textarea:focus,
+c-wcf-dynamic-form .slds-textarea:active {
+    border-color: var(--wg-orange) !important;
+    box-shadow: 0 0 3px var(--wg-orange) !important;
+    outline: none !important;
+}
+
+/* ── File upload: "Upload Files" button ──
+   The real file <input> is visually hidden; SLDS paints the focus ring on
+   the visible button through the sibling selector, so both are covered. */
+c-wcf-dynamic-form .slds-file-selector__button:focus,
+c-wcf-dynamic-form .slds-file-selector__input:focus ~ .slds-file-selector__body .slds-file-selector__button {
+    border-color: var(--wg-orange) !important;
+    box-shadow: 0 0 3px var(--wg-orange) !important;
+    outline: none !important;
+}
+
+/* ── File upload: drop zone while a file is dragged over it ── */
+c-wcf-dynamic-form .slds-file-selector__dropzone.slds-has-drag-over {
+    border-color: var(--wg-orange) !important;
+    box-shadow: 0 0 3px var(--wg-orange) !important;
+    outline: none !important;
+}
+
+/* ── Checkboxes (metadata-driven custom checkbox questions) ── */
+c-wcf-dynamic-form .slds-checkbox [type="checkbox"]:focus + .slds-checkbox_faux,
+c-wcf-dynamic-form .slds-checkbox [type="checkbox"]:focus ~ .slds-checkbox_faux,
+c-wcf-dynamic-form .slds-checkbox [type="checkbox"]:focus + .slds-checkbox__label .slds-checkbox_faux,
+c-wcf-dynamic-form .slds-checkbox [type="checkbox"]:focus ~ .slds-checkbox__label .slds-checkbox_faux {
+    border-color: var(--wg-orange) !important;
+    box-shadow: 0 0 3px var(--wg-orange) !important;
+}
+
+/* ── Keep the red error ring when a field that has a validation error is
+   focused (these selectors are more specific, so they win over the
+   orange rules above) ── */
+c-wcf-dynamic-form .slds-has-error .slds-input:focus,
+c-wcf-dynamic-form .slds-has-error .slds-textarea:focus,
+c-wcf-dynamic-form .slds-has-error .slds-combobox__input:focus,
+c-wcf-dynamic-form .slds-has-error .slds-combobox__input.slds-has-focus {
+    border-color: var(--wg-error) !important;
+    box-shadow: 0 0 3px var(--wg-error) !important;
+}

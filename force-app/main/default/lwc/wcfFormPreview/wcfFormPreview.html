@@ -747,7 +747,7 @@
             <!-- ═══════════════════════════════════════════════════════════
                  SECTION 4 — TRACK 3: LIVELIHOOD UPLIFTMENT (Q19 - Q23)
             ════════════════════════════════════════════════════════════ -->
-            <template if:true={isLivelihood}>
+                       <template if:true={isLivelihood}>
                 <div class="rv-section">
                     <div class="rv-section-head">
                         <span class="rv-section-step">{sectionLivStepLabel}</span>
@@ -764,6 +764,85 @@
                             <lightning-formatted-rich-text value={livelihoodApproach}></lightning-formatted-rich-text>
                         </div>
                     </div>
+
+                    <!-- Q20: Key Programs / Initiatives -->
+                    <div class="rv-row">
+                        <div class="rv-lbl">
+                            <span class="rv-q-num">{qNum.Q20}</span>
+                            <span class="rv-lbl-text">Key Programs / Initiatives <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                        </div>
+                        <div class="rv-val">
+                            <template if:true={hasLivelihoodPrograms}>
+                                <div class="rv-table-wrap">
+                                    <table class="rv-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Program / Initiative Name</th>
+                                                <th>Type of Support Provided</th>
+                                                <th>Duration (Man-Hours)</th>
+                                                <th>Annual Enrollment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={livelihoodPrograms} for:item="row">
+                                                <tr key={row.idx}>
+                                                    <td>{row.name}</td>
+                                                    <td>{row.supportType}</td>
+                                                    <td>{row.manHours}</td>
+                                                    <td>{row.enrollment}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                            <template if:false={hasLivelihoodPrograms}>
+                                <div class="rv-empty-note">No programs provided.</div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Q21: Communities that you work in -->
+                    <div class="rv-row">
+                        <div class="rv-lbl">
+                            <span class="rv-q-num">{qNum.Q21}</span>
+                            <span class="rv-lbl-text">Communities that you work in <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                        </div>
+                        <div class="rv-val">
+                            <template if:true={hasCommunities}>
+                                <div class="rv-table-wrap">
+                                    <table class="rv-table">
+                                        <thead>
+                                            <tr>
+                                                <th>State</th>
+                                                <th>District / Area</th>
+                                                <th>{fyLabel3}</th>
+                                                <th>{fyLabel2}</th>
+                                                <th>{fyLabel1}</th>
+                                                <th>CFY (projected)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={communities} for:item="row">
+                                                <tr key={row.idx}>
+                                                    <td>{row.state}</td>
+                                                    <td>{row.district}</td>
+                                                    <td>{row.fy3}</td>
+                                                    <td>{row.fy2}</td>
+                                                    <td>{row.fy1}</td>
+                                                    <td>{row.proj}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                            <template if:false={hasCommunities}>
+                                <div class="rv-empty-note">No communities provided.</div>
+                            </template>
+                        </div>
+                    </div>
+
 
                     <!-- Q22: Livelihood Outcomes (Actuals) -->
                     <div class="rv-row">

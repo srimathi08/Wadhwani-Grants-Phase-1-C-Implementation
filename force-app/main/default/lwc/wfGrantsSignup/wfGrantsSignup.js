@@ -1,15 +1,16 @@
 import { LightningElement, track } from 'lwc';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
-import initiateSignUp  from '@salesforce/apex/WFGrantsSignUpController.initiateSignUp';
-import completeSignUp  from '@salesforce/apex/WFGrantsSignUpController.completeSignUp';
-import logo            from '@salesforce/resourceUrl/WCF_Logo';
-import flagTelpicker   from '@salesforce/resourceUrl/flagTelpicker';
+import initiateSignUp from '@salesforce/apex/WFGrantsSignUpController.initiateSignUp';
+import completeSignUp from '@salesforce/apex/WFGrantsSignUpController.completeSignUp';
+import logo from '@salesforce/resourceUrl/WCF_Logo';
+import flagTelpicker from '@salesforce/resourceUrl/flagTelpicker';
 
 export default class WFGrantsSignUp extends LightningElement {
 
     // ── Assets ────────────────────────────────────────────────────────────────
     logoimg = logo;
     @track logoFailed = false;
+    @track orgNameError = '';
 
     handleLogoError() {
         this.logoFailed = true;
@@ -22,53 +23,53 @@ export default class WFGrantsSignUp extends LightningElement {
     @track step = 'details';
 
     // ── Form fields ───────────────────────────────────────────────────────────
-    @track firstName        = '';
-    @track lastName         = '';
+    @track firstName = '';
+    @track lastName = '';
     @track organizationName = '';
-    @track email            = '';
-    @track password         = '';
-    @track confirmPassword  = '';
-    @track showPassword        = false;
+    @track email = '';
+    @track password = '';
+    @track confirmPassword = '';
+    @track showPassword = false;
     @track showConfirmPassword = false;
-    @track acceptedTerms    = false;   // Terms of Use + Privacy Policy consent (mandatory, compendium §12)
+    @track acceptedTerms = false;   // Terms of Use + Privacy Policy consent (mandatory, compendium §12)
 
     // ── Language (picklist Preferred_Laungage__c) ─────────────────────────────
     // Read from the ?language= URL param; must match an allowed picklist value
     // or we fall back to the default so a restricted picklist write can't fail.
     ALLOWED_LANGUAGES = ['en_US', 'pt_BR', 'es'];
-    DEFAULT_LANGUAGE  = 'en_US';
+    DEFAULT_LANGUAGE = 'en_US';
 
     // ── intl-tel-input ────────────────────────────────────────────────────────
-    iti            = null;
-    scriptsLoaded  = false;
+    iti = null;
+    scriptsLoaded = false;
     itiInitialized = false;
-    localPhone     = '';
-    countryCode    = '';
+    localPhone = '';
+    countryCode = '';
 
     // Inline (onblur) field-level validation messages
-    @track phoneError           = '';
-    @track emailError           = '';
-    @track passwordError        = '';
+    @track phoneError = '';
+    @track emailError = '';
+    @track passwordError = '';
 
     // ── Flow state ────────────────────────────────────────────────────────────
     @track token = '';   // self-registration token from initSelfRegistration
-    @track otp   = '';
+    @track otp = '';
 
     // ── UI helpers ────────────────────────────────────────────────────────────
-    @track showErrorMessage   = false;
-    @track errorMessage       = '';
+    @track showErrorMessage = false;
+    @track errorMessage = '';
     @track showSuccessMessage = false;
-    @track successMessage     = '';
-    @track isSending        = false;
-    @track isVerifying      = false;
+    @track successMessage = '';
+    @track isSending = false;
+    @track isVerifying = false;
 
     // ── Resend timer ──────────────────────────────────────────────────────────
     @track resendCountdown = 0;
-    @track canResend       = false;
-    _timerInterval         = null;
+    @track canResend = false;
+    _timerInterval = null;
 
     RESEND_SECONDS = 30;
-    CIRCUMFERENCE  = 2 * Math.PI * 18;
+    CIRCUMFERENCE = 2 * Math.PI * 18;
 
     // ─────────────────────────────────────────────────────────────────────────
     // URLs
@@ -99,9 +100,9 @@ export default class WFGrantsSignUp extends LightningElement {
             const params = new URLSearchParams(window.location.search);
             const qs = params.toString();
             const pathParts = window.location.pathname.split('/');
-        const sitePath = `/${pathParts[1]}/s`;
+            const sitePath = `/${pathParts[1]}/s`;
 
-        return `${sitePath}/login${qs ? '?' + qs : ''}`;
+            return `${sitePath}/login${qs ? '?' + qs : ''}`;
         } catch (e) {
             return '/login';
         }
@@ -114,13 +115,13 @@ export default class WFGrantsSignUp extends LightningElement {
         if (!this.scriptsLoaded) {
             this.scriptsLoaded = true;
             Promise.all([
-                loadStyle(this,  flagTelpicker + '/css/intlTelInput.css'),
-                loadStyle(this,  flagTelpicker + '/css/demo.css'),
+                loadStyle(this, flagTelpicker + '/css/intlTelInput.css'),
+                loadStyle(this, flagTelpicker + '/css/demo.css'),
                 loadScript(this, flagTelpicker + '/js/utils.js'),
                 loadScript(this, flagTelpicker + '/js/intlTelInput.js')
             ])
-            .then(() => { this._tryInitIti(); })
-            .catch(err => { console.error('flagTelpicker load error', err); });
+                .then(() => { this._tryInitIti(); })
+                .catch(err => { console.error('flagTelpicker load error', err); });
             return;
         }
         this._tryInitIti();
@@ -137,12 +138,12 @@ export default class WFGrantsSignUp extends LightningElement {
     _startTimer() {
         this._clearTimer();
         this.resendCountdown = this.RESEND_SECONDS;
-        this.canResend       = false;
-        this._timerInterval  = setInterval(() => {
+        this.canResend = false;
+        this._timerInterval = setInterval(() => {
             this.resendCountdown -= 1;
             if (this.resendCountdown <= 0) {
                 this.resendCountdown = 0;
-                this.canResend       = true;
+                this.canResend = true;
                 this._clearTimer();
             }
         }, 1000);
@@ -173,13 +174,13 @@ export default class WFGrantsSignUp extends LightningElement {
         if (!input || typeof window.intlTelInput !== 'function') return;
 
         this.iti = window.intlTelInput(input, {
-            separateDialCode:   true,
-            showFlags:          false,
-            excludeCountries:   ['il'],
-            initialCountry:     'IN',
+            separateDialCode: true,
+            showFlags: false,
+            excludeCountries: ['il'],
+            initialCountry: 'IN',
             preferredCountries: ['in', 'us', 'gb', 'ae', 'sg', 'au'],
-            utilsScript:        flagTelpicker + '/js/utils.js',
-            customPlaceholder:  (placeholder) => {
+            utilsScript: flagTelpicker + '/js/utils.js',
+            customPlaceholder: (placeholder) => {
                 return placeholder.startsWith('0') ? placeholder.slice(1).trim() : placeholder;
             }
         });
@@ -203,7 +204,7 @@ export default class WFGrantsSignUp extends LightningElement {
     _destroyIti() {
         if (this.iti) {
             try { this.iti.destroy(); } catch (e) { /* ignore */ }
-            this.iti            = null;
+            this.iti = null;
             this.itiInitialized = false;
         }
     }
@@ -214,7 +215,7 @@ export default class WFGrantsSignUp extends LightningElement {
         if (this.iti) {
             const countryData = this.iti.getSelectedCountryData();
             const countryCode = (countryData && countryData.dialCode) ? countryData.dialCode : '91';
-            const localPhone  = input.value.replace(/\D/g, '');
+            const localPhone = input.value.replace(/\D/g, '');
             return { countryCode, localPhone };
         }
         return { countryCode: '91', localPhone: input.value.replace(/\D/g, '') };
@@ -245,8 +246,9 @@ export default class WFGrantsSignUp extends LightningElement {
         this[field] = value;
 
         // Clear the inline error for this field while the user is correcting it
-        if (field === 'email')    this.emailError = '';
+        if (field === 'email') this.emailError = '';
         if (field === 'password') this.passwordError = '';
+        if (field === 'organizationName') this.orgNameError = '';
 
         this.clearError();
     }
@@ -290,6 +292,40 @@ export default class WFGrantsSignUp extends LightningElement {
             ? ''
             : 'Enter a valid email address.';
     }
+    // Letters (any language), marks, digits, space and . , & ' ( ) / -
+    // Emojis, @, $, # and other symbols are NOT in this set, so they are rejected.
+    ORG_ALLOWED = /^[\p{L}\p{M}\p{N} .,&'()\/-]+$/u;
+    ORG_BLOCKED_SYMBOLS = /[@$#]/;
+    ORG_EMOJI = /\p{Extended_Pictographic}/u;
+    ORG_FAKE_NAMES = ['test', 'testing', 'demo', 'sample', 'asdf', 'qwerty', 'abc', 'xyz',
+        'na', 'n/a', 'none', 'null', 'nil', 'nothing', 'unknown', 'dummy', 'fake'];
+
+    _validateOrgName(raw) {
+        const value = (raw || '').trim().replace(/\s+/g, ' ');
+        if (!value) return 'Enter your organization name.';
+        if (value.length < 2 || value.length > 80) {
+            return 'Organization name must be between 2 and 80 characters.';
+        }
+        if (this.ORG_BLOCKED_SYMBOLS.test(value) || this.ORG_EMOJI.test(value)) {
+            return 'Organization name cannot contain @, $, # or emojis.';
+        }
+        if (!this.ORG_ALLOWED.test(value)) {
+            return "Use only letters, numbers, spaces and . , & ' ( ) / - in the organization name.";
+        }
+        if (!/\p{L}.*\p{L}/u.test(value)) {
+            return 'Enter a valid organization name (it must contain letters).';
+        }
+        if (/(.)\1{3,}/u.test(value) || this.ORG_FAKE_NAMES.includes(value.toLowerCase())) {
+            return 'Enter your real organization name.';
+        }
+        return '';
+    }
+
+    handleOrgNameBlur() {
+        this.organizationName = (this.organizationName || '').trim().replace(/\s+/g, ' ');
+        this.orgNameError = this.organizationName
+            ? this._validateOrgName(this.organizationName) : '';
+    }
 
     // Validate password rules on blur (empty is caught on Continue)
     handlePasswordBlur() {
@@ -315,13 +351,13 @@ export default class WFGrantsSignUp extends LightningElement {
             level = 1; label = 'Weak'; mod = 'weak';
         } else {
             let bonus = 0;
-            if (pw.length >= 12)                      bonus++;   // longer
+            if (pw.length >= 12) bonus++;   // longer
             if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) bonus++;   // mixed case
-            if (/[^A-Za-z0-9]/.test(pw))              bonus++;   // a symbol
+            if (/[^A-Za-z0-9]/.test(pw)) bonus++;   // a symbol
 
-            if      (bonus === 0) { level = 2; label = 'Fair';   mod = 'fair';   }
-            else if (bonus === 1) { level = 3; label = 'Good';   mod = 'good';   }
-            else                  { level = 4; label = 'Strong'; mod = 'strong'; }
+            if (bonus === 0) { level = 2; label = 'Fair'; mod = 'fair'; }
+            else if (bonus === 1) { level = 3; label = 'Good'; mod = 'good'; }
+            else { level = 4; label = 'Strong'; mod = 'strong'; }
         }
 
         const segments = [1, 2, 3, 4].map(i => ({
@@ -373,10 +409,10 @@ export default class WFGrantsSignUp extends LightningElement {
     // ─────────────────────────────────────────────────────────────────────────
     // Computed getters
     // ─────────────────────────────────────────────────────────────────────────
-    get detailsPage()  { return this.step === 'details'; }
+    get detailsPage() { return this.step === 'details'; }
     get phoneOtpPage() { return this.step === 'phoneOtp'; }
 
-    get step1Class() { return this.step === 'details'  ? 'step-dot step-current' : 'step-dot step-done'; }
+    get step1Class() { return this.step === 'details' ? 'step-dot step-current' : 'step-dot step-done'; }
     // Step 2 label now reflects EMAIL verification (SMS label kept below, commented, for later)
     // get step2Class() { return this.step === 'phoneOtp' ? 'step-dot step-current' : 'step-dot'; } // 'Verify phone' (SMS)
     get step2Class() { return this.step === 'phoneOtp' ? 'step-dot step-current' : 'step-dot'; }
@@ -386,11 +422,11 @@ export default class WFGrantsSignUp extends LightningElement {
 
     get otpDigits() {
         const val = (this.otp || '').padEnd(6, ' ');
-        return [0,1,2,3,4,5].map(i => ({ index: i, value: val[i].trim() }));
+        return [0, 1, 2, 3, 4, 5].map(i => ({ index: i, value: val[i].trim() }));
     }
 
     get disableVerifyButton() {
-        return this.otp.replace(/\s/g,'').length !== 6 || this.isVerifying;
+        return this.otp.replace(/\s/g, '').length !== 6 || this.isVerifying;
     }
 
     // ── SMS verification used to mask the phone number here (disabled for now) ──
@@ -415,7 +451,7 @@ export default class WFGrantsSignUp extends LightningElement {
         this.clearError();
 
         if (!this.firstName.trim()) { this.showError('Enter your first name.'); return; }
-        if (!this.lastName.trim())  { this.showError('Enter your last name.');  return; }
+        if (!this.lastName.trim()) { this.showError('Enter your last name.'); return; }
         if (!/^[\p{L} '-]+$/u.test(this.firstName.trim())) {
             this.showError("First name can contain only letters, spaces, hyphens (-), and apostrophes (').");
             return;
@@ -424,7 +460,13 @@ export default class WFGrantsSignUp extends LightningElement {
             this.showError("Last name can contain only letters, spaces, hyphens (-), and apostrophes (').");
             return;
         }
-        if (!this.organizationName.trim()) { this.showError('Enter your organization name.'); return; }
+        const orgErr = this._validateOrgName(this.organizationName);
+        if (orgErr) {
+            this.orgNameError = orgErr;
+            this.showError(orgErr);
+            return;
+        }
+        this.orgNameError = '';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
             this.emailError = 'Enter a valid email address.';
             this.showError('Enter a valid email address.');
@@ -444,8 +486,8 @@ export default class WFGrantsSignUp extends LightningElement {
         this.phoneError = '';
 
         if (this.password.length < 8
-                || !/[A-Za-z]/.test(this.password)
-                || !/\d/.test(this.password)) {
+            || !/[A-Za-z]/.test(this.password)
+            || !/\d/.test(this.password)) {
             this.passwordError = 'Password must be at least 8 characters, with at least one letter and one number.';
             this.showError('Password must be at least 8 characters, with at least one letter and one number.');
             return;
@@ -460,7 +502,7 @@ export default class WFGrantsSignUp extends LightningElement {
             return;
         }
 
-        this.localPhone  = phone.localPhone;
+        this.localPhone = phone.localPhone;
         this.countryCode = phone.countryCode;
 
         this._sendOtp(true);
@@ -476,34 +518,34 @@ export default class WFGrantsSignUp extends LightningElement {
         this.isSending = true;
 
         initiateSignUp({
-            firstName:        this.firstName.trim(),
-            lastName:         this.lastName.trim(),
-            email:            this.email,
-            phone:            this.localPhone,
-            countryCode:      this.countryCode,
+            firstName: this.firstName.trim(),
+            lastName: this.lastName.trim(),
+            email: this.email,
+            phone: this.localPhone,
+            countryCode: this.countryCode,
             organizationName: this.organizationName.trim(),
-            acceptedTerms:    this.acceptedTerms,
-            language:         this.selectedLanguage,
-            timeZone:         this._browserTimeZone()
+            acceptedTerms: this.acceptedTerms,
+            language: this.selectedLanguage,
+            timeZone: this._browserTimeZone()
         })
-        .then(result => {
-            if (result.status === 'otp_sent') {
-                this.token = result.token;
-                this.otp   = '';
-                if (moveToOtpStep) {
-                    this._destroyIti();
-                    this.step = 'phoneOtp';
+            .then(result => {
+                if (result.status === 'otp_sent') {
+                    this.token = result.token;
+                    this.otp = '';
+                    if (moveToOtpStep) {
+                        this._destroyIti();
+                        this.step = 'phoneOtp';
+                    } else {
+                        // Resend path — confirm to the user a new code was sent
+                        this.showSuccess('A new verification code has been sent to your email.');
+                    }
+                    this._startTimer();
                 } else {
-                    // Resend path — confirm to the user a new code was sent
-                    this.showSuccess('A new verification code has been sent to your email.');
+                    this.showError(result.message || 'Something went wrong. Please try again.');
                 }
-                this._startTimer();
-            } else {
-                this.showError(result.message || 'Something went wrong. Please try again.');
-            }
-        })
-        .catch(err => this.showError(this._extractError(err)))
-        .finally(() => { this.isSending = false; });
+            })
+            .catch(err => this.showError(this._extractError(err)))
+            .finally(() => { this.isSending = false; });
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -515,28 +557,28 @@ export default class WFGrantsSignUp extends LightningElement {
         this.isVerifying = true;
 
         completeSignUp({
-            token:    this.token,
-            otp:      this.otp.replace(/\s/g,''),
-            email:    this.email,
+            token: this.token,
+            otp: this.otp.replace(/\s/g, ''),
+            email: this.email,
             password: this.password,
             startUrl: this.startUrl
         })
-        .then(result => {
-            if (result.status === 'success') {
-                window.location.href = result.redirectUrl;
-            } else {
-                // showError() maps technical wording (e.g. "Token not valid",
-                // "Token not exists") onto friendly text via _friendlyError().
-                this.showError(result.message || 'Sign up failed.');
-                this._handleVerifyFailure(result.message);
-            }
-        })
-        .catch(err => {
-            const raw = this._extractError(err);
-            this.showError(raw);
-            this._handleVerifyFailure(raw);
-        })
-        .finally(() => { this.isVerifying = false; });
+            .then(result => {
+                if (result.status === 'success') {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    // showError() maps technical wording (e.g. "Token not valid",
+                    // "Token not exists") onto friendly text via _friendlyError().
+                    this.showError(result.message || 'Sign up failed.');
+                    this._handleVerifyFailure(result.message);
+                }
+            })
+            .catch(err => {
+                const raw = this._extractError(err);
+                this.showError(raw);
+                this._handleVerifyFailure(raw);
+            })
+            .finally(() => { this.isVerifying = false; });
     }
 
     // When too many wrong attempts kill the verification token, Salesforce
@@ -547,15 +589,15 @@ export default class WFGrantsSignUp extends LightningElement {
         if (!this._isDeadToken(rawMessage)) return;
         this._clearTimer();
         this.resendCountdown = 0;
-        this.canResend       = true;
-        this.otp             = '';
+        this.canResend = true;
+        this.otp = '';
         this.template.querySelectorAll('.otp-box').forEach(box => { box.value = ''; });
     }
 
     _isDeadToken(rawMessage) {
         const msg = (rawMessage || '').toString().toLowerCase();
-        return msg.includes('too many')  || msg.includes('limit')
-            || msg.includes('expired')   || msg.includes('not exist')
+        return msg.includes('too many') || msg.includes('limit')
+            || msg.includes('expired') || msg.includes('not exist')
             || msg.includes('no longer');
     }
 
@@ -564,12 +606,12 @@ export default class WFGrantsSignUp extends LightningElement {
     // ─────────────────────────────────────────────────────────────────────────
     backToDetails() {
         this._clearTimer();
-        this.step            = 'details';
-        this.token           = '';
-        this.otp             = '';
+        this.step = 'details';
+        this.token = '';
+        this.otp = '';
         this.resendCountdown = 0;
-        this.canResend       = false;
-        this.itiInitialized  = false;
+        this.canResend = false;
+        this.itiInitialized = false;
         this.clearError();
     }
 
@@ -578,13 +620,13 @@ export default class WFGrantsSignUp extends LightningElement {
     // ─────────────────────────────────────────────────────────────────────────
     handleOtpDigitInput(event) {
         const index = Number(event.target.dataset.index);
-        const digit = (event.target.value || '').replace(/\D/g,'').slice(-1);
-        const chars = (this.otp || '').padEnd(6,' ').split('');
-        chars[index]       = digit || ' ';
-        this.otp           = chars.join('');
+        const digit = (event.target.value || '').replace(/\D/g, '').slice(-1);
+        const chars = (this.otp || '').padEnd(6, ' ').split('');
+        chars[index] = digit || ' ';
+        this.otp = chars.join('');
         event.target.value = digit;
         if (digit && index < 5) {
-            const next = this.template.querySelector(`.otp-box[data-index="${index+1}"]`);
+            const next = this.template.querySelector(`.otp-box[data-index="${index + 1}"]`);
             if (next) next.focus();
         }
     }
@@ -592,10 +634,10 @@ export default class WFGrantsSignUp extends LightningElement {
     handleOtpDigitKeydown(event) {
         const index = Number(event.target.dataset.index);
         if (event.key === 'Backspace' && !event.target.value && index > 0) {
-            const prev = this.template.querySelector(`.otp-box[data-index="${index-1}"]`);
+            const prev = this.template.querySelector(`.otp-box[data-index="${index - 1}"]`);
             if (prev) { prev.focus(); prev.value = ''; }
-            const chars = (this.otp || '').padEnd(6,' ').split('');
-            chars[index-1] = ' ';
+            const chars = (this.otp || '').padEnd(6, ' ').split('');
+            chars[index - 1] = ' ';
             this.otp = chars.join('');
         }
     }
@@ -603,9 +645,9 @@ export default class WFGrantsSignUp extends LightningElement {
     handleOtpPaste(event) {
         event.preventDefault();
         const pasted = (event.clipboardData || window.clipboardData)
-            .getData('text').replace(/\D/g,'').slice(0,6);
+            .getData('text').replace(/\D/g, '').slice(0, 6);
         if (!pasted) return;
-        this.otp = pasted.padEnd(6,' ');
+        this.otp = pasted.padEnd(6, ' ');
         const boxes = this.template.querySelectorAll('.otp-box');
         boxes.forEach((box, i) => { box.value = pasted[i] || ''; });
         const lastFilled = Math.min(pasted.length, 5);
@@ -616,21 +658,21 @@ export default class WFGrantsSignUp extends LightningElement {
     // Utilities
     // ─────────────────────────────────────────────────────────────────────────
     showError(msg) {
-        this.errorMessage       = this._friendlyError(msg);
-        this.showErrorMessage   = true;
+        this.errorMessage = this._friendlyError(msg);
+        this.showErrorMessage = true;
         this.showSuccessMessage = false;
     }
 
     clearError() {
-        this.errorMessage       = '';
-        this.showErrorMessage   = false;
+        this.errorMessage = '';
+        this.showErrorMessage = false;
         this.showSuccessMessage = false;
     }
 
     showSuccess(msg) {
-        this.successMessage     = msg;
+        this.successMessage = msg;
         this.showSuccessMessage = true;
-        this.showErrorMessage   = false;
+        this.showErrorMessage = false;
     }
 
     _extractError(err) {
@@ -674,6 +716,6 @@ export default class WFGrantsSignUp extends LightningElement {
     }
 
     get currentYear() {
-    return new Date().getFullYear();
-}
+        return new Date().getFullYear();
+    }
 }

@@ -8,7 +8,6 @@
         <members>Submit_proposals_8efc2f42_0adc_11f0_a4d9_d381994d16f0</members>
         <name>ActionPlanTemplate</name>
     </types>
-
     <types>
         <members>Application_Status</members>
         <members>Proposal_Status</members>
@@ -63,6 +62,7 @@
         <members>CoeProposalReviewDetailController</members>
         <members>CoeReviewDetailController</members>
         <members>CoeWelcomeController</members>
+        <members>CoeWelcomeControllerTest</members>
         <members>Coe_ProposalApprovalController</members>
         <members>Coe_ProposalApprovalControllerTest</members>
         <members>CommunitiesLandingController</members>
@@ -95,6 +95,8 @@
         <members>InProgressReviewsController</members>
         <members>InProgressReviewsControllerTest</members>
         <members>IndividualApplicationExportController</members>
+        <members>IndividualApplicationShareCLs</members>
+        <members>IndividualApplicationShareCLsTest</members>
         <members>IndividualApplicationShareTrigger</members>
         <members>IndividualApplicationSharingAction</members>
         <members>LightningForgotPasswordController</members>
@@ -149,6 +151,7 @@
         <members>ProposalPathControllerTest</members>
         <members>ProposalReviewController</members>
         <members>ProposalReviewControllerTest</members>
+        <members>ProposalReviewExportController</members>
         <members>ProposalReviewPDFController</members>
         <members>ProposalReviewSubmissionController</members>
         <members>ProposalShareSyncSchedulable</members>
@@ -209,15 +212,24 @@
         <members>WCFDashboardAccessControllerTest</members>
         <members>WCFFormController</members>
         <members>WCFFormControllerTest</members>
+        <members>WCFFormEngineController</members>
+        <members>WCFFormEngineControllerTest</members>
+        <members>WCFFormFiscalYearUtil</members>
+        <members>WCFFormFiscalYearUtilTest</members>
+        <members>WCFFormMetadataController</members>
+        <members>WCFFormMetadataControllerTest</members>
         <members>WCFPortalUserController</members>
         <members>WCFPortalUserControllerTest</members>
         <members>WCFProposalListController</members>
         <members>WCFProposalListControllerTest</members>
+        <members>WCFReviewerMetadataController</members>
+        <members>WCFReviewerMetadataControllerTest</members>
         <members>WCFTestScratch</members>
         <members>WCFValidatorController</members>
         <members>WCFValidatorControllerTest</members>
         <members>WCF_ControllerActionTest</members>
         <members>WCF_ControllerSmokeTest</members>
+        <members>WCF_PortalUserTest</members>
         <members>WCF_ReviewFormBothController</members>
         <members>WCF_ReviewFormBothControllerTest</members>
         <members>WCF_ReviewFormController</members>
@@ -255,6 +267,8 @@
         <members>translatedOutcomeDataTableController</members>
         <members>translatedOutcomeDataTableControllerTest</members>
         <members>volody_screenController</members>
+        <members>wcfApplicationFaqController</members>
+        <members>wcfApplicationFaqControllerTest</members>
         <members>wcfHomeDashboardController</members>
         <members>wcfHomeDashboardControllerTest</members>
         <members>wcfTranslatePdfGeneratorController</members>
@@ -329,6 +343,7 @@
         <members>WCF_Job_Creation_Proposals</members>
         <members>WCF_Job_Fulfillment_Job_Creation_Proposals</members>
         <members>WCF_Job_Fulfillment_Proposals</members>
+        <members>Wadhwani_Grants</members>
         <name>ApplicationRecordTypeConfig</name>
     </types>
     <types>
@@ -357,6 +372,7 @@
         <members>Default5</members>
         <members>Default6</members>
         <members>Default7</members>
+        <members>Default8</members>
         <members>Guest_user_audience</members>
         <members>Logged_In_User</members>
         <members>Logged_in_reviewer</members>
@@ -394,7 +410,6 @@
         <members>Lead</members>
         <name>AutoResponseRules</name>
     </types>
-
     <types>
         <members>LEXTHEMINGWadhwaniFoundation</members>
         <name>BrandingSet</name>
@@ -438,8 +453,6 @@
         <name>ConnectedApp</name>
     </types>
     <types>
-        <members>Banner</members>
-        <members>Banner1</members>
         <members>Banner2</members>
         <members>India_Alliance_Logo</members>
         <members>Screenshot_20250314_195724</members>
@@ -452,10 +465,6 @@
         <members>Screenshot_20250402_120101</members>
         <members>TOP_BANN</members>
         <members>TOP_BANN1</members>
-        <members>WadhwaniFoundationLogo</members>
-        <members>WadhwaniFoundationLogo1</members>
-        <members>WadhwaniFoundationLogo2</members>
-        <members>WadhwaniFoundationLogo3</members>
         <members>WadhwaniFoundationLogo4</members>
         <members>WadhwaniFoundationLogo5</members>
         <members>WadhwaniFoundationLogo6</members>
@@ -468,17 +477,12 @@
         <members>educationalresearch</members>
         <members>educationalresearch1</members>
         <members>entrepreneruship</members>
-        <members>logout</members>
-        <members>logout1</members>
-        <members>logout2</members>
         <members>shared_image</members>
         <members>shared_image1</members>
         <members>shared_image2</members>
         <members>shared_image3</members>
         <members>shared_imageremovebgpreview</members>
         <members>shared_imageremovebgpreview1</members>
-        <members>skilling</members>
-        <members>undefined</members>
         <members>wadhwani_Logo_round</members>
         <name>ContentAsset</name>
     </types>
@@ -513,6 +517,8 @@
         <members>standard__FundraisingOperationsConsole</members>
         <members>standard__FundraisingStrategy</members>
         <members>standard__Grantmaking</members>
+        <members>standard__IndustriesEcm</members>
+        <members>standard__IndustriesEpc</members>
         <members>standard__LightningBolt</members>
         <members>standard__LightningSales</members>
         <members>standard__LightningSalesConsole</members>
@@ -536,6 +542,8 @@
         <members>AI_Feedback__c.Job_Creation_Approach__c</members>
         <members>AI_Feedback__c.Legal_Structure_FR__c</members>
         <members>AI_Feedback__c.Legal_Structure__c</members>
+        <members>AI_Feedback__c.Livelihood_Approach_FR__c</members>
+        <members>AI_Feedback__c.Livelihood_Approach__c</members>
         <members>AI_Feedback__c.Operational_Synergies_with_WOF_Both_FR__c</members>
         <members>AI_Feedback__c.Operational_Synergies_with_WOF_Both__c</members>
         <members>AI_Feedback__c.Operational_Synergies_with_WOF_FR__c</members>
@@ -560,6 +568,7 @@
         <members>Account.Co_Pl_rec__c</members>
         <members>Account.Concern__c</members>
         <members>Account.Do_you_have_a_US_501_c_3_organization__c</members>
+        <members>Account.Due_Date__c</members>
         <members>Account.EmailCustom__c</members>
         <members>Account.Have_you_cleared_Equivalency_Determinat__c</members>
         <members>Account.Institute_Country_Code__c</members>
@@ -613,6 +622,13 @@
         <members>ApplicationReview.Budget_Requisite__c</members>
         <members>ApplicationReview.Budgets__c</members>
         <members>ApplicationReview.Business_Creation_Growth_Effectiveness__c</members>
+        <members>ApplicationReview.Cat_1_Score__c</members>
+        <members>ApplicationReview.Cat_2_Score__c</members>
+        <members>ApplicationReview.Cat_3_Score__c</members>
+        <members>ApplicationReview.Cat_4_Score__c</members>
+        <members>ApplicationReview.Cat_5_Score__c</members>
+        <members>ApplicationReview.Cat_6_Score__c</members>
+        <members>ApplicationReview.Cat_7_Score__c</members>
         <members>ApplicationReview.Co_Principal_Investigators_PI__c</members>
         <members>ApplicationReview.Commercial_Viability__c</members>
         <members>ApplicationReview.Commercial_viability_Rationale__c</members>
@@ -638,6 +654,7 @@
         <members>ApplicationReview.D2_JC_SupportModel_Rating__c</members>
         <members>ApplicationReview.D2_JF_Distinctiveness_Comment__c</members>
         <members>ApplicationReview.D2_JF_Distinctiveness_Rating__c</members>
+        <members>ApplicationReview.D2_LU_Distinctiveness_Rating__c</members>
         <members>ApplicationReview.D2_OperationalDepth_Comment__c</members>
         <members>ApplicationReview.D2_OperationalDepth_Rating__c</members>
         <members>ApplicationReview.D2_OrgScale_Comment__c</members>
@@ -656,6 +673,9 @@
         <members>ApplicationReview.D3_JF_CostPerPlacement_Rating__c</members>
         <members>ApplicationReview.D3_JF_ScaleRecord_Comment__c</members>
         <members>ApplicationReview.D3_JF_ScaleRecord_Rating__c</members>
+        <members>ApplicationReview.D3_LU_ConversionRate_Rating__c</members>
+        <members>ApplicationReview.D3_LU_CostPerOutcome_Rating__c</members>
+        <members>ApplicationReview.D3_LU_ScaleRecord_Rating__c</members>
         <members>ApplicationReview.D3_ValidationEvidence_Comment__c</members>
         <members>ApplicationReview.D3_ValidationEvidence_Rating__c</members>
         <members>ApplicationReview.D4_GenieAI_Comment__c</members>
@@ -687,11 +707,13 @@
         <members>ApplicationReview.Decision_rationale__c</members>
         <members>ApplicationReview.Demonstration_of_overall_research_trans__c</members>
         <members>ApplicationReview.Does_the_Focus_and_Sub_Focus_area_fall_w__c</members>
+        <members>ApplicationReview.Due_Date_For_Approver__c</members>
         <members>ApplicationReview.Ecosystem_Infra_Rating__c</members>
         <members>ApplicationReview.Eligibility_Check__c</members>
         <members>ApplicationReview.Enrollment_Placement_Credibility_Comment__c</members>
         <members>ApplicationReview.Estd_job_placements_comments__c</members>
         <members>ApplicationReview.Estimated_Jobs_with_WCF_Funding__c</members>
+        <members>ApplicationReview.Evaluation_Completed__c</members>
         <members>ApplicationReview.Evidence_of_Validation_Jobs_Comments__c</members>
         <members>ApplicationReview.Evidence_of_validation_long_term_jobs__c</members>
         <members>ApplicationReview.External_Funding_Potential_Rationale__c</members>
@@ -709,6 +731,7 @@
         <members>ApplicationReview.Flag_rationale_Flagging_Criteria__c</members>
         <members>ApplicationReview.Focus_Area__c</members>
         <members>ApplicationReview.ForWINTeam__c</members>
+        <members>ApplicationReview.Form_Template_Version__c</members>
         <members>ApplicationReview.GenieAI_Adoption_Strength_Comments__c</members>
         <members>ApplicationReview.GenieAI_adoption_potential__c</members>
         <members>ApplicationReview.Geography_Within_WCF_Operating_Cluster__c</members>
@@ -734,6 +757,7 @@
         <members>ApplicationReview.Other_describe_the_concern__c</members>
         <members>ApplicationReview.Overall_Rating_score__c</members>
         <members>ApplicationReview.Overall_Remarks__c</members>
+        <members>ApplicationReview.Overall_Review_Score__c</members>
         <members>ApplicationReview.PI_NAME__c</members>
         <members>ApplicationReview.Priniciple_Investigator_PI_Designation__c</members>
         <members>ApplicationReview.Priniciple_Investigator_PI__c</members>
@@ -758,6 +782,13 @@
         <members>ApplicationReview.Question_Number_1__c</members>
         <members>ApplicationReview.Question_Number_20__c</members>
         <members>ApplicationReview.Question_Number_21__c</members>
+        <members>ApplicationReview.Question_Number_22__c</members>
+        <members>ApplicationReview.Question_Number_23__c</members>
+        <members>ApplicationReview.Question_Number_24__c</members>
+        <members>ApplicationReview.Question_Number_25__c</members>
+        <members>ApplicationReview.Question_Number_26__c</members>
+        <members>ApplicationReview.Question_Number_27__c</members>
+        <members>ApplicationReview.Question_Number_28__c</members>
         <members>ApplicationReview.Question_Number_2__c</members>
         <members>ApplicationReview.Question_Number_3__c</members>
         <members>ApplicationReview.Question_Number_4__c</members>
@@ -798,14 +829,20 @@
         <members>ApplicationReview.Team_Strength_and_Expertise_Rationale__c</members>
         <members>ApplicationReview.Team_Strength_and_Expertise__c</members>
         <members>ApplicationReview.Technology_Readiness_Level__c</members>
+        <members>ApplicationReview.Time_Left__c</members>
         <members>ApplicationReview.Top_3_proposal_strengths_ranked__c</members>
         <members>ApplicationReview.Top_3_proposal_weaknesses_ranked__c</members>
         <members>ApplicationReview.Total_Score__c</members>
         <members>ApplicationReview.Validator_Submission_Date__c</members>
         <members>ApplicationReview.Verification_reports__c</members>
+        <members>ApplicationReview.WG_Reviewer_Name__c</members>
         <members>ApplicationReview.X1M_plan_clear_feasible_linked__c</members>
         <members>ApplicationReview.X3yr_enrollment_placement_credibility__c</members>
         <members>ApplicationReview.ecosystem_and_infra_remarks__c</members>
+        <members>Application_FAQ__c.Category__c</members>
+        <members>Application_FAQ__c.Description__c</members>
+        <members>Application_FAQ__c.Question__c</members>
+        <members>Application_FAQ__c.Sort_Order__c</members>
         <members>Approval_History__c.Assigned_To_Name__c</members>
         <members>Approval_History__c.Assigned_To__c</members>
         <members>Approval_History__c.Comments__c</members>
@@ -944,6 +981,7 @@
         <members>Historical_Data__c.Proposal__c</members>
         <members>Historical_Data__c.Status__c</members>
         <members>IndividualApplication.Additional_Funding_Plans__c</members>
+        <members>IndividualApplication.Annual_Volunteer_Count__c</members>
         <members>IndividualApplication.Application_Asked_for_Rsubmission__c</members>
         <members>IndividualApplication.Application_Resubmitted_to_COE__c</members>
         <members>IndividualApplication.Application_Resubmitted_to_WIN_Admin__c</members>
@@ -979,6 +1017,7 @@
         <members>IndividualApplication.Coe_Email_Address__c</members>
         <members>IndividualApplication.Collaboration_with_Institute_Incubator__c</members>
         <members>IndividualApplication.Competitive_Advantage__c</members>
+        <members>IndividualApplication.Consalidated__c</members>
         <members>IndividualApplication.Current_Technology_Readiness_Level_TRL__c</members>
         <members>IndividualApplication.Current_fiscal_year_s_end_date__c</members>
         <members>IndividualApplication.Current_status_of_the_Project_Work_und__c</members>
@@ -994,6 +1033,8 @@
         <members>IndividualApplication.Envisioned_Project_Impact__c</members>
         <members>IndividualApplication.Expected_TRL_at_the_end_of_the_Project__c</members>
         <members>IndividualApplication.Expertise_and_Experience_of_Team_in_Spec__c</members>
+        <members>IndividualApplication.Fiscal_Day__c</members>
+        <members>IndividualApplication.Fiscal_Month__c</members>
         <members>IndividualApplication.Flagged__c</members>
         <members>IndividualApplication.Focus_Area_2__c</members>
         <members>IndividualApplication.Focus_Area_3__c</members>
@@ -1022,12 +1063,15 @@
         <members>IndividualApplication.Funding_Year__c</members>
         <members>IndividualApplication.Future_Plan_for_next_3_5_on_comple__c</members>
         <members>IndividualApplication.GenieAI_Interest_Level__c</members>
+        <members>IndividualApplication.Has_501c3_Status__c</members>
+        <members>IndividualApplication.Has_Equivalency_Determination__c</members>
         <members>IndividualApplication.Headquarters_City_and_Country__c</members>
         <members>IndividualApplication.Incorporation_Date__c</members>
         <members>IndividualApplication.Incubator_Association_Details__c</members>
         <members>IndividualApplication.Initial_Submission_Date__c</members>
         <members>IndividualApplication.Institution_Name__c</members>
         <members>IndividualApplication.Institution__c</members>
+        <members>IndividualApplication.Is_FCRA_Registered__c</members>
         <members>IndividualApplication.Is_Startup_DPIIT_Registered__c</members>
         <members>IndividualApplication.Is_Startup_Registered__c</members>
         <members>IndividualApplication.Job_Creation_Approach__c</members>
@@ -1052,6 +1096,7 @@
         <members>IndividualApplication.Legal_Structure__c</members>
         <members>IndividualApplication.Legal_Type_Other__c</members>
         <members>IndividualApplication.Legal_Type__c</members>
+        <members>IndividualApplication.Livelihood_Approach__c</members>
         <members>IndividualApplication.Main_Risks_and_Barriers__c</members>
         <members>IndividualApplication.Novelty_of_the_Project__c</members>
         <members>IndividualApplication.Objectives_of_the_Project__c</members>
@@ -1064,6 +1109,7 @@
         <members>IndividualApplication.Operational_Synergies_with_WOF_JC__c</members>
         <members>IndividualApplication.Operational_Synergies_with_WOF__c</members>
         <members>IndividualApplication.Organization_Name__c</members>
+        <members>IndividualApplication.Organizational_Area_s_for_Funding_Inves1__c</members>
         <members>IndividualApplication.Organizational_Area_s_for_Funding_Inves__c</members>
         <members>IndividualApplication.Organizational_Stability_AI_Feedback__c</members>
         <members>IndividualApplication.Organizational_Stability_Rating__c</members>
@@ -1104,6 +1150,8 @@
         <members>IndividualApplication.Proposed_Outcomes_Deliverables_under_t__c</members>
         <members>IndividualApplication.Proposed_Solution__c</members>
         <members>IndividualApplication.Proposed_WIN_Grant_Utilization__c</members>
+        <members>IndividualApplication.Q24_REPORT_URL__c</members>
+        <members>IndividualApplication.Q24_VERIFIED__c</members>
         <members>IndividualApplication.Reference_1_Email__c</members>
         <members>IndividualApplication.Reference_1_Name__c</members>
         <members>IndividualApplication.Reference_1_Role__c</members>
@@ -1118,6 +1166,7 @@
         <members>IndividualApplication.Resubmitted_Approved_for_Funding__c</members>
         <members>IndividualApplication.Revenue_Explanation__c</members>
         <members>IndividualApplication.Review_Status__c</members>
+        <members>IndividualApplication.Selected_Funding_Tracks__c</members>
         <members>IndividualApplication.Skilling_Approach_Rating__c</members>
         <members>IndividualApplication.Skilling_Approach_Strength__c</members>
         <members>IndividualApplication.Skilling_Approach_Summary__c</members>
@@ -1135,6 +1184,7 @@
         <members>IndividualApplication.Sub_Focus_Area_Other__c</members>
         <members>IndividualApplication.Sub_Focus_Area__c</members>
         <members>IndividualApplication.Submission_Round__c</members>
+        <members>IndividualApplication.Submitted_notes__c</members>
         <members>IndividualApplication.Submitter_Name__c</members>
         <members>IndividualApplication.Target_Completion_Month_c__c</members>
         <members>IndividualApplication.Target_Market_Industry_Application__c</members>
@@ -1149,11 +1199,15 @@
         <members>IndividualApplication.Use_of_Funds_Summary__c</members>
         <members>IndividualApplication.Use_of_Funds_Weakness__c</members>
         <members>IndividualApplication.Validated__c</members>
+        <members>IndividualApplication.WG_Approver_Name__c</members>
         <members>IndividualApplication.WG_Phone_Country_Code__c</members>
+        <members>IndividualApplication.WG_Reviewer_Name__c</members>
+        <members>IndividualApplication.WG_Validator_Name__c</members>
         <members>IndividualApplication.WIN_Approval_Comments__c</members>
         <members>IndividualApplication.WIN_Approved_Comments__c</members>
         <members>IndividualApplication.WIN_Level1_Decision_Label__c</members>
         <members>IndividualApplication.WIN_Support__c</members>
+        <members>IndividualApplication.Willing_to_Pursue_ED__c</members>
         <members>IndividualApplication.Work_Email_ID__c</members>
         <members>IndividualApplication.Work_undertaken_supporting_current_TRL__c</members>
         <members>IndividualGDPRState__dll.CreatedBy__c</members>
@@ -1282,6 +1336,22 @@
         <members>Outcomes_Data__c.Jobs_from_Growing_Businesses_FY_1__c</members>
         <members>Outcomes_Data__c.Jobs_from_Growing_Businesses_FY_2__c</members>
         <members>Outcomes_Data__c.Jobs_from_Growing_Businesses_FY_3__c</members>
+        <members>Outcomes_Data__c.LIV_COST_FY1__c</members>
+        <members>Outcomes_Data__c.LIV_COST_FY2__c</members>
+        <members>Outcomes_Data__c.LIV_COST_FY3__c</members>
+        <members>Outcomes_Data__c.LIV_COST_PROJ__c</members>
+        <members>Outcomes_Data__c.LIV_ENROLL_FY1__c</members>
+        <members>Outcomes_Data__c.LIV_ENROLL_FY2__c</members>
+        <members>Outcomes_Data__c.LIV_ENROLL_FY3__c</members>
+        <members>Outcomes_Data__c.LIV_ENROLL_PROJ__c</members>
+        <members>Outcomes_Data__c.LIV_OUTCOME_FY1__c</members>
+        <members>Outcomes_Data__c.LIV_OUTCOME_FY2__c</members>
+        <members>Outcomes_Data__c.LIV_OUTCOME_FY3__c</members>
+        <members>Outcomes_Data__c.LIV_OUTCOME_PROJ__c</members>
+        <members>Outcomes_Data__c.LIV_SERVED_FY1__c</members>
+        <members>Outcomes_Data__c.LIV_SERVED_FY2__c</members>
+        <members>Outcomes_Data__c.LIV_SERVED_FY3__c</members>
+        <members>Outcomes_Data__c.LIV_SERVED_PROJ__c</members>
         <members>Outcomes_Data__c.Long_Term_Outcomes_CFY__c</members>
         <members>Outcomes_Data__c.Long_Term_Outcomes_FY_1__c</members>
         <members>Outcomes_Data__c.Long_Term_Outcomes_FY_2__c</members>
@@ -1364,12 +1434,46 @@
         <members>ProvisionedFeature__dll.featurestate__c</members>
         <members>ProvisionedFeature__dll.id__c</members>
         <members>ProvisionedFeature__dll.systemmodstamp__c</members>
+        <members>RFI_Question__mdt.Display_Type__c</members>
+        <members>RFI_Question__mdt.Field_API_Name__c</members>
+        <members>RFI_Question__mdt.Label__c</members>
+        <members>RFI_Question__mdt.Question_Code__c</members>
+        <members>RFI_Question__mdt.Section_Code__c</members>
+        <members>RFI_Question__mdt.Sequence__c</members>
+        <members>RFI_Question__mdt.Target_Object__c</members>
+        <members>RFI_Section__mdt.Section_Code__c</members>
+        <members>RFI_Section__mdt.Sequence__c</members>
+        <members>RFI_Section__mdt.Track_Code__c</members>
+        <members>RFI_Track__mdt.Is_Active__c</members>
+        <members>RFI_Track__mdt.Sequence__c</members>
+        <members>RFI_Track__mdt.Track_Code__c</members>
+        <members>Reviewer_Category_v5__mdt.Category_Number__c</members>
+        <members>Reviewer_Category_v5__mdt.Is_Active__c</members>
+        <members>Reviewer_Category_v5__mdt.Lede__c</members>
+        <members>Reviewer_Category_v5__mdt.Sequence__c</members>
+        <members>Reviewer_Category_v5__mdt.Title__c</members>
         <members>Reviewer_Query__c.Proposal__c</members>
         <members>Reviewer_Query__c.Query__c</members>
         <members>Reviewer_Query__c.Reply_from_COE__c</members>
         <members>Reviewer_Query__c.Reply_from_PI__c</members>
         <members>Reviewer_Query__c.Reviewer__c</members>
         <members>Reviewer_Query__c.Status__c</members>
+        <members>Reviewer_Question_v5__mdt.Category_Number__c</members>
+        <members>Reviewer_Question_v5__mdt.Category_Title__c</members>
+        <members>Reviewer_Question_v5__mdt.Description_Common__c</members>
+        <members>Reviewer_Question_v5__mdt.Description_Job_Creation__c</members>
+        <members>Reviewer_Question_v5__mdt.Description_Job_Fulfillment__c</members>
+        <members>Reviewer_Question_v5__mdt.Description_Livelihood_Upliftment__c</members>
+        <members>Reviewer_Question_v5__mdt.Is_Active__c</members>
+        <members>Reviewer_Question_v5__mdt.Ladder_Level_1__c</members>
+        <members>Reviewer_Question_v5__mdt.Ladder_Level_2__c</members>
+        <members>Reviewer_Question_v5__mdt.Ladder_Level_3__c</members>
+        <members>Reviewer_Question_v5__mdt.Ladder_Level_4__c</members>
+        <members>Reviewer_Question_v5__mdt.Ladder_Level_5__c</members>
+        <members>Reviewer_Question_v5__mdt.Question_Id__c</members>
+        <members>Reviewer_Question_v5__mdt.Question_Text__c</members>
+        <members>Reviewer_Question_v5__mdt.Sequence__c</members>
+        <members>Reviewer_Question_v5__mdt.Track_Aware__c</members>
         <members>Self_Registration_Request__c.Address_501__c</members>
         <members>Self_Registration_Request__c.Address__c</members>
         <members>Self_Registration_Request__c.Are_you_FCRA_exempted_compliant__c</members>
@@ -1771,6 +1875,25 @@
         <members>Translated_Skilling_Domain__c.Translated_Proposal__c</members>
         <members>Translated_Skilling_Domain__c.When_Programme_Started__c</members>
         <members>Translated_Skilling_Domain__c.Yearly_Enrolment__c</members>
+        <members>Validator_Question__mdt.Applicable_Tracks__c</members>
+        <members>Validator_Question__mdt.Conditional_Parent_Key__c</members>
+        <members>Validator_Question__mdt.Conditional_Parent_Value__c</members>
+        <members>Validator_Question__mdt.Display_Type__c</members>
+        <members>Validator_Question__mdt.Hint_Text__c</members>
+        <members>Validator_Question__mdt.Is_Active__c</members>
+        <members>Validator_Question__mdt.Is_Required__c</members>
+        <members>Validator_Question__mdt.Question_Key__c</members>
+        <members>Validator_Question__mdt.Question_Text__c</members>
+        <members>Validator_Question__mdt.Section_Code__c</members>
+        <members>Validator_Question__mdt.Section_Number__c</members>
+        <members>Validator_Question__mdt.Sequence__c</members>
+        <members>Validator_Question__mdt.Target_Field_API_Name__c</members>
+        <members>Validator_Question__mdt.Word_Limit__c</members>
+        <members>Validator_Section__mdt.Is_Active__c</members>
+        <members>Validator_Section__mdt.Lede__c</members>
+        <members>Validator_Section__mdt.Section_Number__c</members>
+        <members>Validator_Section__mdt.Sequence__c</members>
+        <members>Validator_Section__mdt.Title__c</members>
         <members>Volody_contract__c.Account__c</members>
         <members>Volody_contract__c.Agreement_Name__c</members>
         <members>Volody_contract__c.Contact_Email__c</members>
@@ -1794,6 +1917,16 @@
         <members>WCF_Business_Sector__c.Support_Type_Other__c</members>
         <members>WCF_Business_Sector__c.Support_Types__c</members>
         <members>WCF_Business_Sector__c.Yearly_Enrolment__c</members>
+        <members>WCF_Community__c.District_Area__c</members>
+        <members>WCF_Community__c.Households_FY1__c</members>
+        <members>WCF_Community__c.Households_FY2__c</members>
+        <members>WCF_Community__c.Households_FY3__c</members>
+        <members>WCF_Community__c.Households_Projected__c</members>
+        <members>WCF_Community__c.Proposal__c</members>
+        <members>WCF_Community__c.State__c</members>
+        <members>WCF_Compliance_Document__c.Application_Number__c</members>
+        <members>WCF_Compliance_Document__c.Application_Org_Name__c</members>
+        <members>WCF_Compliance_Document__c.Application_Reviewer__c</members>
         <members>WCF_Compliance_Document__c.ContentDocumentId__c</members>
         <members>WCF_Compliance_Document__c.Document_Status_JSON__c</members>
         <members>WCF_Compliance_Document__c.Document_Type__c</members>
@@ -1818,12 +1951,20 @@
         <members>WCF_Executed_Agreement_c__c.IndividualApplication__c</members>
         <members>WCF_Executed_Agreement_c__c.Status__c</members>
         <members>WCF_Executed_Agreement_c__c.Volody_Link__c</members>
+        <members>WCF_Livelihood_Program__c.Annual_Enrollment__c</members>
+        <members>WCF_Livelihood_Program__c.Duration_Man_Hours__c</members>
+        <members>WCF_Livelihood_Program__c.Program_Name__c</members>
+        <members>WCF_Livelihood_Program__c.Proposal__c</members>
+        <members>WCF_Livelihood_Program__c.Support_Type_Provided__c</members>
         <members>WCF_Skilling_Domain__c.Domain_Programme_Name__c</members>
         <members>WCF_Skilling_Domain__c.Duration_Months__c</members>
         <members>WCF_Skilling_Domain__c.Hours_of_Training__c</members>
         <members>WCF_Skilling_Domain__c.Programme_Start_Date__c</members>
         <members>WCF_Skilling_Domain__c.Proposal__c</members>
         <members>WCF_Skilling_Domain__c.Yearly_Enrolment__c</members>
+        <members>WCF_Supporting_Document__c.Cloud_Storage_Link__c</members>
+        <members>WCF_Supporting_Document__c.Document_Name__c</members>
+        <members>WCF_Supporting_Document__c.Proposal__c</members>
         <members>WIN_COE_Share_Log__c.COE_User__c</members>
         <members>WIN_COE_Share_Log__c.Proposal__c</members>
         <members>WIN_COE_Share_Log__c.Reviewer_Query__c</members>
@@ -2348,6 +2489,7 @@
         <members>CL_Your_Grant_Agreement_of_Understanding_will_be_shared_via_Volody_for_e_signatu</members>
         <members>CL_Your_Job_Creation_Approach</members>
         <members>CL_Your_Latest_Changes</members>
+        <members>CL_Your_Livelihood_Approach</members>
         <members>CL_Your_Programme_Lead</members>
         <members>CL_Your_Programme_Lead_will_be_assigned_shortly_You_will_receive_an_email_notif</members>
         <members>CL_Your_Programme_Lead_will_be_in_touch_to_share_the_Grant_Agreement_for_signatu</members>
@@ -2397,6 +2539,101 @@
         <members>Country_State_Mapping.India_Karnataka</members>
         <members>Country_State_Mapping.United_States_Texas</members>
         <members>Form_Label.Cmt_Organizational_Area_for_Funding</members>
+        <members>RFI_Question.Q10_CURRENT_FY</members>
+        <members>RFI_Question.Q11_SKILLING_APPROACH</members>
+        <members>RFI_Question.Q12_SKILLING_DOMAINS</members>
+        <members>RFI_Question.Q13_JF_HIST_OUTCOMES</members>
+        <members>RFI_Question.Q14_JF_PROJ_OUTCOMES</members>
+        <members>RFI_Question.Q15_JOB_CREATION_APPROACH</members>
+        <members>RFI_Question.Q16_BUSINESS_SECTORS</members>
+        <members>RFI_Question.Q17_JC_HIST_OUTCOMES</members>
+        <members>RFI_Question.Q18_JC_PROJ_OUTCOMES</members>
+        <members>RFI_Question.Q19_LIVELIHOOD_APPROACH</members>
+        <members>RFI_Question.Q20_LIVELIHOOD_PROGRAMS</members>
+        <members>RFI_Question.Q21_COMMUNITIES_SERVED</members>
+        <members>RFI_Question.Q22_LIVELIHOOD_ACTUALS</members>
+        <members>RFI_Question.Q23_LIVELIHOOD_PROJ</members>
+        <members>RFI_Question.Q24_INDEPENDENT_VERIFICATION</members>
+        <members>RFI_Question.Q24_OPERATIONAL_SYNERGIES</members>
+        <members>RFI_Question.Q25_SUSTAINABILITY_PLAN</members>
+        <members>RFI_Question.Q26_ADDITIONAL_FUNDING</members>
+        <members>RFI_Question.Q27_GENIE_AI</members>
+        <members>RFI_Question.Q28_SUPPORTING_DOCS</members>
+        <members>RFI_Question.Q2_HQ_LOCATION</members>
+        <members>RFI_Question.Q2_LEADER_NAME</members>
+        <members>RFI_Question.Q2_LEADER_TENURE</members>
+        <members>RFI_Question.Q2_LEADER_TITLE</members>
+        <members>RFI_Question.Q2_ORG_NAME</members>
+        <members>RFI_Question.Q2_PRIMARY_REGIONS</members>
+        <members>RFI_Question.Q3_JOB_TITLE</members>
+        <members>RFI_Question.Q3_PHONE</members>
+        <members>RFI_Question.Q3_SUBMITTER_NAME</members>
+        <members>RFI_Question.Q3_WORK_EMAIL</members>
+        <members>RFI_Question.Q4_GOVERNANCE_DESC</members>
+        <members>RFI_Question.Q4_INCORP_DATE</members>
+        <members>RFI_Question.Q4_JURISDICTION</members>
+        <members>RFI_Question.Q4_LEGAL_TYPE</members>
+        <members>RFI_Question.Q5_ED_STATUS</members>
+        <members>RFI_Question.Q5_FCRA_STATUS</members>
+        <members>RFI_Question.Q5_US_501C3</members>
+        <members>RFI_Question.Q5_WILLING_ED</members>
+        <members>RFI_Question.Q6_FISCAL_DAY</members>
+        <members>RFI_Question.Q6_FISCAL_MONTH</members>
+        <members>RFI_Question.Q7_TOP_FUNDERS</members>
+        <members>RFI_Question.Q8_REFERENCES</members>
+        <members>RFI_Question.Q9_HIST_FINANCIALS</members>
+        <members>RFI_Section.SEC_ABOUT_ORG</members>
+        <members>RFI_Section.SEC_JOB_CREATION</members>
+        <members>RFI_Section.SEC_JOB_FULFILLMENT</members>
+        <members>RFI_Section.SEC_LIVELIHOOD</members>
+        <members>RFI_Section.SEC_WHY_WADHWANI</members>
+        <members>RFI_Track.JOB_CREATION</members>
+        <members>RFI_Track.JOB_FULFILLMENT</members>
+        <members>RFI_Track.LIVELIHOOD</members>
+        <members>Reviewer_Category_v5.CAT_1</members>
+        <members>Reviewer_Category_v5.CAT_2</members>
+        <members>Reviewer_Category_v5.CAT_3</members>
+        <members>Reviewer_Category_v5.CAT_4</members>
+        <members>Reviewer_Category_v5.CAT_5</members>
+        <members>Reviewer_Category_v5.CAT_6</members>
+        <members>Reviewer_Category_v5.CAT_7</members>
+        <members>Reviewer_Question_v5.Q_1_1</members>
+        <members>Reviewer_Question_v5.Q_1_2</members>
+        <members>Reviewer_Question_v5.Q_1_3</members>
+        <members>Reviewer_Question_v5.Q_1_4</members>
+        <members>Reviewer_Question_v5.Q_2_1</members>
+        <members>Reviewer_Question_v5.Q_2_2</members>
+        <members>Reviewer_Question_v5.Q_2_3</members>
+        <members>Reviewer_Question_v5.Q_3_1</members>
+        <members>Reviewer_Question_v5.Q_3_2</members>
+        <members>Reviewer_Question_v5.Q_3_3</members>
+        <members>Reviewer_Question_v5.Q_3_4</members>
+        <members>Reviewer_Question_v5.Q_4_1</members>
+        <members>Reviewer_Question_v5.Q_4_2</members>
+        <members>Reviewer_Question_v5.Q_4_3</members>
+        <members>Reviewer_Question_v5.Q_5_1</members>
+        <members>Reviewer_Question_v5.Q_5_2</members>
+        <members>Reviewer_Question_v5.Q_5_3</members>
+        <members>Reviewer_Question_v5.Q_6_1</members>
+        <members>Reviewer_Question_v5.Q_6_2</members>
+        <members>Reviewer_Question_v5.Q_6_3</members>
+        <members>Reviewer_Question_v5.Q_7_1</members>
+        <members>Reviewer_Question_v5.Q_7_2</members>
+        <members>Validator_Question.S1_1_MANDATORY</members>
+        <members>Validator_Question.S1_2_VERIFICATION</members>
+        <members>Validator_Question.S1_3_ATTESTATION</members>
+        <members>Validator_Question.S1_4_CONTENT_GAP</members>
+        <members>Validator_Question.S2_1_GEOGRAPHY</members>
+        <members>Validator_Question.S2_2_MANDATE_FIT</members>
+        <members>Validator_Question.S2_3_BLOCKING_CONCERN</members>
+        <members>Validator_Question.S2_3_TEXT_CONCERN</members>
+        <members>Validator_Question.S4_1_SOURCE_CHANNEL</members>
+        <members>Validator_Question.S4_2_BUDGET_RANGE</members>
+        <members>Validator_Question.S5_1_NOTES</members>
+        <members>Validator_Section.SEC_COMPLETENESS</members>
+        <members>Validator_Section.SEC_ELIGIBILITY</members>
+        <members>Validator_Section.SEC_NOTES</members>
+        <members>Validator_Section.SEC_TAGS</members>
         <name>CustomMetadata</name>
     </types>
     <types>
@@ -2406,8 +2643,6 @@
         <name>CustomNotificationType</name>
     </types>
     <types>
-        <members>AITestSuiteRunJob</members>
-        <members>AITestSuiteWorkbookAssoc</members>
         <members>AIWorkbook</members>
         <members>AIWorksheet</members>
         <members>AIWorksheetCell</members>
@@ -2429,26 +2664,25 @@
         <members>Activity</members>
         <members>ActvTgtPlatformFieldValue</members>
         <members>Address</members>
-        <members>AiEvalCopilotTestCaseRslt</members>
-        <members>AiEvalPrmptRagTestCsRslt</members>
-        <members>AiEvalPromptTestCaseRslt</members>
-        <members>AiEvalTestCaseCritRslt</members>
-        <members>AiEvalTestCaseResult</members>
-        <members>AiEvaluation</members>
         <members>AiGroundingFileRef</members>
+        <members>AiGroundingLibFileDef</members>
         <members>AiGroundingSourceStage</members>
         <members>AiGroundingWebRef</members>
         <members>AiJobRun</members>
         <members>AiJobRunItem</members>
         <members>AnalyticsUserAttrFuncTkn</members>
         <members>Applicant</members>
+        <members>ApplicantApplicantRelation</members>
         <members>ApplicationDecision</members>
         <members>ApplicationForm</members>
         <members>ApplicationFormProduct</members>
+        <members>ApplicationFormRelation</members>
         <members>ApplicationRenderMethod</members>
         <members>ApplicationReview</members>
+        <members>ApplicationStageDefExt</members>
         <members>ApplicationStageDefinition</members>
         <members>ApplicationTimeline</members>
+        <members>Application_FAQ__c</members>
         <members>ApprovalSubmission</members>
         <members>ApprovalSubmissionDetail</members>
         <members>ApprovalWorkItem</members>
@@ -2464,6 +2698,12 @@
         <members>AssistantProgress</members>
         <members>AssociatedLocation</members>
         <members>AsyncOperationTracker</members>
+        <members>AttrPicklistExcludedValue</members>
+        <members>AttributeCategory</members>
+        <members>AttributeCategoryAttribute</members>
+        <members>AttributeDefinition</members>
+        <members>AttributePicklist</members>
+        <members>AttributePicklistValue</members>
         <members>AuditTrailFileExport</members>
         <members>AuthorizationForm</members>
         <members>AuthorizationFormConsent</members>
@@ -2481,6 +2721,7 @@
         <members>BenefitDisbursementAdj</members>
         <members>BenefitItemCode</members>
         <members>BenefitManagementRecertification__c</members>
+        <members>BenefitProduct</members>
         <members>BenefitSchedule</members>
         <members>BenefitScheduleAssignment</members>
         <members>BenefitSession</members>
@@ -2492,6 +2733,7 @@
         <members>BudgetCategory</members>
         <members>BudgetCategoryValue</members>
         <members>BudgetPeriod</members>
+        <members>BusinessAccount</members>
         <members>BusinessBrand</members>
         <members>BusinessMilestone</members>
         <members>COE_PI_Share_Log__c</members>
@@ -2539,6 +2781,7 @@
         <members>ContactPointAddress</members>
         <members>ContactPointConsent</members>
         <members>ContactPointEmail</members>
+        <members>ContactPointOttSvc</members>
         <members>ContactPointPhone</members>
         <members>ContactPointTypeConsent</members>
         <members>ContactRequest</members>
@@ -2546,7 +2789,6 @@
         <members>ContentLink</members>
         <members>ContentSource</members>
         <members>ContentVersion</members>
-        <members>ContextAgent</members>
         <members>Contract</members>
         <members>ContractContactRole</members>
         <members>ContractLineItem</members>
@@ -2556,11 +2798,16 @@
         <members>DataAction</members>
         <members>DataActionJobSummary</members>
         <members>DataActionTarget</members>
+        <members>DataAgenticContext</members>
+        <members>DataAgenticContextAgent</members>
+        <members>DataAgenticMemoryCategory</members>
+        <members>DataAgntcMmoryCtgPrompt</members>
         <members>DataCommCapActvTarget</members>
         <members>DataGraph</members>
         <members>DataGuidance</members>
         <members>DataGuidanceStep</members>
         <members>DataGuidanceStepGroup</members>
+        <members>DataHarmonizedUserFdbk</members>
         <members>DataKitDeploymentLog</members>
         <members>DataKnowledgeRsrchRpt</members>
         <members>DataKnowledgeRsrchTmpl</members>
@@ -2581,8 +2828,12 @@
         <members>DataUsePurpose</members>
         <members>DelegatedAccount</members>
         <members>DevopsActivityLog</members>
+        <members>DevopsEnvDeployment</members>
+        <members>DevopsEnvDeploymentMbr</members>
         <members>DevopsEnvironment</members>
         <members>DevopsRequestInfo</members>
+        <members>DigitalSignature</members>
+        <members>DocChkItemValidatedTarget</members>
         <members>DocGenerationQueryResult</members>
         <members>DocTemplateSectionCondition</members>
         <members>DocumentChecklistItem</members>
@@ -2662,6 +2913,7 @@
         <members>IndividualApplicationTask</members>
         <members>Institute_Proposal__c</members>
         <members>Institution__c</members>
+        <members>IntakeFormSection</members>
         <members>IntegrationProviderAttr</members>
         <members>IntegrationProviderDcsnRqmt</members>
         <members>IntegrationProviderDef</members>
@@ -2680,6 +2932,9 @@
         <members>MarketSegment</members>
         <members>MarketSegmentActivation</members>
         <members>MarketSegmentField</members>
+        <members>MessagingEndUser</members>
+        <members>MessagingSession</members>
+        <members>MessagingSessionClient</members>
         <members>Milestone__c</members>
         <members>MktCalculatedInsight</members>
         <members>MktDataTransform</members>
@@ -2711,6 +2966,8 @@
         <members>OrderItem</members>
         <members>OrgMetricScanResult</members>
         <members>OrgMetricScanSummary</members>
+        <members>OutboundEngagementTemplate</members>
+        <members>OutboundEngmtContentRsrc</members>
         <members>Outcome_File_Map__c</members>
         <members>Outcomes_Data__c</members>
         <members>PartnerFundAllocation</members>
@@ -2723,6 +2980,7 @@
         <members>PartyFinancialAsset</members>
         <members>PartyIncome</members>
         <members>PartyProfile</members>
+        <members>PartyProfileAddress</members>
         <members>PaymentRequest</members>
         <members>PaymentRequestLine</members>
         <members>PersonAccount</members>
@@ -2740,8 +2998,26 @@
         <members>ProblemRelatedItem</members>
         <members>ProcessException</members>
         <members>Product2</members>
+        <members>ProductAttributeDefinition</members>
         <members>ProductAvailabilityProjection</members>
+        <members>ProductCatalog</members>
+        <members>ProductCategory</members>
+        <members>ProductCategoryDisqual</members>
+        <members>ProductCategoryProduct</members>
+        <members>ProductCategoryQualification</members>
+        <members>ProductClassification</members>
+        <members>ProductClassificationAttr</members>
+        <members>ProductComponentGroup</members>
+        <members>ProductComponentGrpOverride</members>
+        <members>ProductConfigFlowAssignment</members>
+        <members>ProductConfigurationFlow</members>
+        <members>ProductDisqualification</members>
         <members>ProductFulfillmentLocation</members>
+        <members>ProductQualification</members>
+        <members>ProductRelComponentOverride</members>
+        <members>ProductRelatedComponent</members>
+        <members>ProductRelationshipType</members>
+        <members>ProductSellingModel</members>
         <members>ProfileSkill</members>
         <members>ProfileSkillEndorsement</members>
         <members>ProfileSkillUser</members>
@@ -2754,8 +3030,12 @@
         <members>PublicComplaint</members>
         <members>QuickText</members>
         <members>QuickTextUsage</members>
-        <members>ReceivedDocument</members>
-        <members>ReceivedDocumentType</members>
+        <members>RFI_Dependency_Rule__mdt</members>
+        <members>RFI_Question__mdt</members>
+        <members>RFI_Section__mdt</members>
+        <members>RFI_Track__mdt</members>
+        <members>RFI_Translation__mdt</members>
+        <members>RFI_Validation_Rule__mdt</members>
         <members>Recommendation</members>
         <members>RecordAction</members>
         <members>RecordActnSelItemExtrc</members>
@@ -2767,7 +3047,9 @@
         <members>ReportHierarchyObjectField</members>
         <members>RevenueAsyncOperation</members>
         <members>RevenueTransactionErrorLog</members>
+        <members>Reviewer_Category_v5__mdt</members>
         <members>Reviewer_Query__c</members>
+        <members>Reviewer_Question_v5__mdt</members>
         <members>Scorecard</members>
         <members>ScorecardAssociation</members>
         <members>ScorecardMetric</members>
@@ -2777,6 +3059,7 @@
         <members>Self_Registration_Request__c</members>
         <members>Seller</members>
         <members>ServiceContract</members>
+        <members>ServiceRequestRelatedRecord</members>
         <members>SetupDataSynchronization</members>
         <members>SfdcPartnerSbscrOffer</members>
         <members>SfdcPartnerSbscrOfferItem</members>
@@ -2792,6 +3075,7 @@
         <members>StgDefinitionAssignedRecord</members>
         <members>StreamActivityAccess</members>
         <members>StreamingChannel</members>
+        <members>SvcProcProdCatgProdExtrc</members>
         <members>TableauHostMapping</members>
         <members>Task</members>
         <members>TenantConsumptionAlert</members>
@@ -2818,6 +3102,8 @@
         <members>UserLocalWebServerIdentity</members>
         <members>UserPrioritizedRecord</members>
         <members>UserProvisioningRequest</members>
+        <members>Validator_Question__mdt</members>
+        <members>Validator_Section__mdt</members>
         <members>VideoCall</members>
         <members>VideoCallParticipant</members>
         <members>VideoCallRecording</members>
@@ -2827,9 +3113,12 @@
         <members>VoiceCall</members>
         <members>Volody_contract__c</members>
         <members>WCF_Business_Sector__c</members>
+        <members>WCF_Community__c</members>
         <members>WCF_Compliance_Document__c</members>
         <members>WCF_Executed_Agreement_c__c</members>
+        <members>WCF_Livelihood_Program__c</members>
         <members>WCF_Skilling_Domain__c</members>
+        <members>WCF_Supporting_Document__c</members>
         <members>WIN_COE_Share_Log__c</members>
         <members>WorkOrder</members>
         <members>WorkOrderLineItem</members>
@@ -2844,6 +3133,7 @@
     <types>
         <members>AI_Feedback__c-en_US</members>
         <members>ApplicationReview-en_US</members>
+        <members>Application_FAQ__c-en_US</members>
         <members>Approval_History__c-en_US</members>
         <members>BenefitManagementRecertification__c-en_US</members>
         <members>COE_PI_Share_Log__c-en_US</members>
@@ -2864,7 +3154,15 @@
         <members>Outcomes_Data__c-en_US</members>
         <members>Outcomes_Data__c-es</members>
         <members>Outcomes_Data__c-pt_BR</members>
+        <members>RFI_Dependency_Rule__mdt-en_US</members>
+        <members>RFI_Question__mdt-en_US</members>
+        <members>RFI_Section__mdt-en_US</members>
+        <members>RFI_Track__mdt-en_US</members>
+        <members>RFI_Translation__mdt-en_US</members>
+        <members>RFI_Validation_Rule__mdt-en_US</members>
+        <members>Reviewer_Category_v5__mdt-en_US</members>
         <members>Reviewer_Query__c-en_US</members>
+        <members>Reviewer_Question_v5__mdt-en_US</members>
         <members>Self_Registration_Request__c-en_US</members>
         <members>Translated_Business_Sector__c-en_US</members>
         <members>Translated_Current_Fiscal_Year_Data__c-en_US</members>
@@ -2872,11 +3170,16 @@
         <members>Translated_Outcome_Data__c-en_US</members>
         <members>Translated_Proposal__c-en_US</members>
         <members>Translated_Skilling_Domain__c-en_US</members>
+        <members>Validator_Question__mdt-en_US</members>
+        <members>Validator_Section__mdt-en_US</members>
         <members>Volody_contract__c-en_US</members>
         <members>WCF_Business_Sector__c-en_US</members>
+        <members>WCF_Community__c-en_US</members>
         <members>WCF_Compliance_Document__c-en_US</members>
         <members>WCF_Executed_Agreement_c__c-en_US</members>
+        <members>WCF_Livelihood_Program__c-en_US</members>
         <members>WCF_Skilling_Domain__c-en_US</members>
+        <members>WCF_Supporting_Document__c-en_US</members>
         <members>WIN_COE_Share_Log__c-en_US</members>
         <name>CustomObjectTranslation</name>
     </types>
@@ -2891,14 +3194,16 @@
         <members>ReviewerPortal</members>
         <members>Reviewer_Portal_Enhanced</members>
         <members>Reviewer_Portal_New</members>
-        <members>WCF</members>
         <members>WCF_Reviewer_Portal</members>
         <members>WIN_COE</members>
+        <members>Wadhwani_Grants</members>
         <members>Wadhwani_Org</members>
+        <members>Win_Admin</members>
         <name>CustomSite</name>
     </types>
     <types>
         <members>AI_Feedback__c</members>
+        <members>Application_FAQ__c</members>
         <members>Approval_History__c</members>
         <members>Approved_Proposals</members>
         <members>Awardee_Module</members>
@@ -2924,8 +3229,11 @@
         <members>Translated_Outcome_Data__c</members>
         <members>Translated_Proposal__c</members>
         <members>Volody_contract__c</members>
+        <members>WCF_Community__c</members>
         <members>WCF_Compliance_Document__c</members>
         <members>WCF_Executed_Agreement_c__c</members>
+        <members>WCF_Livelihood_Program__c</members>
+        <members>WCF_Supporting_Document__c</members>
         <members>WIN_Administrative_Decision_Console</members>
         <members>WIN_COE_Share_Log__c</members>
         <name>CustomTab</name>
@@ -3111,9 +3419,13 @@
     </types>
     <types>
         <members>WCF_Folder</members>
+        <members>WCF_Folder/A_decision_is_overdue</members>
         <members>WCF_Folder/Account_Locked</members>
         <members>WCF_Folder/Action_Required_Update_Application</members>
         <members>WCF_Folder/Additional_Information_Reminder</members>
+        <members>WCF_Folder/Additional_Information_Reminder_30day</members>
+        <members>WCF_Folder/Additional_Information_Reminder_60days</members>
+        <members>WCF_Folder/Additional_Information_Reminder_90days</members>
         <members>WCF_Folder/Additional_Information_Requested</members>
         <members>WCF_Folder/Agreement_Executed_Partner</members>
         <members>WCF_Folder/Agreement_Ready_to_Sign</members>
@@ -3133,29 +3445,46 @@
         <members>WCF_Folder/Compliance_Document_Expiry</members>
         <members>WCF_Folder/Compliance_Documents_Approved</members>
         <members>WCF_Folder/Compliance_Documents_Reminder</members>
+        <members>WCF_Folder/Compliance_Documents_Reminder_30_days</members>
+        <members>WCF_Folder/Compliance_Documents_Reminder_60_days</members>
+        <members>WCF_Folder/Compliance_Documents_Reminder_90_days</members>
         <members>WCF_Folder/Compliance_Documents_Requested</members>
         <members>WCF_Folder/Compliance_Revision_Requested</members>
+        <members>WCF_Folder/Compliance_documents_submitted_for_review</members>
+        <members>WCF_Folder/Compliance_your_document_upload_has_started</members>
         <members>WCF_Folder/DD_Complete_Ready_for_Deliberation</members>
         <members>WCF_Folder/Decision_Recorded_PL_Alert</members>
         <members>WCF_Folder/Decision_Under_Review</members>
+        <members>WCF_Folder/Decision_recorded</members>
+        <members>WCF_Folder/Decline_recommended_with_reasons</members>
         <members>WCF_Folder/Draft_Abandonment_Warning</members>
         <members>WCF_Folder/Draft_Saved</members>
         <members>WCF_Folder/Evaluation_Due_Soon</members>
+        <members>WCF_Folder/Information_Located_Review_Can_Resume</members>
         <members>WCF_Folder/Internal_User_Account_Activation</members>
         <members>WCF_Folder/Master_MoU_Renewal_Reminder</members>
         <members>WCF_Folder/Master_MoU_Renewal_Reminder_Mail</members>
         <members>WCF_Folder/New_Application_Validator_Queue</members>
+        <members>WCF_Folder/New_Application_Validator_Queue_1</members>
         <members>WCF_Folder/New_Evaluation_Assigned</members>
         <members>WCF_Folder/Onboarding_Complete_Partner</members>
         <members>WCF_Folder/PL_of_Record_Change</members>
+        <members>WCF_Folder/Passed_to_review_with_a_flagged_concern</members>
         <members>WCF_Folder/Password_Changed_Confirmation</members>
+        <members>WCF_Folder/Ready_for_decision</members>
         <members>WCF_Folder/Reset_Password_Request1</members>
         <members>WCF_Folder/Resubmission_Received_Partner</members>
         <members>WCF_Folder/Reviewer_Evaluation_Submitted_PL_Alert</members>
         <members>WCF_Folder/Reviewer_Recused_PL_Alert</members>
+        <members>WCF_Folder/The_reviewer_needs_more_information</members>
         <members>WCF_Folder/Validation_Due_Soon</members>
         <members>WCF_Folder/Verify_Email_Address</members>
+        <members>WCF_Folder/We_are_closing_your_application_for_now</members>
+        <members>WCF_Folder/We_have_paused_your_onboarding</members>
+        <members>WCF_Folder/We_have_received_your_compliance_documents</members>
         <members>WCF_Folder/Welcome_to_Wadhwani_Grants_your_account_is_ready</members>
+        <members>WCF_Folder/Your_account_is_suspended</members>
+        <members>WCF_Folder/Your_onboarding_with_Wadhwani_Grants_is_complete</members>
         <members>WIN_Proposal_Emails</members>
         <members>WIN_Proposal_Emails/Approved_for_Funding_COE</members>
         <members>WIN_Proposal_Emails/COE_Application_Approved</members>
@@ -3240,10 +3569,11 @@
         <members>ReviewerPortal1</members>
         <members>Reviewer_Portal_Enhanced1</members>
         <members>Reviewer_Portal_New1</members>
-        <members>WCF1</members>
         <members>WCF_Reviewer_Portal1</members>
         <members>WIN_COE1</members>
+        <members>Wadhwani_Grants1</members>
         <members>Wadhwani_Org1</members>
+        <members>Win_Admin1</members>
         <name>ExperienceBundle</name>
     </types>
     <types>
@@ -3293,6 +3623,7 @@
         <members>Home_Page_Default1</members>
         <members>Home_Page_Default2</members>
         <members>Home_Page_Default3</members>
+        <members>IndustriesEcm_UtilityBar</members>
         <members>Institute_Proposal_Record_Page</members>
         <members>Institute_Proposal_Record_Page1</members>
         <members>Integration_UtilityBar</members>
@@ -3310,13 +3641,11 @@
         <members>Proposal_Record_Page4</members>
         <members>Proposal_Record_Page5</members>
         <members>Proposal_Record_Page6</members>
-        <members>Proposal_Review_Record_Page</members>
-        <members>Proposal_Review_Record_Page1</members>
-        <members>Proposal_Review_Record_Page2</members>
-        <members>Proposal_Review_Record_Page3</members>
         <members>Reviewer_Assignment_Report</members>
+        <members>Reviewer_Page</members>
         <members>SalesCloudMobile_UtilityBar</members>
         <members>Translated_Proposal_Record_Page</members>
+        <members>Validator_Page</members>
         <members>WCF_Account_Record_Page</members>
         <members>WCF_Grant_Managment_UtilityBar</members>
         <members>Wadhwani_Grant_Management_UtilityBar</members>
@@ -3362,6 +3691,8 @@
         <members>Volody_Contract_Creation_Screen_Flow</members>
         <members>Volody_Contract_Creation_for_PersonAccount</members>
         <members>Volody_contract_creation_callout_Flow</members>
+        <members>WCF_Application_Decision_Flow</members>
+        <members>WCF_Approver_Email_Alert_Flow</members>
         <members>WCF_Assign_proposals_to_reviewers</members>
         <members>WCF_AutoConvertLeads</members>
         <members>WCF_Mail_Escalations</members>
@@ -3369,6 +3700,7 @@
         <members>WCF_Send_email_on_proposal_submission</members>
         <members>WCF_Update_Org_name_in_account</members>
         <members>WCF_User_Account_Update</members>
+        <members>WF_Compliance_Document_flow</members>
         <members>WIN_AVERAGE_SCORE_CALCULATION</members>
         <members>WIN_Assign_proposals_to_reviewers</members>
         <members>WIN_Invite_Reviewers</members>
@@ -3423,6 +3755,8 @@
         <members>Volody_Contract_Creation_Screen_Flow</members>
         <members>Volody_Contract_Creation_for_PersonAccount</members>
         <members>Volody_contract_creation_callout_Flow</members>
+        <members>WCF_Application_Decision_Flow</members>
+        <members>WCF_Approver_Email_Alert_Flow</members>
         <members>WCF_Assign_proposals_to_reviewers</members>
         <members>WCF_AutoConvertLeads</members>
         <members>WCF_Mail_Escalations</members>
@@ -3430,6 +3764,7 @@
         <members>WCF_Send_email_on_proposal_submission</members>
         <members>WCF_Update_Org_name_in_account</members>
         <members>WCF_User_Account_Update</members>
+        <members>WF_Compliance_Document_flow</members>
         <members>WIN_AVERAGE_SCORE_CALCULATION</members>
         <members>WIN_Assign_proposals_to_reviewers</members>
         <members>WIN_Invite_Reviewers</members>
@@ -3470,7 +3805,17 @@
         <members>FundraisingConfig</members>
         <name>FundraisingConfig</name>
     </types>
-
+    <types>
+        <members>Flex_Translation_Prompt</members>
+        <members>Grant_Field_Feedback_Template</members>
+        <members>Proposal_AI_Feedback_Update_Prompt</members>
+        <members>Proposal_AI_Feedback_Update_Prompt1</members>
+        <members>Proposal_AI_Feedback_Update_Prompt2</members>
+        <members>Proposal_Translation_Prompt</members>
+        <members>Sample_summay</members>
+        <members>Translate_Proposal_New</members>
+        <name>GenAiPromptTemplate</name>
+    </types>
     <types>
         <members>Country</members>
         <members>Country_Code</members>
@@ -3511,8 +3856,8 @@
         <members>ProposallReviewerPortal.Banned</members>
         <members>ReviewerPortal.Banned</members>
         <members>WCF Reviewer Portal.Banned</members>
-        <members>WCF.Banned</members>
         <members>WIN COE.Banned</members>
+        <members>Wadhwani Grants.Banned</members>
         <members>Wadhwani Org.Banned</members>
         <name>KeywordList</name>
     </types>
@@ -3545,8 +3890,10 @@
         <members>ApplicationReview-Reviewer Project Proposal Review</members>
         <members>ApplicationReview-WCF Job Fulfilment Review</members>
         <members>ApplicationReview-WCF Validator</members>
+        <members>ApplicationReview-WG Reviewer</members>
         <members>ApplicationStageDefinition-Application Stage Definition Layout</members>
         <members>ApplicationTimeline-Application Timeline Layout</members>
+        <members>Application_FAQ__c-Application FAQ Layout</members>
         <members>Approval_History__c-Approval History Layout</members>
         <members>AssessmentIndicatorDefinition-Assessment Indicator Definition Layout</members>
         <members>AssessmentTask-Assessment Task Layout</members>
@@ -3666,6 +4013,7 @@
         <members>IndividualApplication-WCF Job Creation %26 Fulfillment layout</members>
         <members>IndividualApplication-WCF Job Creation layout</members>
         <members>IndividualApplication-WCFJob Fulfillment layout</members>
+        <members>IndividualApplication-Wadhwani Grants</members>
         <members>IndividualApplicationTask-Individual Application Task Layout</members>
         <members>Institute_Proposal__c-COE layout</members>
         <members>Institute_Proposal__c-Institute Proposal Layout</members>
@@ -3703,10 +4051,16 @@
         <members>Program-Program Layout</members>
         <members>ProgramEnrollment-Program Enrollment Layout</members>
         <members>QuickText-Quick Text Layout</members>
-        <members>ReceivedDocument-Received Document Layout</members>
-        <members>ReceivedDocumentType-Received Document Type Layout</members>
+        <members>RFI_Dependency_Rule__mdt-RFI Dependency Rule Layout</members>
+        <members>RFI_Question__mdt-RFI Question Layout</members>
+        <members>RFI_Section__mdt-RFI Section Layout</members>
+        <members>RFI_Track__mdt-RFI Track Layout</members>
+        <members>RFI_Translation__mdt-RFI Translation Layout</members>
+        <members>RFI_Validation_Rule__mdt-RFI Validation Rule Layout</members>
         <members>RecurrenceSchedule-Recurrence Schedule Layout</members>
+        <members>Reviewer_Category_v5__mdt-Reviewer Category v5 Layout</members>
         <members>Reviewer_Query__c-Reviewer Query Layout</members>
+        <members>Reviewer_Question_v5__mdt-Reviewer Question v5 Layout</members>
         <members>SalesforceContract-Salesforce Contract Layout</members>
         <members>SalesforceInvoice-Salesforce Invoice Layout</members>
         <members>Scorecard-Scorecard Layout</members>
@@ -3735,14 +4089,19 @@
         <members>UserProvAccount-User Provisioning Account Layout</members>
         <members>UserProvisioningLog-User Provisioning Log Layout</members>
         <members>UserProvisioningRequest-User Provisioning Request Layout</members>
+        <members>Validator_Question__mdt-Validator Question Layout</members>
+        <members>Validator_Section__mdt-Validator Section Layout</members>
         <members>Visit-Visit Layout</members>
         <members>VisitedParty-Visited Party Layout</members>
         <members>Visitor-Visitor Layout</members>
         <members>Volody_contract__c-Volody contract Layout</members>
         <members>WCF_Business_Sector__c-WCF Business Sector Layout</members>
+        <members>WCF_Community__c-WCF Community Layout</members>
         <members>WCF_Compliance_Document__c-WCF Compliance Document Layout</members>
         <members>WCF_Executed_Agreement_c__c-WCF Executed Agreement Layout</members>
+        <members>WCF_Livelihood_Program__c-WCF Livelihood Program Layout</members>
         <members>WCF_Skilling_Domain__c-WCF Skilling Domain Layout</members>
+        <members>WCF_Supporting_Document__c-WCF Supporting Document Layout</members>
         <members>WIN_COE_Share_Log__c-WIN COE Share Log Layout</members>
         <members>WorkOrder-Work Order Layout</members>
         <members>WorkOrderLineItem-Work Order Line Item Layout</members>
@@ -3755,6 +4114,7 @@
     </types>
     <types>
         <members>WCF</members>
+        <members>Wadhwani_Grants</members>
         <name>Letterhead</name>
     </types>
     <types>
@@ -3762,6 +4122,7 @@
         <members>applicationReviewStatus</members>
         <members>approvalHistoryDataTableForCOE</members>
         <members>approvedProposalsDashboard</members>
+        <members>assignedProposals</members>
         <members>autoRedirect</members>
         <members>awardeeDashboard</members>
         <members>coeApplicationListViewV2</members>
@@ -3786,6 +4147,7 @@
         <members>coeStatsCards</members>
         <members>coeWelcomeHeader</members>
         <members>coepath</members>
+        <members>commonStyleTheme</members>
         <members>currentFiscalYearDataTable</members>
         <members>customActionDropdown</members>
         <members>customRichTextArea</members>
@@ -3800,6 +4162,7 @@
         <members>fundingAwardDetail</members>
         <members>fundingAwardList</members>
         <members>historicalDataTable</members>
+        <members>inProgressReviews</members>
         <members>individualApplicationExport</members>
         <members>instituteRegister_Form</members>
         <members>level1Form</members>
@@ -3833,6 +4196,7 @@
         <members>resumeDraftSandbox</members>
         <members>resumeDraftWcfForm</members>
         <members>resumeWinSaveDraftForm</members>
+        <members>reviewExportModal</members>
         <members>reviewSummary</members>
         <members>reviewerAskQuery</members>
         <members>reviewerDashboard</members>
@@ -3842,6 +4206,7 @@
         <members>reviewerQueryList</members>
         <members>reviewerReport</members>
         <members>reviewerstatushome</members>
+        <members>roleContext</members>
         <members>selfRegisterForm</members>
         <members>startTour</members>
         <members>statusPath</members>
@@ -3864,20 +4229,26 @@
         <members>wcfBothReviewerForm</members>
         <members>wcfComplianceDocs</members>
         <members>wcfComplianceDocuments</members>
+        <members>wcfDesignToken</members>
+        <members>wcfDynamicForm</members>
         <members>wcfEligibilityModal</members>
         <members>wcfForm</members>
+        <members>wcfFormEvaluator</members>
         <members>wcfFormPreview</members>
         <members>wcfHomeDashboard</members>
         <members>wcfJobCreationReviewerForm</members>
         <members>wcfPdfGeneration</members>
         <members>wcfPortalHeader</members>
         <members>wcfPortalSidebar</members>
+        <members>wcfPortalUi</members>
+        <members>wcfPortalUiPreview</members>
         <members>wcfProposalListView</members>
         <members>wcfProposalReviewForm</members>
         <members>wcfReturnBanner</members>
         <members>wcfReviewerContainer</members>
         <members>wcfReviewerFormPreview</members>
         <members>wcfRfiResponsePage</members>
+        <members>wcfRfiWelcomePage</members>
         <members>wcfThemeLayout</members>
         <members>wcfTranslatedPdfGeneration</members>
         <members>wcfValidatorDashboard</members>
@@ -3886,6 +4257,7 @@
         <members>wcfvalidatorcontainer</members>
         <members>wfGrantsSignup</members>
         <members>wgApproverDashboard</members>
+        <members>wgGlobaltokens</members>
         <members>wgPlassignmentQueue</members>
         <members>wgPlofRecord</members>
         <members>wgReviewerDashboard</members>
@@ -3897,6 +4269,7 @@
         <members>winFormWithSaveDraft</members>
         <members>winProjectProposalForm_New</members>
         <members>win_ApplicationForm</members>
+        <members>yetToStartApplications</members>
         <name>LightningComponentBundle</name>
     </types>
     <types>
@@ -3935,6 +4308,7 @@
         <members>ApplicationReview.WCF_Validator</members>
         <members>ApplicationStageDefinition.All_ApplicationStageDefinitions</members>
         <members>ApplicationTimeline.All_ApplicationTimelines</members>
+        <members>Application_FAQ__c.All</members>
         <members>ApprovalSubmission.All_ApprovalSubmissions</members>
         <members>ApprovalSubmission.My_ApprovalSubmissions</members>
         <members>ApprovalSubmission.Pending_ApprovalSubmissions</members>
@@ -3948,6 +4322,12 @@
         <members>AssessmentTaskDefinition.All_AssessmentTaskDefinition</members>
         <members>AssessmentTaskOrder.All_AssessmentTaskOrder</members>
         <members>Asset.AllAssets</members>
+        <members>AttrPicklistExcludedValue.All_AttrPicklistExcludedValues</members>
+        <members>AttributeCategory.All_AttributeCategorys</members>
+        <members>AttributeCategoryAttribute.All_AttributeCategoryAttributes</members>
+        <members>AttributeDefinition.All_AttributeDefinitions</members>
+        <members>AttributePicklist.All_AttributePicklists</members>
+        <members>AttributePicklistValue.All_AttributePicklistValues</members>
         <members>AuthorizationForm.All_AuthorizationForms</members>
         <members>AuthorizationFormConsent.All_AuthorizationFormConsents</members>
         <members>AuthorizationFormDataUse.All_AuthorizationFormDataUses</members>
@@ -3977,6 +4357,7 @@
         <members>BusinessMilestone.All_BusinessMilestones</members>
         <members>COE_PI_Share_Log__c.All</members>
         <members>CalculationMatrix.All_CalculationMatrices</members>
+        <members>CalculationMatrix.Org_PCM_Decision_Table</members>
         <members>CalculationProcedure.All_CalculationProcedures</members>
         <members>Campaign.AllActiveCampaigns</members>
         <members>Campaign.MyActiveCampaigns</members>
@@ -3989,6 +4370,7 @@
         <members>Case.MyOpenCases</members>
         <members>Case.Support_Users_Case</members>
         <members>CaseParticipant.All_CaseParticipants</members>
+        <members>CaseProgram.All_CasePrograms</members>
         <members>ChangeRequest.AllChangeRequestsDefault</members>
         <members>ChannelProgram.All_Channel_Programs</members>
         <members>ChannelProgram.My_Channel_Programs</members>
@@ -4035,6 +4417,7 @@
         <members>DataUsePurpose.All_DataUsePurposes</members>
         <members>DelegatedAccount.All_External_Managed_Accounts</members>
         <members>DelegatedAccount.My_External_Managed_Accounts</members>
+        <members>DocChkItemValidatedTarget.All_DocChkItemValidatedTargets</members>
         <members>DocGenerationQueryResult.All_DocGenerationQueryResults</members>
         <members>DocumentChecklistItem.All_DocumentChecklistItems</members>
         <members>DocumentEnvelope.All_DocumentEnvelopes</members>
@@ -4057,6 +4440,7 @@
         <members>Event.TodaysAgenda</members>
         <members>ExpressionSet.All_ExpressionSets</members>
         <members>ExpressionSet.All_ITServiceManagement</members>
+        <members>ExpressionSet.Org_PCM_Qual_Proc</members>
         <members>ExtDataShare.All_ExtDataShares</members>
         <members>ExtDataShareTarget.All_ExtDataShareTargets</members>
         <members>ExtDataShareTarget.My_ExtDataShareTargets</members>
@@ -4162,6 +4546,8 @@
         <members>Order.AllActivatedOrders</members>
         <members>Order.AllDraftOrders</members>
         <members>Order.AllOrders</members>
+        <members>OutboundEngagementTemplate.All_OutboundEngagementTemplates</members>
+        <members>OutboundEngmtContentRsrc.All_OutboundEngmtContentRsrcs</members>
         <members>Outcome_File_Map__c.All</members>
         <members>Outcomes_Data__c.All</members>
         <members>OutreachSourceCode.All_OutreachSourceCodes</members>
@@ -4192,11 +4578,26 @@
         <members>Problem.AllProblemsDefault</members>
         <members>ProcessException.all_process_exceptions</members>
         <members>Product2.AllProducts</members>
+        <members>ProductAttributeDefinition.All_ProductAttributeDefinitions</members>
+        <members>ProductCatalog.All_ProductCatalogs</members>
+        <members>ProductCategory.All_ProductCategorys</members>
+        <members>ProductCategory.Org_ProductCategory_Hierarchy</members>
+        <members>ProductCategoryDisqual.All_ProductCategoryDisquals</members>
+        <members>ProductCategoryQualification.All_ProductCategoryQualifications</members>
+        <members>ProductClassification.All_ProductClassifications</members>
+        <members>ProductClassificationAttr.All_ProductClassificationAttrs</members>
+        <members>ProductComponentGroup.All_ProductComponentGroups</members>
+        <members>ProductComponentGrpOverride.All_ProductComponentGrpOverrides</members>
+        <members>ProductConfigurationFlow.All_ProductConfigurationFlows</members>
+        <members>ProductDisqualification.All_ProductDisqualifications</members>
+        <members>ProductQualification.All_ProductQualifications</members>
+        <members>ProductRelComponentOverride.All_ProductRelComponentOverrides</members>
+        <members>ProductRelationshipType.AllProductRelationshipTypes</members>
+        <members>ProductSellingModel.All_ProductSellingModels</members>
         <members>Program.WCF_Programs</members>
         <members>Program.WIN_Programs</members>
         <members>ProgramEnrollment.All_ProgramEnrollments</members>
-        <members>ReceivedDocument.All_ReceivedDocuments</members>
-        <members>ReceivedDocumentType.All_ReceivedDocumentTypes</members>
+        <members>RFI_Section__mdt.Sys_Admin</members>
         <members>Recommendation.All_Recommendations</members>
         <members>RecordAggregationResult.All_RecordAggregationResults</members>
         <members>RecordAlert.all_record_alerts</members>
@@ -4224,6 +4625,7 @@
         <members>Translated_Historical_Data__c.All</members>
         <members>Translated_Outcome_Data__c.All</members>
         <members>Translated_Proposal__c.All</members>
+        <members>UnitOfMeasure.All_UnitOfMeasures</members>
         <members>User.ActiveUsers</members>
         <members>User.AdminUsers</members>
         <members>User.AllUsers</members>
@@ -4232,8 +4634,11 @@
         <members>VisitedParty.All_VisitedParty</members>
         <members>Visitor.All_Visitor</members>
         <members>Volody_contract__c.All</members>
+        <members>WCF_Community__c.All</members>
         <members>WCF_Compliance_Document__c.All</members>
         <members>WCF_Executed_Agreement_c__c.All</members>
+        <members>WCF_Livelihood_Program__c.All</members>
+        <members>WCF_Supporting_Document__c.All</members>
         <members>WIN_COE_Share_Log__c.All</members>
         <members>WorkOrder.All_WorkOrders</members>
         <members>WorkOrder.My_WorkOrders</members>
@@ -4258,7 +4663,10 @@
         <members>Account</members>
         <members>Address</members>
         <members>Applicant</members>
+        <members>CaseParticipant</members>
         <members>Contact</members>
+        <members>ContactPointEmail</members>
+        <members>ContactPointPhone</members>
         <members>Individual</members>
         <members>Lead</members>
         <members>PartyProfile</members>
@@ -4299,16 +4707,16 @@
         <members>WCF Reviewer Portal.Freeze_for_frequent_posting</members>
         <members>WCF Reviewer Portal.Replace_banned</members>
         <members>WCF Reviewer Portal.Review_the_first_post</members>
-        <members>WCF.Block_banned_keywords</members>
-        <members>WCF.Flag_banned</members>
-        <members>WCF.Freeze_for_frequent_posting</members>
-        <members>WCF.Replace_banned</members>
-        <members>WCF.Review_the_first_post</members>
         <members>WIN COE.Block_banned_keywords</members>
         <members>WIN COE.Flag_banned</members>
         <members>WIN COE.Freeze_for_frequent_posting</members>
         <members>WIN COE.Replace_banned</members>
         <members>WIN COE.Review_the_first_post</members>
+        <members>Wadhwani Grants.Block_banned_keywords</members>
+        <members>Wadhwani Grants.Flag_banned</members>
+        <members>Wadhwani Grants.Freeze_for_frequent_posting</members>
+        <members>Wadhwani Grants.Replace_banned</members>
+        <members>Wadhwani Grants.Review_the_first_post</members>
         <members>Wadhwani Org.Block_banned_keywords</members>
         <members>Wadhwani Org.Flag_banned</members>
         <members>Wadhwani Org.Freeze_for_frequent_posting</members>
@@ -4340,10 +4748,11 @@
         <members>SFDC_Default_Navigation_ReviewerPortal</members>
         <members>SFDC_Default_Navigation_Reviewer_Portal_Enhanced</members>
         <members>SFDC_Default_Navigation_Reviewer_Portal_New</members>
-        <members>SFDC_Default_Navigation_WCF</members>
         <members>SFDC_Default_Navigation_WCF_Reviewer_Portal</members>
         <members>SFDC_Default_Navigation_WIN_COE</members>
+        <members>SFDC_Default_Navigation_Wadhwani_Grants</members>
         <members>SFDC_Default_Navigation_Wadhwani_Org</members>
+        <members>SFDC_Default_Navigation_Win_Admin</members>
         <members>rev_reg_form</members>
         <name>NavigationMenu</name>
     </types>
@@ -4352,10 +4761,11 @@
         <members>Reviewer Portal Enhanced</members>
         <members>Reviewer Portal New</members>
         <members>ReviewerPortal</members>
-        <members>WCF</members>
         <members>WCF Reviewer Portal</members>
         <members>WIN COE</members>
+        <members>Wadhwani Grants</members>
         <members>Wadhwani Org</members>
+        <members>Win Admin</members>
         <name>Network</name>
     </types>
     <types>
@@ -4367,10 +4777,11 @@
         <members>cbReviewerPortal</members>
         <members>cbReviewer_Portal_Enhanced</members>
         <members>cbReviewer_Portal_New</members>
-        <members>cbWCF</members>
         <members>cbWCF_Reviewer_Portal</members>
         <members>cbWIN_COE</members>
+        <members>cbWadhwani_Grants</members>
         <members>cbWadhwani_Org</members>
+        <members>cbWin_Admin</members>
         <name>NetworkBranding</name>
     </types>
     <types>
@@ -4412,6 +4823,8 @@
         <members>sfdcInternalInt__sfdc_a360_sfcrm_data_extract</members>
         <members>sfdcInternalInt__sfdc_chatbot</members>
         <members>sfdcInternalInt__sfdc_nc_constraints_engine_deploy</members>
+        <members>sfdcInternalInt__sfdc_platformmetabolism_slagent</members>
+        <members>sfdcInternalInt__sfdc_tua_dqa_service</members>
         <members>sfdc_aiplanner_service_permset</members>
         <members>wadhwani_Grants_permission_set</members>
         <name>PermissionSet</name>
@@ -4430,12 +4843,18 @@
         <members>force__PartnerCloudChannelManagerPsg</members>
         <members>force__PartnerCloudPartnerUserPsg</members>
         <members>force__PartnerEmailAndFlowAccessPsg</members>
+        <members>force__Program_Management_Administrator</members>
+        <members>force__Program_Management_User</members>
         <members>force__SalesCloudCallCoachingSeller</members>
         <members>force__SalesCloudSeller</members>
         <members>force__SalesWorkspacePSG</members>
         <members>force__ScaleCenterUsers</members>
+        <members>force__SetupWithAgentforceUserPsg</members>
         <members>force__Social_Program_Management_Caseworker</members>
         <members>force__Social_Program_Management_Constituent</members>
+        <members>force__UnifiedCatalogAdminPsl</members>
+        <members>force__UnifiedCatalogAgentPsl</members>
+        <members>force__UnifiedCatalogCommunityUserPsl</members>
         <members>force__Volunteer_Management_User</members>
         <name>PermissionSetGroup</name>
     </types>
@@ -4474,13 +4893,14 @@
         <members>Salesforce API Only System Integrations</members>
         <members>SolutionManager</members>
         <members>Standard</members>
-        <members>WCF Profile</members>
         <members>WCF Reviewer</members>
         <members>WCF Reviewer Portal Profile</members>
         <members>WCF Site User</members>
         <members>WIN COE Profile</members>
         <members>WIN Profile</members>
+        <members>Wadhwani Grants Profile</members>
         <members>Wadhwani Org Profile</members>
+        <members>Win Admin Profile</members>
         <name>Profile</name>
     </types>
     <types>
@@ -4538,6 +4958,7 @@
         <members>Account.WCFECF</members>
         <members>Account.WCF_Reviewer</members>
         <members>ApplicationDecision.Approver</members>
+        <members>ApplicationDecision.WG_Approver</members>
         <members>ApplicationDecision.WIN_Approver</members>
         <members>ApplicationReview.CEO_Admin_Project_Proposal_Review</members>
         <members>ApplicationReview.COE_Proposal_Review</members>
@@ -4546,6 +4967,7 @@
         <members>ApplicationReview.WCF_Job_Fulfillment</members>
         <members>ApplicationReview.WCF_Job_Fulfillment_Job_Creation</members>
         <members>ApplicationReview.WCF_Validator</members>
+        <members>ApplicationReview.WG_Reviewer</members>
         <members>Contact.COE</members>
         <members>Contact.Reviewer</members>
         <members>Contact.WCF</members>
@@ -4557,6 +4979,7 @@
         <members>IndividualApplication.WCF_Job_Creation_Proposals</members>
         <members>IndividualApplication.WCF_Job_Fulfillment_Job_Creation_Proposals</members>
         <members>IndividualApplication.WCF_Job_Fulfillment_Proposals</members>
+        <members>IndividualApplication.Wadhwani_Grants</members>
         <members>Program.WCF_Program</members>
         <members>Program.WIN_Program</members>
         <members>Self_Registration_Request__c.Institute_Register</members>
@@ -4639,6 +5062,7 @@
         <members>unfiled$public/SampleReportofSolutions</members>
         <members>unfiled$public/SampleReportofTasksandActivities</members>
         <members>unfiled$public/SampleReportsLeadsbyStatus</members>
+        <members>unfiled$public/User_with_License_Info_Report_UaL</members>
         <members>unfiled$public/flow_orchestration_log_ootb_report_two_four_eight</members>
         <members>unfiled$public/flow_orchestration_run_ootb_report_two_four_eight</members>
         <members>unfiled$public/flow_orchestration_stage_run_ootb_report_two_four_eight</members>
@@ -4659,6 +5083,7 @@
         <members>Proposals</members>
         <members>Proposals_with_Milestones</members>
         <members>Proposals_with_Reviews</members>
+        <members>User_with_License_Info</members>
         <members>flow_orchestration_log_ootb_crt_two_four_eight</members>
         <members>flow_orchestration_run_crt</members>
         <members>flow_orchestration_run_ootb_crt_two_four_eight</members>
@@ -4718,6 +5143,7 @@
         <members>Actions</members>
         <members>Activities</members>
         <members>Address</members>
+        <members>AdminSuccess</members>
         <members>AgentPlatform</members>
         <members>AgentforceForDevelopers</members>
         <members>Ai4m</members>
@@ -4738,15 +5164,16 @@
         <members>ConnectedApp</members>
         <members>Content</members>
         <members>Contract</members>
-        <members>ConversationServiceIntegration</members>
         <members>ConversationalIntelligence</members>
         <members>Currency</members>
         <members>CustomAddressField</members>
         <members>CustomerDataPlatform</members>
         <members>CustomizablePropensityScoring</members>
         <members>DataImportManagement</members>
+        <members>DataMask</members>
         <members>Deployment</members>
         <members>DevHub</members>
+        <members>DigitalWallet</members>
         <members>Discovery</members>
         <members>DocumentChecklist</members>
         <members>DxGlobalTerms</members>
@@ -4765,10 +5192,12 @@
         <members>EmployeeUser</members>
         <members>EncryptionKey</members>
         <members>EnhancedNotes</members>
+        <members>EnterpriseApi</members>
         <members>Entitlement</members>
         <members>Essentials</members>
         <members>Event</members>
         <members>Evf</members>
+        <members>EvidenceMgmt</members>
         <members>ExperienceBundle</members>
         <members>ExternalClientApp</members>
         <members>FileUploadAndDownloadSecurity</members>
@@ -4778,6 +5207,7 @@
         <members>ForecastingObjectList</members>
         <members>Formula</members>
         <members>GRCIntelligenceUdd</members>
+        <members>GenerativeCampaigns</members>
         <members>GoogleApps</members>
         <members>HerokuAppLink</members>
         <members>HighVelocitySales</members>
@@ -4788,6 +5218,7 @@
         <members>IndustriesContext</members>
         <members>IndustriesEinsteinFeature</members>
         <members>IndustriesEnergyUtilitiesMultiSite</members>
+        <members>IndustriesInsurance</members>
         <members>IndustriesUnifiedInventory</members>
         <members>InsuranceBrokerage</members>
         <members>InterestTagging</members>
@@ -4796,6 +5227,7 @@
         <members>Language</members>
         <members>LeadConfig</members>
         <members>LightningExperience</members>
+        <members>MCETransformations</members>
         <members>Macro</members>
         <members>MailMerge</members>
         <members>MapsAndLocation</members>
@@ -4827,8 +5259,10 @@
         <members>Privacy</members>
         <members>PrmCore</members>
         <members>Product</members>
+        <members>ProductCatalogManagement</members>
         <members>ProductDiscovery</members>
         <members>PurchaseOrderMgmt</members>
+        <members>QualityManagement</members>
         <members>QuickText</members>
         <members>Quote</members>
         <members>RealTimeEvent</members>
@@ -4844,10 +5278,11 @@
         <members>Security</members>
         <members>ServiceAIRecommendations</members>
         <members>ServiceCloudVoice</members>
+        <members>ServiceIssueManagement</members>
+        <members>ServiceItsmChangeManagement</members>
         <members>ServiceItsmIntelligenceUdd</members>
         <members>ServiceProcess</members>
         <members>ServiceSetupAssistant</members>
-        <members>SetupCopilot</members>
         <members>Sharing</members>
         <members>Site</members>
         <members>SocialCustomerService</members>
@@ -4857,8 +5292,10 @@
         <members>SystemNotification</members>
         <members>Territory2</members>
         <members>Trailhead</members>
+        <members>TransactableMarketplacePrivateOffer</members>
         <members>TrialOrg</members>
         <members>UIBundle</members>
+        <members>UiWidget</members>
         <members>UserEngagement</members>
         <members>UserInterface</members>
         <members>UserManagement</members>
@@ -4872,7 +5309,6 @@
         <name>SharingCriteriaRule</name>
     </types>
     <types>
-        <members>AITestSuiteWorkbookAssoc</members>
         <members>AIWorkbook</members>
         <members>AI_Feedback__c</members>
         <members>Account</members>
@@ -4886,13 +5322,15 @@
         <members>ActivityRecurrence2</members>
         <members>ActivityRecurrence2Exception</members>
         <members>ActvTgtPlatformFieldValue</members>
-        <members>AiEvaluation</members>
         <members>AiGroundingFileRef</members>
+        <members>AiGroundingLibFileDef</members>
         <members>AiGroundingSourceStage</members>
         <members>AiGroundingWebRef</members>
         <members>AiJobRun</members>
         <members>AiJobRunItem</members>
+        <members>AiSkill</members>
         <members>AnalyticsUserAttrFuncTkn</members>
+        <members>ApplicantApplicantRelation</members>
         <members>ApplicationDecision</members>
         <members>ApplicationForm</members>
         <members>ApplicationFormProduct</members>
@@ -4900,6 +5338,7 @@
         <members>ApplicationReview</members>
         <members>ApplicationStageDefinition</members>
         <members>ApplicationTimeline</members>
+        <members>Application_FAQ__c</members>
         <members>ApprovalSubmission</members>
         <members>Approval_History__c</members>
         <members>AssessmentIndicatorDefinition</members>
@@ -4910,6 +5349,11 @@
         <members>AssistantProgress</members>
         <members>AssistantRecommendation</members>
         <members>AsyncOperationTracker</members>
+        <members>AttrPicklistExcludedValue</members>
+        <members>AttributeCategory</members>
+        <members>AttributeCategoryAttribute</members>
+        <members>AttributeDefinition</members>
+        <members>AttributePicklist</members>
         <members>AuditTrailFileExport</members>
         <members>AuthorizationForm</members>
         <members>AuthorizationFormConsent</members>
@@ -4945,11 +5389,11 @@
         <members>ComponentResponseCache</members>
         <members>Contact</members>
         <members>ContactPointConsent</members>
+        <members>ContactPointOttSvc</members>
         <members>ContactPointTypeConsent</members>
         <members>ContactRequest</members>
         <members>ContentLink</members>
         <members>ContentSource</members>
-        <members>ContextAgent</members>
         <members>ConvCoachingRecommendation</members>
         <members>Customer</members>
         <members>DataActionJobSummary</members>
@@ -5014,6 +5458,7 @@
         <members>IndividualApplicationTask</members>
         <members>Institute_Proposal__c</members>
         <members>Institution__c</members>
+        <members>IntakeFormSection</members>
         <members>IntegrationProviderDcsnRqmt</members>
         <members>IntegrationProviderExecution</members>
         <members>JournalType</members>
@@ -5023,6 +5468,8 @@
         <members>LocationTrustMeasure</members>
         <members>Macro</members>
         <members>MacroUsage</members>
+        <members>MessagingEndUser</members>
+        <members>MessagingSession</members>
         <members>MktDataTransform</members>
         <members>MktDataTransformSvcLocator</members>
         <members>MktMLModel</members>
@@ -5041,6 +5488,8 @@
         <members>OperatingHours</members>
         <members>Opportunity</members>
         <members>Order</members>
+        <members>OutboundEngagementTemplate</members>
+        <members>OutboundEngmtContentRsrc</members>
         <members>Outcome_File_Map__c</members>
         <members>PartnerFundAllocation</members>
         <members>PartnerFundClaim</members>
@@ -5051,6 +5500,7 @@
         <members>PartyFinancialAsset</members>
         <members>PartyIncome</members>
         <members>PartyProfile</members>
+        <members>PartyProfileAddress</members>
         <members>PaymentRequest</members>
         <members>PersonDisability</members>
         <members>PersonEducation</members>
@@ -5059,8 +5509,20 @@
         <members>Problem</members>
         <members>ProcessException</members>
         <members>Product2</members>
+        <members>ProductAttributeDefinition</members>
         <members>ProductAvailabilityProjection</members>
+        <members>ProductCatalog</members>
+        <members>ProductCategoryDisqual</members>
+        <members>ProductCategoryQualification</members>
+        <members>ProductClassification</members>
+        <members>ProductClassificationAttr</members>
+        <members>ProductComponentGroup</members>
+        <members>ProductComponentGrpOverride</members>
+        <members>ProductConfigurationFlow</members>
+        <members>ProductDisqualification</members>
         <members>ProductFulfillmentLocation</members>
+        <members>ProductQualification</members>
+        <members>ProductRelComponentOverride</members>
         <members>ProfileSkill</members>
         <members>Program</members>
         <members>ProgramEnrollment</members>
@@ -5069,7 +5531,6 @@
         <members>PublicComplaint</members>
         <members>QuickText</members>
         <members>QuickTextUsage</members>
-        <members>ReceivedDocument</members>
         <members>RecordActnSelItemExtrc</members>
         <members>RecordAlert</members>
         <members>RecordMergeHistory</members>
@@ -5082,6 +5543,7 @@
         <members>SearchRecentQuery</members>
         <members>Seller</members>
         <members>ServiceContract</members>
+        <members>ServiceRequestRelatedRecord</members>
         <members>SetupDataSynchronization</members>
         <members>SfdcPartnerSbscrOffer</members>
         <members>SharingRecordCollection</members>
@@ -5093,6 +5555,7 @@
         <members>StgDefinitionAssignedRecord</members>
         <members>StreamActivityAccess</members>
         <members>StreamingChannel</members>
+        <members>SvcProcProdCatgProdExtrc</members>
         <members>TableauHostMapping</members>
         <members>TenantConsumptionAlert</members>
         <members>TodayGoal</members>
@@ -5133,10 +5596,11 @@
         <members>ReviewerPortal1</members>
         <members>Reviewer_Portal_Enhanced1</members>
         <members>Reviewer_Portal_New1</members>
-        <members>WCF1</members>
         <members>WCF_Reviewer_Portal1</members>
         <members>WIN_COE1</members>
+        <members>Wadhwani_Grants1</members>
         <members>Wadhwani_Org1</members>
+        <members>Win_Admin1</members>
         <name>SiteDotCom</name>
     </types>
     <types>
@@ -5257,11 +5721,14 @@
         <members>flagTelpicker</members>
         <members>html2canvas</members>
         <members>jszip</members>
+        <members>mammoth</members>
         <members>nda_icon</members>
         <members>shepherdCss</members>
         <members>shepherdJs</members>
+        <members>wcfFormFocusStyles</members>
         <members>wcfheaderlogo</members>
         <members>wcflogo</members>
+        <members>wgFonts</members>
         <members>xlsx</members>
         <name>StaticResource</name>
     </types>
@@ -5276,12 +5743,16 @@
         <members>Account</members>
         <members>ActionPlanTemplateAssignment</members>
         <members>ApplicationDecision</members>
+        <members>ApplicationFormRelation</members>
         <members>ApplicationRenderMethod</members>
         <members>ApplicationReview</members>
+        <members>ApplicationStageDefExt</members>
         <members>ApplicationStageDefinition</members>
         <members>ApplicationTimeline</members>
+        <members>Application_FAQ__c</members>
         <members>Approval_History__c</members>
         <members>Asset</members>
+        <members>AssociatedLocation</members>
         <members>BenefitAssignment</members>
         <members>BenefitAssignmentAdjustment</members>
         <members>BenefitAssignmentAsset</members>
@@ -5319,6 +5790,7 @@
         <members>IndividualApplicationTask</members>
         <members>Institute_Proposal__c</members>
         <members>Institution__c</members>
+        <members>IntakeFormSection</members>
         <members>Lead</members>
         <members>Milestone__c</members>
         <members>Opportunity</members>
@@ -5348,9 +5820,12 @@
         <members>Translated_Skilling_Domain__c</members>
         <members>Volody_contract__c</members>
         <members>WCF_Business_Sector__c</members>
+        <members>WCF_Community__c</members>
         <members>WCF_Compliance_Document__c</members>
         <members>WCF_Executed_Agreement_c__c</members>
+        <members>WCF_Livelihood_Program__c</members>
         <members>WCF_Skilling_Domain__c</members>
+        <members>WCF_Supporting_Document__c</members>
         <members>WIN_COE_Share_Log__c</members>
         <members>WorkOrder</members>
         <members>WorkOrderLineItem</members>
@@ -5388,12 +5863,10 @@
         <members>Proposal_Record_Page4</members>
         <members>Proposal_Record_Page5</members>
         <members>Proposal_Record_Page6</members>
-        <members>Proposal_Review_Record_Page</members>
-        <members>Proposal_Review_Record_Page1</members>
-        <members>Proposal_Review_Record_Page2</members>
-        <members>Proposal_Review_Record_Page3</members>
         <members>Reviewer_Assignment_Report</members>
+        <members>Reviewer_Page</members>
         <members>Translated_Proposal_Record_Page</members>
+        <members>Validator_Page</members>
         <members>WCF_Account_Record_Page</members>
         <name>UiViewDefinition</name>
     </types>
@@ -5407,12 +5880,12 @@
         <members>WCF Reviewer Portal.Customer_Members</members>
         <members>WCF Reviewer Portal.Members_without_contribution</members>
         <members>WCF Reviewer Portal.Partner_and_Customer_members</members>
-        <members>WCF.Customer_Members</members>
-        <members>WCF.Members_without_contribution</members>
-        <members>WCF.Partner_and_Customer_members</members>
         <members>WIN COE.Customer_Members</members>
         <members>WIN COE.Members_without_contribution</members>
         <members>WIN COE.Partner_and_Customer_members</members>
+        <members>Wadhwani Grants.Customer_Members</members>
+        <members>Wadhwani Grants.Members_without_contribution</members>
+        <members>Wadhwani Grants.Partner_and_Customer_members</members>
         <members>Wadhwani Org.Customer_Members</members>
         <members>Wadhwani Org.Members_without_contribution</members>
         <members>Wadhwani Org.Partner_and_Customer_members</members>
@@ -5557,6 +6030,8 @@
         <members>Volody_Contract_Creation_Screen_Flow</members>
         <members>Volody_Contract_Creation_for_PersonAccount</members>
         <members>Volody_contract_creation_callout_Flow</members>
+        <members>WCF_Application_Decision_Flow</members>
+        <members>WCF_Approver_Email_Alert_Flow</members>
         <members>WCF_Assign_proposals_to_reviewers</members>
         <members>WCF_AutoConvertLeads</members>
         <members>WCF_Mail_Escalations</members>
@@ -5564,6 +6039,7 @@
         <members>WCF_Send_email_on_proposal_submission</members>
         <members>WCF_Update_Org_name_in_account</members>
         <members>WCF_User_Account_Update</members>
+        <members>WF_Compliance_Document_flow</members>
         <members>WIN_AVERAGE_SCORE_CALCULATION</members>
         <members>WIN_Assign_proposals_to_reviewers</members>
         <members>WIN_Invite_Reviewers</members>
@@ -5580,5 +6056,5 @@
         <members>Win_PI_Form</members>
         <name>WorkflowFlowAutomation</name>
     </types>
-    <version>66.0</version>
+    <version>67.0</version>
 </Package>

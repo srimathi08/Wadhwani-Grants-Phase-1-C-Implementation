@@ -7,9 +7,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>Onboarding_Complete_Email</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -57,72 +54,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Onboarding_Complete_Email</name>
-        <label>Your onboarding is complete (E-23)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>Get_Approver_Account_For_Compliance</targetReference>
-        </connector>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>Get_Applicant_Email.Email</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Onboarding_Complete_Partner</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>Get_Applicant_Email.Id</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -184,7 +116,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -204,7 +136,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Contact_30.Email</elementReference>
+                    <elementReference>Get_Contact.Email</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -232,21 +164,21 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Documents_Reminder</setupReference>
+                <setupReference>WCF_Folder/Compliance_Documents_Reminder_30_days</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Contact_30.Id</elementReference>
+                <elementReference>Get_Contact.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -294,7 +226,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Documents_Reminder</setupReference>
+                <setupReference>WCF_Folder/Compliance_Documents_Reminder_60_days</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -308,7 +240,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -356,7 +288,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Documents_Reminder</setupReference>
+                <setupReference>WCF_Folder/Compliance_Documents_Reminder_90_days</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -370,7 +302,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -379,8 +311,8 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>Document_Expired</name>
-        <label>Compliance document expiry (E-23)</label>
+        <name>Compliance_documents_submitted_for_review</name>
+        <label>Compliance documents submitted for review</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -390,7 +322,7 @@
             <name>recipientAddresses</name>
             <value>
                 <collectionElements>
-                    <elementReference>Get_Applicant_Email.Email</elementReference>
+                    <elementReference>Get_Reviewer.PersonEmail</elementReference>
                 </collectionElements>
             </value>
         </inputParameters>
@@ -418,21 +350,83 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Document_Expiry</setupReference>
+                <setupReference>WCF_Folder/Compliance_documents_submitted_for_review</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
         <inputParameters>
             <name>recipientId</name>
             <value>
-                <elementReference>Get_Applicant_Email.Id</elementReference>
+                <elementReference>Get_Reviewer.PersonContactId</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Copy_1_of_Reminder_on_compliance_documents_90d_E_56</name>
+        <label>Copy 1 of Reminder on compliance documents 90d (E-56)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>Get_Contact_100.Email</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/We_have_paused_your_onboarding</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_Contact_100.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -447,6 +441,9 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Check_for_Reviewer</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -494,7 +491,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -556,7 +553,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -618,69 +615,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Send_Onboarding_Rejected_Email</name>
-        <label>Application declined on compliance (E-10)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>Get_Applicant_Email.Email</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Application_Decision_Declined</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>Get_Applicant_Email.Id</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -690,7 +625,7 @@
     </actionCalls>
     <actionCalls>
         <name>Send_Onboarding_Suspended_Email</name>
-        <label>Account suspended on compliance (E-59 / E-60)</label>
+        <label>Account suspended on compliance (E-59 )</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -742,69 +677,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
-        <offset>0</offset>
-        <versionString>3.0.1</versionString>
-    </actionCalls>
-    <actionCalls>
-        <name>Send_Compliance_Cleared_Approver_Email</name>
-        <label>Compliance cleared, ready for approval (E-33)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>recipientAddresses</name>
-            <value>
-                <collectionElements>
-                    <elementReference>Get_Approver_Account_For_Compliance.PersonEmail</elementReference>
-                </collectionElements>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>useEmailTemplate</name>
-            <value>
-                <stringValue>True</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailTemplateName</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Compliance_Cleared_Approver_Alert</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>recipientId</name>
-            <value>
-                <elementReference>Get_Approver_Account_For_Compliance.PersonContactId</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
+                <elementReference>$Record.Id</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
@@ -814,28 +687,6 @@
     </actionCalls>
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <decisions>
-        <name>Check_Approver_For_Compliance</name>
-        <label>Check Approver For Compliance</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
-        <rules>
-            <name>Approver_Found_For_Compliance</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Approver_Account_For_Compliance.PersonContactId</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Send_Compliance_Cleared_Approver_Email</targetReference>
-            </connector>
-            <label>Approver Found For Compliance</label>
-        </rules>
-    </decisions>
     <decisions>
         <name>Check_Applicant_For_Approved</name>
         <label>Check Applicant For Approved</label>
@@ -856,28 +707,6 @@
                 <targetReference>Approved_Email</targetReference>
             </connector>
             <label>Applicant Found For Approved</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <name>Check_Applicant_For_Rejected</name>
-        <label>Check Applicant For Rejected</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
-        <rules>
-            <name>Applicant_Found_For_Rejected</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Send_Onboarding_Rejected_Email</targetReference>
-            </connector>
-            <label>Applicant Found For Rejected</label>
         </rules>
     </decisions>
     <decisions>
@@ -925,6 +754,28 @@
         </rules>
     </decisions>
     <decisions>
+        <name>Check_Contact_100</name>
+        <label>Check Contact 100</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Contact_Found_100</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Contact_100.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_Reminder_on_compliance_documents_90d_E_56</targetReference>
+            </connector>
+            <label>Contact Found 100</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Check_Contact_30</name>
         <label>Check Contact 30</label>
         <locationX>0</locationX>
@@ -934,7 +785,7 @@
             <name>Contact_Found_30</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Contact_30.Id</leftValueReference>
+                <leftValueReference>Get_Contact.Id</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -991,6 +842,50 @@
         </rules>
     </decisions>
     <decisions>
+        <name>Check_for_Reviewer</name>
+        <label>Check for Reviewer</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Reviewer_Exist</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Reviewer.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Compliance_documents_submitted_for_review</targetReference>
+            </connector>
+            <label>Reviewer Exist</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Pending_Submission_100</name>
+        <label>Check Pending Submission 100</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Pending_Submission_on_100</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Doc_100_days.Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Pending Submission</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_IA_100</targetReference>
+            </connector>
+            <label>Pending Submission on 100</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Check_Pending_Submission_30</name>
         <label>Check Pending Submission 30</label>
         <locationX>0</locationX>
@@ -1004,13 +899,6 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <stringValue>Pending Submission</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>Get_Latest_Doc_30.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Required</stringValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -1035,13 +923,6 @@
                     <stringValue>Pending Submission</stringValue>
                 </rightValue>
             </conditions>
-            <conditions>
-                <leftValueReference>Get_Latest_Doc_60.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Required</stringValue>
-                </rightValue>
-            </conditions>
             <connector>
                 <targetReference>Get_IA_60</targetReference>
             </connector>
@@ -1064,13 +945,6 @@
                     <stringValue>Pending Submission</stringValue>
                 </rightValue>
             </conditions>
-            <conditions>
-                <leftValueReference>Get_Latest_Doc_90.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Required</stringValue>
-                </rightValue>
-            </conditions>
             <connector>
                 <targetReference>Get_IA_90</targetReference>
             </connector>
@@ -1085,7 +959,7 @@
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_Rule</name>
-            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
+            <conditionLogic>1 AND 2</conditionLogic>
             <conditions>
                 <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
                 <operator>IsNull</operator>
@@ -1098,13 +972,6 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <stringValue>Pending Submission</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Required</stringValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -1177,42 +1044,13 @@
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Pass</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Approved</stringValue>
+                    <stringValue>Validated</stringValue>
                 </rightValue>
             </conditions>
             <connector>
                 <targetReference>Update_IA_To_Onboarded</targetReference>
             </connector>
             <label>Pass</label>
-        </rules>
-        <rules>
-            <name>Reject_Rule</name>
-            <conditionLogic>or</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Reject</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Rejected</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Update_IA_To_Onboarding_Rejected</targetReference>
-            </connector>
-            <label>Reject</label>
         </rules>
         <rules>
             <name>Suspend_Rule</name>
@@ -1243,20 +1081,6 @@
                 <leftValueReference>$Record.Status__c</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Return</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Request Revision</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
                     <stringValue>Returned</stringValue>
                 </rightValue>
             </conditions>
@@ -1264,35 +1088,6 @@
                 <targetReference>Update_IA_To_Doc_Revision_Request</targetReference>
             </connector>
             <label>Return</label>
-        </rules>
-        <rules>
-            <name>Refresh_Required_Rule</name>
-            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Refresh Required</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Overdue</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Document_Expired</targetReference>
-            </connector>
-            <label>Refresh Required</label>
         </rules>
     </decisions>
     <environments>Default</environments>
@@ -1318,24 +1113,24 @@
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
     <recordLookups>
-        <name>Get_Approver_Account_For_Compliance</name>
-        <label>Get Approver Account For Compliance</label>
+        <name>Doc_100_days</name>
+        <label>Doc 100 days</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Check_Approver_For_Compliance</targetReference>
+            <targetReference>Check_Pending_Submission_100</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
-            <field>WCF_Approver__c</field>
+            <field>Id</field>
             <operator>EqualTo</operator>
             <value>
-                <booleanValue>true</booleanValue>
+                <elementReference>$Record.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Account</object>
+        <object>WCF_Compliance_Document__c</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -1345,7 +1140,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>STATUS_change</targetReference>
+            <targetReference>Get_Reviewer</targetReference>
         </connector>
         <filterLogic>or</filterLogic>
         <filters>
@@ -1367,8 +1162,8 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <name>Get_Contact_30</name>
-        <label>Get Contact 30</label>
+        <name>Get_Contact</name>
+        <label>Get Contact</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
@@ -1388,6 +1183,34 @@
             <operator>EqualTo</operator>
             <value>
                 <elementReference>Get_IA_30.AccountId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Contact</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Contact_100</name>
+        <label>Get Contact 100</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Contact_100</targetReference>
+        </connector>
+        <filterLogic>or</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_IA_100.ContactId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_IA_100.AccountId</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
@@ -1451,13 +1274,34 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
+        <name>Get_IA_100</name>
+        <label>Get IA 100</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Contact_100</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.IndividualApplication__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>IndividualApplication</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Get_IA_30</name>
         <label>Get IA 30</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_Contact_30</targetReference>
+            <targetReference>Get_Contact</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -1597,6 +1441,27 @@
         <object>IndividualApplication</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordLookups>
+        <name>Get_Reviewer</name>
+        <label>Get Reviewer</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>STATUS_change</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WCF_Reviewer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <recordUpdates>
         <name>Update_IA_To_Doc_Revision_Request</name>
         <label>Update IA To Doc Revision Request</label>
@@ -1646,30 +1511,6 @@
         <object>IndividualApplication</object>
     </recordUpdates>
     <recordUpdates>
-        <name>Update_IA_To_Onboarding_Rejected</name>
-        <label>Update IA To Onboarding Rejected</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <connector>
-            <targetReference>Check_Applicant_For_Rejected</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>$Record.IndividualApplication__c</elementReference>
-            </value>
-        </filters>
-        <inputAssignments>
-            <field>Status</field>
-            <value>
-                <stringValue>Onboarding Rejected</stringValue>
-            </value>
-        </inputAssignments>
-        <object>IndividualApplication</object>
-    </recordUpdates>
-    <recordUpdates>
         <name>Update_IA_To_Onboarding_Suspended</name>
         <label>Update IA To Onboarding Suspended</label>
         <locationX>0</locationX>
@@ -1709,7 +1550,7 @@
             <label>30 Days Compliance Reminder</label>
             <offsetNumber>30</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>CreatedDate</recordField>
+            <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <scheduledPaths>
@@ -1720,7 +1561,7 @@
             <label>60 Days Compliance Reminder</label>
             <offsetNumber>60</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>CreatedDate</recordField>
+            <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <scheduledPaths>
@@ -1731,7 +1572,18 @@
             <label>90 Days Compliance Reminder</label>
             <offsetNumber>90</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>CreatedDate</recordField>
+            <recordField>Requested_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <scheduledPaths>
+            <name>X100_Days_Compliance_Paused</name>
+            <connector>
+                <targetReference>Doc_100_days</targetReference>
+            </connector>
+            <label>100 Days Compliance Paused</label>
+            <offsetNumber>100</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>

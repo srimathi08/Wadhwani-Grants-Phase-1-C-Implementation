@@ -8,11 +8,24 @@ public class PdfGeneratorControllerTest {
         Account acc = new Account(Name = 'Draft Test Institution');
         insert acc;
 
+        // Resolve a RecordTypeId for Contact (org has no default record type;
+        // skip the generic 'Master' placeholder, which isn't a real assignable RT)
+        Id contactRtId;
+        for (Schema.RecordTypeInfo rt : Schema.SObjectType.Contact.getRecordTypeInfos()) {
+            if (rt.isAvailable() && rt.getName() != 'Master') {
+                contactRtId = rt.getRecordTypeId();
+                if (rt.isDefaultRecordTypeMapping()) {
+                    break;
+                }
+            }
+        }
+
         // Create Contact
         Contact admin = new Contact(
             LastName = 'Admin',
             Email = 'admin@example.com',
-            AccountId = acc.Id
+            AccountId = acc.Id,
+            RecordTypeId = contactRtId
         );
         insert admin;
 
@@ -51,6 +64,17 @@ public class PdfGeneratorControllerTest {
             Co_Principal_Investigator_Co_PI__c = 'Dr CoDraft',
             CO_PI_Phone__c = '2222222',
             CO_PI_Designation__c = 'Lead',
+
+            // ✅ NEW — Startup fields now queried by the controller
+            Startup_Name__c = 'Draft Startup',
+            Founder_Name__c = 'Dr Founder',
+            Founder_Designation__c = 'CEO',
+            Founder_Institution__c = 'Draft Institute',
+            Founder_Mobile__c = '3333333',
+            Founder_Email__c = 'founder@draft.com',
+            Startup_Registration_Date__c = Date.today(),
+            Startup_Registration_No__c = 'REG-001',
+            DPIIT_Registration_No__c = 'DPIIT-001',
 
             RecordTypeId = rtId,
             Status = 'Draft',
@@ -99,6 +123,16 @@ public class PdfGeneratorControllerTest {
         );
         insert bd;
 
+        // ✅ NEW — Co-Founder, so the controller's new Co_Founder__c query is exercised
+        Co_Founder__c coFounder = new Co_Founder__c(
+            Individual_Application__c = appData.Id,
+            Designation__c = 'CTO',
+            Institution__c = 'Draft Institute',
+            Mobile__c = '4444444',
+            Email__c = 'cofounder@draft.com'
+        );
+        insert coFounder;
+
         // Create ContentDocument
         ContentVersion cv = new ContentVersion(
             Title = 'TestDocument',
@@ -124,7 +158,28 @@ public class PdfGeneratorControllerTest {
 
         // Run Test
         Test.startTest();
-        PdfGeneratorController.getApplicationWithRelatedData(appData.Id);
+        ApplicationWrapper result =
+            PdfGeneratorController.getApplicationWithRelatedData(appData.Id);
         Test.stopTest();
+
+        // ✅ NEW — basic assertions covering the new coFounders + dynamic URL logic
+        System.assertEquals(1, result.milestones.size(), 'Expected one milestone');
+        System.assertEquals(1, result.budgets.size(), 'Expected one budget');
+        System.assertEquals(1, result.coFounders.size(), 'Expected one co-founder');
+        System.assertEquals(1, result.fileUrls.size(), 'Expected one file URL');
+        System.assert(result.fileUrls[0].contains('TestDocument'), 'File URL should include the file title');
+    }
+
+    @isTest
+    static void testNoRecordFoundThrowsException() {
+        Boolean exceptionThrown = false;
+        Test.startTest();
+        try {
+            PdfGeneratorController.getApplicationWithRelatedData(null);
+        } catch (AuraHandledException e) {
+            exceptionThrown = true;
+        }
+        Test.stopTest();
+        System.assert(exceptionThrown, 'Expected an AuraHandledException when no record is found');
     }
 }

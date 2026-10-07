@@ -8,6 +8,7 @@
         <employeeUserRole>Employee</employeeUserRole>
         <partnerUserRole>Partner</partnerUserRole>
     </communityRoles>
+    <disablePvtPagesForPwdResetInLWR>false</disablePvtPagesForPwdResetInLWR>
     <disableReputationRecordConversations>false</disableReputationRecordConversations>
     <emailSenderAddress>krtnakk@gmail.com</emailSenderAddress>
     <emailSenderName>WCF Reviewer Portal</emailSenderName>
@@ -60,6 +61,9 @@
     </networkAuthApiSettings>
     <networkMemberGroups>
         <permissionSet>Application_review_access</permissionSet>
+        <permissionSet>WCF_Validator_Access</permissionSet>
+        <permissionSet>WCF_Reviewer_Access</permissionSet>
+        <permissionSet>WCF_Approver_Access</permissionSet>
         <profile>Admin</profile>
         <profile>WCF Reviewer</profile>
     </networkMemberGroups>
@@ -70,7 +74,9 @@
         <loginPageOverrideSetting>Designer</loginPageOverrideSetting>
         <selfRegProfilePageOverrideSetting>Designer</selfRegProfilePageOverrideSetting>
     </networkPageOverrides>
+    <newSenderAddress>grants.support@wadhwanifoundation.org</newSenderAddress>
     <picassoSite>WCF_Reviewer_Portal1</picassoSite>
+    <secondaryEmailSenderEnabled>false</secondaryEmailSenderEnabled>
     <selfRegistration>false</selfRegistration>
     <sendWelcomeEmail>true</sendWelcomeEmail>
     <site>WCF_Reviewer_Portal</site>

@@ -5,6 +5,30 @@
  */
 public without sharing class WCFFormEngineController {
 
+        // Optional answers that must be wiped on the record when the applicant clears them.
+    private static final Set<String> CLEARABLE_APP_FIELDS = buildClearableAppFields();
+
+    private static Set<String> buildClearableAppFields() {
+        Set<String> s = new Set<String>{
+            'leader_tenure__c',
+            'legal_type_other__c', 'registration_jurisdiction_other__c',
+            'revenue_explanation__c',
+            'details_of_ethical_received__c', 'q24_report_url__c',
+            'genieai_interest_level__c', 'operational_synergies_with_wof__c'
+        };
+        for (Integer i = 1; i <= 3; i++) {
+            for (String p : new List<String>{ 'name', 'amount', 'period_start', 'period_end', 'type' }) {
+                s.add('funder_' + i + '_' + p + '__c');
+            }
+        }
+        for (Integer i = 1; i <= 2; i++) {
+            for (String p : new List<String>{ 'name', 'role', 'email' }) {
+                s.add('reference_' + i + '_' + p + '__c');
+            }
+        }
+        return s;
+    }
+
     public class SaveResult {
         @AuraEnabled public Boolean isSuccess;
         @AuraEnabled public Id recordId;
@@ -146,8 +170,9 @@ public without sharing class WCFFormEngineController {
      * @description Resubmits dynamic RFI application payload after revision requested.
      */
     @AuraEnabled
-    public static SaveResult resubmitDynamicApplication(Id recordId, List<String> selectedTracks, String payloadJson) {
+        public static SaveResult resubmitDynamicApplication(Id recordId, List<String> selectedTracks, String payloadJson) {
         SaveResult res = new SaveResult();
+        Savepoint sp = Database.setSavepoint();
         try {
             IndividualApplication app = prepareAndSaveApplication(recordId, selectedTracks, payloadJson, 'Application Resubmitted');
             
@@ -156,6 +181,7 @@ public without sharing class WCFFormEngineController {
             res.status = 'Application Resubmitted';
             res.message = 'Application resubmitted successfully.';
         } catch (Exception ex) {
+                        Database.rollback(sp);
             System.debug(LoggingLevel.ERROR, 'Error resubmitting application: ' + ex.getMessage() + ' | Line: ' + ex.getLineNumber());
             res.isSuccess = false;
             res.message = 'Error resubmitting application: ' + ex.getMessage();
@@ -192,7 +218,45 @@ public without sharing class WCFFormEngineController {
         }
     }
 
+    // ── File size lookup for upload limits (Q24: 10 MB, Q28: 50 MB) ──────────
+    public class UploadedFileDetail {
+        @AuraEnabled public String documentId;
+        @AuraEnabled public String fileName;
+        @AuraEnabled public Integer sizeInBytes;
+    }
+
     /**
+     * @description Returns the real size of freshly uploaded files.
+     * lightning-file-upload's uploadfinished event does not include the file
+     * size, so wcfDynamicForm calls this to enforce the per-question limits
+     * (Q24 verification report: 10 MB per file, Q28 supporting documents:
+     * 50 MB per file). Runs in user mode: the applicant owns the files they
+     * just uploaded, so no system-mode access is needed.
+     */
+   	
+	@AuraEnabled
+public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDocumentIds) {
+    List<UploadedFileDetail> results = new List<UploadedFileDetail>();
+    if (contentDocumentIds == null || contentDocumentIds.isEmpty()) {
+        return results;
+    }
+    for (ContentVersion cv : [
+        SELECT ContentDocumentId, ContentSize
+        FROM ContentVersion
+        WHERE ContentDocumentId IN :contentDocumentIds
+        AND IsLatest = true
+        WITH SYSTEM_MODE
+    ]) {
+        UploadedFileDetail d = new UploadedFileDetail();
+        d.documentId  = String.valueOf(cv.ContentDocumentId);
+        d.sizeInBytes = cv.ContentSize;
+        results.add(d);
+    }
+    System.debug('getUploadedFileDetails ids=' + contentDocumentIds + ' results=' + results.size());
+    return results;
+}
+    
+   /**
      * @description Fetches all draft application data, child objects, dynamic table rows,
      * and file attachments for resuming in wcfDynamicForm.
      */
@@ -202,6 +266,7 @@ public without sharing class WCFFormEngineController {
         try {
             User currentUser = [
                 SELECT Id, Name, FirstName, LastName, Email, Phone, MobilePhone, Title, AccountId, ContactId,
+                       City, Country,
                        Contact.FirstName, Contact.LastName, Contact.Name, Contact.Email, Contact.Phone, Contact.Title,
                        Contact.Current_Organization__c,
                        Account.Name, Account.IsPersonAccount, Account.WCF_Organizational_Name__c
@@ -234,12 +299,36 @@ public without sharing class WCFFormEngineController {
             }
 
             String userEmailClean = (String.isNotBlank(currentUser.Email)) ? currentUser.Email.replace('.invalid', '') : '';
-            String defaultSubName = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Name))
-                                     ? currentUser.Contact.Name : currentUser.Name;
-            String defaultSubEmail = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Email))
-                                      ? currentUser.Contact.Email : userEmailClean;
-            String defaultSubPhone = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Phone))
-                                      ? currentUser.Contact.Phone : (String.isNotBlank(currentUser.Phone) ? currentUser.Phone : (String.isNotBlank(currentUser.MobilePhone) ? currentUser.MobilePhone : ''));
+            // Name, Email and Mobile are edited on the portal's My Profile page, which
+            // updates the User record. The User values are therefore read first so that
+            // profile changes show up in the form; the Contact values are the fallback.
+            String defaultSubName = String.isNotBlank(currentUser.Name)
+                                     ? currentUser.Name
+                                     : ((currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Name)) ? currentUser.Contact.Name : '');
+            String defaultSubEmail = String.isNotBlank(userEmailClean)
+                                      ? userEmailClean
+                                      : ((currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Email)) ? currentUser.Contact.Email : '');
+            String defaultSubPhone = String.isNotBlank(currentUser.MobilePhone)
+                                      ? currentUser.MobilePhone
+                                      : (String.isNotBlank(currentUser.Phone)
+                                          ? currentUser.Phone
+                                          : ((currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Phone)) ? currentUser.Contact.Phone : ''));
+            // Profile numbers are stored as "+91 9787787877": split the country code
+            // from the number so the form's phone picker shows the right country.
+            String defaultSubPhoneCode = '';
+            if (String.isNotBlank(defaultSubPhone)) {
+                Matcher phoneMatch = Pattern.compile('^\\s*(\\+\\d{1,4})[\\s\\-]+(.+)$').matcher(defaultSubPhone);
+                if (phoneMatch.matches()) {
+                    defaultSubPhoneCode = phoneMatch.group(1);
+                    defaultSubPhone     = phoneMatch.group(2).replaceAll('[^0-9]', '');
+                }
+            }
+            // Headquarters prefill from the profile address ("City, Country"). Used only
+            // when the form's Headquarters field is still empty, so it never overwrites
+            // what the applicant typed in the form.
+            String defaultHqLocation = (String.isNotBlank(currentUser.City) && String.isNotBlank(currentUser.Country))
+                                        ? currentUser.City.trim() + ', ' + currentUser.Country.trim()
+                                        : '';
             String defaultSubTitle = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.Title))
                                       ? currentUser.Contact.Title : (String.isNotBlank(currentUser.Title) ? currentUser.Title : '');
             
@@ -262,6 +351,12 @@ public without sharing class WCFFormEngineController {
                 defaultFv.put('Submitter_Name__c', defaultSubName != null ? defaultSubName : '');
                 defaultFv.put('Work_Email_ID__c', defaultSubEmail != null ? defaultSubEmail : '');
                 defaultFv.put('Phone__c', defaultSubPhone != null ? defaultSubPhone : '');
+                if (String.isNotBlank(defaultSubPhoneCode)) {
+                    defaultFv.put('WG_Phone_Country_Code__c', defaultSubPhoneCode);
+                }
+                if (String.isNotBlank(defaultHqLocation)) {
+                    defaultFv.put('Headquarters_City_and_Country__c', defaultHqLocation);
+                }
                 defaultFv.put('Job_Title__c', defaultSubTitle != null ? defaultSubTitle : '');
                 defaultFv.put('Organization_Name__c', defaultOrgName != null ? defaultOrgName : '');
                 defaultFv.put('Fiscal_Month__c', '03');
@@ -470,6 +565,14 @@ public without sharing class WCFFormEngineController {
             }
             if (String.isNotBlank(defaultSubPhone)) {
                 fv.put('Phone__c', defaultSubPhone);
+                if (String.isNotBlank(defaultSubPhoneCode)) {
+                    fv.put('WG_Phone_Country_Code__c', defaultSubPhoneCode);
+                }
+            }
+            if (String.isNotBlank(defaultHqLocation)
+                && (!fv.containsKey('Headquarters_City_and_Country__c')
+                    || String.isBlank(String.valueOf(fv.get('Headquarters_City_and_Country__c'))))) {
+                fv.put('Headquarters_City_and_Country__c', defaultHqLocation);
             }
             if (String.isNotBlank(defaultSubTitle)) {
                 fv.put('Job_Title__c', defaultSubTitle);
@@ -488,7 +591,7 @@ public without sharing class WCFFormEngineController {
                        CY3_Balance_End__c, CY2_Balance_End__c, CY1_Balance_End__c
                 FROM Historical_Data__c 
                 WHERE Proposal__c = :appId 
-                WITH SYSTEM_MODE LIMIT 1
+                WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1
             ];
             if (!hists.isEmpty()) {
                 Historical_Data__c h = hists[0];
@@ -524,7 +627,7 @@ public without sharing class WCFFormEngineController {
                        Net_Budget__c, Net_Projection__c, Net_Variance__c
                 FROM Current_fiscal_year_data__c 
                 WHERE Proposal__c = :appId 
-                WITH SYSTEM_MODE LIMIT 1
+                WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1
             ];
             if (!fiscals.isEmpty()) {
                 Current_fiscal_year_data__c f = fiscals[0];
@@ -551,7 +654,7 @@ public without sharing class WCFFormEngineController {
             for (String ofn : outcomeFieldMap.keySet()) {
                 validOutcomeFields.add(outcomeFieldMap.get(ofn).getDescribe().getName());
             }
-            String outcomeSoql = 'SELECT ' + String.join(validOutcomeFields, ', ') + ' FROM Outcomes_Data__c WHERE Proposal__c = :appId WITH SYSTEM_MODE ORDER BY CreatedDate DESC LIMIT 1';
+            String outcomeSoql = 'SELECT ' + String.join(validOutcomeFields, ', ') + ' FROM Outcomes_Data__c WHERE Proposal__c = :appId WITH SYSTEM_MODE ORDER BY LastModifiedDate DESC LIMIT 1';
             List<Outcomes_Data__c> outcomes = Database.query(outcomeSoql);
             if (!outcomes.isEmpty()) {
                 Outcomes_Data__c o = outcomes[0];
@@ -970,17 +1073,26 @@ public without sharing class WCFFormEngineController {
         }
 
         // Map valuesMap into IndividualApplication fields
+                // Map valuesMap into IndividualApplication fields
+        // Last_Page__c is skipped here: it is set above from activeTabId, and the
+        // payload also carries the old Last_Page__c value loaded with the draft,
+        // which would otherwise overwrite the current page.
         for (String f : valuesMap.keySet()) {
-            if (f == 'Id' || f == 'RecordTypeId' || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves__c') || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves1__c') || f.equalsIgnoreCase('Selected_Funding_Tracks__c') || !appFields.containsKey(f.toLowerCase())) continue;
-            Object val = valuesMap.get(f);
-            if (val == null) continue;
+            if (f == 'Id' || f == 'RecordTypeId' || f.equalsIgnoreCase('Last_Page__c') || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves__c') || f.equalsIgnoreCase('Organizational_Area_s_for_Funding_Inves1__c') || f.equalsIgnoreCase('Selected_Funding_Tracks__c') || !appFields.containsKey(f.toLowerCase())) continue;
+                       Object val = valuesMap.get(f);
             try {
                 Schema.DescribeFieldResult dfr = appFields.get(f.toLowerCase()).getDescribe();
                 // Allow custom fields even if portal profile FLS is read-only
                 if (!dfr.isCustom() && !dfr.isUpdateable() && !isNew) continue;
                 Schema.DisplayType type = dfr.getType();
-                String strVal = String.valueOf(val);
-                if (String.isBlank(strVal)) continue;
+                String strVal = (val == null) ? '' : String.valueOf(val);
+                if (String.isBlank(strVal)) {
+                    // An optional answer the applicant cleared is cleared on the record too
+                    if (CLEARABLE_APP_FIELDS.contains(f.toLowerCase()) && !dfr.isCalculated()) {
+                        app.put(dfr.getName(), null);
+                    }
+                    continue;
+                }
 
                 if (type == Schema.DisplayType.DATE) {
                     app.put(dfr.getName(), Date.valueOf(strVal));
@@ -1188,13 +1300,20 @@ public without sharing class WCFFormEngineController {
         return app;
     }
 
-    private static void upsertChildObjects(Id appId, Map<String, Object> valuesMap, String statusStr) {
+    //private static void upsertChildObjects(Id appId, Map<String, Object> valuesMap, String statusStr) {
+        private static void upsertChildObjects(Id appId, Map<String, Object> rawValuesMap, String statusStr) {
+        // Drop null entries: the alias blocks below would otherwise write the text "null"
+        // into Text fields. Required table answers are never null.
+        Map<String, Object> valuesMap = new Map<String, Object>();
+        for (String k : rawValuesMap.keySet()) {
+            if (rawValuesMap.get(k) != null) valuesMap.put(k, rawValuesMap.get(k));
+        }
         String childStatus = (statusStr == 'Submitted' || statusStr == 'Application Resubmitted') ? 'Submitted' : 'Draft';
         // 1. Historical_Data__c
         Map<String, Schema.SObjectField> histFields = Schema.SObjectType.Historical_Data__c.fields.getMap();
         Boolean hasHistData = false;
         Historical_Data__c hist = new Historical_Data__c(Proposal__c = appId, Status__c = childStatus);
-        List<Historical_Data__c> existingHist = [SELECT Id FROM Historical_Data__c WHERE Proposal__c = :appId LIMIT 1];
+        List<Historical_Data__c> existingHist = [SELECT Id FROM Historical_Data__c WHERE Proposal__c = :appId ORDER BY LastModifiedDate DESC LIMIT 1];
         if (!existingHist.isEmpty()) {
             hist.Id = existingHist[0].Id;
         }
@@ -1262,7 +1381,7 @@ public without sharing class WCFFormEngineController {
         Map<String, Schema.SObjectField> fiscalFields = Schema.SObjectType.Current_fiscal_year_data__c.fields.getMap();
         Boolean hasFiscalData = false;
         Current_fiscal_year_data__c fiscal = new Current_fiscal_year_data__c(Proposal__c = appId, Status__c = childStatus);
-        List<Current_fiscal_year_data__c> existingFiscal = [SELECT Id FROM Current_fiscal_year_data__c WHERE Proposal__c = :appId LIMIT 1];
+        List<Current_fiscal_year_data__c> existingFiscal = [SELECT Id FROM Current_fiscal_year_data__c WHERE Proposal__c = :appId ORDER BY LastModifiedDate DESC LIMIT 1];
         if (!existingFiscal.isEmpty()) {
             fiscal.Id = existingFiscal[0].Id;
         }
@@ -1318,7 +1437,7 @@ public without sharing class WCFFormEngineController {
         Map<String, Schema.SObjectField> outFields = Schema.SObjectType.Outcomes_Data__c.fields.getMap();
         Boolean hasOutcomeData = false;
         Outcomes_Data__c out = new Outcomes_Data__c(Proposal__c = appId, Status__c = childStatus);
-        List<Outcomes_Data__c> existingOut = [SELECT Id FROM Outcomes_Data__c WHERE Proposal__c = :appId LIMIT 1];
+        List<Outcomes_Data__c> existingOut = [SELECT Id FROM Outcomes_Data__c WHERE Proposal__c = :appId ORDER BY LastModifiedDate DESC LIMIT 1];
         if (!existingOut.isEmpty()) {
             out.Id = existingOut[0].Id;
         }

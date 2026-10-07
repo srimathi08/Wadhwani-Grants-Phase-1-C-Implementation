@@ -1,0 +1,146 @@
+/* ============================================================
+   Wadhwani Foundation — WCF Applicant Portal
+   Global Design Tokens + Web Fonts
+
+   IMPORTANT: this file must live at the ROOT of the wgFonts.zip,
+   alongside the six .woff2 files (NOT in a subfolder), because the
+   url() paths below are relative to this file's own location.
+   Re-upload the zip as a new version of the existing "wgFonts"
+   static resource — keep the resource name unchanged so the
+   wgGlobalTokens component below keeps working.
+   ============================================================ */
+
+/* ---- Barlow — headings, buttons, prominent UI text ---- */
+@font-face {
+  font-family: 'Barlow';
+  src: url('Barlow-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow';
+  src: url('Barlow-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow';
+  src: url('Barlow-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- Open Sans — body text, labels, inputs ---- */
+@font-face {
+  font-family: 'Open Sans';
+  src: url('OpenSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('OpenSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Open Sans';
+  src: url('OpenSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   Design tokens — CSS custom properties.
+   Declared on :root so every LWC on the page inherits them
+   through their Shadow DOM automatically (no per-component
+   wiring needed for these values — only utility CLASSES need
+   the separate @import module discussed earlier).
+   ============================================================ */
+:root {
+  /* Brand colors (90% / house colors) */
+  --wg-red: #BF2026;       /* CTA / buttons ONLY — never a message background */
+  --wg-orange: #F2672A;    /* accent / secondary — use sparingly */
+  --wg-yellow: #F68720;    /* also the Warning status color, see below */
+  --wg-gray: #414041;      /* body text — replaces pure black everywhere */
+  --wg-white: #FFFFFF;
+
+  /* Status colors (functional set) — always paired with a tint background.
+     NOTE: warning is a special case — the brand warning color (#F68720) is
+     used for the border/icon, but banner TEXT uses a darker shade
+     (--wg-warning-text) for readable contrast on the tint background. Use
+     --wg-warning for border/icon, --wg-warning-text for the message copy. */
+  --wg-error: #B3261E;        --wg-error-bg: #FCECEA;
+  --wg-warning: #F68720;      --wg-warning-bg: #FEF3E6;   --wg-warning-text: #8A4B00;
+  --wg-success: #2E7D32;      --wg-success-bg: #EAF4EB;
+  --wg-info: #2380D1;         --wg-info-bg: #E9F2FB;
+
+  /* Neutral / borders / muted text */
+  --wg-border: #E4E4E4;
+  --wg-input-border: #CFCFCF;
+  --wg-text-muted: #6B6B6B;   /* subtitles, secondary/caption copy — lighter than --wg-gray */
+
+  /* Typography — families */
+  --wg-font-heading: 'Barlow', Arial, sans-serif;
+  --wg-font-body: 'Open Sans', Arial, sans-serif;
+
+  /* Typography — scale (confirmed against the portal mockup's own CSS) */
+  --wg-font-size-page-title: 28px;       /* h1 — Barlow Bold 700 */
+  --wg-font-size-section-heading: 20px;  /* h2 — Barlow SemiBold 600 */
+  --wg-font-size-sub-heading: 15px;      /* h3 — Barlow SemiBold 600 */
+  --wg-font-size-body: 14px;             /* body copy, inputs, banners, notes — Open Sans 400 */
+  --wg-font-size-button: 14px;           /* button label — Barlow SemiBold 600 */
+  --wg-font-size-label: 13px;            /* field labels, bold captions — Open Sans SemiBold 600 */
+  --wg-font-size-caption: 12px;          /* smallest UI text — tags, swatch captions */
+
+  /* Typography — weights, for reference when composing font shorthand */
+  --wg-weight-regular: 400;
+  --wg-weight-semibold: 600;
+  --wg-weight-bold: 700;
+
+  /* Shared shape conventions (from the client mockup) */
+  --wg-radius-sm: 6px;      /* inputs, status banners */
+  --wg-radius-md: 8px;      /* swatch cards, the "note" info box */
+  --wg-radius-card: 10px;   /* comparison / content panels */
+  --wg-radius-badge: 20px;  /* status tag / badge pills */
+  --wg-radius-pill: 24px;   /* buttons */
+
+  /* Border widths (from the client mockup) */
+  --wg-border-width-thin: 1px;      /* default card/swatch/note/input borders */
+  --wg-border-width-ghost: 1.5px;   /* ghost/secondary button border */
+  --wg-border-width-rule: 2px;      /* h2 underline rule */
+  --wg-border-width-banner: 4px;    /* status banner left accent */
+
+  /* Generic spacing scale — for page/section layout (margins, gaps).
+     A 4px base scale; use for new layout work. Components with an
+     exact QA'd padding (button, input, banner, etc.) use the
+     component-specific tokens below instead of this scale, so we
+     never drift from the signed-off mockup values. */
+  --wg-space-1: 4px;
+  --wg-space-2: 8px;
+  --wg-space-3: 12px;
+  --wg-space-4: 16px;
+  --wg-space-5: 20px;
+  --wg-space-6: 24px;
+  --wg-space-8: 32px;
+  --wg-space-9: 36px;
+  --wg-space-16: 64px;
+
+  /* Component-specific padding — exact values from the signed-off mockup */
+  --wg-padding-input: 9px 11px;
+  --wg-padding-button: 11px 26px;
+  --wg-padding-banner: 11px 13px;
+  --wg-padding-note: 14px 16px;
+  --wg-padding-tag: 3px 10px;
+  --wg-padding-swatch-label: 8px 10px;
+
+  /* Layout */
+  --wg-container-max-width: 960px;  /* .wrap on the mockup's page shell */
+  --wg-line-height-base: 1.5;
+}

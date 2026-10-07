@@ -17,21 +17,37 @@ import createReviewRecord from '@salesforce/apex/WCFProposalListController.creat
 
 const RATING_LABEL = { 5: 'Very strong', 4: 'Strong', 3: 'Adequate', 2: 'Weak', 1: 'Very weak' };
 
-const OUTCOME_JF   = 'WCF_Job_Fulfillment';
-const OUTCOME_JC   = 'WCF_Job_Creation_Review';
-const OUTCOME_LU   = 'WCF_Livelihood_Upliftment';
+const OUTCOME_JF = 'WCF_Job_Fulfillment';
+const OUTCOME_JC = 'WCF_Job_Creation_Review';
+const OUTCOME_LU = 'WCF_Livelihood_Upliftment';
 const OUTCOME_BOTH = 'WCF_Job_Fulfillment_Job_Creation';
 
-const REC_STRONGLY   = 'Strongly Recommend';
-const REC_RECOMMEND  = 'Recommend';
-const REC_RESERVE    = 'Recommend with Reservations';
-const REC_DO_NOT     = 'Do Not Recommend';
+const REC_STRONGLY = 'Strongly Recommend';
+const REC_RECOMMEND = 'Recommend';
+const REC_RESERVE = 'Recommend with Reservations';
+const REC_DO_NOT = 'Do Not Recommend';
 const POSITIVE_REC_CHOICES = new Set([REC_STRONGLY, REC_RECOMMEND, REC_RESERVE]);
 
+// UPDATED: each choice saves its own Recommend_for_CEO_review__c picklist value
+// (was a plain 'Yes' for all three positive choices).
+const CEO_REC_VALUE = {
+    [REC_STRONGLY]: 'Yes - Strongly recommend',
+    [REC_RECOMMEND]: 'Yes - Recommend',
+    [REC_RESERVE]: 'Yes - Recommend with reservations',
+    [REC_DO_NOT]: 'No'
+};
+
 function storedRecValue(choice) {
-    if (POSITIVE_REC_CHOICES.has(choice)) return 'Yes';
-    if (choice === REC_DO_NOT) return 'No';
-    return '';
+    return CEO_REC_VALUE[choice] || '';
+}
+
+// Reverse map when a draft is reopened. Legacy plain 'Yes' still maps to
+// Recommend, exactly as before.
+function recChoiceFromStored(value) {
+    const match = Object.keys(CEO_REC_VALUE).find(k => CEO_REC_VALUE[k] === value);
+    if (match) return match;
+    if (value === 'Yes') return REC_RECOMMEND;
+    return null;
 }
 
 const MAX_WORDS = 200;
@@ -56,11 +72,6 @@ const ALWAYS_ALLOWED_KEYS = new Set([
     'Enter'
 ]);
 
-/**
- * Dynamic physical field mapping resolver based on question ID and active track.
- * Newly created custom metadata questions without a physical field mapping
- * will automatically and seamlessly store in Decision_Rationale__c JSON.
- */
 function resolvePhysicalFields(qId, track) {
     const normTrack = (track || '').toUpperCase();
     const isJC = normTrack.includes('CREATION') || normTrack === 'JC';
@@ -120,33 +131,46 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     @track recordId;
     @track _applicationId = null;
-    @track showForm        = false;
-    @track submitted       = false;
+    @track showForm = false;
+    @track submitted = false;
     @track _resolvedRecordTypeId = null;
-    @track institutionName      = '';
-    @track applicationName      = '';
+    @track institutionName = '';
+    @track applicationName = '';
     @track outcomeDeveloperName = OUTCOME_BOTH;
-    @track outcomeDisplayLabel  = '';
+    @track outcomeDisplayLabel = '';
 
     @track isLoadingMetadata = true;
     @track categories = [];
     @track openLadders = {};
 
-    @track currentStep     = 0;
-    @track rubricOpen      = false;
-    @track validationError = '';
+    @track currentStep = 0;
+    @track rubricOpen = false;
 
-    @track saveStateText  = 'Auto-saved · just now';
+    // ── Inline field-level validation state ──────────────────────────
+    // Replaces the old single `validationError` banner string. Each
+    // tracker maps a specific control to whether it's currently invalid
+    // (and the message to render right next to that control).
+    @track invalidQuestions = {}; // { [questionId]: { rating: bool, comment: bool } }
+    @track swErrors = { strength: false, strengthMessage: '', weakness: false, weaknessMessage: '' };
+    @track recErrors = {
+        choice: false, choiceMessage: '',
+        strength: false, strengthMessage: '',
+        comment: false, commentMessage: '',
+        rejectionReasons: false, rejectionReasonsMessage: '',
+        rejectionComment: false, rejectionCommentMessage: ''
+    };
+
+    @track saveStateText = 'Auto-saved · just now';
     @track saveStateClass = 'save-idle';
     _saveTimer = null;
 
-    @track ratings  = {};
+    @track ratings = {};
     @track comments = {};
 
-    @track strengths  = ['', '', ''];
+    @track strengths = ['', '', ''];
     @track weaknesses = ['', '', ''];
 
-    @track recChoice   = null;
+    @track recChoice = null;
     @track recStrength = null;
     @track _incomingTrack = null;
 
@@ -168,7 +192,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     get acceptedFormats() {
         return ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
-                '.txt', '.csv', '.png', '.jpg', '.jpeg'];
+            '.txt', '.csv', '.png', '.jpg', '.jpeg'];
     }
 
     get acceptedFormatsString() {
@@ -201,13 +225,13 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     @wire(CurrentPageReference)
     getStateParameters(currentPageReference) {
         if (currentPageReference) {
-            const rawRecordId    = currentPageReference.state.recordId;
-            this._applicationId  = currentPageReference.state.applicationId || rawRecordId;
-            this._incomingTrack  = currentPageReference.state.track || null;
+            const rawRecordId = currentPageReference.state.recordId;
+            this._applicationId = currentPageReference.state.applicationId || rawRecordId;
+            this._incomingTrack = currentPageReference.state.track || null;
 
             this.recordId = (rawRecordId === 'new') ? null : rawRecordId;
-            this.reviewData = { 
-                ...this.reviewData, 
+            this.reviewData = {
+                ...this.reviewData,
                 ApplicationId: this._applicationId,
                 Id: this.recordId || this.reviewData.Id
             };
@@ -245,7 +269,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         hasAlreadyReviewed({ applicationId: this._applicationId })
             .then(result => {
                 if (result) {
-                    this.showForm  = false;
+                    this.showForm = false;
                     this.submitted = true;
                 } else {
                     this.showForm = true;
@@ -260,10 +284,10 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         getIndividualApplication({ recordId: this._applicationId })
             .then(result => {
                 if (result) {
-                    this.institutionName      = result.institutionName || '';
-                    this.applicationName      = result.applicationName || '';
+                    this.institutionName = result.institutionName || '';
+                    this.applicationName = result.applicationName || '';
                     this.outcomeDeveloperName = result.track || OUTCOME_BOTH;
-                    this.outcomeDisplayLabel  = result.trackLabel || result.orgArea || '';
+                    this.outcomeDisplayLabel = result.trackLabel || result.orgArea || '';
                     this._resolvedRecordTypeId = result.recordTypeId || null;
 
                     // Reload metadata if track is now known
@@ -351,22 +375,16 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             }
         }
 
-        this.strengths  = this._parseSW(review.Top_3_proposal_strengths_ranked__c);
+        this.strengths = this._parseSW(review.Top_3_proposal_strengths_ranked__c);
         this.weaknesses = this._parseSW(review.Top_3_proposal_weaknesses_ranked__c);
 
         if (!this.recChoice) {
-            if (review.Recommend_for_CEO_review__c === 'Yes') {
-                this.recChoice = REC_RECOMMEND;
-            } else if (review.Recommend_for_CEO_review__c === 'No') {
-                this.recChoice = REC_DO_NOT;
-            } else {
-                this.recChoice = null;
-            }
+            this.recChoice = recChoiceFromStored(review.Recommend_for_CEO_review__c);
         }
 
         this.recStrength = review.Strength_of_recommendation__c
-                        ? parseInt(review.Strength_of_recommendation__c, 10)
-                        : null;
+            ? parseInt(review.Strength_of_recommendation__c, 10)
+            : null;
 
         this.rejectionReasons = (review.Rejection_Reasons__c || '')
             .split(';')
@@ -380,7 +398,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 .then(files => {
                     this.uploadedFiles = (files || []).map(f => ({
                         documentId: f.documentId,
-                        name:       f.name
+                        name: f.name
                     }));
                 })
                 .catch(err => console.error('Error loading attached files:', err));
@@ -463,8 +481,8 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const total = this.totalStepsDisplay;
         const titles = this.stepTitles;
         return Array.from({ length: total }, (_, i) => ({
-            idx:   i,
-            cls:   i < this.currentStep ? 'done' : i === this.currentStep ? 'curr' : '',
+            idx: i,
+            cls: i < this.currentStep ? 'done' : i === this.currentStep ? 'curr' : '',
             title: titles[i] || `Step ${i + 1}`
         }));
     }
@@ -475,8 +493,8 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
         const cat = this.categories[this.currentStep];
         const LVLS = ['Very strong', 'Strong', 'Adequate', 'Weak', 'Very weak'];
-        const NS   = [5, 4, 3, 2, 1];
-        const CLS  = ['col col-l5', 'col col-l4', 'col col-l3', 'col col-l2', 'col col-l1'];
+        const NS = [5, 4, 3, 2, 1];
+        const CLS = ['col col-l5', 'col col-l4', 'col col-l3', 'col col-l2', 'col col-l1'];
         const TEXTS = [
             'Level 5: Exceptional, verified standard across all sub-criteria with robust multi-year evidence.',
             'Level 4: Strong capability meeting benchmarks with verifiable documentation.',
@@ -496,20 +514,21 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     get rubricBtnClass() { return this.rubricOpen ? 'btn-soft btn-soft-open' : 'btn-soft'; }
     get rubricBtnLabel() { return this.rubricOpen ? 'Hide scoring philosophy' : 'View scoring philosophy'; }
-    get rubricClass()    { return this.rubricOpen ? 'rubric-panel' : 'rubric-panel rubric-hidden'; }
+    get rubricClass() { return this.rubricOpen ? 'rubric-panel' : 'rubric-panel rubric-hidden'; }
 
     get currentQuestions() {
         if (!this.isDimStep || !this.categories || !this.categories[this.currentStep]) {
             return [];
         }
         const cat = this.categories[this.currentStep];
-        const qs  = cat.questions || [];
+        const qs = cat.questions || [];
 
         return qs.map(q => {
             const qId = q.questionId;
             const r = this.ratings[qId];
             const cmtRequired = r != null;
             const isComplete = r != null && (!cmtRequired || (this.comments[qId] || '').trim().length > 0);
+            const invalid = this.invalidQuestions[qId] || {};
 
             // Ladder map
             const ladderArr = q.ladder || [];
@@ -526,11 +545,19 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
             // Word count
             const wc = countWords(this.comments[qId]);
-            const atLimit   = wc >= MAX_WORDS;
+            const atLimit = wc >= MAX_WORDS;
             const nearLimit = wc >= MAX_WORDS - 20;
             const wordCountDisplay = `${wc} / ${MAX_WORDS}`;
             const wordCountClass = atLimit ? 'wc-counter wc-limit' : nearLimit ? 'wc-counter wc-near' : 'wc-counter';
-            const commentTextareaClass = cmtRequired ? 'lwc-textarea lwc-textarea-req' : 'lwc-textarea';
+
+            let commentTextareaClass = cmtRequired ? 'lwc-textarea lwc-textarea-req' : 'lwc-textarea';
+            if (invalid.comment) {
+                commentTextareaClass += ' lwc-textarea-error';
+            }
+
+            const segmentedClass = invalid.rating ? 'segmented segmented-error' : 'segmented';
+            const ratingErrorMessage = invalid.rating ? `Please select a rating for question ${qId}.` : '';
+            const commentErrorMessage = invalid.comment ? `Please enter a justification comment for question ${qId}.` : '';
 
             return {
                 ...q,
@@ -540,6 +567,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 showLadder,
                 ladderToggleLabel: showLadder ? '▾ Hide 5-Point Ladder Details' : '▸ View 5-Point Ladder Details',
                 ladderItems,
+                segmentedClass,
+                ratingError: !!invalid.rating,
+                ratingErrorMessage,
                 ratingBtns: [5, 4, 3, 2, 1].map(n => {
                     const sel = r === n;
                     let cls = '';
@@ -557,6 +587,8 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 commentValue: this.comments[qId] || '',
                 commentPlaceholder: cmtRequired ? 'Required: explain the basis for this rating…' : 'Add context if helpful…',
                 commentTextareaClass,
+                commentError: !!invalid.comment,
+                commentErrorMessage,
                 wordCountDisplay,
                 wordCountClass
             };
@@ -569,29 +601,43 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     get strengthRows() {
-        return [0, 1, 2].map(i => ({
-            idx: i, num: i + 1,
-            strengthField: `strength_${i}`,
-            strengthValue: this.strengths[i] || '',
-            sPlaceholder: i === 0 ? 'Primary strength (most material)…' : `Strength #${i + 1}…`,
-            reqMark: i === 0 ? '*' : ''
-        }));
+        return [0, 1, 2].map(i => {
+            const hasError = i === 0 && this.swErrors.strength;
+            return {
+                idx: i, num: i + 1,
+                strengthField: `strength_${i}`,
+                strengthValue: this.strengths[i] || '',
+                sPlaceholder: i === 0 ? 'Primary strength (most material)…' : `Strength #${i + 1}…`,
+                reqMark: i === 0 ? '*' : '',
+                hasError,
+                errorMessage: hasError ? this.swErrors.strengthMessage : '',
+                rowClass: hasError ? 'ranked-row ranked-row-error' : 'ranked-row',
+                inputClass: hasError ? 'wcf-input-error' : ''
+            };
+        });
     }
 
     get weaknessRows() {
-        return [0, 1, 2].map(i => ({
-            idx: i, num: i + 1,
-            weaknessField: `weakness_${i}`,
-            weaknessValue: this.weaknesses[i] || '',
-            wPlaceholder: i === 0 ? 'Primary concern or weakness (most material)…' : `Weakness #${i + 1}…`,
-            reqMark: i === 0 ? '*' : ''
-        }));
+        return [0, 1, 2].map(i => {
+            const hasError = i === 0 && this.swErrors.weakness;
+            return {
+                idx: i, num: i + 1,
+                weaknessField: `weakness_${i}`,
+                weaknessValue: this.weaknesses[i] || '',
+                wPlaceholder: i === 0 ? 'Primary concern or weakness (most material)…' : `Weakness #${i + 1}…`,
+                reqMark: i === 0 ? '*' : '',
+                hasError,
+                errorMessage: hasError ? this.swErrors.weaknessMessage : '',
+                rowClass: hasError ? 'ranked-row ranked-row-error' : 'ranked-row',
+                inputClass: hasError ? 'wcf-input-error' : ''
+            };
+        });
     }
 
     get isRecPositive() { return POSITIVE_REC_CHOICES.has(this.recChoice); }
     get isRecNegative() { return this.recChoice === REC_DO_NOT; }
-    get isRecChosen()   { return this.recChoice !== null && this.recChoice !== undefined; }
-    get hasRecChoice()   { return this.isRecChosen; }
+    get isRecChosen() { return this.recChoice !== null && this.recChoice !== undefined; }
+    get hasRecChoice() { return this.isRecChosen; }
 
     get recStronglyRecommendClass() {
         return this.recChoice === REC_STRONGLY ? 'yn rec-sel' : 'yn';
@@ -635,7 +681,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             { label: 'Weak Institutional Credibility & Governance', value: 'Weak Institutional Credibility & Governance' },
             { label: 'Insufficient Operational Scale & Team Maturity', value: 'Insufficient Operational Scale & Team Maturity' },
             { label: 'Unverified / Poor Historical Outcome Metrics', value: 'Unverified / Poor Historical Outcome Metrics' },
-            { label: 'Misaligned with WCF Core Strategic Priorities', value: 'Misaligned with WCF Core Strategic Priorities' },
+            { label: 'Misaligned with Wadhwani Grants Core Strategic Priorities', value: 'Misaligned with WCF Core Strategic Priorities' },
             { label: 'Lack of Absorptive & Financial Capacity', value: 'Lack of Absorptive & Financial Capacity' },
             { label: 'Inadequate M&E / Measurement Systems', value: 'Inadequate M&E / Measurement Systems' },
             { label: 'Unjustified Budget Allocation / Cost Structure', value: 'Unjustified Budget Allocation / Cost Structure' },
@@ -662,6 +708,23 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     get rejectionCommentWordCountClass() {
         const wc = countWords(this.reviewData.Rejection_Comment__c);
         return wc >= MAX_WORDS ? 'wc-counter wc-limit' : wc >= MAX_WORDS - 20 ? 'wc-counter wc-near' : 'wc-counter';
+    }
+
+    // ── Field-error-driven class getters (Final Recommendation step) ──
+    get yesnoRowClass() {
+        return this.recErrors.choice ? 'yesno-row yesno-row-error' : 'yesno-row';
+    }
+    get recStrengthSegmentedClass() {
+        return this.recErrors.strength ? 'segmented segmented-error' : 'segmented';
+    }
+    get recYesCommentTextareaClass() {
+        return this.recErrors.comment ? 'lwc-textarea lwc-textarea-error' : 'lwc-textarea';
+    }
+    get rejectionReasonsGroupClass() {
+        return this.recErrors.rejectionReasons ? 'checkbox-grid checkbox-grid-error' : 'checkbox-grid';
+    }
+    get rejectionCommentTextareaClass() {
+        return this.recErrors.rejectionComment ? 'lwc-textarea lwc-textarea-error' : 'lwc-textarea';
     }
 
     // Review Step Getters
@@ -744,13 +807,48 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         this.rubricOpen = !this.rubricOpen;
     }
 
+    // ── Error clearing helpers ─────────────────────────────────────
+    _clearQuestionRatingError(qId) {
+        if (this.invalidQuestions[qId] && this.invalidQuestions[qId].rating) {
+            const next = { ...this.invalidQuestions };
+            next[qId] = { ...next[qId], rating: false };
+            if (!next[qId].comment) {
+                delete next[qId];
+            }
+            this.invalidQuestions = next;
+        }
+    }
+
+    _clearQuestionCommentError(qId) {
+        if (this.invalidQuestions[qId] && this.invalidQuestions[qId].comment) {
+            const next = { ...this.invalidQuestions };
+            next[qId] = { ...next[qId], comment: false };
+            if (!next[qId].rating) {
+                delete next[qId];
+            }
+            this.invalidQuestions = next;
+        }
+    }
+
+    _clearAllFieldErrors() {
+        this.invalidQuestions = {};
+        this.swErrors = { strength: false, strengthMessage: '', weakness: false, weaknessMessage: '' };
+        this.recErrors = {
+            choice: false, choiceMessage: '',
+            strength: false, strengthMessage: '',
+            comment: false, commentMessage: '',
+            rejectionReasons: false, rejectionReasonsMessage: '',
+            rejectionComment: false, rejectionCommentMessage: ''
+        };
+    }
+
     // Rating Selection Handler
     handleRating(event) {
         const qId = event.currentTarget.dataset.qid;
         const val = parseInt(event.currentTarget.dataset.rate || event.currentTarget.dataset.val, 10);
         if (qId && !isNaN(val)) {
             this.ratings = { ...this.ratings, [qId]: val };
-            this.validationError = '';
+            this._clearQuestionRatingError(qId);
             this.autoSave();
         }
     }
@@ -760,12 +858,15 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     handleCommentInput(event) {
         const qId = event.target.dataset.qid;
-        let text  = event.target.value;
+        let text = event.target.value;
         if (countWords(text) > MAX_WORDS) {
             text = truncateToWordLimit(text, MAX_WORDS);
             event.target.value = text;
         }
         this.comments = { ...this.comments, [qId]: text };
+        if (text.trim()) {
+            this._clearQuestionCommentError(qId);
+        }
         this.autoSave();
     }
 
@@ -773,11 +874,17 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         if (ALWAYS_ALLOWED_KEYS.has(event.key) || event.ctrlKey || event.metaKey || event.altKey) {
             return;
         }
-        const text = event.target.value;
-        const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
-        const hasSelection = selStart !== selEnd;
-        if (!hasSelection && countWords(text) >= MAX_WORDS && (event.key === ' ' || event.key.length === 1)) {
+        if (event.key.length !== 1) return; // ignore non-character keys (arrows, F-keys, etc.)
+
+        const target = event.target;
+        const text = target.value;
+        const selStart = target.selectionStart;
+        const selEnd = target.selectionEnd;
+
+        // Build what the text WOULD be after this keystroke (handles selection replace too)
+        const newText = text.slice(0, selStart) + event.key + text.slice(selEnd);
+
+        if (countWords(newText) > MAX_WORDS) {
             event.preventDefault();
         }
     }
@@ -786,7 +893,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const pasted = (event.clipboardData || window.clipboardData).getData('text');
         const current = event.target.value;
         const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
+        const selEnd = event.target.selectionEnd;
         const combined = current.slice(0, selStart) + pasted + current.slice(selEnd);
         if (countWords(combined) > MAX_WORDS) {
             event.preventDefault();
@@ -794,14 +901,17 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             const qId = event.target.dataset.qid;
             event.target.value = truncated;
             this.comments = { ...this.comments, [qId]: truncated };
+            if (truncated.trim()) {
+                this._clearQuestionCommentError(qId);
+            }
             this.autoSave();
         }
     }
 
     handleSwChange(event) {
         const kind = event.target.dataset.kind;
-        const idx  = parseInt(event.target.dataset.idx, 10);
-        let val    = event.target.value;
+        const idx = parseInt(event.target.dataset.idx, 10);
+        let val = event.target.value;
         if (countWords(val) > MAX_WORDS) {
             val = truncateToWordLimit(val, MAX_WORDS);
             event.target.value = val;
@@ -810,17 +920,25 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             const next = [...this.strengths];
             next[idx] = val;
             this.strengths = next;
+            if (idx === 0 && val.trim() && this.swErrors.strength) {
+                this.swErrors = { ...this.swErrors, strength: false, strengthMessage: '' };
+            }
         } else {
             const next = [...this.weaknesses];
             next[idx] = val;
             this.weaknesses = next;
+            if (idx === 0 && val.trim() && this.swErrors.weakness) {
+                this.swErrors = { ...this.swErrors, weakness: false, weaknessMessage: '' };
+            }
         }
         this.autoSave();
     }
 
     handleRecChoice(event) {
         this.recChoice = event.currentTarget.dataset.rec || event.currentTarget.dataset.val;
-        this.validationError = '';
+        if (this.recErrors.choice) {
+            this.recErrors = { ...this.recErrors, choice: false, choiceMessage: '' };
+        }
         this.autoSave();
     }
     handleRecCardClick(event) {
@@ -829,7 +947,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     handleRecStrength(event) {
         this.recStrength = parseInt(event.currentTarget.dataset.recstr || event.currentTarget.dataset.val, 10);
-        this.validationError = '';
+        if (this.recErrors.strength) {
+            this.recErrors = { ...this.recErrors, strength: false, strengthMessage: '' };
+        }
         this.autoSave();
     }
     handleRecStrengthClick(event) {
@@ -843,6 +963,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             event.target.value = text;
         }
         this.reviewData = { ...this.reviewData, Recommendation_Strength_Comments__c: text };
+        if (text.trim() && this.recErrors.comment) {
+            this.recErrors = { ...this.recErrors, comment: false, commentMessage: '' };
+        }
         this.autoSave();
     }
     handleRecCommentKeyDown(event) {
@@ -851,7 +974,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
         const text = event.target.value;
         const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
+        const selEnd = event.target.selectionEnd;
         const hasSelection = selStart !== selEnd;
         if (!hasSelection && countWords(text) >= MAX_WORDS && (event.key === ' ' || event.key.length === 1)) {
             event.preventDefault();
@@ -861,13 +984,16 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const pasted = (event.clipboardData || window.clipboardData).getData('text');
         const current = event.target.value;
         const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
+        const selEnd = event.target.selectionEnd;
         const combined = current.slice(0, selStart) + pasted + current.slice(selEnd);
         if (countWords(combined) > MAX_WORDS) {
             event.preventDefault();
             const truncated = truncateToWordLimit(combined, MAX_WORDS);
             event.target.value = truncated;
             this.reviewData = { ...this.reviewData, Recommendation_Strength_Comments__c: truncated };
+            if (truncated.trim() && this.recErrors.comment) {
+                this.recErrors = { ...this.recErrors, comment: false, commentMessage: '' };
+            }
             this.autoSave();
         }
     }
@@ -881,6 +1007,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             }
         } else {
             this.rejectionReasons = this.rejectionReasons.filter(v => v !== val);
+        }
+        if (this.rejectionReasons.length > 0 && this.recErrors.rejectionReasons) {
+            this.recErrors = { ...this.recErrors, rejectionReasons: false, rejectionReasonsMessage: '' };
         }
         this.autoSave();
     }
@@ -896,6 +1025,9 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             event.target.value = text;
         }
         this.reviewData = { ...this.reviewData, Rejection_Comment__c: text };
+        if (text.trim() && this.recErrors.rejectionComment) {
+            this.recErrors = { ...this.recErrors, rejectionComment: false, rejectionCommentMessage: '' };
+        }
         this.autoSave();
     }
     handleRejectionCommentKeyDown(event) {
@@ -904,7 +1036,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
         const text = event.target.value;
         const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
+        const selEnd = event.target.selectionEnd;
         const hasSelection = selStart !== selEnd;
         if (!hasSelection && countWords(text) >= MAX_WORDS && (event.key === ' ' || event.key.length === 1)) {
             event.preventDefault();
@@ -914,13 +1046,16 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const pasted = (event.clipboardData || window.clipboardData).getData('text');
         const current = event.target.value;
         const selStart = event.target.selectionStart;
-        const selEnd   = event.target.selectionEnd;
+        const selEnd = event.target.selectionEnd;
         const combined = current.slice(0, selStart) + pasted + current.slice(selEnd);
         if (countWords(combined) > MAX_WORDS) {
             event.preventDefault();
             const truncated = truncateToWordLimit(combined, MAX_WORDS);
             event.target.value = truncated;
             this.reviewData = { ...this.reviewData, Rejection_Comment__c: truncated };
+            if (truncated.trim() && this.recErrors.rejectionComment) {
+                this.recErrors = { ...this.recErrors, rejectionComment: false, rejectionCommentMessage: '' };
+            }
             this.autoSave();
         }
     }
@@ -929,7 +1064,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         const targetStep = parseInt(event.currentTarget.dataset.idx, 10);
         if (targetStep <= this.currentStep) {
             this.currentStep = targetStep;
-            this.validationError = '';
+            this._clearAllFieldErrors();
             this._scrollToTop();
         }
     }
@@ -950,7 +1085,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     prevStep() {
         if (this.currentStep > 0) {
             this.currentStep -= 1;
-            this.validationError = '';
+            this._clearAllFieldErrors();
             this.rubricOpen = false;
             this._scrollToTop();
         }
@@ -961,75 +1096,126 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     // Next / Submit button handler
     nextStep() {
-        this.validationError = '';
 
         // Validate Dynamic Category Step (0 to totalCategoryCount - 1)
         if (this.isDimStep) {
             const cat = this.categories[this.currentStep];
             const qs = (cat && cat.questions) ? cat.questions : [];
-            for (let q of qs) {
+            const newInvalid = {};
+            let firstQId = null;
+            let firstMessage = '';
+
+            qs.forEach(q => {
                 const r = this.ratings[q.questionId];
+                const entry = { rating: false, comment: false };
+
                 if (r == null) {
-                    this.validationError = `Please select a rating for question ${q.questionId}.`;
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    this._scrollToQuestion(q.questionId);
-                    return;
+                    entry.rating = true;
+                } else {
+                    const c = (this.comments[q.questionId] || '').trim();
+                    if (!c) {
+                        entry.comment = true;
+                    }
                 }
-                const c = (this.comments[q.questionId] || '').trim();
-                if (!c) {
-                    this.validationError = `Please enter a justification comment for question ${q.questionId}.`;
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    this._scrollToQuestion(q.questionId);
-                    return;
+
+                if (entry.rating || entry.comment) {
+                    newInvalid[q.questionId] = entry;
+                    if (!firstQId) {
+                        firstQId = q.questionId;
+                        firstMessage = entry.rating
+                            ? `Please select a rating for question ${q.questionId}.`
+                            : `Please enter a justification comment for question ${q.questionId}.`;
+                    }
                 }
+            });
+
+            if (firstQId) {
+                this.invalidQuestions = newInvalid;
+                this.showToast('Validation Error', firstMessage, 'error');
+                this._scrollToQuestion(firstQId);
+                return;
             }
+            this.invalidQuestions = {};
         }
 
         // Validate Strengths & Weaknesses Step
         if (this.isSwStep) {
+            const errors = { strength: false, strengthMessage: '', weakness: false, weaknessMessage: '' };
+            let message = '';
+
             if (!(this.strengths[0] || '').trim()) {
-                this.validationError = 'Please provide at least your #1 primary strength.';
-                this.showToast('Validation Error', this.validationError, 'error');
-                return;
+                errors.strength = true;
+                errors.strengthMessage = 'Please provide at least your #1 primary strength.';
+                message = errors.strengthMessage;
             }
             if (!(this.weaknesses[0] || '').trim()) {
-                this.validationError = 'Please provide at least your #1 primary weakness / concern.';
-                this.showToast('Validation Error', this.validationError, 'error');
+                errors.weakness = true;
+                errors.weaknessMessage = 'Please provide at least your #1 primary weakness / concern.';
+                if (!message) message = errors.weaknessMessage;
+            }
+
+            if (errors.strength || errors.weakness) {
+                this.swErrors = errors;
+                this.showToast('Validation Error', message, 'error');
+                this._scrollToSwError(errors);
                 return;
             }
+            this.swErrors = { strength: false, strengthMessage: '', weakness: false, weaknessMessage: '' };
         }
 
         // Validate Final Recommendation Step
         if (this.isRecStep) {
+            const errors = {
+                choice: false, choiceMessage: '',
+                strength: false, strengthMessage: '',
+                comment: false, commentMessage: '',
+                rejectionReasons: false, rejectionReasonsMessage: '',
+                rejectionComment: false, rejectionCommentMessage: ''
+            };
+            let message = '';
+
             if (!this.recChoice) {
-                this.validationError = 'Please select a final recommendation decision.';
-                this.showToast('Validation Error', this.validationError, 'error');
+                errors.choice = true;
+                errors.choiceMessage = 'Please select a final recommendation decision.';
+                message = errors.choiceMessage;
+            } else if (this.showCeoRecommendationYes) {
+                if (this.recStrength == null) {
+                    errors.strength = true;
+                    errors.strengthMessage = 'Please select a recommendation strength level (1 to 5).';
+                    message = errors.strengthMessage;
+                } else if (!(this.reviewData.Recommendation_Strength_Comments__c || '').trim()) {
+                    errors.comment = true;
+                    errors.commentMessage = 'Please provide recommendation strength comments.';
+                    message = errors.commentMessage;
+                }
+            } else if (this.showCeoRecommendationNo) {
+                if (!this.rejectionReasons || this.rejectionReasons.length === 0) {
+                    errors.rejectionReasons = true;
+                    errors.rejectionReasonsMessage = 'Please select at least one rejection reason.';
+                    message = errors.rejectionReasonsMessage;
+                } else if (!(this.reviewData.Rejection_Comment__c || '').trim()) {
+                    errors.rejectionComment = true;
+                    errors.rejectionCommentMessage = 'Please provide a detailed rejection comment.';
+                    message = errors.rejectionCommentMessage;
+                }
+            }
+
+            const hasError = errors.choice || errors.strength || errors.comment
+                || errors.rejectionReasons || errors.rejectionComment;
+
+            if (hasError) {
+                this.recErrors = errors;
+                this.showToast('Validation Error', message, 'error');
+                this._scrollToRecError(errors);
                 return;
             }
-            if (this.showCeoRecommendationYes) {
-                if (this.recStrength == null) {
-                    this.validationError = 'Please select a recommendation strength level (1 to 5).';
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    return;
-                }
-                if (!(this.reviewData.Recommendation_Strength_Comments__c || '').trim()) {
-                    this.validationError = 'Please provide recommendation strength comments.';
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    return;
-                }
-            }
-            if (this.showCeoRecommendationNo) {
-                if (!this.rejectionReasons || this.rejectionReasons.length === 0) {
-                    this.validationError = 'Please select at least one rejection reason.';
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    return;
-                }
-                if (!(this.reviewData.Rejection_Comment__c || '').trim()) {
-                    this.validationError = 'Please provide a detailed rejection comment.';
-                    this.showToast('Validation Error', this.validationError, 'error');
-                    return;
-                }
-            }
+            this.recErrors = {
+                choice: false, choiceMessage: '',
+                strength: false, strengthMessage: '',
+                comment: false, commentMessage: '',
+                rejectionReasons: false, rejectionReasonsMessage: '',
+                rejectionComment: false, rejectionCommentMessage: ''
+            };
         }
 
         // Submit Step
@@ -1047,8 +1233,30 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     _scrollToQuestion(qId) {
         setTimeout(() => {
             const el = this.template.querySelector(`.subq[data-qid="${qId}"]`)
-                    || this.template.querySelector('.error-banner.validate')
-                    || this.template.querySelector('.rating-row');
+                || this.template.querySelector('.rating-row');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
+
+    _scrollToSwError(errors) {
+        setTimeout(() => {
+            const kind = errors.strength ? 'strength' : 'weakness';
+            const el = this.template.querySelector(`lightning-input[data-kind="${kind}"][data-idx="0"]`)
+                || this.template.querySelector('.sw-block');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
+
+    _scrollToRecError(errors) {
+        setTimeout(() => {
+            let selector = '.yesno-row';
+            if (errors.strength || errors.comment) selector = '.path.yes';
+            if (errors.rejectionReasons || errors.rejectionComment) selector = '.path.no';
+            const el = this.template.querySelector(selector);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -1062,7 +1270,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     // Manual Save Draft button handler
     handleSaveDraft() {
         if (!this._applicationId) return;
-        this.saveStateText  = 'Saving…';
+        this.saveStateText = 'Saving…';
         this.saveStateClass = 'save-saving';
 
         const payload = this.buildReviewPayload(false);
@@ -1071,13 +1279,13 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 if (saved && saved.Id) {
                     this.reviewData.Id = saved.Id;
                 }
-                this.saveStateText  = 'Saved · just now';
+                this.saveStateText = 'Saved · just now';
                 this.saveStateClass = 'save-idle';
                 this.showToast('Success', 'Draft saved successfully.', 'success');
             })
             .catch(err => {
                 console.error('Draft manual save error:', err);
-                this.saveStateText  = 'Save error';
+                this.saveStateText = 'Save error';
                 this.saveStateClass = 'save-error';
                 this.showToast('Error', 'Failed to save draft.', 'error');
             });
@@ -1149,14 +1357,14 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                             fileName: file.name,
                             base64Data: base64Data
                         })
-                        .then(res => {
-                            if (res && res.documentId) {
-                                resolve(res);
-                            } else {
-                                reject(new Error('Invalid response from server'));
-                            }
-                        })
-                        .catch(err => reject(err));
+                            .then(res => {
+                                if (res && res.documentId) {
+                                    resolve(res);
+                                } else {
+                                    reject(new Error('Invalid response from server'));
+                                }
+                            })
+                            .catch(err => reject(err));
                     };
                     reader.onerror = error => reject(error);
                     reader.readAsDataURL(file);
@@ -1313,7 +1521,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     autoSave() {
         if (!this._applicationId) return;
-        this.saveStateText  = 'Saving…';
+        this.saveStateText = 'Saving…';
         this.saveStateClass = 'save-saving';
 
         if (this._saveTimer) clearTimeout(this._saveTimer);
@@ -1324,12 +1532,12 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                     if (saved && saved.Id) {
                         this.reviewData.Id = saved.Id;
                     }
-                    this.saveStateText  = 'Auto-saved · just now';
+                    this.saveStateText = 'Auto-saved · just now';
                     this.saveStateClass = 'save-idle';
                 })
                 .catch(err => {
                     console.error('Draft auto-save error:', err);
-                    this.saveStateText  = 'Save error';
+                    this.saveStateText = 'Save error';
                     this.saveStateClass = 'save-error';
                 });
         }, 600);
@@ -1337,7 +1545,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     handleSubmit() {
         if (!this.isAllCompleted) {
-            this.validationError = 'Please complete all ratings, comments, strengths, weaknesses, and recommendation before submitting.';
+            this.showToast('Validation Error', 'Please complete all ratings, comments, strengths, weaknesses, and recommendation before submitting.', 'error');
             return;
         }
 

@@ -12,6 +12,8 @@ import submitDynamicApplication from '@salesforce/apex/WCFFormEngineController.s
 import deleteUploadedFile from '@salesforce/apex/WCFFormEngineController.deleteUploadedFile';
 import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedback';
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
+import WCF_FOCUS_STYLES from '@salesforce/resourceUrl/wcfFormFocusStyles';
+import getUploadedFileDetails from '@salesforce/apex/WCFFormEngineController.getUploadedFileDetails';
 
 function calculateEndingBalance(startBalance, revenue, expense) {
     const start = Number(String(startBalance).replace(/,/g, '')) || 0;
@@ -550,6 +552,7 @@ export default class WcfDynamicForm extends LightningElement {
 
         this.loadMetadata();
         this._loadPdfLibraries();
+        loadStyle(this, WCF_FOCUS_STYLES).catch(err => console.warn('Focus style load warning:', err));
         this.loadDraftData();
     }
 
@@ -1698,9 +1701,45 @@ export default class WcfDynamicForm extends LightningElement {
         return `${f.Reference_2_Name__c}${role}${email}`;
     }
 
+        _hasAnyFormValue(keys) {
+        return keys.some(k => {
+            const v = this.formValues[k];
+            return v !== undefined && v !== null && String(v).trim() !== '';
+        });
+    }
+
+    get showFunder2InReview() {
+        return this._hasAnyFormValue([
+            'Funder_2_Name__c', 'Funder_2_Amount__c', 'Funder_2_Period_Start__c',
+            'Funder_2_Period_End__c', 'Funder_2_Type__c'
+        ]);
+    }
+
+    get showFunder3InReview() {
+        return this._hasAnyFormValue([
+            'Funder_3_Name__c', 'Funder_3_Amount__c', 'Funder_3_Period_Start__c',
+            'Funder_3_Period_End__c', 'Funder_3_Type__c'
+        ]);
+    }
+
+    get showReference2InReview() {
+        return this._hasAnyFormValue([
+            'Reference_2_Name__c', 'Reference_2_Role__c', 'Reference_2_Email__c'
+        ]);
+    }
+
     get reviewLeaderTenure() {
         const v = this.formValues.Leader_Tenure__c;
         return (v !== undefined && v !== null && String(v).trim() !== '') ? `${String(v).trim()} years` : '—';
+    }
+
+        get reviewPhoneWithCode() {
+        const number = this.formValues.Phone__c ? String(this.formValues.Phone__c).trim() : '';
+        if (!number) return '—';
+        if (number.startsWith('+')) return number;
+        const code = this._extractDialCode(this.formValues.WG_Phone_Country_Code__c) || this._currentDialCode();
+        if (!code) return number;
+        return `${code} ${this._normalizeNationalNumber(number, code)}`;
     }
 
     get reviewLegalType() {
@@ -1918,26 +1957,6 @@ export default class WcfDynamicForm extends LightningElement {
             return isNaN(n) ? String(v) : n.toLocaleString('en-US');
         };
 
-        const parseHtml = (html) => {
-            if (!html) return '';
-            const el = new DOMParser().parseFromString(html, 'text/html').body;
-            let result = '';
-            const process = (node) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    result += node.nodeValue;
-                } else if (node.nodeName === 'BR') {
-                    result += '\n';
-                } else if (node.nodeName === 'LI') {
-                    result += `• ${node.textContent.trim()}\n`;
-                } else {
-                    node.childNodes.forEach(process);
-                    if (['DIV', 'P'].includes(node.nodeName)) result += '\n';
-                }
-            };
-            el.childNodes.forEach(process);
-            return result.trim();
-        };
-
         const doc = new jsPDFLib();
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
@@ -2020,13 +2039,121 @@ export default class WcfDynamicForm extends LightningElement {
             y += 7;
         };
 
-        const printLines = (text, indent = 15) => {
-            const lines = doc.splitTextToSize(text, pageWidth - indent - 15);
-            lines.forEach(line => {
-                checkPage(6);
-                doc.text(line, indent, y);
-                y += 5;
+        const RICH_LINE_HEIGHT = 5;
+
+        const setRichFont = (bold, italic) => {
+            let style = 'normal';
+            if (bold && italic) style = 'bolditalic';
+            else if (bold) style = 'bold';
+            else if (italic) style = 'italic';
+            doc.setFont(undefined, style);
+        };
+
+        // Renders rich-text HTML (from the B/I/U/bullet toolbar) into the PDF,
+        // preserving bold/italic/underline runs and bullet lines instead of
+        // flattening everything to plain text.
+        const printRichText = (html, indent = 15) => {
+            const isEmpty = !html || !String(html).replace(/<[^>]*>/g, '').trim();
+            if (isEmpty) {
+                checkPage(RICH_LINE_HEIGHT);
+                doc.setFont(undefined, 'normal');
+                doc.text('—', indent, y);
+                y += RICH_LINE_HEIGHT;
+                return;
+            }
+
+            const maxWidth = pageWidth - indent - 15;
+            const el = new DOMParser().parseFromString(String(html), 'text/html').body;
+            const paragraphs = [];
+            let currentTokens = [];
+
+            const endParagraph = (bullet = false) => {
+                if (currentTokens.length) paragraphs.push({ tokens: currentTokens, bullet });
+                currentTokens = [];
+            };
+
+            const walk = (node, fmt) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const words = node.nodeValue.split(/(\s+)/).filter(w => w !== '');
+                    words.forEach(w => currentTokens.push({ text: w, ...fmt }));
+                    return;
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                const tag = node.nodeName;
+                const nextFmt = {
+                    bold: fmt.bold || tag === 'B' || tag === 'STRONG',
+                    italic: fmt.italic || tag === 'I' || tag === 'EM',
+                    underline: fmt.underline || tag === 'U'
+                };
+
+                if (tag === 'BR') {
+                    endParagraph();
+                    return;
+                }
+                if (tag === 'LI') {
+                    endParagraph();
+                    node.childNodes.forEach(child => walk(child, nextFmt));
+                    endParagraph(true);
+                    return;
+                }
+                if (tag === 'P' || tag === 'DIV' || tag === 'UL' || tag === 'OL') {
+                    endParagraph();
+                    node.childNodes.forEach(child => walk(child, nextFmt));
+                    endParagraph();
+                    return;
+                }
+                node.childNodes.forEach(child => walk(child, nextFmt));
+            };
+
+            el.childNodes.forEach(n => walk(n, { bold: false, italic: false, underline: false }));
+            endParagraph();
+
+            const validParagraphs = paragraphs.filter(p => p.tokens.some(t => t.text.trim() !== ''));
+            if (!validParagraphs.length) {
+                checkPage(RICH_LINE_HEIGHT);
+                doc.setFont(undefined, 'normal');
+                doc.text('—', indent, y);
+                y += RICH_LINE_HEIGHT;
+                return;
+            }
+
+            validParagraphs.forEach(para => {
+                const lineStartX = indent + (para.bullet ? 4 : 0);
+                let x = lineStartX;
+                checkPage(RICH_LINE_HEIGHT);
+                if (para.bullet) {
+                    doc.setFont(undefined, 'normal');
+                    doc.text('•', indent, y);
+                }
+
+                para.tokens.forEach(tok => {
+                    if (/^\s+$/.test(tok.text)) {
+                        if (x === lineStartX) return;
+                        setRichFont(tok.bold, tok.italic);
+                        x += doc.getTextWidth(' ');
+                        return;
+                    }
+
+                    setRichFont(tok.bold, tok.italic);
+                    const w = doc.getTextWidth(tok.text);
+                    if (x > lineStartX && x + w > indent + maxWidth) {
+                        y += RICH_LINE_HEIGHT;
+                        checkPage(RICH_LINE_HEIGHT);
+                        x = lineStartX;
+                    }
+                    doc.text(tok.text, x, y);
+                    if (tok.underline) {
+                        doc.setDrawColor(...TEXT_DARK);
+                        doc.setLineWidth(0.15);
+                        doc.line(x, y + 0.8, x + w, y + 0.8);
+                    }
+                    x += w;
+                });
+                y += RICH_LINE_HEIGHT;
             });
+
+            doc.setFont(undefined, 'normal');
         };
 
         const labelValue = (label, value, qNum = null) => {
@@ -2054,7 +2181,7 @@ export default class WcfDynamicForm extends LightningElement {
             doc.setFontSize(9.5);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(...TEXT_DARK);
-            printLines(parseHtml(String(displayVal)), labelX);
+            printRichText(String(displayVal), labelX);
 
             checkPage(4);
             doc.setDrawColor(...LINE_GRAY);
@@ -2113,7 +2240,7 @@ export default class WcfDynamicForm extends LightningElement {
         labelValue('Submitter Name', form.Submitter_Name__c, 'Q3');
         labelValue('Title', form.Job_Title__c, 'Q3');
         labelValue('Work Email', form.Work_Email_ID__c, 'Q3');
-        labelValue('Phone number', form.Phone__c, 'Q3');
+        labelValue('Phone number', this.reviewPhoneWithCode, 'Q3');
         if (this.hasCustomQuestionsQ3) {
             this.customQuestionsQ3.forEach(cq => {
                 labelValue(cq.label, cq.value, cq.displayNumber);
@@ -2144,11 +2271,17 @@ export default class WcfDynamicForm extends LightningElement {
             });
         }
 
-        labelValue('Funder 1', this.reviewFunder1Display, 'Q7');
-        labelValue('Funder 2', this.reviewFunder2Display, 'Q7');
-        labelValue('Funder 3', this.reviewFunder3Display, 'Q7');
+                labelValue('Funder 1', this.reviewFunder1Display, 'Q7');
+        if (this.showFunder2InReview) {
+            labelValue('Funder 2', this.reviewFunder2Display, 'Q7');
+        }
+        if (this.showFunder3InReview) {
+            labelValue('Funder 3', this.reviewFunder3Display, 'Q7');
+        }
         labelValue('Reference 1', this.reviewReference1Display, 'Q8');
-        labelValue('Reference 2', this.reviewReference2Display, 'Q8');
+        if (this.showReference2InReview) {
+            labelValue('Reference 2', this.reviewReference2Display, 'Q8');
+        }
 
         subHead('Q9', 'Historical Financial Data (Three Prior Fiscal Years)');
         table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
@@ -3019,12 +3152,22 @@ export default class WcfDynamicForm extends LightningElement {
         return null;
     }
 
+     _isNativeFormElement(el) {
+        const tag = el && el.tagName ? el.tagName.toUpperCase() : '';
+        return tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
+    }
+
     _showLightningError(dataId, message) {
         const el = this.template.querySelector(`[data-id="${dataId}"]`) ||
                    this.template.querySelector(`[data-key="${dataId}"]`) ||
                    this.template.querySelector(`[data-field="${dataId}"]`);
         if (el) {
-            if (el.setCustomValidity) {
+            if (this._isNativeFormElement(el)) {
+                // Native inputs (e.g. the funding period dates): reportValidity() would move
+                // the cursor into this field while the user is typing elsewhere, so show the
+                // inline message instead.
+                this._showNativeError(el, message);
+            } else if (el.setCustomValidity) {
                 el.setCustomValidity(message);
                 el.reportValidity();
             } else {
@@ -3034,12 +3177,18 @@ export default class WcfDynamicForm extends LightningElement {
         }
     }
 
-    _clearLightningError(dataId) {
+     _clearLightningError(dataId) {
         const el = this.template.querySelector(`[data-id="${dataId}"]`) ||
                    this.template.querySelector(`[data-key="${dataId}"]`) ||
                    this.template.querySelector(`[data-field="${dataId}"]`);
         if (el) {
-            if (el.setCustomValidity) {
+            if (this._isNativeFormElement(el)) {
+                // Clear without reportValidity(), which can pull focus to an empty required field.
+                if (el.setCustomValidity) {
+                    el.setCustomValidity('');
+                }
+                this._clearNativeError(el);
+            } else if (el.setCustomValidity) {
                 el.setCustomValidity('');
                 el.reportValidity();
             } else {
@@ -3048,7 +3197,7 @@ export default class WcfDynamicForm extends LightningElement {
             this._invalidElements = this._invalidElements.filter(x => x !== el);
         }
     }
-
+   
     _showFieldError(fieldName, message) {
         const el = this.template.querySelector(`[data-field="${fieldName}"]`) ||
                    this.template.querySelector(`[data-id="${fieldName}"]`) ||
@@ -6149,6 +6298,36 @@ export default class WcfDynamicForm extends LightningElement {
         return ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx'];
     }
 
+        _sizeCheckDiagnostic = '';
+
+    async _fetchUploadedFileSizes(files) {
+        const sizeByDocId = {};
+        this._sizeCheckDiagnostic = '';
+        const docIds = (files || []).map(f => f.documentId).filter(Boolean);
+        if (docIds.length === 0) {
+            this._sizeCheckDiagnostic = 'The upload did not return a document Id.';
+            return sizeByDocId;
+        }
+        try {
+            const details = await getUploadedFileDetails({ contentDocumentIds: docIds });
+            console.log('Uploaded file sizes from Apex:', JSON.stringify(details), 'sent:', JSON.stringify(docIds));
+            (details || []).forEach(d => {
+                if (d && d.documentId) {
+                    sizeByDocId[String(d.documentId).substring(0, 15)] = Number(d.sizeInBytes) || 0;
+                }
+            });
+            if (!details || details.length === 0) {
+                this._sizeCheckDiagnostic = `The server found no file record for ${docIds.join(', ')}.`;
+            } else if (docIds.some(id => sizeByDocId[String(id).substring(0, 15)] === undefined)) {
+                this._sizeCheckDiagnostic = `The server returned ${details.map(d => d.documentId).join(', ')} but the upload sent ${docIds.join(', ')}.`;
+            }
+        } catch (err) {
+            const msg = (err && err.body && err.body.message) || (err && err.message) || JSON.stringify(err);
+            this._sizeCheckDiagnostic = `The size check failed: ${msg}`;
+            console.error('Could not verify uploaded file size:', JSON.stringify(err));
+        }
+        return sizeByDocId;
+    }
     // ── Q24 Third-Party Verification File Upload ──────────────────────────
     @track q24UploadedFiles = [];
 
@@ -6156,24 +6335,27 @@ export default class WcfDynamicForm extends LightningElement {
         return this.q24UploadedFiles && this.q24UploadedFiles.length > 0;
     }
 
-    handleQ24UploadFinished(event) {
+            async handleQ24UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
             const MAX_Q24_SIZE = 10 * 1024 * 1024; // 10 MB
+            const sizeByDocId = await this._fetchUploadedFileSizes(uploaded);
             const currentFiles = this.q24UploadedFiles || [];
             const validFiles = [];
             const duplicateNames = [];
             const oversizedNames = [];
+            const unverifiedNames = [];
 
             uploaded.forEach(f => {
-                const size = f.size || f.sizeInBytes || 0;
+                const key = f.documentId ? String(f.documentId).substring(0, 15) : '';
+                const size = sizeByDocId[key];
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
                               validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
-                if (size > MAX_Q24_SIZE) {
-                    oversizedNames.push(f.name);
+                if (size === undefined || size > MAX_Q24_SIZE) {
+                    (size === undefined ? unverifiedNames : oversizedNames).push(f.name);
                     if (f.documentId) {
                         deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
-                            .catch(err => console.warn('Oversized file cleanup warning:', err));
+                            .catch(err => console.warn('Rejected file cleanup warning:', err));
                     }
                 } else if (isDup) {
                     duplicateNames.push(f.name);
@@ -6190,20 +6372,43 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             });
 
-            if (oversizedNames.length > 0) {
-                this.showBanner('error', 'File Size Limit Exceeded', `File "${oversizedNames.join(', ')}" exceeds the 10 MB limit. Please upload a file smaller than 10 MB.`);
-            }
-
-            if (duplicateNames.length > 0) {
-                this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);
-            }
-
             if (validFiles.length > 0) {
                 this.q24UploadedFiles = [...currentFiles, ...validFiles];
+            }
+
+            const uploadedNote = validFiles.length > 0
+                ? ` ${validFiles.length} other file(s) uploaded successfully.`
+                : '';
+            const duplicateNote = duplicateNames.length > 0
+                ? ` Duplicate file(s) skipped: "${duplicateNames.join(', ')}".`
+                : '';
+
+            if (oversizedNames.length > 0) {
+                this.showBanner(
+                    'error',
+                    'File Size Limit Exceeded',
+                    `File "${oversizedNames.join(', ')}" exceeds the 10 MB per-file limit and was not uploaded. Please upload a PDF of 10 MB or less.${duplicateNote}${uploadedNote}`,
+                    8000
+                );
+            } else if (unverifiedNames.length > 0) {
+                this.showBanner(
+                    'error',
+                    'Upload Not Verified',
+                    `We couldn't verify the size of "${unverifiedNames.join(', ')}", so it was not uploaded. ${this._sizeCheckDiagnostic}${duplicateNote}${uploadedNote}`,
+                    15000
+                );
+            } else if (duplicateNames.length > 0) {
+                this.showBanner(
+                    'warning',
+                    'Duplicate File',
+                    `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.${uploadedNote}`
+                );
+            } else if (validFiles.length > 0) {
                 this.showBanner('success', 'File Uploaded', 'Verification Report uploaded successfully.');
             }
         }
     }
+
 
     handleRemoveQ24File(event) {
         const docId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
@@ -6221,24 +6426,27 @@ export default class WcfDynamicForm extends LightningElement {
         return this.q28UploadedFiles && this.q28UploadedFiles.length > 0;
     }
 
-    handleQ28UploadFinished(event) {
+        async handleQ28UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
             const MAX_Q28_SIZE = 50 * 1024 * 1024; // 50 MB
+            const sizeByDocId = await this._fetchUploadedFileSizes(uploaded);
             const currentFiles = this.q28UploadedFiles || [];
             const validFiles = [];
             const duplicateNames = [];
             const oversizedNames = [];
+            const unverifiedNames = [];
 
             uploaded.forEach(f => {
-                const size = f.size || f.sizeInBytes || 0;
+                const key = f.documentId ? String(f.documentId).substring(0, 15) : '';
+                const size = sizeByDocId[key];
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
                               validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
-                if (size > MAX_Q28_SIZE) {
-                    oversizedNames.push(f.name);
+                if (size === undefined || size > MAX_Q28_SIZE) {
+                    (size === undefined ? unverifiedNames : oversizedNames).push(f.name);
                     if (f.documentId) {
                         deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
-                            .catch(err => console.warn('Oversized file cleanup warning:', err));
+                            .catch(err => console.warn('Rejected file cleanup warning:', err));
                     }
                 } else if (isDup) {
                     duplicateNames.push(f.name);
@@ -6255,20 +6463,42 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             });
 
-            if (oversizedNames.length > 0) {
-                this.showBanner('error', 'File Size Limit Exceeded', `File "${oversizedNames.join(', ')}" exceeds the 50 MB limit. Please upload a file smaller than 50 MB.`);
-            }
-
-            if (duplicateNames.length > 0) {
-                this.showBanner('warning', 'Duplicate File', `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.`);
-            }
-
             if (validFiles.length > 0) {
                 this.q28UploadedFiles = [...currentFiles, ...validFiles];
+            }
+
+            const uploadedNote = validFiles.length > 0
+                ? ` ${validFiles.length} other file(s) uploaded successfully.`
+                : '';
+            const duplicateNote = duplicateNames.length > 0
+                ? ` Duplicate file(s) skipped: "${duplicateNames.join(', ')}".`
+                : '';
+
+            if (oversizedNames.length > 0) {
+                this.showBanner(
+                    'error',
+                    'File Size Limit Exceeded',
+                    `File "${oversizedNames.join(', ')}" exceeds the 50 MB per-file limit and was not uploaded. Please upload files of 50 MB or less.${duplicateNote}${uploadedNote}`,
+                    8000
+                );
+            } else if (unverifiedNames.length > 0) {
+                this.showBanner(
+                    'error',
+                    'Upload Not Verified',
+                    `We couldn't verify the size of "${unverifiedNames.join(', ')}", so it was not uploaded. ${this._sizeCheckDiagnostic}${duplicateNote}${uploadedNote}`,
+                    15000
+                );
+            } else if (duplicateNames.length > 0) {
+                this.showBanner(
+                    'warning',
+                    'Duplicate File',
+                    `File "${duplicateNames.join(', ')}" is already uploaded. Duplicate files are not allowed.${uploadedNote}`
+                );
+            } else if (validFiles.length > 0) {
                 this.showBanner('success', 'File Uploaded', 'Supporting Document uploaded successfully.');
             }
         }
-    }
+    } 
 
     handleRemoveQ28File(event) {
         const docId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;

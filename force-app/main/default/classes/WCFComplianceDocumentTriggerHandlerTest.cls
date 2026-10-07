@@ -58,9 +58,9 @@ private class WCFComplianceDocumentTriggerHandlerTest {
         WCFComplianceDocumentTriggerHandler.syncOnboardedStatus(new Set<Id>{ app.Id });
         Test.stopTest();
 
-        System.assertEquals('Onboarded',
+        System.assertEquals('Onboarding Approved',
             [SELECT Status FROM IndividualApplication WHERE Id = :app.Id].Status,
-            'Application should be updated to Onboarded.');
+            'Application should be updated to Onboarding Approved.');
     }
 
     @IsTest
@@ -135,7 +135,7 @@ private class WCFComplianceDocumentTriggerHandlerTest {
         };
         insert docs;
 
-        System.assertEquals('Onboarded',
+        System.assertEquals('Onboarding Approved',
             [SELECT Status FROM IndividualApplication WHERE Id = :app.Id].Status);
 
         Test.startTest();
@@ -230,7 +230,7 @@ private class WCFComplianceDocumentTriggerHandlerTest {
         WCFComplianceDocumentTriggerHandler.syncOnboardedStatus(new Set<Id>{ app.Id });
         Test.stopTest();
 
-        System.assertEquals('Onboarded',
+        System.assertEquals('Onboarding Approved',
             [SELECT Status FROM IndividualApplication WHERE Id = :app.Id].Status);
     }
 }

@@ -126,7 +126,14 @@
                                 <template for:each={acceptedApplicationRows} for:item="row">
                                     <tr key={row.id}>
                                         <td class="wg-col-index">{row.rowNum}</td>
-                                        <td class="wg-cell-id">{row.appName}</td>
+                                        <!-- NEW: hyperlink → read-only proposal + review view -->
+                                        <td class="wg-cell-id">
+                                            <a href="javascript:void(0);"
+                                               class="rd-app-link"
+                                               title="View proposal and review"
+                                               data-id={row.applicationId}
+                                               onclick={handleViewApplication}>{row.appName}</a>
+                                        </td>
                                         <td>{row.organizationName}</td>
                                         <td class="rd-comment">{row.approverComment}</td>
                                         <td class="wg-cell-muted">{row.decisionDateFormatted}</td>
