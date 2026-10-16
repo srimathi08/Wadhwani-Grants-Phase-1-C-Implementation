@@ -70,7 +70,10 @@ const UI_TEXT = {
     noteSuspended: 'Your review is on hold while we carry out additional checks.',
     revisionTitle: 'Revision requested',
     revisionBody: 'Our team reviewed your application and returned it with feedback.',
-    revisionNote: 'Review the comments, update the flagged answers and resubmit.'
+    revisionNote: 'Review the comments, update the flagged answers and resubmit.',
+    notRecommendedTitle: 'Application Not Selected',
+    notRecommendedBody: 'After careful review, your application was not selected for funding at this time. Please reach out to your Programme Lead if you have questions.'
+
 };
 
 const fmt = (tpl, ...args) => args.reduce((s, a, i) => s.replace(`{${i}}`, a), tpl);
@@ -222,6 +225,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     @api programmeLeadEmail;
     @api complianceDocStatus;
     @api complianceHasUploads = false;
+    @api decisionOutcome;
 
     connectedCallback() {
         this.resolvePageUrls();
@@ -256,6 +260,12 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
 
     get isAlertStatus() {
         return ALERT_KEYS.has(this.statusKey);
+    }
+    get isNotRecommended() {
+        const k = norm(this.decisionOutcome);
+        return k === 'notrecommendforfund'
+            || k === 'notrecommendedforfund'
+            || k === 'notrecommended';
     }
 
     get activeIndex() {
@@ -385,7 +395,10 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
             let tooltip = def.tooltip;
 
             if (isActive) {
-                if (isRevision) {
+                if (this.isNotRecommended && i === 5) {
+                    label = UI_TEXT.notRecommendedTitle;
+                    tooltip = UI_TEXT.notRecommendedBody;
+                } else if (isRevision) {
                     label = UI_TEXT.revisionTitle;
                     tooltip = UI_TEXT.revisionBody;
                     subLabel = UI_TEXT.revisionNote;

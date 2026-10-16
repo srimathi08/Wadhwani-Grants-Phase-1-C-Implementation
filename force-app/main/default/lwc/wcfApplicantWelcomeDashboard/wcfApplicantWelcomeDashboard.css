@@ -93,18 +93,19 @@
 }
 
 .btn-primary {
-    background: var(--wcf-red, #BF2026);
-    color: #fff;
+    background: var(--wg-red, #BF2026);
+    color: var(--wg-white, #ffffff);
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--wg-font-size-body, 14px);
+    font-weight: var(--wg-weight-semibold, 600);
+    font-family: var(--wg-font-heading, 'Barlow', sans-serif) !important;
     cursor: pointer;
 }
 
 .btn-primary:hover {
-    background: var(--wcf-orange, #F2672A);
+    background: var(--wg-orange, #F2672A);
 }
 
 .link-secondary {
@@ -153,7 +154,6 @@
 .wcf-content,
 .wcf-actions,
 .lang-btn,
-.btn-primary,
 .link-secondary,
 .wcf-links-list,
 .wcf-links-list a {

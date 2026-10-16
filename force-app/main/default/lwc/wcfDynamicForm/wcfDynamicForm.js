@@ -68,12 +68,6 @@ export default class WcfDynamicForm extends LightningElement {
         return !this.selectedTracks || this.selectedTracks.length === 0;
     }
 
-    // FAQ Accordion State (Matching 1st image: Job Fulfillment open by default, Job Creation & Livelihood closed)
-    @track faqOpen = {
-        jobFulfillment: true,
-        jobCreation: false,
-        livelihood: false
-    };
 
     @track formValues = {
         Fiscal_Month__c: '03',
@@ -206,32 +200,32 @@ export default class WcfDynamicForm extends LightningElement {
     _liveValidationTimeout = null;
 
     PHONE_LENGTH_BY_COUNTRY_CODE = {
-        '+1':   { min: 10, max: 10, example: '2025551234' },
-        '+20':  { min: 9,  max: 10, example: '1001234567' },
+        '+1': { min: 10, max: 10, example: '2025551234' },
+        '+20': { min: 9, max: 10, example: '1001234567' },
         '+234': { min: 10, max: 10, example: '8031234567' },
-        '+27':  { min: 9,  max: 9,  example: '821234567' },
-        '+31':  { min: 9,  max: 9,  example: '612345678' },
-        '+33':  { min: 9,  max: 9,  example: '612345678' },
-        '+34':  { min: 9,  max: 9,  example: '612345678' },
-        '+39':  { min: 9,  max: 10, example: '3123456789' },
-        '+41':  { min: 9,  max: 9,  example: '781234567' },
-        '+44':  { min: 10, max: 10, example: '7123456789' },
-        '+49':  { min: 7,  max: 11, example: '15123456789' },
-        '+52':  { min: 10, max: 10, example: '5512345678' },
-        '+54':  { min: 10, max: 11, example: '91123456789' },
-        '+55':  { min: 10, max: 11, example: '11987654321' },
-        '+60':  { min: 9,  max: 10, example: '123456789' },
-        '+61':  { min: 9,  max: 9,  example: '412345678' },
-        '+63':  { min: 10, max: 10, example: '9171234567' },
-        '+64':  { min: 8,  max: 10, example: '211234567' },
-        '+65':  { min: 8,  max: 8,  example: '81234567' },
-        '+7':   { min: 10, max: 10, example: '9123456789' },
-        '+81':  { min: 10, max: 10, example: '9012345678' },
-        '+82':  { min: 9,  max: 10, example: '1012345678' },
-        '+86':  { min: 11, max: 11, example: '13123456789' },
-        '+91':  { min: 10, max: 10, example: '9812345678' },
-        '+966': { min: 9,  max: 9,  example: '512345678' },
-        '+971': { min: 9,  max: 9,  example: '501234567' },
+        '+27': { min: 9, max: 9, example: '821234567' },
+        '+31': { min: 9, max: 9, example: '612345678' },
+        '+33': { min: 9, max: 9, example: '612345678' },
+        '+34': { min: 9, max: 9, example: '612345678' },
+        '+39': { min: 9, max: 10, example: '3123456789' },
+        '+41': { min: 9, max: 9, example: '781234567' },
+        '+44': { min: 10, max: 10, example: '7123456789' },
+        '+49': { min: 7, max: 11, example: '15123456789' },
+        '+52': { min: 10, max: 10, example: '5512345678' },
+        '+54': { min: 10, max: 11, example: '91123456789' },
+        '+55': { min: 10, max: 11, example: '11987654321' },
+        '+60': { min: 9, max: 10, example: '123456789' },
+        '+61': { min: 9, max: 9, example: '412345678' },
+        '+63': { min: 10, max: 10, example: '9171234567' },
+        '+64': { min: 8, max: 10, example: '211234567' },
+        '+65': { min: 8, max: 8, example: '81234567' },
+        '+7': { min: 10, max: 10, example: '9123456789' },
+        '+81': { min: 10, max: 10, example: '9012345678' },
+        '+82': { min: 9, max: 10, example: '1012345678' },
+        '+86': { min: 11, max: 11, example: '13123456789' },
+        '+91': { min: 10, max: 10, example: '9812345678' },
+        '+966': { min: 9, max: 9, example: '512345678' },
+        '+971': { min: 9, max: 9, example: '501234567' },
     };
 
     @track isDirty = false;
@@ -268,7 +262,7 @@ export default class WcfDynamicForm extends LightningElement {
             // Screen 1 & Track Selection
             TRACK_SELECTION_TITLE: 'Which of these does your work cover?',
             TRACK_SELECTION_SUBTITLE: 'Select all that apply. Your answer sets which questions you get later in the form.',
-            
+
             // Overview & FAQ
             OVERVIEW_TITLE: 'APPLICATION OVERVIEW · SECTIONS 2 & 3',
             OVERVIEW_SEC2_TAG: 'SECTION 2',
@@ -305,22 +299,22 @@ export default class WcfDynamicForm extends LightningElement {
 
             // Tab 1 / Category 1 Flat Questions
             Q1_SELECTED_TRACKS: 'Selected Track',
-            Q2_ORG_NAME: 'Organizational Name',
+            Q2_ORG_NAME: 'Organization Name',
             Q2_HQ_LOCATION: 'Headquarters City and Country',
-            Q2_PRIMARY_REGIONS: 'Primary Service Regions',
+            Q2_PRIMARY_REGIONS: 'Primary Service Regions (countries, then regions within them, in priority order)',
             Q2_LEADER_NAME: 'Leader Name',
-            Q2_LEADER_TITLE: 'Leader Title',
-            Q2_LEADER_TENURE: 'Leader Tenure (Optional)',
-            
+            Q2_LEADER_TITLE: 'Leader Designation / Title',
+            Q2_LEADER_TENURE: 'Leader Tenure, years in role (Optional)',
+
             Q3_SUBMITTER_NAME: 'Submitter Name',
             Q3_JOB_TITLE: 'Job Title',
             Q3_WORK_EMAIL: 'Work Email',
-            Q3_PHONE: 'Phone Number',
+            Q3_PHONE: 'Phone Number (country code + number)',
 
-            Q4_LEGAL_TYPE: 'Legal Structure',
-            Q4_JURISDICTION: 'Registration Jurisdiction',
-            Q4_INCORP_DATE: 'Incorporation Date',
-            Q4_GOVERNANCE_DESC: 'Describe your governance structure and key governing bodies.',
+            Q4_LEGAL_TYPE: 'Entity Type',
+            Q4_JURISDICTION: 'Registration Jurisdiction (country)',
+            Q4_INCORP_DATE: 'Registration / Incorporation Date (DD/MM/YYYY)',
+            Q4_GOVERNANCE_DESC: 'Brief description (<100 words): governance and operational structure: board, leadership, key affiliations.',
             Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).',
 
             Q5_US_501C3: 'Do you have 501(c)(3) status or equivalent US tax-exempt determination?',
@@ -351,7 +345,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q12_SKILLING_DOMAINS: 'Skilling Domains Offered',
             Q12_SKILLING_DOMAINS_DESC: 'List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.',
             Q13_JF_HIST_OUTCOMES: 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)',
-            Q13_JF_HIST_OUTCOMES_DESC: 'Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.',
+            Q13_JF_HIST_OUTCOMES_DESC: 'Enter your enrolment, placement actuals and average cost per placement across the three most recent fiscal years. Placement % are computed for you.',
             Q14_JF_PROJ_OUTCOMES: 'Job Fulfillment Outcomes — Current FY Projections',
             Q14_JF_PROJ_OUTCOMES_DESC: 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren\'t verifiable at submission.',
 
@@ -360,7 +354,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q16_BUSINESS_SECTORS: 'Business Sectors Served',
             Q16_BUSINESS_SECTORS_DESC: 'List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.',
             Q17_JC_HIST_OUTCOMES: 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)',
-            Q17_JC_HIST_OUTCOMES_DESC: 'Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.',
+            Q17_JC_HIST_OUTCOMES_DESC: 'Enter your business creation, job creation actuals and Total avg cost per job across the three most recent fiscal years. Current FY projections are captured separately below.',
             Q18_JC_PROJ_OUTCOMES: 'Job Creation Outcomes — Current FY Projections',
             Q18_JC_PROJ_OUTCOMES_DESC: 'Enter projected business and job-creation numbers for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.',
 
@@ -404,7 +398,7 @@ export default class WcfDynamicForm extends LightningElement {
             // Screen 1 & Track Selection
             TRACK_SELECTION_TITLE: this.getQuestionLabel('TRACK_SELECTION_TITLE', d.TRACK_SELECTION_TITLE),
             TRACK_SELECTION_SUBTITLE: this.getQuestionLabel('TRACK_SELECTION_SUBTITLE', d.TRACK_SELECTION_SUBTITLE),
-            
+
             // Overview & FAQ
             OVERVIEW_TITLE: this.getQuestionLabel('OVERVIEW_TITLE', d.OVERVIEW_TITLE),
             OVERVIEW_SEC2_TAG: 'SECTION 2',
@@ -447,7 +441,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q2_LEADER_NAME: this.getQuestionLabel('Q2_LEADER_NAME', d.Q2_LEADER_NAME),
             Q2_LEADER_TITLE: this.getQuestionLabel('Q2_LEADER_TITLE', d.Q2_LEADER_TITLE),
             Q2_LEADER_TENURE: this.getQuestionLabel('Q2_LEADER_TENURE', d.Q2_LEADER_TENURE),
-            
+
             Q3_SUBMITTER_NAME: this.getQuestionLabel('Q3_SUBMITTER_NAME', d.Q3_SUBMITTER_NAME),
             Q3_JOB_TITLE: this.getQuestionLabel('Q3_JOB_TITLE', d.Q3_JOB_TITLE),
             Q3_WORK_EMAIL: this.getQuestionLabel('Q3_WORK_EMAIL', d.Q3_WORK_EMAIL),
@@ -580,7 +574,7 @@ export default class WcfDynamicForm extends LightningElement {
             if (this._beforeUnloadHandler) {
                 window.removeEventListener('beforeunload', this._beforeUnloadHandler);
             }
-        } catch (e) {}
+        } catch (e) { }
     }
 
     @track metadataQuestions = [];
@@ -610,26 +604,26 @@ export default class WcfDynamicForm extends LightningElement {
 
     _partitionSectionQuestions() {
         const defaultsQ2 = [
-            { key: 'Q2_ORG_NAME', targetField: 'Organization_Name__c', label: 'Organizational Name', displayType: 'Text', isRequired: true, sequence: 1 },
+            { key: 'Q2_ORG_NAME', targetField: 'Organization_Name__c', label: 'Organization Name', displayType: 'Text', isRequired: true, sequence: 1 },
             { key: 'Q2_HQ_LOCATION', targetField: 'Headquarters_City_and_Country__c', label: 'Headquarters City and Country', displayType: 'Text', isRequired: true, sequence: 2 },
-            { key: 'Q2_PRIMARY_REGIONS', targetField: 'Primary_Service_Regions__c', label: 'Primary Service Regions', displayType: 'Text', isRequired: true, sequence: 3 },
+            { key: 'Q2_PRIMARY_REGIONS', targetField: 'Primary_Service_Regions__c', label: 'Primary Service Regions (countries, then regions within them, in priority order)', displayType: 'Text', isRequired: true, sequence: 3 },
             { key: 'Q2_LEADER_NAME', targetField: 'Leader_Name__c', label: 'Leader Name', displayType: 'Text', isRequired: true, sequence: 4 },
-            { key: 'Q2_LEADER_TITLE', targetField: 'Leader_Title__c', label: 'Leader Title', displayType: 'Text', isRequired: true, sequence: 5 },
-            { key: 'Q2_LEADER_TENURE', targetField: 'Leader_Tenure__c', label: 'Leader Tenure (Optional)', displayType: 'Number', isRequired: false, sequence: 6 }
+            { key: 'Q2_LEADER_TITLE', targetField: 'Leader_Title__c', label: 'Leader Designation / Title', displayType: 'Text', isRequired: true, sequence: 5 },
+            { key: 'Q2_LEADER_TENURE', targetField: 'Leader_Tenure__c', label: 'Leader Tenure, years in role (Optional)', displayType: 'Number', isRequired: false, sequence: 6 }
         ];
         const defaultsQ3 = [
             { key: 'Q3_SUBMITTER_NAME', targetField: 'Submitter_Name__c', label: 'Submitter Name', displayType: 'Text', isRequired: true, sequence: 1 },
             { key: 'Q3_JOB_TITLE', targetField: 'Job_Title__c', label: 'Job Title', displayType: 'Text', isRequired: true, sequence: 2 },
-            { key: 'Q3_PHONE', targetField: 'Phone__c', label: 'Phone Number', displayType: 'Phone', isRequired: true, sequence: 3 },
+            { key: 'Q3_PHONE', targetField: 'Phone__c', label: 'Phone Number (country code + number)', displayType: 'Phone', isRequired: true, sequence: 3 },
             { key: 'Q3_WORK_EMAIL', targetField: 'Work_Email_ID__c', label: 'Work Email', displayType: 'Email', isRequired: true, sequence: 4 }
         ];
         const defaultsQ4 = [
-            { key: 'Q4_LEGAL_TYPE', targetField: 'Legal_Type__c', label: 'Legal Structure', displayType: 'Picklist', isRequired: true, sequence: 1 },
-            { key: 'Q4_JURISDICTION', targetField: 'Registration_Jurisdiction__c', label: 'Registration Jurisdiction', displayType: 'Picklist', isRequired: true, sequence: 2 },
-            { key: 'Q4_INCORP_DATE', targetField: 'Incorporation_Date__c', label: 'Incorporation Date', displayType: 'Date', isRequired: true, sequence: 3 }
+            { key: 'Q4_LEGAL_TYPE', targetField: 'Legal_Type__c', label: 'Entity Type', displayType: 'Picklist', isRequired: true, sequence: 1 },
+            { key: 'Q4_JURISDICTION', targetField: 'Registration_Jurisdiction__c', label: 'Registration Jurisdiction (country)', displayType: 'Picklist', isRequired: true, sequence: 2 },
+            { key: 'Q4_INCORP_DATE', targetField: 'Incorporation_Date__c', label: 'Registration / Incorporation Date (DD/MM/YYYY)', displayType: 'Date', isRequired: true, sequence: 3 }
         ];
         const defaultsQ4Gov = [
-            { key: 'Q4_GOVERNANCE_DESC', targetField: 'Legal_Structure__c', label: 'Describe your governance structure and key governing bodies.', displayType: 'TextArea', isRequired: true, sequence: 4 }
+            { key: 'Q4_GOVERNANCE_DESC', targetField: 'Legal_Structure__c', label: 'Brief description (<100 words): governance and operational structure: board, leadership, key affiliations.', displayType: 'TextArea', isRequired: true, sequence: 4 }
         ];
         const defaultsQ5 = [
             { key: 'Q5_US_501C3', targetField: 'Has_501c3_Status__c', label: 'Do you have 501(c)(3) status in the US?', displayType: 'Picklist', isRequired: true, sequence: 1 },
@@ -687,9 +681,9 @@ export default class WcfDynamicForm extends LightningElement {
         const q2 = custom.filter(q => (
             q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q2' || q.sectionCode === 'Q2'
         ) && (
-            (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
-            (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
-        ));
+                (q.key && q.key.toUpperCase().startsWith('Q2_')) ||
+                (q.targetField && q.targetField.toLowerCase() === 'annual_volunteer_count__c')
+            ));
         const q3 = custom.filter(q => (
             q.sectionCode === 'SEC_ABOUT_ORG' || q.sectionCode === 'SEC_ABOUT_ORG_Q3' || q.sectionCode === 'Q3'
         ) && q.key && q.key.toUpperCase().startsWith('Q3_'));
@@ -741,30 +735,30 @@ export default class WcfDynamicForm extends LightningElement {
             fiscalMonth: this.formValues.Fiscal_Month__c || '03',
             fiscalDay: this.formValues.Fiscal_Day__c || '31'
         })
-        .then(result => {
-            if (result && result.questions) {
-                this.metadataQuestions = result.questions;
-            }
-            if (result && result.tracks) {
-                this.metadataTracks = result.tracks;
-            }
-            if (result && result.sections) {
-                this.metadataSections = result.sections;
-            }
-            if (result && result.fiscalYears) {
-                this.fiscalYears = result.fiscalYears;
-            }
-            if (result && result.labelMap) {
-                this.labelMap = result.labelMap;
-            }
-            this._buildMetadataLookups();
-            this._partitionSectionQuestions();
-            this._partitionCustomQuestions();
-            this.labels = this._computeLabels();
-        })
-        .catch(err => {
-            console.warn('Metadata load warning:', err);
-        });
+            .then(result => {
+                if (result && result.questions) {
+                    this.metadataQuestions = result.questions;
+                }
+                if (result && result.tracks) {
+                    this.metadataTracks = result.tracks;
+                }
+                if (result && result.sections) {
+                    this.metadataSections = result.sections;
+                }
+                if (result && result.fiscalYears) {
+                    this.fiscalYears = result.fiscalYears;
+                }
+                if (result && result.labelMap) {
+                    this.labelMap = result.labelMap;
+                }
+                this._buildMetadataLookups();
+                this._partitionSectionQuestions();
+                this._partitionCustomQuestions();
+                this.labels = this._computeLabels();
+            })
+            .catch(err => {
+                console.warn('Metadata load warning:', err);
+            });
     }
 
     getQuestionLabel(key, defaultVal) {
@@ -800,7 +794,7 @@ export default class WcfDynamicForm extends LightningElement {
         const targetField = q.targetField || q.Field_API_Name__c || key;
         const label = this.getQuestionLabel(key, q.label || q.Label__c || q.MasterLabel || key);
         const dt = (q.displayType || q.Display_Type__c || 'Text').toLowerCase();
-        
+
         let val = this.formValues[targetField];
         if (val === undefined && targetField) {
             const targetLower = targetField.toLowerCase();
@@ -818,16 +812,16 @@ export default class WcfDynamicForm extends LightningElement {
         const isPhoneInput = key === 'Q3_PHONE' || targetField === 'Phone__c' || dt === 'phone';
         const isEmail = (key === 'Q3_WORK_EMAIL' || targetField === 'Work_Email_ID__c' || dt === 'email') && !isPhoneInput;
         const isNumber = (key === 'Q2_LEADER_TENURE' || targetField === 'Leader_Tenure__c' || dt === 'number' || dt === 'currency' || dt === 'percent') && !isPhoneInput;
-        
+
         const isLegalType = key === 'Q4_LEGAL_TYPE' || targetField === 'Legal_Type__c';
         const isJurisdiction = key === 'Q4_JURISDICTION' || targetField === 'Registration_Jurisdiction__c';
         const isIncorpDate = key === 'Q4_INCORP_DATE' || targetField === 'Incorporation_Date__c';
         const isGovernanceRichText = key === 'Q4_GOVERNANCE_DESC' || targetField === 'Legal_Structure__c';
-        
+
         const isCompliancePicklist = (key && key.startsWith('Q5_')) || (targetField && (targetField.includes('501c3') || targetField.includes('Equivalency') || targetField.includes('FCRA') || targetField.includes('Willing')));
         const isFiscalMonth = key === 'Q6_FISCAL_MONTH' || targetField === 'Fiscal_Month__c';
         const isFiscalDay = key === 'Q6_FISCAL_DAY' || targetField === 'Fiscal_Day__c';
-        
+
         const isPicklist = (dt === 'picklist' || dt === 'combobox') && !isLegalType && !isJurisdiction && !isCompliancePicklist && !isFiscalMonth && !isFiscalDay;
         const isDate = (dt === 'date' || dt === 'datetime') && !isIncorpDate;
         const isTextArea = (dt === 'textarea' || dt === 'richtext') && !isGovernanceRichText;
@@ -1200,25 +1194,6 @@ export default class WcfDynamicForm extends LightningElement {
         });
     }
 
-    // ── FAQ Accordion Toggle Handler ────────────────────────────────────
-    toggleFaq(event) {
-        const faqKey = event.currentTarget.dataset.faq;
-        if (faqKey && this.faqOpen.hasOwnProperty(faqKey)) {
-            this.faqOpen = {
-                ...this.faqOpen,
-                [faqKey]: !this.faqOpen[faqKey]
-            };
-        }
-    }
-
-    get isFaqJobFulfillmentOpen() { return this.faqOpen.jobFulfillment; }
-    get isFaqJobCreationOpen() { return this.faqOpen.jobCreation; }
-    get isFaqLivelihoodOpen() { return this.faqOpen.livelihood; }
-
-    get faqJobFulfillmentSymbol() { return this.faqOpen.jobFulfillment ? '–' : '+'; }
-    get faqJobCreationSymbol() { return this.faqOpen.jobCreation ? '–' : '+'; }
-    get faqLivelihoodSymbol() { return this.faqOpen.livelihood ? '–' : '+'; }
-
     // ── Screen Navigation ────────────────────────────────────────────────
     get isScreen1() {
         return this.currentScreen === 'screen1';
@@ -1259,6 +1234,7 @@ export default class WcfDynamicForm extends LightningElement {
         }
         this.currentScreen = 'screen2';
         this.activeTabId = 'tabAboutOrg';
+        this.loadMetadata();
     }
 
     handleBackToTrackSelection() {
@@ -1270,9 +1246,9 @@ export default class WcfDynamicForm extends LightningElement {
             event.preventDefault();
             event.stopPropagation();
         }
-        const faqElement = this.template.querySelector('[data-id="faq-section"]') || 
-                           this.template.querySelector('.faq-section-target') ||
-                           this.template.querySelector('c-wcf-application-faq-modal');
+        const faqElement = this.template.querySelector('[data-id="faq-section"]') ||
+            this.template.querySelector('.faq-section-target') ||
+            this.template.querySelector('c-wcf-application-faq-modal');
         if (faqElement) {
             faqElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -1661,7 +1637,7 @@ export default class WcfDynamicForm extends LightningElement {
     get reviewFunder1Display() {
         const f = this.formValues;
         if (!f.Funder_1_Name__c) return '—';
-        const amt = this.previewFunder1Amount ? ` - $${this.previewFunder1Amount}` : '';
+        const amt = f.Funder_1_Amount__c ? ` - ${this._formatCurrency(f.Funder_1_Amount__c)}` : '';
         const type = f.Funder_1_Type__c ? ` (${f.Funder_1_Type__c})` : '';
         const period = this.previewFunder1Period ? ` · Period: ${this.previewFunder1Period}` : '';
         return `${f.Funder_1_Name__c}${amt}${type}${period}`;
@@ -1670,7 +1646,7 @@ export default class WcfDynamicForm extends LightningElement {
     get reviewFunder2Display() {
         const f = this.formValues;
         if (!f.Funder_2_Name__c) return '—';
-        const amt = this.previewFunder2Amount ? ` - $${this.previewFunder2Amount}` : '';
+        const amt = f.Funder_2_Amount__c ? ` - ${this._formatCurrency(f.Funder_2_Amount__c)}` : '';
         const type = f.Funder_2_Type__c ? ` (${f.Funder_2_Type__c})` : '';
         const period = this.previewFunder2Period ? ` · Period: ${this.previewFunder2Period}` : '';
         return `${f.Funder_2_Name__c}${amt}${type}${period}`;
@@ -1679,7 +1655,7 @@ export default class WcfDynamicForm extends LightningElement {
     get reviewFunder3Display() {
         const f = this.formValues;
         if (!f.Funder_3_Name__c) return '—';
-        const amt = this.previewFunder3Amount ? ` - $${this.previewFunder3Amount}` : '';
+        const amt = f.Funder_3_Amount__c ? ` - ${this._formatCurrency(f.Funder_3_Amount__c)}` : '';
         const type = f.Funder_3_Type__c ? ` (${f.Funder_3_Type__c})` : '';
         const period = this.previewFunder3Period ? ` · Period: ${this.previewFunder3Period}` : '';
         return `${f.Funder_3_Name__c}${amt}${type}${period}`;
@@ -1701,7 +1677,7 @@ export default class WcfDynamicForm extends LightningElement {
         return `${f.Reference_2_Name__c}${role}${email}`;
     }
 
-        _hasAnyFormValue(keys) {
+    _hasAnyFormValue(keys) {
         return keys.some(k => {
             const v = this.formValues[k];
             return v !== undefined && v !== null && String(v).trim() !== '';
@@ -1733,7 +1709,7 @@ export default class WcfDynamicForm extends LightningElement {
         return (v !== undefined && v !== null && String(v).trim() !== '') ? `${String(v).trim()} years` : '—';
     }
 
-        get reviewPhoneWithCode() {
+    get reviewPhoneWithCode() {
         const number = this.formValues.Phone__c ? String(this.formValues.Phone__c).trim() : '';
         if (!number) return '—';
         if (number.startsWith('+')) return number;
@@ -1939,516 +1915,949 @@ export default class WcfDynamicForm extends LightningElement {
             return;
         }
 
-        const form = this.formValues;
-        const val = v => (v === null || v === undefined || v === '') ? '—' : String(v);
-        const val$ = v => {
-            if (v === null || v === undefined || v === '') return '—';
-            const clean = String(v).replace(/,/g, '').trim();
-            if (clean === '') return '—';
-            const n = Number(clean);
-            if (isNaN(n)) return `$${v}`;
-            return `$${n.toLocaleString('en-US')}`;
-        };
-        const valNum = v => {
-            if (v === null || v === undefined || v === '') return '—';
-            const clean = String(v).replace(/,/g, '').trim();
-            if (clean === '') return '—';
-            const n = Number(clean);
-            return isNaN(n) ? String(v) : n.toLocaleString('en-US');
-        };
+        try {
+            const RED = [153, 0, 0];       // #990000
+            const NAVY = [27, 42, 74];      // #1B2A4A
+            const LIGHT = [253, 246, 244];  // soft tint
+            const GREY = [112, 110, 107];
+            const BORDER = [240, 232, 230];
 
-        const doc = new jsPDFLib();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        let y = 20;
-        let pageCount = 1;
+            const form = this.formValues;
+            const qn = this.qNum;
 
-        const BRAND      = [191, 32, 38];    // Wadhwani Crimson Red -- corrected to var(--wg-red)'s actual rgb (was stale pre-rebrand #990000; audit sweep fix)
-        const NAVY       = [27, 42, 74];     // Navy (#1B2A4A)
-        const BRAND_SOFT = [253, 246, 244];  // Soft tint
-        const TEXT_DARK  = [33, 37, 41];
-        const TEXT_GRAY  = [100, 100, 100];
-        const LINE_GRAY  = [220, 220, 220];
+            const val = v => (v === null || v === undefined || v === '') ? '—' : String(v);
+            const val$ = v => {
+                if (v === null || v === undefined || v === '') return '—';
+                const clean = String(v).replace(/[,\s$]/g, '').trim();
+                if (clean === '') return '—';
+                const n = Number(clean);
+                if (isNaN(n)) return `$${v}`;
+                const abs = Math.abs(n);
+                const hasCents = Math.round(abs * 100) % 100 !== 0;
+                const body = abs.toLocaleString('en-US', {
+                    minimumFractionDigits: hasCents ? 2 : 0,
+                    maximumFractionDigits: 2
+                });
+                return n < 0 ? `-$${body}` : `$${body}`;
+            };
+            const valNum = v => {
+                if (v === null || v === undefined || v === '') return '—';
+                const clean = String(v).replace(/,/g, '').trim();
+                if (clean === '') return '—';
+                const n = Number(clean);
+                return isNaN(n) ? String(v) : n.toLocaleString('en-US');
+            };
 
-        const addHeader = () => {
-            if (this.logoBase64 && pageCount === 1) {
-                const logoW = 40;
-                const ratio = this._logoAspectRatio || (242 / 120);
-                const logoH = logoW / ratio;
-                doc.addImage(this.logoBase64, 'PNG', (pageWidth - logoW) / 2, 12, logoW, logoH);
-                y = 12 + logoH + 8;
+            const doc = new jsPDFLib();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const marginX = 15;
+            const contentW = pageWidth - marginX * 2;
+            const labelW = 50;
+            const valueX = marginX + labelW + 4;
+            const valueW = contentW - labelW - 4;
+            let y = 20;
+            let pageCount = 1;
+
+            const addHeader = () => {
+                doc.setFillColor(...NAVY);
+                doc.rect(0, 0, pageWidth, 4, 'F');
+                if (pageCount === 1) {
+                    if (this.logoBase64) {
+                        doc.addImage(this.logoBase64, 'PNG', (pageWidth - 46) / 2, 10, 46, 18);
+                        y = 34;
+                    } else {
+                        y = 16;
+                    }
+                    doc.setFontSize(15);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(...NAVY);
+                    doc.text('Wadhwani Grants Application', pageWidth / 2, y, { align: 'center' });
+                    y += 10;
+                } else {
+                    doc.setFontSize(9);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(...RED);
+                    doc.text('WADHWANI GRANTS APPLICATION', marginX, 12);
+                    doc.setDrawColor(...RED);
+                    doc.setLineWidth(0.3);
+                    doc.line(marginX, 15, pageWidth - marginX, 15);
+                    y = 22;
+                }
+                doc.setTextColor(0, 0, 0);
+            };
+
+            const checkPage = (needed = 15) => {
+                if (y + needed >= pageHeight - 18) {
+                    doc.addPage();
+                    pageCount++;
+                    addHeader();
+                }
+            };
+
+            const sectionHeader = (title, stepLabel) => {
+                checkPage(22);
+                y += 3;
+                doc.setFillColor(...NAVY);
+                doc.rect(marginX, y - 6, contentW, 10, 'F');
+                doc.setFillColor(...RED);
+                doc.rect(marginX, y + 3.2, contentW, 0.8, 'F');
+                if (stepLabel) {
+                    doc.setFontSize(7.5);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(255, 150, 130);
+                    doc.text(stepLabel.toUpperCase(), marginX + 6, y - 1.3);
+                }
+                doc.setFontSize(11.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(255, 255, 255);
+                doc.text(title, marginX + (stepLabel ? doc.getTextWidth(stepLabel.toUpperCase()) + 12 : 6), y);
+                y += 10;
+                doc.setFontSize(9.5);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(0, 0, 0);
+            };
+
+            const drawQLabel = (num, label, top) => {
+                doc.setFillColor(...RED);
+                doc.circle(marginX + 4, top + 1, 3.1, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                doc.text(String(num), marginX + 4, top + 2.1, { align: 'center' });
+                doc.setTextColor(...NAVY);
+                doc.setFontSize(9.3);
+                doc.setFont(undefined, 'bold');
+                const labelLines = doc.splitTextToSize(label, labelW - 10);
+                labelLines.forEach((l, i) => doc.text(l, marginX + 10, top + 2 + i * 4.2));
+                return labelLines.length * 4.2 + 4;
+            };
+
+            const rowDivider = () => {
+                doc.setDrawColor(...BORDER);
+                doc.setLineWidth(0.2);
+                doc.line(marginX, y, pageWidth - marginX, y);
+                y += 3;
+            };
+
+            const simpleQRow = (num, label, value, bold = false) => {
+                const valStr = (value === null || value === undefined || value === '') ? '—' : String(value);
+                doc.setFontSize(9.5);
+                doc.setFont(undefined, bold ? 'bold' : 'normal');
+                const lines = doc.splitTextToSize(valStr, valueW);
+                const labelLines = doc.splitTextToSize(label, labelW - 10);
+                const rowH = Math.max(lines.length * 4.6, labelLines.length * 4.2) + 8;
+                checkPage(rowH + 4);
+                const top = y;
+                drawQLabel(num, label, top);
+                doc.setTextColor(...(bold ? NAVY : [0, 0, 0]));
+                doc.setFontSize(9.5);
+                doc.setFont(undefined, bold ? 'bold' : 'normal');
+                lines.forEach((l, i) => doc.text(l, valueX, top + 2 + i * 4.6));
+                y = top + rowH;
+                rowDivider();
+            };
+
+            const MIN_FIT_FONT = 7.5;
+
+            const breakToken = (tok, width) => {
+                const parts = tok.split(/(?=@)|(?<=[./\-_])/);
+                const lines = [];
+                let line = '';
+                parts.forEach(p => {
+                    if (line && doc.getTextWidth(line + p) > width) { lines.push(line); line = ''; }
+                    line += p;
+                });
+                if (line) lines.push(line);
+                return lines.flatMap(l => doc.getTextWidth(l) > width ? doc.splitTextToSize(l, width) : [l]);
+            };
+
+            const layoutCell = (text, width, fontSize, style = 'normal') => {
+                const str = String(text);
+                doc.setFont(undefined, style);
+                doc.setFontSize(fontSize);
+
+                const widest = () => Math.max(...str.split(/\s+/).map(w => doc.getTextWidth(w)));
+                if (widest() <= width) return { lines: doc.splitTextToSize(str, width), fontSize };
+
+                let fs = fontSize;
+                while (fs > MIN_FIT_FONT) {
+                    fs = Math.max(MIN_FIT_FONT, +(fs - 0.2).toFixed(1));
+                    doc.setFontSize(fs);
+                    if (widest() <= width) return { lines: doc.splitTextToSize(str, width), fontSize: fs };
+                }
+
+                const prepared = str.split(/(\s+)/)
+                    .map(tok => (tok.trim() && doc.getTextWidth(tok) > width) ? breakToken(tok, width).join('\n') : tok)
+                    .join('');
+                return { lines: doc.splitTextToSize(prepared, width), fontSize: fs };
+            };
+
+            const gridQRow = (num, label, fields, cols = 2) => {
+                const items = fields.map(f => ({
+                    label: f.label,
+                    value: (f.value !== null && f.value !== undefined && f.value !== '') ? String(f.value) : '—'
+                }));
+                if (items.length === 0) return;
+
+                const cellW = (valueW - (cols - 1) * 8) / cols;
+                const cells = items.map(f => layoutCell(f.value, cellW, 9.3));
+
+                const gridRows = [];
+                for (let i = 0; i < cells.length; i += cols) gridRows.push(cells.slice(i, i + cols));
+                let gridHeight = 0;
+                gridRows.forEach(gr => {
+                    const maxLines = Math.max(...gr.map(c => c.lines.length));
+                    gridHeight += 4.3 + maxLines * 4.3 + 4;
+                });
+
+                doc.setFontSize(9.3);
+                doc.setFont(undefined, 'bold');
+                const labelLines = doc.splitTextToSize(label, labelW - 10);
+                const labelHeight = labelLines.length * 4.2 + 4;
+                const rowHeight = Math.max(gridHeight, labelHeight, 14) + 4;
+
+                checkPage(rowHeight + 4);
+                const top = y;
+                drawQLabel(num, label, top);
+
+                let gy = top;
+                let idx = 0;
+                gridRows.forEach(gr => {
+                    const maxLines = Math.max(...gr.map(c => c.lines.length));
+                    gr.forEach((cell, ci) => {
+                        const f = items[idx];
+                        const cx = valueX + ci * (cellW + 8);
+                        doc.setFontSize(7.8);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(...RED);
+                        doc.text(f.label.toUpperCase(), cx, gy + 2);
+                        doc.setFontSize(cell.fontSize);
+                        doc.setFont(undefined, 'normal');
+                        doc.setTextColor(...NAVY);
+                        cell.lines.forEach((l, li) => doc.text(l, cx, gy + 6.3 + li * 4.3));
+                        idx++;
+                    });
+                    gy += 4.3 + maxLines * 4.3 + 4;
+                });
+
+                y = top + rowHeight;
+                rowDivider();
+            };
+
+            const table = (head, body, colStyles = {}) => {
+                checkPage(40);
+                doc.autoTable({
+                    startY: y,
+                    margin: { left: marginX, right: marginX },
+                    head: [head],
+                    body,
+                    theme: 'striped',
+                    styles: { fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
+                    headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
+                    alternateRowStyles: { fillColor: LIGHT },
+                    columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY }, ...colStyles }
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            };
+
+            const PDF_BOTTOM = pageHeight - 18;
+            const LIST_INDENT = 5;
+            const BULLET_W = 4;
+            const PLAIN = { bold: false, italic: false, underline: false, strike: false };
+            const BLOCK_TAGS = new Set(['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'TABLE', 'TR', 'SECTION']);
+
+            const newPage = () => { doc.addPage(); pageCount++; addHeader(); };
+            const fontStyleOf = r => (r.bold && r.italic) ? 'bolditalic' : r.bold ? 'bold' : r.italic ? 'italic' : 'normal';
+            const sameStyle = (a, b) => a.bold === b.bold && a.italic === b.italic && a.underline === b.underline && a.strike === b.strike;
+
+            const htmlToParagraphs = (html) => {
+                const raw = (html === null || html === undefined) ? '' : String(html);
+                const dash = [{ prefix: null, level: 0, runs: [{ ...PLAIN, text: '—' }] }];
+                if (!raw.trim() || raw.trim() === '—') return dash;
+
+                const paragraphs = [];
+                let current = null;
+                const openPara = (prefix, level) => { current = { prefix, level, runs: [] }; paragraphs.push(current); };
+                const closeParaIfUsed = () => { if (current && current.runs.length) current = null; };
+
+                const styleOf = (el, parent) => {
+                    const s = { ...parent };
+                    const tag = el.nodeName;
+                    if (tag === 'B' || tag === 'STRONG' || /^H[1-6]$/.test(tag)) s.bold = true;
+                    if (tag === 'I' || tag === 'EM') s.italic = true;
+                    if (tag === 'U' || tag === 'INS') s.underline = true;
+                    if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') s.strike = true;
+                    const st = el.style;
+                    if (st) {
+                        const fw = String(st.fontWeight || '');
+                        if (fw === 'bold' || fw === 'bolder' || parseInt(fw, 10) >= 600) s.bold = true;
+                        if (st.fontStyle === 'italic' || st.fontStyle === 'oblique') s.italic = true;
+                        const deco = `${st.textDecoration || ''} ${st.textDecorationLine || ''}`;
+                        if (deco.includes('underline')) s.underline = true;
+                        if (deco.includes('line-through')) s.strike = true;
+                    }
+                    return s;
+                };
+
+                const walk = (node, style, level, listCtx) => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = node.nodeValue.replace(/\u00a0/g, ' ').replace(/[\r\n\t]+/g, ' ');
+                        const atParaStart = !current || current.runs.length === 0;
+                        if (!text || (atParaStart && !text.trim())) return;
+                        if (!current) openPara(null, level);
+                        current.runs.push({ ...style, text });
+                        return;
+                    }
+                    if (node.nodeType !== Node.ELEMENT_NODE) return;
+                    const tag = node.nodeName;
+
+                    if (tag === 'BR') {
+                        if (!current) openPara(null, level);
+                        current.runs.push({ ...style, br: true });
+                        return;
+                    }
+                    const s = styleOf(node, style);
+
+                    if (tag === 'UL' || tag === 'OL') {
+                        closeParaIfUsed();
+                        const ctx = { ordered: tag === 'OL', index: 0 };
+                        node.childNodes.forEach(ch => walk(ch, s, level + 1, ctx));
+                        current = null;
+                        return;
+                    }
+                    if (tag === 'LI') {
+                        const lvl = Math.max(level, 1);
+                        let prefix = '•';
+                        if (listCtx) { listCtx.index++; if (listCtx.ordered) prefix = `${listCtx.index}.`; }
+                        openPara(prefix, lvl);
+                        node.childNodes.forEach(ch => walk(ch, s, lvl, null));
+                        current = null;
+                        return;
+                    }
+                    if (BLOCK_TAGS.has(tag)) {
+                        closeParaIfUsed();
+                        node.childNodes.forEach(ch => walk(ch, s, level, listCtx));
+                        closeParaIfUsed();
+                        return;
+                    }
+                    node.childNodes.forEach(ch => walk(ch, s, level, listCtx));
+                };
+
+                new DOMParser().parseFromString(raw, 'text/html').body
+                    .childNodes.forEach(ch => walk(ch, PLAIN, 0, null));
+
+                const result = paragraphs.filter(p => p.runs.length);
+                return result.length ? result : dash;
+            };
+
+            const layoutRichText = (html, maxWidth, fontSize) => {
+                doc.setFontSize(fontSize);
+                const measure = (text, run) => { doc.setFont(undefined, fontStyleOf(run)); return doc.getTextWidth(text); };
+                const out = [];
+
+                htmlToParagraphs(html).forEach(p => {
+                    const prefixX = p.level > 0 ? (p.level - 1) * LIST_INDENT : 0;
+                    const textX = p.level > 0 ? prefixX + BULLET_W : 0;
+                    const avail = Math.max(maxWidth - textX, 20);
+                    const lines = [];
+                    let line;
+
+                    const startLine = () => {
+                        line = { segs: [], width: 0, textX, prefixX, prefix: lines.length ? null : p.prefix };
+                        lines.push(line);
+                    };
+                    const pushSeg = (text, run) => {
+                        const w = measure(text, run);
+                        const last = line.segs[line.segs.length - 1];
+                        if (last && sameStyle(last.run, run)) last.text += text;
+                        else line.segs.push({ text, run });
+                        line.width += w;
+                    };
+
+                    const items = [];
+                    let word = null;
+                    p.runs.forEach(r => {
+                        if (r.br) { word = null; items.push({ type: 'br' }); return; }
+                        r.text.split(/(\s+)/).forEach(part => {
+                            if (!part) return;
+                            if (/^\s+$/.test(part)) {
+                                word = null;
+                                if (items.length && items[items.length - 1].type === 'space') return;
+                                items.push({ type: 'space', run: r });
+                            } else {
+                                if (!word) { word = { type: 'word', pieces: [] }; items.push(word); }
+                                word.pieces.push({ text: part, run: r });
+                            }
+                        });
+                    });
+
+                    startLine();
+                    let space = null;
+                    items.forEach(it => {
+                        if (it.type === 'br') { startLine(); space = null; return; }
+                        if (it.type === 'space') { if (line.segs.length) space = it; return; }
+
+                        const wordW = it.pieces.reduce((sum, pc) => sum + measure(pc.text, pc.run), 0);
+                        const spaceW = space ? measure(' ', space.run) : 0;
+                        if (line.segs.length && line.width + spaceW + wordW > avail) { startLine(); space = null; }
+                        if (space && line.segs.length) pushSeg(' ', space.run);
+                        space = null;
+
+                        it.pieces.forEach(pc => {
+                            if (wordW <= avail) { pushSeg(pc.text, pc.run); return; }
+                            for (const ch of pc.text) {
+                                if (line.segs.length && line.width + measure(ch, pc.run) > avail) startLine();
+                                pushSeg(ch, pc.run);
+                            }
+                        });
+                    });
+                    if (lines.length > 1 && !lines[lines.length - 1].segs.length) lines.pop();
+                    out.push(...lines);
+                });
+                return out;
+            };
+
+            const drawRichLine = (line, x, baseY, fontSize, color) => {
+                doc.setFontSize(fontSize);
+                doc.setTextColor(...color);
+                if (line.prefix) {
+                    doc.setFont(undefined, 'normal');
+                    doc.text(line.prefix, x + line.prefixX, baseY);
+                }
+                let cx = x + line.textX;
+                line.segs.forEach(seg => {
+                    doc.setFont(undefined, fontStyleOf(seg.run));
+                    doc.text(seg.text, cx, baseY);
+                    const w = doc.getTextWidth(seg.text);
+                    if (seg.run.underline || seg.run.strike) {
+                        doc.setDrawColor(...color);
+                        doc.setLineWidth(0.2);
+                        if (seg.run.underline) doc.line(cx, baseY + 0.8, cx + w, baseY + 0.8);
+                        if (seg.run.strike) doc.line(cx, baseY - fontSize * 0.11, cx + w, baseY - fontSize * 0.11);
+                    }
+                    cx += w;
+                });
+                doc.setFont(undefined, 'normal');
+            };
+
+            const richQRow = (num, label, html) => {
+                const FS = 9.5, LH = 4.6;
+                const lines = layoutRichText(html, valueW, FS);
+                doc.setFontSize(9.3);
+                doc.setFont(undefined, 'bold');
+                const labelH = doc.splitTextToSize(label, labelW - 10).length * 4.2 + 4;
+
+                checkPage(Math.max(labelH, Math.min(lines.length, 3) * LH) + 8);
+                const top = y;
+                drawQLabel(num, label, top);
+
+                let ly = top + 2, broke = false;
+                lines.forEach(line => {
+                    if (ly > PDF_BOTTOM - 1) { newPage(); ly = y + 2; broke = true; }
+                    drawRichLine(line, valueX, ly, FS, [0, 0, 0]);
+                    ly += LH;
+                });
+                y = broke ? ly + 6 : Math.max(ly + 6, top + labelH + 4);
+                rowDivider();
+            };
+
+            const richBoxUnder = (label, html) => {
+                const FS = 9.3, LH = 4.4;
+                const textX = valueX + 5;
+                const lines = layoutRichText(html, valueW - 8, FS);
+                let i = 0, first = true;
+
+                while (i < lines.length) {
+                    const headH = first ? 10.5 : 6;
+                    const fit = Math.floor((PDF_BOTTOM - y - headH - 4) / LH) + 1;
+                    const minFit = first ? Math.min(2, lines.length) : 1;
+                    if (fit < minFit) { newPage(); continue; }
+
+                    const n = Math.min(fit, lines.length - i);
+                    const boxH = headH + (n - 1) * LH + 4;
+                    doc.setFillColor(...LIGHT); doc.rect(valueX, y, valueW, boxH, 'F');
+                    doc.setFillColor(...RED); doc.rect(valueX, y, 1, boxH, 'F');
+                    if (first) {
+                        doc.setFontSize(7.8);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(...RED);
+                        doc.text(label.toUpperCase(), textX, y + 5.5);
+                    }
+                    for (let j = 0; j < n; j++) drawRichLine(lines[i + j], textX, y + headH + j * LH, FS, NAVY);
+
+                    y += boxH; i += n; first = false;
+                    if (i < lines.length) newPage();
+                }
+                y += 4;
+                rowDivider();
+            };
+
+            addHeader();
+
+            const totalSections = 2 + (this.hasJobFulfillmentTrack ? 1 : 0) + (this.hasJobCreationTrack ? 1 : 0) + (this.hasLivelihoodTrack ? 1 : 0);
+            let currentSec = 1;
+
+            // ══ SECTION 1 — About Your Organisation ══
+            sectionHeader('About Your Organisation', `Section ${currentSec} of ${totalSections}`);
+
+            // Q1: Selected Track
+            simpleQRow(qn.Q1, 'Organizational Area(s) for Funding/Investment', this.selectedTrackLabelsDisplay);
+
+            // Q2: Organizational Identifying Info
+            gridQRow(qn.Q2, 'Organizational Identifying Information', [
+                { label: 'Organizational Name', value: form.Organization_Name__c },
+                { label: 'Headquarters City and Country', value: form.Headquarters_City_and_Country__c },
+                { label: 'Primary Service Regions', value: form.Primary_Service_Regions__c },
+                { label: 'Leader Name', value: form.Leader_Name__c },
+                { label: 'Leader Title', value: form.Leader_Title__c },
+                { label: 'Leader Tenure', value: this.reviewLeaderTenure },
+                ...(this.customQuestionsQ2 || []).map(cq => ({ label: cq.label, value: cq.displayValue || cq.value }))
+            ], 2);
+
+            // Q3: Submitter Contact Information
+            gridQRow(qn.Q3, 'Submitter Contact Information', [
+                { label: 'Name', value: form.Submitter_Name__c },
+                { label: 'Title', value: form.Job_Title__c },
+                { label: 'Email Address', value: form.Work_Email_ID__c },
+                { label: 'Phone Number', value: this.reviewPhoneWithCode },
+                ...(this.customQuestionsQ3 || []).map(cq => ({ label: cq.label, value: cq.displayValue || cq.value }))
+            ], 2);
+
+            // Q4: Legal Structure
+            gridQRow(qn.Q4, 'Legal Structure', [
+                { label: 'Type', value: this.reviewLegalType },
+                { label: 'Registration Jurisdiction', value: this.reviewRegistrationJurisdiction },
+                { label: 'Incorporation Date', value: this.formattedIncorporationDate },
+                ...(this.customQuestionsQ4 || []).map(cq => ({ label: cq.label, value: cq.displayValue || cq.value }))
+            ], 3);
+            if (form.Legal_Structure__c) richBoxUnder('Brief Description of Legal Structure', form.Legal_Structure__c);
+
+            // Q5: Legal and Tax Compliance
+            gridQRow(qn.Q5, 'Legal and Tax Compliance', [
+                { label: '501(c)(3) Status in US', value: this.reviewHas501c3 },
+                { label: 'Equivalency Determination (ED)', value: this.reviewHasED },
+                { label: 'FCRA Registered (India)', value: this.reviewIsFCRA },
+                { label: 'Willing to Pursue ED', value: this.reviewWillingED },
+                ...(this.customQuestionsQ5 || []).map(cq => ({ label: cq.label, value: cq.displayValue || cq.value }))
+            ], 2);
+
+            // Q6: Fiscal Year End Date
+            simpleQRow(qn.Q6, 'Fiscal Year End Date', this.formattedFiscalYearEndReview, true);
+            if (this.hasCustomQuestionsQ6) {
+                this.customQuestionsQ6.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                });
             }
-            doc.setFontSize(14);
+
+            // Q7: Top 3 Most Prominent Funders
+            const fundersList = [];
+            if (form.Funder_1_Name__c) {
+                fundersList.push([
+                    form.Funder_1_Name__c,
+                    val$(form.Funder_1_Amount__c),
+                    this.previewFunder1Period || '—',
+                    form.Funder_1_Type__c || '—'
+                ]);
+            }
+            if (this.showFunder2InReview && form.Funder_2_Name__c) {
+                fundersList.push([
+                    form.Funder_2_Name__c,
+                    val$(form.Funder_2_Amount__c),
+                    this.previewFunder2Period || '—',
+                    form.Funder_2_Type__c || '—'
+                ]);
+            }
+            if (this.showFunder3InReview && form.Funder_3_Name__c) {
+                fundersList.push([
+                    form.Funder_3_Name__c,
+                    val$(form.Funder_3_Amount__c),
+                    this.previewFunder3Period || '—',
+                    form.Funder_3_Type__c || '—'
+                ]);
+            }
+            if (fundersList.length > 0) {
+                checkPage(10);
+                const topFundersTop = y;
+                drawQLabel(qn.Q7, 'Top 3 Most Prominent Funders', topFundersTop);
+                y = topFundersTop + 10;
+                table(['Funder', 'Amount (USD)', 'Period', 'Type'], fundersList);
+            } else {
+                simpleQRow(qn.Q7, 'Top 3 Most Prominent Funders', '—');
+            }
+
+            // Q8: References for Outreach
+            const refList = [];
+            if (form.Reference_1_Name__c) {
+                refList.push([
+                    form.Reference_1_Name__c,
+                    form.Reference_1_Role__c || '—',
+                    form.Reference_1_Email__c || '—'
+                ]);
+            }
+            if (this.showReference2InReview && form.Reference_2_Name__c) {
+                refList.push([
+                    form.Reference_2_Name__c,
+                    form.Reference_2_Role__c || '—',
+                    form.Reference_2_Email__c || '—'
+                ]);
+            }
+            if (refList.length > 0) {
+                checkPage(10);
+                const refTop = y;
+                drawQLabel(qn.Q8, 'References for Outreach', refTop);
+                y = refTop + 10;
+                table(['Name', 'Organisation / Role', 'Email'], refList, { 2: { cellWidth: 'wrap' } });
+            } else {
+                simpleQRow(qn.Q8, 'References for Outreach', '—');
+            }
+
+            // Q9: Historical Financial Data
+            checkPage(10);
+            const finTrackTop = y;
+            drawQLabel(qn.Q9, 'Historical Financial Data', finTrackTop);
+            y = finTrackTop + 10;
+
+            doc.setFontSize(8.5);
             doc.setFont(undefined, 'bold');
-            doc.setTextColor(...BRAND);
-            doc.text('Wadhwani Grants Application', pageWidth / 2, y, { align: 'center' });
-            y += 5;
-            doc.setDrawColor(...BRAND);
-            doc.setLineWidth(0.6);
-            doc.line(15, y, pageWidth - 15, y);
-            y += 10;
-            doc.setTextColor(...TEXT_DARK);
-        };
+            doc.setTextColor(...NAVY);
+            doc.text('Historical Financial Data (Three Prior Fiscal Years)', marginX, y);
+            y += 4;
+            table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
+                ['Balance at Start of Year', val$(form.START_FY3), val$(this.computedStartFY2), val$(this.computedStartFY1)],
+                ['Revenue', val$(form.REV_FY3), val$(form.REV_FY2), val$(form.REV_FY1)],
+                ['Capital Expenditure', val$(form.CAP_FY3), val$(form.CAP_FY2), val$(form.CAP_FY1)],
+                ['Operating Expenditure', val$(form.OP_FY3), val$(form.OP_FY2), val$(form.OP_FY1)],
+                ['Balance at End of Year', val$(this.computedEndFY3), val$(this.computedEndFY2), val$(this.computedEndFY1)]
+            ]);
 
-        const checkPage = (needed = 15) => {
-            if (y + needed >= pageHeight - 20) {
-                doc.addPage();
-                pageCount++;
-                y = 20;
+            // Q10: Current Fiscal Year Data
+            checkPage(10);
+            const cfyTop = y;
+            drawQLabel(qn.Q10, 'Current Fiscal Year Data', cfyTop);
+            y = cfyTop + 10;
+
+            doc.setFontSize(8.5);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(...NAVY);
+            doc.text('Current Fiscal Year (CFY)', marginX, y);
+            y += 4;
+            table(['Item', 'Budget', 'Projection', 'Deviation'], [
+                ['Revenue', val$(form.CFY_REV_BUDGET), val$(form.CFY_REV_PROJ), val$(this.computedRevDeviation)],
+                ['Capital Expenditure', val$(form.CFY_CAP_BUDGET), val$(form.CFY_CAP_PROJ), val$(this.computedCapDeviation)],
+                ['Operating Expenditure', val$(form.CFY_OP_BUDGET), val$(form.CFY_OP_PROJ), val$(this.computedOpDeviation)],
+                ['Revenue - Expense Net', val$(this.computedNetBudget), val$(this.computedNetProjection), val$(this.computedNetDeviation)]
+            ]);
+            if (form.Revenue_Explanation__c) richBoxUnder('Explanation of Deviation', form.Revenue_Explanation__c);
+
+            if (this.hasCustomQuestionsAboutOrg) {
+                this.customQuestionsAboutOrg.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                });
             }
-        };
 
-        const section = (title) => {
+            // ══ SECTION 2 — Track 1: Job Fulfillment (Q11 - Q14) ══
+            if (this.hasJobFulfillmentTrack) {
+                currentSec++;
+                sectionHeader('Track 1: Job Fulfillment', `Section ${currentSec} of ${totalSections}`);
+
+                richQRow(qn.Q11, 'Your Skilling Approach', form.Skilling_Approach__c);
+
+                if (this.hasSkillingDomainsForReview) {
+                    checkPage(10);
+                    const t12 = y;
+                    drawQLabel(qn.Q12, 'Skilling Domains Offered', t12);
+                    y = t12 + 10;
+                    const domRows = this.skillingDomainsForReview.map(r => [
+                        r.name,
+                        val(r.hours),
+                        val(r.duration),
+                        val(r.displayWhenStarted),
+                        val(r.enrollment)
+                    ]);
+                    table(['Domain / Program Name', 'Hours of Training', 'Duration (Months)', 'When Started', 'Annual Enrollment'], domRows);
+                }
+
+                checkPage(10);
+                const t13 = y;
+                drawQLabel(qn.Q13, 'Job Fulfillment Outcomes (Actuals)', t13);
+                y = t13 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)', marginX, y);
+                y += 4;
+
+                const jfRows = [
+                    ['# Learner Enrolments', valNum(form.JF_ENROLL_FY3), valNum(form.JF_ENROLL_FY2), valNum(form.JF_ENROLL_FY1)],
+                    ['# of learner placements', valNum(form.JF_PLACE_FY3), valNum(form.JF_PLACE_FY2), valNum(form.JF_PLACE_FY1)],
+                    ['Placement %', `${val(this.computedJfPlacePctFY3)}%`, `${val(this.computedJfPlacePctFY2)}%`, `${val(this.computedJfPlacePctFY1)}%`],
+                    ['Avg Cost per Placement', val$(form.JF_COST_FY3), val$(form.JF_COST_FY2), val$(form.JF_COST_FY1)]
+                ];
+                table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], jfRows);
+
+                checkPage(10);
+                const t14 = y;
+                drawQLabel(qn.Q14, 'Job Fulfillment Outcomes (Projections)', t14);
+                y = t14 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Job Fulfillment Outcomes — Current FY Projections', marginX, y);
+                y += 4;
+
+                const jfProjRows = [
+                    ['# Learner Enrolments', valNum(form.JF_ENROLL_PROJ)],
+                    ['# of learner placements', valNum(form.JF_PLACE_PROJ)],
+                    ['Placement %', `${val(this.computedJfPlacePctProj)}%`],
+                    ['Avg Cost per Placement', val$(form.JF_COST_PROJ)]
+                ];
+                table(['Item', 'FY-2026 (CFY) — Projection'], jfProjRows);
+
+                if (this.hasCustomQuestionsJobFulfillment) {
+                    this.customQuestionsJobFulfillment.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                    });
+                }
+            }
+
+            // ══ SECTION 3 — Track 2: Job Creation (Q15 - Q18) ══
+            if (this.hasJobCreationTrack) {
+                currentSec++;
+                sectionHeader('Track 2: Job Creation / Entrepreneurship', `Section ${currentSec} of ${totalSections}`);
+
+                richQRow(qn.Q15, 'Your Job Creation Approach', form.Job_Creation_Approach__c);
+
+                if (this.hasBusinessSectorsForReview) {
+                    checkPage(10);
+                    const t16 = y;
+                    drawQLabel(qn.Q16, 'Business Sectors Served', t16);
+                    y = t16 + 10;
+                    const secRows = this.businessSectorsForReview.map(s => [
+                        s.sectorDisplay,
+                        val(s.displayWhenBegan),
+                        val(s.supportTypesDisplay),
+                        val(s.enrollment)
+                    ]);
+                    table(['Business Sector', 'When Support Began', 'Type of Support Provided', 'Yearly Enrolment'], secRows);
+                }
+
+                checkPage(10);
+                const t17 = y;
+                drawQLabel(qn.Q17, 'Job Creation Outcomes (Actuals)', t17);
+                y = t17 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Job Creation Outcomes — Last 3 Fiscal Years (Actuals)', marginX, y);
+                y += 4;
+
+                const jcRows = [
+                    ['# New Businesses Started', valNum(form.JC_NEW_BIZ_FY3), valNum(form.JC_NEW_BIZ_FY2), valNum(form.JC_NEW_BIZ_FY1)],
+                    ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_FY3), valNum(form.JC_NEW_JOBS_FY2), valNum(form.JC_NEW_JOBS_FY1)],
+                    ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_FY3), valNum(form.JC_EXIST_BIZ_FY2), valNum(form.JC_EXIST_BIZ_FY1)],
+                    ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_FY3), valNum(form.JC_EXIST_JOBS_FY2), valNum(form.JC_EXIST_JOBS_FY1)],
+                    ['Total Avg Cost per Job Created', val$(form.JC_COST_FY3), val$(form.JC_COST_FY2), val$(form.JC_COST_FY1)]
+                ];
+                table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], jcRows);
+
+                checkPage(10);
+                const t18 = y;
+                drawQLabel(qn.Q18, 'Job Creation Outcomes (Projections)', t18);
+                y = t18 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Job Creation Outcomes — Current FY Projections', marginX, y);
+                y += 4;
+
+                const jcProjRows = [
+                    ['# New Businesses Started', valNum(form.JC_NEW_BIZ_PROJ)],
+                    ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_PROJ)],
+                    ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_PROJ)],
+                    ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_PROJ)],
+                    ['Total Avg Cost per Job Created', val$(form.JC_COST_PROJ)]
+                ];
+                table(['Item', 'CFY (projected)'], jcProjRows);
+
+                if (this.hasCustomQuestionsJobCreation) {
+                    this.customQuestionsJobCreation.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                    });
+                }
+            }
+
+            // ══ SECTION 4 — Track 3: Livelihood Upliftment (Q19 - Q23) ══
+            if (this.hasLivelihoodTrack) {
+                currentSec++;
+                sectionHeader('Track 3: Livelihood Upliftment', `Section ${currentSec} of ${totalSections}`);
+
+                richQRow(qn.Q19, 'Your Livelihood Upliftment Approach', form.Livelihood_Approach__c);
+
+                if (this.hasLivelihoodProgramsForReview) {
+                    checkPage(10);
+                    const t20 = y;
+                    drawQLabel(qn.Q20, 'Key Programs / Initiatives', t20);
+                    y = t20 + 10;
+                    const progRows = this.livelihoodProgramsForReview.map(p => [
+                        p.name,
+                        val(p.supportType),
+                        val(p.manHours),
+                        val(p.enrollment)
+                    ]);
+                    table(['Program / Initiative Name', 'Type of Support Provided', 'Duration (Man-Hours)', 'Annual Enrollment'], progRows);
+                }
+
+                if (this.hasCommunityRowsForReview) {
+                    checkPage(10);
+                    const t21 = y;
+                    drawQLabel(qn.Q21, 'Communities that you work in', t21);
+                    y = t21 + 10;
+                    const commRows = this.communityRowsForReview.map(c => [
+                        c.state,
+                        val(c.district),
+                        val(c.fy3),
+                        val(c.fy2),
+                        val(c.fy1),
+                        val(c.proj)
+                    ]);
+                    table(['State', 'District / Area', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label), 'CFY (projected)'], commRows);
+                }
+
+                checkPage(10);
+                const t22 = y;
+                drawQLabel(qn.Q22, 'Livelihood Outcomes (Actuals)', t22);
+                y = t22 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Livelihood Outcomes (Actuals)', marginX, y);
+                y += 4;
+
+                const livRows = [
+                    ['Households served during the year', valNum(form.LIV_SERVED_FY3), valNum(form.LIV_SERVED_FY2), valNum(form.LIV_SERVED_FY1)],
+                    ['Households newly enrolled during the year', valNum(form.LIV_ENROLL_FY3), valNum(form.LIV_ENROLL_FY2), valNum(form.LIV_ENROLL_FY1)],
+                    ['Households meeting outcome criteria', valNum(form.LIV_OUTCOME_FY3), valNum(form.LIV_OUTCOME_FY2), valNum(form.LIV_OUTCOME_FY1)],
+                    ['Avg. cost per outcome (USD)', val$(form.LIV_COST_FY3), val$(form.LIV_COST_FY2), val$(form.LIV_COST_FY1)]
+                ];
+                table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], livRows);
+
+                checkPage(10);
+                const t23 = y;
+                drawQLabel(qn.Q23, 'Livelihood Outcomes (Projections)', t23);
+                y = t23 + 10;
+
+                doc.setFontSize(8.5);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(...NAVY);
+                doc.text('Livelihood Outcomes, Current FY Projections', marginX, y);
+                y += 4;
+
+                const livProjRows = [
+                    ['Households served during the year (projected)', valNum(form.LIV_SERVED_PROJ)],
+                    ['Households newly enrolled during the year (projected)', valNum(form.LIV_ENROLL_PROJ)],
+                    ['Households expected to meet outcome criteria', valNum(form.LIV_OUTCOME_PROJ)],
+                    ['Avg. cost per outcome (USD) - projected', val$(form.LIV_COST_PROJ)]
+                ];
+                table(['Item', 'CFY (projected)'], livProjRows);
+
+                if (this.hasCustomQuestionsLivelihood) {
+                    this.customQuestionsLivelihood.forEach(cq => {
+                        simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                    });
+                }
+            }
+
+            // ══ SECTION 5 — Why Wadhwani Grants & Organizational Sustainability (Q24 - Q28) ══
+            currentSec++;
+            sectionHeader('Why Wadhwani Grants & Organizational Sustainability', `Section ${currentSec} of ${totalSections}`);
+
+            // Q24: Independent Verification
+            gridQRow(qn.Q24, 'Independent Verification of Your Outcomes', [
+                { label: 'Outcomes Verified by a Third Party?', value: this.reviewQ24Verified },
+                ...(this.reviewQ24Verified === 'Yes' || form.Q24_VERIFIED === 'Yes' ? [{ label: 'Verification Details', value: this.reviewDetailsOfEthicalReceived }] : []),
+                ...(this.q24UploadedFiles && this.q24UploadedFiles.length > 0 ? [{
+                    label: 'Verification Reports',
+                    value: this.reviewVerificationReportsDisplay
+                }] : [])
+            ], 1);
+
+            // Q25: Sustainability Plan
+            richQRow(qn.Q25, 'Sustainability Plan', form.Organizational_Sustainability__c);
+
+            // Q26: Direction for Additional Funding
+            richQRow(qn.Q26, 'Direction for Additional Funding', form.Use_of_Additional_Funding__c);
+
+            // Q27: Operational Synergies — GenieAI
+            simpleQRow(qn.Q27, 'Operational Synergies — GenieAI', this.reviewGenieInterestLevel, true);
+            if (form.GenieAI_Synergies_Description__c) {
+                richBoxUnder('How GenieAI could contribute', form.GenieAI_Synergies_Description__c);
+            }
+
+            // Q28: Supporting Documents
+            if (this.q28UploadedFiles && this.q28UploadedFiles.length > 0) {
+                checkPage(10);
+                const docTop = y;
+                drawQLabel(qn.Q28, 'Supporting Documents', docTop);
+                y = docTop + 10;
+                table(['File Name'], this.q28UploadedFiles.map(f => [f.name]));
+            } else {
+                simpleQRow(qn.Q28, 'Supporting Documents', '—');
+            }
+
+            if (this.hasCustomQuestionsWhyWadhwani) {
+                this.customQuestionsWhyWadhwani.forEach(cq => {
+                    simpleQRow(cq.displayNumber, cq.label, cq.displayValue || cq.value);
+                });
+            }
+
+            // ══ Attestation ══
             checkPage(24);
-            y += 6;
             doc.setFillColor(...NAVY);
-            doc.rect(15, y, pageWidth - 30, 10, 'F');
-            doc.setFillColor(...BRAND);
-            doc.rect(15, y + 10, pageWidth - 30, 1, 'F');
+            doc.rect(marginX, y, contentW, 22, 'F');
+            doc.setFillColor(...RED);
+            doc.rect(marginX, y, 3, 22, 'F');
             doc.setFontSize(10.5);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(255, 255, 255);
-            doc.text(title.toUpperCase(), 19, y + 6.8);
-            y += 16;
-            doc.setFontSize(9.5);
+            doc.text('Attestation — Confirmation of Accuracy', marginX + 8, y + 7);
+            doc.setFontSize(8.5);
             doc.setFont(undefined, 'normal');
-            doc.setTextColor(...TEXT_DARK);
-        };
+            doc.setTextColor(230, 230, 230);
+            doc.text(`Attesting User: ${this.attestingUserName || '—'}`, marginX + 8, y + 13);
+            doc.text(`Title: ${this.attestingUserTitle || '—'}`, marginX + 8, y + 18);
+            const attDate = form.Attestation_Date__c ? (this._fmtDateDisplay ? this._fmtDateDisplay(form.Attestation_Date__c) : form.Attestation_Date__c) : new Date().toLocaleDateString();
+            doc.text(`Date: ${attDate}`, marginX + contentW / 2 + 10, y + 18);
+            y += 28;
 
-        const subHead = (qNum, title) => {
-            checkPage(16);
-            y += 4;
-            if (qNum) {
-                doc.setFillColor(...BRAND_SOFT);
-                const w = doc.getTextWidth(qNum) + 6;
-                doc.roundedRect(15, y - 4, w, 5.5, 1, 1, 'F');
+            // ── Page numbering on every page ──
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= totalPages; p++) {
+                doc.setPage(p);
+                doc.setDrawColor(...RED);
+                doc.setLineWidth(0.3);
+                doc.line(marginX, pageHeight - 14, pageWidth - marginX, pageHeight - 14);
                 doc.setFontSize(8);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(...BRAND);
-                doc.text(qNum, 18, y);
-                doc.setFontSize(9.5);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(...TEXT_DARK);
-                doc.text(title, 15 + w + 3, y);
-            } else {
-                doc.setFontSize(9.5);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(...TEXT_DARK);
-                doc.text(title, 15, y);
-            }
-            y += 7;
-        };
-
-        const RICH_LINE_HEIGHT = 5;
-
-        const setRichFont = (bold, italic) => {
-            let style = 'normal';
-            if (bold && italic) style = 'bolditalic';
-            else if (bold) style = 'bold';
-            else if (italic) style = 'italic';
-            doc.setFont(undefined, style);
-        };
-
-        // Renders rich-text HTML (from the B/I/U/bullet toolbar) into the PDF,
-        // preserving bold/italic/underline runs and bullet lines instead of
-        // flattening everything to plain text.
-        const printRichText = (html, indent = 15) => {
-            const isEmpty = !html || !String(html).replace(/<[^>]*>/g, '').trim();
-            if (isEmpty) {
-                checkPage(RICH_LINE_HEIGHT);
                 doc.setFont(undefined, 'normal');
-                doc.text('—', indent, y);
-                y += RICH_LINE_HEIGHT;
-                return;
+                doc.setTextColor(...GREY);
+                const appIdentifier = form.Organization_Name__c || (this.recordId ? `Application (${this.recordId})` : 'Draft');
+                doc.text(`${appIdentifier} · Generated ${new Date().toLocaleDateString()}`, marginX, pageHeight - 9);
+                doc.text(`Page ${p} of ${totalPages}`, pageWidth - marginX, pageHeight - 9, { align: 'right' });
             }
 
-            const maxWidth = pageWidth - indent - 15;
-            const el = new DOMParser().parseFromString(String(html), 'text/html').body;
-            const paragraphs = [];
-            let currentTokens = [];
+            const fileName = `Wadhwani Grants Application ${form.Organization_Name__c || 'Draft'}.pdf`;
+            doc.save(fileName);
 
-            const endParagraph = (bullet = false) => {
-                if (currentTokens.length) paragraphs.push({ tokens: currentTokens, bullet });
-                currentTokens = [];
-            };
-
-            const walk = (node, fmt) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const words = node.nodeValue.split(/(\s+)/).filter(w => w !== '');
-                    words.forEach(w => currentTokens.push({ text: w, ...fmt }));
-                    return;
-                }
-                if (node.nodeType !== Node.ELEMENT_NODE) return;
-
-                const tag = node.nodeName;
-                const nextFmt = {
-                    bold: fmt.bold || tag === 'B' || tag === 'STRONG',
-                    italic: fmt.italic || tag === 'I' || tag === 'EM',
-                    underline: fmt.underline || tag === 'U'
-                };
-
-                if (tag === 'BR') {
-                    endParagraph();
-                    return;
-                }
-                if (tag === 'LI') {
-                    endParagraph();
-                    node.childNodes.forEach(child => walk(child, nextFmt));
-                    endParagraph(true);
-                    return;
-                }
-                if (tag === 'P' || tag === 'DIV' || tag === 'UL' || tag === 'OL') {
-                    endParagraph();
-                    node.childNodes.forEach(child => walk(child, nextFmt));
-                    endParagraph();
-                    return;
-                }
-                node.childNodes.forEach(child => walk(child, nextFmt));
-            };
-
-            el.childNodes.forEach(n => walk(n, { bold: false, italic: false, underline: false }));
-            endParagraph();
-
-            const validParagraphs = paragraphs.filter(p => p.tokens.some(t => t.text.trim() !== ''));
-            if (!validParagraphs.length) {
-                checkPage(RICH_LINE_HEIGHT);
-                doc.setFont(undefined, 'normal');
-                doc.text('—', indent, y);
-                y += RICH_LINE_HEIGHT;
-                return;
-            }
-
-            validParagraphs.forEach(para => {
-                const lineStartX = indent + (para.bullet ? 4 : 0);
-                let x = lineStartX;
-                checkPage(RICH_LINE_HEIGHT);
-                if (para.bullet) {
-                    doc.setFont(undefined, 'normal');
-                    doc.text('•', indent, y);
-                }
-
-                para.tokens.forEach(tok => {
-                    if (/^\s+$/.test(tok.text)) {
-                        if (x === lineStartX) return;
-                        setRichFont(tok.bold, tok.italic);
-                        x += doc.getTextWidth(' ');
-                        return;
-                    }
-
-                    setRichFont(tok.bold, tok.italic);
-                    const w = doc.getTextWidth(tok.text);
-                    if (x > lineStartX && x + w > indent + maxWidth) {
-                        y += RICH_LINE_HEIGHT;
-                        checkPage(RICH_LINE_HEIGHT);
-                        x = lineStartX;
-                    }
-                    doc.text(tok.text, x, y);
-                    if (tok.underline) {
-                        doc.setDrawColor(...TEXT_DARK);
-                        doc.setLineWidth(0.15);
-                        doc.line(x, y + 0.8, x + w, y + 0.8);
-                    }
-                    x += w;
-                });
-                y += RICH_LINE_HEIGHT;
-            });
-
-            doc.setFont(undefined, 'normal');
-        };
-
-        const labelValue = (label, value, qNum = null) => {
-            const displayVal = (value === null || value === undefined || value === '') ? '—' : value;
-            checkPage(16);
-
-            let labelX = 15;
-            if (qNum) {
-                doc.setFontSize(7.5);
-                doc.setFont(undefined, 'bold');
-                const bw = doc.getTextWidth(qNum) + 5;
-                doc.setFillColor(...BRAND_SOFT);
-                doc.roundedRect(15, y - 3.5, bw, 5, 1, 1, 'F');
-                doc.setTextColor(...BRAND);
-                doc.text(qNum, 17.5, y);
-                labelX = 15 + bw + 3;
-            }
-
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(...TEXT_GRAY);
-            doc.text(label.toUpperCase(), labelX, y);
-            y += 4.5;
-
-            doc.setFontSize(9.5);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(...TEXT_DARK);
-            printRichText(String(displayVal), labelX);
-
-            checkPage(4);
-            doc.setDrawColor(...LINE_GRAY);
-            doc.setLineWidth(0.2);
-            doc.line(15, y + 1, pageWidth - 15, y + 1);
-            y += 5.5;
-        };
-
-        const table = (head, body, aligns = null) => {
-            checkPage(35);
-            const columnStyles = {};
-            const resolvedAligns = aligns || head.map((_, i) => (i === 0 ? 'left' : 'right'));
-            resolvedAligns.forEach((a, i) => { columnStyles[i] = { halign: a }; });
-            doc.autoTable({
-                startY: y,
-                head: [head],
-                body,
-                theme: 'grid',
-                styles: {
-                    fontSize: 8,
-                    cellPadding: 3.5,
-                    lineColor: LINE_GRAY,
-                    lineWidth: 0.2,
-                    textColor: TEXT_DARK,
-                    valign: 'middle'
-                },
-                headStyles: {
-                    fillColor: NAVY,
-                    textColor: 255,
-                    fontStyle: 'bold',
-                    halign: 'center'
-                },
-                columnStyles,
-                alternateRowStyles: { fillColor: BRAND_SOFT },
-                margin: { left: 15, right: 15 }
-            });
-            y = doc.lastAutoTable.finalY + 8;
-        };
-
-        addHeader();
-
-        // ══ SECTION 1 — About Your Organisation ══
-        section('1. ABOUT YOUR ORGANISATION');
-        labelValue('Selected Track', this.selectedTrackLabelsDisplay, 'Q1');
-        labelValue('Organizational Name', form.Organization_Name__c, 'Q2');
-        labelValue('Headquarters City and Country', form.Headquarters_City_and_Country__c, 'Q2');
-        labelValue('Primary Service Regions', form.Primary_Service_Regions__c, 'Q2');
-        labelValue('Leader Name', form.Leader_Name__c, 'Q2');
-        labelValue('Leader Title', form.Leader_Title__c, 'Q2');
-        labelValue('Leader Tenure', this.reviewLeaderTenure, 'Q2');
-        if (this.hasCustomQuestionsQ2) {
-            this.customQuestionsQ2.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
+            this.showBanner('success', 'PDF Downloaded', `${fileName} has been saved to your downloads.`);
+        } catch (e) {
+            console.error('PDF generation error:', e?.message || String(e), e?.stack);
+            this.showBanner('error', 'PDF Generation Failed', 'Could not generate the PDF. Please try again.');
         }
-        labelValue('Submitter Name', form.Submitter_Name__c, 'Q3');
-        labelValue('Title', form.Job_Title__c, 'Q3');
-        labelValue('Work Email', form.Work_Email_ID__c, 'Q3');
-        labelValue('Phone number', this.reviewPhoneWithCode, 'Q3');
-        if (this.hasCustomQuestionsQ3) {
-            this.customQuestionsQ3.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-        labelValue('Legal Type', this.reviewLegalType, 'Q4');
-        labelValue('Registration Jurisdiction', this.reviewRegistrationJurisdiction, 'Q4');
-        labelValue('Incorporation Date', this.formattedIncorporationDate, 'Q4');
-        labelValue('Brief Description', form.Legal_Structure__c || '—', 'Q4');
-        if (this.hasCustomQuestionsQ4) {
-            this.customQuestionsQ4.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-        labelValue('501(c)(3) Status in US', this.reviewHas501c3, 'Q5');
-        labelValue('Equivalency Determination (ED)', this.reviewHasED, 'Q5');
-        labelValue('FCRA Registered (India)', this.reviewIsFCRA, 'Q5');
-        labelValue('Willing to Pursue ED', this.reviewWillingED, 'Q5');
-        if (this.hasCustomQuestionsQ5) {
-            this.customQuestionsQ5.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-        labelValue('Fiscal Year End Date', this.formattedFiscalYearEndReview, 'Q6');
-        if (this.hasCustomQuestionsQ6) {
-            this.customQuestionsQ6.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-
-                labelValue('Funder 1', this.reviewFunder1Display, 'Q7');
-        if (this.showFunder2InReview) {
-            labelValue('Funder 2', this.reviewFunder2Display, 'Q7');
-        }
-        if (this.showFunder3InReview) {
-            labelValue('Funder 3', this.reviewFunder3Display, 'Q7');
-        }
-        labelValue('Reference 1', this.reviewReference1Display, 'Q8');
-        if (this.showReference2InReview) {
-            labelValue('Reference 2', this.reviewReference2Display, 'Q8');
-        }
-
-        subHead('Q9', 'Historical Financial Data (Three Prior Fiscal Years)');
-        table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-            ['Balance at Start of Year', val$(form.START_FY3), val$(this.computedStartFY2), val$(this.computedStartFY1)],
-            ['Revenue', val$(form.REV_FY3), val$(form.REV_FY2), val$(form.REV_FY1)],
-            ['Capital Expenditure', val$(form.CAP_FY3), val$(form.CAP_FY2), val$(form.CAP_FY1)],
-            ['Operating Expenditure', val$(form.OP_FY3), val$(form.OP_FY2), val$(form.OP_FY1)],
-            ['Balance at End of Year', val$(this.computedEndFY3), val$(this.computedEndFY2), val$(this.computedEndFY1)]
-        ]);
-
-        subHead('Q10', 'Current Fiscal Year Data');
-        table(['ITEM', 'BUDGET', 'PROJECTION', 'DEVIATION'], [
-            ['Revenue', val$(form.CFY_REV_BUDGET), val$(form.CFY_REV_PROJ), val$(this.computedRevDeviation)],
-            ['Capital Expenditure', val$(form.CFY_CAP_BUDGET), val$(form.CFY_CAP_PROJ), val$(this.computedCapDeviation)],
-            ['Operating Expenditure', val$(form.CFY_OP_BUDGET), val$(form.CFY_OP_PROJ), val$(this.computedOpDeviation)],
-            ['Revenue - Expense Net', val$(this.computedNetBudget), val$(this.computedNetProjection), val$(this.computedNetDeviation)]
-        ]);
-        labelValue('Explanation of Deviation', form.Revenue_Explanation__c || '—', 'Q10');
-        if (this.hasCustomQuestionsAboutOrg) {
-            this.customQuestionsAboutOrg.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-
-        // ══ SECTION 2 — Job Fulfillment ══
-        if (this.hasJobFulfillmentTrack) {
-            section('2. JOB FULFILLMENT');
-            labelValue('Your Skilling Approach', form.Skilling_Approach__c || '—', 'Q11');
-
-            if (this.hasSkillingDomainsForReview) {
-                subHead('Q12', 'Skilling Domains Offered');
-                const domRows = this.skillingDomainsForReview.map(r => [r.name, val(r.hours), val(r.duration), val(r.displayWhenStarted), val(r.enrollment)]);
-                table(['Domain / Program Name', 'Hours of Training', 'Duration (Months)', 'When Started', 'Annual Enrollment'], domRows);
-            }
-
-            subHead('Q13', 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)');
-            table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['# Learner Enrolments', valNum(form.JF_ENROLL_FY3), valNum(form.JF_ENROLL_FY2), valNum(form.JF_ENROLL_FY1)],
-                ['# of learner placements', valNum(form.JF_PLACE_FY3), valNum(form.JF_PLACE_FY2), valNum(form.JF_PLACE_FY1)],
-                ['Placement %', `${val(this.computedJfPlacePctFY3)}%`, `${val(this.computedJfPlacePctFY2)}%`, `${val(this.computedJfPlacePctFY1)}%`],
-                ['Avg Cost per Placement', val$(form.JF_COST_FY3), val$(form.JF_COST_FY2), val$(form.JF_COST_FY1)]
-            ]);
-
-            subHead('Q14', 'Job Fulfillment Outcomes — Current FY Projections');
-            table(['ITEM', 'FY-2026 (CFY) — PROJECTION'], [
-                ['# Learner Enrolments', valNum(form.JF_ENROLL_PROJ)],
-                ['# of learner placements', valNum(form.JF_PLACE_PROJ)],
-                ['Placement %', `${val(this.computedJfPlacePctProj)}%`],
-                ['Avg Cost per Placement', val$(form.JF_COST_PROJ)]
-            ]);
-
-            if (this.hasCustomQuestionsJobFulfillment) {
-                this.customQuestionsJobFulfillment.forEach(cq => {
-                    labelValue(cq.label, cq.value, cq.displayNumber);
-                });
-            }
-        }
-
-        // ══ SECTION 3 — Job Creation ══
-        if (this.hasJobCreationTrack) {
-            section('3. JOB CREATION');
-            labelValue('Your Job Creation Approach', form.Job_Creation_Approach__c || '—', 'Q15');
-
-            if (this.hasBusinessSectorsForReview) {
-                subHead('Q16', 'Business Sectors Served');
-                const secRows = this.businessSectorsForReview.map(s => [s.sectorDisplay, val(s.displayWhenBegan), val(s.supportTypesDisplay), val(s.enrollment)]);
-                table(['Business Sector', 'When Support Began', 'Type of Support Provided', 'Yearly Enrolment'], secRows);
-            }
-
-            subHead('Q17', 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)');
-            table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['# New Businesses Started', valNum(form.JC_NEW_BIZ_FY3), valNum(form.JC_NEW_BIZ_FY2), valNum(form.JC_NEW_BIZ_FY1)],
-                ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_FY3), valNum(form.JC_NEW_JOBS_FY2), valNum(form.JC_NEW_JOBS_FY1)],
-                ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_FY3), valNum(form.JC_EXIST_BIZ_FY2), valNum(form.JC_EXIST_BIZ_FY1)],
-                ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_FY3), valNum(form.JC_EXIST_JOBS_FY2), valNum(form.JC_EXIST_JOBS_FY1)],
-                ['Total Avg Cost per Job Created', val$(form.JC_COST_FY3), val$(form.JC_COST_FY2), val$(form.JC_COST_FY1)]
-            ]);
-
-            subHead('Q18', 'Job Creation Outcomes — Current FY Projections');
-            table(['ITEM', 'CFY (PROJECTED)'], [
-                ['# New Businesses Started', valNum(form.JC_NEW_BIZ_PROJ)],
-                ['# jobs created by new businesses', valNum(form.JC_NEW_JOBS_PROJ)],
-                ['Existing Businesses Supported', valNum(form.JC_EXIST_BIZ_PROJ)],
-                ['# jobs created by existing businesses', valNum(form.JC_EXIST_JOBS_PROJ)],
-                ['Total Avg Cost per Job Created', val$(form.JC_COST_PROJ)]
-            ]);
-
-            if (this.hasCustomQuestionsJobCreation) {
-                this.customQuestionsJobCreation.forEach(cq => {
-                    labelValue(cq.label, cq.value, cq.displayNumber);
-                });
-            }
-        }
-
-        // ══ SECTION 4 — Livelihood Upliftment ══
-        if (this.hasLivelihoodTrack) {
-            section('4. LIVELIHOOD UPLIFTMENT');
-            labelValue('Your Livelihood Upliftment Approach', form.Livelihood_Approach__c || '—', 'Q19');
-
-            if (this.hasLivelihoodProgramsForReview) {
-                subHead('Q20', 'Key Programs / Initiatives');
-                const progRows = this.livelihoodProgramsForReview.map(p => [p.name, val(p.supportType), val(p.manHours), val(p.enrollment)]);
-                table(['Program / Initiative Name', 'Type of Support Provided', 'Duration (Man-Hours)', 'Annual Enrollment'], progRows);
-            }
-
-            if (this.hasCommunityRowsForReview) {
-                subHead('Q21', 'Communities Worked In');
-                const commRows = this.communityRowsForReview.map(c => [c.state, val(c.district), val(c.fy3), val(c.fy2), val(c.fy1), val(c.proj)]);
-                table(['State', 'District / Area', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label), 'CFY (projected)'], commRows);
-            }
-
-            subHead('Q22', 'Livelihood Outcomes (Actuals)');
-            table(['ITEM', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], [
-                ['Households served during the year', valNum(form.LIV_SERVED_FY3), valNum(form.LIV_SERVED_FY2), valNum(form.LIV_SERVED_FY1)],
-                ['Households newly enrolled during the year', valNum(form.LIV_ENROLL_FY3), valNum(form.LIV_ENROLL_FY2), valNum(form.LIV_ENROLL_FY1)],
-                ['Households meeting outcome criteria', valNum(form.LIV_OUTCOME_FY3), valNum(form.LIV_OUTCOME_FY2), valNum(form.LIV_OUTCOME_FY1)],
-                ['Avg. cost per outcome (USD)', val$(form.LIV_COST_FY3), val$(form.LIV_COST_FY2), val$(form.LIV_COST_FY1)]
-            ]);
-
-            subHead('Q23', 'Livelihood Outcomes (Projections)');
-            table(['ITEM', 'CFY (PROJECTED)'], [
-                ['Households served during the year (projected)', valNum(form.LIV_SERVED_PROJ)],
-                ['Households newly enrolled during the year (projected)', valNum(form.LIV_ENROLL_PROJ)],
-                ['Households expected to meet outcome criteria', valNum(form.LIV_OUTCOME_PROJ)],
-                ['Avg. cost per outcome (USD) - projected', val$(form.LIV_COST_PROJ)]
-            ]);
-
-            if (this.hasCustomQuestionsLivelihood) {
-                this.customQuestionsLivelihood.forEach(cq => {
-                    labelValue(cq.label, cq.value, cq.displayNumber);
-                });
-            }
-        }
-
-        // ══ SECTION 5 — Why Wadhwani Grants ══
-        section('5. WHY WADHWANI GRANTS');
-        labelValue('Outcomes Verified by Third Party', this.reviewQ24Verified, 'Q24');
-        labelValue('Verification Details', this.reviewDetailsOfEthicalReceived, 'Q24');
-        labelValue('Verification Reports', this.reviewVerificationReportsDisplay, 'Q24');
-        labelValue('Organizational Sustainability', form.Organizational_Sustainability__c || '—', 'Q25');
-        labelValue('Desired Use of Additional Funding / Investment', form.Use_of_Additional_Funding__c || '—', 'Q26');
-        labelValue('Operational Synergies - Interest Level', this.reviewGenieInterestLevel, 'Q27');
-        labelValue('Operational Synergies - Description', form.GenieAI_Synergies_Description__c || '—', 'Q27');
-        labelValue('Supporting Documents', this.reviewSupportingDocumentsDisplay, 'Q28');
-
-        if (this.hasCustomQuestionsWhyWadhwani) {
-            this.customQuestionsWhyWadhwani.forEach(cq => {
-                labelValue(cq.label, cq.value, cq.displayNumber);
-            });
-        }
-
-        section('CONFIRMATION OF ACCURACY');
-        labelValue('Attesting User Name', this.attestingUserName);
-        labelValue('Attesting User Title', this.attestingUserTitle);
-
-        checkPage(15);
-        doc.setFontSize(8);
-        doc.setTextColor(...TEXT_GRAY);
-        doc.text(
-            `Submitted by: ${form.Submitter_Name__c || ''}  |  Generated: ${new Date().toLocaleDateString()}`,
-            15, pageHeight - 10
-        );
-
-        const fileName = `Wadhwani Grants Application ${form.Organization_Name__c || 'Draft'}.pdf`;
-        doc.save(fileName);
-
-        this.showBanner('success', 'PDF Downloaded', `${fileName} has been saved to your downloads.`);
     }
 
     _syncRichTextFieldsFromDOM() {
@@ -2576,24 +2985,24 @@ export default class WcfDynamicForm extends LightningElement {
 
         // 1. Text / Name-like fields
         const liveTextValidators = {
-            Organization_Name__c:               v => this._validateNameLikeField(v, 'Organization Name'),
-            Headquarters_City_and_Country__c:   v => this._validateHQCityCountry(v),
-            Primary_Service_Regions__c:         v => this._validateRegionsField(v),
-            Leader_Name__c:                     v => this._validateNameLikeField(v, 'Leader Name'),
-            Leader_Title__c:                    v => this._validateNameLikeField(v, 'Leader Title'),
-            Submitter_Name__c:                  v => this._validateNameLikeField(v, 'Submitter Name'),
-            Job_Title__c:                       v => this._validateNameLikeField(v, 'Submitter Title'),
-            Legal_Type_Other__c:                v => this._validateNameLikeField(v, 'Legal Type'),
+            Organization_Name__c: v => this._validateNameLikeField(v, 'Organization Name'),
+            Headquarters_City_and_Country__c: v => this._validateHQCityCountry(v),
+            Primary_Service_Regions__c: v => this._validateRegionsField(v),
+            Leader_Name__c: v => this._validateNameLikeField(v, 'Leader Name'),
+            Leader_Title__c: v => this._validateNameLikeField(v, 'Leader Title'),
+            Submitter_Name__c: v => this._validateNameLikeField(v, 'Submitter Name'),
+            Job_Title__c: v => this._validateNameLikeField(v, 'Submitter Title'),
+            Legal_Type_Other__c: v => this._validateNameLikeField(v, 'Legal Type'),
             Registration_Jurisdiction_Other__c: v => this._validateNameLikeField(v, 'Registration Jurisdiction'),
-            Funder_1_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
-            Funder_2_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
-            Funder_3_Name__c:                   v => this._validateNameLikeField(v, 'Funder Name'),
-            Reference_1_Name__c:                v => this._validateNameLikeField(v, 'Reference Name'),
-            Reference_1_Role__c:                v => this._validateNameLikeField(v, 'Reference Role / Designation'),
-            Reference_2_Name__c:                v => this._validateNameLikeField(v, 'Reference Name'),
-            Reference_2_Role__c:                v => this._validateNameLikeField(v, 'Reference Role / Designation'),
-            Attesting_User_Name__c:             v => this._validateNameLikeField(v, 'Attesting User Name'),
-            Attesting_User_Title__c:            v => this._validateNameLikeField(v, 'Attesting User Title')
+            Funder_1_Name__c: v => this._validateNameLikeField(v, 'Funder Name'),
+            Funder_2_Name__c: v => this._validateNameLikeField(v, 'Funder Name'),
+            Funder_3_Name__c: v => this._validateNameLikeField(v, 'Funder Name'),
+            Reference_1_Name__c: v => this._validateNameLikeField(v, 'Reference Name'),
+            Reference_1_Role__c: v => this._validateNameLikeField(v, 'Reference Role / Designation'),
+            Reference_2_Name__c: v => this._validateNameLikeField(v, 'Reference Name'),
+            Reference_2_Role__c: v => this._validateNameLikeField(v, 'Reference Role / Designation'),
+            Attesting_User_Name__c: v => this._validateNameLikeField(v, 'Attesting User Name'),
+            Attesting_User_Title__c: v => this._validateNameLikeField(v, 'Attesting User Title')
         };
 
         if (liveTextValidators[key]) {
@@ -2821,8 +3230,8 @@ export default class WcfDynamicForm extends LightningElement {
                 loadScript(this, flagTelpicker + '/js/utils.js'),
                 loadScript(this, flagTelpicker + '/js/intlTelInput.js')
             ])
-            .then(() => this._managePhoneIti())
-            .catch(err => console.error('flagTelpicker load error', err));
+                .then(() => this._managePhoneIti())
+                .catch(err => console.error('flagTelpicker load error', err));
             return;
         }
         if (typeof window.intlTelInput !== 'function') return;
@@ -2852,13 +3261,13 @@ export default class WcfDynamicForm extends LightningElement {
         const storedDial = this._extractDialCode(this.formValues.WG_Phone_Country_Code__c);
 
         this._phoneIti = window.intlTelInput(input, {
-            separateDialCode:   true,
-            showFlags:          false,
-            excludeCountries:   ['il'],
-            initialCountry:     'in',
+            separateDialCode: true,
+            showFlags: false,
+            excludeCountries: ['il'],
+            initialCountry: 'in',
             preferredCountries: ['in', 'us', 'gb', 'ae', 'sg', 'au'],
-            utilsScript:        flagTelpicker + '/js/utils.js',
-            customPlaceholder:  (ph) => (ph && ph.startsWith('0')) ? ph.slice(1).trim() : ph
+            utilsScript: flagTelpicker + '/js/utils.js',
+            customPlaceholder: (ph) => (ph && ph.startsWith('0')) ? ph.slice(1).trim() : ph
         });
 
         const wrapper = input.closest('.iti');
@@ -2989,8 +3398,8 @@ export default class WcfDynamicForm extends LightningElement {
             (data.features || []).forEach(feature => {
                 const props = feature.properties || {};
                 const cityName = props.name || props.city;
-                const state    = props.state || '';
-                const country  = props.country || '';
+                const state = props.state || '';
+                const country = props.country || '';
 
                 if (!cityName) return;
 
@@ -2999,7 +3408,7 @@ export default class WcfDynamicForm extends LightningElement {
                     return;
                 }
 
-                const value      = [cityName, state, country].filter(Boolean).join(', ');
+                const value = [cityName, state, country].filter(Boolean).join(', ');
                 const subDisplay = [state, country].filter(Boolean).join(', ');
 
                 if (!seen.has(value)) {
@@ -3027,12 +3436,12 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     handleHQSelect(event) {
-        const label   = event.currentTarget.dataset.label;
+        const label = event.currentTarget.dataset.label;
         const country = event.currentTarget.dataset.country || '';
-        const val     = [label, country].filter(Boolean).join(', ');
+        const val = [label, country].filter(Boolean).join(', ');
 
-        this.hqSearchKey     = val;
-        this.hqResults       = [];
+        this.hqSearchKey = val;
+        this.hqResults = [];
         this.hqShowNoResults = false;
 
         this._setHQValue(val);
@@ -3093,7 +3502,7 @@ export default class WcfDynamicForm extends LightningElement {
             return 'Please enter exactly one city and one country separated by a single comma (e.g., "Chennai, India").';
         }
         const [city, country] = parts;
-        if (!/[a-zA-Z]/.test(city))    return 'Please enter a valid city name.';
+        if (!/[a-zA-Z]/.test(city)) return 'Please enter a valid city name.';
         if (!/[a-zA-Z]/.test(country)) return 'Please enter a valid country name.';
         return null;
     }
@@ -3130,7 +3539,7 @@ export default class WcfDynamicForm extends LightningElement {
             return 'Phone number can only contain digits and characters like +, -, (), or spaces.';
         }
 
-        const dialCode   = this._extractDialCode(countryCodeValue);
+        const dialCode = this._extractDialCode(countryCodeValue);
         const digitsOnly = this._normalizeNationalNumber(trimmed, dialCode);
         if (!digitsOnly) return 'Phone number cannot be blank or contain only spaces.';
 
@@ -3152,15 +3561,15 @@ export default class WcfDynamicForm extends LightningElement {
         return null;
     }
 
-     _isNativeFormElement(el) {
+    _isNativeFormElement(el) {
         const tag = el && el.tagName ? el.tagName.toUpperCase() : '';
         return tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
     }
 
     _showLightningError(dataId, message) {
         const el = this.template.querySelector(`[data-id="${dataId}"]`) ||
-                   this.template.querySelector(`[data-key="${dataId}"]`) ||
-                   this.template.querySelector(`[data-field="${dataId}"]`);
+            this.template.querySelector(`[data-key="${dataId}"]`) ||
+            this.template.querySelector(`[data-field="${dataId}"]`);
         if (el) {
             if (this._isNativeFormElement(el)) {
                 // Native inputs (e.g. the funding period dates): reportValidity() would move
@@ -3177,10 +3586,10 @@ export default class WcfDynamicForm extends LightningElement {
         }
     }
 
-     _clearLightningError(dataId) {
+    _clearLightningError(dataId) {
         const el = this.template.querySelector(`[data-id="${dataId}"]`) ||
-                   this.template.querySelector(`[data-key="${dataId}"]`) ||
-                   this.template.querySelector(`[data-field="${dataId}"]`);
+            this.template.querySelector(`[data-key="${dataId}"]`) ||
+            this.template.querySelector(`[data-field="${dataId}"]`);
         if (el) {
             if (this._isNativeFormElement(el)) {
                 // Clear without reportValidity(), which can pull focus to an empty required field.
@@ -3197,11 +3606,11 @@ export default class WcfDynamicForm extends LightningElement {
             this._invalidElements = this._invalidElements.filter(x => x !== el);
         }
     }
-   
+
     _showFieldError(fieldName, message) {
         const el = this.template.querySelector(`[data-field="${fieldName}"]`) ||
-                   this.template.querySelector(`[data-id="${fieldName}"]`) ||
-                   this.template.querySelector(`[data-key="${fieldName}"]`);
+            this.template.querySelector(`[data-id="${fieldName}"]`) ||
+            this.template.querySelector(`[data-key="${fieldName}"]`);
         if (el) {
             el.classList.add('richtext-invalid');
             this._registerInvalid(el);
@@ -3215,8 +3624,8 @@ export default class WcfDynamicForm extends LightningElement {
 
     _clearFieldError(fieldName) {
         const el = this.template.querySelector(`[data-field="${fieldName}"]`) ||
-                   this.template.querySelector(`[data-id="${fieldName}"]`) ||
-                   this.template.querySelector(`[data-key="${fieldName}"]`);
+            this.template.querySelector(`[data-id="${fieldName}"]`) ||
+            this.template.querySelector(`[data-key="${fieldName}"]`);
         if (el) el.classList.remove('richtext-invalid', 'invalid-field', 'richtext-overlimit');
         if (el) this._invalidElements = this._invalidElements.filter(x => x !== el);
 
@@ -3241,10 +3650,10 @@ export default class WcfDynamicForm extends LightningElement {
         if (!errEl) {
             errEl = document.createElement('p');
             errEl.className = 'field-error-msg';
-            errEl.style.color      = 'var(--wg-error)'; // audit sweep fix -- was stale literal #C23934, now uses the token (inherits through the shadow tree from :host)
-            errEl.style.fontSize   = '12px';
+            errEl.style.color = 'var(--wg-error)'; // audit sweep fix -- was stale literal #C23934, now uses the token (inherits through the shadow tree from :host)
+            errEl.style.fontSize = '12px';
             errEl.style.lineHeight = '1.4';
-            errEl.style.marginTop  = '4px';
+            errEl.style.marginTop = '4px';
             host.appendChild(errEl);
         }
         errEl.textContent = message;
@@ -3374,7 +3783,7 @@ export default class WcfDynamicForm extends LightningElement {
             if (parts.length === 3) {
                 return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-        } catch (_) {}
+        } catch (_) { }
         return dateStr;
     }
 
@@ -3581,9 +3990,9 @@ export default class WcfDynamicForm extends LightningElement {
 
     _checkRichText(field, label, limit) {
         const el = this.template.querySelector(`[data-field="${field}"]`) ||
-                   this.template.querySelector(`[data-id="${field}"]`) ||
-                   this.template.querySelector(`[data-key="${field}"]`);
-        
+            this.template.querySelector(`[data-id="${field}"]`) ||
+            this.template.querySelector(`[data-key="${field}"]`);
+
         let text = '';
         let htmlVal = '';
         if (el) {
@@ -3808,33 +4217,33 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Funder 1',
                 fields: {
-                    name:   'Funder_1_Name__c',
+                    name: 'Funder_1_Name__c',
                     amount: 'Funder_1_Amount__c',
-                    start:  'Funder_1_Period_Start__c',
-                    end:    'Funder_1_Period_End__c',
-                    type:   'Funder_1_Type__c',
+                    start: 'Funder_1_Period_Start__c',
+                    end: 'Funder_1_Period_End__c',
+                    type: 'Funder_1_Type__c',
                 },
                 show: true,
             },
             {
                 label: 'Funder 2',
                 fields: {
-                    name:   'Funder_2_Name__c',
+                    name: 'Funder_2_Name__c',
                     amount: 'Funder_2_Amount__c',
-                    start:  'Funder_2_Period_Start__c',
-                    end:    'Funder_2_Period_End__c',
-                    type:   'Funder_2_Type__c',
+                    start: 'Funder_2_Period_Start__c',
+                    end: 'Funder_2_Period_End__c',
+                    type: 'Funder_2_Type__c',
                 },
                 show: this.showFunder2,
             },
             {
                 label: 'Funder 3',
                 fields: {
-                    name:   'Funder_3_Name__c',
+                    name: 'Funder_3_Name__c',
                     amount: 'Funder_3_Amount__c',
-                    start:  'Funder_3_Period_Start__c',
-                    end:    'Funder_3_Period_End__c',
-                    type:   'Funder_3_Type__c',
+                    start: 'Funder_3_Period_Start__c',
+                    end: 'Funder_3_Period_End__c',
+                    type: 'Funder_3_Type__c',
                 },
                 show: this.showFunder3,
             },
@@ -3902,8 +4311,8 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Reference 1',
                 fields: {
-                    name:  'Reference_1_Name__c',
-                    role:  'Reference_1_Role__c',
+                    name: 'Reference_1_Name__c',
+                    role: 'Reference_1_Role__c',
                     email: 'Reference_1_Email__c'
                 },
                 show: true
@@ -3911,8 +4320,8 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Reference 2',
                 fields: {
-                    name:  'Reference_2_Name__c',
-                    role:  'Reference_2_Role__c',
+                    name: 'Reference_2_Name__c',
+                    role: 'Reference_2_Role__c',
                     email: 'Reference_2_Email__c'
                 },
                 show: this.showReference2
@@ -4786,19 +5195,19 @@ export default class WcfDynamicForm extends LightningElement {
 
     // ── Q9 Math End Balances & Auto-Chained Start Balances ────────────────
     _rawEndFY3() {
-        return calculateEndingBalance(this.formValues.START_FY3, this.formValues.REV_FY3, (Number(String(this.formValues.CAP_FY3).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY3).replace(/,/g, ''))||0));
+        return calculateEndingBalance(this.formValues.START_FY3, this.formValues.REV_FY3, (Number(String(this.formValues.CAP_FY3).replace(/,/g, '')) || 0) + (Number(String(this.formValues.OP_FY3).replace(/,/g, '')) || 0));
     }
     _rawStartFY2() {
         return this._rawEndFY3();
     }
     _rawEndFY2() {
-        return calculateEndingBalance(this._rawStartFY2(), this.formValues.REV_FY2, (Number(String(this.formValues.CAP_FY2).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY2).replace(/,/g, ''))||0));
+        return calculateEndingBalance(this._rawStartFY2(), this.formValues.REV_FY2, (Number(String(this.formValues.CAP_FY2).replace(/,/g, '')) || 0) + (Number(String(this.formValues.OP_FY2).replace(/,/g, '')) || 0));
     }
     _rawStartFY1() {
         return this._rawEndFY2();
     }
     _rawEndFY1() {
-        return calculateEndingBalance(this._rawStartFY1(), this.formValues.REV_FY1, (Number(String(this.formValues.CAP_FY1).replace(/,/g, ''))||0) + (Number(String(this.formValues.OP_FY1).replace(/,/g, ''))||0));
+        return calculateEndingBalance(this._rawStartFY1(), this.formValues.REV_FY1, (Number(String(this.formValues.CAP_FY1).replace(/,/g, '')) || 0) + (Number(String(this.formValues.OP_FY1).replace(/,/g, '')) || 0));
     }
 
     get computedEndFY3() {
@@ -4837,24 +5246,24 @@ export default class WcfDynamicForm extends LightningElement {
     get computedNetBudget() {
         const rev = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
         const cap = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
-        const op  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
+        const op = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
         return this._formatNumberWithCommas(rev - (cap + op));
     }
     get computedNetProjection() {
         const rev = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
         const cap = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
-        const op  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+        const op = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
         return this._formatNumberWithCommas(rev - (cap + op));
     }
     get computedNetDeviation() {
         const revBud = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
         const capBud = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
-        const opBud  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
+        const opBud = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
         const netBud = revBud - (capBud + opBud);
 
         const revProj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
         const capProj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
-        const opProj  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+        const opProj = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
         const netProj = revProj - (capProj + opProj);
 
         return this._formatNumberWithCommas(netProj - netBud);
@@ -4865,8 +5274,8 @@ export default class WcfDynamicForm extends LightningElement {
         const revProj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
         const capBud = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
         const capProj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
-        const opBud  = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, ''))  || 0;
-        const opProj  = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, ''))  || 0;
+        const opBud = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
+        const opProj = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
 
         const revDev = revProj - revBud;
         const capDev = capProj - capBud;
@@ -4909,6 +5318,101 @@ export default class WcfDynamicForm extends LightningElement {
         if (isNaN(num)) return val;
         return num.toLocaleString('en-US');
     }
+
+    _formatCurrency(val, defaultVal = '$0') {
+        if (val === null || val === undefined || String(val).trim() === '') return defaultVal;
+        const cleanStr = String(val).replace(/[,\s$]/g, '');
+        const num = Number(cleanStr);
+        if (isNaN(num)) return String(val);
+        const abs = Math.abs(num);
+        const hasCents = Math.round(abs * 100) % 100 !== 0;
+        const body = abs.toLocaleString('en-US', {
+            minimumFractionDigits: hasCents ? 2 : 0,
+            maximumFractionDigits: 2
+        });
+        return num < 0 ? `-$${body}` : `$${body}`;
+    }
+
+    // ── Q9 Review Display Getters (Historical Financials) ────────────────
+    get reviewStartFY3() { return this._formatCurrency(this.formValues.START_FY3); }
+    get reviewStartFY2() { return this._formatCurrency(this._rawEndFY3()); }
+    get reviewStartFY1() { return this._formatCurrency(this._rawEndFY2()); }
+    get reviewRevFY3() { return this._formatCurrency(this.formValues.REV_FY3); }
+    get reviewRevFY2() { return this._formatCurrency(this.formValues.REV_FY2); }
+    get reviewRevFY1() { return this._formatCurrency(this.formValues.REV_FY1); }
+    get reviewCapFY3() { return this._formatCurrency(this.formValues.CAP_FY3); }
+    get reviewCapFY2() { return this._formatCurrency(this.formValues.CAP_FY2); }
+    get reviewCapFY1() { return this._formatCurrency(this.formValues.CAP_FY1); }
+    get reviewOpFY3() { return this._formatCurrency(this.formValues.OP_FY3); }
+    get reviewOpFY2() { return this._formatCurrency(this.formValues.OP_FY2); }
+    get reviewOpFY1() { return this._formatCurrency(this.formValues.OP_FY1); }
+    get reviewEndFY3() { return this._formatCurrency(this._rawEndFY3()); }
+    get reviewEndFY2() { return this._formatCurrency(this._rawEndFY2()); }
+    get reviewEndFY1() { return this._formatCurrency(this._rawEndFY1()); }
+
+    // ── Q10 Review Display Getters (Current Fiscal Year Data) ────────────
+    get reviewCfyRevBudget() { return this._formatCurrency(this.formValues.CFY_REV_BUDGET); }
+    get reviewCfyRevProj() { return this._formatCurrency(this.formValues.CFY_REV_PROJ); }
+    get reviewRevDeviation() {
+        const budget = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        return this._formatCurrency(proj - budget);
+    }
+    get reviewCfyCapBudget() { return this._formatCurrency(this.formValues.CFY_CAP_BUDGET); }
+    get reviewCfyCapProj() { return this._formatCurrency(this.formValues.CFY_CAP_PROJ); }
+    get reviewCapDeviation() {
+        const budget = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        return this._formatCurrency(proj - budget);
+    }
+    get reviewCfyOpBudget() { return this._formatCurrency(this.formValues.CFY_OP_BUDGET); }
+    get reviewCfyOpProj() { return this._formatCurrency(this.formValues.CFY_OP_PROJ); }
+    get reviewOpDeviation() {
+        const budget = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
+        const proj = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
+        return this._formatCurrency(proj - budget);
+    }
+    get reviewNetBudget() {
+        const rev = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const cap = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const op = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
+        return this._formatCurrency(rev - (cap + op));
+    }
+    get reviewNetProjection() {
+        const rev = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        const cap = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        const op = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
+        return this._formatCurrency(rev - (cap + op));
+    }
+    get reviewNetDeviation() {
+        const revBud = Number(String(this.formValues.CFY_REV_BUDGET).replace(/,/g, '')) || 0;
+        const capBud = Number(String(this.formValues.CFY_CAP_BUDGET).replace(/,/g, '')) || 0;
+        const opBud = Number(String(this.formValues.CFY_OP_BUDGET).replace(/,/g, '')) || 0;
+        const netBud = revBud - (capBud + opBud);
+
+        const revProj = Number(String(this.formValues.CFY_REV_PROJ).replace(/,/g, '')) || 0;
+        const capProj = Number(String(this.formValues.CFY_CAP_PROJ).replace(/,/g, '')) || 0;
+        const opProj = Number(String(this.formValues.CFY_OP_PROJ).replace(/,/g, '')) || 0;
+        const netProj = revProj - (capProj + opProj);
+
+        return this._formatCurrency(netProj - netBud);
+    }
+
+    // ── Cost Review Getters ──────────────────────────────────────────────
+    get reviewJfCostFY3() { return this._formatCurrency(this.formValues.JF_COST_FY3); }
+    get reviewJfCostFY2() { return this._formatCurrency(this.formValues.JF_COST_FY2); }
+    get reviewJfCostFY1() { return this._formatCurrency(this.formValues.JF_COST_FY1); }
+    get reviewJfCostProj() { return this._formatCurrency(this.formValues.JF_COST_PROJ); }
+
+    get reviewJcCostFY3() { return this._formatCurrency(this.formValues.JC_COST_FY3); }
+    get reviewJcCostFY2() { return this._formatCurrency(this.formValues.JC_COST_FY2); }
+    get reviewJcCostFY1() { return this._formatCurrency(this.formValues.JC_COST_FY1); }
+    get reviewJcCostProj() { return this._formatCurrency(this.formValues.JC_COST_PROJ); }
+
+    get reviewLivCostFY3() { return this._formatCurrency(this.formValues.LIV_COST_FY3); }
+    get reviewLivCostFY2() { return this._formatCurrency(this.formValues.LIV_COST_FY2); }
+    get reviewLivCostFY1() { return this._formatCurrency(this.formValues.LIV_COST_FY1); }
+    get reviewLivCostProj() { return this._formatCurrency(this.formValues.LIV_COST_PROJ); }
 
     get previewFunder1Amount() { return this._formatNumberWithCommas(this.formValues.Funder_1_Amount__c); }
     get previewFunder2Amount() { return this._formatNumberWithCommas(this.formValues.Funder_2_Amount__c); }
@@ -5683,11 +6187,11 @@ export default class WcfDynamicForm extends LightningElement {
     get fiscalMonthOptions() {
         return [
             { label: 'January', value: '01' }, { label: 'February', value: '02' },
-            { label: 'March', value: '03' },   { label: 'April', value: '04' },
-            { label: 'May', value: '05' },     { label: 'June', value: '06' },
-            { label: 'July', value: '07' },    { label: 'August', value: '08' },
-            { label: 'September', value: '09' },{ label: 'October', value: '10' },
-            { label: 'November', value: '11' },{ label: 'December', value: '12' }
+            { label: 'March', value: '03' }, { label: 'April', value: '04' },
+            { label: 'May', value: '05' }, { label: 'June', value: '06' },
+            { label: 'July', value: '07' }, { label: 'August', value: '08' },
+            { label: 'September', value: '09' }, { label: 'October', value: '10' },
+            { label: 'November', value: '11' }, { label: 'December', value: '12' }
         ];
     }
 
@@ -5842,33 +6346,33 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Funder 1',
                 fields: {
-                    name:   'Funder_1_Name__c',
+                    name: 'Funder_1_Name__c',
                     amount: 'Funder_1_Amount__c',
-                    start:  'Funder_1_Period_Start__c',
-                    end:    'Funder_1_Period_End__c',
-                    type:   'Funder_1_Type__c',
+                    start: 'Funder_1_Period_Start__c',
+                    end: 'Funder_1_Period_End__c',
+                    type: 'Funder_1_Type__c',
                 },
                 show: true,
             },
             {
                 label: 'Funder 2',
                 fields: {
-                    name:   'Funder_2_Name__c',
+                    name: 'Funder_2_Name__c',
                     amount: 'Funder_2_Amount__c',
-                    start:  'Funder_2_Period_Start__c',
-                    end:    'Funder_2_Period_End__c',
-                    type:   'Funder_2_Type__c',
+                    start: 'Funder_2_Period_Start__c',
+                    end: 'Funder_2_Period_End__c',
+                    type: 'Funder_2_Type__c',
                 },
                 show: this.showFunder2,
             },
             {
                 label: 'Funder 3',
                 fields: {
-                    name:   'Funder_3_Name__c',
+                    name: 'Funder_3_Name__c',
                     amount: 'Funder_3_Amount__c',
-                    start:  'Funder_3_Period_Start__c',
-                    end:    'Funder_3_Period_End__c',
-                    type:   'Funder_3_Type__c',
+                    start: 'Funder_3_Period_Start__c',
+                    end: 'Funder_3_Period_End__c',
+                    type: 'Funder_3_Type__c',
                 },
                 show: this.showFunder3,
             },
@@ -5964,8 +6468,8 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Reference 1',
                 fields: {
-                    name:  'Reference_1_Name__c',
-                    role:  'Reference_1_Role__c',
+                    name: 'Reference_1_Name__c',
+                    role: 'Reference_1_Role__c',
                     email: 'Reference_1_Email__c'
                 },
                 show: true
@@ -5973,8 +6477,8 @@ export default class WcfDynamicForm extends LightningElement {
             {
                 label: 'Reference 2',
                 fields: {
-                    name:  'Reference_2_Name__c',
-                    role:  'Reference_2_Role__c',
+                    name: 'Reference_2_Name__c',
+                    role: 'Reference_2_Role__c',
                     email: 'Reference_2_Email__c'
                 },
                 show: this.showReference2
@@ -6213,44 +6717,44 @@ export default class WcfDynamicForm extends LightningElement {
             fieldValue: fieldValue,
             submitterName: submitterName
         })
-        .then(() => {
-            setTimeout(() => {
-                this.loadAIFeedback(fieldApiName, submitterName);
-            }, 6000);
-        })
-        .catch(err => {
-            console.error('Apex upsertAIFeedback call failed:', err);
-            this.aiResponse = 'Error generating AI feedback.';
-            this.isAiLoading = false;
-        });
+            .then(() => {
+                setTimeout(() => {
+                    this.loadAIFeedback(fieldApiName, submitterName);
+                }, 6000);
+            })
+            .catch(err => {
+                console.error('Apex upsertAIFeedback call failed:', err);
+                this.aiResponse = 'Error generating AI feedback.';
+                this.isAiLoading = false;
+            });
     }
 
     loadAIFeedback(fieldApiName, submitterName) {
         getAIFeedbackRecord({ submitterName })
-        .then(result => {
-            if (result) {
-                const flexFieldMap = {
-                    'Legal_Structure__c': 'Legal_Structure_FR__c',
-                    'Revenue_Explanation__c': 'Revenue_Explanation_FR__c',
-                    'Skilling_Approach__c': 'Skilling_Approach_FR__c',
-                    'Job_Creation_Approach__c': 'Job_Creation_Approach_FR__c',
-                    'Livelihood_Approach__c': 'Livelihood_Approach_FR__c',
-                    'Operational_Synergies_with_WOF__c': 'Operational_Synergies_with_WOF_FR__c',
-                    'Organizational_Sustainability__c': 'Organizational_Sustainability_FR__c',
-                    'Use_of_Additional_Funding__c': 'Use_of_Additional_Funding_FR__c'
-                };
-                const flexField = flexFieldMap[fieldApiName] || 'Legal_Structure_FR__c';
-                this.aiResponse = result[flexField] || 'No feedback available yet.';
-            } else {
-                this.aiResponse = 'No feedback available yet.';
-            }
-            this.isAiLoading = false;
-        })
-        .catch(err => {
-            console.error('Failed to load AI feedback:', err);
-            this.aiResponse = 'Error loading AI feedback.';
-            this.isAiLoading = false;
-        });
+            .then(result => {
+                if (result) {
+                    const flexFieldMap = {
+                        'Legal_Structure__c': 'Legal_Structure_FR__c',
+                        'Revenue_Explanation__c': 'Revenue_Explanation_FR__c',
+                        'Skilling_Approach__c': 'Skilling_Approach_FR__c',
+                        'Job_Creation_Approach__c': 'Job_Creation_Approach_FR__c',
+                        'Livelihood_Approach__c': 'Livelihood_Approach_FR__c',
+                        'Operational_Synergies_with_WOF__c': 'Operational_Synergies_with_WOF_FR__c',
+                        'Organizational_Sustainability__c': 'Organizational_Sustainability_FR__c',
+                        'Use_of_Additional_Funding__c': 'Use_of_Additional_Funding_FR__c'
+                    };
+                    const flexField = flexFieldMap[fieldApiName] || 'Legal_Structure_FR__c';
+                    this.aiResponse = result[flexField] || 'No feedback available yet.';
+                } else {
+                    this.aiResponse = 'No feedback available yet.';
+                }
+                this.isAiLoading = false;
+            })
+            .catch(err => {
+                console.error('Failed to load AI feedback:', err);
+                this.aiResponse = 'Error loading AI feedback.';
+                this.isAiLoading = false;
+            });
     }
 
     closeAIModal() {
@@ -6298,7 +6802,7 @@ export default class WcfDynamicForm extends LightningElement {
         return ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx'];
     }
 
-        _sizeCheckDiagnostic = '';
+    _sizeCheckDiagnostic = '';
 
     async _fetchUploadedFileSizes(files) {
         const sizeByDocId = {};
@@ -6335,7 +6839,7 @@ export default class WcfDynamicForm extends LightningElement {
         return this.q24UploadedFiles && this.q24UploadedFiles.length > 0;
     }
 
-            async handleQ24UploadFinished(event) {
+    async handleQ24UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
             const MAX_Q24_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -6350,7 +6854,7 @@ export default class WcfDynamicForm extends LightningElement {
                 const key = f.documentId ? String(f.documentId).substring(0, 15) : '';
                 const size = sizeByDocId[key];
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
-                              validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
+                    validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
                 if (size === undefined || size > MAX_Q24_SIZE) {
                     (size === undefined ? unverifiedNames : oversizedNames).push(f.name);
                     if (f.documentId) {
@@ -6426,7 +6930,7 @@ export default class WcfDynamicForm extends LightningElement {
         return this.q28UploadedFiles && this.q28UploadedFiles.length > 0;
     }
 
-        async handleQ28UploadFinished(event) {
+    async handleQ28UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
             const MAX_Q28_SIZE = 50 * 1024 * 1024; // 50 MB
@@ -6441,7 +6945,7 @@ export default class WcfDynamicForm extends LightningElement {
                 const key = f.documentId ? String(f.documentId).substring(0, 15) : '';
                 const size = sizeByDocId[key];
                 const isDup = currentFiles.some(existing => existing.name && existing.name.toLowerCase() === f.name.toLowerCase()) ||
-                              validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
+                    validFiles.some(v => v.name && v.name.toLowerCase() === f.name.toLowerCase());
                 if (size === undefined || size > MAX_Q28_SIZE) {
                     (size === undefined ? unverifiedNames : oversizedNames).push(f.name);
                     if (f.documentId) {
@@ -6498,7 +7002,7 @@ export default class WcfDynamicForm extends LightningElement {
                 this.showBanner('success', 'File Uploaded', 'Supporting Document uploaded successfully.');
             }
         }
-    } 
+    }
 
     handleRemoveQ28File(event) {
         const docId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
@@ -6517,22 +7021,22 @@ export default class WcfDynamicForm extends LightningElement {
         f.CY3_Revenue__c = f.REV_FY3 || f.CY3_Revenue__c || '';
         f.CY3_Capital_Expenditure__c = f.CAP_FY3 || f.CY3_Capital_Expenditure__c || '';
         f.CY3_Operating_Expenditure__c = f.OP_FY3 || f.CY3_Operating_Expenditure__c || '';
-        f.CY3_Expense__c = String((Number(f.CY3_Capital_Expenditure__c)||0) + (Number(f.CY3_Operating_Expenditure__c)||0));
-        f.CY3_Balance_End__c = String((Number(f.CY3_Balance_Start_CFY_3__c)||0) + (Number(f.CY3_Revenue__c)||0) - (Number(f.CY3_Expense__c)||0));
+        f.CY3_Expense__c = String((Number(f.CY3_Capital_Expenditure__c) || 0) + (Number(f.CY3_Operating_Expenditure__c) || 0));
+        f.CY3_Balance_End__c = String((Number(f.CY3_Balance_Start_CFY_3__c) || 0) + (Number(f.CY3_Revenue__c) || 0) - (Number(f.CY3_Expense__c) || 0));
 
         f.CY2_Balance_Start_CFY_2__c = f.CY3_Balance_End__c;
         f.CY2_Revenue__c = f.REV_FY2 || f.CY2_Revenue__c || '';
         f.CY2_Capital_Expenditure__c = f.CAP_FY2 || f.CY2_Capital_Expenditure__c || '';
         f.CY2_Operating_Expenditure__c = f.OP_FY2 || f.CY2_Operating_Expenditure__c || '';
-        f.CY2_Expense__c = String((Number(f.CY2_Capital_Expenditure__c)||0) + (Number(f.CY2_Operating_Expenditure__c)||0));
-        f.CY2_Balance_End__c = String((Number(f.CY2_Balance_Start_CFY_2__c)||0) + (Number(f.CY2_Revenue__c)||0) - (Number(f.CY2_Expense__c)||0));
+        f.CY2_Expense__c = String((Number(f.CY2_Capital_Expenditure__c) || 0) + (Number(f.CY2_Operating_Expenditure__c) || 0));
+        f.CY2_Balance_End__c = String((Number(f.CY2_Balance_Start_CFY_2__c) || 0) + (Number(f.CY2_Revenue__c) || 0) - (Number(f.CY2_Expense__c) || 0));
 
         f.CY1_Balance_Start_CFY_1__c = f.CY2_Balance_End__c;
         f.CY1_Revenue__c = f.REV_FY1 || f.CY1_Revenue__c || '';
         f.CY1_Capital_Expenditure__c = f.CAP_FY1 || f.CY1_Capital_Expenditure__c || '';
         f.CY1_Operating_Expenditure__c = f.OP_FY1 || f.CY1_Operating_Expenditure__c || '';
-        f.CY1_Expense__c = String((Number(f.CY1_Capital_Expenditure__c)||0) + (Number(f.CY1_Operating_Expenditure__c)||0));
-        f.CY1_Balance_End__c = String((Number(f.CY1_Balance_Start_CFY_1__c)||0) + (Number(f.CY1_Revenue__c)||0) - (Number(f.CY1_Expense__c)||0));
+        f.CY1_Expense__c = String((Number(f.CY1_Capital_Expenditure__c) || 0) + (Number(f.CY1_Operating_Expenditure__c) || 0));
+        f.CY1_Balance_End__c = String((Number(f.CY1_Balance_Start_CFY_1__c) || 0) + (Number(f.CY1_Revenue__c) || 0) - (Number(f.CY1_Expense__c) || 0));
 
         // 2. Current Fiscal Year Data (Current_fiscal_year_data__c)
         f.Revenue_Budget__c = f.CFY_REV_BUDGET || f.Revenue_Budget__c || '';
@@ -6691,28 +7195,28 @@ export default class WcfDynamicForm extends LightningElement {
             selectedTracks: this.selectedTracks,
             payloadJson: JSON.stringify(payload)
         })
-        .then(result => {
-            if (result && result.isSuccess) {
-                this._recordId = result.recordId;
-                this.isDirty = false;
-                if (showToast) {
-                    this.showBanner('success', 'Draft Saved', 'Your RFI application draft has been saved successfully.');
+            .then(result => {
+                if (result && result.isSuccess) {
+                    this._recordId = result.recordId;
+                    this.isDirty = false;
+                    if (showToast) {
+                        this.showBanner('success', 'Draft Saved', 'Your RFI application draft has been saved successfully.');
+                    }
+                } else if (showToast) {
+                    this.showBanner('error', 'Error Saving Draft', result ? result.message : 'Draft save failed.');
                 }
-            } else if (showToast) {
-                this.showBanner('error', 'Error Saving Draft', result ? result.message : 'Draft save failed.');
-            }
-        })
-        .catch(err => {
-            console.error('Draft save failed:', err);
-            if (showToast) {
-                this.showBanner('error', 'Error Saving Draft', err.body ? err.body.message : err.message || 'Draft save failed.');
-            }
-        })
-        .finally(() => {
-            if (showToast) {
-                this.isLoading = false;
-            }
-        });
+            })
+            .catch(err => {
+                console.error('Draft save failed:', err);
+                if (showToast) {
+                    this.showBanner('error', 'Error Saving Draft', err.body ? err.body.message : err.message || 'Draft save failed.');
+                }
+            })
+            .finally(() => {
+                if (showToast) {
+                    this.isLoading = false;
+                }
+            });
     }
 
     async handleSubmit() {
@@ -6776,24 +7280,24 @@ export default class WcfDynamicForm extends LightningElement {
             selectedTracks: this.selectedTracks,
             payloadJson: JSON.stringify(payload)
         })
-        .then(result => {
-            if (result && result.isSuccess) {
-                this.isDirty = false;
-                this.showBanner('success', 'Submitted', 'Your RFI application has been successfully submitted.');
-                this.dispatchEvent(new CustomEvent('submitted', { detail: { recordId: result.recordId } }));
-                setTimeout(() => {
-                    window.location.href = '/wcf/s/';
-                }, 1500);
-            } else {
-                this.showBanner('error', 'Submission Error', result ? result.message : 'Submission failed.');
-            }
-        })
-        .catch(err => {
-            console.error('Submit failed:', err);
-            this.showBanner('error', 'Submission Error', err.body ? err.body.message : err.message || 'Submission failed.');
-        })
-        .finally(() => {
-            this.isLoading = false;
-        });
+            .then(result => {
+                if (result && result.isSuccess) {
+                    this.isDirty = false;
+                    this.showBanner('success', 'Submitted', 'Your RFI application has been successfully submitted.');
+                    this.dispatchEvent(new CustomEvent('submitted', { detail: { recordId: result.recordId } }));
+                    setTimeout(() => {
+                        window.location.href = '/wcf/s/';
+                    }, 1500);
+                } else {
+                    this.showBanner('error', 'Submission Error', result ? result.message : 'Submission failed.');
+                }
+            })
+            .catch(err => {
+                console.error('Submit failed:', err);
+                this.showBanner('error', 'Submission Error', err.body ? err.body.message : err.message || 'Submission failed.');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
     }
 }

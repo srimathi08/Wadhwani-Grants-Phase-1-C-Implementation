@@ -999,8 +999,13 @@ export default class WcfFormPreview extends LightningElement {
         return this._val(this._app?.Attesting_User_Title__c || this._app?.Job_Title__c || this._app?.CreatedBy?.Title);
     }
     get attestingDate() {
-        return this._fmtDateTime(this._app?.Attestation_Date__c || this._app?.Initial_Submission_Date__c || this._app?.LastModifiedDate || this._app?.CreatedDate);
-    }
+    return this._fmtDateTime(
+        this._app?.Last_Resubmission_Date__c ||
+        this._app?.Initial_Submission_Date__c ||
+        this._app?.Attestation_Date__c ||
+        this._app?.CreatedDate
+    );
+}
 
     // ── Preview & Document Download Handling ─────────────────────────────────
     async handlePreview(event) {

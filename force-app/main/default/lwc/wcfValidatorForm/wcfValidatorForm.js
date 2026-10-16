@@ -148,6 +148,10 @@ const FLAG_REASONS = Object.freeze([
     { code: 'institution', value: 'Institutional credibility concern at first read', label: 'Institutional credibility concern at first read' },
     { code: 'other', value: 'Other', label: 'Other' }
 ]);
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const pad2 = n => String(n).padStart(2, '0');
+
 export default class WcfValidatorForm extends NavigationMixin(LightningElement) {
 
     @api recordId;
@@ -160,6 +164,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     @track _attestingUserName = null;
     @track _attestingUserTitle = null;
     @track _submissionDate = null;
+    @track _attestationDateTime = null;
     @track _reviewerReturnComment = null;
     @track _reviewerReturnDate = null;
     @track _applicationName = null;
@@ -502,6 +507,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             this._attestingUserName = data.attestingUserName || null;
             this._attestingUserTitle = data.attestingUserTitle || null;
             this._submissionDate = data.submissionDate || null;
+            this._attestationDateTime = data.attestationDateTime || null;
             this._applicationName = data.applicationName || null;
             this._dueDate = data.dueDate || null;
             this._appStatus = data.appStatus || null;
@@ -655,9 +661,8 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             autoIndicator = {
                 show: true,
                 stateClass: this.s1_2_stateClass,
-                icon: this.hasAttachments ? '✓' : '⚠',
-                hasAttachments: this.hasAttachments,
-                message: this.attachmentSummary
+                icon: this.s1_2_icon,
+                message: this.verificationStatus.message
             };
         } else if (q.key === 's1_3_confirm') {
             autoIndicator = {
@@ -810,14 +815,12 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     get attestingUserName() { return this._attestingUserName; }
     get attestingUserTitle() { return this._attestingUserTitle; }
 
-    get submittedDateFormatted() {
-        if (!this._submissionDate) return null;
-        return new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
-            timeZoneName: 'short'
-        }).format(new Date(this._submissionDate));
-    }
+ get submittedDateFormatted() {
+    if (!this._attestationDateTime) return null;
+    const d = new Date(this._attestationDateTime);   // ISO UTC from Apex, so no guessing
+    if (isNaN(d.getTime())) return null;
+    return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
 
     get s1_3_message() {
         const name = this.attestingUserName;
@@ -875,31 +878,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         return (this.formState.selectedQuestions || []).length > 0;
     }
 
-    get attachmentSummary() {
-        if (!this._attachments || this._attachments.length === 0) {
-            return 'Checking verification reports...';
-        }
-        return this._attachments.map(a => {
-            const displayKey = this.getDynamicQuestionKey(a.questionKey);
-            const v1 = a.v1Value || 'N/A';
-            let filePart;
-            if (a.fileName) {
-                const ext = a.fileExtension ? '.' + a.fileExtension : '';
-                const size = (a.fileSizeMB != null) ? ' (' + a.fileSizeMB + ' MB)' : '';
-                if (a.questionKey === 'Q24' || a.questionKey === 'Q15' || a.questionKey === 'Q17') {
-                    filePart = `verification report uploaded (${a.fileName}${ext}${size})`;
-                } else {
-                    filePart = `uploaded (${a.fileName}${ext}${size})`;
-                }
-            } else {
-                filePart = 'No file uploaded';
-            }
-            if (a.questionKey === 'Q24' || a.questionKey === 'Q15' || a.questionKey === 'Q17') {
-                return `${displayKey}.v1 = ${v1}; ${displayKey}.v3 ${filePart.startsWith('verification') ? '' : '— '}${filePart}`;
-            }
-            return `${displayKey}: ${filePart}`;
-        }).join('\n');
-    }
+get attachmentSummary() { return this.verificationStatus.message; }
 
     get hasAttachments() {
         return Array.isArray(this._attachments) &&
@@ -1344,11 +1323,45 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         }
         return lines.join('\n');
     }
-
-    get s1_2_stateClass() {
-        if (!this._attachments || this._attachments.length === 0) return 'wcf-auto-state wcf-auto-amber';
-        return this.hasAttachments ? 'wcf-auto-state wcf-auto-green' : 'wcf-auto-state wcf-auto-amber';
+    // S1.2: verification report status, driven by the applicant's Yes/No answer
+get verificationStatus() {
+    if (!this._attachments || this._attachments.length === 0) {
+        return { ok: false, message: 'Checking verification reports…' };
     }
+    const rows = this._attachments.filter(a => a.questionKey === 'Q24');
+    const answer = String((rows[0] && rows[0].v1Value) || '').trim().toLowerCase();
+    const files = rows.filter(a => a.fileName);
+    const label = `Independent verification of outcomes (Q${this.qNum.Q24})`;
+
+    const fileList = files.map(a => {
+        const ext = a.fileExtension ? '.' + a.fileExtension : '';
+        const size = a.fileSizeMB != null ? ` (${a.fileSizeMB} MB)` : '';
+        return `${a.fileName}${ext}${size}`;
+    }).join(', ');
+
+    if (answer === 'no' || answer.startsWith('no ')) {
+        return {
+            ok: true,
+            message: `${label}: the applicant answered "No", so no verification report is expected.`
+                + (files.length ? `\nA file was uploaded anyway: ${fileList}` : '')
+        };
+    }
+    if (answer.startsWith('yes')) {
+        return files.length
+            ? { ok: true, message: `${label}: the applicant answered "Yes" and uploaded a report: ${fileList}` }
+            : { ok: false, message: `${label}: the applicant answered "Yes" but no verification report was uploaded.` };
+    }
+    // No answer found (N/A)
+    return files.length
+        ? { ok: true, message: `${label}: report uploaded: ${fileList}` }
+        : { ok: false, message: `${label}: no answer found and no report uploaded. Please check the form.` };
+}
+    get s1_2_stateClass() {
+    return this.verificationStatus.ok
+        ? 'wcf-auto-state wcf-auto-green'
+        : 'wcf-auto-state wcf-auto-amber';
+}
+get s1_2_icon() { return this.verificationStatus.ok ? '✓' : '⚠'; }
     get s1_3_stateClass() { return 'wcf-auto-state wcf-auto-green'; }
 
        get selectedFlagReasons() {

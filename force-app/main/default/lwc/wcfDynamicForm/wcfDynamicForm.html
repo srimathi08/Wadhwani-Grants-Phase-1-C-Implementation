@@ -143,12 +143,12 @@
                             <p class="section-desc">{labels.OVERVIEW_SEC3_DESC}</p>
                         </div>
 
-                        <!-- Orange Callout Box -->
+                        <!-- Orange Callout Box 
                         <div class="orange-callout-box">
                             <span class="orange-icon">⚠</span>
                             <span>Both lines are track-neutral on purpose. The questions underneath already change by
                                 track, so the intro no longer names one.</span>
-                        </div>
+                        </div> -->
                     </div>
 
 
@@ -157,76 +157,7 @@
                     <div data-id="faq-section" class="block-divider-label faq-section-target">{labels.FAQ_SECTION_TITLE}
                     </div>
 
-                    <div class="rfi-card-box faq-card-box">
-                        <!-- FAQ 1: Job Fulfillment -->
-                        <div class="faq-item">
-                            <div class="faq-header clickable" data-faq="jobFulfillment" onclick={toggleFaq}>
-                                <span class="faq-symbol">{faqJobFulfillmentSymbol}</span>
-                                <h3 class="faq-question-text">{labels.FAQ_JF_TITLE}</h3>
-                            </div>
-                            <template if:true={isFaqJobFulfillmentOpen}>
-                                <div class="faq-content-body">
-                                    <p>Job Fulfillment means training someone, then helping them get a paid job. The
-                                        outcome is one placement: one person you trained, now working for one employer.
-                                    </p>
-                                    <div class="faq-example-box">
-                                        <strong>Example.</strong> An organization trains someone to operate machines.
-                                        That person gets a job as a machine operator at a factory. That's one Job
-                                        Fulfillment outcome.
-
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-
-                        <!-- FAQ 2: Job Creation -->
-                        <div class="faq-item">
-                            <div class="faq-header clickable" data-faq="jobCreation" onclick={toggleFaq}>
-                                <span class="faq-symbol">{faqJobCreationSymbol}</span>
-                                <h3 class="faq-question-text">{labels.FAQ_JC_TITLE}</h3>
-                            </div>
-                            <template if:true={isFaqJobCreationOpen}>
-                                <div class="faq-content-body">
-                                    <p>Job Creation means helping another business grow so it can hire more people. You
-                                        might give money, advice, mentoring, or help finding buyers. The outcome is a
-                                        new job at that business, not at yours.</p>
-                                    <div class="faq-example-box">
-                                        <strong>Example.</strong> An organization gives a small factory money and new
-                                        buyers. The factory hires three more workers to keep up. That's three Job
-                                        Creation outcomes.
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-
-                        <!-- FAQ 3: Livelihood -->
-                        <div class="faq-item">
-                            <div class="faq-header clickable" data-faq="livelihood" onclick={toggleFaq}>
-                                <span class="faq-symbol">{faqLivelihoodSymbol}</span>
-                                <h3 class="faq-question-text">{labels.FAQ_LIV_TITLE}</h3>
-                            </div>
-                            <template if:true={isFaqLivelihoodOpen}>
-                                <div class="faq-content-body">
-                                    <p>Livelihood upliftment means working with people who already earn their own money,
-                                        like a farmer or someone running a small shop, and helping them earn more. No
-                                        one is placed in a job. No new business is registered. Only their income
-                                        changes.
-
-                                        A household counts as a Livelihood outcome only when both of these are true:
-                                        yearly income is now Rs 1,00,000 or more, and that's at least 30% higher than
-                                        when the household joined. Both must be true for the same household, measured
-                                        from when it joined, not from last year. Count each household once, the first
-                                        year both are true, and never again.</p>
-                                    <div class="faq-example-box">
-                                        <strong>Example.</strong> A household joins earning Rs 84,000 a year. Three
-                                        years later it earns Rs 1,20,000 a year: over Rs 1,00,000, and about 43% higher
-                                        than when it joined. Both rules are met, so this household counts as one
-                                        Livelihood outcome, that year only.
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
+                    <c-wcf-application-faq-modal standalone category="RFI Track FAQ"></c-wcf-application-faq-modal>
 
                 </div>
             </template>
@@ -1144,8 +1075,8 @@
                                             <tr>
                                                 <td>
                                                     <strong>Balance at Start of Year</strong>
-                                                    <div class="subtext-muted">Earliest year only — chains forward
-                                                        automatically..</div>
+                                                    <div class="subtext-muted">Earliest year
+                                                        only. Later years carry forward automatically.</div>
                                                 </td>
                                                 <td>
                                                     <div class="currency-input-cell"><span
@@ -1244,32 +1175,29 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
-                                                        <div class="computed-cell"><strong>{computedEndFY3}</strong>
+                                                    <div class="currency-input-cell">
+                                                        <div class="computed-cell"><strong>{reviewEndFY3}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
-                                                        <div class="computed-cell"><strong>{computedEndFY2}</strong>
+                                                    <div class="currency-input-cell">
+                                                        <div class="computed-cell"><strong>{reviewEndFY2}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
-                                                        <div class="computed-cell"><strong>{computedEndFY1}</strong>
+                                                    <div class="currency-input-cell">
+                                                        <div class="computed-cell"><strong>{reviewEndFY1}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div class="subtext-muted" style="margin-top: 8px; font-style: italic;">You enter 7
-                                        numbers (1 start balance + 3 revenues + 3 expenses); the remaining cells fill
-                                        automatically.</div>
+                                    <div class="subtext-muted" style="margin-top: 8px; font-style: italic;">You enter 10
+                                        numbers (1 start balance, 3 revenues, 3 capital expenditures and 3 operating
+                                        expenditures); the remaining cells fill automatically.</div>
                                 </div>
                             </div>
 
@@ -1312,10 +1240,9 @@
                                                             data-key="CFY_REV_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
+                                                    <div class="currency-input-cell">
                                                         <div class="computed-cell">
-                                                            <strong>{computedRevDeviation}</strong>
+                                                            <strong>{reviewRevDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1339,10 +1266,9 @@
                                                             data-key="CFY_CAP_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
+                                                    <div class="currency-input-cell">
                                                         <div class="computed-cell">
-                                                            <strong>{computedCapDeviation}</strong>
+                                                            <strong>{reviewCapDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1366,10 +1292,9 @@
                                                             data-key="CFY_OP_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
+                                                    <div class="currency-input-cell">
                                                         <div class="computed-cell">
-                                                            <strong>{computedOpDeviation}</strong>
+                                                            <strong>{reviewOpDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1380,25 +1305,22 @@
                                                     <div class="subtext-muted">Auto-computed</div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
-                                                        <div class="computed-cell"><strong>{computedNetBudget}</strong>
+                                                    <div class="currency-input-cell">
+                                                        <div class="computed-cell"><strong>{reviewNetBudget}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
+                                                    <div class="currency-input-cell">
                                                         <div class="computed-cell">
-                                                            <strong>{computedNetProjection}</strong>
+                                                            <strong>{reviewNetProjection}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell"><span
-                                                            class="currency-prefix">$</span>
+                                                    <div class="currency-input-cell">
                                                         <div class="computed-cell">
-                                                            <strong>{computedNetDeviation}</strong>
+                                                            <strong>{reviewNetDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -3355,33 +3277,33 @@
                                         <tbody>
                                             <tr>
                                                 <td>Balance at Start of Year</td>
-                                                <td>${previewStartFY3}</td>
-                                                <td>${computedStartFY2}</td>
-                                                <td>${computedStartFY1}</td>
+                                                <td>{reviewStartFY3}</td>
+                                                <td>{reviewStartFY2}</td>
+                                                <td>{reviewStartFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Revenue</td>
-                                                <td>${previewRevFY3}</td>
-                                                <td>${previewRevFY2}</td>
-                                                <td>${previewRevFY1}</td>
+                                                <td>{reviewRevFY3}</td>
+                                                <td>{reviewRevFY2}</td>
+                                                <td>{reviewRevFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Capital Expenditure</td>
-                                                <td>${previewCapFY3}</td>
-                                                <td>${previewCapFY2}</td>
-                                                <td>${previewCapFY1}</td>
+                                                <td>{reviewCapFY3}</td>
+                                                <td>{reviewCapFY2}</td>
+                                                <td>{reviewCapFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Operating Expenditure</td>
-                                                <td>${previewOpFY3}</td>
-                                                <td>${previewOpFY2}</td>
-                                                <td>${previewOpFY1}</td>
+                                                <td>{reviewOpFY3}</td>
+                                                <td>{reviewOpFY2}</td>
+                                                <td>{reviewOpFY1}</td>
                                             </tr>
                                             <tr>
                                                 <td>Balance at End of Year</td>
-                                                <td>${computedEndFY3}</td>
-                                                <td>${computedEndFY2}</td>
-                                                <td>${computedEndFY1}</td>
+                                                <td>{reviewEndFY3}</td>
+                                                <td>{reviewEndFY2}</td>
+                                                <td>{reviewEndFY1}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -3404,27 +3326,27 @@
                                         <tbody>
                                             <tr>
                                                 <td>Revenue</td>
-                                                <td>${previewCfyRevBudget}</td>
-                                                <td>${previewCfyRevProj}</td>
-                                                <td>${computedRevDeviation}</td>
+                                                <td>{reviewCfyRevBudget}</td>
+                                                <td>{reviewCfyRevProj}</td>
+                                                <td>{reviewRevDeviation}</td>
                                             </tr>
                                             <tr>
                                                 <td>Capital Expenditure</td>
-                                                <td>${previewCfyCapBudget}</td>
-                                                <td>${previewCfyCapProj}</td>
-                                                <td>${computedCapDeviation}</td>
+                                                <td>{reviewCfyCapBudget}</td>
+                                                <td>{reviewCfyCapProj}</td>
+                                                <td>{reviewCapDeviation}</td>
                                             </tr>
                                             <tr>
                                                 <td>Operating Expenditure</td>
-                                                <td>${previewCfyOpBudget}</td>
-                                                <td>${previewCfyOpProj}</td>
-                                                <td>${computedOpDeviation}</td>
+                                                <td>{reviewCfyOpBudget}</td>
+                                                <td>{reviewCfyOpProj}</td>
+                                                <td>{reviewOpDeviation}</td>
                                             </tr>
                                             <tr>
                                                 <td>Revenue - Expense Net</td>
-                                                <td>${computedNetBudget}</td>
-                                                <td>${computedNetProjection}</td>
-                                                <td>${computedNetDeviation}</td>
+                                                <td>{reviewNetBudget}</td>
+                                                <td>{reviewNetProjection}</td>
+                                                <td>{reviewNetDeviation}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -3540,9 +3462,9 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg Cost per Placement</td>
-                                                    <td>${previewJfCostFY3}</td>
-                                                    <td>${previewJfCostFY2}</td>
-                                                    <td>${previewJfCostFY1}</td>
+                                                    <td>{reviewJfCostFY3}</td>
+                                                    <td>{reviewJfCostFY2}</td>
+                                                    <td>{reviewJfCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3575,7 +3497,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg Cost per Placement</td>
-                                                    <td>${previewJfCostProj}</td>
+                                                    <td>{reviewJfCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3683,9 +3605,9 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Total Avg Cost per Job Created</td>
-                                                    <td>${previewJcCostFY3}</td>
-                                                    <td>${previewJcCostFY2}</td>
-                                                    <td>${previewJcCostFY1}</td>
+                                                    <td>{reviewJcCostFY3}</td>
+                                                    <td>{reviewJcCostFY2}</td>
+                                                    <td>{reviewJcCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3722,7 +3644,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Total Avg Cost per Job Created</td>
-                                                    <td>${previewJcCostProj}</td>
+                                                    <td>{reviewJcCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3857,9 +3779,9 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg. cost per outcome (USD)</td>
-                                                    <td>${previewLivCostFY3}</td>
-                                                    <td>${previewLivCostFY2}</td>
-                                                    <td>${previewLivCostFY1}</td>
+                                                    <td>{reviewLivCostFY3}</td>
+                                                    <td>{reviewLivCostFY2}</td>
+                                                    <td>{reviewLivCostFY1}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -3892,7 +3814,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>Avg. cost per outcome (USD) - projected</td>
-                                                    <td>${previewLivCostProj}</td>
+                                                    <td>{reviewLivCostProj}</td>
                                                 </tr>
                                             </tbody>
                                         </table>

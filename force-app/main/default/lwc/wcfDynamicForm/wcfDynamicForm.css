@@ -299,6 +299,11 @@ p, span, label, input, button, select, textarea, .q-subtitle, .section-desc, .fa
     margin-bottom: 20px;
 }
 
+c-wcf-application-faq-modal {
+    display: block;
+    width: 100%;
+}
+
 .q-title {
     font-size: 1.15rem;
     font-weight: var(--wg-weight-bold);
@@ -1955,61 +1960,6 @@ lightning-textarea:focus-within {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-}
-
-/* ── FAQ Accordion (Block 3) ── */
-.faq-card-box {
-    padding: 12px 20px;
-}
-
-.faq-item {
-    border-bottom: 1px solid var(--wg-border);
-    padding: 14px 0;
-}
-
-.faq-item:last-child {
-    border-bottom: none;
-}
-
-.faq-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.faq-symbol {
-    font-size: 1.25rem;
-    font-weight: var(--wg-weight-bold);
-    color: var(--wg-red);
-    width: 20px;
-    text-align: center;
-    line-height: 1;
-}
-
-.faq-question-text {
-    font-size: 1.05rem;
-    font-weight: var(--wg-weight-semibold);
-    color: var(--wg-text-muted);
-    margin: 0;
-}
-
-.faq-content-body {
-    padding: 12px 0 6px 32px;
-    font-size: 0.92rem;
-    color: var(--wg-text-muted);
-    line-height: 1.6;
-}
-
-.faq-example-box {
-    margin-top: 10px;
-    background: #f7fafc;
-    border-left: 3px solid var(--wg-red);
-    padding: 10px 14px;
-    border-radius: 0 6px 6px 0;
-    font-size: 0.88rem;
-    color: var(--wg-text-muted);
 }
 
 /* ── In-component toast banner (replaces native ShowToastEvent) ──

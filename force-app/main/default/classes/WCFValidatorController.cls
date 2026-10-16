@@ -423,6 +423,7 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public String attestingUserName;
         @AuraEnabled public String attestingUserTitle;
         @AuraEnabled public String submissionDate;
+        @AuraEnabled public Datetime attestationDateTime;
         @AuraEnabled public String applicationName;
         @AuraEnabled public String dueDate;
         @AuraEnabled public String appStatus;
@@ -759,7 +760,7 @@ public without sharing class WCFValidatorController {
                    Registration_Jurisdiction__c, Incorporation_Date__c, Legal_Structure__c,
                    Has_501c3_Status__c, Has_Equivalency_Determination__c,
                    Is_FCRA_Registered__c, Willing_to_Pursue_ED__c,
-                   Fiscal_Month__c, Fiscal_Day__c
+                   Fiscal_Month__c, Fiscal_Day__c , Attestation_Date__c,Last_Resubmission_Date__c
             FROM IndividualApplication 
             WHERE Id = :applicationId 
             WITH SYSTEM_MODE
@@ -773,6 +774,14 @@ public without sharing class WCFValidatorController {
             wrapper.submissionDate     = app.Initial_Submission_Date__c != null
                                          ? String.valueOf(app.Initial_Submission_Date__c) 
                                          : null;
+            // Resubmitted applications show the latest resubmission; first-time submissions show the initial one.
+// Attestation_Date__c is kept only as a last-resort fallback.
+// Attestation is locked to the ORIGINAL submission. Resubmissions must not move it.
+Datetime lockedAttestation = app.Initial_Submission_Date__c;
+if (lockedAttestation == null) {
+    lockedAttestation = app.Attestation_Date__c;   // fallback for older records
+}
+wrapper.attestationDateTime = lockedAttestation;
             wrapper.applicationName = app.Name;
             wrapper.dueDate         = app.Due_Date__c != null ? String.valueOf(app.Due_Date__c) : null;
             wrapper.appStatus       = app.Status;
@@ -1119,7 +1128,7 @@ public without sharing class WCFValidatorController {
             'GenieAI_Interest_Level__c',
             'Operational_Synergies_with_WOF__c', 'Operational_Synergies_with_WOF_JC__c', 'Operational_Synergies_with_WOF_Both__c',
             'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Initial_Submission_Date__c', 'Attestation_Date__c',
-            'CreatedDate', 'LastModifiedDate', 'CreatedBy.Name', 'CreatedBy.Title'
+            'CreatedDate', 'LastModifiedDate', 'CreatedBy.Name', 'CreatedBy.Title','Last_Resubmission_Date__c'
         };
 
         Map<String, Schema.SObjectField> appFieldMap = Schema.SObjectType.IndividualApplication.fields.getMap();

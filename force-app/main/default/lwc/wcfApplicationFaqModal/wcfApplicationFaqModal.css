@@ -68,9 +68,14 @@
     padding: 24px;
 }
 
+:host {
+    display: block;
+    width: 100%;
+}
+
 .faq-page-standalone {
-    max-width: 960px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
     padding: 0;
 }
 
@@ -78,9 +83,11 @@
 .rfi-card-box {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 24px;
     margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -90,9 +97,9 @@
     gap: 0;
 }
 
-/* ── Accordion Items (Dashed Dividers matching Block 3) ── */
+/* ── Accordion Items (Dividers matching Block 3) ── */
 .faq-item {
-    border-bottom: 1px dashed #cbd5e1;
+    border-bottom: 1px solid #edf2f7;
     padding-bottom: 16px;
     margin-bottom: 16px;
 }
@@ -107,7 +114,7 @@
 .faq-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 2px 0;
     transition: color 0.15s ease;
 }
@@ -118,16 +125,16 @@
 }
 
 .faq-header:hover .faq-question-text {
-    color: #ea580c;
+    color: #8A1C1C;
 }
 
 /* ── Symbol (- / +) on the left ── */
 .faq-symbol {
     font-weight: 700;
-    color: #c2410c;
-    font-size: 16px;
+    color: #8A1C1C;
+    font-size: 1.25rem;
     line-height: 1;
-    min-width: 14px;
+    min-width: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -136,8 +143,8 @@
 /* ── Question Title Text ── */
 .faq-question-text {
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 600;
     color: #1e293b;
     margin: 0;
     line-height: 1.4;
@@ -146,16 +153,16 @@
 /* ── Content Body (Indented under Question) ── */
 .faq-content-body {
     padding-top: 10px;
-    padding-left: 24px;
+    padding-left: 32px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 0.92rem;
     color: #475569;
     line-height: 1.6;
 }
 
 .faq-content-body p {
     margin: 0 0 8px 0;
-    font-size: 14px;
+    font-size: 0.92rem;
     color: #475569;
     line-height: 1.6;
 }
@@ -164,11 +171,11 @@
 .faq-content-body .faq-example-box,
 .faq-content-body .example-box {
     background: #f8fafc;
-    border-left: 3px solid #f97316;
+    border-left: 3px solid #8A1C1C;
     padding: 10px 14px;
     margin-top: 10px;
     margin-bottom: 4px;
-    font-size: 13.5px;
+    font-size: 0.88rem;
     color: #334155;
     line-height: 1.5;
     border-radius: 0 6px 6px 0;
