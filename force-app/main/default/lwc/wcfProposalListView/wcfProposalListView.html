@@ -130,7 +130,8 @@
                                                     data-action={p.reviewAction}
                                                     data-headquarters={p.Headquarters_City_and_Country__c}
                                                     data-track={p.trackParam}
-                                                    disabled={p.isRejected}
+                                                    disabled={p.isDisabled}
+                                                    title={p.actionTitle}
                                                     onclick={handleReviewAction}>
                                                     <lightning-icon icon-name={p.actionIcon} size="xx-small" alternative-text=""></lightning-icon>
                                                     {p.actionLabel}

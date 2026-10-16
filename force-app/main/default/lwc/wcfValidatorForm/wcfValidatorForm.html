@@ -534,120 +534,96 @@
                             <h2 class="preview-modal-title">Confirm your decision</h2>
                         </header>
 
-                        <div class="slds-modal__content preview-container">
+                       <div class="slds-modal__content preview-container">
 
-                            <!-- Completeness Check -->
-                            <div class="preview-section">
-                                <h3>Completeness check</h3>
-                                <div class="preview-item">
-                                    <span class="label">Mandatory fields</span>
-                                    <span class="value">{formState.s1_1_confirm}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Verification reports</span>
-                                    <span class="value">{formState.s1_2_confirm}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Attestation</span>
-                                    <span class="value">{formState.s1_3_confirm}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Content gap</span>
-                                    <span class="value">{formState.s1_4_text}</span>
-                                </div>
+    <!-- Completeness check -->
+    <div class="preview-section">
+        <h3>{previewCompleteness.title}</h3>
+        <template for:each={previewCompleteness.rows} for:item="row">
+            <div key={row.key} class="preview-item">
+                <span class="label">{row.label}</span>
+                <span class="value">{row.value}</span>
+            </div>
+        </template>
+    </div>
+
+    <!-- Eligibility -->
+    <div class="preview-section">
+        <h3>{previewEligibility.title}</h3>
+        <template for:each={previewEligibility.rows} for:item="row">
+            <div key={row.key} class="preview-item">
+                <span class="label">{row.label}</span>
+                <span class="value">{row.value}</span>
+            </div>
+        </template>
+    </div>
+
+    <!-- Decision (unchanged from your current file) -->
+    <div class="preview-section decision-section">
+        <h3>Decision</h3>
+        <div class="decision-card">
+            <div class="decision-title">{formState.s3_1}</div>
+            <div class="decision-rationale">{formState.s3_2}</div>
+        </div>
+
+        <template if:true={showReturnSection}>
+            <template if:true={hasPreviewQuestions}>
+                <div class="preview-subsection">
+                    <h4>Return reasons by question</h4>
+                    <div class="preview-qnum-pills">
+                        <template for:each={previewQuestionCards} for:item="card">
+                            <span key={card.key} class="preview-qnum-pill">Q{card.num}</span>
+                        </template>
+                    </div>
+                    <template for:each={previewQuestionCards} for:item="card">
+                        <div key={card.key} class="preview-qcard">
+                            <div class="preview-qcard-header">
+                                <span class="preview-qcard-num">Q{card.num}</span>
+                                <span class="preview-qcard-label">{card.label} — Return Reason</span>
                             </div>
-
-                            <!-- Eligibility -->
-                            <div class="preview-section">
-                                <h3>Eligibility assessment</h3>
-                                <div class="preview-item">
-                                    <span class="label">Geography</span>
-                                    <span class="value">{formState.s2_1}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Mandate fit</span>
-                                    <span class="value">{formState.s2_2}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Blocking concern</span>
-                                    <span class="value">{formState.s2_3}</span>
-                                </div>
-                                <template if:true={showS2_3_text}>
-                                    <div class="preview-item">
-                                        <span class="label">Concern details</span>
-                                        <span class="value">{formState.s2_3_text}</span>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <!-- Decision -->
-                            <div class="preview-section decision-section">
-                                <h3>Decision</h3>
-                                <div class="decision-card">
-                                    <div class="decision-title">{formState.s3_1}</div>
-                                    <div class="decision-rationale">{formState.s3_2}</div>
-                                </div>
-
-                                <template if:true={showReturnSection}>
-                                    <template if:true={hasPreviewQuestions}>
-                                        <div class="preview-subsection">
-                                            <h4>Return reasons by question</h4>
-                                            <div class="preview-qnum-pills">
-                                                <template for:each={previewQuestionCards} for:item="card">
-                                                    <span key={card.key} class="preview-qnum-pill">Q{card.num}</span>
-                                                </template>
-                                            </div>
-
-                                            <template for:each={previewQuestionCards} for:item="card">
-                                                <div key={card.key} class="preview-qcard">
-                                                    <div class="preview-qcard-header">
-                                                        <span class="preview-qcard-num">Q{card.num}</span>
-                                                        <span class="preview-qcard-label">{card.label} — Return Reason</span>
-                                                    </div>
-                                                    <div class="preview-qcard-text">{card.text}</div>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </template>
-                                </template>
-
-                                <template if:true={showFlagSection}>
-                                    <div class="preview-subsection">
-                                        <h4>Flag reasons</h4>
-                                        <template for:each={selectedFlagReasons} for:item="reason">
-                                            <span key={reason} class="preview-tag">{reason}</span>
-                                        </template>
-                                    </div>
-                                    <template if:true={showFlagOther}>
-                                        <div class="preview-subsection">
-                                            <h4>Other concern</h4>
-                                            <div class="preview-notes">{formState.s3_4}</div>
-                                        </div>
-                                    </template>
-                                </template>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="preview-section">
-                                <h3>Application tags</h3>
-                                <div class="preview-item">
-                                    <span class="label">Source channel</span>
-                                    <span class="value">{formState.s4_1}</span>
-                                </div>
-                                <div class="preview-item">
-                                    <span class="label">Budget range</span>
-                                    <span class="value">{formState.s4_2}</span>
-                                </div>
-                            </div>
-
-                            <!-- Notes -->
-                            <div class="preview-section">
-                                <h3>Notes for reviewers</h3>
-                                <div class="preview-notes">{formState.s5_1}</div>
-                            </div>
-
+                            <div class="preview-qcard-text">{card.text}</div>
                         </div>
+                    </template>
+                </div>
+            </template>
+        </template>
 
+        <template if:true={showFlagSection}>
+            <div class="preview-subsection">
+                <h4>Flag reasons</h4>
+                <template for:each={selectedFlagReasons} for:item="reason">
+                    <span key={reason} class="preview-tag">{reason}</span>
+                </template>
+            </div>
+            <template if:true={showFlagOther}>
+                <div class="preview-subsection">
+                    <h4>Other concern</h4>
+                    <div class="preview-notes">{formState.s3_4}</div>
+                </div>
+            </template>
+        </template>
+    </div>
+
+    <!-- Application tags -->
+    <div class="preview-section">
+        <h3>{previewTags.title}</h3>
+        <template for:each={previewTags.rows} for:item="row">
+            <div key={row.key} class="preview-item">
+                <span class="label">{row.label}</span>
+                <span class="value">{row.value}</span>
+            </div>
+        </template>
+    </div>
+
+    <!-- Notes (only when the form shows Section 5, i.e. Pass or Flag) -->
+    <template if:true={showNotesSection}>
+        <div class="preview-section">
+            <h3>{previewNotesTitle}</h3>
+            <div class="preview-notes">{formState.s5_1}</div>
+        </div>
+    </template>
+
+</div>
                         <footer class="slds-modal__footer">
                             <lightning-button
                                 label="Back to edit"

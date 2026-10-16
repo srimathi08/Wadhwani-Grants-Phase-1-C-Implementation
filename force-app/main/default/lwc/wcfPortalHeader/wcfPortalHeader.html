@@ -1,4 +1,18 @@
 <template>
+
+    <!-- Redirect mask: covers Home while the role resolves and the user is forwarded -->
+    <template if:true={showRedirectOverlay}>
+        <div class="wcf-redirect" role="status" aria-live="polite">
+            <div class="wcf-redirect__card">
+                <img class="wcf-redirect__logo" src={logoUrl} alt="Wadhwani Foundation" />
+                <div class="wcf-redirect__bar">
+                    <span class="wcf-redirect__bar-fill"></span>
+                </div>
+                <p class="wcf-redirect__text">Taking you to your dashboard&hellip;</p>
+            </div>
+        </div>
+    </template>
+
     <header class="wcf-header">
 
         <!-- Brand thread: quiet 3px signature in the three brand colors -->
@@ -6,7 +20,7 @@
 
         <div class="wcf-header__inner">
 
-            <!-- Logo -->
+            <!-- Logo: routes to the user's own dashboard (see homeHref) -->
             <a href={homeHref} class="wcf-header__logo">
                 <img src={logoUrl} alt="Wadhwani Foundation" />
             </a>
@@ -25,9 +39,11 @@
             <template if:false={isLoading}>
                 <nav class="wcf-header__nav" aria-label="Primary">
 
+                    <!-- Home tab hidden per client request. Restore by uncommenting.
                     <a href={homeHref} class="wcf-nav-item">
                         Home
                     </a>
+                    -->
 
                     <template if:true={showValidatorTabs}>
                         <a href={urls.validatorDashboard} class="wcf-nav-item">
@@ -47,9 +63,14 @@
                         </a>
                     </template>
 
+                    <template for:each={inlineItems} for:item="item">
+    <a key={item.key} href={item.url} class="wcf-nav-item">
+        {item.label}
+    </a>
+</template>
+
                     <!-- More — contents differ per role, hidden when empty -->
                     <template if:true={showMore}>
-
                         <div class="wcf-nav-item--dropdown">
 
                             <button
@@ -65,14 +86,11 @@
                                     size="x-small"
                                     class="wcf-header__icon wcf-header__icon--chevron">
                                 </lightning-icon>
-
                             </button>
 
                             <template if:true={isMoreOpen}>
-
                                 <div class="wcf-dropdown">
-
-                                    <template for:each={moreItems} for:item="item">
+                                    <template for:each={dropdownItems} for:item="item">
                                         <a
                                             key={item.key}
                                             href={item.url}
@@ -85,82 +103,72 @@
                                             {item.label}
                                         </a>
                                     </template>
-
                                 </div>
-
                             </template>
 
                         </div>
-
                     </template>
 
                 </nav>
-
             </template>
 
-            <!-- ========================= -->
             <!-- Role switcher + Profile -->
-            <!-- ========================= -->
-
             <div class="wcf-header__actions">
 
                 <template if:false={isLoading}>
-                   <template if:true={showRoleChip}>
+                    <template if:true={showRoleChip}>
+                        <div class="wcf-role">
 
-    <div class="wcf-role">
+                            <!-- Multiple roles: interactive switcher -->
+                            <template if:true={isRoleSwitchable}>
 
-        <!-- Multiple roles: interactive switcher -->
-        <template if:true={isRoleSwitchable}>
+                                <button
+                                    class="wcf-role__trigger"
+                                    onclick={toggleRole}
+                                    aria-expanded={isRoleOpen}
+                                    aria-haspopup="true">
 
-            <button
-                class="wcf-role__trigger"
-                onclick={toggleRole}
-                aria-expanded={isRoleOpen}
-                aria-haspopup="true">
+                                    <span class="wcf-role__eyebrow">Viewing as</span>
+                                    <span class="wcf-role__value">{activeRoleLabel}</span>
 
-                <span class="wcf-role__eyebrow">Viewing as</span>
-                <span class="wcf-role__value">{activeRoleLabel}</span>
+                                    <lightning-icon
+                                        icon-name="utility:chevrondown"
+                                        size="xx-small"
+                                        class="wcf-header__icon wcf-header__icon--chevron">
+                                    </lightning-icon>
+                                </button>
 
-                <lightning-icon
-                    icon-name="utility:chevrondown"
-                    size="xx-small"
-                    class="wcf-header__icon wcf-header__icon--chevron">
-                </lightning-icon>
+                                <template if:true={isRoleOpen}>
+                                    <div class="wcf-dropdown wcf-dropdown--right wcf-dropdown--role" role="menu">
+                                        <p class="wcf-dropdown__label">Switch role</p>
+                                        <template for:each={roleOptions} for:item="option">
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                role="menuitem"
+                                                class={option.cssClass}
+                                                data-role={option.value}
+                                                aria-current={option.isSelected}
+                                                onclick={handleRoleSelect}>
+                                                <span class="wcf-role__dot"></span>
+                                                {option.label}
+                                            </button>
+                                        </template>
+                                    </div>
+                                </template>
 
-            </button>
+                            </template>
 
-            <template if:true={isRoleOpen}>
-                <div class="wcf-dropdown wcf-dropdown--right wcf-dropdown--role" role="menu">
-                    <p class="wcf-dropdown__label">Switch role</p>
-                    <template for:each={roleOptions} for:item="option">
-                        <button
-                            key={option.value}
-                            type="button"
-                            role="menuitem"
-                            class={option.cssClass}
-                            data-role={option.value}
-                            aria-current={option.isSelected}
-                            onclick={handleRoleSelect}>
-                            <span class="wcf-role__dot"></span>
-                            {option.label}
-                        </button>
+                            <!-- Single role: static label, nothing to open -->
+                            <template if:false={isRoleSwitchable}>
+                                <div class="wcf-role__trigger wcf-role__trigger--static">
+                                    <span class="wcf-role__eyebrow">Viewing as</span>
+                                    <span class="wcf-role__value">{activeRoleLabel}</span>
+                                </div>
+                            </template>
+
+                        </div>
                     </template>
-                </div>
-            </template>
-
-        </template>
-
-        <!-- Single role: static label, nothing to open -->
-        <template if:false={isRoleSwitchable}>
-            <div class="wcf-role__trigger wcf-role__trigger--static">
-                <span class="wcf-role__eyebrow">Viewing as</span>
-                <span class="wcf-role__value">{activeRoleLabel}</span>
-            </div>
-        </template>
-
-    </div>
-
-</template>
                 </template>
 
                 <div class="wcf-profile">
@@ -177,11 +185,9 @@
                             size="x-small"
                             class="wcf-header__icon">
                         </lightning-icon>
-
                     </button>
 
                     <template if:true={isProfileOpen}>
-
                         <div class="wcf-dropdown wcf-dropdown--right">
 
                             <template if:true={isGuestUser}>
@@ -203,7 +209,6 @@
                             </template>
 
                         </div>
-
                     </template>
 
                 </div>

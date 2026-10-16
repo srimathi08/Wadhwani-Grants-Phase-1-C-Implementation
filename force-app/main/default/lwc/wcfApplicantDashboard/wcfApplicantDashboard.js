@@ -143,33 +143,33 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
 
     // ── Approval / Stage 4 data ────────────────────────────────────────
     @track approvalDate;
-    @track mouStatus       = 'Pending';   // Pending | Active | Expired
+    @track mouStatus = 'Pending';   // Pending | Active | Expired
     @track mouVolodyLink;
     @track mouDownloadUrl;
     @track mouFileName;
     @track mouDocumentId;
-    @track mouFileSize     = '1.2 MB';
+    @track mouFileSize = '1.2 MB';
     @track complianceUploaded = 0;
-    @track complianceTotal    = 6;        // Default; overridden from Apex
+    @track complianceTotal = 6;        // Default; overridden from Apex
     @track complianceStatus;
     @track complianceReviewerNotes;
     @track complianceDocStatus;
     @track complianceHasUploads = false;
 
     // ── View flags ────────────────────────────────────────────────────
-    @track showWelcomeView    = false;
-    @track showFormView       = false;
-    @track showRevisionView   = false;
-    @track showPreviewView    = false;
+    @track showWelcomeView = false;
+    @track showFormView = false;
+    @track showRevisionView = false;
+    @track showPreviewView = false;
     @track showComplianceView = false;
-    @track selectedLanguage   = 'en_US';
+    @track selectedLanguage = 'en_US';
 
     @track questionReturnNotes = [];
 
     @track showEligibilityModal = false;
     @track showFaqModal = false;
     @track rawStatus;
-    @track reviewerReturnComment;   
+    @track reviewerReturnComment;
 
     // Fallback page order, used only when the selected tracks can't be read
     // from selectedFundingArea (see activePageSequence).
@@ -253,25 +253,25 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     // outcomes. The VALUES are the Custom Labels from your notepad.
     decidedStatusLabelMap = {
         'Not Recommend for Fund': CL_Not_Recommend_for_Fund,
-        'Reviewer Rejected':      CL_Reviewer_Rejected,
+        'Reviewer Rejected': CL_Reviewer_Rejected,
     };
 
     // ─────────────────────────────────────────────────────────────────
     // Lifecycle
     // ─────────────────────────────────────────────────────────────────
 
-connectedCallback() {
-    const shouldResume = sessionStorage.getItem('wcf_resume_after_redirect');
-    if (shouldResume === 'true') {
-        sessionStorage.removeItem('wcf_resume_after_redirect');
-        this._pendingResume = true;
-        
-    }
-    this.loadStatus();
-    this.resolvePageUrls();
-}
+    connectedCallback() {
+        const shouldResume = sessionStorage.getItem('wcf_resume_after_redirect');
+        if (shouldResume === 'true') {
+            sessionStorage.removeItem('wcf_resume_after_redirect');
+            this._pendingResume = true;
 
-resolvePageUrls() {
+        }
+        this.loadStatus();
+        this.resolvePageUrls();
+    }
+
+    resolvePageUrls() {
         this[NavigationMixin.GenerateUrl]({
             type: 'comm__namedPage',
             attributes: { name: 'ApplicationFAQ__c' } // must match the page's exact API name
@@ -285,22 +285,22 @@ resolvePageUrls() {
 
     loadStatus() {
         this.isLoading = true;
-       return  getApplicationStatusForUser()
+        return getApplicationStatusForUser()
             .then(result => {
                 console.log('FULL RESULT:', JSON.stringify(result));
 
-                this.normalizedStatus    = result.status;
-                this.recordId            = result.recordId;
-                this.applicationName     = result.applicationName;
-                this.organizationName    = result.organizationName;
-                this.headquarters        = result.headquarters;
+                this.normalizedStatus = result.status;
+                this.recordId = result.recordId;
+                this.applicationName = result.applicationName;
+                this.organizationName = result.organizationName;
+                this.headquarters = result.headquarters;
                 this.selectedFundingArea = result.selectedFundingArea;
-                this.submitterName       = result.submitterName;
-                this.lastModified        = result.lastModified;
-                this.createdDate         = result.createdDate;
-                this.lastPage            = result.lastPage;
-                this.programmeLeadName   = result.programmeLeadName;
-                this.programmeLeadEmail  = result.programmeLeadEmail;
+                this.submitterName = result.submitterName;
+                this.lastModified = result.lastModified;
+                this.createdDate = result.createdDate;
+                this.lastPage = result.lastPage;
+                this.programmeLeadName = result.programmeLeadName;
+                this.programmeLeadEmail = result.programmeLeadEmail;
                 this.rawStatus = result.rawStatus;
 
                 // Revision data
@@ -317,25 +317,25 @@ resolvePageUrls() {
                     this.questionReturnNotes = result.questionReturnNotes;
                 }
                 if (result.reviewerReturnComment) {
-    this.reviewerReturnComment = result.reviewerReturnComment;
-}
+                    this.reviewerReturnComment = result.reviewerReturnComment;
+                }
 
                 // Stage 4 Approval data
                 // Apex should return these when status === 'Approved'
-                if (result.approvalDate)       { this.approvalDate       = result.approvalDate; }
-                if (result.mouStatus)          { this.mouStatus          = result.mouStatus; }
-                if (result.mouVolodyLink)      { this.mouVolodyLink      = result.mouVolodyLink; }
-                if (result.mouDownloadUrl)     { this.mouDownloadUrl     = result.mouDownloadUrl; }
-                if (result.mouFileName)        { this.mouFileName        = result.mouFileName; }
-                if (result.mouDocumentId)      { this.mouDocumentId      = result.mouDocumentId; }
-                if (result.mouFileSize)        { this.mouFileSize        = result.mouFileSize; }
+                if (result.approvalDate) { this.approvalDate = result.approvalDate; }
+                if (result.mouStatus) { this.mouStatus = result.mouStatus; }
+                if (result.mouVolodyLink) { this.mouVolodyLink = result.mouVolodyLink; }
+                if (result.mouDownloadUrl) { this.mouDownloadUrl = result.mouDownloadUrl; }
+                if (result.mouFileName) { this.mouFileName = result.mouFileName; }
+                if (result.mouDocumentId) { this.mouDocumentId = result.mouDocumentId; }
+                if (result.mouFileSize) { this.mouFileSize = result.mouFileSize; }
                 if (result.complianceUploaded != null) { this.complianceUploaded = result.complianceUploaded; }
-                if (result.complianceTotal    != null) { this.complianceTotal    = result.complianceTotal; }
+                if (result.complianceTotal != null) { this.complianceTotal = result.complianceTotal; }
                 this.complianceStatus = result.complianceStatus;
                 this.complianceReviewerNotes = result.complianceReviewerNotes;
-                this.complianceDocStatus     = result.complianceDocStatus;
-                this.complianceHasUploads    = result.complianceHasUploads === true;
-                        })
+                this.complianceDocStatus = result.complianceDocStatus;
+                this.complianceHasUploads = result.complianceHasUploads === true;
+            })
             .then(() => this.syncComplianceFromChecklist())
             .catch(error => {
                 console.error('Error loading application status', error);
@@ -344,9 +344,9 @@ resolvePageUrls() {
             .finally(() => {
                 this.isLoading = false;
                 if (this._pendingResume) {
-                this._pendingResume = false;
-                this.showFormView = true;   // only flip AFTER recordId is populated
-            }
+                    this._pendingResume = false;
+                    this.showFormView = true;   // only flip AFTER recordId is populated
+                }
             });
     }
     // The compliance screen's own Apex is the source of truth for compliance
@@ -380,7 +380,7 @@ resolvePageUrls() {
             .slice()
             .sort((a, b) => a.questionNum - b.questionNum)
             .map(n => ({
-                key  : n.questionNum,
+                key: n.questionNum,
                 label: `Q${n.questionNum} — ${n.returnText}`
             }));
     }
@@ -432,11 +432,11 @@ resolvePageUrls() {
     }
 
     get isApproved() {
-    const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
-    const approvedFamily = ['approved', 'onboardinginitiated', 'onboardinginprogress',
-        'compliancereview', 'onboardingapproved', 'onboarded'];
-    return approvedFamily.includes(s) && !this.isOverlayOpen;
-}
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        const approvedFamily = ['approved', 'onboardinginitiated', 'onboardinginprogress',
+            'compliancereview', 'onboardingapproved', 'onboarded'];
+        return approvedFamily.includes(s) && !this.isOverlayOpen;
+    }
 
     get isDecided() {
         return this.normalizedStatus === 'Decided' && !this.isOverlayOpen;
@@ -479,8 +479,8 @@ resolvePageUrls() {
     get activePageSequence() {
         const area = String(this.selectedFundingArea || '').toUpperCase();
         const hasJobFulfillment = area.includes('FULFILLMENT') || area.includes('FULFILMENT');
-        const hasJobCreation    = area.includes('CREATION');
-        const hasLivelihood     = area.includes('LIVELIHOOD');
+        const hasJobCreation = area.includes('CREATION');
+        const hasLivelihood = area.includes('LIVELIHOOD');
 
         if (!hasJobFulfillment && !hasJobCreation && !hasLivelihood) {
             return this.pageSequence;
@@ -488,8 +488,8 @@ resolvePageUrls() {
 
         const sequence = [1];
         if (hasJobFulfillment) sequence.push(2);
-        if (hasJobCreation)    sequence.push(4);
-        if (hasLivelihood)     sequence.push(5);
+        if (hasJobCreation) sequence.push(4);
+        if (hasLivelihood) sequence.push(5);
         sequence.push(6, 7);
         return sequence;
     }
@@ -541,8 +541,8 @@ resolvePageUrls() {
     // Display helpers — Stage 4 Approved card
     // ─────────────────────────────────────────────────────────────────
     get decidedStatusLabel() {
-    return this.decidedStatusLabelMap[this.rawStatus] || 'DECISION MADE';
-}
+        return this.decidedStatusLabelMap[this.rawStatus] || 'DECISION MADE';
+    }
 
     get hasMouLink() {
         return !!this.mouVolodyLink;
@@ -572,9 +572,9 @@ resolvePageUrls() {
     // MoU status badge class
     get mouStatusBadgeClass() {
         const map = {
-            'Active'  : 'dash-track-badge dash-track-badge--active',
-            'Expired' : 'dash-track-badge dash-track-badge--expired',
-            'Pending' : 'dash-track-badge dash-track-badge--pending'
+            'Active': 'dash-track-badge dash-track-badge--active',
+            'Expired': 'dash-track-badge dash-track-badge--expired',
+            'Pending': 'dash-track-badge dash-track-badge--pending'
         };
         return map[this.mouStatus] || map['Pending'];
     }
@@ -582,9 +582,9 @@ resolvePageUrls() {
     // MoU status display label
     get mouStatusLabel() {
         const map = {
-            'Active'  : 'SIGNED',
-            'Expired' : 'EXPIRED',
-            'Pending' : CL_AWAITING_SIGNATURE
+            'Active': 'SIGNED',
+            'Expired': 'EXPIRED',
+            'Pending': CL_AWAITING_SIGNATURE
         };
         return map[this.mouStatus] || CL_AWAITING_SIGNATURE;
     }
@@ -605,7 +605,7 @@ resolvePageUrls() {
         }
         if (this.complianceTotal === 0) return 'dash-track-badge dash-track-badge--pending';
         if (this.complianceUploaded >= this.complianceTotal) {
-            return 'dash-track-badge dash-track-badge--active';
+            return 'dash-track-badge dash-track-badge--review';
         }
         if (this.complianceUploaded > 0) {
             return 'dash-track-badge dash-track-badge--inprogress';
@@ -619,7 +619,7 @@ resolvePageUrls() {
         if (this.complianceStatus === 'Returned') return 'ACTION NEEDED';
         if (this.complianceStatus === 'Validated') return 'COMPLETE';
         if (this.complianceTotal === 0) return 'NOT STARTED';
-        if (this.complianceUploaded >= this.complianceTotal) return 'COMPLETE';
+        if (this.complianceUploaded >= this.complianceTotal) return 'PENDING REVIEW';
         return CL_IN_PROGRESS;
     }
 
@@ -638,20 +638,20 @@ resolvePageUrls() {
     get showReturnedBanner() {
         return this.complianceStatus === 'Returned';
     }
-        // Values fed to the Application Timeline. They fall back to the same data
+    // Values fed to the Application Timeline. They fall back to the same data
     // the compliance card uses, so both always agree.
-   get timelineComplianceStatus() {
-    // complianceStatus is the aggregate over all documents (same field the
-    // banners use). Fall back to the request-level value when it is blank
-    // or only says "In Progress".
-    const live = this.complianceStatus;
-    if (live && live !== 'In Progress') return live;
-    return this.complianceDocStatus || live;
-}
+    get timelineComplianceStatus() {
+        // complianceStatus is the aggregate over all documents (same field the
+        // banners use). Fall back to the request-level value when it is blank
+        // or only says "In Progress".
+        const live = this.complianceStatus;
+        if (live && live !== 'In Progress') return live;
+        return this.complianceDocStatus || live;
+    }
 
     get timelineHasUploads() {
-    return this.complianceHasUploads;
-}
+        return this.complianceHasUploads;
+    }
     // Inline style for compliance progress bar fill
     get complianceProgressStyle() {
         if (this.complianceTotal === 0) return 'width: 0%';
@@ -734,7 +734,7 @@ resolvePageUrls() {
         const { uploaded, total, status } = event.detail;
 
         this.complianceUploaded = uploaded ?? this.complianceUploaded;
-        this.complianceTotal    = total    ?? this.complianceTotal;
+        this.complianceTotal = total ?? this.complianceTotal;
 
         // FIX: these two drive the Application Timeline side card
         // (compliance-doc-status / compliance-has-uploads props) and
@@ -748,23 +748,23 @@ resolvePageUrls() {
         }
     }
 
-handleOpenEligibility(event) {
-    if (event) event.preventDefault();
-    this.showEligibilityModal = true;
-}
+    handleOpenEligibility(event) {
+        if (event) event.preventDefault();
+        this.showEligibilityModal = true;
+    }
 
-handleCloseEligibility() {
-    this.showEligibilityModal = false;
-}
+    handleCloseEligibility() {
+        this.showEligibilityModal = false;
+    }
 
-handleOpenFaq(event) {
-    if (event) event.preventDefault();
-    this.showFaqModal = true;
-}
+    handleOpenFaq(event) {
+        if (event) event.preventDefault();
+        this.showFaqModal = true;
+    }
 
-handleCloseFaq() {
-    this.showFaqModal = false;
-}
+    handleCloseFaq() {
+        this.showFaqModal = false;
+    }
 
 
     get isNotStartedMode() {
@@ -810,24 +810,24 @@ handleCloseFaq() {
             const result = await getFileBase64({ contentVersionId: docId });
             const extension = (result.fileType || 'pdf').toLowerCase();
             const mimeType = (extension === 'pdf') ? 'application/pdf'
-                           : (extension === 'png') ? 'image/png'
-                           : (extension === 'jpg' || extension === 'jpeg') ? 'image/jpeg'
-                           : 'application/octet-stream';
+                : (extension === 'png') ? 'image/png'
+                    : (extension === 'jpg' || extension === 'jpeg') ? 'image/jpeg'
+                        : 'application/octet-stream';
 
-            const byteChars   = atob(result.base64);
+            const byteChars = atob(result.base64);
             const byteNumbers = new Array(byteChars.length);
             for (let i = 0; i < byteChars.length; i++) {
                 byteNumbers[i] = byteChars.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            const blob      = new Blob([byteArray], { type: mimeType });
-            const blobUrl   = URL.createObjectURL(blob);
+            const blob = new Blob([byteArray], { type: mimeType });
+            const blobUrl = URL.createObjectURL(blob);
 
             if (mode === 'view') {
                 window.open(blobUrl, '_blank');
             } else {
                 const a = document.createElement('a');
-                a.href     = blobUrl;
+                a.href = blobUrl;
                 a.download = fileName || ((result.title || 'Grant_Agreement_signed') + '.' + extension);
                 document.body.appendChild(a);
                 a.click();

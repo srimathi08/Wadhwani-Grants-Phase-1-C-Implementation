@@ -225,18 +225,7 @@ export default class WcfFormPreview extends LightningElement {
     get additionalInfoFiles() {
         return (this._attachments || [])
             .filter(a => a.contentDocumentId && a.questionKey === 'ADDENDUM')
-            .map(a => {
-                const ext = a.fileExtension ? '.' + a.fileExtension : '';
-                let fullName = a.fileName || 'Document';
-                if (ext && !fullName.toLowerCase().endsWith(ext.toLowerCase())) {
-                    fullName += ext;
-                }
-                return {
-                    documentId: a.contentDocumentId,
-                    versionId: a.contentVersionId,
-                    name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
-                };
-            });
+            .map(a => this._mapAttachment(a, 'Reviewer-requested document'));
     }
 
     // ── Lifecycle Callbacks ──────────────────────────────────────────────────
@@ -491,6 +480,52 @@ export default class WcfFormPreview extends LightningElement {
 
     _val(v) { return (v != null && v !== '') ? v : '—'; }
 
+    _fileTypeMeta(ext) {
+        const e = (ext || '').toLowerCase().replace(/^\./, '');
+        const map = {
+            pdf: { icon: 'doctype:pdf', label: 'PDF' },
+            xlsx: { icon: 'doctype:excel', label: 'Excel' },
+            xls: { icon: 'doctype:excel', label: 'Excel' },
+            csv: { icon: 'doctype:csv', label: 'CSV' },
+            docx: { icon: 'doctype:word', label: 'Word' },
+            doc: { icon: 'doctype:word', label: 'Word' },
+            pptx: { icon: 'doctype:ppt', label: 'PowerPoint' },
+            png: { icon: 'doctype:image', label: 'Image' },
+            jpg: { icon: 'doctype:image', label: 'Image' },
+            jpeg: { icon: 'doctype:image', label: 'Image' },
+            txt: { icon: 'doctype:txt', label: 'Text' }
+        };
+        return map[e] || { icon: 'doctype:unknown', label: e ? e.toUpperCase() : 'File' };
+    }
+
+    _mapAttachment(a, fallbackLabel) {
+        const ext = a.fileExtension ? '.' + a.fileExtension : '';
+        let fullName = a.fileName || 'Document';
+        if (ext && !fullName.toLowerCase().endsWith(ext.toLowerCase())) fullName += ext;
+
+        const type = this._fileTypeMeta(a.fileExtension);
+        const sizeLabel = a.fileSizeMB ? `${a.fileSizeMB} MB` : '';
+        const dt = a.createdDate ? new Date(a.createdDate) : null;
+        const uploadedOn = (dt && !isNaN(dt.getTime()))
+            ? `${dt.getDate()} ${this.MONTH_ABBR[dt.getMonth()]} ${dt.getFullYear()}`
+            : '';
+        const label = a.label || fallbackLabel;
+
+        return {
+            documentId: a.contentDocumentId,
+            versionId: a.contentVersionId,
+            name: fullName,
+            label,
+            typeLabel: type.label,
+            iconName: type.icon,
+            sizeLabel,
+            uploadedOn,
+            createdTs: a.createdDate ? new Date(a.createdDate).getTime() : 0,
+            metaLine: [label, type.label, sizeLabel, uploadedOn ? `Uploaded ${uploadedOn}` : '']
+                .filter(Boolean).join(' · ')
+        };
+    }
+
     // ── Multi-Track Detection & Dynamic Section Labels ───────────────────────
     get _orgArea() {
         return this._app?.Organizational_Area_s_for_Funding_Inves1__c
@@ -608,13 +643,13 @@ export default class WcfFormPreview extends LightningElement {
         return new Date(dateStr).getFullYear();
     }
     get fyLabel1() {
-        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 1}` : 'FY-1';
+        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 1}` : 'FY2026';
     }
     get fyLabel2() {
-        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 2}` : 'FY-2';
+        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 2}` : 'FY2025';
     }
     get fyLabel3() {
-        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 3}` : 'FY-3';
+        return this.fiscalEndYear ? `FY-${this.fiscalEndYear - 3}` : 'FY2024';
     }
 
     // ── Section 1: About Your Organisation Getters ───────────────────────────
@@ -913,22 +948,12 @@ export default class WcfFormPreview extends LightningElement {
         );
     }
     get q24Documents() {
-        const allAtts = this._attachments || [];
-        const q24Files = allAtts.filter(a => a.contentDocumentId && a.questionKey === 'Q24');
-        const listToMap = q24Files.length > 0 ? q24Files : allAtts.filter(a => a.contentDocumentId && (a.questionKey === 'Q15' || a.questionKey === 'Q17'));
-
-        return listToMap.map(a => {
-            const ext = a.fileExtension ? '.' + a.fileExtension : '';
-            let fullName = a.fileName || 'Document';
-            if (ext && !fullName.toLowerCase().endsWith(ext.toLowerCase())) {
-                fullName += ext;
-            }
-            return {
-                documentId: a.contentDocumentId,
-                versionId: a.contentVersionId,
-                name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
-            };
-        });
+        const all = this._attachments || [];
+        const q24 = all.filter(a => a.contentDocumentId && a.questionKey === 'Q24');
+        const src = q24.length
+            ? q24
+            : all.filter(a => a.contentDocumentId && (a.questionKey === 'Q15' || a.questionKey === 'Q17'));
+        return src.map(a => this._mapAttachment(a, 'Verification report'));
     }
     get hasQ24Documents() {
         return this.q24Documents.length > 0;
@@ -959,18 +984,8 @@ export default class WcfFormPreview extends LightningElement {
     get supportingDocuments() {
         return (this._attachments || [])
             .filter(a => a.contentDocumentId && (a.questionKey === 'Q28' || a.questionKey === 'SUPPORTING' || a.questionKey === 'OTHER'))
-            .map(a => {
-                const ext = a.fileExtension ? '.' + a.fileExtension : '';
-                let fullName = a.fileName || 'Document';
-                if (ext && !fullName.toLowerCase().endsWith(ext.toLowerCase())) {
-                    fullName += ext;
-                }
-                return {
-                    documentId: a.contentDocumentId,
-                    versionId: a.contentVersionId,
-                    name: fullName + (a.fileSizeMB ? ` (${a.fileSizeMB} MB)` : '')
-                };
-            });
+            .map(a => this._mapAttachment(a, 'Supporting document'))
+            .sort((x, y) => y.createdTs - x.createdTs);
     }
     get hasSupportingDocuments() {
         return this.supportingDocuments.length > 0;
@@ -1498,7 +1513,45 @@ export default class WcfFormPreview extends LightningElement {
                 y = top + rowH;
                 rowDivider();
             };
+            // ── Token-aware cell layout ─────────────────────────────────────────────
+            const MIN_FIT_FONT = 7.5;
 
+            // Break one over-wide token at natural boundaries; hard-split only as a last resort.
+            const breakToken = (tok, width) => {
+                const parts = tok.split(/(?=@)|(?<=[./\-_])/);
+                const lines = [];
+                let line = '';
+                parts.forEach(p => {
+                    if (line && doc.getTextWidth(line + p) > width) { lines.push(line); line = ''; }
+                    line += p;
+                });
+                if (line) lines.push(line);
+                return lines.flatMap(l => doc.getTextWidth(l) > width ? doc.splitTextToSize(l, width) : [l]);
+            };
+
+            // Returns { lines, fontSize } for a cell. Prose is untouched; only tokens
+            // wider than the cell trigger shrink-to-fit, then semantic breaking.
+            const layoutCell = (text, width, fontSize, style = 'normal') => {
+                const str = String(text);
+                doc.setFont(undefined, style);
+                doc.setFontSize(fontSize);
+
+                const widest = () => Math.max(...str.split(/\s+/).map(w => doc.getTextWidth(w)));
+                if (widest() <= width) return { lines: doc.splitTextToSize(str, width), fontSize };
+
+                let fs = fontSize;
+                while (fs > MIN_FIT_FONT) {
+                    fs = Math.max(MIN_FIT_FONT, +(fs - 0.2).toFixed(1));
+                    doc.setFontSize(fs);
+                    if (widest() <= width) return { lines: doc.splitTextToSize(str, width), fontSize: fs };
+                }
+
+                // Still too wide at the minimum size → break at natural points
+                const prepared = str.split(/(\s+)/)
+                    .map(tok => (tok.trim() && doc.getTextWidth(tok) > width) ? breakToken(tok, width).join('\n') : tok)
+                    .join('');
+                return { lines: doc.splitTextToSize(prepared, width), fontSize: fs };
+            };
             const gridQRow = (num, label, fields, cols = 2) => {
                 const items = fields.map(f => ({
                     label: f.label,
@@ -1507,18 +1560,18 @@ export default class WcfFormPreview extends LightningElement {
                 if (items.length === 0) return;
 
                 const cellW = (valueW - (cols - 1) * 8) / cols;
-                doc.setFontSize(9.3);
-                doc.setFont(undefined, 'normal');
-                const cellLines = items.map(f => doc.splitTextToSize(String(f.value), cellW));
+                const cells = items.map(f => layoutCell(f.value, cellW, 9.3));
 
                 const gridRows = [];
-                for (let i = 0; i < cellLines.length; i += cols) gridRows.push(cellLines.slice(i, i + cols));
+                for (let i = 0; i < cells.length; i += cols) gridRows.push(cells.slice(i, i + cols));
                 let gridHeight = 0;
                 gridRows.forEach(gr => {
-                    const maxLines = Math.max(...gr.map(l => l.length));
+                    const maxLines = Math.max(...gr.map(c => c.lines.length));
                     gridHeight += 4.3 + maxLines * 4.3 + 4;
                 });
 
+                doc.setFontSize(9.3);
+                doc.setFont(undefined, 'bold');
                 const labelLines = doc.splitTextToSize(label, labelW - 10);
                 const labelHeight = labelLines.length * 4.2 + 4;
                 const rowHeight = Math.max(gridHeight, labelHeight, 14) + 4;
@@ -1530,18 +1583,18 @@ export default class WcfFormPreview extends LightningElement {
                 let gy = top;
                 let idx = 0;
                 gridRows.forEach(gr => {
-                    const maxLines = Math.max(...gr.map(l => l.length));
-                    gr.forEach((lines, ci) => {
+                    const maxLines = Math.max(...gr.map(c => c.lines.length));
+                    gr.forEach((cell, ci) => {
                         const f = items[idx];
                         const cx = valueX + ci * (cellW + 8);
                         doc.setFontSize(7.8);
                         doc.setFont(undefined, 'bold');
                         doc.setTextColor(...RED);
                         doc.text(f.label.toUpperCase(), cx, gy + 2);
-                        doc.setFontSize(9.3);
+                        doc.setFontSize(cell.fontSize);            // per-cell size (shrink-to-fit)
                         doc.setFont(undefined, 'normal');
                         doc.setTextColor(...NAVY);
-                        lines.forEach((l, li) => doc.text(l, cx, gy + 6.3 + li * 4.3));
+                        cell.lines.forEach((l, li) => doc.text(l, cx, gy + 6.3 + li * 4.3));
                         idx++;
                     });
                     gy += 4.3 + maxLines * 4.3 + 4;
@@ -1553,7 +1606,7 @@ export default class WcfFormPreview extends LightningElement {
 
 
 
-            const table = (head, body) => {
+            const table = (head, body, colStyles = {}) => {
                 checkPage(40);
                 doc.autoTable({
                     startY: y,
@@ -1564,7 +1617,7 @@ export default class WcfFormPreview extends LightningElement {
                     styles: { fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
                     headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
                     alternateRowStyles: { fillColor: LIGHT },
-                    columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY } }
+                    columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY }, ...colStyles }
                 });
                 y = doc.lastAutoTable.finalY + 8;
             };
@@ -1885,7 +1938,8 @@ export default class WcfFormPreview extends LightningElement {
                 drawQLabel(q.Q8, 'References for Outreach', refTop);
                 y = refTop + 10;
                 table(['Name', 'Organisation / Role', 'Email'],
-                    this.references.map(r => [r.name, r.organisation, r.email]));
+                    this.references.map(r => [r.name, r.organisation, r.email]),
+                    { 2: { cellWidth: 'wrap' } });
             } else {
                 simpleQRow(q.Q8, 'References for Outreach', '—');
             }
@@ -2136,7 +2190,10 @@ export default class WcfFormPreview extends LightningElement {
             gridQRow(q.Q24, 'Independent Verification of Your Outcomes', [
                 { label: 'Outcomes Verified by a Third Party?', value: this.q24Verified },
                 ...(this.isQ24VerifiedYes ? [{ label: 'Verification Details', value: this.detailsOfEthicalReceived }] : []),
-                ...(this.hasQ24Documents ? [{ label: 'Verification Reports', value: this.q24Documents.map(f => f.name).join(', ') }] : [])
+                ...(this.hasQ24Documents ? [{
+                    label: 'Verification Reports',
+                    value: this.q24Documents.map(f => f.name + (f.sizeLabel ? ` (${f.sizeLabel})` : '')).join(', ')
+                }] : [])
             ], 1);
 
             // Q25: Sustainability Plan
@@ -2154,7 +2211,9 @@ export default class WcfFormPreview extends LightningElement {
                 const docTop = y;
                 drawQLabel(q.Q28, 'Supporting Documents', docTop);
                 y = docTop + 10;
-                table(['File Name'], this.supportingDocuments.map(f => [f.name]));
+                table(['File', 'Label', 'Type', 'Size', 'Uploaded'],
+                    this.supportingDocuments.map(f => [f.name, f.label, f.typeLabel, f.sizeLabel || '—', f.uploadedOn || '—']),
+                    { 0: { cellWidth: 60 } });
             } else {
                 simpleQRow(q.Q28, 'Supporting Documents', '—');
             }
@@ -2184,7 +2243,9 @@ export default class WcfFormPreview extends LightningElement {
                 y += noteLines.length * 4 + 6;
                 doc.setTextColor(0, 0, 0);
 
-                table(['File Name'], this.additionalInfoFiles.map(f => [f.name]));
+                table(['File', 'Label', 'Type', 'Size', 'Uploaded'],
+                    this.additionalInfoFiles.map(f => [f.name, f.label, f.typeLabel, f.sizeLabel || '—', f.uploadedOn || '—']),
+                    { 0: { cellWidth: 60 } });
             }
 
             // ══ Attestation ══

@@ -43,8 +43,13 @@
     transition: width 0.3s ease;
 }
 
-.tl-progress-fill--warning { background: #b26a00; }
-.tl-progress-fill--danger  { background: #c0392b; }
+.tl-progress-fill--warning {
+    background: #b26a00;
+}
+
+.tl-progress-fill--danger {
+    background: #c0392b;
+}
 
 /* ── Completion panel ──────────────────────────────────────────── */
 .tl-complete {
@@ -90,7 +95,9 @@
     border-top: 1px solid #f0f0f0;
 }
 
-.tl-phase:first-child { border-top: none; }
+.tl-phase:first-child {
+    border-top: none;
+}
 
 .tl-phase-head {
     display: flex;
@@ -105,7 +112,9 @@
     font-family: inherit;
 }
 
-.tl-phase-head:hover .tl-phase-label { color: #993c1d; }
+.tl-phase-head:hover .tl-phase-label {
+    color: #993c1d;
+}
 
 .tl-phase-icon {
     flex-shrink: 0;
@@ -121,10 +130,25 @@
     font-weight: 700;
 }
 
-.tl-phase-icon--done    { background: #1e7e34; color: #fff; }
-.tl-phase-icon--active  { background: #c8391d; color: #fff; }
-.tl-phase-icon--warning { background: #b26a00; color: #fff; }
-.tl-phase-icon--danger  { background: #c0392b; color: #fff; }
+.tl-phase-icon--done {
+    background: #1e7e34;
+    color: #fff;
+}
+
+.tl-phase-icon--active {
+    background: #c8391d;
+    color: #fff;
+}
+
+.tl-phase-icon--warning {
+    background: #b26a00;
+    color: #fff;
+}
+
+.tl-phase-icon--danger {
+    background: #c0392b;
+    color: #fff;
+}
 
 .tl-phase-text {
     flex: 1;
@@ -157,8 +181,15 @@
     color: #993c1d;
 }
 
-.tl-badge--warning { background: #fff4e0; color: #8a5200; }
-.tl-badge--danger  { background: #fdecea; color: #a12a1e; }
+.tl-badge--warning {
+    background: #fff4e0;
+    color: #8a5200;
+}
+
+.tl-badge--danger {
+    background: #fdecea;
+    color: #a12a1e;
+}
 
 .tl-chev {
     flex-shrink: 0;
@@ -168,7 +199,9 @@
     transition: transform 0.2s ease;
 }
 
-.tl-chev--open { transform: rotate(180deg); }
+.tl-chev--open {
+    transform: rotate(180deg);
+}
 
 /* ── Steps inside an expanded phase ────────────────────────────── */
 .tl-phase-body {
@@ -213,9 +246,20 @@
     border-color: #c8391d;
 }
 
-.tl-dot--warning { background: #b26a00; border-color: #b26a00; }
-.tl-dot--danger  { background: #c0392b; border-color: #c0392b; }
-.tl-dot--ghost   { border-color: #e5e5e5; background: #f7f7f7; }
+.tl-dot--warning {
+    background: #b26a00;
+    border-color: #b26a00;
+}
+
+.tl-dot--danger {
+    background: #c0392b;
+    border-color: #c0392b;
+}
+
+.tl-dot--ghost {
+    border-color: #e5e5e5;
+    background: #f7f7f7;
+}
 
 .tl-line {
     width: 2px;
@@ -224,8 +268,13 @@
     background: #e5e5e5;
 }
 
-.tl-line--done { background: #1e7e34; }
-.tl-line--half { background: linear-gradient(to bottom, #1e7e34 50%, #e5e5e5 50%); }
+.tl-line--done {
+    background: #1e7e34;
+}
+
+.tl-line--half {
+    background: linear-gradient(to bottom, #1e7e34 50%, #e5e5e5 50%);
+}
 
 .tl-step-body {
     flex: 1;
@@ -252,8 +301,13 @@
     margin-bottom: 2px;
 }
 
-.tl-active-card--warning { background: #fff4e0; }
-.tl-active-card--danger  { background: #fdecea; }
+.tl-active-card--warning {
+    background: #fff4e0;
+}
+
+.tl-active-card--danger {
+    background: #fdecea;
+}
 
 .tl-active-title {
     margin: 0 0 4px 0;
@@ -262,8 +316,13 @@
     color: #993c1d;
 }
 
-.tl-active-card--warning .tl-active-title { color: #8a5200; }
-.tl-active-card--danger  .tl-active-title { color: #a12a1e; }
+.tl-active-card--warning .tl-active-title {
+    color: #8a5200;
+}
+
+.tl-active-card--danger .tl-active-title {
+    color: #a12a1e;
+}
 
 .tl-active-desc {
     margin: 0;
@@ -272,8 +331,13 @@
     color: #7d3a22;
 }
 
-.tl-active-card--warning .tl-active-desc { color: #7a4b06; }
-.tl-active-card--danger  .tl-active-desc { color: #8f2b21; }
+.tl-active-card--warning .tl-active-desc {
+    color: #7a4b06;
+}
+
+.tl-active-card--danger .tl-active-desc {
+    color: #8f2b21;
+}
 
 .tl-active-note {
     margin: 8px 0 0 0;
@@ -283,7 +347,32 @@
     color: #8a5200;
 }
 
-.tl-active-card--danger .tl-active-note { color: #a12a1e; }
+.tl-active-card--danger .tl-active-note {
+    color: #a12a1e;
+}
+
+/* ── Success (current step is ticked) ──────────────────────────── */
+.tl-active-card--success {
+    background: #eef7f0;
+}
+
+.tl-active-card--success .tl-active-title {
+    color: #1a5c2a;
+}
+
+.tl-active-card--success .tl-active-desc {
+    color: #3c7a4c;
+}
+
+.tl-badge--success {
+    background: #e3f2e5;
+    color: #1a5c2a;
+}
+
+.tl-phase-icon--success {
+    background: #1e7e34;
+    color: #fff;
+}
 
 .tl-action {
     margin-top: 10px;
@@ -298,7 +387,9 @@
     cursor: pointer;
 }
 
-.tl-action:hover { background: #fff8f6; }
+.tl-action:hover {
+    background: #fff8f6;
+}
 
 /* ── Remaining-steps summary ───────────────────────────────────── */
 .tl-step--remaining .tl-step-body {
@@ -328,7 +419,9 @@
     cursor: pointer;
 }
 
-.tl-toggle-all:hover { text-decoration: underline; }
+.tl-toggle-all:hover {
+    text-decoration: underline;
+}
 
 /* ── Tooltip (unchanged) ───────────────────────────────────────── */
 .timeline-info-icon {
@@ -454,4 +547,32 @@
 
 .timeline-link-list a:hover {
     text-decoration: underline;
+}
+
+/* ── Neutral (Not Started) ─────────────────────────────────────── */
+.tl-active-card--neutral {
+    background: #f3f3f3;
+}
+
+.tl-active-card--neutral .tl-active-title {
+    color: #414041;
+}
+
+.tl-active-card--neutral .tl-active-desc {
+    color: #6b6b6b;
+}
+
+.tl-badge--neutral {
+    background: #ececec;
+    color: #555;
+}
+
+.tl-dot--neutral {
+    background: #9a9a9a;
+    border-color: #9a9a9a;
+}
+
+.tl-phase-icon--neutral {
+    background: #9a9a9a;
+    color: #fff;
 }

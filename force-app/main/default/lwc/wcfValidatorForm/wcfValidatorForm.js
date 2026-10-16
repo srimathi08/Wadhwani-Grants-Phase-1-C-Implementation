@@ -46,6 +46,11 @@ const DECISION_RETURN = 'Return';
 const DECISION_FLAG = 'Flag';
 const FLAG_OTHER_VALUE = 'Other';
 
+// U173 / IP-11: questions that never block (TR-35). Used only for the S1.1
+// fallback list when the server check is unavailable. Keep in sync with
+// OPTIONAL_QUESTION_KEYS in WCFValidatorController.
+const OPTIONAL_CANONICAL_KEYS = new Set(['Q7', 'Q8', 'Q27', 'Q28']);
+
 const APP_FIELDS = [
     APP_NAME_FIELD, APP_SUBMITTED_FIELD, APP_GEOGRAPHY_FIELD,
     APP_MANDATE_FIELD, APP_STATUS_FIELD, APP_CATEGORY_FIELD, APP_DUE_DATE_FIELD,
@@ -94,7 +99,55 @@ const DEFAULT_STATE = () => ({
     selectedQuestions: [],
     questionTexts: {},
 });
+// ─────────────────────────────────────────────────────────────────────────────
+// VOCABULARY  (single source of truth for display text)
+// RULE: `value` = stored picklist value (never change it, saved data depends on it).
+//       `label` = what users read. `code` = what logic keys off. Never match logic on label text.
+// ─────────────────────────────────────────────────────────────────────────────
+const TRACK_LABEL = Object.freeze({
+    JOB_FULFILLMENT: 'Job Fulfillment',
+    JOB_CREATION: 'Job Creation',
+    LIVELIHOOD: 'Livelihood Upliftment'
+});
+const MANDATE_SCOPE = `${TRACK_LABEL.JOB_FULFILLMENT} and ${TRACK_LABEL.JOB_CREATION}`;
 
+// Display-only safety net for text coming from Apex/metadata. NEVER apply to stored values.
+const normalizeTerms = t =>
+    typeof t === 'string' ? t.replace(/\b([Ff])ulfilment\b/g, '$1ulfillment') : t;
+
+const OPTION_CATALOG = Object.freeze({
+    s2_1: [
+        { value: 'Within active clusters', label: 'Inside active clusters' },
+        { value: 'Borderline', label: 'Partly inside active clusters' },
+        { value: 'Outside active clusters', label: 'Outside active clusters' }
+    ],
+    s2_2: [
+        { value: 'Fit', label: 'Matches the chosen track' },
+        { value: 'Borderline', label: 'Partly matches the chosen track' },
+        { value: 'Misfit', label: `Outside ${MANDATE_SCOPE}` }
+    ],
+    s4_1: [
+        { value: 'WSN / WEN Nomination', label: 'WSN / WEN Nomination' },
+        { value: 'WCF Direct Research', label: 'Wadhwani Grants Direct Research' },
+        { value: 'Self-Signup', label: 'Self-Signup' },
+        { value: 'Unknown / TBD', label: 'Unknown / TBD' }
+    ],
+    s4_2: ['< $1M', '$1M – $5M', '$5M – $10M', '$10M – $50M',
+           '$50M – $100M', '> $100M', 'Unknown / cannot determine']
+        .map(v => ({ value: v, label: v }))
+});
+
+const FLAG_REASONS = Object.freeze([
+    { code: 'geo', value: 'Geographic scope outside active clusters', label: 'Geographic scope outside active clusters' },
+    // `value` keeps the legacy UK spelling on purpose: saved records hold it. It is never displayed.
+    { code: 'mandate', value: 'Mandate misfit (work not Job Fulfilment / Job Creation aligned)', label: `Work outside ${MANDATE_SCOPE}` },
+    { code: 'sanctions', value: 'Sanctions / debarment / watchlist concern', label: 'Sanctions / debarment / watchlist concern' },
+    { code: 'floor', value: 'Materially below missing-middle floor', label: 'Materially below missing-middle floor' },
+    { code: 'ceiling', value: 'Materially above missing-middle ceiling', label: 'Materially above missing-middle ceiling' },
+    { code: 'outcome', value: 'Outcome credibility concern at first read', label: 'Outcome credibility concern at first read' },
+    { code: 'institution', value: 'Institutional credibility concern at first read', label: 'Institutional credibility concern at first read' },
+    { code: 'other', value: 'Other', label: 'Other' }
+]);
 export default class WcfValidatorForm extends NavigationMixin(LightningElement) {
 
     @api recordId;
@@ -116,6 +169,9 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     @track _orgArea = null;
     @track _geography = null;
     @track _populatedQuestionKeys = [];
+    // U173 / IP-11: server-computed S1.1 verdict (declared tracks, required,
+    // missing and not-auto-checkable questions)
+    @track _mandatoryCheck = null;
 
     // Draft tracking
     @track isDraftSaved = false;
@@ -197,17 +253,22 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         if (wired) return String(wired);
         return this._mandateTrack || '';
     }
+
+    // U173: track detection now uses the same case-insensitive rule as
+    // WCFValidatorController (contains 'both' / 'fulfil' / 'creation' /
+    // 'livelihood'), so 'Fulfilment' vs 'Fulfillment' spellings can no
+    // longer make the UI numbering disagree with Apex.
     get isJobFulfillment() {
-        const a = this.orgArea || '';
-        return a.includes('Job Fulfillment') || a === 'Job Fulfillment Only' || a === 'Both Job Fulfillment and Job Creation';
+        const a = (this.orgArea || '').toLowerCase();
+        return a.includes('both') || a.includes('fulfil');
     }
     get isJobCreation() {
-        const a = this.orgArea || '';
-        return a.includes('Job Creation') || a === 'Job Creation Only' || a === 'Both Job Fulfillment and Job Creation';
+        const a = (this.orgArea || '').toLowerCase();
+        return a.includes('both') || a.includes('creation');
     }
     get isLivelihood() {
-        const a = this.orgArea || '';
-        return a.includes('Livelihood');
+        const a = (this.orgArea || '').toLowerCase();
+        return a.includes('livelihood');
     }
 
     get hasJF() { return this.isJobFulfillment; }
@@ -448,6 +509,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             this._orgArea = data.orgArea || null;
             this._geography = data.geography || null;
             this._populatedQuestionKeys = data.populatedQuestionKeys || [];
+            this._mandatoryCheck = data.mandatoryCheck || null;
 
             const review = data.review;
             if (review && review.Id) {
@@ -606,7 +668,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             };
         }
 
-        let rawOpts = q.options || [];
+               let rawOpts = q.options || [];
         if (rawOpts.length === 0) {
             if (isConfirmPill) {
                 rawOpts = [
@@ -618,35 +680,8 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
                     { label: 'No', value: 'No' },
                     { label: 'Yes', value: 'Yes', sublabel: 'specify in follow-on field' }
                 ];
-            } else if (q.key === 's2_1') {
-                rawOpts = [
-                    { label: 'Within active clusters', value: 'Within active clusters' },
-                    { label: 'Borderline', value: 'Borderline' },
-                    { label: 'Outside active clusters', value: 'Outside active clusters' }
-                ];
-            } else if (q.key === 's2_2') {
-                rawOpts = [
-                    { label: 'Fit', value: 'Fit' },
-                    { label: 'Borderline', value: 'Borderline' },
-                    { label: 'Misfit', value: 'Misfit' }
-                ];
-            } else if (q.key === 's4_1') {
-                rawOpts = [
-                    { label: 'WSN / WEN Nomination', value: 'WSN / WEN Nomination' },
-                    { label: 'Wadhwani Grants Direct Research', value: 'WCF Direct Research' },
-                    { label: 'Self-Signup', value: 'Self-Signup' },
-                    { label: 'Unknown / TBD', value: 'Unknown / TBD' }
-                ];
-            } else if (q.key === 's4_2') {
-                rawOpts = [
-                    { label: '< $1M', value: '< $1M' },
-                    { label: '$1M – $5M', value: '$1M – $5M' },
-                    { label: '$5M – $10M', value: '$5M – $10M' },
-                    { label: '$10M – $50M', value: '$10M – $50M' },
-                    { label: '$50M – $100M', value: '$50M – $100M' },
-                    { label: '> $100M', value: '> $100M' },
-                    { label: 'Unknown / cannot determine', value: 'Unknown / cannot determine' }
-                ];
+            } else if (OPTION_CATALOG[q.key]) {
+                rawOpts = OPTION_CATALOG[q.key];
             }
         }
 
@@ -663,7 +698,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             }
             return {
                 val: val,
-                label: opt.label,
+                label: normalizeTerms(opt.label),
                 sublabel: opt.sublabel || null,
                 cls: cls
             };
@@ -674,9 +709,9 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
 
         return {
             key: q.key,
-            label: q.label,
-            questionText: q.questionText,
-            hintText: q.hintText,
+            label: normalizeTerms(q.label),
+            questionText: normalizeTerms(q.questionText),
+            hintText: normalizeTerms(q.hintText),
             isRequired: q.isRequired,
             displayType: q.displayType,
             isConfirmPill,
@@ -722,7 +757,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             ? sec.questions.map(q => this._enrichQuestion(q))
             : [
                 this._enrichQuestion({ key: 's2_1', questionText: 'Geography: Does the applicant\'s primary geography fall within Wadhwani Grants\'s active operating clusters?', hintText: 'Active clusters: India, Latin America (Brazil / Mexico), Southeast Asia (Indonesia / Philippines). MENA = monitor only.', displayType: 'PicklistCard', isRequired: true }),
-                this._enrichQuestion({ key: 's2_2', questionText: 'Mandate fit: Does the applicant\'s work fall credibly within Job Fulfillment, Job Creation, or both, at first read?', displayType: 'PicklistCard', isRequired: true }),
+                this._enrichQuestion({ key: 's2_2', questionText: `Mandate fit: Does the applicant's work fall credibly within ${TRACK_LABEL.JOB_FULFILLMENT}, ${TRACK_LABEL.JOB_CREATION}, or both, at first read?`, displayType: 'PicklistCard', isRequired: true }),
                 this._enrichQuestion({ key: 's2_3', questionText: 'Blocking concern: Did your first-pass review surface any concern that could materially affect Reviewer evaluation?', hintText: 'Examples: sanctions / watchlist hit; contradicting outcome data; institutional credibility concerns. Most applicants: No.', displayType: 'BinaryRadio', isRequired: true }),
                 this._enrichQuestion({ key: 's2_3_text', questionText: 'Describe the blocking concern', displayType: 'TextArea', isRequired: true, wordLimit: 300, conditionalParentKey: 's2_3', conditionalParentValue: 'Yes' })
             ];
@@ -910,36 +945,40 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         });
     }
 
+        get _suggestedFlagCodes() {
+        const has = (v, t) => String(v || '').toLowerCase().includes(t);
+        const s = this.formState;
+        const codes = new Set();
+        if (has(s.s2_1, 'outside')) codes.add('geo');
+        if (has(s.s2_2, 'misfit')) codes.add('mandate');
+        if (s.s2_3 === S2_3_YES_VALUE) codes.add('sanctions');
+        return codes;
+    }
+
     get flagOptions() {
-        const suggested = [];
-        if (this.formState.s2_1 && this.formState.s2_1.toLowerCase().includes('outside')) suggested.push('geo');
-        if (this.formState.s2_2 && this.formState.s2_2.toLowerCase().includes('misfit')) suggested.push('mandate');
-        if (this.formState.s2_3 === S2_3_YES_VALUE) suggested.push('sanctions');
+        const byValue = new Map(FLAG_REASONS.map(r => [r.value, r]));
+        const list = (this._s3_3Options && this._s3_3Options.length > 0)
+            ? this._s3_3Options.map(m => ({
+                code: byValue.get(m.value)?.code || null,
+                value: m.value,
+                label: normalizeTerms(m.label)
+            }))
+            : FLAG_REASONS;
 
-        const rawList = (this._s3_3Options && this._s3_3Options.length > 0)
-            ? this._s3_3Options
-            : [
-                { label: 'Geographic scope outside active clusters', value: 'Geographic scope outside active clusters' },
-                { label: 'Mandate misfit (work not Job Fulfilment / Job Creation aligned)', value: 'Mandate misfit (work not Job Fulfilment / Job Creation aligned)' },
-                { label: 'Sanctions / debarment / watchlist concern', value: 'Sanctions / debarment / watchlist concern' },
-                { label: 'Materially below missing-middle floor', value: 'Materially below missing-middle floor' },
-                { label: 'Materially above missing-middle ceiling', value: 'Materially above missing-middle ceiling' },
-                { label: 'Outcome credibility concern at first read', value: 'Outcome credibility concern at first read' },
-                { label: 'Institutional credibility concern at first read', value: 'Institutional credibility concern at first read' },
-                { label: 'Other', value: 'Other' }
-            ];
+        const suggestedCodes = this._suggestedFlagCodes;
+        const selected = this.formState.s3_3 || [];
 
-        return rawList.map(o => {
-            const isSuggested = suggested.includes(o.value.toLowerCase());
-            const isSelected = (this.formState.s3_3 || []).includes(o.value);
+        return list.map(r => {
+            const isSelected = selected.includes(r.value);
+            const isSuggested = !!r.code && suggestedCodes.has(r.code);
             return {
-                val: o.value,
-                label: o.label,
+                val: r.value,
+                label: r.label,
                 suggested: isSuggested,
                 cls: ['wcf-check-opt',
                     isSelected ? 'wcf-check-sel' : '',
-                    isSuggested && !isSelected ? 'wcf-check-suggested' : '']
-                    .join(' ').trim()
+                    isSuggested && !isSelected ? 'wcf-check-suggested' : ''
+                ].filter(Boolean).join(' ')
             };
         });
     }
@@ -1230,18 +1269,119 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     get wordCount_s3_5() { return this.wc(this.formState.s3_5); }
     get wordCount_s5_1() { return this.wc(this.formState.s5_1); }
 
-    get s1_1_stateClass() { return 'wcf-auto-state wcf-auto-green'; }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // S1.1 MANDATORY-FIELDS CHECK  (U173 / IP-11)
+    // Server returns requiredKeys / missingKeys / unverifiedKeys. Nothing is
+    // reported as "populated" unless Apex actually verified it.
+    // ─────────────────────────────────────────────────────────────────────────────
+    get declaredTrackLabels() {
+        const labels = [];
+               if (this.isJobFulfillment) labels.push(TRACK_LABEL.JOB_FULFILLMENT);
+        if (this.isJobCreation) labels.push(TRACK_LABEL.JOB_CREATION);
+        if (this.isLivelihood) labels.push(TRACK_LABEL.LIVELIHOOD); // TR-16 wording
+        return labels;
+    }
+
+    _questionLabel(key) {
+        const disp = this.qNum[key];
+        const title = disp != null ? this.questionTitleMap[disp] : '';
+        return `Q${disp != null ? disp : String(key).replace('Q', '')}${title ? ' ' + title : ''}`;
+    }
+
+    get mandatoryCheck() {
+        const mc = this._mandatoryCheck;
+        const tracks = ((mc && mc.declaredTracks && mc.declaredTracks.length)
+            ? mc.declaredTracks : this.declaredTrackLabels).join(' + ') || 'No track declared';
+
+        // Server did not return a check: claim nothing, but still list what to verify
+        if (!mc || !Array.isArray(mc.requiredKeys) || mc.requiredKeys.length === 0) {
+            const expected = Object.keys(this.qNum)
+                .filter(k => !OPTIONAL_CANONICAL_KEYS.has(k))
+                .map(k => this._questionLabel(k));
+            return {
+                state: 'unverified',
+                tracks,
+                requiredCount: expected.length,
+                missing: [],
+                unverified: expected
+            };
+        }
+
+        const missing = (mc.missingKeys || []).map(k => this._questionLabel(k));
+        const unverified = (mc.unverifiedKeys || []).map(k => this._questionLabel(k));
+        return {
+            state: missing.length ? 'missing' : 'ok',
+            tracks,
+            requiredCount: mc.requiredKeys.length,
+            missing,
+            unverified
+        };
+    }
+
+    get s1_1_stateClass() {
+        return this.mandatoryCheck.state === 'ok'
+            ? 'wcf-auto-state wcf-auto-green'
+            : 'wcf-auto-state wcf-auto-amber';
+    }
+
+    get s1_1_icon() {
+        return this.mandatoryCheck.state === 'ok' ? '✓' : '⚠';
+    }
+
+    get s1_1_message() {
+        const c = this.mandatoryCheck;
+        const lines = [];
+        if (c.state === 'missing') {
+            lines.push(`${c.tracks}: ${c.missing.length} of ${c.requiredCount} mandatory questions are empty.`);
+            lines.push(`Missing: ${c.missing.join('; ')}`);
+        } else if (c.state === 'ok') {
+            lines.push(`${c.tracks}: no empty mandatory questions found (${c.requiredCount} checked).`);
+        } else {
+            lines.push(`${c.tracks}: automatic check unavailable. Verify these ${c.requiredCount} mandatory questions manually.`);
+        }
+        if (c.unverified.length) {
+            lines.push(`${c.state === 'unverified' ? 'Check' : 'Not auto-checked, confirm on the form'}: ${c.unverified.join('; ')}`);
+        }
+        return lines.join('\n');
+    }
+
     get s1_2_stateClass() {
         if (!this._attachments || this._attachments.length === 0) return 'wcf-auto-state wcf-auto-amber';
         return this.hasAttachments ? 'wcf-auto-state wcf-auto-green' : 'wcf-auto-state wcf-auto-amber';
     }
     get s1_3_stateClass() { return 'wcf-auto-state wcf-auto-green'; }
-    get s1_1_icon() { return '✓'; }
-    get s1_1_message() { return 'Mandatory fields check — verify against submitted form.'; }
 
-    get selectedFlagReasons() {
-        return this.formState.s3_3 || [];
+       get selectedFlagReasons() {
+        const labelByVal = new Map(this.flagOptions.map(o => [o.val, o.label]));
+        // A stored value that is no longer in the list still shows, rather than vanishing.
+        return (this.formState.s3_3 || []).map(v => labelByVal.get(v) || normalizeTerms(v));
     }
+
+        // "Source Channel: How did this Application reach…" -> "Source Channel" (same text the form shows)
+    _shortName(q) {
+        const t = normalizeTerms(q.questionText || q.label || '');
+        const i = t.indexOf(':');
+        return (i > 0 ? t.slice(0, i) : t).trim();
+    }
+
+    // Builds dialog rows from the SAME enriched questions the form renders.
+    _previewSection(section) {
+        return {
+            title: section.title,
+            rows: section.questions
+                .filter(q => q.showQuestion)
+                .map(q => {
+                    const raw = this.formState[q.key];
+                    const hit = (q.options || []).find(o => o.val === raw);
+                    return { key: q.key, label: this._shortName(q), value: hit ? hit.label : (raw || '—') };
+                })
+        };
+    }
+
+    get previewCompleteness() { return this._previewSection(this.section1); }
+    get previewEligibility() { return this._previewSection(this.section2); }
+    get previewTags() { return this._previewSection(this.section4); }
+    get previewNotesTitle() { return this.section5.title; }
 
     wcClass(field) {
         const limit = DEFAULT_WORD_LIMITS[field];

@@ -23,7 +23,7 @@
                     <template lwc:if={isReturned}>
                         <span class="wg-pill wg-pill--returned ac-status-pill">
                             <lightning-icon icon-name="utility:reply" size="xx-small" alternative-text=""></lightning-icon>
-                            Returned to Reviewer on {returnedDateFormatted} — awaiting Reviewer decision
+                            Returned to Reviewer on {returnedDateFormatted}. Awaiting Reviewer decision
                         </span>
                     </template>
 
@@ -211,7 +211,7 @@
                             <lightning-icon icon-name="utility:reply" size="xx-small" alternative-text=""></lightning-icon>
                             Reject
                         </button>
-                        <button class="success-btn wg-btn-sm" onclick={handleApprove} disabled={isDecisionMade}>
+                        <button class="success-btn accept-btn wg-btn-sm" onclick={handleApprove} disabled={isDecisionMade}>
                             <lightning-icon icon-name="utility:check" size="xx-small" alternative-text=""></lightning-icon>
                             Accept
                         </button>
@@ -249,7 +249,7 @@
                                 <lightning-spinner alternative-text="Saving" size="small"></lightning-spinner>
                             </template>
                             <template lwc:else>
-                                Confirm {pendingDecision}
+                                {modalConfirmLabel}
                             </template>
                         </button>
                     </div>
@@ -265,13 +265,8 @@
                         <h3 class="modal-title">Revoke decision</h3>
                     </div>
                     <div class="modal-body">
-                        <p>
-                            Are you sure you want to revoke the
-                            <strong>{existingDecision}</strong> decision for
-                            <strong>{appName}</strong>?
-                            This marks the decision as Revoked and allows a new one to be submitted.
-                        </p>
-                    </div>
+    <p>Are you sure you want to revoke the&#160;<strong class="revoke-decision-text">{existingDecision}</strong>&#160;decision for {appName}? This marks the decision as Revoked and allows a new one to be submitted.</p>
+</div>
                     <div class="modal-footer">
                         <button class="neutral-btn wg-btn-sm"
                                 onclick={handleRevokeCancel}

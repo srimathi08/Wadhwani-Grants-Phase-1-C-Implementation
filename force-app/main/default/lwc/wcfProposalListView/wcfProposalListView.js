@@ -130,7 +130,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         try {
             const rows = await getAcceptedApplicationsQueue();
             const map = new Map();
-            (rows || []).forEach(r => map.set(r.applicationId, r.approverComment));
+           (rows || []).forEach(r => map.set(r.applicationId, {
+    comment: r.approverComment,
+    complianceStatus: r.complianceRequested ? (r.complianceStatus || 'Requested') : null
+}));
             this.acceptedApplicationsMap = map;
         } catch (e) {
             console.error('Accepted applications error:', e);
@@ -189,8 +192,9 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                     return p.Status === 'Returned by Approver';
                 }
                 if (this.activeReviewFilter === 'acceptedApplications') {
-                    return this.acceptedApplicationsMap.has(p.Id);
-                }
+    const a = this.acceptedApplicationsMap.get(p.Id);
+    return !!a && !a.complianceStatus;
+}
                 return true;
             });
         }
@@ -278,9 +282,12 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         return this.proposals.filter(p => p.Status === 'Returned by Approver').length;
     }
 
-    get acceptedCount() {
-        return this.proposals.filter(p => this.acceptedApplicationsMap.has(p.Id)).length;
-    }
+   get acceptedCount() {
+    return this.proposals.filter(p => {
+        const a = this.acceptedApplicationsMap.get(p.Id);
+        return !!a && !a.complianceStatus;
+    }).length;
+}
 
     // ── Summary tiles for the template ───────────────────────────
     get summaryItems() {
@@ -416,7 +423,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
             // ── Action button (same priority order as before) ──
             const isRejected = p.Status === 'Reviewer Rejected';
-            const isAccepted = this.acceptedApplicationsMap.has(p.Id);
+            const acc              = this.acceptedApplicationsMap.get(p.Id);
+            const isAccepted       = !!acc;
+            const complianceStatus = acc ? acc.complianceStatus : null;
+            let actionTitle = '';
 
             let actionLabel, actionBtnClass, actionIcon, reviewAction;
             if (isRejected) {
@@ -424,7 +434,14 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 actionBtnClass = 'neutral-btn' + SM;
                 actionIcon     = 'utility:ban';
                 reviewAction   = 'rejected';
-            } else if (isAccepted) {
+            } else if (isAccepted && complianceStatus) {
+    actionLabel    = 'Compliance Requested';
+    actionBtnClass = 'neutral-btn' + SM;
+    actionIcon     = 'utility:check';
+    reviewAction   = 'complianceRequested';
+    actionTitle    = 'Compliance status: ' + complianceStatus;
+} 
+             else if (isAccepted) {
                 actionLabel    = 'Request Compliance';
                 actionBtnClass = 'success-btn' + SM;
                 actionIcon     = 'utility:new';
@@ -483,7 +500,9 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 reviewBadgeLabel, reviewBadgeClass,
                 formattedDate,
                 reviewId, reviewAction,
-                approverComment: this.acceptedApplicationsMap.get(p.Id) || '—',
+                approverComment: acc ? acc.comment : '—',
+actionTitle,
+isDisabled: isRejected || reviewAction === 'complianceRequested',
                 actionLabel, actionBtnClass, actionIcon,
                 dueDateDisplay, dueDateClass,
                 isRejected
@@ -533,8 +552,9 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     }
 
     handleRefresh() {
-        this.loadData();
-    }
+    this.loadData();
+    this.loadAcceptedApplications();
+}
 
     // ── Pagination handlers ──────────────────────────────────────
     handlePrevPage()     { if (!this.isFirstPage) this.currentPage--; }
@@ -549,8 +569,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     // ── Navigation (unchanged) ───────────────────────────────────
     handleReviewAction(evt) {
         const action = evt.currentTarget.dataset.action;
-        if (action === 'rejected') return;
-
+        if (action === 'rejected' || action === 'complianceRequested') return;
         if (action === 'complianceRequest') {
             const proposalId = evt.currentTarget.dataset.id;
             const appName    = evt.currentTarget.dataset.appname;

@@ -39,6 +39,11 @@ export default class WcfPortalHeader extends LightningElement {
 
     isGuestUser = isGuest;
 
+    // True only when this instance is rendering on the site's Home page
+    // (never inside Experience Builder / preview).
+    _onHome = false;
+    _redirected = false;
+
     // Raw paths without the role param. The `urls` getter adds it.
     _baseUrls = {
         validatorDashboard: '#',
@@ -56,7 +61,7 @@ export default class WcfPortalHeader extends LightningElement {
         sourcingChannelReport: '/wg-sourcing-channel-report'
     };
 
-    // Where each role lands when selected from the dropdown.
+    // Where each role lands when selected from the dropdown or forwarded from Home.
     _roleLandingKey = {
         [ROLES.VALIDATOR]: 'validatorDashboard',
         [ROLES.REVIEWER]: 'reviewerDashboard',
@@ -80,6 +85,9 @@ export default class WcfPortalHeader extends LightningElement {
 
         this._resolveUrls();
 
+        // Decided before first render so the overlay is up from the first paint.
+        this._onHome = !this._isBuilderContext() && this._isHomePage();
+
         if (this.isGuestUser) {
             this.isLoading = false;
         } else {
@@ -98,6 +106,12 @@ export default class WcfPortalHeader extends LightningElement {
     disconnectedCallback() {
         document.removeEventListener('click', this._outsideClickHandler);
     }
+
+    /*
+     * ==========================
+     * URL RESOLUTION
+     * ==========================
+     */
 
     _resolveUrls() {
 
@@ -141,6 +155,53 @@ export default class WcfPortalHeader extends LightningElement {
 
         this._baseUrls = resolved;
     }
+
+    /*
+     * ==========================
+     * HOME → DASHBOARD REDIRECT
+     * ==========================
+     */
+
+    // Never redirect inside Experience Builder / preview, or Home can't be edited.
+    _isBuilderContext() {
+        return /builder|live-preview|sitepreview/i.test(window.location.hostname);
+    }
+
+    _isHomePage() {
+        const normalize = p => (p || '').replace(/\/+$/, '');
+        const homePath = new URL(this.homeUrl, window.location.origin).pathname;
+        return normalize(window.location.pathname) === normalize(homePath);
+    }
+
+    // Mask is shown only on Home, and only while the role is resolving or the
+    // redirect is in flight. Guests and no-role users drop out of both states,
+    // so they are never stuck behind it.
+    get showRedirectOverlay() {
+        return this._onHome && (this.isLoading || this._redirected);
+    }
+
+    _redirectHomeToLanding() {
+        if (!this._onHome || this._redirected) {
+            return;
+        }
+
+        const landingKey = this._roleLandingKey[this.activeRole];
+        const target = landingKey ? this.urls[landingKey] : null;
+        if (!target || target === '#') {
+            return;
+        }
+
+        this._redirected = true;
+
+        // replace(): Home never enters history, so Back can't bounce through it.
+        window.location.replace(target);
+    }
+
+    /*
+     * ==========================
+     * DATA LOAD
+     * ==========================
+     */
 
     async _loadCurrentAccountId() {
         try {
@@ -196,23 +257,23 @@ export default class WcfPortalHeader extends LightningElement {
     _resolveRole() {
         this.activeRole = resolveActiveRole(this.roleContext);
         persistRole(this.activeRole);
+        this._redirectHomeToLanding();
     }
 
     get heldRoles() {
         return getHeldRoles(this.roleContext);
     }
 
-    // A one-item picklist is noise. Single-role users get it applied silently.
-    // Show the chip whenever a role resolved — it's useful context even
-// when there's nothing to switch to.
-get showRoleChip() {
-    return !this.isGuestUser && !!this.activeRole;
-}
+    // Show the chip whenever a role resolved — useful context even when
+    // there's nothing to switch to.
+    get showRoleChip() {
+        return !this.isGuestUser && !!this.activeRole;
+    }
 
-// Only interactive when there's an actual choice to make.
-get isRoleSwitchable() {
-    return this.heldRoles.length > 1;
-}
+    // Only interactive when there's an actual choice to make.
+    get isRoleSwitchable() {
+        return this.heldRoles.length > 1;
+    }
 
     get activeRoleLabel() {
         return this.activeRole ? ROLE_LABELS[this.activeRole] : '';
@@ -266,8 +327,12 @@ get isRoleSwitchable() {
         return out;
     }
 
+    // Logo goes to the user's own dashboard; falls back to Home (guest / no role).
     get homeHref() {
-        return withRole(this.homeUrl, this.activeRole);
+        const landingKey = this._roleLandingKey[this.activeRole];
+        return landingKey
+            ? this.urls[landingKey]
+            : withRole(this.homeUrl, this.activeRole);
     }
 
     /*
@@ -328,9 +393,19 @@ get isRoleSwitchable() {
         return items;
     }
 
-    get showMore() {
-        return this.moreItems.length > 0;
-    }
+   // One extra item reads better as a normal tab than as a dropdown with a single entry.
+get inlineItems() {
+    return this.moreItems.length === 1 ? this.moreItems : [];
+}
+
+// Dropdown only appears once a role has 2+ extra items.
+get dropdownItems() {
+    return this.moreItems.length > 1 ? this.moreItems : [];
+}
+
+get showMore() {
+    return this.dropdownItems.length > 0;
+}
 
     toggleMore(event) {
         event.stopPropagation();

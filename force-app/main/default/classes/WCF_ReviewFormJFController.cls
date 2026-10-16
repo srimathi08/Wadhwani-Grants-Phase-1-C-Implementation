@@ -33,10 +33,12 @@ public without sharing class WCF_ReviewFormJFController {
     private static ApplicationReview findExistingReview(
         Id applicationId, Id userId, String recordTypeId
     ) {
+ Set<Id> reviewerRtIds = RecordTypeHelper.applicationReviewReviewerAllowedIds();  
         List<ApplicationReview> existing = [
             SELECT Id, Status, ReviewedById, AssignedUserId, RecordTypeId
             FROM   ApplicationReview
             WHERE  ApplicationId  = :applicationId
+AND  RecordTypeId IN :reviewerRtIds
               AND  (IsSubmitted = false OR IsSubmitted = null)
               AND  Status != 'Review Submitted'
             WITH SYSTEM_MODE
@@ -404,6 +406,8 @@ public without sharing class WCF_ReviewFormJFController {
 
     @AuraEnabled(cacheable=false)
     public static ApplicationReview getDraftReviewRecord(Id applicationId) {
+ Set<Id> reviewerRtIds = RecordTypeHelper.applicationReviewReviewerAllowedIds();   // ← declare it
+
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.ApplicationReview.fields.getMap();
         List<String> selectFields = new List<String>();
         for (String fieldName : fieldMap.keySet()) {
@@ -413,6 +417,7 @@ public without sharing class WCF_ReviewFormJFController {
         String query = 'SELECT ' + String.join(selectFields, ', ') + 
                        ' FROM ApplicationReview' +
                        ' WHERE (ApplicationId = :applicationId OR Id = :applicationId)' +
+ '   AND RecordTypeId IN :reviewerRtIds' +      // ← ADD
                        '   AND (IsSubmitted = false OR IsSubmitted = null)' +
                        '   AND Status != \'Review Submitted\'' +
                        ' ORDER BY LastModifiedDate DESC' +

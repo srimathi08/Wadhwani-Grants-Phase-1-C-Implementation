@@ -14,14 +14,11 @@
                 <span class="rv-action-toolbar-title">Application preview</span>
                 <div class="rv-action-toolbar-actions">
                     <template if:true={isPdfGenerating}>
-                        <lightning-spinner alternative-text="Generating PDF" size="x-small" class="rv-pdf-spinner"></lightning-spinner>
+                        <lightning-spinner alternative-text="Generating PDF" size="x-small"
+                            class="rv-pdf-spinner"></lightning-spinner>
                     </template>
-                    <lightning-button
-                        variant="brand"
-                        label="Download as PDF"
-                        icon-name="utility:download"
-                        disabled={isPdfGenerating}
-                        onclick={handleDownloadPDF}>
+                    <lightning-button variant="brand" label="Download as PDF" icon-name="utility:download"
+                        disabled={isPdfGenerating} onclick={handleDownloadPDF}>
                     </lightning-button>
                 </div>
             </div>
@@ -244,7 +241,8 @@
                 <div class="rv-row">
                     <div class="rv-lbl">
                         <span class="rv-q-num">{qNum.Q7}</span>
-                        <span class="rv-lbl-text">Top 3 Most Prominent Funders <span class="rv-opt-tag">Optional</span></span>
+                        <span class="rv-lbl-text">Top 3 Most Prominent Funders <span
+                                class="rv-opt-tag">Optional</span></span>
                     </div>
                     <div class="rv-val">
                         <template if:true={hasFunders}>
@@ -282,7 +280,8 @@
                 <div class="rv-row">
                     <div class="rv-lbl">
                         <span class="rv-q-num">{qNum.Q8}</span>
-                        <span class="rv-lbl-text">References for Outreach <span class="rv-opt-tag">Optional</span></span>
+                        <span class="rv-lbl-text">References for Outreach <span
+                                class="rv-opt-tag">Optional</span></span>
                     </div>
                     <div class="rv-val">
                         <template if:true={hasReferences}>
@@ -325,7 +324,9 @@
                                 <thead>
                                     <tr>
                                         <th>Item</th>
-                                        <th>{fyLabel3}</th><th>{fyLabel2}</th><th>{fyLabel1}</th>
+                                        <th>{fyLabel3}</th>
+                                        <th>{fyLabel2}</th>
+                                        <th>{fyLabel1}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -377,7 +378,10 @@
                             <table class="rv-table">
                                 <thead>
                                     <tr>
-                                        <th>Item</th><th>Budget</th><th>Projection</th><th>Deviation</th>
+                                        <th>Item</th>
+                                        <th>Budget</th>
+                                        <th>Projection</th>
+                                        <th>Deviation</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -412,7 +416,8 @@
                         <template if:true={showCFYExplanation}>
                             <div class="rv-rich-box">
                                 <div class="rv-rich-label">Explanation of Deviation</div>
-                                <lightning-formatted-rich-text value={cfyVarianceExplanation}></lightning-formatted-rich-text>
+                                <lightning-formatted-rich-text
+                                    value={cfyVarianceExplanation}></lightning-formatted-rich-text>
                             </div>
                         </template>
                     </div>
@@ -449,7 +454,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q11}</span>
-                            <span class="rv-lbl-text">Your Skilling Approach <span class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
+                            <span class="rv-lbl-text">Your Skilling Approach <span class="rv-tag rv-tag-jf">Job
+                                    Fulfillment</span></span>
                         </div>
                         <div class="rv-val">
                             <lightning-formatted-rich-text value={skillingApproach}></lightning-formatted-rich-text>
@@ -460,7 +466,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q12}</span>
-                            <span class="rv-lbl-text">Skilling Domains Offered <span class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
+                            <span class="rv-lbl-text">Skilling Domains Offered <span class="rv-tag rv-tag-jf">Job
+                                    Fulfillment</span></span>
                         </div>
                         <div class="rv-val">
                             <template if:true={hasSkillingDomains}>
@@ -499,7 +506,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q13}</span>
-                            <span class="rv-lbl-text">Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals) <span class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
+                            <span class="rv-lbl-text">Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals) <span
+                                    class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
@@ -507,7 +515,9 @@
                                     <thead>
                                         <tr>
                                             <th>Item</th>
-                                            <th>{fyLabel3}</th><th>{fyLabel2}</th><th>{fyLabel1}</th>
+                                            <th>{fyLabel3}</th>
+                                            <th>{fyLabel2}</th>
+                                            <th>{fyLabel1}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -545,20 +555,31 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q14}</span>
-                            <span class="rv-lbl-text">Job Fulfillment Outcomes — Current FY Projections <span class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
+                            <span class="rv-lbl-text">Job Fulfillment Outcomes — Current FY Projections <span
+                                    class="rv-tag rv-tag-jf">Job Fulfillment</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
                                 <table class="rv-table">
                                     <thead>
                                         <tr>
-                                            <th>Item</th><th>FY-2026 (CFY) — Projection</th>
+                                            <th>Item</th>
+                                            <th>FY-2026 (CFY) — Projection</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td># Learner Enrolments</td><td>{outcomeData.learnerEnrolCFY}</td></tr>
-                                        <tr><td># of learner placements</td><td>{outcomeData.learnerPlaceCFY}</td></tr>
-                                        <tr><td>Placement %</td><td>{outcomeData.placePctCFY}</td></tr>
+                                        <tr>
+                                            <td># Learner Enrolments</td>
+                                            <td>{outcomeData.learnerEnrolCFY}</td>
+                                        </tr>
+                                        <tr>
+                                            <td># of learner placements</td>
+                                            <td>{outcomeData.learnerPlaceCFY}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Placement %</td>
+                                            <td>{outcomeData.placePctCFY}</td>
+                                        </tr>
                                         <tr class="rv-cost-row rv-cost-row-manual">
                                             <td>Avg Cost per Placement</td>
                                             <td>{outcomeData.manualCostPerPlaceCFY}</td>
@@ -601,7 +622,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q15}</span>
-                            <span class="rv-lbl-text">Your Job Creation Approach <span class="rv-tag rv-tag-jc">Job Creation</span></span>
+                            <span class="rv-lbl-text">Your Job Creation Approach <span class="rv-tag rv-tag-jc">Job
+                                    Creation</span></span>
                         </div>
                         <div class="rv-val">
                             <lightning-formatted-rich-text value={jobCreationApproach}></lightning-formatted-rich-text>
@@ -612,7 +634,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q16}</span>
-                            <span class="rv-lbl-text">Business Sectors Served <span class="rv-tag rv-tag-jc">Job Creation</span></span>
+                            <span class="rv-lbl-text">Business Sectors Served <span class="rv-tag rv-tag-jc">Job
+                                    Creation</span></span>
                         </div>
                         <div class="rv-val">
                             <template if:true={hasBusinessSectors}>
@@ -649,7 +672,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q17}</span>
-                            <span class="rv-lbl-text">Job Creation Outcomes — Last 3 Fiscal Years (Actuals) <span class="rv-tag rv-tag-jc">Job Creation</span></span>
+                            <span class="rv-lbl-text">Job Creation Outcomes — Last 3 Fiscal Years (Actuals) <span
+                                    class="rv-tag rv-tag-jc">Job Creation</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
@@ -657,7 +681,9 @@
                                     <thead>
                                         <tr>
                                             <th>Item</th>
-                                            <th>{fyLabel3}</th><th>{fyLabel2}</th><th>{fyLabel1}</th>
+                                            <th>{fyLabel3}</th>
+                                            <th>{fyLabel2}</th>
+                                            <th>{fyLabel1}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -701,21 +727,35 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q18}</span>
-                            <span class="rv-lbl-text">Job Creation Outcomes — Current FY Projections <span class="rv-tag rv-tag-jc">Job Creation</span></span>
+                            <span class="rv-lbl-text">Job Creation Outcomes — Current FY Projections <span
+                                    class="rv-tag rv-tag-jc">Job Creation</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
                                 <table class="rv-table">
                                     <thead>
                                         <tr>
-                                            <th>Item</th><th>CFY (projected)</th>
+                                            <th>Item</th>
+                                            <th>CFY (projected)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td># New Businesses Started</td><td>{outcomeData.newBizCFY}</td></tr>
-                                        <tr><td># jobs created by new businesses</td><td>{outcomeData.jobsNewBizCFY}</td></tr>
-                                        <tr><td>Existing Businesses Supported</td><td>{outcomeData.growBizCFY}</td></tr>
-                                        <tr><td># jobs created by existing businesses</td><td>{outcomeData.jobsGrowBizCFY}</td></tr>
+                                        <tr>
+                                            <td># New Businesses Started</td>
+                                            <td>{outcomeData.newBizCFY}</td>
+                                        </tr>
+                                        <tr>
+                                            <td># jobs created by new businesses</td>
+                                            <td>{outcomeData.jobsNewBizCFY}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Existing Businesses Supported</td>
+                                            <td>{outcomeData.growBizCFY}</td>
+                                        </tr>
+                                        <tr>
+                                            <td># jobs created by existing businesses</td>
+                                            <td>{outcomeData.jobsGrowBizCFY}</td>
+                                        </tr>
                                         <tr class="rv-cost-row rv-cost-row-manual">
                                             <td>Total Avg Cost per Job Created</td>
                                             <td>{outcomeData.manualCostPerJobCFY}</td>
@@ -747,7 +787,7 @@
             <!-- ═══════════════════════════════════════════════════════════
                  SECTION 4 — TRACK 3: LIVELIHOOD UPLIFTMENT (Q19 - Q23)
             ════════════════════════════════════════════════════════════ -->
-                       <template if:true={isLivelihood}>
+            <template if:true={isLivelihood}>
                 <div class="rv-section">
                     <div class="rv-section-head">
                         <span class="rv-section-step">{sectionLivStepLabel}</span>
@@ -758,7 +798,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q19}</span>
-                            <span class="rv-lbl-text">Your Livelihood Upliftment Approach <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                            <span class="rv-lbl-text">Your Livelihood Upliftment Approach <span
+                                    class="rv-tag rv-tag-liv">Livelihood</span></span>
                         </div>
                         <div class="rv-val">
                             <lightning-formatted-rich-text value={livelihoodApproach}></lightning-formatted-rich-text>
@@ -769,7 +810,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q20}</span>
-                            <span class="rv-lbl-text">Key Programs / Initiatives <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                            <span class="rv-lbl-text">Key Programs / Initiatives <span
+                                    class="rv-tag rv-tag-liv">Livelihood</span></span>
                         </div>
                         <div class="rv-val">
                             <template if:true={hasLivelihoodPrograms}>
@@ -806,7 +848,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q21}</span>
-                            <span class="rv-lbl-text">Communities that you work in <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                            <span class="rv-lbl-text">Communities that you work in <span
+                                    class="rv-tag rv-tag-liv">Livelihood</span></span>
                         </div>
                         <div class="rv-val">
                             <template if:true={hasCommunities}>
@@ -848,7 +891,8 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q22}</span>
-                            <span class="rv-lbl-text">Livelihood Outcomes (Actuals) <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                            <span class="rv-lbl-text">Livelihood Outcomes (Actuals) <span
+                                    class="rv-tag rv-tag-liv">Livelihood</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
@@ -856,7 +900,9 @@
                                     <thead>
                                         <tr>
                                             <th>Item</th>
-                                            <th>{fyLabel3}</th><th>{fyLabel2}</th><th>{fyLabel1}</th>
+                                            <th>{fyLabel3}</th>
+                                            <th>{fyLabel2}</th>
+                                            <th>{fyLabel1}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -894,20 +940,31 @@
                     <div class="rv-row">
                         <div class="rv-lbl">
                             <span class="rv-q-num">{qNum.Q23}</span>
-                            <span class="rv-lbl-text">Livelihood Outcomes, Current FY Projections <span class="rv-tag rv-tag-liv">Livelihood</span></span>
+                            <span class="rv-lbl-text">Livelihood Outcomes, Current FY Projections <span
+                                    class="rv-tag rv-tag-liv">Livelihood</span></span>
                         </div>
                         <div class="rv-val">
                             <div class="rv-table-wrap">
                                 <table class="rv-table">
                                     <thead>
                                         <tr>
-                                            <th>Item</th><th>CFY (projected)</th>
+                                            <th>Item</th>
+                                            <th>CFY (projected)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Households served during the year (projected)</td><td>{outcomeData.livServedProj}</td></tr>
-                                        <tr><td>Households newly enrolled during the year (projected)</td><td>{outcomeData.livEnrollProj}</td></tr>
-                                        <tr><td>Households expected to meet outcome criteria (projected)</td><td>{outcomeData.livOutcomeProj}</td></tr>
+                                        <tr>
+                                            <td>Households served during the year (projected)</td>
+                                            <td>{outcomeData.livServedProj}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Households newly enrolled during the year (projected)</td>
+                                            <td>{outcomeData.livEnrollProj}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Households expected to meet outcome criteria (projected)</td>
+                                            <td>{outcomeData.livOutcomeProj}</td>
+                                        </tr>
                                         <tr class="rv-cost-row rv-cost-row-manual">
                                             <td>Avg. cost per outcome (USD) - projected</td>
                                             <td>{outcomeData.livCostManualProj}</td>
@@ -962,20 +1019,18 @@
                             <template if:true={hasQ24Documents}>
                                 <div class="rv-doc-heading">Verification reports</div>
                                 <template for:each={q24Documents} for:item="f">
-                                    <div key={f.documentId} class="rv-doc-row">
-                                        <lightning-icon icon-name="utility:attach" size="x-small" alternative-text=""></lightning-icon>
-                                        <button type="button" class="rv-file-link"
-                                                data-docid={f.documentId}
-                                                data-versionid={f.versionId}
+                                    <div key={f.documentId} class="rv-doc-card">
+                                        <lightning-icon icon-name={f.iconName} size="small"
+                                            alternative-text={f.typeLabel} class="rv-doc-icon"></lightning-icon>
+                                        <div class="rv-doc-main">
+                                            <button type="button" class="rv-file-link rv-doc-name" title={f.name}
+                                                data-docid={f.documentId} data-versionid={f.versionId}
                                                 onclick={handlePreview}>{f.name}</button>
-                                        <lightning-button
-                                            label="Open"
-                                            variant="base"
-                                            data-docid={f.documentId}
-                                            data-versionid={f.versionId}
-                                            onclick={handlePreview}
-                                            class="rv-doc-open">
-                                        </lightning-button>
+                                            <div class="rv-doc-meta">{f.metaLine}</div>
+                                        </div>
+                                        <lightning-button label="Open" variant="base" data-docid={f.documentId}
+                                            data-versionid={f.versionId} onclick={handlePreview}
+                                            class="rv-doc-open"></lightning-button>
                                     </div>
                                 </template>
                             </template>
@@ -1009,7 +1064,8 @@
                 <div class="rv-row">
                     <div class="rv-lbl">
                         <span class="rv-q-num">{qNum.Q27}</span>
-                        <span class="rv-lbl-text">Operational Synergies &mdash; GenieAI <span class="rv-opt-tag">Optional</span></span>
+                        <span class="rv-lbl-text">Operational Synergies &mdash; GenieAI <span
+                                class="rv-opt-tag">Optional</span></span>
                     </div>
                     <div class="rv-val">
                         <div class="rv-genie-interest">
@@ -1020,7 +1076,8 @@
                             <div class="rv-sub-answer rv-sub-answer-purple">
                                 <div class="rv-sub-answer-header">How GenieAI could contribute</div>
                                 <div class="rv-sub-answer-body">
-                                    <lightning-formatted-rich-text value={synergiesValue}></lightning-formatted-rich-text>
+                                    <lightning-formatted-rich-text
+                                        value={synergiesValue}></lightning-formatted-rich-text>
                                 </div>
                             </div>
                         </template>
@@ -1034,24 +1091,20 @@
                         <span class="rv-lbl-text">Supporting Documents <span class="rv-opt-tag">Optional</span></span>
                     </div>
                     <div class="rv-val">
-                        <template if:true={hasSupportingDocuments}>
-                            <template for:each={supportingDocuments} for:item="f">
-                                <div key={f.documentId} class="rv-doc-row">
-                                    <lightning-icon icon-name="utility:attach" size="x-small" alternative-text=""></lightning-icon>
-                                    <button type="button" class="rv-file-link"
-                                            data-docid={f.documentId}
-                                            data-versionid={f.versionId}
-                                            onclick={handlePreview}>{f.name}</button>
-                                    <lightning-button
-                                        label="Open"
-                                        variant="base"
-                                        data-docid={f.documentId}
-                                        data-versionid={f.versionId}
-                                        onclick={handlePreview}
-                                        class="rv-doc-open">
-                                    </lightning-button>
+                        <template for:each={supportingDocuments} for:item="f">
+                            <div key={f.documentId} class="rv-doc-card">
+                                <lightning-icon icon-name={f.iconName} size="small" alternative-text={f.typeLabel}
+                                    class="rv-doc-icon"></lightning-icon>
+                                <div class="rv-doc-main">
+                                    <button type="button" class="rv-file-link rv-doc-name" title={f.name}
+                                        data-docid={f.documentId} data-versionid={f.versionId}
+                                        onclick={handlePreview}>{f.name}</button>
+                                    <div class="rv-doc-meta">{f.metaLine}</div>
                                 </div>
-                            </template>
+                                <lightning-button label="Open" variant="base" data-docid={f.documentId}
+                                    data-versionid={f.versionId} onclick={handlePreview}
+                                    class="rv-doc-open"></lightning-button>
+                            </div>
                         </template>
                         <template if:false={hasSupportingDocuments}>
                             <div class="rv-val-bold">—</div>
@@ -1099,20 +1152,18 @@
                                 The applicant uploaded the following document(s) in response to the Reviewer's request.
                             </p>
                             <template for:each={additionalInfoFiles} for:item="f">
-                                <div key={f.documentId} class="rv-doc-row">
-                                    <lightning-icon icon-name="utility:attach" size="x-small" alternative-text=""></lightning-icon>
-                                    <button type="button" class="rv-file-link"
-                                            data-docid={f.documentId}
-                                            data-versionid={f.versionId}
+                                <div key={f.documentId} class="rv-doc-card">
+                                    <lightning-icon icon-name={f.iconName} size="small" alternative-text={f.typeLabel}
+                                        class="rv-doc-icon"></lightning-icon>
+                                    <div class="rv-doc-main">
+                                        <button type="button" class="rv-file-link rv-doc-name" title={f.name}
+                                            data-docid={f.documentId} data-versionid={f.versionId}
                                             onclick={handleOpenAdditionalInfoFile}>{f.name}</button>
-                                    <lightning-button
-                                        label="Open"
-                                        variant="base"
-                                        data-docid={f.documentId}
-                                        data-versionid={f.versionId}
-                                        onclick={handleOpenAdditionalInfoFile}
-                                        class="rv-doc-open">
-                                    </lightning-button>
+                                        <div class="rv-doc-meta">{f.metaLine}</div>
+                                    </div>
+                                    <lightning-button label="Open" variant="base" data-docid={f.documentId}
+                                        data-versionid={f.versionId} onclick={handleOpenAdditionalInfoFile}
+                                        class="rv-doc-open"></lightning-button>
                                 </div>
                             </template>
                         </div>
@@ -1152,7 +1203,8 @@
 
         <template if:false={hasRecord}>
             <div class="error-banner rv-load-error" role="alert">
-                <lightning-icon icon-name="utility:error" size="x-small" variant="error" alternative-text=""></lightning-icon>
+                <lightning-icon icon-name="utility:error" size="x-small" variant="error"
+                    alternative-text=""></lightning-icon>
                 <div class="wg-banner-body">Could not load application record.</div>
             </div>
         </template>
@@ -1160,24 +1212,16 @@
         <!-- Office Document Preview Modal -->
         <template if:true={isOfficePreviewOpen}>
             <section role="dialog" aria-modal="true" aria-label={officePreviewTitle}
-                     class="slds-modal slds-fade-in-open office-preview-modal">
+                class="slds-modal slds-fade-in-open office-preview-modal">
                 <div class="slds-modal__container rv-office-container">
                     <header class="slds-modal__header rv-office-header">
                         <h2 class="rv-office-title">{officePreviewTitle}</h2>
                         <div class="rv-office-actions">
-                            <lightning-button
-                                label="Download file"
-                                variant="neutral"
-                                icon-name="utility:download"
+                            <lightning-button label="Download file" variant="neutral" icon-name="utility:download"
                                 onclick={handleDownloadCurrentOfficeDoc}>
                             </lightning-button>
-                            <lightning-button-icon
-                                icon-name="utility:close"
-                                variant="bare"
-                                size="large"
-                                alternative-text="Close"
-                                title="Close"
-                                onclick={closeOfficePreview}>
+                            <lightning-button-icon icon-name="utility:close" variant="bare" size="large"
+                                alternative-text="Close" title="Close" onclick={closeOfficePreview}>
                             </lightning-button-icon>
                         </div>
                     </header>

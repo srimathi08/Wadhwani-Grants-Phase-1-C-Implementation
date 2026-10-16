@@ -136,7 +136,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     @track _resolvedRecordTypeId = null;
     @track institutionName = '';
     @track applicationName = '';
-    @track outcomeDeveloperName = OUTCOME_BOTH;
+    @track outcomeDeveloperName = '';
     @track outcomeDisplayLabel = '';
 
     @track isLoadingMetadata = true;
@@ -242,14 +242,24 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     connectedCallback() {
-        this.loadFormMetadata();
+
     }
 
-    loadFormMetadata() {
+    _metaReqId = 0;
+
+    loadFormMetadata(trackOverride) {
+        const trackParam = trackOverride
+            || this.outcomeDisplayLabel
+            || this._incomingTrack
+            || null;
+        if (!trackParam) return;                      // track not known yet, so don't load
+
+        const reqId = ++this._metaReqId;
         this.isLoadingMetadata = true;
-        const trackParam = this._incomingTrack || this.outcomeDisplayLabel || this.outcomeDeveloperName || null;
+
         getReviewerFormV5Metadata({ trackName: trackParam })
             .then(res => {
+                if (reqId !== this._metaReqId) return;   // a newer request exists, so ignore this one
                 if (res && res.success && res.categories && res.categories.length > 0) {
                     this.categories = res.categories;
                     if (this._cachedDraftReview) {
@@ -259,6 +269,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 this.isLoadingMetadata = false;
             })
             .catch(err => {
+                if (reqId !== this._metaReqId) return;
                 console.error('Error loading reviewer form metadata:', err);
                 this.isLoadingMetadata = false;
             });
@@ -295,6 +306,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 }
             })
             .catch(error => console.error('Error fetching application:', error));
+        this.loadFormMetadata('ALL');
     }
 
     loadDraftReview() {
@@ -304,20 +316,19 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 if (review && review.Id) {
                     this._cachedDraftReview = review;
                     this.applyDraftReviewData(review);
-                } else {
+                } else if (!this.reviewData.Id) {              // ← only create if none exists
                     const trackParam = this.outcomeDeveloperName || this._incomingTrack || 'Both';
                     createReviewRecord({ applicationId: this._applicationId, track: trackParam })
                         .then(newReviewId => {
-                            if (newReviewId) {
-                                this.reviewData = { ...this.reviewData, Id: newReviewId };
-                            }
+                            if (newReviewId) this.reviewData = { ...this.reviewData, Id: newReviewId };
                         })
-                        .catch(err => {
-                            console.error('Error auto-creating review record:', err);
-                        });
+                        .catch(err => console.error('Error auto-creating review record:', err));
                 }
             })
-            .catch(error => console.error('Error loading draft:', error));
+            .catch(error => {
+                console.error('Error loading draft:', error);
+                this.showToast('Error', error?.body?.message || 'Could not load your saved draft.', 'error');
+            });
     }
 
     applyDraftReviewData(review) {
@@ -492,15 +503,15 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             return null;
         }
         const cat = this.categories[this.currentStep];
-        const LVLS = ['Very strong', 'Strong', 'Adequate', 'Weak', 'Very weak'];
-        const NS = [5, 4, 3, 2, 1];
-        const CLS = ['col col-l5', 'col col-l4', 'col col-l3', 'col col-l2', 'col col-l1'];
+        const LVLS = ['Very weak', 'Weak', 'Adequate', 'Strong', 'Very strong'];
+        const NS = [1, 2, 3, 4, 5];
+        const CLS = ['col col-l1', 'col col-l2', 'col col-l3', 'col col-l4', 'col col-l5'];
         const TEXTS = [
-            'Level 5: Exceptional, verified standard across all sub-criteria with robust multi-year evidence.',
-            'Level 4: Strong capability meeting benchmarks with verifiable documentation.',
-            'Level 3: Adequate baseline meeting minimum operational standards with minor gaps.',
+            'Level 1: Very weak, unverified claims, or serious institutional/operational deficiencies.',
             'Level 2: Weak capability, notable omissions, or inconsistent track record.',
-            'Level 1: Very weak, unverified claims, or serious institutional/operational deficiencies.'
+            'Level 3: Adequate baseline meeting minimum operational standards with minor gaps.',
+            'Level 4: Strong capability meeting benchmarks with verifiable documentation.',
+            'Level 5: Exceptional, verified standard across all sub-criteria with robust multi-year evidence.'
         ];
 
         return {
@@ -533,11 +544,11 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             // Ladder map
             const ladderArr = q.ladder || [];
             const ladderItems = [
-                { level: 5, text: ladderArr[4] || 'Level 5: Very strong' },
-                { level: 4, text: ladderArr[3] || 'Level 4: Strong' },
-                { level: 3, text: ladderArr[2] || 'Level 3: Adequate' },
+                { level: 1, text: ladderArr[0] || 'Level 1: Very weak' },
                 { level: 2, text: ladderArr[1] || 'Level 2: Weak' },
-                { level: 1, text: ladderArr[0] || 'Level 1: Very weak' }
+                { level: 3, text: ladderArr[2] || 'Level 3: Adequate' },
+                { level: 4, text: ladderArr[3] || 'Level 4: Strong' },
+                { level: 5, text: ladderArr[4] || 'Level 5: Very strong' }
             ];
 
             const selectedLadderText = r != null && ladderArr[r - 1] ? ladderArr[r - 1] : '';
@@ -570,7 +581,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 segmentedClass,
                 ratingError: !!invalid.rating,
                 ratingErrorMessage,
-                ratingBtns: [5, 4, 3, 2, 1].map(n => {
+                ratingBtns: [1, 2, 3, 4, 5].map(n => {
                     const sel = r === n;
                     let cls = '';
                     if (sel) {
@@ -660,7 +671,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
     }
 
     get recStrengthBtns() {
-        return [5, 4, 3, 2, 1].map(n => ({
+        return [1, 2, 3, 4, 5].map(n => ({
             n,
             label: RATING_LABEL[n],
             yesSelCls: this.recStrength === n ? 'seg-sel' : ''
@@ -1489,9 +1500,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                     if (r != null) {
                         payload[mapping.rating] = String(r);
                     }
-                    if (c) {
-                        payload[mapping.comment] = c;
-                    }
+                    if (c && mapping.comment) { payload[mapping.comment] = c; }
                 }
 
                 // Append full structured answer to JSON array

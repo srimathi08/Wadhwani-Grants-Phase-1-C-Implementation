@@ -23,12 +23,12 @@
                             <span class="meta-label">Recommend</span>
                             <span class={recClass}>{recIcon} {recommendation}</span>
                         </span>
-                        <template if:true={recStrengthLabel}>
+                        <!--  <template if:true={recStrengthLabel}>
                             <span class="meta-item">
                                 <span class="meta-label">Conviction</span>
                                 <span class="strength-label">{recStrengthLabel} ({recStrengthNum})</span>
                             </span>
-                        </template>
+                        </template> -->
                     </div>
                 </div>
 
@@ -51,7 +51,8 @@
                             <div class="dim-num">{dim.id}</div>
                             <div class="dim-title-wrap">
                                 <span class="dim-title">{dim.title}</span>
-                                <span class="dim-mean"><span class="meta-label">Mean</span> <strong>{dim.mean}</strong></span>
+                                <span class="dim-mean"><span class="meta-label">Mean</span>
+                                    <strong>{dim.mean}</strong></span>
                             </div>
                         </div>
                         <template for:each={dim.questions} for:item="q">

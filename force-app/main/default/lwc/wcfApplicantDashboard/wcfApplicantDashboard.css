@@ -45,6 +45,7 @@
 }
 
 @media (max-width: 768px) {
+
     .dash-grid,
     .dash-grid--approved {
         grid-template-columns: 1fr;
@@ -71,13 +72,40 @@
     text-transform: uppercase;
 }
 
-.dash-badge--draft      { background: #fdecea; color: #c0392b; }
-.dash-badge--submitted  { background: #eaf6ec; color: #1e7e34; }
-.dash-badge--revision   { background: #fdecea; color: #c0392b; }
-.dash-badge--sealed     { background: #e9f0fb; color: #2c5cc5; }
-.dash-badge--review     { background: #fff3cd; color: #8a6d00; }
-.dash-badge--approved   { background: #d4f4e2; color: #04844b; }
-.dash-badge--decided    { background: #6b7280; color: #ffffff; }
+.dash-badge--draft {
+    background: #fdecea;
+    color: #c0392b;
+}
+
+.dash-badge--submitted {
+    background: #eaf6ec;
+    color: #1e7e34;
+}
+
+.dash-badge--revision {
+    background: #fdecea;
+    color: #c0392b;
+}
+
+.dash-badge--sealed {
+    background: #e9f0fb;
+    color: #2c5cc5;
+}
+
+.dash-badge--review {
+    background: #fff3cd;
+    color: #8a6d00;
+}
+
+.dash-badge--approved {
+    background: #d4f4e2;
+    color: #04844b;
+}
+
+.dash-badge--decided {
+    background: #6b7280;
+    color: #ffffff;
+}
 
 /* ── Card row (title + action button) ────────────────────────── */
 .dash-card-row {
@@ -314,14 +342,23 @@
     justify-content: center;
 }
 
-.dash-track-icon--mou        { background: #fdecea; }
-.dash-track-icon--docs       { background: #e9f0fb; }
-.dash-track-icon--programme  { background: #f3f3f3; }
+.dash-track-icon--mou {
+    background: #fdecea;
+}
+
+.dash-track-icon--docs {
+    background: #e9f0fb;
+}
+
+.dash-track-icon--programme {
+    background: #f3f3f3;
+}
 
 /* Content column */
 .dash-track-body {
     flex: 1;
-    min-width: 0; /* prevent text overflow from breaking layout */
+    min-width: 0;
+    /* prevent text overflow from breaking layout */
 }
 
 /* Title + badge on the same line, spaced apart — this is the key
@@ -385,16 +422,32 @@
     flex-shrink: 0;
 }
 
-.dash-track-badge--active     { background: #d4f4e2; color: #04844b; }
-.dash-track-badge--pending    { background: #ecebea; color: #514f4d; }
-.dash-track-badge--inprogress { background: #fff3cd; color: #8a6d00; }
-.dash-track-badge--expired    { background: #fdecea; color: #c23934; }
+.dash-track-badge--active {
+    background: #d4f4e2;
+    color: #04844b;
+}
+
+.dash-track-badge--pending {
+    background: #ecebea;
+    color: #514f4d;
+}
+
+.dash-track-badge--inprogress {
+    background: #fff3cd;
+    color: #8a6d00;
+}
+
+.dash-track-badge--expired {
+    background: #fdecea;
+    color: #c23934;
+}
 
 /* Compliance progress bar fill (distinct class from draft .dash-progress-fill
    so renderedCallback can target each independently) */
 .dash-compliance-fill {
     height: 100%;
-    background: #04844b !important;   /* green, not red */
+    background: #04844b !important;
+    /* green, not red */
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -412,15 +465,27 @@
 .dash-back-btn {
     margin-bottom: 16px;
 }
+
 .dash-badge--decided-text {
     text-transform: none;
     white-space: normal;
 }
 
 /* Compliance Decision Badges */
-.dash-track-badge--rejected   { background-color: #fdecea; color: #c23934; }
-.dash-track-badge--suspended  { background-color: #fff3cd; color: #8a6d00; }
-.dash-track-badge--returned   { background-color: #fff4e5; color: #93540a; }
+.dash-track-badge--rejected {
+    background-color: #fdecea;
+    color: #c23934;
+}
+
+.dash-track-badge--suspended {
+    background-color: #fff3cd;
+    color: #8a6d00;
+}
+
+.dash-track-badge--returned {
+    background-color: #fff4e5;
+    color: #93540a;
+}
 
 /* Compliance Decision Banners */
 .decision-banner {
@@ -432,7 +497,7 @@
     border-radius: 6px;
     border-left: 4px solid;
     font-size: 0.9rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .decision-content strong {
@@ -468,6 +533,7 @@
     border-color: #fbc02d;
     border-left-width: 5px;
 }
+
 .decision-icon-suspended {
     --sds-c-icon-color-foreground: #fbc02d;
 }
@@ -478,6 +544,7 @@
     border-color: #f57c00;
     border-left-width: 5px;
 }
+
 .decision-icon-returned {
     --sds-c-icon-color-foreground: #f57c00;
 }
@@ -586,4 +653,9 @@
 .dash-btn-download-doc:hover {
     background: #a30d25;
     border-color: #a30d25;
+}
+
+.dash-track-badge--review {
+    background: #fdf0e1;
+    color: #8a4b08;
 }

@@ -52,6 +52,7 @@ const UI_TEXT = {
     complete: 'Complete',
     completeTitle: "You're onboarded",
     completeBody: 'All steps are finished.',
+    notStarted: 'Not started',
     inProgress: 'In progress',
     actionNeeded: 'Action needed',
     onHold: 'On hold',
@@ -66,7 +67,10 @@ const UI_TEXT = {
     viewDocs: 'View documents',
     noteReturned: 'Your documents were returned. Please review the comments and resubmit.',
     noteRejected: 'Your documents did not pass review. Contact your Programme Lead.',
-    noteSuspended: 'Your review is on hold while we carry out additional checks.'
+    noteSuspended: 'Your review is on hold while we carry out additional checks.',
+    revisionTitle: 'Revision requested',
+    revisionBody: 'Our team reviewed your application and returned it with feedback.',
+    revisionNote: 'Review the comments, update the flagged answers and resubmit.'
 };
 
 const fmt = (tpl, ...args) => args.reduce((s, a, i) => s.replace(`{${i}}`, a), tpl);
@@ -96,22 +100,26 @@ const PHASE_DEFS = [
 ];
 
 const STATUS_TO_STEP_INDEX = {
-    NotStarted: 0,
-    Draft: 2,
-    RevisionRequested: 1,
-    Submitted: 3,
-    Sealed: 3,
-    ApplicationResubmitted: 3,
-    UnderReview: 4,
-    InReview: 4,
-    ReviewSubmitted: 5,
-    Decided: 5,
-    Approved: 6,
-    OnboardingInitiated: 7,
-    OnboardingInProgress: 8,
-    ComplianceReview: 9,
-    OnboardingApproved: 10,
-    Onboarded: 11
+    NotStarted: 0,                 // Not Started
+    RevisionRequested: 1,          // In Progress (editing again)
+    Draft: 1,                      // In Progress  (was 2)
+
+    Submitted: 2,                  // Completeness Check  (was 3)
+    Sealed: 2,                     // Completeness Check  (was 3)
+    ApplicationResubmitted: 2,     // Completeness Check  (was 3)
+
+    UnderReview: 3,                // Being Reviewed  (was 4)
+    InReview: 3,                   // Being Reviewed  (was 4)
+
+    ReviewSubmitted: 4,            // Approval in Progress  (was 5)
+    Decided: 5,                    // Approved for Onboarding
+    Approved: 5,                   // Approved for Onboarding   (was 6)
+
+    OnboardingInitiated: 6,        // was 7
+    OnboardingInProgress: 7,       // was 8
+    ComplianceReview: 8,           // was 9
+    OnboardingApproved: 9,         // was 10
+    Onboarded: 10                  // Complete
 };
 
 const ALERT_STATUSES = new Set(['Rejected', 'Suspended']);
@@ -123,7 +131,7 @@ const COMPLIANCE_TO_STEP_INDEX = {
     'Returned': 8,
     'Rejected': 8,
     'Suspended': 8,
-    'Validated': 10
+    'Validated': 9
 };
 
 const ONBOARDING_STATUSES = new Set([
@@ -285,16 +293,19 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     get totalSteps() {
         return STEP_DEFS.length;
     }
+    get doneCount() {
+        const ai = this.activeIndex;
+        const tickCurrent = !this.exceptionLevel && ai > 0;
+        return Math.min(tickCurrent ? ai + 1 : ai, STEP_DEFS.length);
+    }
 
     get isComplete() {
-        return this.activeIndex >= STEP_DEFS.length;
+        return this.doneCount >= STEP_DEFS.length;
     }
 
     get progressPercent() {
-        const done = Math.min(this.activeIndex, STEP_DEFS.length);
-        return Math.round((done / STEP_DEFS.length) * 100);
+        return Math.round((this.doneCount / STEP_DEFS.length) * 100);
     }
-
     get stepCounterLabel() {
         if (this.isComplete) return UI_TEXT.complete;
         return fmt(UI_TEXT.stepOf, this.activeIndex + 1, STEP_DEFS.length);
@@ -307,32 +318,34 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     }
 
     // ── Exception handling ────────────────────────────────────────────
-    // 'danger' | 'warning' | null
-
     get activeCardClass() {
-        return this.exceptionLevel
-            ? `tl-active-card tl-active-card--${this.exceptionLevel}`
-            : 'tl-active-card';
+        if (this.exceptionLevel) return `tl-active-card tl-active-card--${this.exceptionLevel}`;
+        return this.isNotStarted
+            ? 'tl-active-card tl-active-card--neutral'
+            : 'tl-active-card tl-active-card--success';
     }
 
-
-
     get activeBadgeClass() {
-        return this.exceptionLevel
-            ? `tl-badge tl-badge--${this.exceptionLevel}`
-            : 'tl-badge';
+        if (this.exceptionLevel) return `tl-badge tl-badge--${this.exceptionLevel}`;
+        return this.isNotStarted
+            ? 'tl-badge tl-badge--neutral'
+            : 'tl-badge tl-badge--success';
     }
 
     // ── Action button on the active step ──────────────────────────────
 
 
     get exceptionLevel() {
+        if (this.statusKey === 'revisionrequested') return 'warning';
         if (this.statusKey === 'rejected') return 'danger';
         if (this.statusKey === 'suspended') return 'warning';
         const k = this.complianceKey;
         if (k === 'rejected') return 'danger';
         if (k === 'returned' || k === 'suspended') return 'warning';
         return null;
+    }
+    get isNotStarted() {
+        return !this.exceptionLevel && this.activeIndex === 0;
     }
 
     get activeBadgeText() {
@@ -343,7 +356,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
                 ? UI_TEXT.onHold
                 : UI_TEXT.actionNeeded;
         }
-        return UI_TEXT.inProgress;
+        return this.isNotStarted ? UI_TEXT.notStarted : UI_TEXT.inProgress;
     }
 
     get showComplianceAction() {
@@ -360,40 +373,48 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     // ── Steps (same shape as before, plus phase metadata) ─────────────
     get steps() {
         const ai = this.activeIndex;
+        const dc = this.doneCount;
+        const isRevision = this.statusKey === 'revisionrequested';
+
         return STEP_DEFS.map((def, i) => {
-            const isDone = i < ai;
-            const isActive = i === ai;
+            const isDone = i < dc;
+            const isActive = i === ai && !this.isComplete;
 
             let subLabel = '';
+            let label = def.label;
+            let tooltip = def.tooltip;
+
             if (isActive) {
-                if (this.statusKey === 'rejected') {
-                    subLabel = CL_Rejected;
-                } else if (this.statusKey === 'suspended') {
-                    subLabel = CL_Suspended;
-                } else if (this.complianceKey === 'returned') {
-                    subLabel = UI_TEXT.noteReturned;
-                } else if (this.complianceKey === 'rejected') {
-                    subLabel = UI_TEXT.noteRejected;
-                } else if (this.complianceKey === 'suspended') {
-                    subLabel = UI_TEXT.noteSuspended;
-                }
+                if (isRevision) {
+                    label = UI_TEXT.revisionTitle;
+                    tooltip = UI_TEXT.revisionBody;
+                    subLabel = UI_TEXT.revisionNote;
+                } else if (this.statusKey === 'rejected') subLabel = CL_Rejected;
+                else if (this.statusKey === 'suspended') subLabel = CL_Suspended;
+                else if (this.complianceKey === 'returned') subLabel = UI_TEXT.noteReturned;
+                else if (this.complianceKey === 'rejected') subLabel = UI_TEXT.noteRejected;
+                else if (this.complianceKey === 'suspended') subLabel = UI_TEXT.noteSuspended;
             }
 
             return {
                 ...def,
+                label,
+                tooltip,
                 index: i,
                 isDone,
                 isActive,
                 isUpcoming: i > ai,
                 subLabel,
-                dotClass: isDone
-                    ? 'tl-dot tl-dot--done'
-                    : isActive
-                        ? `tl-dot tl-dot--active${this.exceptionLevel ? ' tl-dot--' + this.exceptionLevel : ''}`
-                        : 'tl-dot',
-                lineClass: i < ai - 1
+                dotClass: isActive && this.exceptionLevel
+                    ? `tl-dot tl-dot--active tl-dot--${this.exceptionLevel}`
+                    : isDone
+                        ? 'tl-dot tl-dot--done'
+                        : isActive
+                            ? 'tl-dot tl-dot--neutral'
+                            : 'tl-dot',
+                lineClass: i < dc - 1
                     ? 'tl-line tl-line--done'
-                    : i === ai - 1
+                    : i === dc - 1
                         ? 'tl-line tl-line--half'
                         : 'tl-line'
             };
@@ -408,12 +429,14 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
         return PHASE_DEFS.map((p) => {
             const slice = all.slice(p.start, p.end + 1);
             const count = slice.length;
-            const isDone = ai > p.end;
-            const isActive = !isDone && ai >= p.start && ai <= p.end;
-            const isUpcoming = ai < p.start;
+            const dc = this.doneCount;
+            const isDone = dc > p.end;
+            const hasActive = !this.isComplete && ai >= p.start && ai <= p.end;
+            const isActive = hasActive && !isDone;
+            const isUpcoming = !isDone && !hasActive;
 
             const override = this.expandedOverrides[p.key];
-            const openByDefault = isActive || (this.isComplete && p.key === 'onboarding');
+            const openByDefault = hasActive || (this.isComplete && p.key === 'onboarding');
             const expanded = this.showAllSteps
                 ? true
                 : (override === undefined ? openByDefault : override);
@@ -431,7 +454,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
             let meta;
             if (isDone) meta = fmt(UI_TEXT.stepsDone, count);
             else if (isUpcoming) meta = fmt(UI_TEXT.stepsTotal, count);
-            else meta = fmt(UI_TEXT.stepsDone, Math.max(ai - p.start, 0));
+            else meta = fmt(UI_TEXT.stepsDone, Math.max(dc - p.start, 0));
 
             return {
                 key: p.key,
@@ -450,8 +473,12 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
                 remainingNames: upcoming.map(s => s.label).join(', '),
                 iconClass: isDone
                     ? 'tl-phase-icon tl-phase-icon--done'
-                    : isActive
-                        ? `tl-phase-icon tl-phase-icon--active${this.exceptionLevel ? ' tl-phase-icon--' + this.exceptionLevel : ''}`
+                    : hasActive
+                        ? (this.exceptionLevel
+                            ? `tl-phase-icon tl-phase-icon--active tl-phase-icon--${this.exceptionLevel}`
+                            : (dc > 0
+                                ? 'tl-phase-icon tl-phase-icon--success'
+                                : 'tl-phase-icon tl-phase-icon--neutral'))   // was --active
                         : 'tl-phase-icon',
                 rowClass: expanded ? 'tl-phase tl-phase--open' : 'tl-phase',
                 chevronClass: expanded ? 'tl-chev tl-chev--open' : 'tl-chev',

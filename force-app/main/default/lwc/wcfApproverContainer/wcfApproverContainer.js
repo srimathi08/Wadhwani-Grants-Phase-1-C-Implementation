@@ -143,12 +143,16 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
         });
     }
 
-    get priorReturnDateFormatted() {
-        if (!this.priorReturnDate) return '';
-        return new Date(this.priorReturnDate).toLocaleDateString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
-    }
+   _formatDate(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '';
+    const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`;
+}
+get priorReturnDateFormatted() {
+    return this._formatDate(this.priorReturnDate);
+}
     get hasReviewerComment() {
         return !!this.reviewerComment;
     }
@@ -307,7 +311,7 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
                 title:   'Comment Required',
                 message: this.pendingDecision === 'Accept'
                     ? 'Please add a comment to support this decision.'
-                    : 'Please add a comment explaining why this application is being returned.',
+                   : 'Please add a comment explaining why this recommendation is being rejected.',
                 variant: 'error'
             }));
             return;
@@ -364,11 +368,11 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
 
             let resultMessage;
             if (newStatus === 'Not Recommend for Fund') {
-                resultMessage = 'not recommended for fund';
+            resultMessage = 'not recommended for grant';
             } else if (newStatus === 'Returned by Approver') {
-                resultMessage = 'returned to the Reviewer for further evaluation';
+            resultMessage = 'returned to the Reviewer for further evaluation';
             } else {
-                resultMessage = 'recommended for fund';
+            resultMessage = 'recommended for grant';
             }
 
             this.dispatchEvent(new ShowToastEvent({
@@ -442,12 +446,9 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
         return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
     }
 
-    get returnedDateFormatted() {
-        if (!this.decisionDate) return '';
-        return new Date(this.decisionDate).toLocaleDateString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
-    }
+   get returnedDateFormatted() {
+    return this._formatDate(this.decisionDate);
+}
 
     get isDecisionMade() {
         return !!this.existingDecision || this.isSubmitting;
@@ -473,22 +474,30 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     get modalTitle() {
         if (this.pendingDecision === 'Accept') return 'Confirm Acceptance';
         if (this.pendingDecision === 'Conditionally Approve') return 'Confirm Conditional Approval';
-        if (this.pendingDecision === 'Return') return 'Confirm Return to Reviewer';
+        if (this.pendingDecision === 'Return') return 'Confirm Rejection';
         return 'Confirm Decline';
     }
 
-    get modalMessage() {
-        if (this.pendingDecision === 'Accept') {
-            return `You are about to ACCEPT application ${this.appName}. A comment is required. Depending on the Reviewer's recommendation, this will update the status to Recommend for Fund or Not Recommend for Fund.`;
-        }
-        if (this.pendingDecision === 'Conditionally Approve') {
-            return `You are about to CONDITIONALLY APPROVE application ${this.appName}. A comment is required. This will update the application status to Recommend for Fund.`;
-        }
-        if (this.pendingDecision === 'Return') {
-            return `You are about to REJECT application ${this.appName} and return it to the Reviewer. A comment is required so the Reviewer understands your concern.`;
-        }
-        return `You are about to DECLINE application ${this.appName}. This will update the application status to Not Recommend for Fund.`;
+    get modalConfirmLabel() {
+    if (this.pendingDecision === 'Return') return 'Confirm Reject';
+    return `Confirm ${this.pendingDecision}`;
     }
+
+    get revokeModalMessage() {
+    return `Are you sure you want to revoke the ${this.existingDecision} decision for ${this.appName}? This marks the decision as Revoked and allows a new one to be submitted.`;
+    }
+    get modalMessage() {
+    if (this.pendingDecision === 'Accept') {
+        return `You are about to ACCEPT application ${this.appName}. A comment is required. Depending on the Reviewer's recommendation, this will update the status to Recommend for Grant or Not Recommend for Grant.`;
+    }
+    if (this.pendingDecision === 'Conditionally Approve') {
+        return `You are about to CONDITIONALLY APPROVE application ${this.appName}. A comment is required. This will update the application status to Recommend for Grant.`;
+    }
+    if (this.pendingDecision === 'Return') {
+        return `You are about to REJECT application ${this.appName} and return it to the Reviewer. A comment is required so the Reviewer understands your concern.`;
+    }
+    return `You are about to DECLINE application ${this.appName}. This will update the application status to Not Recommend for Grant.`;
+}
 
     get modalHeaderClass() {
         if (this.pendingDecision === 'Accept') return 'modal-header modal-approve';
@@ -545,14 +554,14 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     }
 
     get decisionPanelButtonLabel() {
-        return this.pendingDecision === 'Accept' ? 'Continue — Accept' : 'Continue — Reject';
+        return this.pendingDecision === 'Accept' ? 'Continue: Accept' : 'Continue: Reject';
     }
 
-    // NEW (display only): the Continue button used the red "Reject" style
-    // for both decisions. Accept now shows green, Reject stays red.
+    // Accept = blue (accept-btn overrides the green success-btn look),
+    // Reject = red (primary-btn).
     get decisionPanelButtonClass() {
         return this.pendingDecision === 'Accept'
-            ? 'success-btn wg-btn-sm'
+            ? 'success-btn accept-btn wg-btn-sm'
             : 'primary-btn wg-btn-sm';
     }
     get decisionPanelButtonIcon() {

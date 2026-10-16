@@ -330,7 +330,17 @@ private static final Set<String> CLOSED_STATUSES =
                 rec.Organisation__c = linkedApps[0].AccountId;
             }
         }
-
+        if (String.isBlank(recordId) && rec.IndividualApplication__c != null) {
+    Integer existing = [
+        SELECT COUNT() FROM WCF_Compliance_Document__c
+        WHERE IndividualApplication__c = :rec.IndividualApplication__c
+        WITH SYSTEM_MODE
+    ];
+    if (existing > 0) {
+        throw new AuraHandledException(
+            'A compliance request already exists for this application. Open the existing request instead of creating a new one.');
+    }
+}
         rec.Document_Types__c        = documentTypes;
         rec.Requested_Date__c        = parseDate(requestedDate);
         rec.Due_Date__c              = parseDate(dueDate);

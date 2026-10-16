@@ -23,11 +23,27 @@ const QUESTION_FIELD_MAP = {
     '1.3': { rating: 'D1_FinancialRecords_Rating__c', comment: 'D1_FinancialRecords_Comment__c' },
     '1.4': { rating: 'D1_SustainabilityVision_Rating__c', comment: 'D1_SustainabilityVision_Comment__c' },
     '2.1': { rating: 'D2_ProgramAlignment_Rating__c', comment: 'D2_ProgramAlignment_Comment__c' },
-    '2.2': { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' },
     '2.3': { rating: 'D2_OperationalDepth_Rating__c', comment: 'D2_OperationalDepth_Comment__c' },
-    '3.1': { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' },
-    '3.2': { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' },
-    '3.3': { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' },
+    '2.2': [
+        { rating: 'D2_JF_Distinctiveness_Rating__c', comment: 'D2_JF_Distinctiveness_Comment__c' },
+        { rating: 'D2_JC_Distinctiveness_Rating__c', comment: 'D2_JC_Distinctiveness_Comment__c' },
+            { rating: 'D2_LU_Distinctiveness_Rating__c', comment: 'D2_LU_Distinctiveness_Comment__c' }
+    ],
+    '3.1': [
+        { rating: 'D3_JF_ScaleRecord_Rating__c', comment: 'D3_JF_ScaleRecord_Comment__c' },
+        { rating: 'D3_JC_ScaleRecord_Rating__c', comment: 'D3_JC_ScaleRecord_Comment__c' },
+        { rating: 'D3_LU_ScaleRecord_Rating__c', comment: 'D3_LU_ScaleRecord_Comment__c' }
+    ],
+    '3.2': [
+        { rating: 'D3_JF_ConversionRate_Rating__c', comment: 'D3_JF_ConversionRate_Comment__c' },
+        { rating: 'D3_JC_ConversionRate_Rating__c', comment: 'D3_JC_ConversionRate_Comment__c' },
+       { rating: 'D3_LU_ConversionRate_Rating__c', comment: 'D3_LU_ConversionRate_Comment__c' }
+    ],
+    '3.3': [
+        { rating: 'D3_JF_CostPerPlacement_Rating__c', comment: 'D3_JF_CostPerPlacement_Comment__c' },
+        { rating: 'D3_JC_CostPerJob_Rating__c', comment: 'D3_JC_CostPerJob_Comment__c' },
+        { rating: 'D3_LU_CostPerOutcome_Rating__c', comment: 'D3_LU_CostPerOutcome_Comment__c' }
+    ],
     '3.4': { rating: 'D3_ValidationEvidence_Rating__c', comment: 'D3_ValidationEvidence_Comment__c' },
     '4.1': { rating: 'D4_MandateFit_Rating__c', comment: 'D4_MandateFit_Comment__c' },
     '4.2': { rating: 'D4_Geography_Rating__c', comment: 'D4_Geography_Comment__c' },
@@ -72,7 +88,7 @@ export default class WcfReviewerFormPreview extends LightningElement {
 
     @track reviewRecord = null;
     @track categories = [];
-    @track isLoading  = true;
+    @track isLoading = true;
 
     connectedCallback() {
         this._connected = true;
@@ -102,7 +118,7 @@ export default class WcfReviewerFormPreview extends LightningElement {
 
     get hasData() { return !!this.reviewRecord; }
 
-    get reviewName()     { return this.reviewRecord?.Name || ''; }
+    get reviewName() { return this.reviewRecord?.Name || ''; }
     get recommendation() {
         const r = this.reviewRecord?.Recommend_for_CEO_review__c;
         return r ? recDisplayLabel(r) : '—';
@@ -155,15 +171,14 @@ export default class WcfReviewerFormPreview extends LightningElement {
         if (r.Decision_Rationale__c) {
             try {
                 const parsed = JSON.parse(r.Decision_Rationale__c);
-                if (Array.isArray(parsed)) {
-                    parsed.forEach(item => {
-                        if (item.questionId) {
-                            jsonAnswersMap[item.questionId] = item;
-                        }
-                    });
-                }
+                const list = Array.isArray(parsed)
+                    ? parsed
+                    : (parsed && Array.isArray(parsed.structuredAnswers) ? parsed.structuredAnswers : []);
+                list.forEach(item => {
+                    if (item && item.questionId) jsonAnswersMap[item.questionId] = item;
+                });
             } catch (e) {
-                // ignore
+                console.error('Could not parse Decision_Rationale__c', e);
             }
         }
 
@@ -180,13 +195,18 @@ export default class WcfReviewerFormPreview extends LightningElement {
                 let comment = null;
                 let ladderText = '';
 
-                if (jsonItem) {
-                    rating = jsonItem.rating != null ? parseInt(jsonItem.rating, 10) : null;
+                if (jsonItem && jsonItem.rating != null) {
+                    rating = parseInt(jsonItem.rating, 10);
                     comment = jsonItem.comment || null;
                     ladderText = jsonItem.ladderLevelText || '';
-                } else if (fieldInfo) {
-                    rating = r[fieldInfo.rating] != null ? parseInt(r[fieldInfo.rating], 10) : null;
-                    comment = r[fieldInfo.comment] || null;
+                } else {
+                    const candidates = [].concat(QUESTION_FIELD_MAP[qId] || []);
+                    for (const f of candidates) {
+                        if (rating == null && r[f.rating] != null && r[f.rating] !== '') {
+                            rating = parseInt(r[f.rating], 10);
+                            comment = f.comment ? (r[f.comment] || null) : null;
+                        }
+                    }
                     const ladderArr = q.ladder || [];
                     ladderText = rating != null && ladderArr[rating - 1] ? ladderArr[rating - 1] : '';
                 }
@@ -198,9 +218,9 @@ export default class WcfReviewerFormPreview extends LightningElement {
                 const pipClass = rating != null ? `pip pip-r${rating}` : 'pip pip-empty';
 
                 return {
-                    id:          qId,
-                    text:        q.questionText,
-                    rating:      rating != null ? rating : '—',
+                    id: qId,
+                    text: q.questionText,
+                    rating: rating != null ? rating : '—',
                     ratingLabel: rating != null ? (RATING_LABEL[rating] || rating) : 'Not rated',
                     ladderText,
                     comment,
@@ -223,8 +243,8 @@ export default class WcfReviewerFormPreview extends LightningElement {
         return (val || '').split('\n').map((t, i) => ({ idx: i, num: i + 1, text: t })).filter(s => s.text.trim());
     }
 
-    get strengthList()  { return this._parseSW(this.reviewRecord?.Top_3_proposal_strengths_ranked__c); }
-    get weaknessList()  { return this._parseSW(this.reviewRecord?.Top_3_proposal_weaknesses_ranked__c); }
-    get hasStrengths()  { return this.strengthList.length > 0; }
+    get strengthList() { return this._parseSW(this.reviewRecord?.Top_3_proposal_strengths_ranked__c); }
+    get weaknessList() { return this._parseSW(this.reviewRecord?.Top_3_proposal_weaknesses_ranked__c); }
+    get hasStrengths() { return this.strengthList.length > 0; }
     get hasWeaknesses() { return this.weaknessList.length > 0; }
 }

@@ -34,28 +34,28 @@ export default class WcfApplicantWelcomeDashboard extends NavigationMixin(Lightn
     faqUrl = '';
     eligibilityUrl = '';
 
-        // ── Expose labels to the template ──────────────────────────
+    // ── Expose labels to the template ──────────────────────────
     label = {
         welcomeToYourDashboard: CL_Welcome_to_your_dashboard,
         noApplicationYet: CL_NO_APPLICATION_YET,
         youHaventStarted: CL_You_haven_t_started_an_application_yet,
         fourSectionCopy: CL_When_you_re_ready_the_application_takes_you_through_a_four_section_form_cove,
         startYourApplication: CL_Start_your_application,
-       ApplicationFaq: CL_Application_FAQ,
-       EligiblityCri: CL_Eligibility_criteria,
-       Usefullinks: CL_Useful_links,
-       Queries:CL_For_any_queries,
-       noFee: CL_No_Fee,                    // ← ADD
-    noFeeDisclaimer: CL_No_Fee_Disclaimer // ← ADD
-        
+        ApplicationFaq: CL_Application_FAQ,
+        EligiblityCri: CL_Eligibility_criteria,
+        Usefullinks: CL_Useful_links,
+        Queries: CL_For_any_queries,
+        noFee: CL_No_Fee,                    // ← ADD
+        noFeeDisclaimer: CL_No_Fee_Disclaimer // ← ADD
+
     };
 
     connectedCallback() {
         // Reflect whatever language was last chosen (by this page OR wcfForm)
         this.selectedLanguage = localStorage.getItem('selectedLanguage') || 'en_US';
-         this.resolvePageUrls();
+        this.resolvePageUrls();
     }
-        resolvePageUrls() {
+    resolvePageUrls() {
         this[NavigationMixin.GenerateUrl]({
             type: 'comm__namedPage',
             attributes: { name: 'ApplicationFAQ__c' } // must match the page's exact API name
@@ -98,13 +98,13 @@ export default class WcfApplicantWelcomeDashboard extends NavigationMixin(Lightn
         }));
     }
 
-handleOpenFaq(event) {
-    event.preventDefault();
-    this.dispatchEvent(new CustomEvent('openfaq'));
-}
+    handleOpenFaq(event) {
+        event.preventDefault();
+        this.dispatchEvent(new CustomEvent('openfaq'));
+    }
 
-handleOpenEligibility(event) {
-    event.preventDefault();
-    this.dispatchEvent(new CustomEvent('openeligibility'));
-}
+    handleOpenEligibility(event) {
+        event.preventDefault();
+        this.dispatchEvent(new CustomEvent('openeligibility'));
+    }
 }

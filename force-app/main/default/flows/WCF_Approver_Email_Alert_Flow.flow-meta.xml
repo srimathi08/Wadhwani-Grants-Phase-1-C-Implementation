@@ -7,6 +7,9 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>END_ELEMENT_7</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -82,6 +85,9 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>END_ELEMENT_8</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -157,6 +163,9 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>END_ELEMENT_9</targetReference>
+        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -232,6 +241,9 @@
         <label>Check Approver Found (Scheduled)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>END_ELEMENT_10</targetReference>
+        </defaultConnector>
         <defaultConnectorLabel>No Approver Found</defaultConnectorLabel>
         <rules>
             <name>Approver_Found_Scheduled</name>
@@ -254,6 +266,9 @@
         <label>Check If Decision Recorded</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>END_ELEMENT_11</targetReference>
+        </defaultConnector>
         <defaultConnectorLabel>Decision Already Recorded</defaultConnectorLabel>
         <rules>
             <name>No_Decision_Recorded</name>
@@ -276,15 +291,18 @@
         <label>Check Recommendation</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>END_ELEMENT_12</targetReference>
+        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Recommend_for_CEO_Yes</name>
-            <conditionLogic>and</conditionLogic>
+            <conditionLogic>(1 OR 3 OR 4) AND 2</conditionLogic>
             <conditions>
                 <leftValueReference>$Record.Recommend_for_CEO_review__c</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Yes</stringValue>
+                    <stringValue>Yes - Strongly recommend</stringValue>
                 </rightValue>
             </conditions>
             <conditions>
@@ -292,6 +310,20 @@
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Recommend_for_CEO_review__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Yes - Recommend</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Recommend_for_CEO_review__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Yes - Recommend with reservations</stringValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -323,6 +355,36 @@
         </rules>
     </decisions>
     <description>WCF Approver Email Alert Flow for Ready for Decision (E-22), Decline Recommended (E-47), and Decision Overdue (E-55)</description>
+    <ends>
+        <name>END_ELEMENT_10</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
+    <ends>
+        <name>END_ELEMENT_11</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
+    <ends>
+        <name>END_ELEMENT_12</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
+    <ends>
+        <name>END_ELEMENT_7</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
+    <ends>
+        <name>END_ELEMENT_8</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
+    <ends>
+        <name>END_ELEMENT_9</name>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+    </ends>
     <environments>Default</environments>
     <formulas>
         <name>currentyear</name>
@@ -621,7 +683,7 @@ Ready for your decision
 &lt;/p&gt;
 
 &lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
-Application {!$Record.Application.Name} · {!$Record.Application.Organization_Name__c}
+Application {!$Record.Application.Name} - {!$Record.Application.Organization_Name__c}
 
 &lt;/h1&gt;
 &lt;/td&gt;
@@ -790,7 +852,7 @@ Decline recommended
 &lt;/p&gt;
 
 &lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
-Application {!$Record.Application.Name} &amp;middot; {{org_name}}
+Application {!$Record.Application.Name} - {!$Record.Application.Organization_Name__c}
 &lt;/h1&gt;
 &lt;/td&gt;
 
@@ -831,7 +893,7 @@ The reasons given:
 &lt;tr&gt;
 &lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
 &lt;strong&gt;The reasons given:&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;
-{!$Record.Non_Recommendation_Strength_Comments__c}&lt;br/&gt;&lt;br/&gt;
+{!$Record.Rejection_Comment__c}&lt;br/&gt;&lt;br/&gt;
 &lt;strong&gt;Decision due:&lt;/strong&gt; {!$Record.Due_Date_For_Approver__c}
 &lt;/td&gt;
 &lt;/tr&gt;
@@ -954,7 +1016,7 @@ Decision overdue
 &lt;/p&gt;
 
 &lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
-Application {!$Record.Application.Name}  &amp;middot; {!$Record.Application.Organization_Name__c}&lt;/h1&gt;
+Application {!$Record.Application.Name} - {!$Record.Application.Organization_Name__c}&lt;/h1&gt;
 &lt;/td&gt;
 
 &lt;!-- RIGHT: logo --&gt;

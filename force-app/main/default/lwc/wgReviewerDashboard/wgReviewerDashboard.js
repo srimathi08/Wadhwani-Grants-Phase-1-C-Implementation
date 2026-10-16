@@ -4,35 +4,42 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 // ── resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
 import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
 import getValidatedProposals from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
-import getReviewStatusMap    from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
-import getReviewerPreview    from '@salesforce/apex/ReviewSummaryController.getReviewerPreview';
+import getReviewStatusMap from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
+import getReviewerPreview from '@salesforce/apex/WCFProposalListController.getReviewerPreview';
 import getApproverReturnQueueCount from '@salesforce/apex/WCFProposalListController.getApproverReturnQueueCount';
-import getAcceptedApplicationsCount from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsCount';
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
 import getLatestReviewId from '@salesforce/apex/ComplianceDocumentController.getLatestReviewId';
 
 // ── KPI tiles — same order, labels and colors as the Reviewer Queue tiles ──
-// filter = token passed to the queue page (wcfProposalListView reads it).
 const TILE_DEFS = [
-    { id: 'all',                  label: 'Total Assigned',        subtitle: 'All proposals assigned to you',               countKey: 'reviewerTotal',              tone: 'info' },
-    { id: 'notStarted',           label: 'Not Started',           subtitle: 'Awaiting your first action',                  countKey: 'reviewerNotStarted',         tone: 'neutral' },
-    { id: 'inProgress',           label: 'In Progress',           subtitle: 'Reviews started but not submitted',           countKey: 'reviewerInProgress',         tone: 'warning' },
-    { id: 'reviewed',             label: 'Reviewed',              subtitle: 'Submitted review forms',                      countKey: 'reviewerReviewed',           tone: 'success' },
-    { id: 'returnedByApprover',   label: 'Returned by Approver',  subtitle: 'Awaiting your Approve / Return decision',     countKey: 'reviewerReturnedByApprover', tone: 'brand', alertWhenPositive: true },
-    { id: 'acceptedApplications', label: 'Accepted Applications', subtitle: 'Approver-accepted, ready for compliance docs', countKey: 'reviewerAcceptedCount',      tone: 'success' }
+    { id: 'all', label: 'Total Assigned', subtitle: 'All proposals assigned to you', countKey: 'reviewerTotal', tone: 'info' },
+    { id: 'notStarted', label: 'Not Started', subtitle: 'Awaiting your first action', countKey: 'reviewerNotStarted', tone: 'neutral' },
+    { id: 'inProgress', label: 'In Progress', subtitle: 'Reviews started but not submitted', countKey: 'reviewerInProgress', tone: 'warning' },
+    { id: 'reviewed', label: 'Reviewed', subtitle: 'Submitted review forms', countKey: 'reviewerReviewed', tone: 'success' },
+    { id: 'returnedByApprover', label: 'Returned by Approver', subtitle: 'Awaiting your Approve / Return decision', countKey: 'reviewerReturnedByApprover', tone: 'brand', alertWhenPositive: true },
+    { id: 'acceptedApplications', label: 'Accepted Applications', subtitle: 'Approver-accepted, ready for compliance docs', countKey: 'reviewerAcceptedCount', tone: 'success' }
 ];
+const ACCEPTED_PREVIEW_LIMIT = 5;
+// ── Compliance status → pill tone. Unknown statuses fall back to 'info'. ──
+const COMPLIANCE_TONE = {
+    'Pending Submission': 'warning',
+    'Submitted': 'info',
+    'Validated': 'success',
+    'Rejected': 'error',
+    'Suspended': 'neutral'
+};
 
 export default class WgReviewerDashboard extends NavigationMixin(LightningElement) {
 
     // ─── State ────────────────────────────────────────────────────
-    @track reviewerTotal      = 0;
-    @track reviewerReviewed   = 0;
+    @track reviewerTotal = 0;
+    @track reviewerReviewed = 0;
     @track reviewerInProgress = 0;
     @track reviewerNotStarted = 0;
     @track reviewerReturnedByApprover = 0;
     @track reviewerPreviewRows = [];
 
-    @track reviewerAcceptedCount   = 0;
+    @track reviewerAcceptedCount = 0;
     @track acceptedApplicationRows = [];
 
     _isOpeningApplication = false;
@@ -46,7 +53,7 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
 
     _siteUrl(page, params) {
         const path = String(page || '').replace(/^\/+/, '');
-        let url    = `${this.sitePath}/${path}`;
+        let url = `${this.sitePath}/${path}`;
         if (params) {
             const qs = Object.keys(params)
                 .filter(k => params[k] !== undefined && params[k] !== null && params[k] !== '')
@@ -68,11 +75,11 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     // ─── KPI tiles for the template ───────────────────────────────
     get reviewerCards() {
         return TILE_DEFS.map(t => {
-            const count   = this[t.countKey] || 0;
+            const count = this[t.countKey] || 0;
             const isAlert = t.alertWhenPositive && count > 0;
             return {
-                id      : t.id,
-                label   : t.label,
+                id: t.id,
+                label: t.label,
                 subtitle: t.subtitle,
                 count,
                 kpiClass: 'wg-stat' + (isAlert ? ' wg-stat--alert' : ''),
@@ -81,43 +88,59 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
         });
     }
 
-    async loadAcceptedApplications() {
-        try {
-            this.reviewerAcceptedCount = await getAcceptedApplicationsCount();
-            const rows = await getAcceptedApplicationsQueue();
-            this.acceptedApplicationRows = (rows || []).map((r, i) => ({
+    // ─── Accepted applications ────────────────────────────────────
+   async loadAcceptedApplications() {
+    try {
+        const rows = await getAcceptedApplicationsQueue();
+
+        // Only accepted apps that still need a compliance request (newest decision first, from Apex)
+        const pending = (rows || []).filter(r => !r.complianceRequested);
+
+        // Tile + "View all" count come from the same list, so they always match the table
+        this.reviewerAcceptedCount = pending.length;
+
+        this.acceptedApplicationRows = pending
+            .slice(0, ACCEPTED_PREVIEW_LIMIT)
+            .map((r, i) => ({
                 id: r.applicationId,
                 rowNum: i + 1,
                 applicationId: r.applicationId,
                 appName: r.appName,
                 organizationName: r.organizationName || '—',
-                approverComment: r.approverComment,
+                approverComment: r.approverComment || '—',
                 decisionDateFormatted: r.decisionDate
                     ? new Date(r.decisionDate).toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
-                      })
+                    })
                     : '—'
             }));
-        } catch (e) {
-            console.error('Accepted applications error:', e);
-        }
+    } catch (e) {
+        console.error('Accepted applications error:', e);
     }
+}
+
+handleViewRequestedCompliances() {
+    this[NavigationMixin.Navigate]({
+        type: 'standard__webPage',
+        attributes: { url: this._siteUrl('wg-compliance-documents') }
+    });
+}
 
     handleCreateComplianceRequest(event) {
         const applicationId = event.currentTarget.dataset.id;
-        const appName       = event.currentTarget.dataset.appname;
+        const appName = event.currentTarget.dataset.appname;
         this[NavigationMixin.Navigate]({
             type: 'standard__webPage',
             attributes: {
                 url: this._siteUrl('wg-compliance-documents', {
-                    applicationId : applicationId,
-                    appName       : appName
+                    applicationId: applicationId,
+                    appName: appName
                 })
             }
         });
     }
 
-    // ─── NEW: Application link → read-only proposal + review view ─
+    // ─── Application link → read-only proposal + review view ──────
     async handleViewApplication(event) {
         event.preventDefault();
         if (this._isOpeningApplication) return;
@@ -140,9 +163,9 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                 type: 'standard__webPage',
                 attributes: {
                     url: this._siteUrl('review-forms', {
-                        recordId      : reviewId,
-                        applicationId : applicationId,
-                        action        : 'view'
+                        recordId: reviewId,
+                        applicationId: applicationId,
+                        action: 'view'
                     })
                 }
             });
@@ -184,8 +207,8 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                 }
             }
 
-            this.reviewerTotal      = (proposals || []).length;
-            this.reviewerReviewed   = reviewed;
+            this.reviewerTotal = (proposals || []).length;
+            this.reviewerReviewed = reviewed;
             this.reviewerInProgress = inProgress;
             this.reviewerNotStarted = notStarted;
 
@@ -207,32 +230,31 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
             const rows = await getReviewerPreview({ maxRows: 20 });
             const mapped = (rows || []).map(r => {
                 const rtName = r.recordTypeName || '';
-                const track  = rtName.includes('Creation') && rtName.includes('Fulfillment')
+                const track = rtName.includes('Creation') && rtName.includes('Fulfillment')
                     ? 'JF/JC'
                     : rtName.includes('Creation') ? 'JC' : 'JF';
                 const isInProgress = r.status === 'In Progress';
-                const dueDateRaw   = r.dueDate || null;
+                const dueDateRaw = r.dueDate || null;
                 return {
-                    id:           r.reviewId || r.appRecordId,
-                    appId:        r.appName,
-                    appRecordId:  r.appRecordId,
-                    reviewId:     r.reviewId || null,
+                    id: r.reviewId || r.appRecordId,
+                    appId: r.appName,
+                    appRecordId: r.appRecordId,
+                    reviewId: r.reviewId || null,
                     headquarters: r.headquarters || '',
-                    account:      r.accountName || '—',
+                    account: r.accountName || '—',
                     track,
-                    // Display only — same track colors as the queue
-                    trackTags:    this._trackTags(track),
+                    trackTags: this._trackTags(track),
                     dueDateRaw,
                     dueDate: dueDateRaw
                         ? this._parseDate(dueDateRaw).toLocaleDateString('en-GB', {
                             day: '2-digit', month: 'short', year: 'numeric'
-                          })
+                        })
                         : '—',
                     dueDateClass: this._computeDueDateClass(dueDateRaw),
-                    status:       isInProgress ? 'In Progress' : 'Not Started',
-                    statusClass:  isInProgress ? 'wg-pill wg-pill--warning' : 'wg-pill wg-pill--neutral',
-                    action:       isInProgress ? 'Resume Review' : 'Start Review',
-                    actionIcon:   isInProgress ? 'utility:edit' : 'utility:play',
+                    status: isInProgress ? 'In Progress' : 'Not Started',
+                    statusClass: isInProgress ? 'wg-pill wg-pill--warning' : 'wg-pill wg-pill--neutral',
+                    action: isInProgress ? 'Resume Review' : 'Start Review',
+                    actionIcon: isInProgress ? 'utility:edit' : 'utility:play',
                     reviewAction: isInProgress ? 'resume' : 'start'
                 };
             });
@@ -253,7 +275,7 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     _trackTags(track) {
         const TAGS = {
             JF: { code: 'JF', label: 'Job Fulfillment', cls: 'wg-tag wg-tag--info' },
-            JC: { code: 'JC', label: 'Job Creation',    cls: 'wg-tag wg-tag--warning' }
+            JC: { code: 'JC', label: 'Job Creation', cls: 'wg-tag wg-tag--warning' }
         };
         return String(track || '')
             .split('/')
@@ -278,12 +300,12 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     }
 
     handleReviewerRowAction(event) {
-        const proposalId   = event.currentTarget.dataset.id;
-        const appName      = event.currentTarget.dataset.appname;
-        const reviewId     = event.currentTarget.dataset.reviewId;
-        const action       = event.currentTarget.dataset.action;
+        const proposalId = event.currentTarget.dataset.id;
+        const appName = event.currentTarget.dataset.appname;
+        const reviewId = event.currentTarget.dataset.reviewId;
+        const action = event.currentTarget.dataset.action;
         const headquarters = event.currentTarget.dataset.headquarters;
-        const track        = event.currentTarget.dataset.track;
+        const track = event.currentTarget.dataset.track;
         this._navigateReviewer(proposalId, appName, reviewId, action, headquarters, track);
     }
 
@@ -327,8 +349,8 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                 type: 'standard__webPage',
                 attributes: {
                     url: this._siteUrl('review-forms', {
-                        recordId      : reviewId,
-                        applicationId : proposalId
+                        recordId: reviewId,
+                        applicationId: proposalId
                     })
                 }
             });
@@ -339,9 +361,9 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
             type: 'standard__webPage',
             attributes: {
                 url: this._siteUrl('review-forms', {
-                    recordId      : 'new',
-                    applicationId : proposalId,
-                    track         : track
+                    recordId: 'new',
+                    applicationId: proposalId,
+                    track: track
                 })
             }
         });
@@ -363,10 +385,10 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
 
     _computeDueDateClass(dueDate) {
         if (!dueDate) return 'due-date';
-        const due      = this._parseDate(dueDate);
-        const today    = new Date(); today.setHours(0, 0, 0, 0);
+        const due = this._parseDate(dueDate);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         const diffDays = Math.ceil((due - today) / 86400000);
-        if (diffDays < 0)  return 'due-date due-overdue';
+        if (diffDays < 0) return 'due-date due-overdue';
         if (diffDays <= 3) return 'due-date due-urgent';
         return 'due-date';
     }

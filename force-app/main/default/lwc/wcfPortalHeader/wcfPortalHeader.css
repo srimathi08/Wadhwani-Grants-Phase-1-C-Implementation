@@ -456,3 +456,67 @@
     border-color : transparent;
     box-shadow   : none;
 }
+/* ── Home → dashboard redirect mask ─────────────────────────────────
+   Covers the Home page while the role resolves, so users see a branded
+   transition instead of the Home content flashing.
+   ──────────────────────────────────────────────────────────────────── */
+
+.wcf-redirect {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--wcf-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wcf-redirect__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.wcf-redirect__logo {
+    height: 44px;
+    display: block;
+}
+
+.wcf-redirect__bar {
+    position: relative;
+    width: 160px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--wcf-border);
+    overflow: hidden;
+}
+
+.wcf-redirect__bar-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--wcf-gold), var(--wcf-red));
+    animation: wcf-slide 1.2s ease-in-out infinite;
+}
+
+.wcf-redirect__text {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--wcf-text);
+}
+
+@keyframes wcf-slide {
+    0%   { left: -40%; }
+    100% { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wcf-redirect__bar-fill {
+        animation: none;
+        width: 100%;
+    }
+}

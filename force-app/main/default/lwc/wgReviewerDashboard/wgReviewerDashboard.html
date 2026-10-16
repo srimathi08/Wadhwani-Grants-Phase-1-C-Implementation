@@ -100,64 +100,65 @@
                 </div>
             </div>
 
-            <!-- ACCEPTED APPLICATIONS -->
-            <div class="rd-section">
-                <div class="wg-section-head">
-                    <div>
-                        <h2 class="wg-section-title">Accepted applications</h2>
-                        <p class="wg-section-subtitle">The Approver has accepted these — request compliance documents</p>
-                    </div>
-                </div>
+           <!-- ACCEPTED APPLICATIONS — awaiting compliance request -->
+<div class="rd-section">
+    <div class="wg-section-head">
+        <div>
+            <h2 class="wg-section-title">Accepted applications</h2>
+           <p class="wg-section-subtitle">Accepted by the Approver — awaiting a compliance document request</p>
+        </div>
+        <button class="wg-link" onclick={handleViewRequestedCompliances}>View requested compliances →</button>
+    </div>
 
-                <div class="wg-card">
-                    <div class="wg-table-wrap">
-                        <table class="wg-table rd-table">
-                            <thead>
-                                <tr>
-                                    <th class="wg-col-index" scope="col">#</th>
-                                    <th scope="col">Application</th>
-                                    <th scope="col">Organization</th>
-                                    <th scope="col">Approver comment</th>
-                                    <th scope="col">Decision date</th>
-                                    <th class="wg-col-action" scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template for:each={acceptedApplicationRows} for:item="row">
-                                    <tr key={row.id}>
-                                        <td class="wg-col-index">{row.rowNum}</td>
-                                        <!-- NEW: hyperlink → read-only proposal + review view -->
-                                        <td class="wg-cell-id">
-                                            <a href="javascript:void(0);"
-                                               class="rd-app-link"
-                                               title="View proposal and review"
-                                               data-id={row.applicationId}
-                                               onclick={handleViewApplication}>{row.appName}</a>
-                                        </td>
-                                        <td>{row.organizationName}</td>
-                                        <td class="rd-comment">{row.approverComment}</td>
-                                        <td class="wg-cell-muted">{row.decisionDateFormatted}</td>
-                                        <td class="wg-col-action">
-                                            <button class="success-btn wg-btn-sm"
-                                                    data-id={row.applicationId}
-                                                    data-appname={row.appName}
-                                                    onclick={handleCreateComplianceRequest}>
-                                                <lightning-icon icon-name="utility:new" size="xx-small" alternative-text=""></lightning-icon>
-                                                Request compliance
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template lwc:if={noAcceptedApplicationRows}>
-                                    <tr>
-                                        <td colspan="6" class="wg-table-empty">No accepted applications awaiting compliance documents</td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <div class="wg-card">
+        <div class="wg-table-wrap">
+            <table class="wg-table rd-table rd-table--accepted">
+                <thead>
+                    <tr>
+                        <th class="wg-col-index rd-col-index" scope="col">#</th>
+                        <th class="rd-col-app" scope="col">Application</th>
+                        <th class="rd-col-org" scope="col">Organization</th>
+                        <th scope="col">Approver comment</th>
+                        <th class="rd-col-date" scope="col">Decision date</th>
+                        <th class="rd-col-action rd-align-end" scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={acceptedApplicationRows} for:item="row">
+                        <tr key={row.id}>
+                            <td class="wg-col-index">{row.rowNum}</td>
+                            <td class="wg-cell-id">
+                                <a href="javascript:void(0);" class="rd-app-link"
+                                   title="View proposal and review"
+                                   data-id={row.applicationId}
+                                   onclick={handleViewApplication}>{row.appName}</a>
+                            </td>
+                            <td>{row.organizationName}</td>
+                            <td class="rd-comment-cell">
+                                <div class="rd-comment" title={row.approverComment}>{row.approverComment}</div>
+                            </td>
+                            <td class="wg-cell-muted rd-nowrap">{row.decisionDateFormatted}</td>
+                            <td class="rd-align-end">
+                                <button class="success-btn wg-btn-sm rd-action-btn"
+                                        data-id={row.applicationId}
+                                        data-appname={row.appName}
+                                        onclick={handleCreateComplianceRequest}>
+                                    <lightning-icon icon-name="utility:new" size="xx-small" alternative-text=""></lightning-icon>
+                                    Request compliance
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                    <template lwc:if={noAcceptedApplicationRows}>
+                        <tr>
+                            <td colspan="6" class="wg-table-empty">No accepted applications awaiting a compliance request</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         </div>
     </div>

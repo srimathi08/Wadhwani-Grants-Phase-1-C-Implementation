@@ -420,6 +420,29 @@
     gap: var(--wg-space-2);
 }
 
+/* ── Accept buttons: BLUE per spec ───────────────────────────────
+   Applied on top of the shared success-btn (keeps its size, shape,
+   font and disabled behaviour; only the color changes). The extra
+   class gives this rule higher specificity than success-btn alone.
+   If the design system has a dedicated primary-blue token, replace
+   --wg-info here and in .btn-confirm-approve / .modal-approve below. */
+.success-btn.accept-btn {
+    background: var(--wg-info);
+    border-color: var(--wg-info);
+    color: var(--wg-white);
+}
+
+.success-btn.accept-btn:hover:not(:disabled) {
+    background: var(--wg-info);
+    border-color: var(--wg-info);
+    filter: brightness(0.88);
+}
+
+.success-btn.accept-btn:focus-visible {
+    outline: 2px solid var(--wg-orange);
+    outline-offset: 2px;
+}
+
 /* Rejection reason tiles — same selection language as the forms */
 .reason-tile-grid {
     display: grid;
@@ -496,7 +519,7 @@
     border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
 }
 
-.modal-approve     { border-top-color: var(--wg-success); }
+.modal-approve     { border-top-color: var(--wg-info); }   /* Accept = blue */
 .modal-return,
 .modal-decline     { border-top-color: var(--wg-error); }
 .modal-conditional { border-top-color: var(--wg-warning); }
@@ -553,7 +576,7 @@
     font-weight: var(--wg-weight-semibold);
     color: var(--wg-white);
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, filter 0.15s ease;
 }
 
 .modal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -563,8 +586,9 @@
     outline-offset: 2px;
 }
 
-.btn-confirm-approve                               { background: var(--wg-success); }
-.btn-confirm-approve:hover:not(:disabled)          { background: var(--wg-success-deep); }
+/* Confirm Accept = blue */
+.btn-confirm-approve                               { background: var(--wg-info); }
+.btn-confirm-approve:hover:not(:disabled)          { background: var(--wg-info); filter: brightness(0.88); }
 .btn-confirm-return,
 .btn-confirm-decline                               { background: var(--wg-red); }
 .btn-confirm-return:hover:not(:disabled),
@@ -598,4 +622,7 @@
 @media (prefers-reduced-motion: reduce) {
     .modal-box { animation: none; }
     .resizer, .reason-tile, .modal-btn, .ac-convo-bar { transition: none; }
+}
+.revoke-decision-text {
+    font-weight: 700;
 }

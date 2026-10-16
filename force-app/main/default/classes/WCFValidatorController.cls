@@ -99,6 +99,8 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public Decimal fileSizeMB;
         @AuraEnabled public Id contentDocumentId;
         @AuraEnabled public Id contentVersionId;
+   @AuraEnabled public Datetime createdDate;
+   @AuraEnabled public String   label;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -172,6 +174,7 @@ public without sharing class WCFValidatorController {
                 ContentDocument.FileExtension,
                 ContentDocument.ContentSize,
                 ContentDocument.Description,
+              ContentDocument.CreatedDate,         
                 ContentDocument.LatestPublishedVersionId,
                 ContentDocument.LatestPublishedVersion.Title,
                 ContentDocument.LatestPublishedVersion.FileExtension,
@@ -242,6 +245,8 @@ public without sharing class WCFValidatorController {
         w.fileSizeMB        = cdl.ContentDocument.ContentSize != null
                               ? (Decimal.valueOf(cdl.ContentDocument.ContentSize) / 1048576).setScale(2)
                               : 0;
+        w.createdDate       = cdl.ContentDocument.CreatedDate;
+        
         return w;
     }
 
@@ -268,7 +273,7 @@ public without sharing class WCFValidatorController {
     @AuraEnabled(cacheable=true)
     public static String getContentDownloadUrl(Id contentVersionId) {
         ContentVersion cv = [
-            SELECT Id, ContentDocumentId
+            SELECT Id, ContentDocumentId,CreatedDate, Description
             FROM ContentVersion
             WHERE Id = :contentVersionId
             LIMIT 1
@@ -370,8 +375,50 @@ public without sharing class WCFValidatorController {
             LIMIT 1
         ];
     }
+    // ─────────────────────────────────────────────────────────────
+    // U173 / IP-11: MANDATORY-FIELDS CHECK (S1.1)
+    // Optional on the form (never block, TR-35): Q7 Top 3 Funders, Q8 References,
+    // Q27 GenieAI synergies, Q28 Supporting Documents. This set is the single
+    // source of truth: requiredKeys is built from it. Keep in sync with
+    // OPTIONAL_CANONICAL_KEYS in wcfValidatorForm.js.
+    // ─────────────────────────────────────────────────────────────
+    private static final Set<String> OPTIONAL_QUESTION_KEYS = new Set<String>{ 'Q7', 'Q8', 'Q27', 'Q28' };
 
-    public class ReviewWrapper {
+    // Questions answered by IndividualApplication fields: ALL listed fields must be populated.
+    // To cover a new question later, add one entry here (and its fields to the
+    // getExistingReview SELECT; a field missing from the SELECT degrades to "unverified").
+    private static final Map<String, List<String>> APP_REQUIRED_FIELDS = new Map<String, List<String>>{
+        'Q2'  => new List<String>{ 'Organization_Name__c', 'Headquarters_City_and_Country__c',
+                                   'Primary_Service_Regions__c', 'Leader_Name__c', 'Leader_Title__c' },
+        'Q3'  => new List<String>{ 'Submitter_Name__c', 'Job_Title__c', 'Phone__c', 'Work_Email_ID__c' },
+        'Q4'  => new List<String>{ 'Legal_Type__c', 'Registration_Jurisdiction__c',
+                                   'Incorporation_Date__c', 'Legal_Structure__c' },
+        'Q5'  => new List<String>{ 'Has_501c3_Status__c', 'Has_Equivalency_Determination__c',
+                                   'Is_FCRA_Registered__c', 'Willing_to_Pursue_ED__c' },
+        'Q11' => new List<String>{ 'Skilling_Approach__c' },
+        'Q15' => new List<String>{ 'Job_Creation_Approach__c' },
+        'Q19' => new List<String>{ 'Livelihood_Approach__c' },
+        'Q25' => new List<String>{ 'Organizational_Sustainability__c' }
+    };
+
+    // Questions answered by Outcomes_Data__c (latest record).
+    private static final List<String> OUTCOME_QUESTION_KEYS =
+        new List<String>{ 'Q13', 'Q14', 'Q17', 'Q18', 'Q22', 'Q23' };
+
+    // Q24 is stored on the application by the new form; older submissions kept it on Outcomes_Data__c.
+    private static final List<String> Q24_OUTCOME_FALLBACK_FIELDS = new List<String>{
+        'X3rd_Party_Placement_Verification_CFY__c', 'Job_Verification_3rd_Party_CFY__c',
+        'X3rd_Party_Placement_Verification_FY_1__c', 'Job_Verification_3rd_Party_FY1__c'
+    };
+
+    public class MandatoryCheck {
+        @AuraEnabled public List<String> declaredTracks;
+        @AuraEnabled public List<String> requiredKeys;    // canonical keys, in form order
+        @AuraEnabled public List<String> missingKeys;     // verified empty
+        @AuraEnabled public List<String> unverifiedKeys;  // cannot be checked from stored data
+    }
+
+        public class ReviewWrapper {
         @AuraEnabled public ApplicationReview review;
         @AuraEnabled public String attestingUserName;
         @AuraEnabled public String attestingUserTitle;
@@ -383,6 +430,7 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public String orgArea;
         @AuraEnabled public String geography;
         @AuraEnabled public List<String> populatedQuestionKeys;
+        @AuraEnabled public MandatoryCheck mandatoryCheck;
     }
 
     public static List<String> calculatePopulatedQuestionKeys(IndividualApplication app, Id applicationId) {
@@ -441,6 +489,201 @@ public without sharing class WCFValidatorController {
         popKeys.add('Q28');
 
         return popKeys;
+    }
+        // Each requirement = list of alternative fields; ANY non-null alternative satisfies it.
+    // Numeric 0 is a valid answer, so we test for null, never for > 0.
+    private static List<List<String>> outcomeRequirements(String qKey) {
+        List<List<String>> r = new List<List<String>>();
+        if (qKey == 'Q13' || qKey == 'Q14') {
+            List<String> years = qKey == 'Q13' ? new List<String>{ 'FY_1', 'FY_2', 'FY_3' } : new List<String>{ 'CFY' };
+            for (String y : years) {
+                r.add(new List<String>{ 'Projected_Learner_Enrollments_' + y + '__c' });
+                r.add(new List<String>{ 'Projected_Learner_Placements_' + y + '__c' });
+                r.add(new List<String>{ 'Avg_Cost_per_Placement_' + y + '__c', 'Manual_Avg_Cost_per_Placement_' + y + '__c' });
+            }
+        } else if (qKey == 'Q17' || qKey == 'Q18') {
+            List<String> years = qKey == 'Q17' ? new List<String>{ 'FY_1', 'FY_2', 'FY_3' } : new List<String>{ 'CFY' };
+            for (String y : years) {
+                String yj = y.remove('_');   // FY_1 -> FY1 (Projected_Jobs_from_New_Businesses_* has no underscore)
+                r.add(new List<String>{ 'Projected_New_Businesses_' + y + '__c' });
+                r.add(new List<String>{ 'Projected_Jobs_from_New_Businesses_' + yj + '__c' });
+                r.add(new List<String>{ 'Growing_Businesses_Supported_' + y + '__c' });
+                r.add(new List<String>{ 'Jobs_from_Growing_Businesses_' + y + '__c' });
+                r.add(new List<String>{ 'Avg_Cost_per_Job_' + y + '__c', 'Manual_Avg_Cost_per_Job_' + y + '__c' });
+            }
+        } else if (qKey == 'Q22' || qKey == 'Q23') {
+            List<String> years = qKey == 'Q22' ? new List<String>{ 'FY3', 'FY2', 'FY1' } : new List<String>{ 'PROJ' };
+            for (String y : years) {
+                for (String m : new List<String>{ 'LIV_SERVED_', 'LIV_ENROLL_', 'LIV_OUTCOME_', 'LIV_COST_' }) {
+                    r.add(new List<String>{ m + y + '__c' });
+                }
+            }
+        }
+        return r;
+    }
+
+    private static Boolean hasValue(SObject rec, String fieldName) {
+        Object v = rec.get(fieldName);
+        return v != null && !(v instanceof String && String.isBlank((String) v));
+    }
+
+    // true = all populated, false = at least one verified empty, null = cannot be checked
+    private static Boolean allFieldsPopulated(SObject rec, List<String> fieldNames) {
+        Boolean unchecked = false;
+        for (String f : fieldNames) {
+            if (!rec.isSet(f)) { unchecked = true; continue; }   // not in the SELECT: never call it "missing"
+            if (!hasValue(rec, f)) return false;
+        }
+        return unchecked ? null : true;
+    }
+
+    // true = every requirement met, false = some requirement verified empty, null = cannot be checked
+    private static Boolean outcomePopulated(Outcomes_Data__c rec, Set<String> queried, List<List<String>> reqs) {
+        Boolean unchecked = false;
+        for (List<String> alts : reqs) {
+            Boolean anyKnown = false;
+            Boolean anyValue = false;
+            for (String f : alts) {
+                if (!queried.contains(f.toLowerCase())) continue;   // field does not exist in this org
+                anyKnown = true;
+                                if (rec != null && hasValue(rec, f)) anyValue = true;
+            }
+            if (!anyKnown) unchecked = true;
+            else if (!anyValue) return false;   // no Outcomes record, or the value is empty
+        }
+        return unchecked ? null : true;
+    }
+
+    private static void putIfKnown(Map<String, Boolean> chk, String key, Boolean result) {
+        if (result != null) chk.put(key, result);   // null leaves the key absent => "unverified"
+    }
+
+    private static Outcomes_Data__c loadLatestOutcome(Id applicationId, List<String> selectable) {
+        if (selectable.isEmpty()) return null;
+        String soql = 'SELECT Id, ' + String.join(selectable, ', ')
+            + ' FROM Outcomes_Data__c WHERE Proposal__c = :applicationId'
+            + ' ORDER BY LastModifiedDate DESC LIMIT 1';   // same ordering as getWCFFullPreviewData
+        List<SObject> rows = Database.queryWithBinds(
+            soql, new Map<String, Object>{ 'applicationId' => applicationId }, AccessLevel.SYSTEM_MODE);
+        return rows.isEmpty() ? null : (Outcomes_Data__c) rows[0];
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Builds the S1.1 mandatory-fields verdict.
+    //   missingKeys    -> verified empty from stored data
+    //   unverifiedKeys -> cannot be confirmed from stored data alone
+    //   neither        -> verified populated
+    // calculatePopulatedQuestionKeys() is intentionally left untouched;
+    // it still drives the Return-question grid and getPopulatedQuestionNumbers().
+    // ─────────────────────────────────────────────────────────────
+    public static MandatoryCheck calculateMandatoryCheck(IndividualApplication app, Id applicationId) {
+        String oa = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
+            ? app.Organizational_Area_s_for_Funding_Inves1__c.toLowerCase()
+            : (String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves__c)
+                ? app.Organizational_Area_s_for_Funding_Inves__c.toLowerCase()
+                : '');
+        Boolean isBoth = oa.contains('both');
+        Boolean hasJF  = isBoth || oa.contains('fulfil');
+        Boolean hasJC  = isBoth || oa.contains('creation');
+        Boolean hasLU  = oa.contains('livelihood');
+
+        MandatoryCheck mc = new MandatoryCheck();
+        mc.declaredTracks = new List<String>();
+        if (hasJF) mc.declaredTracks.add('Job Fulfillment');
+        if (hasJC) mc.declaredTracks.add('Job Creation');
+        if (hasLU) mc.declaredTracks.add('Livelihood Upliftment');   // TR-16 wording
+
+        List<String> req = new List<String>{ 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q9', 'Q10' };
+        if (hasJF) req.addAll(new List<String>{ 'Q11', 'Q12', 'Q13', 'Q14' });
+        if (hasJC) req.addAll(new List<String>{ 'Q15', 'Q16', 'Q17', 'Q18' });
+        if (hasLU) req.addAll(new List<String>{ 'Q19', 'Q20', 'Q21', 'Q22', 'Q23' });
+        req.addAll(new List<String>{ 'Q24', 'Q25', 'Q26', 'Q27' });
+        mc.requiredKeys = new List<String>();
+        for (String k : req) {
+            if (!OPTIONAL_QUESTION_KEYS.contains(k)) mc.requiredKeys.add(k);
+        }
+
+        // true = populated, false = verified empty, key absent = cannot be checked from data
+        Map<String, Boolean> chk = new Map<String, Boolean>();
+        chk.put('Q1', String.isNotBlank(oa));
+
+        // Application-field questions (Q2, Q3, Q4, Q5, Q11, Q15, Q19, Q25)
+        for (String k : APP_REQUIRED_FIELDS.keySet()) {
+            if (mc.requiredKeys.contains(k)) putIfKnown(chk, k, allFieldsPopulated(app, APP_REQUIRED_FIELDS.get(k)));
+        }
+
+        // Q6: the date field (older form) OR month + day (new form)
+        if (app.Current_fiscal_year_s_end_date__c != null) {
+            chk.put('Q6', true);
+        } else {
+            putIfKnown(chk, 'Q6', allFieldsPopulated(app, new List<String>{ 'Fiscal_Month__c', 'Fiscal_Day__c' }));
+        }
+
+        chk.put('Q9',  [SELECT count() FROM Historical_Data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+        chk.put('Q10', [SELECT count() FROM Current_fiscal_year_data__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+
+        if (hasJF) {
+            chk.put('Q12', [SELECT count() FROM WCF_Skilling_Domain__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+        }
+        if (hasJC) {
+            chk.put('Q16', String.isNotBlank(app.Business_Sectors_JSON__c)
+                || [SELECT count() FROM WCF_Business_Sector__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+        }
+        if (hasLU) {
+            chk.put('Q20', [SELECT count() FROM WCF_Livelihood_Program__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+            chk.put('Q21', [SELECT count() FROM WCF_Community__c WHERE Proposal__c = :applicationId WITH SYSTEM_MODE] > 0);
+        }
+
+        chk.put('Q26', String.isNotBlank(app.Use_of_Additional_Funding__c) || String.isNotBlank(app.Use_of_Additional_Funding_JC__c));
+        chk.put('Q27', String.isNotBlank(app.GenieAI_Interest_Level__c)
+            || (hasJF && !hasJC && String.isNotBlank(app.Operational_Synergies_with_WOF__c))
+            || (hasJC && !hasJF && String.isNotBlank(app.Operational_Synergies_with_WOF_JC__c))
+            || (isBoth && String.isNotBlank(app.Operational_Synergies_with_WOF_Both__c)));
+
+        // Outcomes_Data__c questions (Q13, Q14, Q17, Q18, Q22, Q23) + Q24 fallback.
+        // The query is built from the same spec as the checks, so they cannot drift apart.
+        Map<String, List<List<String>>> outcomeReqs = new Map<String, List<List<String>>>();
+        Set<String> wanted = new Set<String>();
+        for (String k : OUTCOME_QUESTION_KEYS) {
+            if (!mc.requiredKeys.contains(k)) continue;
+            List<List<String>> reqs = outcomeRequirements(k);
+            outcomeReqs.put(k, reqs);
+            for (List<String> alts : reqs) wanted.addAll(alts);
+        }
+        Boolean q24OnApp = hasValue(app, 'Q24_VERIFIED__c');
+        if (q24OnApp) chk.put('Q24', true);
+        else wanted.addAll(Q24_OUTCOME_FALLBACK_FIELDS);
+
+        if (!wanted.isEmpty()) {
+            Map<String, Schema.SObjectField> describeMap = Schema.SObjectType.Outcomes_Data__c.fields.getMap();
+            List<String> selectable = new List<String>();
+            Set<String> queried = new Set<String>();
+            for (String f : wanted) {
+                if (describeMap.containsKey(f.toLowerCase())) {
+                    selectable.add(f);
+                    queried.add(f.toLowerCase());
+                }
+            }
+            Outcomes_Data__c outcome = loadLatestOutcome(applicationId, selectable);
+            for (String k : outcomeReqs.keySet()) {
+                putIfKnown(chk, k, outcomePopulated(outcome, queried, outcomeReqs.get(k)));
+            }
+            if (!q24OnApp) {
+                putIfKnown(chk, 'Q24', outcomePopulated(outcome, queried,
+                    new List<List<String>>{ Q24_OUTCOME_FALLBACK_FIELDS }));
+            }
+        }
+
+        mc.missingKeys = new List<String>();
+        mc.unverifiedKeys = new List<String>();
+        for (String k : mc.requiredKeys) {
+            if (!chk.containsKey(k)) {
+                mc.unverifiedKeys.add(k);
+            } else if (!chk.get(k)) {
+                mc.missingKeys.add(k);
+            }
+        }
+        return mc;
     }
 
     public static Map<String, Integer> calculateQuestionNumberMap(String orgArea) {
@@ -509,7 +752,14 @@ public without sharing class WCFValidatorController {
                    Business_Sectors_JSON__c,
                    Organizational_Sustainability__c, Use_of_Additional_Funding__c, Use_of_Additional_Funding_JC__c,
                    GenieAI_Interest_Level__c, Operational_Synergies_with_WOF__c,
-                   Operational_Synergies_with_WOF_JC__c, Operational_Synergies_with_WOF_Both__c
+                   Operational_Synergies_with_WOF_JC__c, Operational_Synergies_with_WOF_Both__c,
+                   Organization_Name__c, Submitter_Name__c, Legal_Type__c,
+                   Current_fiscal_year_s_end_date__c, Q24_VERIFIED__c, Headquarters_City_and_Country__c, Primary_Service_Regions__c,
+                   Leader_Name__c, Leader_Title__c, Job_Title__c, Phone__c, Work_Email_ID__c,
+                   Registration_Jurisdiction__c, Incorporation_Date__c, Legal_Structure__c,
+                   Has_501c3_Status__c, Has_Equivalency_Determination__c,
+                   Is_FCRA_Registered__c, Willing_to_Pursue_ED__c,
+                   Fiscal_Month__c, Fiscal_Day__c
             FROM IndividualApplication 
             WHERE Id = :applicationId 
             WITH SYSTEM_MODE
@@ -532,6 +782,14 @@ public without sharing class WCFValidatorController {
                                          ? app.Organizational_Area_s_for_Funding_Inves1__c
                                          : app.Organizational_Area_s_for_Funding_Inves__c;
             wrapper.populatedQuestionKeys = calculatePopulatedQuestionKeys(app, applicationId);
+            
+                        try {
+                wrapper.mandatoryCheck = calculateMandatoryCheck(app, applicationId);
+            } catch (Exception e) {
+                // The LWC falls back to its "verify manually" list when this is null
+                System.debug(LoggingLevel.ERROR, 'calculateMandatoryCheck failed: ' + e.getMessage());
+                wrapper.mandatoryCheck = null;
+            }
         }
 
         Id validatorRecordTypeId = getWCFValidatorRecordTypeId();
