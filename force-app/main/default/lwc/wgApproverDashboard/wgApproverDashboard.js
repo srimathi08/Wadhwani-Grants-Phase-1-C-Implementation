@@ -52,7 +52,7 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
 
         const defs = [
             { id: 'pending',          label: 'Pending Decisions',    subtitle: 'Reviewed proposals awaiting your decision',   count: summary.pending || 0,          tone: 'brand',    alertWhenPositive: true },
-            { id: 'backFromReviewer', label: 'Back from Reviewer',   subtitle: 'Reviewer responded — ready for your final decision', count: summary.backFromReviewer || 0, tone: 'warning', alertWhenPositive: true },
+            { id: 'backFromReviewer', label: 'Back from Reviewer',   subtitle: 'Reviewer responded: ready for your final decision', count: summary.backFromReviewer || 0, tone: 'warning', alertWhenPositive: true },
             { id: 'returned',         label: 'Returned to Reviewer', subtitle: 'Sent back to the Reviewer for clarification', count: summary.returned || 0,         tone: 'returned' },
             { id: 'recYes',           label: 'Recommended',          subtitle: 'Proposals recommended for approval',          count: recYes,                        tone: 'info' },
             { id: 'recNo',            label: 'Not Recommended',      subtitle: 'Proposals not recommended for approval',      count: recNo,                         tone: 'neutral' },

@@ -29,8 +29,10 @@ export default class WcfSourcingChannelReport extends LightningElement {
     @track filters = { ...DEFAULT_FILTERS };
 
     @track sourceChannelData = null;   // KPI tiles + source channel bars
-    @track sourceChannelRows = [];     // detail table
+    @track sourceChannelRows = [];     // detail table (unfiltered)
     @track budgetRangeData   = null;   // independent budget dataset
+
+    searchTerm = '';                   // client-side search on detail table
 
     geographyOptions = [{ label: 'All geographies', value: ALL }];
     stageOptions     = [{ label: 'All stages', value: ALL }];
@@ -68,8 +70,13 @@ export default class WcfSourcingChannelReport extends LightningElement {
         this.refreshAll();
     }
 
+    handleSearchChange(event) {
+        this.searchTerm = event.detail.value || '';
+    }
+
     handleReset() {
         this.filters = { ...DEFAULT_FILTERS };
+        this.searchTerm = '';
         this.refreshAll();
     }
 
@@ -150,9 +157,10 @@ export default class WcfSourcingChannelReport extends LightningElement {
                 }
             ];
 
-            this.sourceChannelRows = (d.rows || []).map((r, i) => ({
+            // rowNum is assigned in the filteredRows getter so numbering
+            // stays sequential after searching
+            this.sourceChannelRows = (d.rows || []).map(r => ({
                 ...r,
-                rowNum:        i + 1,
                 channelClass:  this._channelClass(r.sourceChannel),
                 decisionClass: this._decisionClass(r.decision)
             }));
@@ -241,8 +249,39 @@ export default class WcfSourcingChannelReport extends LightningElement {
         return !this.isBudgetLoading && !this.budgetRangeBars;
     }
 
+    // ─── Search / detail table getters ────────────────────────────
+    get hasSearchTerm() {
+        return (this.searchTerm || '').trim().length > 0;
+    }
+
+    get filteredRows() {
+        const term = (this.searchTerm || '').trim().toLowerCase();
+        const rows = this.sourceChannelRows || [];
+
+        const matched = term
+            ? rows.filter(r =>
+                [r.appName, r.orgName, r.sourceChannel, r.budgetRange, r.stage, r.decision]
+                    .some(v => (v || '').toString().toLowerCase().includes(term)))
+            : rows;
+
+        // Re-number so the # column stays sequential after filtering
+        return matched.map((r, i) => ({ ...r, rowNum: i + 1 }));
+    }
+
     get noSourceChannelRows() {
-        return !this.sourceChannelRows || this.sourceChannelRows.length === 0;
+        return this.filteredRows.length === 0;
+    }
+
+    get emptyRowsMessage() {
+        return this.hasSearchTerm
+            ? 'No organisations match your search'
+            : 'No sourcing channel data available';
+    }
+
+    get resultCountLabel() {
+        const total = (this.sourceChannelRows || []).length;
+        if (!this.hasSearchTerm) return `${total} organisations`;
+        return `${this.filteredRows.length} of ${total} organisations`;
     }
 
     // ─── Helpers ──────────────────────────────────────────────────

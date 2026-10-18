@@ -195,12 +195,12 @@ const DEFAULT_TITLES = {
     Q10: 'Current Fiscal Year Budget & Projections',
     Q11: 'Your Skilling Approach',
     Q12: 'Skilling Domains Offered',
-    Q13: 'Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)',
-    Q14: 'Job Fulfillment Outcomes — Current FY Projections',
+    Q13: 'Job Fulfillment Outcomes: Last 3 Fiscal Years (Actuals)',
+    Q14: 'Job Fulfillment Outcomes: Current FY Projections',
     Q15: 'Your Job Creation Approach',
     Q16: 'Business Sectors Served',
-    Q17: 'Job Creation Outcomes — Last 3 Fiscal Years (Actuals)',
-    Q18: 'Job Creation Outcomes — Current FY Projections',
+    Q17: 'Job Creation Outcomes: Last 3 Fiscal Years (Actuals)',
+    Q18: 'Job Creation Outcomes: Current FY Projections',
     Q19: 'Your Livelihood Upliftment Approach',
     Q20: 'Your Key Programs / Initiatives',
     Q21: 'Communities that you work in',
@@ -217,8 +217,8 @@ const DEFAULT_TITLES = {
 const DEFAULT_DESCRIPTIONS = {
     SEC6_DESC: 'When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)',
     Q4_GOVERNANCE_DESC: 'Describe your governance structure and key governing bodies.',
-    Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).',
-    Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.',
+    Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure: board, leadership, key affiliations (<100 words).',
+    Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognisable. All amounts in USD.',
     Q8_REFERENCES_DESC: 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.',
     Q9_HIST_FINANCIALS_DESC: 'Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.',
     Q10_CURRENT_FY_DESC: 'Your current fiscal year budget, latest projection, and explanation of any deviation.',
@@ -227,7 +227,7 @@ const DEFAULT_DESCRIPTIONS = {
     Q11_SKILLING_APPROACH_DESC: 'Tell us about your skilling work in roughly 500 words. If you run named programs, walk us through your top three (names, what they teach, who they serve). Cover your theory of change, the journey from learner enrollment to placement, and what makes your approach different from others.',
     Q12_SKILLING_DOMAINS_DESC: 'List the skilling domains your organization offers (one row each, minimum 1). For each: typical training hours, duration in months, when you started running it, and your annual enrollment.',
     Q13_JF_HIST_OUTCOMES_DESC: 'Enter your enrolment and placement actuals across the three most recent fiscal years. Placement % and average cost per placement are computed for you.',
-    Q14_JF_PROJ_OUTCOMES_DESC: 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block — projections aren\'t verifiable at submission.',
+    Q14_JF_PROJ_OUTCOMES_DESC: 'Enter your projected enrolment and placement numbers for the current fiscal year. These are forward-looking estimates. No verification block: projections aren\'t verifiable at submission.',
     Q15_JOB_CREATION_APPROACH_DESC: 'Tell us about your job creation work in roughly 500 words. Cover (i) your support model (capital, mentorship, business advisory, sector-specific TA, market linkages, etc.); (ii) your theory of change, the journey from engagement through to jobs created and sustained; (iii) what makes your approach different from others.',
     Q16_BUSINESS_SECTORS_DESC: 'List the business sectors in which you support entrepreneurs / Micro, Small, and Medium Enterprises. For each, tell us what type of support you provide, when you started supporting that sector, and your annual enrolment number.',
     Q17_JC_HIST_OUTCOMES_DESC: 'Enter your business creation and job creation actuals across the three most recent fiscal years. Total avg cost per job created is computed for you. Current FY projections are captured separately below.',
@@ -239,7 +239,7 @@ const DEFAULT_DESCRIPTIONS = {
     Q24_INDEPENDENT_VERIFICATION_DESC: 'This applies to every applicant, whichever track you completed. If a third party has independently verified or evaluated the outcomes you reported, sharing the report strengthens your application; it is not required. If not, we will discuss verification together at the next stage.',
     Q25_SUSTAINABILITY_PLAN_DESC: 'How is your organization positioned to sustain its work over time? In about 100 words cover: (1) funding mix, main revenue sources; (2) programmatic resilience, dependence on any single program or contract; (3) funder concentration, reliance on one funder and how you manage that risk. A plain-language picture is all we need.',
     Q26_ADDITIONAL_FUNDING_DESC: 'Then, in words. If you were given a grant of USD 1 million a year, what would you do with it? In about 200 words, tell us how you would deploy it to scale your impact: program expansion, geographic scaling, new offerings, capacity-building, technology investment, and so on. Treat the figure as approximate; scale it to your own situation. We will work out specifics together at the next stage, so no detailed budget or M&E plan is needed here.',
-    Q27_GENIE_AI_DESC: 'GenieAI is Wadhwani Foundation\'s AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying — we want your honest signal. If you\'re open to exploring synergy, tell us how it could fit. If not, that\'s a complete and acceptable answer.',
+    Q27_GENIE_AI_DESC: 'GenieAI is Wadhwani Foundation\'s AI platform for skilling, entrepreneurship, and government services. This is fully optional and never disqualifying: we want your honest signal. If you\'re open to exploring synergy, tell us how it could fit. If not, that\'s a complete and acceptable answer.',
     Q28_SUPPORTING_DOCS_DESC: 'If there\'s anything else you\'d like to share in support of your application, you may upload it here.'
 };
 
@@ -726,7 +726,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     /** Same header the main form shows on Q14 ("FY-2026 (CFY) — Projection"). */
     get cfyProjectionHeader() {
         const cfy = this.fiscalYears && this.fiscalYears.cfyLabel;
-        return cfy ? `${cfy} (CFY) — Projection` : 'FY-2026 (CFY) — Projection';
+        return cfy ? `${cfy} (CFY): Projection` : 'FY-2026 (CFY): Projection';
     }
 
     // ── Flagged questions ───────────────────────────────────────────────────
@@ -828,7 +828,7 @@ export default class WcfRfiResponsePage extends LightningElement {
                             this._inputCell('START_FY3', fy.fy3, 'Balance at Start of Year', true),
                             this._computedCell('start-fy2', this._fmtComputed(this.cy3BalanceEnd), true),
                             this._computedCell('start-fy1', this._fmtComputed(this.cy2BalanceEnd), true)
-                        ], { subtext: 'Earliest year only — chains forward automatically.' }),
+                        ], { subtext: 'Earliest year only (chains forward automatically).' }),
                         histRow('rev', 'Revenue', 'REV', { currency: true }),
                         histRow('cap', 'Capital expenditure', 'CAP', { currency: true, subtext: CAPEX_HINT }),
                         histRow('op', 'Operating expenditure', 'OP', { currency: true, subtext: OPEX_HINT }),
@@ -1196,7 +1196,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get legalTypeOptions() {
         return [
-            { label: '— Select type —', value: '' },
+            { label: 'Select type', value: '' },
             { label: 'Non-profit', value: 'Non-profit' },
             { label: 'For-profit', value: 'For-profit' },
             { label: 'Hybrid', value: 'Hybrid' },
@@ -1207,7 +1207,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get countryOptions() {
         return [
-            { label: '— Select country —', value: '' },
+            { label: 'Select country', value: '' },
             { label: 'Brazil', value: 'Brazil' },
             { label: 'Egypt', value: 'Egypt' },
             { label: 'India', value: 'India' },
@@ -1229,7 +1229,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
     get funderTypeOptions() {
         return [
-            { label: '— Select —', value: '' },
+            { label: 'Select an option', value: '' },
             { label: 'Grant', value: 'Grant' },
             { label: 'Loan', value: 'Loan' },
             { label: 'Equity', value: 'Equity' },
@@ -1468,7 +1468,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     // ── Q16 Business sectors ────────────────────────────────────────────────
     get sectorDropdownOptions() {
         return [
-            { label: '— Select —', value: '' },
+            { label: 'Select an option', value: '' },
             { label: 'Agriculture and allied', value: 'Agriculture and allied' },
             { label: 'Manufacturing', value: 'Manufacturing' },
             { label: 'Textiles and apparel', value: 'Textiles and apparel' },
@@ -1571,7 +1571,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     // ── Q21 Communities ─────────────────────────────────────────────────────
     get stateOptions() {
         return [
-            '— Select State —', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+            'Select State', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
             'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
             'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan',
             'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
@@ -1699,7 +1699,7 @@ export default class WcfRfiResponsePage extends LightningElement {
 
                 if (msg) {
                     this._markCellInvalid(cell.key, msg);
-                    if (!firstError) firstError = `${title}: ${cell.rowLabel} (${cell.colLabel}) — ${msg}`;
+                    if (!firstError) firstError = `${title}: ${cell.rowLabel} (${cell.colLabel}): ${msg}`;
                 }
             });
         });

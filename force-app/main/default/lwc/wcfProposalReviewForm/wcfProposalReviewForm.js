@@ -740,9 +740,24 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
 
     // Review Step Getters
     get overallCalculatedScore() {
-        const validRatings = Object.values(this.ratings).filter(r => r != null && !isNaN(r));
-        if (!validRatings.length) return '—';
-        return (validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length).toFixed(2);
+        if (!this.categories || !this.categories.length) return '—';
+
+        const categoryMeans = [];
+        this.categories.forEach(cat => {
+            const qs = cat.questions || [];
+            const catRatings = qs
+                .map(q => this.ratings[q.questionId])
+                .filter(r => r != null && !isNaN(r));
+
+            if (catRatings.length > 0) {
+                const catAvg = catRatings.reduce((sum, r) => sum + Number(r), 0) / catRatings.length;
+                categoryMeans.push(catAvg);
+            }
+        });
+
+        if (!categoryMeans.length) return '—';
+        const overall = categoryMeans.reduce((sum, m) => sum + m, 0) / categoryMeans.length;
+        return overall.toFixed(2);
     }
 
     get reviewSummaryDims() {

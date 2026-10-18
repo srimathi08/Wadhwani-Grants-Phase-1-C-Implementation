@@ -48,6 +48,16 @@ private static final Set<String> CLOSED_STATUSES =
     public class ApplicationLinkDTO {
         @AuraEnabled public String recordId        { get; set; }
         @AuraEnabled public String applicationName { get; set; }
+        @AuraEnabled public String geography       { get; set; }
+    }
+
+    public class ApplicationOrgDetailsDTO {
+        @AuraEnabled public String applicationId    { get; set; }
+        @AuraEnabled public String applicationName  { get; set; }
+        @AuraEnabled public String organisationId   { get; set; }
+        @AuraEnabled public String organisationName { get; set; }
+        @AuraEnabled public String geography        { get; set; }
+        @AuraEnabled public Boolean hasExistingRequest { get; set; }
     }
 
     public class ReviewItemDTO {
@@ -57,6 +67,7 @@ private static final Set<String> CLOSED_STATUSES =
         @AuraEnabled public String fileName { get; set; }
         @AuraEnabled public String downloadUrl { get; set; }
         @AuraEnabled public String reviewerNotes { get; set; }
+        @AuraEnabled public String requestReviewerNotes { get; set; }
         @AuraEnabled public String contentDocumentId { get; set; }
         @AuraEnabled public String contentVersionId { get; set; }
     }
@@ -241,6 +252,18 @@ private static final Set<String> CLOSED_STATUSES =
         return rows;
     }
 
+    // ─── Geography Resolution Helper ────────────────────────────────────────
+
+    private static String resolveGeography(String countryOrCity) {
+        if (String.isBlank(countryOrCity)) return '';
+        String lower = countryOrCity.toLowerCase();
+        if (lower.contains('india')) return 'India';
+        if (lower.contains('mexico')) return 'Mexico';
+        if (lower.contains('brazil') || lower.contains('brasil')) return 'Brazil';
+        if (lower.contains('usa') || lower.contains('united states') || lower.contains('america')) return 'USA';
+        return 'Other';
+    }
+
     // ─── Fetch latest approved proposal for an org ──────────────────────────
 
     @AuraEnabled(cacheable=false)
@@ -248,7 +271,7 @@ private static final Set<String> CLOSED_STATUSES =
         if (String.isBlank(organisationId)) return null;
 
         List<IndividualApplication> apps = [
-            SELECT Id, Name, AccountId, Status
+            SELECT Id, Name, AccountId, Status, Headquarters_City_and_Country__c, Account.BillingCountry
             FROM IndividualApplication
             WHERE AccountId = :organisationId
             WITH SYSTEM_MODE
@@ -269,6 +292,90 @@ private static final Set<String> CLOSED_STATUSES =
         ApplicationLinkDTO dto = new ApplicationLinkDTO();
         dto.recordId        = chosenApp.Id;
         dto.applicationName = chosenApp.Name;
+        String geoRaw = (chosenApp.Account != null && String.isNotBlank(chosenApp.Account.BillingCountry))
+            ? chosenApp.Account.BillingCountry
+            : chosenApp.Headquarters_City_and_Country__c;
+        dto.geography       = resolveGeography(geoRaw);
+        return dto;
+    }
+
+    // ─── Fetch org & application details for a given proposal ──────────────
+
+    @AuraEnabled(cacheable=false)
+    public static ApplicationOrgDetailsDTO getApplicationOrgDetails(String applicationId) {
+        if (String.isBlank(applicationId)) return null;
+
+        List<IndividualApplication> apps = [
+            SELECT Id, Name, AccountId, Account.Name, Account.WCF_Organizational_Name__c,
+                   Account.BillingCountry, Headquarters_City_and_Country__c, Organization_Name__c
+            FROM IndividualApplication
+            WHERE Id = :applicationId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+
+        if (apps.isEmpty()) return null;
+        IndividualApplication app = apps[0];
+
+        ApplicationOrgDetailsDTO dto = new ApplicationOrgDetailsDTO();
+        dto.applicationId   = app.Id;
+        dto.applicationName = app.Name;
+
+        String orgId = app.AccountId != null ? String.valueOf(app.AccountId) : '';
+        String orgName = '';
+        String geoRaw = '';
+
+        if (app.Account != null) {
+            orgName = String.isNotBlank(app.Account.WCF_Organizational_Name__c)
+                ? app.Account.WCF_Organizational_Name__c
+                : app.Account.Name;
+            if (String.isNotBlank(app.Account.BillingCountry)) {
+                geoRaw = app.Account.BillingCountry;
+            }
+        }
+
+        if (String.isBlank(orgName) && String.isNotBlank(app.Organization_Name__c)) {
+            orgName = app.Organization_Name__c;
+        }
+
+        if (String.isBlank(geoRaw) && String.isNotBlank(app.Headquarters_City_and_Country__c)) {
+            geoRaw = app.Headquarters_City_and_Country__c;
+        }
+
+        if (String.isBlank(orgId) && String.isNotBlank(app.Organization_Name__c)) {
+            List<Account> accs = [
+                SELECT Id, Name, WCF_Organizational_Name__c, BillingCountry
+                FROM Account
+                WHERE Name = :app.Organization_Name__c OR WCF_Organizational_Name__c = :app.Organization_Name__c
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ];
+            if (!accs.isEmpty()) {
+                orgId = accs[0].Id;
+                if (String.isBlank(orgName)) {
+                    orgName = String.isNotBlank(accs[0].WCF_Organizational_Name__c)
+                        ? accs[0].WCF_Organizational_Name__c
+                        : accs[0].Name;
+                }
+                if (String.isBlank(geoRaw) && String.isNotBlank(accs[0].BillingCountry)) {
+                    geoRaw = accs[0].BillingCountry;
+                }
+            }
+        }
+
+        dto.organisationId   = orgId;
+        dto.organisationName = orgName;
+        dto.geography        = resolveGeography(geoRaw);
+
+        List<WCF_Compliance_Document__c> existingRequests = [
+            SELECT Id
+            FROM WCF_Compliance_Document__c
+            WHERE IndividualApplication__c = :applicationId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        dto.hasExistingRequest = !existingRequests.isEmpty();
+
         return dto;
     }
 
@@ -428,6 +535,7 @@ private static final Set<String> CLOSED_STATUSES =
             dto.contentDocumentId = request.ContentDocumentId__c;
             dto.downloadUrl = dto.hasFile ? '/sfc/servlet.shepherd/document/download/' + request.ContentDocumentId__c : null;
             dto.reviewerNotes = request.Reviewer_Notes__c;
+            dto.requestReviewerNotes = request.Reviewer_Notes__c;
             items.add(dto);
         } else if (String.isNotBlank(request.Document_Types__c)) {
             List<String> labels = new List<String>();
@@ -458,6 +566,7 @@ private static final Set<String> CLOSED_STATUSES =
             for (String label : labels) {
                 ReviewItemDTO dto = new ReviewItemDTO();
                 dto.documentLabel = label;
+                dto.requestReviewerNotes = request.Reviewer_Notes__c;
 
                 if (dedicatedDocs.containsKey(label)) {
                     WCF_Compliance_Document__c doc = dedicatedDocs.get(label);
@@ -466,7 +575,11 @@ private static final Set<String> CLOSED_STATUSES =
                     dto.fileName = doc.File_Name__c;
                     dto.contentDocumentId = doc.ContentDocumentId__c;
                     dto.downloadUrl = dto.hasFile ? '/sfc/servlet.shepherd/document/download/' + doc.ContentDocumentId__c : null;
-                    dto.reviewerNotes = doc.Reviewer_Notes__c;
+                    if (doc.Status__c == 'Validated' && String.isNotBlank(request.Reviewer_Notes__c) && doc.Reviewer_Notes__c == request.Reviewer_Notes__c) {
+                        dto.reviewerNotes = null;
+                    } else {
+                        dto.reviewerNotes = doc.Reviewer_Notes__c;
+                    }
                 } else {
                     Map<String, Object> entry = statusMap.containsKey(label) ? (Map<String, Object>) statusMap.get(label) : null;
                     if (entry != null) {
@@ -476,7 +589,12 @@ private static final Set<String> CLOSED_STATUSES =
                         dto.fileName = (String) entry.get('fileName');
                         dto.contentDocumentId = contentDocId;
                         dto.downloadUrl = dto.hasFile ? '/sfc/servlet.shepherd/document/download/' + contentDocId : null;
-                        dto.reviewerNotes = (String) entry.get('reviewerNotes');
+                        String entryNotes = (String) entry.get('reviewerNotes');
+                        if (dto.status == 'Validated' && String.isNotBlank(request.Reviewer_Notes__c) && entryNotes == request.Reviewer_Notes__c) {
+                            dto.reviewerNotes = null;
+                        } else {
+                            dto.reviewerNotes = entryNotes;
+                        }
                     } else {
                         dto.status = 'Pending Submission';
                         dto.hasFile = false;
@@ -555,6 +673,9 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
         request.Status__c         = targetStatus;
         request.Reviewer_Notes__c = reviewerNotes;
         update request;
+        if (request.IndividualApplication__c != null) {
+            WCFComplianceDocumentTriggerHandler.syncOnboardedStatus(new Set<Id>{request.IndividualApplication__c});
+        }
         return;
     }
 
@@ -571,7 +692,7 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
     Map<String, WCF_Compliance_Document__c> dedicatedMap = new Map<String, WCF_Compliance_Document__c>();
     if (request.IndividualApplication__c != null) {
         for (WCF_Compliance_Document__c doc : [
-            SELECT Id, Document_Type__c, ContentDocumentId__c, Status__c, Reviewer_Notes__c
+            SELECT Id, Document_Type__c, ContentDocumentId__c, Status__c, Reviewer_Notes__c, IndividualApplication__c
             FROM   WCF_Compliance_Document__c
             WHERE  IndividualApplication__c = :request.IndividualApplication__c
               AND  Document_Type__c IN :labels
@@ -634,12 +755,16 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
         if (dedicatedMap.containsKey(label)) {
             WCF_Compliance_Document__c d = dedicatedMap.get(label);
             d.Status__c         = targetStatus;
-            d.Reviewer_Notes__c = reviewerNotes;
+            d.Reviewer_Notes__c = (decision == 'Pass') ? null : reviewerNotes;
             docsToUpdate.add(d);
         } else {
             Map<String, Object> e = (Map<String, Object>) statusMap.get(label);
             e.put('status', targetStatus);
-            e.put('reviewerNotes', reviewerNotes);
+            if (decision == 'Pass') {
+                e.remove('reviewerNotes');
+            } else {
+                e.put('reviewerNotes', reviewerNotes);
+            }
         }
     }
 
@@ -658,6 +783,10 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
     update request;
 
     if (!docsToUpdate.isEmpty()) update docsToUpdate;
+
+    if (request.IndividualApplication__c != null) {
+        WCFComplianceDocumentTriggerHandler.syncOnboardedStatus(new Set<Id>{request.IndividualApplication__c});
+    }
 }
 
     // ─── Grant Agreement DTO & Methods ───────────────────────────────────────
@@ -848,10 +977,11 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
             }
 
             // 4. Update Application status to Onboarded
-            update new IndividualApplication(
+            update as system new IndividualApplication(
                 Id     = appId,
                 Status = 'Onboarded'
             );
+            WCFComplianceDocumentTriggerHandler.syncOnboardedStatus(new Set<Id>{appId});
         }
     }
 

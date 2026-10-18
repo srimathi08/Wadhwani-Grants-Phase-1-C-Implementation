@@ -3,8 +3,8 @@ import { NavigationMixin } from 'lightning/navigation';
 import { CurrentPageReference } from 'lightning/navigation';
 // ── resolves to '/reviewersite/s' in sandbox and '/internal/s' in production ──
 import COMMUNITY_BASE_PATH from '@salesforce/community/basePath';
-import getValidatedProposals  from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
-import getReviewStatusMap     from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
+import getValidatedProposals from '@salesforce/apex/WCFProposalListController.getValidatedProposals';
+import getReviewStatusMap from '@salesforce/apex/WCFProposalListController.getReviewStatusMap';
 import getAcceptedApplicationsQueue from '@salesforce/apex/WCFProposalListController.getAcceptedApplicationsQueue';
 
 // ── Recommend_for_CEO_review__c helpers ─────────────────────────────
@@ -27,18 +27,18 @@ const PAGE_SIZE_OPTIONS = [
 ];
 
 const TRACK_OPTIONS = [
-    { label: 'All Tracks',                               value: '' },
-    { label: 'Job Fulfillment Only',                     value: 'Job Fulfillment Only' },
-    { label: 'Job Creation Only',                        value: 'Job Creation Only' },
-    { label: 'Livelihood Upliftment',                    value: 'Livelihood Upliftment' },
-    { label: 'Both Job Fulfillment and Job Creation',    value: 'Both' }
+    { label: 'All Tracks', value: '' },
+    { label: 'Job Fulfillment Only', value: 'Job Fulfillment Only' },
+    { label: 'Job Creation Only', value: 'Job Creation Only' },
+    { label: 'Livelihood Upliftment', value: 'Livelihood Upliftment' },
+    { label: 'Both Job Fulfillment and Job Creation', value: 'Both' }
 ];
 
 const STATUS_OPTIONS = [
-    { label: 'All Statuses',                      value: '' },
-    { label: 'Under Review',                      value: 'Under Review' },
-    { label: 'Review Completed - Recommended',    value: 'Review Completed - Recommended' },
-    { label: 'Review Completed - Not Recommended',value: 'Review Completed - Not Recommended' }
+    { label: 'All Statuses', value: '' },
+    { label: 'Under Review', value: 'Under Review' },
+    { label: 'Review Completed - Recommended', value: 'Review Completed - Recommended' },
+    { label: 'Review Completed - Not Recommended', value: 'Review Completed - Not Recommended' }
 ];
 
 const VALID_REVIEW_FILTERS = ['total', 'reviewed', 'inProgress', 'notStarted', 'all',
@@ -46,46 +46,46 @@ const VALID_REVIEW_FILTERS = ['total', 'reviewed', 'inProgress', 'notStarted', '
 
 // ── Readable labels for every filter token (banner + tiles) ──────
 const FILTER_LABELS = {
-    total               : 'Total Assigned',
-    all                 : 'Total Assigned',
-    reviewed            : 'Reviewed',
-    inProgress          : 'In Progress',
-    notStarted          : 'Not Started',
-    flagged             : 'Flagged',
-    returnedByApprover  : 'Returned by Approver',
+    total: 'Total Assigned',
+    all: 'Total Assigned',
+    reviewed: 'Reviewed',
+    inProgress: 'In Progress',
+    notStarted: 'Not Started',
+    flagged: 'Flagged',
+    returnedByApprover: 'Returned by Approver',
     acceptedApplications: 'Accepted Applications'
 };
 
 // ── Summary tiles (order = display order) — same shared tile as the validator queue ──
 const SUMMARY_TILES = [
-    { id: 'total',                countGetter: 'totalCount',              tone: 'info' },
-    { id: 'notStarted',           countGetter: 'notStartedCount',         tone: 'neutral' },
-    { id: 'inProgress',           countGetter: 'inProgressCount',         tone: 'warning' },
-    { id: 'reviewed',             countGetter: 'reviewedCount',           tone: 'success' },
-    { id: 'returnedByApprover',   countGetter: 'returnedByApproverCount', tone: 'brand', alertWhenPositive: true },
-    { id: 'acceptedApplications', countGetter: 'acceptedCount',           tone: 'success' },
-    { id: 'flagged',              countGetter: 'flaggedCount',            tone: 'returned' }
+    { id: 'total', countGetter: 'totalCount', tone: 'info' },
+    { id: 'notStarted', countGetter: 'notStartedCount', tone: 'neutral' },
+    { id: 'inProgress', countGetter: 'inProgressCount', tone: 'warning' },
+    { id: 'reviewed', countGetter: 'reviewedCount', tone: 'success' },
+    { id: 'returnedByApprover', countGetter: 'returnedByApproverCount', tone: 'brand', alertWhenPositive: true },
+    { id: 'acceptedApplications', countGetter: 'acceptedCount', tone: 'success' },
+    { id: 'flagged', countGetter: 'flaggedCount', tone: 'returned' }
 ];
 
 export default class WcfProposalListView extends NavigationMixin(LightningElement) {
-    @track proposals            = [];
-    @track reviewStatusMap      = {};
-    @track isLoading            = true;
-    @track searchTerm           = '';
-    @track selectedTrack        = '';
-    @track selectedStatus       = '';
-    @track currentPage          = 1;
-    @track activeReviewFilter   = '';
+    @track proposals = [];
+    @track reviewStatusMap = {};
+    @track isLoading = true;
+    @track searchTerm = '';
+    @track selectedTrack = '';
+    @track selectedStatus = '';
+    @track currentPage = 1;
+    @track activeReviewFilter = '';
 
     // pageSize stored as string to match combobox option values.
-    @track pageSizeStr  = '10';
-    @track sortField    = 'CreatedDate';
+    @track pageSizeStr = '10';
+    @track sortField = 'CreatedDate';
     @track sortAscending = false;
     @track acceptedApplicationsMap = new Map();
 
     pageSizeOptions = PAGE_SIZE_OPTIONS;
-    trackOptions    = TRACK_OPTIONS;
-    statusOptions   = STATUS_OPTIONS;
+    trackOptions = TRACK_OPTIONS;
+    statusOptions = STATUS_OPTIONS;
 
     // ─────────────────────────────────────────────────────────────
     // SITE BASE PATH (environment-independent navigation)
@@ -95,8 +95,8 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     }
 
     _siteUrl(page, params) {
-        const path  = String(page || '').replace(/^\/+/, '');
-        let url     = `${this.sitePath}/${path}`;
+        const path = String(page || '').replace(/^\/+/, '');
+        let url = `${this.sitePath}/${path}`;
         if (params) {
             const qs = Object.keys(params)
                 .filter(k => params[k] !== undefined && params[k] !== null && params[k] !== '')
@@ -130,10 +130,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         try {
             const rows = await getAcceptedApplicationsQueue();
             const map = new Map();
-           (rows || []).forEach(r => map.set(r.applicationId, {
-    comment: r.approverComment,
-    complianceStatus: r.complianceRequested ? (r.complianceStatus || 'Requested') : null
-}));
+            (rows || []).forEach(r => map.set(r.applicationId, {
+                comment: r.approverComment,
+                complianceStatus: r.complianceRequested ? (r.complianceStatus || 'Requested') : null
+            }));
             this.acceptedApplicationsMap = map;
         } catch (e) {
             console.error('Accepted applications error:', e);
@@ -147,7 +147,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 getValidatedProposals(),
                 getReviewStatusMap()
             ]);
-            this.proposals       = proposals;
+            this.proposals = proposals;
             this.reviewStatusMap = reviewMap || {};
         } catch (e) {
             console.error('Error loading proposals:', e);
@@ -192,9 +192,9 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                     return p.Status === 'Returned by Approver';
                 }
                 if (this.activeReviewFilter === 'acceptedApplications') {
-    const a = this.acceptedApplicationsMap.get(p.Id);
-    return !!a && !a.complianceStatus;
-}
+                    const a = this.acceptedApplicationsMap.get(p.Id);
+                    return !!a && !a.complianceStatus;
+                }
                 return true;
             });
         }
@@ -244,13 +244,13 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     _isEligibleForQueue(p) {
         const info = this.reviewStatusMap[p.Id] || {};
         return !info.isFlagged &&
-               p.Status !== 'Returned by Approver';
+            p.Status !== 'Returned by Approver';
     }
 
     get totalCount() {
         return (this.proposals || []).length;
     }
-    get hasProposals()  { return this.filteredCount > 0; }
+    get hasProposals() { return this.filteredCount > 0; }
 
     // ── Summary counters (always based on ALL proposals, not filtered) ──
     get reviewedCount() {
@@ -282,28 +282,28 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
         return this.proposals.filter(p => p.Status === 'Returned by Approver').length;
     }
 
-   get acceptedCount() {
-    return this.proposals.filter(p => {
-        const a = this.acceptedApplicationsMap.get(p.Id);
-        return !!a && !a.complianceStatus;
-    }).length;
-}
+    get acceptedCount() {
+        return this.proposals.filter(p => {
+            const a = this.acceptedApplicationsMap.get(p.Id);
+            return !!a && !a.complianceStatus;
+        }).length;
+    }
 
     // ── Summary tiles for the template ───────────────────────────
     get summaryItems() {
         return SUMMARY_TILES.map(t => {
-            const count    = this[t.countGetter] || 0;
+            const count = this[t.countGetter] || 0;
             const isActive = this.activeReviewFilter === t.id;
-            const isAlert  = t.alertWhenPositive && count > 0;
+            const isAlert = t.alertWhenPositive && count > 0;
             return {
-                id      : t.id,
-                label   : FILTER_LABELS[t.id],
+                id: t.id,
+                label: FILTER_LABELS[t.id],
                 count,
-                pressed : isActive ? 'true' : 'false',
-                cls     : 'wg-stat'
-                          + (isAlert  ? ' wg-stat--alert'  : '')
-                          + (isActive ? ' wg-stat--active' : ''),
-                dotCls  : 'wg-stat-dot wg-stat-dot--' + t.tone
+                pressed: isActive ? 'true' : 'false',
+                cls: 'wg-stat'
+                    + (isAlert ? ' wg-stat--alert' : '')
+                    + (isActive ? ' wg-stat--active' : ''),
+                dotCls: 'wg-stat-dot wg-stat-dot--' + t.tone
             };
         });
     }
@@ -318,32 +318,32 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     // FIX: was "{filteredCount} of {totalCount}" — totalCount excludes flagged,
     // rejected and returned rows, so the unfiltered list could read "150 of 144".
     get subtitle() {
-        const all   = (this.proposals || []).length;
+        const all = (this.proposals || []).length;
         const shown = this.filteredCount;
-        const noun  = all === 1 ? 'assigned proposal' : 'assigned proposals';
+        const noun = all === 1 ? 'assigned proposal' : 'assigned proposals';
         return shown === all ? `${all} ${noun}` : `Showing ${shown} of ${all} ${noun}`;
     }
 
     // ── Pagination ───────────────────────────────────────────────
-    get totalPages()      { return Math.ceil(this.filteredCount / this.pageSize) || 1; }
+    get totalPages() { return Math.ceil(this.filteredCount / this.pageSize) || 1; }
     get paginationStart() { return (this.currentPage - 1) * this.pageSize + 1; }
-    get paginationEnd()   { return Math.min(this.currentPage * this.pageSize, this.filteredCount); }
-    get isFirstPage()     { return this.currentPage === 1; }
-    get isLastPage()      { return this.currentPage === this.totalPages; }
+    get paginationEnd() { return Math.min(this.currentPage * this.pageSize, this.filteredCount); }
+    get isFirstPage() { return this.currentPage === 1; }
+    get isLastPage() { return this.currentPage === this.totalPages; }
 
     get pageNumbers() {
         const pages = [];
         const total = this.totalPages;
-        const curr  = this.currentPage;
+        const curr = this.currentPage;
         let start = Math.max(1, curr - 2);
-        let end   = Math.min(total, start + 4);
+        let end = Math.min(total, start + 4);
         if (end - start < 4) start = Math.max(1, end - 4);
         for (let i = start; i <= end; i++) {
             const active = i === curr;
             pages.push({
-                num     : i,
+                num: i,
                 btnClass: active ? 'wg-icon-btn wcf-pg-num wcf-pg-num--active' : 'wg-icon-btn wcf-pg-num',
-                current : active ? 'page' : 'false'
+                current: active ? 'page' : 'false'
             });
         }
         return pages;
@@ -375,11 +375,33 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
         return this.filteredProposals.slice(start, start + this.pageSize).map((p, idx) => {
 
-            const reviewInfo   = this.reviewStatusMap[p.Id] || {};
-            const isSubmitted  = reviewInfo.isSubmitted || false;
+            const reviewInfo = this.reviewStatusMap[p.Id] || {};
+            const isSubmitted = reviewInfo.isSubmitted || false;
             const reviewStatus = reviewInfo.status || null;
-            const reviewId     = reviewInfo.reviewId || null;
-            const dueDate      = reviewInfo.dueDate || null;
+            const reviewId = reviewInfo.reviewId || null;
+            const dueDate = reviewInfo.dueDate || null;
+            const isFlagged = !!reviewInfo.isFlagged;
+
+            // ── Flag reason ──
+            let flagReason = '';
+            if (isFlagged) {
+                const parts = [];
+                if (reviewInfo.flagRationale) {
+                    const cleanRationale = reviewInfo.flagRationale
+                        .split(';')
+                        .map(s => s.trim())
+                        .filter(s => s.length > 0)
+                        .join(', ');
+                    if (cleanRationale) parts.push(cleanRationale);
+                }
+                if (reviewInfo.otherConcern) {
+                    parts.push('Other: ' + reviewInfo.otherConcern.trim());
+                }
+                if (reviewInfo.decisionRationale && !parts.length) {
+                    parts.push(reviewInfo.decisionRationale.trim());
+                }
+                flagReason = parts.join(' | ') || 'Flagged by Validator';
+            }
 
             // ── Track tags (same colors as every other portal screen) ──
             const rawTrack = p.Organizational_Area_s_for_Funding_Inves1__c || p.Organizational_Area_s_for_Funding_Inves__c || '';
@@ -389,8 +411,8 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             const hasLU = rawLower.includes('livelihood') || rawLower.includes('upliftment') || rawLower.includes('lu');
 
             const trackBadges = [];
-            if (hasJF) trackBadges.push({ code: 'JF', label: 'Job Fulfillment',       badgeClass: 'wg-tag wg-tag--info' });
-            if (hasJC) trackBadges.push({ code: 'JC', label: 'Job Creation',          badgeClass: 'wg-tag wg-tag--warning' });
+            if (hasJF) trackBadges.push({ code: 'JF', label: 'Job Fulfillment', badgeClass: 'wg-tag wg-tag--info' });
+            if (hasJC) trackBadges.push({ code: 'JC', label: 'Job Creation', badgeClass: 'wg-tag wg-tag--warning' });
             if (hasLU) trackBadges.push({ code: 'LU', label: 'Livelihood Upliftment', badgeClass: 'wg-tag wg-tag--success' });
 
             if (trackBadges.length === 0 && rawTrack) {
@@ -405,7 +427,7 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
             const status = p.Status || '';
             let statusBadgeClass = 'wg-pill wg-pill--neutral';
             if (status === 'Submitted' || status === 'Under Review') statusBadgeClass = 'wg-pill wg-pill--info';
-            else if (status === 'Revision Requested')                statusBadgeClass = 'wg-pill wg-pill--returned';
+            else if (status === 'Revision Requested') statusBadgeClass = 'wg-pill wg-pill--returned';
 
             // ── Review status pill ──
             let reviewBadgeLabel = 'Not Started';
@@ -423,68 +445,68 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
 
             // ── Action button (same priority order as before) ──
             const isRejected = p.Status === 'Reviewer Rejected';
-            const acc              = this.acceptedApplicationsMap.get(p.Id);
-            const isAccepted       = !!acc;
+            const acc = this.acceptedApplicationsMap.get(p.Id);
+            const isAccepted = !!acc;
             const complianceStatus = acc ? acc.complianceStatus : null;
             let actionTitle = '';
 
             let actionLabel, actionBtnClass, actionIcon, reviewAction;
             if (isRejected) {
-                actionLabel    = 'Rejected';
+                actionLabel = 'Rejected';
                 actionBtnClass = 'neutral-btn' + SM;
-                actionIcon     = 'utility:ban';
-                reviewAction   = 'rejected';
+                actionIcon = 'utility:ban';
+                reviewAction = 'rejected';
             } else if (isAccepted && complianceStatus) {
-    actionLabel    = 'Compliance Requested';
-    actionBtnClass = 'neutral-btn' + SM;
-    actionIcon     = 'utility:check';
-    reviewAction   = 'complianceRequested';
-    actionTitle    = 'Compliance status: ' + complianceStatus;
-} 
-             else if (isAccepted) {
-                actionLabel    = 'Request Compliance';
-                actionBtnClass = 'success-btn' + SM;
-                actionIcon     = 'utility:new';
-                reviewAction   = 'complianceRequest';
-            } else if (p.Status === 'Returned by Approver') {
-                actionLabel    = 'Review Decision';
-                actionBtnClass = 'primary-btn' + SM;
-                actionIcon     = 'utility:reply';
-                reviewAction   = 'approverReturn';
-            } else if (isSubmitted || reviewStatus === 'Review Submitted') {
-                actionLabel    = 'View Review';
+                actionLabel = 'Compliance Requested';
                 actionBtnClass = 'neutral-btn' + SM;
-                actionIcon     = 'utility:preview';
-                reviewAction   = 'view';
+                actionIcon = 'utility:check';
+                reviewAction = 'complianceRequested';
+                actionTitle = 'Compliance status: ' + complianceStatus;
+            }
+            else if (isAccepted) {
+                actionLabel = 'Request Compliance';
+                actionBtnClass = 'success-btn' + SM;
+                actionIcon = 'utility:new';
+                reviewAction = 'complianceRequest';
+            } else if (p.Status === 'Returned by Approver') {
+                actionLabel = 'Review Decision';
+                actionBtnClass = 'primary-btn' + SM;
+                actionIcon = 'utility:reply';
+                reviewAction = 'approverReturn';
+            } else if (isSubmitted || reviewStatus === 'Review Submitted') {
+                actionLabel = 'View Review';
+                actionBtnClass = 'neutral-btn' + SM;
+                actionIcon = 'utility:preview';
+                reviewAction = 'view';
             } else if (reviewId && reviewStatus === 'In Progress') {
-                actionLabel    = 'Resume Review';
+                actionLabel = 'Resume Review';
                 actionBtnClass = 'primary-btn' + SM;
-                actionIcon     = 'utility:edit';
-                reviewAction   = 'resume';
+                actionIcon = 'utility:edit';
+                reviewAction = 'resume';
             } else {
-                actionLabel    = 'Start Review';
+                actionLabel = 'Start Review';
                 actionBtnClass = 'primary-btn' + SM;
-                actionIcon     = 'utility:play';
-                reviewAction   = 'start';
+                actionIcon = 'utility:play';
+                reviewAction = 'start';
             }
 
             // ── Due date ──
-            const parsedDue    = this._parseDate(dueDate);
+            const parsedDue = this._parseDate(dueDate);
             let dueDateDisplay = parsedDue
                 ? parsedDue.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                 : '—';
-            let dueDateClass   = 'due-date';
+            let dueDateClass = 'due-date';
             if (parsedDue && !isSubmitted) {
-                const today    = new Date(); today.setHours(0, 0, 0, 0);
+                const today = new Date(); today.setHours(0, 0, 0, 0);
                 const diffDays = Math.ceil((parsedDue - today) / 86400000);
-                if (diffDays < 0)       dueDateClass = 'due-date due-overdue';
+                if (diffDays < 0) dueDateClass = 'due-date due-overdue';
                 else if (diffDays <= 3) dueDateClass = 'due-date due-urgent';
             }
 
             const formattedDate = p.CreatedDate
                 ? new Date(p.CreatedDate).toLocaleDateString('en-GB', {
-                    day: '2-digit', month: 'short', year: 'numeric'
-                  })
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                })
                 : '—';
 
             return {
@@ -492,6 +514,8 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 sno: start + idx + 1,
                 // Rows waiting on the reviewer's Approve/Return decision stand out
                 rowClass: p.Status === 'Returned by Approver' ? 'wg-row--attention' : '',
+                isFlagged,
+                flagReason: flagReason || '—',
                 trackShort,
                 trackParam,
                 trackBadges,
@@ -501,8 +525,8 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 formattedDate,
                 reviewId, reviewAction,
                 approverComment: acc ? acc.comment : '—',
-actionTitle,
-isDisabled: isRejected || reviewAction === 'complianceRequested',
+                actionTitle,
+                isDisabled: isRejected || reviewAction === 'complianceRequested',
                 actionLabel, actionBtnClass, actionIcon,
                 dueDateDisplay, dueDateClass,
                 isRejected
@@ -513,9 +537,9 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
     // ── Sort ─────────────────────────────────────────────────────
     get isSortedByName() { return this.sortField === 'Name'; }
     get isSortedByDate() { return this.sortField === 'CreatedDate'; }
-    get sortIcon()       { return this.sortAscending ? 'utility:arrowup' : 'utility:arrowdown'; }
+    get sortIcon() { return this.sortAscending ? 'utility:arrowup' : 'utility:arrowdown'; }
 
-    get sortIconName()  { return this.isSortedByName ? this.sortIcon : 'utility:sort'; }
+    get sortIconName() { return this.isSortedByName ? this.sortIcon : 'utility:sort'; }
     get sortClassName() { return 'wg-sort' + (this.isSortedByName ? ' wg-sort--active' : ''); }
     get ariaSortName() {
         if (!this.isSortedByName) return 'none';
@@ -527,38 +551,38 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
         if (this.sortField === field) {
             this.sortAscending = !this.sortAscending;
         } else {
-            this.sortField     = field;
+            this.sortField = field;
             this.sortAscending = true;
         }
         this.currentPage = 1;
     }
 
     // ── Filter handlers ──────────────────────────────────────────
-    handleSearch(evt)       { this.searchTerm     = evt.target.value;  this.currentPage = 1; }
-    handleTrackFilter(evt)  { this.selectedTrack  = evt.detail.value;  this.currentPage = 1; }
-    handleStatusFilter(evt) { this.selectedStatus = evt.detail.value;  this.currentPage = 1; }
+    handleSearch(evt) { this.searchTerm = evt.target.value; this.currentPage = 1; }
+    handleTrackFilter(evt) { this.selectedTrack = evt.detail.value; this.currentPage = 1; }
+    handleStatusFilter(evt) { this.selectedStatus = evt.detail.value; this.currentPage = 1; }
 
     handleClearFilters() {
-        this.searchTerm         = '';
-        this.selectedTrack      = '';
-        this.selectedStatus     = '';
+        this.searchTerm = '';
+        this.selectedTrack = '';
+        this.selectedStatus = '';
         this.activeReviewFilter = '';
-        this.currentPage        = 1;
+        this.currentPage = 1;
     }
 
     handleClearReviewFilter() {
         this.activeReviewFilter = '';
-        this.currentPage        = 1;
+        this.currentPage = 1;
     }
 
     handleRefresh() {
-    this.loadData();
-    this.loadAcceptedApplications();
-}
+        this.loadData();
+        this.loadAcceptedApplications();
+    }
 
     // ── Pagination handlers ──────────────────────────────────────
-    handlePrevPage()     { if (!this.isFirstPage) this.currentPage--; }
-    handleNextPage()     { if (!this.isLastPage)  this.currentPage++; }
+    handlePrevPage() { if (!this.isFirstPage) this.currentPage--; }
+    handleNextPage() { if (!this.isLastPage) this.currentPage++; }
     handlePageClick(evt) { this.currentPage = parseInt(evt.currentTarget.dataset.page, 10); }
 
     handlePageSizeChange(evt) {
@@ -572,24 +596,24 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
         if (action === 'rejected' || action === 'complianceRequested') return;
         if (action === 'complianceRequest') {
             const proposalId = evt.currentTarget.dataset.id;
-            const appName    = evt.currentTarget.dataset.appname;
+            const appName = evt.currentTarget.dataset.appname;
             this[NavigationMixin.Navigate]({
                 type: 'standard__webPage',
                 attributes: {
                     url: this._siteUrl('wg-compliance-documents', {
-                        applicationId : proposalId,
-                        appName       : appName
+                        applicationId: proposalId,
+                        appName: appName
                     })
                 }
             });
             return;
         }
 
-        const proposalId   = evt.currentTarget.dataset.id;
-        const appName      = evt.currentTarget.dataset.appname;
-        const reviewId     = evt.currentTarget.dataset.reviewId;
+        const proposalId = evt.currentTarget.dataset.id;
+        const appName = evt.currentTarget.dataset.appname;
+        const reviewId = evt.currentTarget.dataset.reviewId;
         const headquarters = evt.currentTarget.dataset.headquarters;
-        const track        = evt.currentTarget.dataset.track;
+        const track = evt.currentTarget.dataset.track;
         this._navigateReviewer(proposalId, appName, reviewId, action, headquarters, track);
     }
 
@@ -599,9 +623,9 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
                 type: 'standard__webPage',
                 attributes: {
                     url: this._siteUrl('review-forms', {
-                        recordId      : reviewId,
-                        applicationId : proposalId,
-                        action        : action
+                        recordId: reviewId,
+                        applicationId: proposalId,
+                        action: action
                     })
                 }
             });
@@ -612,9 +636,9 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
             type: 'standard__webPage',
             attributes: {
                 url: this._siteUrl('review-forms', {
-                    recordId      : 'new',
-                    applicationId : proposalId,
-                    track         : track
+                    recordId: 'new',
+                    applicationId: proposalId,
+                    track: track
                 })
             }
         });
@@ -622,5 +646,9 @@ isDisabled: isRejected || reviewAction === 'complianceRequested',
 
     get isAcceptedFilterActive() {
         return this.activeReviewFilter === 'acceptedApplications';
+    }
+
+    get isFlaggedFilterActive() {
+        return this.activeReviewFilter === 'flagged';
     }
 }

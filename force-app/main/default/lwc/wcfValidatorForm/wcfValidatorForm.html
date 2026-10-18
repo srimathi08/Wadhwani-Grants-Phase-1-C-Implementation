@@ -47,7 +47,7 @@
                 <div class="wcf-draft-banner-left">
                     <lightning-icon icon-name="utility:reply" size="x-small" alternative-text="" class="wcf-draft-icon"></lightning-icon>
                     <div class="wcf-draft-banner-text">
-                        <span class="wcf-draft-banner-title">Returned by Reviewer — action required</span>
+                        <span class="wcf-draft-banner-title">Returned by Reviewer: action required</span>
                         <span class="wcf-draft-banner-sub">
                             <template if:true={reviewerReturnComment}>
                                 {reviewerReturnComment}
@@ -301,7 +301,7 @@
                             <div class="wcf-vf-field-top">
                                 <div class="wcf-vf-field-q">Flag rationale: Select all reasons that apply. <span class="wcf-req">*</span></div>
                             </div>
-                            <p class="wcf-hint">You can select more than one. Reviewers see your selections alongside your free-text rationale. Options suggested by your Section 2 answers have a dashed border — confirm or change.</p>
+                            <p class="wcf-hint">You can select more than one. Reviewers see your selections alongside your free-text rationale. Options suggested by your Section 2 answers have a dashed border (confirm or change).</p>
                             <div class="wcf-checklist">
                                 <template for:each={flagOptions} for:item="opt">
                                     <button type="button" key={opt.val} class={opt.cls} data-val={opt.val} onclick={handleFlagCheck}>
@@ -320,7 +320,7 @@
                             <div class="wcf-dep-nested">
                                 <div class="wcf-vf-field">
                                     <div class="wcf-vf-field-top">
-                                        <div class="wcf-vf-field-q">Other — describe the concern. <span class="wcf-req">*</span></div>
+                                        <div class="wcf-vf-field-q">Other: describe the concern. <span class="wcf-req">*</span></div>
                                     </div>
                                     <lightning-textarea
                                         name="s3_4"
@@ -579,7 +579,7 @@
                         <div key={card.key} class="preview-qcard">
                             <div class="preview-qcard-header">
                                 <span class="preview-qcard-num">Q{card.num}</span>
-                                <span class="preview-qcard-label">{card.label} — Return Reason</span>
+                                <span class="preview-qcard-label">{card.label}: Return Reason</span>
                             </div>
                             <div class="preview-qcard-text">{card.text}</div>
                         </div>

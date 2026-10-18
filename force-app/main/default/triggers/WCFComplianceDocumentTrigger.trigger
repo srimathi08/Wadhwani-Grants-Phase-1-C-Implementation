@@ -8,7 +8,7 @@ trigger WCFComplianceDocumentTrigger on WCF_Compliance_Document__c (after update
             applicationIds.add(doc.IndividualApplication__c);
         } else {
             WCF_Compliance_Document__c oldDoc = Trigger.oldMap.get(doc.Id);
-            if (oldDoc.Status__c != doc.Status__c) {
+            if (oldDoc.Status__c != doc.Status__c || oldDoc.Document_Status_JSON__c != doc.Document_Status_JSON__c) {
                 applicationIds.add(doc.IndividualApplication__c);
             }
         }

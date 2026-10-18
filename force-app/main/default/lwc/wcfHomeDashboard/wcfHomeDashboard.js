@@ -133,7 +133,7 @@ export default class WcfPipelineStrip extends NavigationMixin(LightningElement) 
             const counts = await getPipelineCounts();
 
             if (!counts) {
-                throw new Error('Apex returned null — check class permissions');
+                throw new Error('Apex returned null: check class permissions');
             }
 
             this.counts = {
@@ -156,7 +156,7 @@ export default class WcfPipelineStrip extends NavigationMixin(LightningElement) 
             this.loadError = msg;
 
             this.dispatchEvent(new ShowToastEvent({
-                title   : 'Pipeline Strip — load error',
+                title   : 'Pipeline Strip: load error',
                 message : msg,
                 variant : 'error',
                 mode    : 'sticky'

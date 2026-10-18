@@ -966,17 +966,23 @@ export default class WcfFormPreview extends LightningElement {
     get additionalFunding() {
         return this._val(this._app?.Use_of_Additional_Funding__c || this._app?.Use_of_Additional_Funding_JC__c);
     }
-    get genieInterestLevel() { return this._val(this._app?.GenieAI_Interest_Level__c); }
+    get genieInterestLevel() {
+        return this._val(getFieldValue(this._app, 'GenieAI_Interest_Level__c') || this._app?.GenieAI_Interest_Level__c);
+    }
     get showSynergies() {
-        const l = this._app?.GenieAI_Interest_Level__c;
+        const l = getFieldValue(this._app, 'GenieAI_Interest_Level__c') || this._app?.GenieAI_Interest_Level__c;
         return l === 'Yes, interested' || l === 'Maybe, want to learn more' || !!this.synergiesValue;
     }
     get genieInterestBadgeClass() { return (this.showSynergies && this.genieInterestLevel !== '—') ? 'rv-badge rv-badge-green' : 'rv-badge rv-badge-grey'; }
     get synergiesValue() {
         if (!this._app) return '';
-        return this._app.Operational_Synergies_with_WOF__c
+        return getFieldValue(this._app, 'Operational_Synergies_with_WOF__c')
+            || this._app.Operational_Synergies_with_WOF__c
+            || getFieldValue(this._app, 'GenieAI_Synergies__c')
             || this._app.GenieAI_Synergies__c
+            || getFieldValue(this._app, 'Operational_Synergies_with_WOF_JC__c')
             || this._app.Operational_Synergies_with_WOF_JC__c
+            || getFieldValue(this._app, 'Operational_Synergies_with_WOF_Both__c')
             || this._app.Operational_Synergies_with_WOF_Both__c
             || '';
     }
@@ -1899,9 +1905,9 @@ export default class WcfFormPreview extends LightningElement {
             // Q4: Legal Structure
             gridQRow(q.Q4, 'Legal Structure', [
                 { label: 'Type', value: this.legalType },
-                ...(this.showLegalTypeOther ? [{ label: 'Legal Type — Specified', value: this.legalTypeOtherSpecified }] : []),
+                ...(this.showLegalTypeOther ? [{ label: 'Legal Type: Specified', value: this.legalTypeOtherSpecified }] : []),
                 { label: 'Registration Jurisdiction', value: this.registrationJurisdiction },
-                ...(this.showRegistrationJurisdictionOther ? [{ label: 'Registration Jurisdiction — Specified', value: this.registrationJurisdictionOtherSpecified }] : []),
+                ...(this.showRegistrationJurisdictionOther ? [{ label: 'Registration Jurisdiction: Specified', value: this.registrationJurisdictionOtherSpecified }] : []),
                 { label: 'Incorporation Date', value: this.incorporationDate },
                 ...(this.customQuestionsQ4 || []).map(cq => ({ label: cq.label, value: cq.displayValue }))
             ], 3);
@@ -2018,7 +2024,7 @@ export default class WcfFormPreview extends LightningElement {
                 doc.setFontSize(8.5);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(...NAVY);
-                doc.text('Job Fulfillment Outcomes — Last 3 Fiscal Years (Actuals)', marginX, y);
+                doc.text('Job Fulfillment Outcomes: Last 3 Fiscal Years (Actuals)', marginX, y);
                 y += 4;
 
                 const jfRows = [
@@ -2037,7 +2043,7 @@ export default class WcfFormPreview extends LightningElement {
                 doc.setFontSize(8.5);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(...NAVY);
-                doc.text('Job Fulfillment Outcomes — Current FY Projections', marginX, y);
+                doc.text('Job Fulfillment Outcomes: Current FY Projections', marginX, y);
                 y += 4;
 
                 const jfProjRows = [
@@ -2046,7 +2052,7 @@ export default class WcfFormPreview extends LightningElement {
                     ['Placement %', o.placePctCFY],
                     ['Avg Cost per Placement', o.manualCostPerPlaceCFY]
                 ];
-                table(['Item', 'FY-2026 (CFY) — Projection'], jfProjRows);
+                table(['Item', 'FY-2026 (CFY): Projection'], jfProjRows);
 
                 if (this.hasCustomQuestionsJobFulfillment) {
                     this.customQuestionsJobFulfillment.forEach(cq => {
@@ -2079,7 +2085,7 @@ export default class WcfFormPreview extends LightningElement {
                 doc.setFontSize(8.5);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(...NAVY);
-                doc.text('Job Creation Outcomes — Last 3 Fiscal Years (Actuals)', marginX, y);
+                doc.text('Job Creation Outcomes: Last 3 Fiscal Years (Actuals)', marginX, y);
                 y += 4;
 
                 const jcRows = [
@@ -2099,7 +2105,7 @@ export default class WcfFormPreview extends LightningElement {
                 doc.setFontSize(8.5);
                 doc.setFont(undefined, 'bold');
                 doc.setTextColor(...NAVY);
-                doc.text('Job Creation Outcomes — Current FY Projections', marginX, y);
+                doc.text('Job Creation Outcomes: Current FY Projections', marginX, y);
                 y += 4;
 
                 const jcProjRows = [
@@ -2207,7 +2213,7 @@ export default class WcfFormPreview extends LightningElement {
             richQRow(q.Q26, 'Direction for Additional Funding', this.additionalFunding);
 
             // Q27: Operational Synergies — GenieAI
-            simpleQRow(q.Q27, 'Operational Synergies — GenieAI', this.genieInterestLevel, true);
+            simpleQRow(q.Q27, 'Operational Synergies: GenieAI', this.genieInterestLevel, true);
             if (this.showSynergies && this.synergiesValue) richBoxUnder('How GenieAI could contribute', this.synergiesValue);
 
             // Q28: Supporting Documents
@@ -2262,7 +2268,7 @@ export default class WcfFormPreview extends LightningElement {
             doc.setFontSize(10.5);
             doc.setFont(undefined, 'bold');
             doc.setTextColor(255, 255, 255);
-            doc.text('Attestation — Confirmation of Accuracy', marginX + 8, y + 7);
+            doc.text('Attestation: Confirmation of Accuracy', marginX + 8, y + 7);
             doc.setFontSize(8.5);
             doc.setFont(undefined, 'normal');
             doc.setTextColor(230, 230, 230);
@@ -2291,7 +2297,7 @@ export default class WcfFormPreview extends LightningElement {
 
         } catch (e) {
             console.error('PDF generation error:', e?.message || String(e), e?.stack);
-            alert('Could not generate the PDF. Please try again — if this keeps happening, refresh the page first.');
+            alert('Could not generate the PDF. Please try again: if this keeps happening, refresh the page first.');
         } finally {
             this.isPdfGenerating = false;
         }

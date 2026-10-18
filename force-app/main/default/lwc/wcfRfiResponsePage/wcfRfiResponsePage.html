@@ -32,7 +32,7 @@
                         <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
                     </div>
                     <div>
-                        <h1 class="rfi-header-title">Revision Requested — Application {applicationName}</h1>
+                        <h1 class="rfi-header-title">Revision Requested: Application {applicationName}</h1>
                         <p class="rfi-header-sub">
                             Please review the validator feedback notes below and update only the returned questions.
                             All other answers in your application remain unchanged.
@@ -51,7 +51,7 @@
                                         <lightning-icon icon-name="utility:announcement" size="xx-small" variant="error"></lightning-icon>
                                     </div>
                                     <div class="rfi-note-content">
-                                        <span class="rfi-note-qref">Question {q.displayNumber} — {q.title}</span>
+                                        <span class="rfi-note-qref">Question {q.displayNumber}: {q.title}</span>
                                         <div class="rfi-note-text">
                                             <strong>Validator Note:</strong> {q.returnText}
                                         </div>
@@ -722,7 +722,7 @@
                                             <lightning-combobox label="Interest Level (Optional)"
                                                 value={formValues.GenieAI_Interest_Level__c}
                                                 options={genieAIOptions}
-                                                placeholder="— Select —"
+                                                placeholder="Select an option"
                                                 data-field="GenieAI_Interest_Level__c"
                                                 onchange={handleFieldChange}></lightning-combobox>
                                         </div>
@@ -744,7 +744,7 @@
                                     <!-- ═════════ Q28: Supporting documents (optional) ═════════ -->
                                     <template if:true={q.isQ28}>
                                         <p class="rfi-field-hint">{descriptions.Q28}</p>
-                                        <p class="subtext-muted">PDF, Word, PowerPoint, or Excel — up to 50 MB per file.</p>
+                                        <p class="subtext-muted">PDF, Word, PowerPoint, or Excel (up to 50 MB per file).</p>
                                         <div class="rfi-upload-container">
                                             <lightning-file-upload
                                                 label="Upload Supporting Document"

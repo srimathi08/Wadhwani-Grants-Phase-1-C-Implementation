@@ -13,7 +13,7 @@
                 <div class="form-row">
                     <label class="form-label">Organisation <span class="req">*</span></label>
                     <select class="form-select" data-field="organisationId" onchange={handleFieldChange}>
-                        <option value="">— Select Organisation —</option>
+                        <option value="">Select Organisation</option>
                         <template for:each={formattedOrgOptions} for:item="o">
                             <option key={o.value} value={o.value} selected={o.selected}>{o.label}</option>
                         </template>
@@ -52,7 +52,7 @@
                 <div class="form-row">
                     <label class="form-label">Geography <span class="req">*</span></label>
                     <select class="form-select" data-field="geography" onchange={handleFieldChange}>
-                        <option value="">— Select —</option>
+                        <option value="">Select</option>
                         <option value="India">India</option>
                         <option value="Mexico">Mexico</option>
                         <option value="Brazil">Brazil</option>
@@ -116,7 +116,7 @@
                               data-field="notes"
                               value={form.notes}
                               onchange={handleFieldChange}
-                              placeholder="Optional — internal notes for tracking this request">
+                              placeholder="Optional: internal notes for tracking this request">
                     </textarea>
                 </div>
 
@@ -142,7 +142,7 @@
     <div class="modal-backdrop" onclick={handleReviewBackdropClick}>
         <div class="modal-box" onclick={stopProp}>
             <div class="modal-header">
-                <span class="modal-title">Review Documents — {reviewRequestId}</span>
+                <span class="modal-title">Review Documents: {reviewRequestId}</span>
                 <button class="modal-close" onclick={closeReviewModal}>✕</button>
             </div>
             <div class="modal-body">
@@ -161,7 +161,7 @@
                                      <a href="javascript:void(0);" data-version-id={doc.contentVersionId} data-file-name={doc.fileName} onclick={handlePreviewFile}>{doc.fileName}</a>
                                  </div>
                                  <template if:true={doc.reviewerNotes}>
-                                     <div class="review-doc-notes"><strong>Note:</strong> {doc.reviewerNotes}</div>
+                                     <div class={doc.notesClass}><strong>Note:</strong> {doc.reviewerNotes}</div>
                                  </template>
                              </template>
                             <template if:false={doc.hasFile}>
@@ -182,6 +182,11 @@
         <div class="review-locked-note">
             All uploaded documents have a decision recorded. 
         </div>
+        <template if:true={reviewRequestNotes}>
+            <div class="review-overall-notes">
+                <strong>Reviewer Note:</strong> {reviewRequestNotes}
+            </div>
+        </template>
     </template>
 
     <template if:true={noDocsToReview}>
@@ -229,7 +234,7 @@
 
                 <div class="review-decision-form-actions">
                     <button class="btn-cancel" onclick={handleCancelDecision} disabled={isDeciding}>Cancel</button>
-                    <button class="btn-save" onclick={handleConfirmDecision} disabled={isDeciding}>Confirm — {pendingDecision}</button>
+                    <button class="btn-save" onclick={handleConfirmDecision} disabled={isDeciding}>Confirm: {pendingDecision}</button>
                 </div>
             </div>
         </template>
@@ -395,7 +400,7 @@
     <div class="sc-detail-header">
     <div>
         <div class="sc-detail-title">{tableTitle}</div>
-        <div class="sc-detail-sub">Sorted by due date — nearest first. Click a row to edit.</div>
+        <div class="sc-detail-sub">Sorted by due date (nearest first). Click a row to edit.</div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
         <input type="text"

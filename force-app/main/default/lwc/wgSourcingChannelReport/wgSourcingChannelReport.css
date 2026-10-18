@@ -345,3 +345,26 @@
 .decision-return  { background: #fff7ed; color: #c2410c; }
 .decision-flag    { background: #faf5ff; color: #7c3aed; }
 .decision-pending { background: #f3f4f6; color: #6b7280; }
+
+/* Append to your existing wcfSourcingChannelReport.css */
+
+.sc-detail-header-flex {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sc-search-wrap {
+    min-width: 280px;
+    max-width: 360px;
+    flex: 0 1 340px;
+}
+
+.sc-search-count {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: #8a94a6;
+    text-align: right;
+}

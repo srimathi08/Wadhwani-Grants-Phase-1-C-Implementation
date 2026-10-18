@@ -91,6 +91,9 @@
                                         <template lwc:if={isAcceptedFilterActive}>
                                             <th scope="col">Approver comment</th>
                                         </template>
+                                        <template lwc:if={isFlaggedFilterActive}>
+                                            <th scope="col">Flag reason</th>
+                                        </template>
                                         <th scope="col">Due date</th>
                                         <th class="wg-col-action" scope="col">Action</th>
                                     </tr>
@@ -99,7 +102,20 @@
                                     <template for:each={paginatedProposals} for:item="p">
                                         <tr key={p.Id} class={p.rowClass}>
                                             <td class="wg-col-index">{p.sno}</td>
-                                            <td class="wg-cell-id">{p.Name}</td>
+                                            <td class="wg-cell-id">
+                                                <span>{p.Name}</span>
+                                                <template lwc:if={p.isFlagged}>
+                                                    <lightning-icon
+                                                        icon-name="utility:priority"
+                                                        size="x-small"
+                                                        variant="warning"
+                                                        class="slds-m-left_xx-small"
+                                                        style="--slds-c-icon-color-foreground-default: #f68720; --lwc-colorTextIconDefault: #f68720; vertical-align: middle;"
+                                                        title={p.flagReason}
+                                                        alternative-text="Flagged by Validator">
+                                                    </lightning-icon>
+                                                </template>
+                                            </td>
                                             <td><span class="wcf-trunc" title={p.Organization_Name__c}>{p.Organization_Name__c}</span></td>
                                             <td><span class="wcf-trunc" title={p.Headquarters_City_and_Country__c}>{p.Headquarters_City_and_Country__c}</span></td>
                                             <td><span class="wcf-trunc" title={p.Submitter_Name__c}>{p.Submitter_Name__c}</span></td>
@@ -116,6 +132,24 @@
                                             <template lwc:if={isAcceptedFilterActive}>
                                                 <td>
                                                     <span class="wcf-trunc wcf-trunc-wide" title={p.approverComment}>{p.approverComment}</span>
+                                                </td>
+                                            </template>
+                                            <template lwc:if={isFlaggedFilterActive}>
+                                                <td>
+                                                    <div style="display: flex; align-items: flex-start; gap: 6px; max-width: 360px;">
+                                                        <template lwc:if={p.isFlagged}>
+                                                            <lightning-icon
+                                                                icon-name="utility:priority"
+                                                                size="x-small"
+                                                                variant="warning"
+                                                                style="--slds-c-icon-color-foreground-default: #f68720; --lwc-colorTextIconDefault: #f68720; flex-shrink: 0; margin-top: 2px;"
+                                                                alternative-text="Flagged">
+                                                            </lightning-icon>
+                                                        </template>
+                                                        <span style="white-space: normal; line-height: 1.4; word-break: break-word;" title={p.flagReason}>
+                                                            {p.flagReason}
+                                                        </span>
+                                                    </div>
                                                 </td>
                                             </template>
                                             <td>

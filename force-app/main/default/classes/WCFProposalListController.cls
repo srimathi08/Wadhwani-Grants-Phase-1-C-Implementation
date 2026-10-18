@@ -126,6 +126,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
                        Decision_Final_Decision_from_Sec_1_2__c,
                        Decision_rationale__c,
                        Flag_rationale_Flagging_Criteria__c,
+                       Other_describe_the_concern__c,
                        Flag__c,
                        Status
                 FROM ApplicationReview
@@ -148,6 +149,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
                         existing.isFlagged          = true;
                         existing.flagRationale      = ar.Flag_rationale_Flagging_Criteria__c;
                         existing.decisionRationale  = ar.Decision_rationale__c;
+                        existing.otherConcern       = ar.Other_describe_the_concern__c;
                     }
                 } else {
                     ReviewInfo info          = new ReviewInfo();
@@ -158,6 +160,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
                     info.isFlagged           = isFlagged;
                     info.flagRationale       = isFlagged ? ar.Flag_rationale_Flagging_Criteria__c : null;
                     info.decisionRationale   = isFlagged ? ar.Decision_rationale__c : null;
+                    info.otherConcern         = isFlagged ? ar.Other_describe_the_concern__c : null;
                     resultMap.put(appId, info);
                 }
             }
@@ -170,9 +173,10 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
             @AuraEnabled public String status;
             @AuraEnabled public Boolean isSubmitted;
             @AuraEnabled public String dueDate;
-     @AuraEnabled public Boolean isFlagged;
+            @AuraEnabled public Boolean isFlagged;
             @AuraEnabled public String  flagRationale;
             @AuraEnabled public String  decisionRationale;
+            @AuraEnabled public String  otherConcern;
             @AuraEnabled public String  recommendation;   // NEW: Recommend_for_CEO_review__c
         }
     

@@ -90,7 +90,7 @@ const LOCKED_HINTS = {
 };
 
 const FROZEN_ROW_HINTS = {
-    'Rejected' : 'Locked — this compliance submission was rejected.',
+    'Rejected' : 'Locked: this compliance submission was rejected.',
     'Suspended': 'Locked while the compliance review is suspended.'
 };
 
@@ -469,7 +469,7 @@ export default class WcfComplianceDocs extends LightningElement {
             isSuspended       : status === 'Suspended',
                         reasonText        : raw.returnReason || DEFAULT_REASONS[status] || '',
             description       : raw.dueDate
-                ? `${raw.description} — due ${this.formatDate(raw.dueDate)}.`
+                ? `${raw.description} (due ${this.formatDate(raw.dueDate)}).`
                 : (raw.description && !raw.description.endsWith('.') ? `${raw.description}.` : raw.description),
             lockedHint        : this.lockedHintFor(status, isEditable),
             isExpiringSoon,
@@ -721,6 +721,20 @@ export default class WcfComplianceDocs extends LightningElement {
         if (!files || files.length === 0) return;
 
         const file = files[0];
+
+        // 25 MB file size limit (25 * 1024 * 1024 bytes)
+        const MAX_FILE_SIZE = 25 * 1024 * 1024;
+        if (file.size && file.size > MAX_FILE_SIZE) {
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+            discardUploadedFile({ applicationId: this.recordId, contentDocumentId: file.documentId })
+                .catch(() => { /* best effort */ });
+            this.showToast(
+                'File Size Exceeded',
+                `"${file.name}" (${sizeMb} MB) exceeds the maximum allowed size of 25 MB. Please upload a file within 25 MB.`,
+                'error'
+            );
+            return;
+        }
 
         // The uploader's "Upload Files" dialog is still open at this point.
         // Remember it so the row is not re-rendered until it has closed.

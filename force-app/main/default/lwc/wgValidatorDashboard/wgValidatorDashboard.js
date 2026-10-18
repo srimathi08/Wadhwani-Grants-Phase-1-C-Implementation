@@ -1,6 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import getActionCounts     from '@salesforce/apex/WCFValidatorController.getActionCounts';
+import getActionCounts from '@salesforce/apex/WCFValidatorController.getActionCounts';
 import getValidatorPreview from '@salesforce/apex/WCFValidatorController.getValidatorPreview';
 
 /*
@@ -17,17 +17,18 @@ import getValidatorPreview from '@salesforce/apex/WCFValidatorController.getVali
 // tone → dot color (wcfPortalUi): info = blue, warning = amber, success = green,
 // brand/error = red, neutral = grey. half = tile takes half a row (row 2 of 3 + 2).
 const TILE_DEFS = [
-    { id: 'resume',             label: 'In Validator Queue',   subtitle: 'Draft & resumed proposals awaiting action',        tone: 'warning' },
-    { id: 'validate',           label: 'My Active Reviews',    subtitle: 'Submitted proposals ready to validate',            tone: 'info' },
-    { id: 'validated',          label: 'Validated',            subtitle: 'Completed & finalised records',                    tone: 'success' },
-    { id: 'resubmit',           label: 'Resubmissions',        subtitle: 'Applications resubmitted after return',            tone: 'brand', alertWhenPositive: true, half: true },
-    { id: 'returnedByReviewer', label: 'Returned by Reviewer', subtitle: 'Sent back by the Reviewer — needs your decision',   tone: 'error', alertWhenPositive: true, half: true }
+    { id: 'validate', label: 'To Validate', subtitle: 'Submitted proposals ready to validate', tone: 'info' },
+    { id: 'resume', label: 'In Progress', subtitle: 'Drafts you have started', tone: 'warning' },
+    { id: 'resubmit', label: 'Revalidate', subtitle: 'Applications resubmitted after return', tone: 'brand', alertWhenPositive: true },
+    { id: 'returnedByReviewer', label: 'Returned by Reviewer', subtitle: 'Sent back by the Reviewer: needs your decision', tone: 'error', alertWhenPositive: true },
+    { id: 'awaiting', label: 'Awaiting Applicant', subtitle: 'Returned to the applicant for changes', tone: 'neutral' },
+    { id: 'validated', label: 'Validated', subtitle: 'Completed & finalised records', tone: 'success' }
 ];
 
 export default class WgValidatorDashboard extends NavigationMixin(LightningElement) {
 
     // ─── State ────────────────────────────────────────────────────
-    @track validatorCards       = [];
+    @track validatorCards = [];
     @track validatorPreviewRows = [];
 
     // ─── Lifecycle ────────────────────────────────────────────────
@@ -40,34 +41,33 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
     async loadValidatorCounts() {
         try {
             const data = await getActionCounts();
-            const resume             = data?.resume             ?? 0;
-            const awaitingApplicant  = data?.awaitingApplicant  ?? 0;
-            const validate           = data?.validate           ?? 0;
-            const validated          = data?.validated          ?? 0;
-            const resubmit           = data?.resubmit           ?? 0;
+            const resume = data?.resume ?? 0;
+            const awaiting = data?.awaitingApplicant ?? 0;
+            const validate = data?.validate ?? 0;
+            const validated = data?.validated ?? 0;
+            const resubmit = data?.resubmit ?? 0;
             const returnedByReviewer = data?.returnedByReviewer ?? 0;
 
-            // Colleague's logic: drafts and awaiting-applicant share one tile
             const counts = {
-                resume            : resume + awaitingApplicant,
                 validate,
-                validated,
+                resume,
                 resubmit,
-                returnedByReviewer
+                returnedByReviewer,
+                awaiting,
+                validated
             };
 
             this.validatorCards = TILE_DEFS.map(t => {
-                const count   = counts[t.id] ?? 0;
+                const count = counts[t.id] ?? 0;
                 const isAlert = t.alertWhenPositive && count > 0;
                 return {
-                    id      : t.id,
-                    label   : t.label,
+                    id: t.id,
+                    label: t.label,
                     subtitle: t.subtitle,
                     count,
-                    status  : t.id,
+                    status: t.id,
                     kpiClass: 'wg-stat'
-                              + (t.half   ? ' wg-stat--half'  : '')
-                              + (isAlert  ? ' wg-stat--alert' : ''),
+                        + (isAlert ? ' wg-stat--alert' : ''),
                     dotClass: 'wg-stat-dot wg-stat-dot--' + t.tone
                 };
             });
@@ -82,19 +82,19 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
             const mapped = (rows || [])
                 .filter(w => !w.isValidated)
                 .map(w => {
-                    const app        = w.application;
+                    const app = w.application;
                     const dueDateRaw = app.Due_Date__c || null;
                     return {
-                        id:             app.Id,
-                        appId:          app.Name,
-                        account:        app.Account?.Name ?? '—',
-                        hasDraft:       w.hasDraft,
+                        id: app.Id,
+                        appId: app.Name,
+                        account: app.Account?.Name ?? '—',
+                        hasDraft: w.hasDraft,
                         isResubmission: w.isResubmission,
                         dueDateRaw,
                         dueDate: dueDateRaw
                             ? this._parseDate(dueDateRaw).toLocaleDateString('en-GB', {
-                                day: '2-digit', month: 'short', year: 'numeric'
-                              })
+                                day: '2-digit', month: '2-digit', year: 'numeric'
+                            })
                             : '—',
                         dueDateClass: this._computeDueDateClass(dueDateRaw),
                         ...this._rowState(w)
@@ -188,7 +188,7 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
 
     /** Row action → Validator Queue page with the record auto-opened */
     handlePreviewValidate(event) {
-        const recordId   = event.currentTarget.dataset.id;
+        const recordId = event.currentTarget.dataset.id;
         const recordName = event.currentTarget.dataset.appname;
         if (!recordId) return;
         this[NavigationMixin.Navigate]({
@@ -234,10 +234,10 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
 
     _computeDueDateClass(dueDate) {
         if (!dueDate) return 'due-date';
-        const due      = this._parseDate(dueDate);
-        const today    = new Date(); today.setHours(0, 0, 0, 0);
+        const due = this._parseDate(dueDate);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         const diffDays = Math.ceil((due - today) / 86400000);
-        if (diffDays < 0)  return 'due-date due-overdue';
+        if (diffDays < 0) return 'due-date due-overdue';
         if (diffDays <= 3) return 'due-date due-urgent';
         return 'due-date';
     }

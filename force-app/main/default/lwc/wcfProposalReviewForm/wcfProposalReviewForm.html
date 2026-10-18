@@ -278,19 +278,19 @@
                                 <div class="yesno">
                                     <button type="button" class={recStronglyRecommendClass}
                                         data-rec="Strongly Recommend" onclick={handleRecChoice}>
-                                        Strongly recommend
+                                        Yes-Strongly recommend
                                     </button>
                                     <button type="button" class={recRecommendClass} data-rec="Recommend"
                                         onclick={handleRecChoice}>
-                                        Recommend
+                                        Yes-Recommend
                                     </button>
                                     <button type="button" class={recReservationsClass}
                                         data-rec="Recommend with Reservations" onclick={handleRecChoice}>
-                                        Recommend with reservations
+                                        Yes-Recommend with reservations
                                     </button>
                                     <button type="button" class={recDoNotRecommendClass} data-rec="Do Not Recommend"
                                         onclick={handleRecChoice}>
-                                        Do not recommend
+                                        No-Do not recommend
                                     </button>
                                 </div>
                             </div>
@@ -362,7 +362,7 @@
                                         <span class="l">
                                             Rejection comment <span class="req">*</span>
                                             <template if:true={showRejectionOther}>
-                                                <span class="help"> — describe the "Other" reason here</span>
+                                                <span class="help">: describe the "Other" reason here</span>
                                             </template>
                                         </span>
                                         <div class="textarea-wrap">
@@ -392,7 +392,7 @@
                         <div class="upload-section">
                             <div class="upload-header">
                                 <span class="upload-title">Supporting documents</span>
-                                <span class="upload-sub">Optional — attach any notes, spreadsheets, or memos to support
+                                <span class="upload-sub">Optional: attach any notes, spreadsheets, or memos to support
                                     your review</span>
                             </div>
                             <template if:true={uploadTargetRecordId}>

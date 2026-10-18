@@ -3,7 +3,6 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
-import APP_ORG_AREA_FIELD from '@salesforce/schema/IndividualApplication.Organizational_Area_s_for_Funding_Inves__c';
 import getReviewerReturnInfo from '@salesforce/apex/WCFValidatorController.getReviewerReturnInfo';
 import getWCFValidatorRecordTypeIdForClient from '@salesforce/apex/WCFValidatorController.getWCFValidatorRecordTypeIdForClient';
 import getValidatorFormMetadata from '@salesforce/apex/WCFValidatorController.getValidatorFormMetadata';
@@ -16,13 +15,6 @@ import WADHWANI_LOGO from '@salesforce/resourceUrl/WIN_Logo';
 // ─────────────────────────────────────────────────────────────────────────────
 import VALIDATOR_REVIEW_OBJECT from '@salesforce/schema/ApplicationReview';
 import QUESTION_NUMBER_FIELD from '@salesforce/schema/ApplicationReview.Question_Number__c';
-import APP_NAME_FIELD from '@salesforce/schema/IndividualApplication.Name';
-import APP_SUBMITTED_FIELD from '@salesforce/schema/IndividualApplication.AppliedDate';
-import APP_GEOGRAPHY_FIELD from '@salesforce/schema/IndividualApplication.Primary_Focus_Area__c';
-import APP_MANDATE_FIELD from '@salesforce/schema/IndividualApplication.Sub_Focus_Area__c';
-import APP_STATUS_FIELD from '@salesforce/schema/IndividualApplication.Status';
-import APP_CATEGORY_FIELD from '@salesforce/schema/IndividualApplication.Category';
-import APP_DUE_DATE_FIELD from '@salesforce/schema/IndividualApplication.Due_Date__c';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CURRENT USER
@@ -50,12 +42,6 @@ const FLAG_OTHER_VALUE = 'Other';
 // fallback list when the server check is unavailable. Keep in sync with
 // OPTIONAL_QUESTION_KEYS in WCFValidatorController.
 const OPTIONAL_CANONICAL_KEYS = new Set(['Q7', 'Q8', 'Q27', 'Q28']);
-
-const APP_FIELDS = [
-    APP_NAME_FIELD, APP_SUBMITTED_FIELD, APP_GEOGRAPHY_FIELD,
-    APP_MANDATE_FIELD, APP_STATUS_FIELD, APP_CATEGORY_FIELD, APP_DUE_DATE_FIELD,
-    APP_ORG_AREA_FIELD,
-];
 
 const DEFAULT_WORD_LIMITS = {
     s1_4_text: 200,
@@ -189,7 +175,6 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     _effectiveRecordId = null;
     _urlRecordId = null;
     _recordTypeId = null;
-    _appData = null;
     _userData = null;
 
     // FIX (RFI view): sequence counter so a slow, stale metadata response
@@ -218,11 +203,6 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         }
     }
 
-    @wire(getRecord, { recordId: '$_wiredAppId', fields: APP_FIELDS })
-    wiredApplication({ data, error }) {
-        if (data) this._appData = data;
-        else if (error) console.error('Application wire error:', JSON.stringify(error));
-    }
 
     get applicantName() { return this._applicationName || '—'; }
     get applicationId() { return this.recordId || this._urlRecordId || '—'; }
@@ -235,16 +215,9 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
                 return this._submissionDate;
             }
         }
-        const raw = this._appData ? getFieldValue(this._appData, APP_SUBMITTED_FIELD) : null;
-        if (!raw) return '—';
-        try {
-            return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                .format(new Date(raw));
-        } catch (e) {
-            return String(raw);
-        }
+                return '—';
     }
-    get geography() { return this._geography || (this._appData ? getFieldValue(this._appData, APP_GEOGRAPHY_FIELD) : '—'); }
+    get geography() { return this._geography || '—'; }
     get mandateTrack() { return this._mandateTrack; }
 
     // FIX (RFI view): the org area drives the track (and therefore the question
@@ -253,11 +226,9 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
     // falls back to the wired Application field (already in APP_FIELDS but
     // never read) and finally to the mandate track. Apex value still wins.
     get orgArea() {
-        if (this._orgArea) return this._orgArea;
-        const wired = this._appData ? getFieldValue(this._appData, APP_ORG_AREA_FIELD) : null;
-        if (wired) return String(wired);
-        return this._mandateTrack || '';
-    }
+    if (this._orgArea) return this._orgArea;
+    return this._mandateTrack || '';
+}
 
     // U173: track detection now uses the same case-insensitive rule as
     // WCFValidatorController (contains 'both' / 'fulfil' / 'creation' /
@@ -377,7 +348,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         map[q.Q24] = 'Independent Verification of Your Outcomes';
         map[q.Q25] = 'Sustainability Plan';
         map[q.Q26] = 'Direction for Additional Funding';
-        map[q.Q27] = 'Operational Synergies — GenieAI';
+        map[q.Q27] = 'Operational Synergies: GenieAI';
         map[q.Q28] = 'Supporting Documents';
         return map;
     }
@@ -748,7 +719,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
                 this._enrichQuestion({ key: 's1_1_confirm', questionText: 'Mandatory fields: populated', displayType: 'ConfirmPill', isRequired: true }),
                 this._enrichQuestion({ key: 's1_2_confirm', questionText: 'Verification reports: uploaded where claimed', displayType: 'ConfirmPill', isRequired: true }),
                 this._enrichQuestion({ key: 's1_3_confirm', questionText: 'Attestation: signed and timestamped', displayType: 'ConfirmPill', isRequired: true }),
-                this._enrichQuestion({ key: 's1_4_text', questionText: 'Substantive content gap', hintText: 'Note any field that is technically populated but effectively empty — placeholder text, single-word responses to narrative questions, etc.', displayType: 'TextArea', isRequired: false, wordLimit: 200 })
+                this._enrichQuestion({ key: 's1_4_text', questionText: 'Substantive content gap', hintText: 'Note any field that is technically populated but effectively empty (placeholder text, single-word responses to narrative questions, etc.)', displayType: 'TextArea', isRequired: false, wordLimit: 200 })
             ];
         return { sectionNumber, title, lede, questions };
     }
@@ -843,7 +814,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
             .map(num => {
                 const hasValue = !!(texts[num] && texts[num].trim());
-                const title = titleMap[num] ? ` — ${titleMap[num]}` : ' — Return Reason';
+                const title = titleMap[num] ? `: ${titleMap[num]}` : ': Return Reason';
                 return {
                     key: num,
                     num: num,
@@ -869,7 +840,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             .map(num => ({
                 key: num,
                 num: num,
-                label: titleMap[num] ? `Question ${num} — ${titleMap[num]}` : `Question ${num}`,
+                label: titleMap[num] ? `Question ${num}: ${titleMap[num]}` : `Question ${num}`,
                 text: texts[num] || '—',
             }));
     }
@@ -1088,7 +1059,7 @@ get attachmentSummary() { return this.verificationStatus.message; }
 
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Draft saved',
-                message: `Progress saved — ${this.completionPercent}% complete (${this.completedFieldCount} of ${this.totalRequiredFieldCount} required fields).`,
+                message: `Progress saved: ${this.completionPercent}% complete (${this.completedFieldCount} of ${this.totalRequiredFieldCount} required fields).`,
                 variant: 'success'
             }));
 
@@ -1233,7 +1204,7 @@ get attachmentSummary() { return this.verificationStatus.message; }
                 [DECISION_RETURN]: 'Return to Applicant',
                 [DECISION_FLAG]: 'Flag and route to Reviewers'
             };
-            return 'Ready to submit — decision: ' + labels[this.formState.s3_1];
+            return 'Ready to submit: decision: ' + labels[this.formState.s3_1];
         }
         return this.missingFields.length + ' required field(s) pending: '
             + this.missingFields.slice(0, 3).join(', ')

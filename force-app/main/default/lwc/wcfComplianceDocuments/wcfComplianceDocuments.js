@@ -7,6 +7,7 @@ import getComplianceRows      from '@salesforce/apex/ComplianceDocumentControlle
 import saveComplianceRequest  from '@salesforce/apex/ComplianceDocumentController.saveComplianceRequest';
 import getOrganisationOptions from '@salesforce/apex/ComplianceDocumentController.getOrganisationOptions';
 import getLinkedApplication   from '@salesforce/apex/ComplianceDocumentController.getLinkedApplication';
+import getApplicationOrgDetails from '@salesforce/apex/ComplianceDocumentController.getApplicationOrgDetails';
 import getComplianceDocumentReviewItems from '@salesforce/apex/ComplianceDocumentController.getComplianceDocumentReviewItems';
 import saveComplianceRequestDecision from '@salesforce/apex/ComplianceDocumentController.saveComplianceRequestDecision';
 import getFileBase64 from '@salesforce/apex/WCFValidatorController.getFileBase64';
@@ -77,12 +78,15 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     @track isSavingAgreement              = false;
 
     @track selectedReturnLabels = [];
+    @track reviewRequestNotes   = '';
     _decisionNotes = '';
     @track pendingDecision = null;
     @track isDeciding = false;
     @track searchTerm = '';
 
     _isOpeningApplication = false;
+    _prefilledForm = null;
+    _currentOrgLabel = '';
 
     @track currentPage = 1;
     pageSize = 10;
@@ -96,17 +100,74 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
 
     renderedCallback() {
         this._syncOrgSelect();
+        this._syncGeoSelect();
     }
 
-    _checkUrlParams() {
+    _cleanUrlParams() {
+        try {
+            if (window.history && window.history.replaceState && window.location.search) {
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        } catch (e) {
+            // Ignore if in restricted environment
+        }
+    }
+
+    async _checkUrlParams() {
         try {
             const params = new URLSearchParams(window.location.search);
+            const appId = params.get('applicationId') || params.get('appId');
             const orgId = params.get('orgId') || params.get('organisationId');
-            if (orgId) {
-                this.form = { ...this.form, organisationId: orgId };
-                this.fetchLinkedApplication(orgId);
+
+            if (!appId && !orgId) return;
+
+            if (appId) {
+                const details = await getApplicationOrgDetails({ applicationId: appId });
+                if (details) {
+                    this._cleanUrlParams();
+
+                    // If a compliance document request already exists for this proposal, do not open the modal
+                    if (details.hasExistingRequest) {
+                        return;
+                    }
+
+                    if (details.organisationId && details.organisationName) {
+                        this._currentOrgLabel = details.organisationName;
+                        const exists = (this.orgOptions || []).some(o => o.value === details.organisationId);
+                        if (!exists) {
+                            this.orgOptions = [
+                                ...(this.orgOptions || []),
+                                { value: details.organisationId, label: details.organisationName, selected: true }
+                            ];
+                        }
+                    }
+                    this.form = {
+                        ...DEFAULT_FORM,
+                        recordId:        null,
+                        organisationId:  details.organisationId || '',
+                        applicationId:   details.applicationId || '',
+                        applicationName: details.applicationName || '',
+                        geography:       details.geography || '',
+                        documentTypes:   [],
+                        priority:        'Normal'
+                    };
+                    this._prefilledForm = { ...this.form };
+                    this.showModal = true;
+                    return;
+                }
             }
-        } catch (e) { }
+
+            if (orgId) {
+                this._cleanUrlParams();
+                this.form = { ...DEFAULT_FORM, organisationId: orgId };
+                await this.fetchLinkedApplication(orgId);
+                this._prefilledForm = { ...this.form };
+                this.showModal = true;
+            }
+        } catch (e) {
+            console.error('_checkUrlParams error:', e);
+        }
     }
 
     get formattedOrgOptions() {
@@ -136,7 +197,14 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     async loadOrgOptions() {
         try {
             const opts = await getOrganisationOptions();
-            this.orgOptions = (opts || []).map(o => ({ ...o, selected: o.value === this.form.organisationId }));
+            let options = (opts || []).map(o => ({ ...o, selected: o.value === this.form.organisationId }));
+            if (this.form.organisationId && this._currentOrgLabel) {
+                const exists = options.some(o => o.value === this.form.organisationId);
+                if (!exists) {
+                    options = [...options, { value: this.form.organisationId, label: this._currentOrgLabel, selected: true }];
+                }
+            }
+            this.orgOptions = options;
         } catch (e) {
             console.error('loadOrgOptions error:', JSON.stringify(e));
             this.formError = e.body?.message || 'Could not load organisations.';
@@ -208,16 +276,19 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
         this.isLoadingReviewItems = true;
         try {
             const items = await getComplianceDocumentReviewItems({ recordId: this.reviewRecordId });
-           const closed = ['Validated', 'Returned', 'Rejected', 'Suspended'];
-this.reviewItems = (items || []).map(d => ({
-    ...d,
-    statusPillClass: this._decisionStatusClass(d.status),
-    isOpen: !!d.hasFile && !closed.includes(d.status),
-    isAwaitingReupload: d.status === 'Returned'
-}));
+            const closed = ['Validated', 'Returned', 'Rejected', 'Suspended'];
+            this.reviewRequestNotes = (items && items.length > 0 && items[0].requestReviewerNotes) ? items[0].requestReviewerNotes : '';
+            this.reviewItems = (items || []).map(d => ({
+                ...d,
+                statusPillClass: this._decisionStatusClass(d.status),
+                notesClass: this._docNotesClass(d.status),
+                isOpen: !!d.hasFile && !closed.includes(d.status),
+                isAwaitingReupload: d.status === 'Returned'
+            }));
         } catch (e) {
             console.error('loadReviewItems error:', e);
             this.reviewItems = [];
+            this.reviewRequestNotes = '';
         } finally {
             this.isLoadingReviewItems = false;
         }
@@ -263,33 +334,42 @@ this.reviewItems = (items || []).map(d => ({
         }
     }
 
-_decisionStatusClass(status) {
-    if (status === 'Validated') return 'status-pill status-validated';
-    if (status === 'Returned')  return 'status-pill status-awaiting';
-    if (status === 'Rejected')  return 'status-pill status-rejected';
-    if (status === 'Suspended') return 'status-pill status-suspended';
-    return 'status-pill status-inprogress';
-}
+    _decisionStatusClass(status) {
+        if (status === 'Validated') return 'status-pill status-validated';
+        if (status === 'Returned')  return 'status-pill status-awaiting';
+        if (status === 'Rejected')  return 'status-pill status-rejected';
+        if (status === 'Suspended') return 'status-pill status-suspended';
+        return 'status-pill status-inprogress';
+    }
 
-handleReviewNoteInput(event) {
-    this._reviewNotesByLabel[event.target.dataset.label] = event.target.value;
-}
+    _docNotesClass(status) {
+        if (status === 'Validated') return 'review-doc-notes review-doc-notes-validated';
+        if (status === 'Returned')  return 'review-doc-notes review-doc-notes-returned';
+        if (status === 'Rejected')  return 'review-doc-notes review-doc-notes-rejected';
+        if (status === 'Suspended') return 'review-doc-notes review-doc-notes-suspended';
+        return 'review-doc-notes';
+    }
 
-handleSearchInput(event) {
-    this.searchTerm = event.target.value.toLowerCase().trim();
-    this.currentPage = 1;
-}
-    
-closeReviewModal() {
-    this.showReviewModal = false;
-    this.reviewItems = [];
-    this._reviewNotesByLabel = {};
-    this.selectedReturnLabels = [];
-    this._decisionNotes = '';
-    this.pendingDecision = null;
-    this.isDeciding = false;
-this.formError = null;
-}
+    handleReviewNoteInput(event) {
+        this._reviewNotesByLabel[event.target.dataset.label] = event.target.value;
+    }
+
+    handleSearchInput(event) {
+        this.searchTerm = event.target.value.toLowerCase().trim();
+        this.currentPage = 1;
+    }
+        
+    closeReviewModal() {
+        this.showReviewModal = false;
+        this.reviewItems = [];
+        this.reviewRequestNotes = '';
+        this._reviewNotesByLabel = {};
+        this.selectedReturnLabels = [];
+        this._decisionNotes = '';
+        this.pendingDecision = null;
+        this.isDeciding = false;
+        this.formError = null;
+    }
 handleReviewBackdropClick() { this.closeReviewModal(); }
     // ── Auto-fetch linked proposal ────────────────────────────────────────
     async fetchLinkedApplication(orgId) {
@@ -303,7 +383,8 @@ handleReviewBackdropClick() { this.closeReviewModal(); }
             this.form = {
                 ...this.form,
                 applicationId:   result ? result.recordId        : '',
-                applicationName: result ? result.applicationName : ''
+                applicationName: result ? result.applicationName : '',
+                geography:       (!this.form.geography && result?.geography) ? result.geography : this.form.geography
             };
         } catch (e) {
             console.error('fetchLinkedApplication error:', e);
@@ -447,7 +528,7 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
 
     get emptyMessage() {
         if (this.activeFilter === 'pending')  return 'No pending compliance document requests.';
-        if (this.activeFilter === 'overdue')  return 'No overdue requests — great work!';
+        if (this.activeFilter === 'overdue')  return 'No overdue requests: great work!';
         if (this.activeFilter === 'received') return 'No received documents yet.';
         return 'No compliance document requests found. Click "+ New Request" to create one.';
     }
@@ -505,7 +586,11 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
 
 
     openNewModal() {
-        this.form      = { ...DEFAULT_FORM, documentTypes: [] };
+        if (this._prefilledForm) {
+            this.form = { ...this._prefilledForm, documentTypes: [] };
+        } else {
+            this.form = { ...DEFAULT_FORM, documentTypes: [] };
+        }
         this.formError = null;
         this.showModal = true;
         this.loadOrgOptions();
@@ -518,6 +603,7 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
 
         // Ensure the edited record's organization is in the dropdown options
         if (row.orgId && row.orgName && row.orgName !== '—') {
+            this._currentOrgLabel = row.orgName;
             const exists = this.orgOptions.some(o => o.value === row.orgId);
             if (!exists) {
                 this.orgOptions = [...this.orgOptions, { value: row.orgId, label: row.orgName, selected: true }];
@@ -544,8 +630,8 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
         }
     }
 
-    closeModal()          { this.showModal = false; }
-    handleBackdropClick() { this.showModal = false; }
+    closeModal()          { this.showModal = false; this._cleanUrlParams(); }
+    handleBackdropClick() { this.showModal = false; this._cleanUrlParams(); }
     stopProp(event)       { event.stopPropagation(); }
 
     handleOpenReview(event) {
@@ -732,6 +818,8 @@ handleFieldChange(event) {
         this.form = { ...this.form, documentTypes: [] };
     }
     if (field === 'organisationId') {
+        const opt = (this.orgOptions || []).find(o => o.value === val);
+        this._currentOrgLabel = opt ? opt.label : '';
         this.fetchLinkedApplication(val);
     }
     if (field === 'requestedDate' || field === 'dueDate') {
@@ -869,6 +957,8 @@ async handleSave() {
                 notes:          this.form.notes || null
             });
             this.showModal = false;
+            this._prefilledForm = null;
+            this._cleanUrlParams();
             await this.loadData();
             await this.loadOrgOptions();  
         } catch (e) {
@@ -899,7 +989,13 @@ async handleSave() {
     _syncOrgSelect() {
         const orgId = this.form.organisationId;
         const sel   = this.template.querySelector('select[data-field="organisationId"]');
-        if (sel && orgId) sel.value = orgId;
+        if (sel && orgId && sel.value !== orgId) sel.value = orgId;
+    }
+
+    _syncGeoSelect() {
+        const geo = this.form.geography;
+        const sel = this.template.querySelector('select[data-field="geography"]');
+        if (sel && geo && sel.value !== geo) sel.value = geo;
     }
 
 get isSaveDisabled() {

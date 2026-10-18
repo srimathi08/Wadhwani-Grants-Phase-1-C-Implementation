@@ -151,7 +151,7 @@ export default class WcfValidatorContainer extends NavigationMixin(LightningElem
     handleSealComplete(evt) {
         this.dispatchEvent(new ShowToastEvent({
             title  : 'Validator Record Validated',
-            message: 'Decision: ' + (evt.detail.decision || '') + ' — record saved successfully.',
+            message: 'Decision: ' + (evt.detail.decision || '') + ': record saved successfully.',
             variant: 'success',
         }));
         this.showValidator   = false;

@@ -37,7 +37,7 @@
 
                         <div class="dash-card-row">
                             <div>
-                                <h2 class="dash-app-name">{organizationName} — {selectedFundingArea}</h2>
+                                <h2 class="dash-app-name">{organizationName}: {selectedFundingArea}</h2>
                                 <p class="dash-meta">
                                     {labels.CL_Started} {createdDateFormatted} &middot; {labels.CL_Last_saved}
                                     {lastModifiedFormatted}
@@ -348,17 +348,24 @@
         ======================================================== -->
             <template if:true={isApproved}>
                 <div class="dash-greeting">
-                    <h1>Congratulations, {submitterFirstName}!</h1>
+                    <template if:false={isComplianceHalted}>
+                        <h1>Congratulations, {submitterFirstName}!</h1>
+                    </template>
+                    <template if:true={isComplianceHalted}>
+                        <h1>Hello, {submitterFirstName}.</h1>
+                    </template>
                     <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
                 </div>
 
-                <div class="dash-congrats-banner">
-                    <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
-                    <div>
-                        <strong>{labels.CL_Your_application_has_been_approved}</strong>
-                        <p>{labels.CL_Complete_the_three_steps_below_to_begin_your_partnership_with_Wadhwani_Grants}</p>
+                <template if:false={isComplianceHalted}>
+                    <div class="dash-congrats-banner">
+                        <lightning-icon icon-name="utility:success" size="small"></lightning-icon>
+                        <div>
+                            <strong>{labels.CL_Your_application_has_been_approved}</strong>
+                            <p>{labels.CL_Complete_the_three_steps_below_to_begin_your_partnership_with_Wadhwani_Grants}</p>
+                        </div>
                     </div>
-                </div>
+                </template>
 
                 <!-- ── Compliance Review Decision Banners ── -->
                 <template if:true={showPassedBanner}>
@@ -383,6 +390,12 @@
                             <p>We regret to inform you that your compliance documents did not meet the required review
                                 criteria and have been rejected. As a result, your application cannot proceed further.
                                 If you require additional information, please contact the support team.</p>
+                            <template if:true={complianceReviewerNotes}>
+                                <div class="comments-section">
+                                    <strong>Comments:</strong>
+                                    <p class="reviewer-comments">{complianceReviewerNotes}</p>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -396,6 +409,12 @@
                             <p>Your compliance document review has been suspended. Your application is currently on hold
                                 while additional internal review or verification is being carried out. We will notify
                                 you if any further action is required from your side.</p>
+                            <template if:true={complianceReviewerNotes}>
+                                <div class="comments-section">
+                                    <strong>Comments:</strong>
+                                    <p class="reviewer-comments">{complianceReviewerNotes}</p>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -422,11 +441,27 @@
 
                     <!-- ── Main card: 3-track task list ── -->
                     <div class="dash-card dash-card--main">
-                        <span class="dash-badge dash-badge--approved">{labels.CL_APPROVED}</span>
-                        <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}
-                        </h2>
-                        <p class="dash-meta" style="margin-bottom: 20px;">Approved {approvalDateFormatted} &middot;
-                            {labels.CL_Three_steps_to_activate_your_partnership}</p>
+                        <template if:false={isComplianceHalted}>
+                            <span class="dash-badge dash-badge--approved">{labels.CL_APPROVED}</span>
+                            <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}
+                            </h2>
+                            <p class="dash-meta" style="margin-bottom: 20px;">Approved {approvalDateFormatted} &middot;
+                                {labels.CL_Three_steps_to_activate_your_partnership}</p>
+                        </template>
+
+                        <template if:true={isComplianceRejected}>
+                            <span class="dash-badge dash-badge--draft">REJECTED</span>
+                            <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}
+                            </h2>
+                            <p class="dash-meta" style="margin-bottom: 20px;">Compliance Review Rejected &middot; Read-only</p>
+                        </template>
+
+                        <template if:true={isComplianceSuspended}>
+                            <span class="dash-badge dash-badge--review">ON HOLD</span>
+                            <h2 class="dash-app-name" style="margin-bottom: 4px;">{labels.CL_Application} {applicationName}
+                            </h2>
+                            <p class="dash-meta" style="margin-bottom: 20px;">Compliance Review Suspended &middot; On hold</p>
+                        </template>
 
                         <!-- Track 1: Master MoU / Grant Agreement -->
                         <div class="dash-track-row">
@@ -530,6 +565,7 @@
                     <c-wcf-application-timeline class="dash-card dash-card--side" current-status={normalizedStatus}
                         compliance-doc-status={timelineComplianceStatus} compliance-has-uploads={timelineHasUploads}
                         programme-lead-name={programmeLeadName} programme-lead-email={programmeLeadEmail}
+                        compliance-reviewer-notes={complianceReviewerNotes}
                         oncomplianceaction={handleOpenComplianceDocs}>
                     </c-wcf-application-timeline>
                 </div>

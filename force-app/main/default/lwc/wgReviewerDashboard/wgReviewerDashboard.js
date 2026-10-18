@@ -89,42 +89,42 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     }
 
     // ─── Accepted applications ────────────────────────────────────
-   async loadAcceptedApplications() {
-    try {
-        const rows = await getAcceptedApplicationsQueue();
+    async loadAcceptedApplications() {
+        try {
+            const rows = await getAcceptedApplicationsQueue();
 
-        // Only accepted apps that still need a compliance request (newest decision first, from Apex)
-        const pending = (rows || []).filter(r => !r.complianceRequested);
+            // Only accepted apps that still need a compliance request (newest decision first, from Apex)
+            const pending = (rows || []).filter(r => !r.complianceRequested);
 
-        // Tile + "View all" count come from the same list, so they always match the table
-        this.reviewerAcceptedCount = pending.length;
+            // Tile + "View all" count come from the same list, so they always match the table
+            this.reviewerAcceptedCount = pending.length;
 
-        this.acceptedApplicationRows = pending
-            .slice(0, ACCEPTED_PREVIEW_LIMIT)
-            .map((r, i) => ({
-                id: r.applicationId,
-                rowNum: i + 1,
-                applicationId: r.applicationId,
-                appName: r.appName,
-                organizationName: r.organizationName || '—',
-                approverComment: r.approverComment || '—',
-                decisionDateFormatted: r.decisionDate
-                    ? new Date(r.decisionDate).toLocaleDateString('en-GB', {
-                        day: '2-digit', month: 'short', year: 'numeric'
-                    })
-                    : '—'
-            }));
-    } catch (e) {
-        console.error('Accepted applications error:', e);
+            this.acceptedApplicationRows = pending
+                .slice(0, ACCEPTED_PREVIEW_LIMIT)
+                .map((r, i) => ({
+                    id: r.applicationId,
+                    rowNum: i + 1,
+                    applicationId: r.applicationId,
+                    appName: r.appName,
+                    organizationName: r.organizationName || '—',
+                    approverComment: r.approverComment || '—',
+                    decisionDateFormatted: r.decisionDate
+                        ? new Date(r.decisionDate).toLocaleDateString('en-GB', {
+                            day: '2-digit', month: '2-digit', year: 'numeric'
+                        })
+                        : '—'
+                }));
+        } catch (e) {
+            console.error('Accepted applications error:', e);
+        }
     }
-}
 
-handleViewRequestedCompliances() {
-    this[NavigationMixin.Navigate]({
-        type: 'standard__webPage',
-        attributes: { url: this._siteUrl('wg-compliance-documents') }
-    });
-}
+    handleViewRequestedCompliances() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: { url: this._siteUrl('wg-compliance-documents') }
+        });
+    }
 
     handleCreateComplianceRequest(event) {
         const applicationId = event.currentTarget.dataset.id;
@@ -247,7 +247,7 @@ handleViewRequestedCompliances() {
                     dueDateRaw,
                     dueDate: dueDateRaw
                         ? this._parseDate(dueDateRaw).toLocaleDateString('en-GB', {
-                            day: '2-digit', month: 'short', year: 'numeric'
+                            day: '2-digit', month: '2-digit', year: 'numeric'
                         })
                         : '—',
                     dueDateClass: this._computeDueDateClass(dueDateRaw),

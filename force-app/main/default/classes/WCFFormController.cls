@@ -1369,14 +1369,14 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
             String reviewStatus = app.Review_Status__c;
                Set<String> reviewerOnlyStatuses = new Set<String>{
     'Review Completed - Not Recommended',
-    'Review Completed - Recommended',
     'Reviewer Rejected',
-    'Recommended',
     'Not Recommended'
 };
             String normalized;
         
-          if (reviewerOnlyStatuses.contains(sfStatus)) {
+          if (sfStatus == 'Review Completed - Recommended' || sfStatus == 'Recommended') {
+    normalized = 'ReviewSubmitted';
+} else if (reviewerOnlyStatuses.contains(sfStatus)) {
     normalized = 'UnderReview';
 } else if (sfStatus == 'Draft') {
                 normalized = 'Draft';
@@ -1397,7 +1397,13 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                 normalized = 'UnderReview';
             } else if (sfStatus == 'Onboarded') {
                 normalized = 'Onboarded';
-            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Onboarding Approved' || sfStatus == 'Doc Revision Request'|| sfStatus == 'Doc Resubmitteed'|| sfStatus == 'Onboarding Suspended') {
+            } else if (sfStatus == 'Onboarding Approved') {
+                normalized = 'OnboardingApproved';
+            } else if (sfStatus == 'Onboarding Suspended') {
+                normalized = 'OnboardingSuspended';
+            } else if (sfStatus == 'Onboarding Rejected') {
+                normalized = 'OnboardingRejected';
+            } else if (sfStatus == 'Recommend for Fund' || sfStatus == 'Doc Revision Request'|| sfStatus == 'Doc Resubmitteed' || sfStatus == 'Doc Resubmitted') {
                 normalized = 'Approved';
             } else if (sfStatus == 'Not Recommend for Fund'
                     || sfStatus == 'Rejected - Level 1'
@@ -1735,6 +1741,18 @@ Set<String> uploadedStatuses = new Set<String>{
 
                 result.complianceStatus = compStatus;
                 result.complianceReviewerNotes = compNotes;
+
+                // When a compliance request has been raised by reviewer and application is in approved stage,
+                // reflect Onboarding Initiated (or In Progress) on application status
+                if (result.status == 'Approved' && !allDocs.isEmpty()) {
+                    if (totalUploaded == 0 && compStatus == 'In Progress') {
+                        result.status = 'OnboardingInitiated';
+                    } else if (totalUploaded > 0 && compStatus == 'In Progress') {
+                        result.status = 'OnboardingInProgress';
+                    } else if (compStatus == 'Validated') {
+                        result.status = 'OnboardingApproved';
+                    }
+                }
 
                 // ── Grant Agreement Query ──
                 List<WCF_Executed_Agreement__c> agreements = [

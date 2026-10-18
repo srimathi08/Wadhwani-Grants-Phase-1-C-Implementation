@@ -4,7 +4,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <div class="greeting-block">
-                <div class="greeting-meta">REPORTS — INTERNAL ONLY</div>
+                <div class="greeting-meta">REPORTS: INTERNAL ONLY</div>
                 <h1 class="greeting-title">Sourcing <span class="accent">Channel Report</span></h1>
                 <p class="greeting-sub">Portfolio intelligence</p>
             </div>
@@ -151,12 +151,28 @@
                 <template if:true={isChannelLoading}>
                     <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
                 </template>
-                <div class="sc-detail-header">
-                    <div class="sc-detail-title">Organisation Detail</div>
-                    <div class="sc-detail-sub">
-                        Per-organisation source channel, budget range, stage and validator decision
+
+                <div class="sc-detail-header sc-detail-header-flex">
+                    <div>
+                        <div class="sc-detail-title">Organisation Detail</div>
+                        <div class="sc-detail-sub">
+                            Per-organisation source channel, budget range, stage and validator decision
+                        </div>
+                    </div>
+                    <div class="sc-search-wrap">
+                        <lightning-input
+                            type="search"
+                            name="search"
+                            label="Search"
+                            variant="label-hidden"
+                            placeholder="Search organisation, application ID, stage…"
+                            value={searchTerm}
+                            onchange={handleSearchChange}>
+                        </lightning-input>
+                        <div class="sc-search-count">{resultCountLabel}</div>
                     </div>
                 </div>
+
                 <table class="preview-table">
                     <thead>
                         <tr>
@@ -170,7 +186,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template for:each={sourceChannelRows} for:item="row">
+                        <template for:each={filteredRows} for:item="row">
                             <tr key={row.recordId}>
                                 <td>{row.rowNum}</td>
                                 <td class="cell-id">{row.appName}</td>
@@ -184,7 +200,7 @@
                         <template if:true={noSourceChannelRows}>
                             <tr>
                                 <td colspan="7" class="preview-empty">
-                                    No sourcing channel data available
+                                    {emptyRowsMessage}
                                 </td>
                             </tr>
                         </template>

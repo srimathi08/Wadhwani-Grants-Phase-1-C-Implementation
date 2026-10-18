@@ -266,9 +266,25 @@ public without sharing class WCFComplianceController {
         if (hasRejected) {
             result.complianceStatus = 'Rejected';
             result.reviewerNotes    = String.join(rejectedNotes, '; ');
+            if (String.isBlank(result.reviewerNotes)) {
+                for (WCF_Compliance_Document__c d : allDocs) {
+                    if (d.Status__c == 'Rejected' && String.isNotBlank(d.Reviewer_Notes__c)) {
+                        result.reviewerNotes = d.Reviewer_Notes__c;
+                        break;
+                    }
+                }
+            }
         } else if (hasSuspended) {
             result.complianceStatus = 'Suspended';
             result.reviewerNotes    = String.join(suspendedNotes, '; ');
+            if (String.isBlank(result.reviewerNotes)) {
+                for (WCF_Compliance_Document__c d : allDocs) {
+                    if (d.Status__c == 'Suspended' && String.isNotBlank(d.Reviewer_Notes__c)) {
+                        result.reviewerNotes = d.Reviewer_Notes__c;
+                        break;
+                    }
+                }
+            }
         } else if (hasReturned) {
             result.complianceStatus = 'Returned';
             result.reviewerNotes    = String.join(returnedNotes, '; ');
@@ -318,6 +334,7 @@ public without sharing class WCFComplianceController {
         }
 
         validateOwnership(applicationId);
+        validateFileSize(contentDocumentId, fileName);
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
@@ -460,6 +477,7 @@ public without sharing class WCFComplianceController {
 
         Id applicationId = applicationIdOf(adHocRecordId);
         validateOwnership(applicationId);
+        validateFileSize(contentDocumentId, fileName);
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         WCF_Compliance_Document__c doc = findAdHocRequest(allDocs, adHocRecordId, documentLabel);
@@ -1070,6 +1088,30 @@ public without sharing class WCFComplianceController {
 
     private static void addNote(List<String> notes, String note) {
         if (String.isNotBlank(note) && !notes.contains(note)) notes.add(note);
+    }
+
+    private static final Integer MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+
+    private static void validateFileSize(String contentDocumentId, String fileName) {
+        if (String.isBlank(contentDocumentId)) return;
+        List<ContentVersion> cvList = [
+            SELECT Id, ContentSize, Title
+            FROM   ContentVersion
+            WHERE  ContentDocumentId = :contentDocumentId
+            AND    IsLatest = true
+            WITH   SYSTEM_MODE
+            LIMIT  1
+        ];
+        if (!cvList.isEmpty() && cvList[0].ContentSize != null && cvList[0].ContentSize > MAX_FILE_SIZE_BYTES) {
+            String nameStr = String.isNotBlank(fileName) ? fileName : cvList[0].Title;
+            Decimal sizeMb = (Decimal.valueOf(cvList[0].ContentSize) / (1024 * 1024)).setScale(1);
+            try {
+                delete [SELECT Id FROM ContentDocument WHERE Id = :contentDocumentId WITH SYSTEM_MODE];
+            } catch (Exception ex) {
+                System.debug(LoggingLevel.WARN, 'Could not delete oversized ContentDocument: ' + ex.getMessage());
+            }
+            throw new AuraHandledException('File "' + nameStr + '" (' + sizeMb + ' MB) exceeds the maximum allowed size of 25 MB. Please upload a file within 25 MB.');
+        }
     }
 
     private static void linkFileIfNeeded(Id complianceDocId, Id contentDocumentId) {

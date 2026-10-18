@@ -354,7 +354,7 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     syncComplianceFromChecklist() {
         const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
         const family = ['approved', 'onboardinginitiated', 'onboardinginprogress',
-            'compliancereview', 'onboardingapproved', 'onboarded'];
+            'compliancereview', 'onboardingapproved', 'onboarded', 'onboardingsuspended', 'onboardingrejected'];
         if (!this.recordId || !family.includes(s)) {
             return Promise.resolve();
         }
@@ -381,7 +381,7 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
             .sort((a, b) => a.questionNum - b.questionNum)
             .map(n => ({
                 key: n.questionNum,
-                label: `Q${n.questionNum} — ${n.returnText}`
+                label: `Q${n.questionNum}: ${n.returnText}`
             }));
     }
 
@@ -434,7 +434,7 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     get isApproved() {
         const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
         const approvedFamily = ['approved', 'onboardinginitiated', 'onboardinginprogress',
-            'compliancereview', 'onboardingapproved', 'onboarded'];
+            'compliancereview', 'onboardingapproved', 'onboarded', 'onboardingsuspended', 'onboardingrejected'];
         return approvedFamily.includes(s) && !this.isOverlayOpen;
     }
 
@@ -591,16 +591,16 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
 
     // Compliance progress pill class
     get complianceStatusBadgeClass() {
-        if (this.complianceStatus === 'Rejected') {
+        if (this.isComplianceRejected) {
             return 'dash-track-badge dash-track-badge--rejected';
         }
-        if (this.complianceStatus === 'Suspended') {
+        if (this.isComplianceSuspended) {
             return 'dash-track-badge dash-track-badge--suspended';
         }
         if (this.complianceStatus === 'Returned') {
             return 'dash-track-badge dash-track-badge--returned';
         }
-        if (this.complianceStatus === 'Validated') {
+        if (this.complianceStatus === 'Validated' || this.isOnboarded) {
             return 'dash-track-badge dash-track-badge--active';
         }
         if (this.complianceTotal === 0) return 'dash-track-badge dash-track-badge--pending';
@@ -614,25 +614,42 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     }
 
     get complianceProgressLabel() {
-        if (this.complianceStatus === 'Rejected') return 'REJECTED';
-        if (this.complianceStatus === 'Suspended') return 'SUSPENDED';
+        if (this.isComplianceRejected) return 'REJECTED';
+        if (this.isComplianceSuspended) return 'SUSPENDED';
         if (this.complianceStatus === 'Returned') return 'ACTION NEEDED';
-        if (this.complianceStatus === 'Validated') return 'COMPLETE';
+        if (this.complianceStatus === 'Validated' || this.isOnboarded) return 'COMPLETE';
         if (this.complianceTotal === 0) return 'NOT STARTED';
         if (this.complianceUploaded >= this.complianceTotal) return 'PENDING REVIEW';
         return CL_IN_PROGRESS;
     }
 
+    get isComplianceHalted() {
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        return this.complianceStatus === 'Rejected' || this.complianceStatus === 'Suspended' ||
+            s === 'onboardingrejected' || s === 'onboardingsuspended';
+    }
+
+    get isComplianceRejected() {
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        return this.complianceStatus === 'Rejected' || s === 'onboardingrejected';
+    }
+
+    get isComplianceSuspended() {
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        return this.complianceStatus === 'Suspended' || s === 'onboardingsuspended';
+    }
+
     get showPassedBanner() {
-        return this.complianceStatus === 'Validated';
+        const s = String(this.normalizedStatus || '').replace(/[\s_-]/g, '').toLowerCase();
+        return (this.complianceStatus === 'Validated' || s === 'onboardingapproved' || s === 'onboarded') && !this.isComplianceHalted;
     }
 
     get showRejectedBanner() {
-        return this.complianceStatus === 'Rejected';
+        return this.isComplianceRejected;
     }
 
     get showSuspendedBanner() {
-        return this.complianceStatus === 'Suspended';
+        return this.isComplianceSuspended;
     }
 
     get showReturnedBanner() {

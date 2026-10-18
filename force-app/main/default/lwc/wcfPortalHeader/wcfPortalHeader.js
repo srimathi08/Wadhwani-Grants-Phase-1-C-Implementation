@@ -17,6 +17,9 @@ import {
     withRole
 } from 'c/roleContext';
 
+const MAX_INLINE_SECONDARY = 3;
+
+
 export default class WcfPortalHeader extends LightningElement {
 
     @api logoUrl = '/sfsites/c/resource/WIN_Logo';
@@ -67,6 +70,24 @@ export default class WcfPortalHeader extends LightningElement {
         [ROLES.REVIEWER]: 'reviewerDashboard',
         [ROLES.APPROVER]: 'approverDashboard'
     };
+
+    // Secondary nav items (inline tab or "More" dropdown) and the roles that
+    // may see them. To expose an item to another role, add the role here.
+    // Array order = display order. `key` must exist in _pagePathMap.
+    _secondaryNavConfig = [
+        {
+            key: 'complianceDocuments',
+            label: 'Compliance Document Requests',
+            icon: 'utility:file',
+            roles: [ROLES.REVIEWER]
+        },
+        {
+            key: 'sourcingChannelReport',
+            label: 'Sourcing Channel Report',
+            icon: 'utility:summary',
+            roles: [ROLES.VALIDATOR, ROLES.REVIEWER]
+        }
+    ];
 
     _homeUrlExplicitlySet = false;
     _logoutUrlExplicitlySet = false;
@@ -363,49 +384,61 @@ export default class WcfPortalHeader extends LightningElement {
             && this.activeRole === ROLES.APPROVER;
     }
 
+    // True when `role` is the active role (held-check included).
+    // Single source of truth for the per-role flags above.
+    _isActiveHeldRole(role) {
+        switch (role) {
+            case ROLES.VALIDATOR:
+                return this.showValidatorTabs;
+            case ROLES.REVIEWER:
+                return this.showReviewerTabs;
+            case ROLES.APPROVER:
+                return this.showApproverTabs;
+            default:
+                return false;
+        }
+    }
+
     /*
-     * "More" contents are role-specific:
+     * Secondary items are driven by _secondaryNavConfig:
      *   Validator → Sourcing Channel Report
-     *   Reviewer  → Compliance Documents
+     *   Reviewer  → Compliance Document Requests, Sourcing Channel Report
      *   Approver  → nothing, so the trigger is hidden entirely
      */
     get moreItems() {
-        const items = [];
-
-        if (this.showValidatorTabs) {
-            items.push({
-                key: 'sourcingChannelReport',
-                label: 'Sourcing Channel Report',
-                icon: 'utility:summary',
-                url: this.urls.sourcingChannelReport
-            });
-        }
-
-        if (this.showReviewerTabs) {
-            items.push({
-                key: 'complianceDocuments',
-                label: 'Compliance Document Requests',
-                icon: 'utility:file',
-                url: this.urls.complianceDocuments
-            });
-        }
-
-        return items;
+        return this._secondaryNavConfig
+            .filter(item => item.roles.some(role => this._isActiveHeldRole(role)))
+            .map(item => ({
+                key: item.key,
+                label: item.label,
+                icon: item.icon,
+                url: this.urls[item.key]
+            }));
     }
 
-   // One extra item reads better as a normal tab than as a dropdown with a single entry.
-get inlineItems() {
-    return this.moreItems.length === 1 ? this.moreItems : [];
-}
+    // One extra item reads better as a normal tab than as a dropdown with a single entry.
+       // Overflow rule:
+    //  - Up to MAX_INLINE_SECONDARY items: all inline, no dropdown.
+    //  - Beyond that: keep (MAX - 1) inline and move the rest into "More",
+    //    so the dropdown always holds 2+ items and never a lone entry.
+    get _inlineCount() {
+        const total = this.moreItems.length;
+        return total <= MAX_INLINE_SECONDARY
+            ? total
+            : MAX_INLINE_SECONDARY - 1;
+    }
 
-// Dropdown only appears once a role has 2+ extra items.
-get dropdownItems() {
-    return this.moreItems.length > 1 ? this.moreItems : [];
-}
+    get inlineItems() {
+        return this.moreItems.slice(0, this._inlineCount);
+    }
 
-get showMore() {
-    return this.dropdownItems.length > 0;
-}
+    get dropdownItems() {
+        return this.moreItems.slice(this._inlineCount);
+    }
+
+    get showMore() {
+        return this.dropdownItems.length > 0;
+    }
 
     toggleMore(event) {
         event.stopPropagation();

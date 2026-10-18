@@ -121,15 +121,17 @@ const STATUS_TO_STEP_INDEX = {
     OnboardingInitiated: 6,        // was 7
     OnboardingInProgress: 7,       // was 8
     ComplianceReview: 8,           // was 9
+    OnboardingSuspended: 8,
+    OnboardingRejected: 8,
     OnboardingApproved: 9,         // was 10
     Onboarded: 10                  // Complete
 };
 
-const ALERT_STATUSES = new Set(['Rejected', 'Suspended']);
+const ALERT_STATUSES = new Set(['Rejected', 'Suspended', 'OnboardingRejected', 'OnboardingSuspended']);
 
 // Compliance doc status → activeIndex (the step now in progress).
 const COMPLIANCE_TO_STEP_INDEX = {
-    'Pending Submission': 7,
+    'Pending Submission': 6,
     'Received': 8,
     'Returned': 8,
     'Rejected': 8,
@@ -139,7 +141,8 @@ const COMPLIANCE_TO_STEP_INDEX = {
 
 const ONBOARDING_STATUSES = new Set([
     'Approved', 'OnboardingInitiated', 'OnboardingInProgress',
-    'ComplianceReview', 'OnboardingApproved', 'Onboarded'
+    'ComplianceReview', 'OnboardingApproved', 'Onboarded',
+    'OnboardingSuspended', 'OnboardingRejected'
 ]);
 
 const UPLOAD_STEP_INDEX = 7;
@@ -153,7 +156,9 @@ const norm = (s) => (s == null ? '' : String(s)).replace(/[\s_-]/g, '').toLowerC
 // ⚠️ Replace these with the REAL picklist API values from the status field.
 const STATUS_ALIASES = {
     'Passed for Onboarding': 'Approved',
-    'Passed for Onboarded': 'Onboarded'
+    'Passed for Onboarded': 'Onboarded',
+    'Onboarding Suspended': 'OnboardingSuspended',
+    'Onboarding Rejected': 'OnboardingRejected'
 };
 
 const STATUS_LOOKUP = {};
@@ -226,6 +231,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     @api complianceDocStatus;
     @api complianceHasUploads = false;
     @api decisionOutcome;
+    @api complianceReviewerNotes;
 
     connectedCallback() {
         this.resolvePageUrls();
@@ -347,8 +353,8 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
 
     get exceptionLevel() {
         if (this.statusKey === 'revisionrequested') return 'warning';
-        if (this.statusKey === 'rejected') return 'danger';
-        if (this.statusKey === 'suspended') return 'warning';
+        if (this.statusKey === 'rejected' || this.statusKey === 'onboardingrejected') return 'danger';
+        if (this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended') return 'warning';
         const k = this.complianceKey;
         if (k === 'rejected') return 'danger';
         if (k === 'returned' || k === 'suspended') return 'warning';
@@ -362,7 +368,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
         const lvl = this.exceptionLevel;
         if (lvl === 'danger') return UI_TEXT.actionNeeded;
         if (lvl === 'warning') {
-            return this.complianceKey === 'suspended' || this.statusKey === 'suspended'
+            return this.complianceKey === 'suspended' || this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended'
                 ? UI_TEXT.onHold
                 : UI_TEXT.actionNeeded;
         }
@@ -402,11 +408,13 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
                     label = UI_TEXT.revisionTitle;
                     tooltip = UI_TEXT.revisionBody;
                     subLabel = UI_TEXT.revisionNote;
-                } else if (this.statusKey === 'rejected') subLabel = CL_Rejected;
-                else if (this.statusKey === 'suspended') subLabel = CL_Suspended;
-                else if (this.complianceKey === 'returned') subLabel = UI_TEXT.noteReturned;
-                else if (this.complianceKey === 'rejected') subLabel = UI_TEXT.noteRejected;
-                else if (this.complianceKey === 'suspended') subLabel = UI_TEXT.noteSuspended;
+                } else if (this.statusKey === 'rejected' || this.statusKey === 'onboardingrejected') {
+                    subLabel = this.complianceReviewerNotes || CL_Rejected;
+                } else if (this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended') {
+                    subLabel = this.complianceReviewerNotes || CL_Suspended;
+                } else if (this.complianceKey === 'returned') subLabel = UI_TEXT.noteReturned;
+                else if (this.complianceKey === 'rejected') subLabel = this.complianceReviewerNotes || UI_TEXT.noteRejected;
+                else if (this.complianceKey === 'suspended') subLabel = this.complianceReviewerNotes || UI_TEXT.noteSuspended;
             }
 
             return {
