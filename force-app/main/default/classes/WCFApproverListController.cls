@@ -16,6 +16,8 @@ public without sharing class WCFApproverListController {
         @AuraEnabled public String  recommendation;
         @AuraEnabled public String  existingDecision;
         @AuraEnabled public String  existingDecisionId;
+        @AuraEnabled public Integer submissionRound;
+        @AuraEnabled public Integer revisionCount;
     }
 
     // ── NEW: wrapper returned by getExistingDecision ──
@@ -31,6 +33,13 @@ public without sharing class WCFApproverListController {
     @AuraEnabled public String   priorReturnComment;
     @AuraEnabled public DateTime priorReturnDate;
         @AuraEnabled public String   priorRejectionReasons;   // ← NEW
+        @AuraEnabled public Boolean  isRevoked;
+        @AuraEnabled public String   revokedPriorDecision;
+        @AuraEnabled public String   revokedComment;
+        @AuraEnabled public DateTime revokedDate;
+        @AuraEnabled public String   returnStatusLabel;
+        @AuraEnabled public Integer  submissionRound;
+        @AuraEnabled public Integer  revisionCount;
 
     }
 
@@ -79,7 +88,9 @@ public without sharing class WCFApproverListController {
                    Organizational_Area_s_for_Funding_Inves__c,
                    Organizational_Area_s_for_Funding_Inves1__c,
                    Status,
-                   RecordTypeId
+                   RecordTypeId,
+                   Submission_Round__c,
+                   Last_Resubmission_Date__c
             FROM IndividualApplication
             WHERE Id IN :appIds
             AND RecordTypeId IN :allowedRtIds
@@ -118,6 +129,13 @@ public without sharing class WCFApproverListController {
             item.headquarters      = app.Headquarters_City_and_Country__c;
             item.submitterName     = app.Submitter_Name__c;
             item.applicationStatus = app.Status;
+
+            Decimal round = app.Submission_Round__c;
+            if (round == null || round < 1) {
+                round = (app.Status == 'Application Resubmitted' || app.Last_Resubmission_Date__c != null) ? 2 : 1;
+            }
+            item.submissionRound = round.intValue();
+            item.revisionCount   = Math.max(0, round.intValue() - 1);
 
             String rawTrack = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
                 ? app.Organizational_Area_s_for_Funding_Inves1__c
@@ -199,7 +217,9 @@ public static String saveDecision(
     List<ApplicationDecision> existing = [
         SELECT Id, RecordTypeId FROM ApplicationDecision
         WHERE ApplicationId = :applicationId
+        AND ApplicationDecision != 'Revoke'
         WITH SYSTEM_MODE
+        ORDER BY CreatedDate DESC
         LIMIT 1
     ];
 
@@ -297,10 +317,12 @@ public static String saveDecision(
     @AuraEnabled
 public static void revokeDecision(Id applicationId) {
     List<ApplicationDecision> existing = [
-        SELECT Id, Decision_Date__c
+        SELECT Id, Decision_Date__c, ApplicationDecision, Comment
         FROM ApplicationDecision
         WHERE ApplicationId = :applicationId
+        AND ApplicationDecision != 'Revoke'
         WITH SYSTEM_MODE
+        ORDER BY CreatedDate DESC
         LIMIT 1
     ];
 
@@ -316,13 +338,34 @@ public static void revokeDecision(Id applicationId) {
         throw new AuraHandledException('Revoke period has expired.');
     }
 
-    //  Instead of nulling out the decision, stamp it as Revoke for audit history
+    // Preserve the prior decision and date in Comment for audit history
+    String priorDec = ad.ApplicationDecision;
+    String auditNote = '[Decision ' + priorDec + ' revoked on ' + DateTime.now().format('dd MMM yyyy, HH:mm') + ']';
+    if (String.isNotBlank(ad.Comment)) {
+        ad.Comment = auditNote + ' Original comment: ' + ad.Comment;
+    } else {
+        ad.Comment = auditNote;
+    }
+
     ad.ApplicationDecision = 'Revoke';
+    ad.Decision_Date__c    = DateTime.now();
     update as system ad;
 
-    // Reset application status back to Review Completed - Recommended
+    // Reset application status back to Review Completed
+    String resetStatus = 'Review Completed - Recommended';
+    List<ApplicationReview> reviews = [
+        SELECT Recommend_for_CEO_review__c
+        FROM ApplicationReview
+        WHERE ApplicationId = :applicationId
+        WITH SYSTEM_MODE
+        ORDER BY LastModifiedDate DESC
+        LIMIT 1
+    ];
+    if (!reviews.isEmpty() && reviews[0].Recommend_for_CEO_review__c == 'No') {
+        resetStatus = 'Review Completed - Not Recommended';
+    }
     IndividualApplication app = new IndividualApplication(Id = applicationId);
-    app.Status = 'Review Completed - Recommended';
+    app.Status = resetStatus;
     try {
         update as system app;
     } catch (DmlException e) {
@@ -340,47 +383,74 @@ public static DecisionWrapper getExistingDecision(Id applicationId) {
         LIMIT 1
     ];
 
-    if (ads.isEmpty()
-        || ads[0].ApplicationDecision == null
-        || ads[0].ApplicationDecision == 'Revoke') {
+    if (ads.isEmpty() || ads[0].ApplicationDecision == null) {
         return null;
     }
 
     ApplicationDecision ad = ads[0];
 
+    IndividualApplication app = [
+        SELECT Status, Submission_Round__c, Last_Resubmission_Date__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId
+        WITH SYSTEM_MODE
+        LIMIT 1
+    ];
+    Decimal round = app.Submission_Round__c;
+    if (round == null || round < 1) {
+        round = (app.Status == 'Application Resubmitted' || app.Last_Resubmission_Date__c != null) ? 2 : 1;
+    }
+    Integer appSubRound = round.intValue();
+    Integer appRevCount = Math.max(0, round.intValue() - 1);
+
+    // If latest decision is 'Revoke', preserve history and unlock decision buttons
+    if (ad.ApplicationDecision == 'Revoke') {
+        DecisionWrapper rw     = new DecisionWrapper();
+        rw.decision            = null;
+        rw.decisionId          = ad.Id;
+        rw.decisionDate        = ad.Decision_Date__c;
+        rw.comment             = ad.Comment;
+        rw.isRevoked           = true;
+        rw.revokedDate         = ad.Decision_Date__c;
+        rw.revokedComment      = ad.Comment;
+        rw.isRevokable         = false;
+        rw.isReturned          = false;
+        rw.isBackFromReviewer  = false;
+        rw.submissionRound     = appSubRound;
+        rw.revisionCount       = appRevCount;
+        return rw;
+    }
+
     DecisionWrapper w      = new DecisionWrapper();
-     if (ad.ApplicationDecision == 'Approved with Resubmission') {
-        IndividualApplication app = [
-            SELECT Status FROM IndividualApplication
-            WHERE Id = :applicationId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        Boolean stillWithReviewer = (app.Status == 'Returned by Approver');
+    w.submissionRound      = appSubRound;
+    w.revisionCount        = appRevCount;
+    if (ad.ApplicationDecision == 'Approved with Resubmission') {
+        Boolean isReadyForReapproval = (app.Status == 'Review Completed - Recommended'
+                                     || app.Status == 'Review Completed - Not Recommended');
 
         // Always carry the Approver's original comment forward as context,
         // regardless of which branch below fires.
-        w.priorReturnComment = ad.Comment;
-        w.priorReturnDate    = ad.Decision_Date__c;
-         w.priorRejectionReasons   = ad.Rejection_Reasons__c;   // ← NEW
-         
-         
-  if (stillWithReviewer) {
-            // ── Still out with Reviewer — lock the screen exactly as before ──
-            w.decision     = ad.ApplicationDecision;
-            w.decisionId   = ad.Id;
-            w.decisionDate = ad.Decision_Date__c;
-            w.comment      = ad.Comment;
-            w.isReturned   = true;
-            w.isRevokable  = false;
-        } else {
-            // ── NEW: Reviewer closed the loop — unlock buttons for a fresh
-            // decision, but flag isBackFromReviewer so the UI can still show
-            // the Approver's own prior comment for context. ──
+        w.priorReturnComment     = ad.Comment;
+        w.priorReturnDate        = ad.Decision_Date__c;
+        w.priorRejectionReasons  = ad.Rejection_Reasons__c;
+
+        if (isReadyForReapproval) {
+            // ── Reviewer closed the loop — unlock buttons for a fresh decision ──
             w.decision            = null;
             w.isReturned          = false;
             w.isBackFromReviewer  = true;
             w.isRevokable         = false;
+        } else {
+            // ── Still out with Reviewer or Validator — lock the screen ──
+            w.decision          = ad.ApplicationDecision;
+            w.decisionId        = ad.Id;
+            w.decisionDate      = ad.Decision_Date__c;
+            w.comment           = ad.Comment;
+            w.isReturned        = true;
+            w.isRevokable       = false;
+            w.returnStatusLabel = (app.Status == 'Returned to Validator')
+                ? 'Returned to Validator'
+                : 'Returned to Reviewer';
         }
         return w;
     }
@@ -522,12 +592,12 @@ public static ApproverSummary getApproverSummary() {
             approved++;
         } else if (dec == 'Decline') {
             declined++;
-        }else if (dec == 'Approved with Resubmission') {
-            if (st == 'Returned by Approver') {
-            returned++;   // NEW
-                } else {
+        } else if (dec == 'Approved with Resubmission') {
+            if (st == 'Review Completed - Recommended' || st == 'Review Completed - Not Recommended') {
                 backFromReviewer++;      // Reviewer sent it back — ready for fresh decision
                 pending++;               // also needs Approver action, so counts toward Pending too
+            } else {
+                returned++;              // Still in return cycle (Returned by Approver or Returned to Validator)
             }
         }
     }

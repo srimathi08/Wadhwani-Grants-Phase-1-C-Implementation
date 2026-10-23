@@ -755,11 +755,15 @@ if (String.isNotBlank(skillingDomainsJson)) {
         if (app.Initial_Submission_Date__c == null) {
             // First ever submission
             app.Initial_Submission_Date__c = System.now();
-     app.Status = 'Submitted';
+            app.Status = 'Submitted';
+            if (app.Submission_Round__c == null || app.Submission_Round__c < 1) {
+                app.Submission_Round__c = 1;
+            }
         } else {
             // Resubmission after validator review
             app.Last_Resubmission_Date__c = System.now();
-    app.Status = 'Application Resubmitted';
+            app.Status = 'Application Resubmitted';
+            app.Submission_Round__c = (app.Submission_Round__c == null || app.Submission_Round__c < 1 ? 1 : app.Submission_Round__c) + 1;
         }
                     
                     upsert app;
@@ -1888,8 +1892,11 @@ Set<String> uploadedStatuses = new Set<String>{
                 
             }
             app.Status = 'Application Resubmitted';
-                app.Last_Resubmission_Date__c = System.now();
-                update as system app;
+            app.Last_Resubmission_Date__c = System.now();
+            IndividualApplication existingApp = [SELECT Id, Submission_Round__c FROM IndividualApplication WHERE Id = :applicationId WITH SYSTEM_MODE LIMIT 1];
+            Decimal curRound = existingApp.Submission_Round__c;
+            app.Submission_Round__c = (curRound == null || curRound < 1 ? 1 : curRound) + 1;
+            update as system app;
     
             // ── 2. Update Historical_Data__c (Q12) ───────────────────────────
             if (!histFields.isEmpty()) {

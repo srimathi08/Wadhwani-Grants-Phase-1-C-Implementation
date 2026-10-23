@@ -56,7 +56,14 @@
                             <template for:each={approverPreviewRows} for:item="row">
                                 <tr key={row.applicationId} class={row.rowClass}>
                                     <td class="wg-col-index">{row.rowNum}</td>
-                                    <td class="wg-cell-id">{row.applicationName}</td>
+                                    <td class="wg-cell-id">
+                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                            <span>{row.applicationName}</span>
+                                            <template lwc:if={row.hasRevision}>
+                                                <span class="wg-tag wg-tag--warning">{row.revisionLabel}</span>
+                                            </template>
+                                        </div>
+                                    </td>
                                     <td>{row.organizationName}</td>
                                     <td>
                                         <div class="ad-tags">

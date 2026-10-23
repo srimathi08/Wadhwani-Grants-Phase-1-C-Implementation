@@ -103,11 +103,24 @@ private class ComplianceDocumentControllerTest {
             // Test Pass decision
             ComplianceDocumentController.saveComplianceRequestDecision(requestId, 'Pass', 'Approved all docs', null);
             
+            // Re-open doc for Return test
+            WCF_Compliance_Document__c doc = [SELECT Id FROM WCF_Compliance_Document__c WHERE Id = :requestId];
+            doc.Document_Status_JSON__c = '{"80G Certificate":{"status":"Pending Review","contentDocumentId":"069e00000000000AAA","fileName":"test.pdf","reviewerNotes":"Notes"}}';
+            update doc;
+
             // Test Return decision with specific labels
             ComplianceDocumentController.saveComplianceRequestDecision(requestId, 'Return', 'Please re-upload', new List<String>{'80G Certificate'});
 
+            // Re-open doc for Reject test
+            doc.Document_Status_JSON__c = '{"80G Certificate":{"status":"Pending Review","contentDocumentId":"069e00000000000AAA","fileName":"test.pdf","reviewerNotes":"Notes"}}';
+            update doc;
+
             // Test Reject decision
             ComplianceDocumentController.saveComplianceRequestDecision(requestId, 'Reject', 'Rejected', null);
+
+            // Re-open doc for Suspend test
+            doc.Document_Status_JSON__c = '{"80G Certificate":{"status":"Pending Review","contentDocumentId":"069e00000000000AAA","fileName":"test.pdf","reviewerNotes":"Notes"}}';
+            update doc;
 
             // Test Suspend decision
             ComplianceDocumentController.saveComplianceRequestDecision(requestId, 'Suspend', 'Suspended', null);

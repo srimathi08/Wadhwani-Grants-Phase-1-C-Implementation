@@ -110,16 +110,17 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
         const dec = r.existingDecision;
         if (!dec || dec === 'Revoke') return true;
         if (dec === 'Approved with Resubmission'
-            && r.applicationStatus !== 'Returned by Approver') return true;
+            && this._isBackFromReviewer(r)) return true;
         return false;
     }
     _isBackFromReviewer(r) {
         return r.existingDecision === 'Approved with Resubmission'
-            && r.applicationStatus !== 'Returned by Approver';
+            && (r.applicationStatus === 'Review Completed - Recommended'
+                || r.applicationStatus === 'Review Completed - Not Recommended');
     }
     _isReturnedToReviewer(r) {
         return r.existingDecision === 'Approved with Resubmission'
-            && r.applicationStatus === 'Returned by Approver';
+            && !this._isBackFromReviewer(r);
     }
 
     // ── Summary counts (always computed from ALL items) ───────────
@@ -279,13 +280,19 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
 
             if (dec === 'Approve' || dec === 'Accept') decisionBadgeClass = 'wg-pill wg-pill--success';
             else if (dec === 'Decline')               decisionBadgeClass = 'wg-pill wg-pill--error';
-            else if (dec === 'Approved with Resubmission') {
-                if (row.applicationStatus === 'Returned by Approver') {
-                    decisionBadgeClass = 'wg-pill wg-pill--returned';
-                    decisionLabel      = 'Returned to Reviewer';
-                } else {
+            else if (dec === 'Revoke') {
+                decisionBadgeClass = 'wg-pill wg-pill--warning';
+                decisionLabel      = 'Decision Revoked';
+            } else if (dec === 'Approved with Resubmission') {
+                if (this._isBackFromReviewer(row)) {
                     decisionBadgeClass = 'wg-pill wg-pill--warning';
                     decisionLabel      = 'Back from Reviewer';
+                } else if (row.applicationStatus === 'Returned to Validator') {
+                    decisionBadgeClass = 'wg-pill wg-pill--returned';
+                    decisionLabel      = 'Returned to Validator';
+                } else {
+                    decisionBadgeClass = 'wg-pill wg-pill--returned';
+                    decisionLabel      = 'Returned to Reviewer';
                 }
             }
 
@@ -297,6 +304,10 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
                 actionLabel    = 'Start Reapprove';
                 actionBtnClass = 'primary-btn' + SM;
                 actionIcon     = 'utility:refresh';
+            } else if (row.existingDecision === 'Revoke') {
+                actionLabel    = 'Start Approve';
+                actionBtnClass = 'primary-btn' + SM;
+                actionIcon     = 'utility:approval';
             } else if (row.existingDecision) {
                 actionLabel    = 'View Decision';
                 actionBtnClass = 'neutral-btn' + SM;
@@ -314,9 +325,16 @@ export default class WcfApproverListView extends NavigationMixin(LightningElemen
                 actionIcon     = 'utility:approval';
             }
 
+            const round = row.submissionRound || (row.applicationStatus === 'Application Resubmitted' ? 2 : 1);
+            const revCount = row.revisionCount != null ? row.revisionCount : Math.max(0, round - 1);
+            const hasRevision = revCount > 0;
+            const revisionLabel = `Rev ${revCount}`;
+
             return {
                 ...row,
                 sno: start + idx + 1,
+                hasRevision,
+                revisionLabel,
                 // Rows the Reviewer sent back need the Approver's attention
                 rowClass: isBackFromReviewer ? 'wg-row--attention' : '',
                 trackBadges,

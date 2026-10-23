@@ -146,7 +146,7 @@ export default class WcfComplianceDocs extends LightningElement {
     @track totalRequired   = 0;
     @track totalValidated  = 0;
     @track totalUploaded   = 0;
-    @track uploadingDocType;
+    @track uploadingTypes = [];   // document types with a save in flight
     @track lockReason;          // 'Rejected' | 'Suspended' | 'Validated' | undefined
     @track isFrozen = false;    // Rejected / Suspended → nothing editable
 
@@ -170,9 +170,13 @@ export default class WcfComplianceDocs extends LightningElement {
     _onVisibility;
     _onFocus;
 
-    // Waiting for lightning-file-upload's dialog to close before re-rendering.
+        // Waiting for lightning-file-upload's dialog to close before re-rendering.
     _awaitingDialogClose = false;
     _dialogWaitTimer;
+
+    // Saves are sent one at a time, in the order the uploads finished.
+    _saveQueue    = Promise.resolve();
+    _pendingSaves = 0;
 
     // ─────────────────────────────────────────────────────────────
     // Lifecycle
@@ -248,7 +252,8 @@ export default class WcfComplianceDocs extends LightningElement {
         return this.isLoading
             || this.isSubmitting
             || this._awaitingDialogClose
-            || !!this.uploadingDocType
+            || this.uploadingTypes.length > 0
+            || this._pendingSaves > 0
             || (this.checklistItems || []).some(i => i.isPreparing || i.isUploadingThis)
             || this.isUploadDialogOpen();
     }
@@ -478,7 +483,8 @@ export default class WcfComplianceDocs extends LightningElement {
                 : 'The compliance team will ask you for a renewed copy if one is needed.',
             expiryDateFormatted    : this.formatDate(raw.expiryDate),
             submittedDateFormatted : this.formatDate(raw.submittedDate),
-            isUploadingThis        : this.uploadingDocType === raw.documentType
+            fileDatePrefix         : status === 'Draft' ? 'Uploaded' : 'Submitted',
+            isUploadingThis        : this.uploadingTypes.includes(raw.documentType)
         };
     }
 
@@ -714,52 +720,93 @@ export default class WcfComplianceDocs extends LightningElement {
             });
     }
 
+        setUploading(docType, on) {
+        const set = new Set(this.uploadingTypes);
+        if (on) set.add(docType); else set.delete(docType);
+        this.uploadingTypes = [...set];
+        this.checklistItems = this.checklistItems.map(i =>
+            i.documentType === docType ? { ...i, isUploadingThis: on } : i
+        );
+    }
+
+    isTransientError(msg) {
+        return /UNABLE_TO_LOCK_ROW|unable to obtain exclusive access|timed out|concurrent/i.test(msg || '');
+    }
+
+    async saveWithRetry(fn, attempts = 3) {
+        for (let n = 1; ; n++) {
+            try {
+                return await fn();
+            } catch (e) {
+                if (n >= attempts || !this.isTransientError(this.extractErrorMessage(e))) throw e;
+                // eslint-disable-next-line @lwc/lwc/no-async-operation
+                await new Promise(resolve => setTimeout(resolve, 700 * n));
+            }
+        }
+    }
+
     handleUploadFinished(event) {
         const docType    = event.target.dataset.doctype;
         const recordHint = event.target.dataset.recordId;
-        const files      = event.detail.files;
-        if (!files || files.length === 0) return;
+        const files      = event.detail.files || [];
+        if (!files.length) return;
 
-        const file = files[0];
-
-        // 25 MB file size limit (25 * 1024 * 1024 bytes)
+        // 25 MB limit: discard oversized files straight away.
         const MAX_FILE_SIZE = 25 * 1024 * 1024;
-        if (file.size && file.size > MAX_FILE_SIZE) {
-            const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-            discardUploadedFile({ applicationId: this.recordId, contentDocumentId: file.documentId })
+        const accepted = [];
+        files.forEach(f => {
+            if (f.size && f.size > MAX_FILE_SIZE) {
+                const sizeMb = (f.size / (1024 * 1024)).toFixed(1);
+                discardUploadedFile({ applicationId: this.recordId, contentDocumentId: f.documentId })
+                    .catch(() => { /* best effort */ });
+                this.showToast(
+                    'File Size Exceeded',
+                    `"${f.name}" (${sizeMb} MB) exceeds the maximum allowed size of 25 MB. Please upload a file within 25 MB.`,
+                    'error'
+                );
+            } else {
+                accepted.push(f);
+            }
+        });
+        if (!accepted.length) return;
+
+        // One file per document row: keep the first, discard the rest and say so.
+        const file = accepted[0];
+        accepted.slice(1).forEach(extra => {
+            discardUploadedFile({ applicationId: this.recordId, contentDocumentId: extra.documentId })
                 .catch(() => { /* best effort */ });
+        });
+        if (accepted.length > 1) {
             this.showToast(
-                'File Size Exceeded',
-                `"${file.name}" (${sizeMb} MB) exceeds the maximum allowed size of 25 MB. Please upload a file within 25 MB.`,
-                'error'
+                'One file per document',
+                `Only "${file.name}" was kept for this document. Upload the other files against their own rows.`,
+                'warning'
             );
-            return;
         }
 
-        // The uploader's "Upload Files" dialog is still open at this point.
-        // Remember it so the row is not re-rendered until it has closed.
         const uploadDialog = this.findOpenUploadDialog();
 
-        this.uploadingDocType = docType;
-
+        this.setUploading(docType, true);
+        this._pendingSaves++;
         this.checklistItems = this.checklistItems.map(i =>
             i.documentType === docType
-                ? { ...i, isUploadingThis: true, isUploaded: true, isReplacing: false }
+                ? { ...i, isUploaded: true, isReplacing: false }
                 : i
         );
         this.notifyParent();
 
         const item    = this.findItem(docType);
         const isAdHoc = !!(item && item.adHocParentId);
+        const expiry  = this.expiryDateByType[docType] || null;
 
-        const savePromise = isAdHoc
+        const doSave = () => isAdHoc
             ? saveAdHocComplianceDocument({
                   adHocRecordId    : item.adHocParentId,
                   documentLabel    : docType,
                   contentDocumentId: file.documentId,
                   fileName         : file.name,
                   issueDate        : null,
-                  expiryDate       : this.expiryDateByType[docType] || null
+                  expiryDate       : expiry
               })
             : saveComplianceDocument({
                   applicationId    : this.recordId,
@@ -767,11 +814,13 @@ export default class WcfComplianceDocs extends LightningElement {
                   contentDocumentId: file.documentId,
                   fileName         : file.name,
                   issueDate        : null,
-                  expiryDate       : this.expiryDateByType[docType] || null,
+                  expiryDate       : expiry,
                   existingRecordId : recordHint || null
               });
 
-        savePromise
+        // Chain onto the queue so saves never overlap.
+        this._saveQueue = this._saveQueue
+            .then(() => this.saveWithRetry(doSave))
             .then(() => {
                 delete this.expiryDateByType[docType];
                 this.showToast(
@@ -781,21 +830,22 @@ export default class WcfComplianceDocs extends LightningElement {
                 );
             })
             .catch(error => {
-                // The save was refused (e.g. the reviewer locked this row while
-                // the page was open) — remove the file the uploader already stored.
-                discardUploadedFile({ applicationId: this.recordId, contentDocumentId: file.documentId })
-                    .catch(() => { /* best effort */ });
-                this.showToast('Upload not saved', this.extractErrorMessage(error), 'error');
+                const errorMsg = this.extractErrorMessage(error);
+                // Delete the stored file only for a real refusal (e.g. row locked by the
+                // reviewer), never for a transient failure: that file may be good.
+                if (!this.isTransientError(errorMsg)) {
+                    discardUploadedFile({ applicationId: this.recordId, contentDocumentId: file.documentId })
+                        .catch(() => { /* best effort */ });
+                }
+                const isSizeError = /exceeds the maximum allowed size|within 25 MB|file size/i.test(errorMsg);
+                this.showToast(isSizeError ? 'File Size Limit Exceeded' : 'Upload not saved', errorMsg, 'error');
             })
-            .finally(() => {
-                this.uploadingDocType = undefined;
-                this.checklistItems = this.checklistItems.map(i =>
-                    i.documentType === docType ? { ...i, isUploadingThis: false } : i
-                );
-                // Refresh only once the uploader's dialog is gone, so the
-                // lightning-file-upload that owns it is still mounted while it
-                // closes and Salesforce can tear the modal down properly.
-                return this.afterUploadDialogCloses(uploadDialog).then(() => {
+            .then(() => {
+                this._pendingSaves--;
+                this.setUploading(docType, false);
+                // Reload only when the whole queue has drained and the uploader dialog is gone.
+                if (this._pendingSaves > 0) return undefined;
+                return this.afterUploadDialogCloses(this.findOpenUploadDialog()).then(() => {
                     this._lastSignature = undefined;
                     return this.loadChecklist({ silent: true });
                 });

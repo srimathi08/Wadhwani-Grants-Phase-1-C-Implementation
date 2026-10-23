@@ -84,12 +84,18 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
                 .map(w => {
                     const app = w.application;
                     const dueDateRaw = app.Due_Date__c || null;
+                    const round = w.submissionRound || app.Submission_Round__c || (w.isResubmission ? 2 : 1);
+                    const revCount = w.revisionCount != null ? w.revisionCount : Math.max(0, round - 1);
+                    const hasRevision = revCount > 0;
+                    const revisionLabel = `Rev ${revCount}`;
                     return {
                         id: app.Id,
                         appId: app.Name,
                         account: app.Account?.Name ?? '—',
                         hasDraft: w.hasDraft,
                         isResubmission: w.isResubmission,
+                        hasRevision,
+                        revisionLabel,
                         dueDateRaw,
                         dueDate: dueDateRaw
                             ? this._parseDate(dueDateRaw).toLocaleDateString('en-GB', {

@@ -234,6 +234,51 @@ public without sharing class WCFFormEngineController {
      * just uploaded, so no system-mode access is needed.
      */
    	
+         /**
+     * Tags a freshly uploaded file as Q24 / Q28 right after upload so it is
+     * restored under the right question when the revision page is reopened.
+     */
+    @AuraEnabled
+    public static void tagUploadedFile(Id contentDocumentId, Id recordId, String tag) {
+        if (contentDocumentId == null || recordId == null
+            || (tag != 'Q24' && tag != 'Q28')) return;
+        try {
+            // Only tag files that are linked to this application
+            Integer linked = [
+                SELECT COUNT() FROM ContentDocumentLink
+                WHERE ContentDocumentId = :contentDocumentId
+                AND LinkedEntityId = :recordId
+            ];
+            if (linked == 0) return;
+
+            List<ContentVersion> cvs = [
+                SELECT Id, Description FROM ContentVersion
+                WHERE ContentDocumentId = :contentDocumentId AND IsLatest = true
+                WITH SYSTEM_MODE
+            ];
+            for (ContentVersion cv : cvs) cv.Description = tag;
+            if (!cvs.isEmpty()) update as system cvs;
+        } catch (Exception e) {
+            System.debug(LoggingLevel.WARN, 'tagUploadedFile: ' + e.getMessage());
+        }
+    }
+
+    /**
+     * Saves only the Q24 answer while the application is on the revision page.
+     * Status and dates are not touched.
+     */
+    @AuraEnabled
+    public static void saveRevisionQ24Answer(Id recordId, String verified, String details) {
+        if (recordId == null) return;
+        try {
+            IndividualApplication app = new IndividualApplication(Id = recordId);
+            app.Q24_VERIFIED__c = verified;
+            app.Details_of_Ethical_Received__c = details;
+            update as system app;
+        } catch (Exception e) {
+            System.debug(LoggingLevel.WARN, 'saveRevisionQ24Answer: ' + e.getMessage());
+        }
+    }
 	@AuraEnabled
 public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDocumentIds) {
     List<UploadedFileDetail> results = new List<UploadedFileDetail>();
@@ -966,6 +1011,7 @@ public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDo
                 'GenieAI_Interest_Level__c', 'Operational_Synergies_with_WOF__c',
                 'Attesting_User_Name__c', 'Attesting_User_Title__c', 'Attestation_Date__c',
                 'Draft_Email_Sent__c',
+                'Submission_Round__c',
                 'Organizational_Area_s_for_Funding_Inves__c', 'Organizational_Area_s_for_Funding_Inves1__c', 'Selected_Funding_Tracks__c'
             };
             for (RFI_Question__mdt q : [SELECT Field_API_Name__c, Target_Object__c FROM RFI_Question__mdt]) {
@@ -1249,11 +1295,16 @@ public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDo
             }
             app.Attestation_Date__c = System.now();
 
+            Decimal curRound = (Decimal) app.get('Submission_Round__c');
             if (targetStatus == 'Application Resubmitted' || app.Status == 'Revision Requested') {
                 app.Status = 'Application Resubmitted';
                 app.Last_Resubmission_Date__c = System.now();
+                app.put('Submission_Round__c', (curRound == null || curRound < 1 ? 1 : curRound) + 1);
             } else {
                 app.Status = 'Submitted';
+                if (curRound == null || curRound < 1) {
+                    app.put('Submission_Round__c', 1);
+                }
             }
         } else {
             if (app.Status != 'Revision Requested' && app.Status != 'Application Resubmitted') {

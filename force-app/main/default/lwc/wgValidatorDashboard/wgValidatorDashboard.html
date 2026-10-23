@@ -56,7 +56,14 @@
                                 <template for:each={validatorPreviewRows} for:item="row">
                                     <tr key={row.id} class={row.rowClass}>
                                         <td class="wg-col-index">{row.rowNum}</td>
-                                        <td class="wg-cell-id">{row.appId}</td>
+                                        <td class="wg-cell-id">
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <span>{row.appId}</span>
+                                                <template lwc:if={row.hasRevision}>
+                                                    <span class="wg-tag wg-tag--warning">{row.revisionLabel}</span>
+                                                </template>
+                                            </div>
+                                        </td>
                                         <td>{row.account}</td>
                                         <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
                                         <td><span class={row.statusClass}>{row.status}</span></td>

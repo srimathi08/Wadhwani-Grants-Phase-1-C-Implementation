@@ -89,7 +89,7 @@ private static final Set<String> CLOSED_STATUSES =
            WITH SYSTEM_MODE
         ]) {
             dto.allRequests++;
-            if (rec.Status__c == 'Received' || rec.Status__c == 'Validated') {
+            if (rec.Status__c == 'Received' || rec.Status__c == 'Validated' || rec.Status__c == 'Pending Review' || rec.Status__c == 'Submitted') {
                 dto.received++;
             } else if (rec.Status__c == 'Rejected' || rec.Status__c == 'Suspended') {
                 // decided, so it counts in All only
@@ -449,8 +449,17 @@ private static final Set<String> CLOSED_STATUSES =
     }
 }
         rec.Document_Types__c        = documentTypes;
-        rec.Requested_Date__c        = parseDate(requestedDate);
-        rec.Due_Date__c              = parseDate(dueDate);
+        Date reqDate = parseDate(requestedDate);
+        if (reqDate == null && String.isBlank(recordId)) {
+            reqDate = Date.today();
+        }
+        rec.Requested_Date__c        = reqDate;
+
+        Date due = parseDate(dueDate);
+        if (due == null && String.isBlank(recordId)) {
+            due = (reqDate != null ? reqDate.addDays(100) : Date.today().addDays(100));
+        }
+        rec.Due_Date__c              = due;
         rec.Priority__c              = priority;
         if (String.isBlank(recordId) && String.isBlank(rec.Status__c)) {
             rec.Status__c            = 'Pending Submission';

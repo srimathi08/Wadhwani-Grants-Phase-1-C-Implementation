@@ -27,18 +27,46 @@ const GEO_DOC_TYPES = {
              'Audited Financials (FY24-25)', 'Other Document']
 };
 
-const DEFAULT_FORM = {
-    recordId:        null,
-    organisationId:  '',
-    applicationId:   '',
-    applicationName: '',
-    geography:       '',
-    documentTypes:   [],
-    requestedDate:   '',
-    dueDate:         '',
-    priority:        'Normal',
-    notes:           ''
-};
+function getTodayIso() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function getDueDateIso(requestedDateIso) {
+    let d;
+    if (requestedDateIso) {
+        const [y, m, day] = requestedDateIso.split('-').map(Number);
+        d = new Date(y, m - 1, day);
+    } else {
+        d = new Date();
+    }
+    d.setDate(d.getDate() + 100);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function buildDefaultForm() {
+    const today = getTodayIso();
+    return {
+        recordId:        null,
+        organisationId:  '',
+        applicationId:   '',
+        applicationName: '',
+        geography:       '',
+        documentTypes:   [],
+        requestedDate:   today,
+        dueDate:         getDueDateIso(today),
+        priority:        'Normal',
+        notes:           ''
+    };
+}
+
+const DEFAULT_FORM = buildDefaultForm();
 
 export default class WcfComplianceDocuments extends NavigationMixin(LightningElement) {
 
@@ -53,6 +81,7 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
     @track formError      = null;
     @track form           = { ...DEFAULT_FORM };
     @track dateError    = null;
+    @track docTypeError = null;
 
     @track showReviewModal      = false;
     @track isLoadingReviewItems = false;
@@ -143,7 +172,7 @@ export default class WcfComplianceDocuments extends NavigationMixin(LightningEle
                         }
                     }
                     this.form = {
-                        ...DEFAULT_FORM,
+                        ...buildDefaultForm(),
                         recordId:        null,
                         organisationId:  details.organisationId || '',
                         applicationId:   details.applicationId || '',
@@ -413,7 +442,7 @@ _displayDate(iso) {
     today.setHours(0, 0, 0, 0);
     return rawRows.map((r, i) => {
         const dueDateRaw = this._parseIso(r.dueDate);
-        const settled   = ['Received', 'Validated', 'Rejected', 'Suspended'];
+        const settled   = ['Received', 'Validated', 'Rejected', 'Suspended', 'Pending Review', 'Submitted'];
 const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status);
         const isUrgent   = dueDateRaw && !isOverdue &&
                            Math.ceil((dueDateRaw - today) / 86400000) <= 3;
@@ -474,11 +503,11 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
    get filteredRows() {
     let src = this.rows;
    if (this.activeFilter === 'pending') {
-    src = src.filter(r => !['Received','Validated','Rejected','Suspended'].includes(r.status) && !r.isOverdue);
+    src = src.filter(r => !['Received','Validated','Rejected','Suspended','Pending Review','Submitted'].includes(r.status) && !r.isOverdue);
 } else if (this.activeFilter === 'overdue') {
     src = src.filter(r => r.isOverdue);
 } else if (this.activeFilter === 'received') {
-    src = src.filter(r => ['Received','Validated'].includes(r.status));
+    src = src.filter(r => ['Received','Validated','Pending Review','Submitted'].includes(r.status));
 }
     if (this.searchTerm) {
         src = src.filter(r =>
@@ -587,11 +616,17 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
 
     openNewModal() {
         if (this._prefilledForm) {
-            this.form = { ...this._prefilledForm, documentTypes: [] };
+            this.form = {
+                ...this._prefilledForm,
+                documentTypes: [],
+                requestedDate: this._prefilledForm.requestedDate || getTodayIso(),
+                dueDate: this._prefilledForm.dueDate || getDueDateIso(this._prefilledForm.requestedDate)
+            };
         } else {
-            this.form = { ...DEFAULT_FORM, documentTypes: [] };
+            this.form = { ...buildDefaultForm(), documentTypes: [] };
         }
         this.formError = null;
+        this.docTypeError = null;
         this.showModal = true;
         this.loadOrgOptions();
     }
@@ -623,6 +658,7 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
             notes:           row.notes || ''
         };
         this.formError = null;
+        this.docTypeError = null;
         this.showModal = true;
 
         if (row.orgId && !row.applicationId) {
@@ -630,8 +666,8 @@ const isOverdue = dueDateRaw && dueDateRaw < today && !settled.includes(r.status
         }
     }
 
-    closeModal()          { this.showModal = false; this._cleanUrlParams(); }
-    handleBackdropClick() { this.showModal = false; this._cleanUrlParams(); }
+    closeModal()          { this.showModal = false; this.formError = null; this.docTypeError = null; this._cleanUrlParams(); }
+    handleBackdropClick() { this.showModal = false; this.formError = null; this.docTypeError = null; this._cleanUrlParams(); }
     stopProp(event)       { event.stopPropagation(); }
 
     handleOpenReview(event) {
@@ -822,7 +858,12 @@ handleFieldChange(event) {
         this._currentOrgLabel = opt ? opt.label : '';
         this.fetchLinkedApplication(val);
     }
-    if (field === 'requestedDate' || field === 'dueDate') {
+    if (field === 'requestedDate') {
+        if (!this.form.recordId && val) {
+            this.form = { ...this.form, dueDate: getDueDateIso(val) };
+        }
+        this._validateDates();
+    } else if (field === 'dueDate') {
         this._validateDates();
     }
 }
@@ -844,6 +885,12 @@ _validateDates() {
             types = types.filter(t => t !== dtype);
         }
         this.form = { ...this.form, documentTypes: types };
+        if (types.length > 0) {
+            this.docTypeError = null;
+            if (this.formError === 'Please select at least one Document Type.') {
+                this.formError = null;
+            }
+        }
     }
 
 
@@ -925,6 +972,7 @@ async handleConfirmDecision() {
     // ── Save ─────────────────────────────────────────────────────────────
 async handleSave() {
     this.formError = null;
+    this.docTypeError = null;
 
     if (!this.form.organisationId) {
         this.formError = 'Please select an Organisation.'; return;
@@ -933,7 +981,9 @@ async handleSave() {
         this.formError = 'Please select a Geography.'; return;
     }
     if (!this.form.documentTypes || this.form.documentTypes.length === 0) {
-        this.formError = 'Please select at least one Document Type.'; return;
+        this.docTypeError = 'Please select at least one Document Type before creating the request.';
+        this.formError = 'Please select at least one Document Type.';
+        return;
     }
     if (!this.form.dueDate) {
         this.formError = 'Please enter a Due Date.'; return;

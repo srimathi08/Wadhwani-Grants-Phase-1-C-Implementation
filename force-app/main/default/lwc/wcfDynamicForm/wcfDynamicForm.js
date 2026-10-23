@@ -14,6 +14,7 @@ import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedbac
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
 import WCF_FOCUS_STYLES from '@salesforce/resourceUrl/wcfFormFocusStyles';
 import getUploadedFileDetails from '@salesforce/apex/WCFFormEngineController.getUploadedFileDetails';
+import { preparePdfDoc, plainTextToHtml } from 'c/wcfPdfFonts';
 
 function calculateEndingBalance(startBalance, revenue, expense) {
     const start = Number(String(startBalance).replace(/,/g, '')) || 0;
@@ -289,9 +290,9 @@ export default class WcfDynamicForm extends LightningElement {
             SEC2_TITLE: 'Organizational Identifying Information',
             SEC2_DESC: 'A few details so we know who we\'re talking to.',
             SEC3_TITLE: 'Submitter Contact Information',
-            SEC3_DESC: 'Who is filling out this form? You\'ll be the initial point of contact for your organisation.',
+            SEC3_DESC: 'Who is filling out this form? You\'ll be the initial point of contact for your organization.',
             SEC4_TITLE: 'Legal Structure',
-            SEC4_DESC: 'Tell us how your organisation is legally constituted and where it\'s registered.',
+            SEC4_DESC: 'Tell us how your organization is legally constituted and where it\'s registered.',
             SEC5_TITLE: 'Legal and Tax Compliance',
             SEC5_DESC: 'Wadhwani Grants disburses from a US entity, so cross-border grants require certain compliance credentials. Tell us what your organization holds today. If you hold none yet, the last question simply asks whether you would be open to pursuing an Equivalency Determination (ED), a process Wadhwani Grants supports for selected partners. This is for our compliance planning; it does not affect how we read the rest of your application.',
             SEC6_TITLE: 'Fiscal Year End Date',
@@ -363,7 +364,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q20_LIVELIHOOD_PROGRAMS: 'Your Key Programs / Initiatives',
             Q20_LIVELIHOOD_PROGRAMS_DESC: 'Tell us about your flagship programs and the type of interventions you offer. For each program / initative provide a view on what are the different interventions, how many man-hours do you spend with each beneficiary and how many beneficiaries typically enroll each year for each program.',
             Q21_COMMUNITIES_SERVED: 'Communities that you work in',
-            Q21_COMMUNITIES_SERVED_DESC: 'Tell us where this program runs and how many households it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.',
+            Q21_COMMUNITIES_SERVED_DESC: 'Tell us where this program runs and how many beneficiaries it reaches. Use the figures you already keep; we are not asking you to build anything new for this form.',
             Q22_LIVELIHOOD_ACTUALS: 'Livelihood Outcomes (Actuals)',
             Q23_LIVELIHOOD_PROJ: 'Livelihood Outcomes, Current FY Projections',
             Q23_LIVELIHOOD_PROJ_DESC: 'Projected figures for the current fiscal year. Forward-looking estimates; historical actuals are in the previous section.',
@@ -384,7 +385,7 @@ export default class WcfDynamicForm extends LightningElement {
             // Review & Submit
             REVIEW_SUBMIT_TITLE: 'Review & Submit',
             REVIEW_SUBMIT_DESC: 'Take a final look at what you\'ve entered. Go back to any previous section to make edits before submitting.',
-            REVIEW_SEC_ABOUT_ORG: 'ABOUT YOUR ORGANISATION',
+            REVIEW_SEC_ABOUT_ORG: 'ABOUT YOUR ORGANIZATION',
             REVIEW_SEC_JOB_FULFILLMENT: 'JOB FULFILLMENT',
             REVIEW_SEC_JOB_CREATION: 'JOB CREATION',
             REVIEW_SEC_LIVELIHOOD: 'LIVELIHOOD UPLIFTMENT',
@@ -566,10 +567,20 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             }
         });
+
+        this._setupFileUploadObservers();
     }
 
     disconnectedCallback() {
         this._destroyPhoneIti();
+        if (this._q24FileObserver) {
+            this._q24FileObserver.disconnect();
+            this._q24FileObserver = null;
+        }
+        if (this._q28FileObserver) {
+            this._q28FileObserver.disconnect();
+            this._q28FileObserver = null;
+        }
         try {
             if (this._beforeUnloadHandler) {
                 window.removeEventListener('beforeunload', this._beforeUnloadHandler);
@@ -1992,6 +2003,7 @@ export default class WcfDynamicForm extends LightningElement {
             };
 
             const doc = new jsPDFLib();
+            const { fontFamily } = await preparePdfDoc(doc);
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             const marginX = 15;
@@ -2196,7 +2208,7 @@ export default class WcfDynamicForm extends LightningElement {
                     head: [head],
                     body,
                     theme: 'striped',
-                    styles: { fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
+                    styles: { font: fontFamily, fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
                     headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
                     alternateRowStyles: { fillColor: LIGHT },
                     columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY }, ...colStyles }
@@ -2442,7 +2454,7 @@ export default class WcfDynamicForm extends LightningElement {
             let currentSec = 1;
 
             // ══ SECTION 1 — About Your Organisation ══
-            sectionHeader('About Your Organisation', `Section ${currentSec} of ${totalSections}`);
+            sectionHeader('About Your Organization', `Section ${currentSec} of ${totalSections}`);
 
             // Q1: Selected Track
             simpleQRow(qn.Q1, 'Organizational Area(s) for Funding/Investment', this.selectedTrackLabelsDisplay);
@@ -2550,7 +2562,7 @@ export default class WcfDynamicForm extends LightningElement {
                 const refTop = y;
                 drawQLabel(qn.Q8, 'References for Outreach', refTop);
                 y = refTop + 10;
-                table(['Name', 'Organisation / Role', 'Email'], refList, { 2: { cellWidth: 'wrap' } });
+                table(['Name', 'Organization / Role', 'Email'], refList, { 2: { cellWidth: 'wrap' } });
             } else {
                 simpleQRow(qn.Q8, 'References for Outreach', 'N/A');
             }
@@ -2791,9 +2803,9 @@ export default class WcfDynamicForm extends LightningElement {
                 y += 4;
 
                 const livRows = [
-                    ['Households served during the year', valNum(form.LIV_SERVED_FY3), valNum(form.LIV_SERVED_FY2), valNum(form.LIV_SERVED_FY1)],
-                    ['Households newly enrolled during the year', valNum(form.LIV_ENROLL_FY3), valNum(form.LIV_ENROLL_FY2), valNum(form.LIV_ENROLL_FY1)],
-                    ['Households meeting outcome criteria', valNum(form.LIV_OUTCOME_FY3), valNum(form.LIV_OUTCOME_FY2), valNum(form.LIV_OUTCOME_FY1)],
+                    ['Beneficiaries served during the year', valNum(form.LIV_SERVED_FY3), valNum(form.LIV_SERVED_FY2), valNum(form.LIV_SERVED_FY1)],
+                    ['Beneficiaries newly enrolled during the year', valNum(form.LIV_ENROLL_FY3), valNum(form.LIV_ENROLL_FY2), valNum(form.LIV_ENROLL_FY1)],
+                    ['Beneficiaries meeting outcome criteria', valNum(form.LIV_OUTCOME_FY3), valNum(form.LIV_OUTCOME_FY2), valNum(form.LIV_OUTCOME_FY1)],
                     ['Avg. cost per outcome (USD)', val$(form.LIV_COST_FY3), val$(form.LIV_COST_FY2), val$(form.LIV_COST_FY1)]
                 ];
                 table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], livRows);
@@ -2810,9 +2822,9 @@ export default class WcfDynamicForm extends LightningElement {
                 y += 4;
 
                 const livProjRows = [
-                    ['Households served during the year (projected)', valNum(form.LIV_SERVED_PROJ)],
-                    ['Households newly enrolled during the year (projected)', valNum(form.LIV_ENROLL_PROJ)],
-                    ['Households expected to meet outcome criteria', valNum(form.LIV_OUTCOME_PROJ)],
+                    ['Beneficiaries served during the year (projected)', valNum(form.LIV_SERVED_PROJ)],
+                    ['Beneficiaries newly enrolled during the year (projected)', valNum(form.LIV_ENROLL_PROJ)],
+                    ['Beneficiaries expected to meet outcome criteria', valNum(form.LIV_OUTCOME_PROJ)],
                     ['Avg. cost per outcome (USD) - projected', val$(form.LIV_COST_PROJ)]
                 ];
                 table(['Item', 'CFY (projected)'], livProjRows);
@@ -2848,7 +2860,7 @@ export default class WcfDynamicForm extends LightningElement {
             simpleQRow(qn.Q27, 'Operational Synergies: GenieAI', this.reviewGenieInterestLevel, true);
             const genieContribution = form.Operational_Synergies_with_WOF__c || form.GenieAI_Synergies_Description__c;
             if (genieContribution) {
-                richBoxUnder('How GenieAI could contribute', genieContribution);
+                richBoxUnder('How GenieAI could contribute', plainTextToHtml(genieContribution));
             }
 
             // Q28: Supporting Documents
@@ -3149,7 +3161,7 @@ export default class WcfDynamicForm extends LightningElement {
                     const sNum = Number(sClean);
                     if (!isNaN(oNum) && !isNaN(sNum)) {
                         if (oNum > sNum) {
-                            this._showLightningError(pair.outcomeKey, `Outcomes cannot exceed households served (${pair.yearLabel}).`);
+                            this._showLightningError(pair.outcomeKey, `Outcomes cannot exceed beneficiaries served (${pair.yearLabel}).`);
                             return false;
                         } else {
                             const basicErr = this._validateIntegerCount(oClean, this._getLabelForFieldKey(pair.outcomeKey) || 'Outcomes');
@@ -3552,16 +3564,25 @@ export default class WcfDynamicForm extends LightningElement {
             && (this.hqSearchKey || '').length > 1;
     }
 
+    // U50: tracks whether the city box has focus, so a late search response
+    // can't reopen the list after the user has clicked away.
+    _hqHasFocus = false;
+
     handleHQFocus() {
+        this._hqHasFocus = true;
         if (this.hqSearchKey && this.hqSearchKey.length > 1 && this.hqResults.length > 0) {
             this.hqResults = [...this.hqResults];
         }
     }
 
     handleHQBlur() {
+        this._hqHasFocus = false;
+        // U50: cancel a search that hasn't started yet
+        window.clearTimeout(this.hqDelayTimeout);
         setTimeout(() => {
             this.hqResults = [];
             this.hqShowNoResults = false;
+            this.hqIsLoading = false;
         }, 200);
     }
 
@@ -3590,8 +3611,14 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     async fetchHQLocations() {
+        const query = this.hqSearchKey;
         try {
-            const response = await searchHQLocation({ query: this.hqSearchKey });
+            const response = await searchHQLocation({ query });
+            // U50: ignore a response that arrives after the user left the box
+            // or kept typing; otherwise the list reopens over the next fields.
+            if (!this._hqHasFocus || query !== this.hqSearchKey) {
+                return;
+            }
             const data = JSON.parse(response);
 
             const seen = new Set();
@@ -3632,9 +3659,12 @@ export default class WcfDynamicForm extends LightningElement {
         } catch (error) {
             console.error('Error fetching HQ locations:', error);
             this.hqResults = [];
-            this.hqShowNoResults = true;
+            this.hqShowNoResults = this._hqHasFocus;   // U50: no stuck box after blur
         } finally {
-            this.hqIsLoading = false;
+            // U50: only the latest search may switch the spinner off
+            if (query === this.hqSearchKey) {
+                this.hqIsLoading = false;
+            }
         }
     }
 
@@ -3662,6 +3692,19 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     // ── Field Quality & Validation Helpers ─────────────────────────────────
+    // U76: true when the text contains letters from a script the form does not
+    // support (anything other than Latin, accented Latin or Cyrillic), e.g.
+    // Hindi, Tamil, Arabic or Chinese. Used to give the right message instead
+    // of "numbers or symbols alone are not allowed".
+    _hasUnsupportedScript(text) {
+        const withoutSupported = String(text || '').normalize('NFC').replace(/[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/g, '');
+        return /[\p{L}\p{M}]/u.test(withoutSupported);
+    }
+
+    _unsupportedScriptMessage(fieldLabel) {
+        return `${fieldLabel} must be written in English letters (A to Z, accented letters such as é are fine). Other scripts, such as Hindi or Tamil, are not supported.`;
+    }
+
     _validateNameLikeField(value, fieldLabel) {
         if (value === null || value === undefined) return null;
         const trimmed = String(value).trim();
@@ -3678,6 +3721,10 @@ export default class WcfDynamicForm extends LightningElement {
 
         if (/(--|;|\bor\b\s+\d+\s*=\s*\d+|\bunion\b\s+\bselect\b|'\s*or\s*')/i.test(trimmed)) {
             return `${fieldLabel} contains characters that are not allowed.`;
+        }
+
+        if (this._hasUnsupportedScript(trimmed)) {
+            return this._unsupportedScriptMessage(fieldLabel);   // U76
         }
 
         if (!/[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/.test(trimmed)) {
@@ -3726,6 +3773,10 @@ export default class WcfDynamicForm extends LightningElement {
 
         if (/(--|\bor\b\s+\d+\s*=\s*\d+|\bunion\b\s+\bselect\b|'\s*or\s*')/i.test(trimmed)) {
             return 'Primary Service Regions contains characters that are not allowed.';
+        }
+
+        if (this._hasUnsupportedScript(trimmed)) {
+            return this._unsupportedScriptMessage('Primary Service Regions');   // U76
         }
 
         const LETTER = /[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/;
@@ -4123,18 +4174,18 @@ export default class WcfDynamicForm extends LightningElement {
             manHours: 'Duration in Man-Hours',
             state: 'State',
             district: 'District / Area',
-            LIV_SERVED_FY3: 'Households Served (FY-3)',
-            LIV_SERVED_FY2: 'Households Served (FY-2)',
-            LIV_SERVED_FY1: 'Households Served (FY-1)',
-            LIV_SERVED_PROJ: 'Households Served (Projected)',
-            LIV_ENROLL_FY3: 'Households Newly Enrolled (FY-3)',
-            LIV_ENROLL_FY2: 'Households Newly Enrolled (FY-2)',
-            LIV_ENROLL_FY1: 'Households Newly Enrolled (FY-1)',
-            LIV_ENROLL_PROJ: 'Households Newly Enrolled (Projected)',
-            LIV_OUTCOME_FY3: 'Households Meeting Outcome Criteria (FY-3)',
-            LIV_OUTCOME_FY2: 'Households Meeting Outcome Criteria (FY-2)',
-            LIV_OUTCOME_FY1: 'Households Meeting Outcome Criteria (FY-1)',
-            LIV_OUTCOME_PROJ: 'Households Meeting Outcome Criteria (Projected)',
+            LIV_SERVED_FY3: 'Beneficiaries Served (FY-3)',
+            LIV_SERVED_FY2: 'Beneficiaries Served (FY-2)',
+            LIV_SERVED_FY1: 'Beneficiaries Served (FY-1)',
+            LIV_SERVED_PROJ: 'Beneficiaries Served (Projected)',
+            LIV_ENROLL_FY3: 'Beneficiaries Newly Enrolled (FY-3)',
+            LIV_ENROLL_FY2: 'Beneficiaries Newly Enrolled (FY-2)',
+            LIV_ENROLL_FY1: 'Beneficiaries Newly Enrolled (FY-1)',
+            LIV_ENROLL_PROJ: 'Beneficiaries Newly Enrolled (Projected)',
+            LIV_OUTCOME_FY3: 'Beneficiaries Meeting Outcome Criteria (FY-3)',
+            LIV_OUTCOME_FY2: 'Beneficiaries Meeting Outcome Criteria (FY-2)',
+            LIV_OUTCOME_FY1: 'Beneficiaries Meeting Outcome Criteria (FY-1)',
+            LIV_OUTCOME_PROJ: 'Beneficiaries Meeting Outcome Criteria (Projected)',
             LIV_COST_FY3: 'Avg Cost per Outcome (FY-3)',
             LIV_COST_FY2: 'Avg Cost per Outcome (FY-2)',
             LIV_COST_FY1: 'Avg Cost per Outcome (FY-1)',
@@ -4234,12 +4285,22 @@ export default class WcfDynamicForm extends LightningElement {
 
         if (words.length === 0) {
             this._showFieldError(field, `${label} is required.`);
+            if (el) el.classList.remove('richtext-overlimit');
             return false;
         }
         if (words.length > limit) {
-            this._showFieldError(field, `${label} exceeds the ${limit}-word limit (currently ${words.length} words). Please shorten it before proceeding.`);
+            if (el) {
+                el.classList.add('richtext-invalid', 'richtext-overlimit');
+                this._registerInvalid(el);
+            }
+            const errEl = this.template.querySelector(`[data-error="${field}"]`);
+            if (errEl) {
+                errEl.textContent = '';
+                errEl.style.display = 'none';
+            }
             return false;
         }
+        if (el) el.classList.remove('richtext-overlimit');
         this._clearFieldError(field);
         return true;
     }
@@ -5089,7 +5150,7 @@ export default class WcfDynamicForm extends LightningElement {
                 const el = this.template.querySelector(`lightning-input[data-id="${row.id}"][data-field="${f}"]`);
                 const val = row[f];
                 const clean = (val !== '' && val !== null && val !== undefined) ? String(val).replace(/,/g, '').trim() : '';
-                const err = this._validateIntegerCount(clean, 'Household count');
+                const err = this._validateIntegerCount(clean, 'Beneficiary count');
                 if (err) {
                     if (el?.setCustomValidity) {
                         el.setCustomValidity(err);
@@ -5107,18 +5168,18 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Q22 & Q23 Outcomes
         const outcomeNumFields = [
-            { key: 'LIV_SERVED_FY3', label: 'Households Served (FY-3)' },
-            { key: 'LIV_SERVED_FY2', label: 'Households Served (FY-2)' },
-            { key: 'LIV_SERVED_FY1', label: 'Households Served (FY-1)' },
-            { key: 'LIV_SERVED_PROJ', label: 'Households Served (Projected)' },
-            { key: 'LIV_ENROLL_FY3', label: 'Households Newly Enrolled (FY-3)' },
-            { key: 'LIV_ENROLL_FY2', label: 'Households Newly Enrolled (FY-2)' },
-            { key: 'LIV_ENROLL_FY1', label: 'Households Newly Enrolled (FY-1)' },
-            { key: 'LIV_ENROLL_PROJ', label: 'Households Newly Enrolled (Projected)' },
-            { key: 'LIV_OUTCOME_FY3', label: 'Households Meeting Outcome Criteria (FY-3)' },
-            { key: 'LIV_OUTCOME_FY2', label: 'Households Meeting Outcome Criteria (FY-2)' },
-            { key: 'LIV_OUTCOME_FY1', label: 'Households Meeting Outcome Criteria (FY-1)' },
-            { key: 'LIV_OUTCOME_PROJ', label: 'Households Meeting Outcome Criteria (Projected)' },
+            { key: 'LIV_SERVED_FY3', label: 'Beneficiaries Served (FY-3)' },
+            { key: 'LIV_SERVED_FY2', label: 'Beneficiaries Served (FY-2)' },
+            { key: 'LIV_SERVED_FY1', label: 'Beneficiaries Served (FY-1)' },
+            { key: 'LIV_SERVED_PROJ', label: 'Beneficiaries Served (Projected)' },
+            { key: 'LIV_ENROLL_FY3', label: 'Beneficiaries Newly Enrolled (FY-3)' },
+            { key: 'LIV_ENROLL_FY2', label: 'Beneficiaries Newly Enrolled (FY-2)' },
+            { key: 'LIV_ENROLL_FY1', label: 'Beneficiaries Newly Enrolled (FY-1)' },
+            { key: 'LIV_ENROLL_PROJ', label: 'Beneficiaries Newly Enrolled (Projected)' },
+            { key: 'LIV_OUTCOME_FY3', label: 'Beneficiaries Meeting Outcome Criteria (FY-3)' },
+            { key: 'LIV_OUTCOME_FY2', label: 'Beneficiaries Meeting Outcome Criteria (FY-2)' },
+            { key: 'LIV_OUTCOME_FY1', label: 'Beneficiaries Meeting Outcome Criteria (FY-1)' },
+            { key: 'LIV_OUTCOME_PROJ', label: 'Beneficiaries Meeting Outcome Criteria (Projected)' },
             { key: 'LIV_COST_FY3', label: 'Avg Cost per Outcome (FY-3)' },
             { key: 'LIV_COST_FY2', label: 'Avg Cost per Outcome (FY-2)' },
             { key: 'LIV_COST_FY1', label: 'Avg Cost per Outcome (FY-1)' },
@@ -5140,7 +5201,7 @@ export default class WcfDynamicForm extends LightningElement {
             }
         });
 
-        // Ratio validation: Outcomes cannot exceed households served
+        // Ratio validation: Outcomes cannot exceed beneficiaries served
         const livRatioPairs = [
             { outcomeKey: 'LIV_OUTCOME_FY3', servedKey: 'LIV_SERVED_FY3', yearLabel: 'FY-3' },
             { outcomeKey: 'LIV_OUTCOME_FY2', servedKey: 'LIV_SERVED_FY2', yearLabel: 'FY-2' },
@@ -5154,7 +5215,7 @@ export default class WcfDynamicForm extends LightningElement {
                 const oNum = Number(String(oVal).replace(/,/g, '').trim());
                 const sNum = Number(String(sVal).replace(/,/g, '').trim());
                 if (!isNaN(oNum) && !isNaN(sNum) && oNum > sNum) {
-                    this._showLightningError(pair.outcomeKey, `Outcomes cannot exceed households served (${pair.yearLabel}).`);
+                    this._showLightningError(pair.outcomeKey, `Outcomes cannot exceed beneficiaries served (${pair.yearLabel}).`);
                     isValid = false;
                 }
             }
@@ -5212,20 +5273,26 @@ export default class WcfDynamicForm extends LightningElement {
         }
 
         // Q27 GenieAI interest & description
+        const gEl = this.template.querySelector('[data-field="Operational_Synergies_with_WOF__c"]') ||
+                    this.template.querySelector('[data-id="Operational_Synergies_with_WOF__c"]');
         if (org.GenieAI_Interest_Level__c === 'Yes, interested' || org.GenieAI_Interest_Level__c === 'Maybe, want to learn more') {
             const desc = (org.Operational_Synergies_with_WOF__c || '').trim();
             const words = desc.split(/\s+/).filter(w => w.length > 0);
             if (words.length === 0) {
                 this._showLightningError('Operational_Synergies_with_WOF__c', 'Please describe how GenieAI could contribute, or change your interest level to "Not at this time".');
+                if (gEl) gEl.classList.remove('richtext-overlimit');
                 isValid = false;
             } else if (words.length > 200) {
                 this._showLightningError('Operational_Synergies_with_WOF__c', `Exceeds 200-word limit (currently ${words.length} words). Please shorten before proceeding.`);
+                if (gEl) gEl.classList.add('richtext-overlimit');
                 isValid = false;
             } else {
                 this._clearLightningError('Operational_Synergies_with_WOF__c');
+                if (gEl) gEl.classList.remove('richtext-overlimit');
             }
         } else {
             this._clearLightningError('Operational_Synergies_with_WOF__c');
+            if (gEl) gEl.classList.remove('richtext-overlimit');
         }
 
         return isValid;
@@ -5293,18 +5360,63 @@ export default class WcfDynamicForm extends LightningElement {
                 return el && el.isConnected && (el.offsetParent !== null || el.closest('.modern-richtext-wrapper') !== null || el.closest('table') !== null || el.closest('.modern-subsection-card') !== null);
             });
             const validElementsList = currentInvalidElements.length > 0 ? currentInvalidElements : this._invalidElements;
-            const uniqueLabels = Array.from(new Set(
-                validElementsList.map(el => this._getFieldLabel(el)).filter(Boolean)
-            ));
-            const labelsStr = uniqueLabels.map(l => `"${l}"`).join(', ');
 
-            this.showBanner(
-                'error',
-                'Missing Required Fields',
-                labelsStr
-                    ? `Please complete all required fields before proceeding: ${labelsStr}`
-                    : 'Please complete all required fields before proceeding.'
-            );
+            const isOverLimit = (el) => {
+                if (el.classList && el.classList.contains('richtext-overlimit')) return true;
+                const fieldName = el.dataset?.field || el.dataset?.id || el.dataset?.key;
+                if (fieldName) {
+                    const errEl = this.template.querySelector(`[data-error="${fieldName}"]`);
+                    if (errEl && errEl.textContent && errEl.textContent.toLowerCase().includes('word limit')) {
+                        return true;
+                    }
+                }
+                const host = this._fieldErrorHost(el);
+                if (host) {
+                    const inlineMsg = host.querySelector('.field-error-msg');
+                    if (inlineMsg && inlineMsg.textContent && inlineMsg.textContent.toLowerCase().includes('word limit')) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            const overLimitElements = [];
+            const missingElements = [];
+
+            validElementsList.forEach(el => {
+                if (isOverLimit(el)) {
+                    overLimitElements.push(el);
+                } else {
+                    missingElements.push(el);
+                }
+            });
+
+            const overLimitLabels = Array.from(new Set(
+                overLimitElements.map(el => this._getFieldLabel(el)).filter(Boolean)
+            ));
+            const missingLabels = Array.from(new Set(
+                missingElements.map(el => this._getFieldLabel(el)).filter(Boolean)
+            ));
+
+            let bannerTitle = 'Validation Error';
+            let bannerMessage = 'Please review your answers before proceeding.';
+
+            if (overLimitLabels.length > 0 && missingLabels.length === 0) {
+                bannerTitle = 'Word Limit Exceeded';
+                const listStr = overLimitLabels.map(l => `"${l}"`).join(', ');
+                bannerMessage = `Please shorten your text to meet the word limit: ${listStr}`;
+            } else if (missingLabels.length > 0 && overLimitLabels.length === 0) {
+                bannerTitle = 'Missing Required Fields';
+                const listStr = missingLabels.map(l => `"${l}"`).join(', ');
+                bannerMessage = `Please complete all required fields before proceeding: ${listStr}`;
+            } else if (missingLabels.length > 0 && overLimitLabels.length > 0) {
+                bannerTitle = 'Please Review Your Answers';
+                const missingStr = missingLabels.map(l => `"${l}"`).join(', ');
+                const overLimitStr = overLimitLabels.map(l => `"${l}"`).join(', ');
+                bannerMessage = `Please complete required fields: ${missingStr}. Word limit exceeded on: ${overLimitStr}.`;
+            }
+
+            this.showBanner('error', bannerTitle, bannerMessage);
 
             this._scrollToFirstError();
             return false;
@@ -6394,7 +6506,7 @@ export default class WcfDynamicForm extends LightningElement {
             } else if (['fy3', 'fy2', 'fy1', 'proj'].includes(field)) {
                 if (val !== '' && val !== null && val !== undefined) {
                     const clean = String(val).replace(/,/g, '').trim();
-                    const err = this._validateIntegerCount(clean, 'Household count');
+                    const err = this._validateIntegerCount(clean, 'Beneficiary count');
                     if (err) {
                         if (event.target.setCustomValidity) {
                             event.target.setCustomValidity(err);
@@ -7159,6 +7271,94 @@ export default class WcfDynamicForm extends LightningElement {
         return ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx'];
     }
 
+    // ── File Upload Stock Error Interceptors (Q24 & Q28) ───────────────
+    _q24FileObserver;
+    _q28FileObserver;
+    _observedQ24El;
+    _observedQ28El;
+
+    _setupFileUploadObservers() {
+        const q24Uploader = this.template.querySelector('lightning-file-upload[name="q24Upload"]');
+        if (q24Uploader && (!this._q24FileObserver || this._observedQ24El !== q24Uploader)) {
+            if (this._q24FileObserver) this._q24FileObserver.disconnect();
+            this._observedQ24El = q24Uploader;
+            this._q24FileObserver = this._createFileUploadObserver(
+                q24Uploader,
+                ext => `Only PDF files (.pdf) are supported. Unsupported file type: ${ext}`
+            );
+        } else if (!q24Uploader && this._q24FileObserver) {
+            this._q24FileObserver.disconnect();
+            this._q24FileObserver = null;
+            this._observedQ24El = null;
+        }
+
+        const q28Uploader = this.template.querySelector('lightning-file-upload[name="q28Upload"]');
+        if (q28Uploader && (!this._q28FileObserver || this._observedQ28El !== q28Uploader)) {
+            if (this._q28FileObserver) this._q28FileObserver.disconnect();
+            this._observedQ28El = q28Uploader;
+            this._q28FileObserver = this._createFileUploadObserver(
+                q28Uploader,
+                ext => `Only PDF, Word, Excel, or PowerPoint files are accepted. Unsupported file type: ${ext}`
+            );
+        } else if (!q28Uploader && this._q28FileObserver) {
+            this._q28FileObserver.disconnect();
+            this._q28FileObserver = null;
+            this._observedQ28El = null;
+        }
+    }
+
+    _createFileUploadObserver(uploaderEl, messageBuilder) {
+        const checkAndReplaceNode = (node) => {
+            if (!node) return;
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.nodeValue || '';
+                if (/support the following file types/i.test(text)) {
+                    const colonIdx = text.lastIndexOf(':');
+                    const ext = colonIdx !== -1 ? text.substring(colonIdx + 1).trim() : '';
+                    node.nodeValue = messageBuilder(ext);
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                const text = node.textContent || '';
+                if (/support the following file types/i.test(text)) {
+                    const colonIdx = text.lastIndexOf(':');
+                    const ext = colonIdx !== -1 ? text.substring(colonIdx + 1).trim() : '';
+                    const friendlyMsg = messageBuilder(ext);
+
+                    let foundTextNode = false;
+                    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+                    let childTextNode;
+                    while ((childTextNode = walker.nextNode())) {
+                        if (/support the following file types/i.test(childTextNode.nodeValue)) {
+                            childTextNode.nodeValue = friendlyMsg;
+                            foundTextNode = true;
+                        }
+                    }
+                    if (!foundTextNode) {
+                        node.textContent = friendlyMsg;
+                    }
+                }
+            }
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                checkAndReplaceNode(mutation.target);
+                if (mutation.addedNodes && mutation.addedNodes.length) {
+                    mutation.addedNodes.forEach(n => checkAndReplaceNode(n));
+                }
+            }
+        });
+
+        observer.observe(uploaderEl, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+
+        checkAndReplaceNode(uploaderEl);
+        return observer;
+    }
+
     _sizeCheckDiagnostic = '';
 
     async _fetchUploadedFileSizes(files) {
@@ -7199,7 +7399,7 @@ export default class WcfDynamicForm extends LightningElement {
     async handleQ24UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
-            const MAX_Q24_SIZE = 10 * 1024 * 1024; // 10 MB
+            const MAX_Q24_SIZE = 25 * 1024 * 1024; // 25 MB
             const sizeByDocId = await this._fetchUploadedFileSizes(uploaded);
             const currentFiles = this.q24UploadedFiles || [];
             const validFiles = [];
@@ -7248,7 +7448,7 @@ export default class WcfDynamicForm extends LightningElement {
                 this.showBanner(
                     'error',
                     'File Size Limit Exceeded',
-                    `File "${oversizedNames.join(', ')}" exceeds the 10 MB per-file limit and was not uploaded. Please upload a PDF of 10 MB or less.${duplicateNote}${uploadedNote}`,
+                    `File "${oversizedNames.join(', ')}" exceeds the 25 MB per-file limit and was not uploaded. Please upload a PDF of 25 MB or less.${duplicateNote}${uploadedNote}`,
                     8000
                 );
             } else if (unverifiedNames.length > 0) {
@@ -7290,7 +7490,7 @@ export default class WcfDynamicForm extends LightningElement {
     async handleQ28UploadFinished(event) {
         const uploaded = event.detail.files || [];
         if (uploaded.length > 0) {
-            const MAX_Q28_SIZE = 50 * 1024 * 1024; // 50 MB
+            const MAX_Q28_SIZE = 25 * 1024 * 1024; // 25 MB
             const sizeByDocId = await this._fetchUploadedFileSizes(uploaded);
             const currentFiles = this.q28UploadedFiles || [];
             const validFiles = [];
@@ -7339,7 +7539,7 @@ export default class WcfDynamicForm extends LightningElement {
                 this.showBanner(
                     'error',
                     'File Size Limit Exceeded',
-                    `File "${oversizedNames.join(', ')}" exceeds the 50 MB per-file limit and was not uploaded. Please upload files of 50 MB or less.${duplicateNote}${uploadedNote}`,
+                    `File "${oversizedNames.join(', ')}" exceeds the 25 MB per-file limit and was not uploaded. Please upload files of 25 MB or less.${duplicateNote}${uploadedNote}`,
                     8000
                 );
             } else if (unverifiedNames.length > 0) {

@@ -42,7 +42,7 @@ const STATUS_OPTIONS = [
 ];
 
 const VALID_REVIEW_FILTERS = ['total', 'reviewed', 'inProgress', 'notStarted', 'all',
-    'flagged', 'returnedByApprover', 'acceptedApplications'];
+    'flagged', 'returnedByApprover', 'backFromValidator', 'acceptedApplications'];
 
 // ── Readable labels for every filter token (banner + tiles) ──────
 const FILTER_LABELS = {
@@ -53,6 +53,7 @@ const FILTER_LABELS = {
     notStarted: 'Not Started',
     flagged: 'Flagged',
     returnedByApprover: 'Returned by Approver',
+    backFromValidator: 'Back from Validator',
     acceptedApplications: 'Accepted Applications'
 };
 
@@ -63,6 +64,7 @@ const SUMMARY_TILES = [
     { id: 'inProgress', countGetter: 'inProgressCount', tone: 'warning' },
     { id: 'reviewed', countGetter: 'reviewedCount', tone: 'success' },
     { id: 'returnedByApprover', countGetter: 'returnedByApproverCount', tone: 'brand', alertWhenPositive: true },
+    { id: 'backFromValidator', countGetter: 'backFromValidatorCount', tone: 'warning', alertWhenPositive: true },
     { id: 'acceptedApplications', countGetter: 'acceptedCount', tone: 'success' },
     { id: 'flagged', countGetter: 'flaggedCount', tone: 'returned' }
 ];
@@ -189,7 +191,10 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                     return !!info.isFlagged;
                 }
                 if (this.activeReviewFilter === 'returnedByApprover') {
-                    return p.Status === 'Returned by Approver';
+                    return p.Status === 'Returned by Approver' && !info.isBackFromValidator;
+                }
+                if (this.activeReviewFilter === 'backFromValidator') {
+                    return p.Status === 'Returned by Approver' && !!info.isBackFromValidator;
                 }
                 if (this.activeReviewFilter === 'acceptedApplications') {
                     const a = this.acceptedApplicationsMap.get(p.Id);
@@ -279,7 +284,17 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
     }
 
     get returnedByApproverCount() {
-        return this.proposals.filter(p => p.Status === 'Returned by Approver').length;
+        return this.proposals.filter(p => {
+            const info = this.reviewStatusMap[p.Id] || {};
+            return p.Status === 'Returned by Approver' && !info.isBackFromValidator;
+        }).length;
+    }
+
+    get backFromValidatorCount() {
+        return this.proposals.filter(p => {
+            const info = this.reviewStatusMap[p.Id] || {};
+            return p.Status === 'Returned by Approver' && !!info.isBackFromValidator;
+        }).length;
     }
 
     get acceptedCount() {
@@ -509,9 +524,19 @@ export default class WcfProposalListView extends NavigationMixin(LightningElemen
                 })
                 : '—';
 
+            const round = p.Submission_Round__c || (p.Status === 'Application Resubmitted' || p.Last_Resubmission_Date__c ? 2 : 1);
+            const revCount = Math.max(0, round - 1);
+            const hasRevision = revCount > 0;
+            const revisionLabel = `Rev ${revCount}`;
+
+            const isBackFromValidator = p.Status === 'Returned by Approver' && !!reviewInfo.isBackFromValidator;
+
             return {
                 ...p,
                 sno: start + idx + 1,
+                hasRevision,
+                revisionLabel,
+                isBackFromValidator,
                 // Rows waiting on the reviewer's Approve/Return decision stand out
                 rowClass: p.Status === 'Returned by Approver' ? 'wg-row--attention' : '',
                 isFlagged,

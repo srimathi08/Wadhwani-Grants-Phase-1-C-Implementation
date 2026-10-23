@@ -103,7 +103,15 @@
                                         <tr key={p.Id} class={p.rowClass}>
                                             <td class="wg-col-index">{p.sno}</td>
                                             <td class="wg-cell-id">
-                                                <span>{p.Name}</span>
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <span>{p.Name}</span>
+                                                    <template lwc:if={p.hasRevision}>
+                                                        <span class="wg-tag wg-tag--warning">{p.revisionLabel}</span>
+                                                    </template>
+                                                    <template lwc:if={p.isBackFromValidator}>
+                                                        <span class="wg-tag wg-tag--info">Back from Validator</span>
+                                                    </template>
+                                                </div>
                                                 <template lwc:if={p.isFlagged}>
                                                     <lightning-icon
                                                         icon-name="utility:priority"

@@ -29,7 +29,7 @@
             <div class="rv-section">
                 <div class="rv-section-head">
                     <span class="rv-section-step">{section1StepLabel}</span>
-                    <span class="rv-section-title">About Your Organisation</span>
+                    <span class="rv-section-title">About Your Organization</span>
                 </div>
 
                 <!-- Q1: Selected Tracks -->
@@ -907,19 +907,19 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Households served during the year</td>
+                                            <td>Beneficiaries served during the year</td>
                                             <td>{outcomeData.livServedFY3}</td>
                                             <td>{outcomeData.livServedFY2}</td>
                                             <td>{outcomeData.livServedFY1}</td>
                                         </tr>
                                         <tr>
-                                            <td>Households newly enrolled during the year</td>
+                                            <td>Beneficiaries newly enrolled during the year</td>
                                             <td>{outcomeData.livEnrollFY3}</td>
                                             <td>{outcomeData.livEnrollFY2}</td>
                                             <td>{outcomeData.livEnrollFY1}</td>
                                         </tr>
                                         <tr>
-                                            <td>Households meeting outcome criteria</td>
+                                            <td>Beneficiaries meeting outcome criteria</td>
                                             <td>{outcomeData.livOutcomeFY3}</td>
                                             <td>{outcomeData.livOutcomeFY2}</td>
                                             <td>{outcomeData.livOutcomeFY1}</td>
@@ -954,15 +954,15 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Households served during the year (projected)</td>
+                                            <td>Beneficiaries served during the year (projected)</td>
                                             <td>{outcomeData.livServedProj}</td>
                                         </tr>
                                         <tr>
-                                            <td>Households newly enrolled during the year (projected)</td>
+                                            <td>Beneficiaries newly enrolled during the year (projected)</td>
                                             <td>{outcomeData.livEnrollProj}</td>
                                         </tr>
                                         <tr>
-                                            <td>Households expected to meet outcome criteria (projected)</td>
+                                            <td>Beneficiaries expected to meet outcome criteria (projected)</td>
                                             <td>{outcomeData.livOutcomeProj}</td>
                                         </tr>
                                         <tr class="rv-cost-row rv-cost-row-manual">
@@ -1231,6 +1231,43 @@
                 </div>
             </section>
             <div class="slds-backdrop slds-backdrop_open" onclick={closeOfficePreview}></div>
+        </template>
+
+        <!-- Large Attachments Omitted Modal -->
+        <template if:true={isOmittedModalOpen}>
+            <section role="dialog" aria-modal="true" aria-label="Large Attachments Excluded from ZIP"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="max-width: 540px;">
+                    <header class="slds-modal__header" style="background: #fff8f5; border-bottom: 1px solid #fbdcd0;">
+                        <button class="slds-button slds-button_icon slds-modal__close" onclick={closeOmittedModal} title="Close">✕</button>
+                        <h2 class="slds-text-heading_medium" style="color: #b54708; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <span>⚠️</span> Note: Large Attachments Excluded from ZIP
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" style="font-size: 0.875rem; color: #344054;">
+                        <p style="margin-bottom: 10px;">
+                            The application summary PDF and smaller documents were downloaded successfully in the ZIP archive.
+                        </p>
+                        <p style="margin-bottom: 8px; font-weight: 600; color: #1d2939;">
+                            The following file(s) exceeded the ZIP transfer limit and could not be bundled:
+                        </p>
+                        <ul style="list-style: disc; padding-left: 20px; margin-bottom: 14px; color: #475467;">
+                            <template for:each={omittedFileList} for:item="f">
+                                <li key={f.name} style="margin-bottom: 4px;">
+                                    <strong>{f.name}</strong> <span style="color: #667085;">({f.sizeLabel})</span>
+                                </li>
+                            </template>
+                        </ul>
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; font-size: 0.8125rem; color: #475467;">
+                            ℹ️ <strong>How to view these files:</strong> You can open or download each of these files individually at any time by clicking on them directly in the <strong>Verification Report</strong> and <strong>Supporting Documents</strong> sections of the preview.
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer" style="background: #fff; border-top: 1px solid #f2f4f7;">
+                        <lightning-button variant="brand" label="Understood" onclick={closeOmittedModal}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" onclick={closeOmittedModal}></div>
         </template>
 
     </template>

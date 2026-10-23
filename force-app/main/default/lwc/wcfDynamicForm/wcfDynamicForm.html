@@ -2415,18 +2415,18 @@
                                                 class="required">*</span></div>
                                         <div class="modern-subsection-description"
                                             style="line-height: 1.5; color: var(--wg-text-muted);">
-                                            <p style="margin-bottom: 8px;">A household counts as an outcome when both of
+                                            <p style="margin-bottom: 8px;">A beneficiary counts as an outcome when both of
                                                 these are true:</p>
                                             <ol
                                                 style="margin-left: 20px; margin-bottom: 8px; list-style-type: decimal;">
-                                                <li>Its yearly income is now Rs 1,00,000 or more.</li>
-                                                <li>That income is at least 30% higher than when the household joined
+                                                <li>Their yearly income is now Rs 1,00,000 or more.</li>
+                                                <li>That income is at least 30% higher than when the beneficiary joined
                                                     you.</li>
                                             </ol>
-                                            <p style="margin-bottom: 8px;">Both must be true of the same household.
-                                                Growth is measured from when it joined, not from last year. Count each
-                                                household once, in the first year both are true, and never again. A
-                                                household counted in CFY-2 does not appear again in CFY-1.</p>
+                                            <p style="margin-bottom: 8px;">Both must be true of the same beneficiary.
+                                                Growth is measured from when they joined, not from last year. Count each
+                                                beneficiary once, in the first year both are true, and never again. A
+                                                beneficiary counted in CFY-2 does not appear again in CFY-1.</p>
 
                                             <p style="margin-bottom: 4px; font-weight: 600;">Examples (threshold: Rs
                                                 1,00,000)</p>
@@ -2439,17 +2439,17 @@
                                                 <li>Rs 1,20,000 to Rs 1,80,000 (+50%): Yes. Both true.</li>
                                             </ul>
 
-                                            <p style="margin-bottom: 8px;">Income means take-home money the household
+                                            <p style="margin-bottom: 8px;">Income means take-home money the beneficiary
                                                 keeps after business costs, not total sales. We compare the 6 months
                                                 before you started with the most recent 6 months, and double each to get
                                                 a yearly figure. Both readings need a bank or UPI statement covering
-                                                that period, for the same named people. Where there is no household
-                                                figure, use the person's own small business, judged the same way.</p>
+                                                that period, for the same named people. Where there is no beneficiary
+                                                income figure, use the person's own small business, judged the same way.</p>
 
-                                            <p style="margin-bottom: 0;">Most households get there in about three years.
-                                                That is a guide, not a cutoff. You tell us whether the household credits
-                                                your work. We ask a sample of households the same question. This form
-                                                asks only for the count. Household records come later, only if you
+                                            <p style="margin-bottom: 0;">Most beneficiaries get there in about three years.
+                                                That is a guide, not a cutoff. You tell us whether the beneficiary credits
+                                                your work. We ask a sample of beneficiaries the same question. This form
+                                                asks only for the count. Beneficiary records come later, only if you
                                                 receive a grant.</p>
                                         </div>
                                     </div>
@@ -2467,7 +2467,7 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households served during the
+                                                <td><span class="required">*</span> <strong>Beneficiaries served during the
                                                         year</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivServedFY3}
                                                         onchange={handleInputChange}
@@ -2480,7 +2480,7 @@
                                                         data-key="LIV_SERVED_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households newly enrolled
+                                                <td><span class="required">*</span> <strong>Beneficiaries newly enrolled
                                                         during the year</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivEnrollFY3}
                                                         onchange={handleInputChange}
@@ -2493,7 +2493,7 @@
                                                         data-key="LIV_ENROLL_FY1"></lightning-input></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households meeting outcome
+                                                <td><span class="required">*</span> <strong>Beneficiaries meeting outcome
                                                         criteria</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivOutcomeFY3}
                                                         onchange={handleInputChange}
@@ -2558,21 +2558,21 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households served during the
+                                                <td><span class="required">*</span> <strong>Beneficiaries served during the
                                                         year (projected)</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivServedProj}
                                                         onchange={handleInputChange}
                                                         data-key="LIV_SERVED_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households newly enrolled
+                                                <td><span class="required">*</span> <strong>Beneficiaries newly enrolled
                                                         during the year (projected)</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivEnrollProj}
                                                         onchange={handleInputChange}
                                                         data-key="LIV_ENROLL_PROJ"></lightning-input></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="required">*</span> <strong>Households expected to meet
+                                                <td><span class="required">*</span> <strong>Beneficiaries expected to meet
                                                         outcome criteria (projected)</strong></td>
                                                 <td><lightning-input type="text" value={formattedLivOutcomeProj}
                                                         onchange={handleInputChange}
@@ -2761,10 +2761,11 @@
                                         <div class="modern-field full-width" style="margin-top: 16px;">
                                             <label class="field-label-bold"><span class="required">*</span> Upload
                                                 verification report</label>
-                                            <p class="subtext-muted">PDF only, max 10 MB.</p>
+                                            <p class="subtext-muted">PDF only, max 25 MB per file. You can select
+                                                several files at once.</p>
                                             <div style="margin-top: 8px;">
                                                 <lightning-file-upload label="Upload" name="q24Upload"
-                                                    accept={pdfAcceptFormats} record-id={recordId}
+                                                    accept={pdfAcceptFormats} multiple record-id={recordId}
                                                     onuploadfinished={handleQ24UploadFinished}>
                                                 </lightning-file-upload>
                                             </div>
@@ -2966,7 +2967,7 @@
 
                                 <div style="margin-top: 16px;">
                                     <p class="subtext-muted" style="margin-bottom: 8px;">PDF, Word, PowerPoint, or Excel
-                                        (up to 50 MB per file).</p>
+                                        (up to 25 MB per file). You can select several files at once.</p>
                                     <lightning-file-upload label="Upload Supporting Document" name="q28Upload"
                                         accept={supportingDocsAcceptFormats} multiple record-id={recordId}
                                         onuploadfinished={handleQ28UploadFinished}>
@@ -3788,19 +3789,19 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Households served during the year</td>
+                                                    <td>Beneficiaries served during the year</td>
                                                     <td>{previewLivServedFY3}</td>
                                                     <td>{previewLivServedFY2}</td>
                                                     <td>{previewLivServedFY1}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Households newly enrolled during the year</td>
+                                                    <td>Beneficiaries newly enrolled during the year</td>
                                                     <td>{previewLivEnrollFY3}</td>
                                                     <td>{previewLivEnrollFY2}</td>
                                                     <td>{previewLivEnrollFY1}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Households meeting outcome criteria</td>
+                                                    <td>Beneficiaries meeting outcome criteria</td>
                                                     <td>{previewLivOutcomeFY3}</td>
                                                     <td>{previewLivOutcomeFY2}</td>
                                                     <td>{previewLivOutcomeFY1}</td>
@@ -3829,15 +3830,15 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Households served during the year (projected)</td>
+                                                    <td>Beneficiaries served during the year (projected)</td>
                                                     <td>{previewLivServedProj}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Households newly enrolled during the year (projected)</td>
+                                                    <td>Beneficiaries newly enrolled during the year (projected)</td>
                                                     <td>{previewLivEnrollProj}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Households expected to meet outcome criteria</td>
+                                                    <td>Beneficiaries expected to meet outcome criteria</td>
                                                     <td>{previewLivOutcomeProj}</td>
                                                 </tr>
                                                 <tr>

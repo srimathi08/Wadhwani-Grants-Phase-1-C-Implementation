@@ -13,6 +13,7 @@ public without sharing class WCFValidatorController {
                 Id, Name, AccountId, Account.Name,
                 Status, AppliedDate, Funding_Year__c,
                 Category, ApplicationType, RecordType.Name, Due_Date__c,
+                Submission_Round__c, Last_Resubmission_Date__c,
                 Organizational_Area_s_for_Funding_Inves1__c, Organizational_Area_s_for_Funding_Inves__c
             FROM IndividualApplication
             WHERE RecordTypeId IN :allowedTypeIds
@@ -74,6 +75,13 @@ public without sharing class WCFValidatorController {
             w.isResubmission       = isResubmission;
             w.isAwaitingApplicant  = isAwaitingApplicant;
             w.isReturnedByReviewer = isReturnedByReviewer;
+
+            Decimal round = app.Submission_Round__c;
+            if (round == null || round < 1) {
+                round = (isResubmission || app.Last_Resubmission_Date__c != null) ? 2 : 1;
+            }
+            w.submissionRound = round.intValue();
+            w.revisionCount   = Math.max(0, round.intValue() - 1);
 
             result.add(w);
         }
@@ -315,6 +323,8 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public Boolean isAwaitingApplicant;
         @AuraEnabled public Boolean isReturnedByReviewer; 
         @AuraEnabled public String reviewStatus;
+        @AuraEnabled public Integer submissionRound;
+        @AuraEnabled public Integer revisionCount;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -956,10 +966,17 @@ wrapper.attestationDateTime = lockedAttestation;
             }
 
             if (status == 'Validated' && appId != null) {
+                IndividualApplication currentApp = [
+                    SELECT Status FROM IndividualApplication WHERE Id = :appId WITH SYSTEM_MODE LIMIT 1
+                ];
                 IndividualApplication app = new IndividualApplication(Id = appId);
 
                 if (decision == 'Pass' || decision == 'Flag') {
-                    app.Status = 'Under Review';
+                    if (currentApp.Status == 'Returned to Validator') {
+                        app.Status = 'Returned by Approver';
+                    } else {
+                        app.Status = 'Under Review';
+                    }
                 } else if (decision == 'Return') {
                     app.Status = 'Revision Requested';
                 }
@@ -1369,7 +1386,8 @@ wrapper.attestationDateTime = lockedAttestation;
         Id validatorRtId = getWCFValidatorRecordTypeId();
 
         List<IndividualApplication> apps = [
-            SELECT Id, Name, Account.Name, Status, AppliedDate, RecordType.Name, Due_Date__c
+            SELECT Id, Name, Account.Name, Status, AppliedDate, RecordType.Name, Due_Date__c,
+                   Submission_Round__c, Last_Resubmission_Date__c
             FROM IndividualApplication
             WHERE RecordTypeId IN :allowedTypeIds
             AND Status IN (
@@ -1421,6 +1439,14 @@ wrapper.attestationDateTime = lockedAttestation;
             w.hasDraft            = draftIds.contains(app.Id) && !isResubmission && !isAwaitingApplicant;
             w.isResubmission      = isResubmission;
             w.isAwaitingApplicant = isAwaitingApplicant;
+
+            Decimal round = app.Submission_Round__c;
+            if (round == null || round < 1) {
+                round = (isResubmission || app.Last_Resubmission_Date__c != null) ? 2 : 1;
+            }
+            w.submissionRound = round.intValue();
+            w.revisionCount   = Math.max(0, round.intValue() - 1);
+
             result.add(w);
 
             if (result.size() >= maxRows) break;

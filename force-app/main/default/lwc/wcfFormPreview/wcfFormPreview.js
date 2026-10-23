@@ -10,6 +10,7 @@ import AUTO_TABLE from '@salesforce/resourceUrl/autotable';
 import JSZIP from '@salesforce/resourceUrl/jszip';
 import MAMMOTH_LIB from '@salesforce/resourceUrl/mammoth';
 import XLSX_LIB from '@salesforce/resourceUrl/xlsx';
+import { preparePdfDoc, plainTextToHtml } from 'c/wcfPdfFonts';
 
 const MONTH_NAMES = {
     '01': 'January', '1': 'January', 'january': 'January', 'jan': 'January',
@@ -1316,6 +1317,14 @@ export default class WcfFormPreview extends LightningElement {
         };
     }
 
+    @track isOmittedModalOpen = false;
+    @track omittedFileList = [];
+
+    closeOmittedModal() {
+        this.isOmittedModalOpen = false;
+        this.omittedFileList = [];
+    }
+
     async _buildCombinedZip(pdfBlob, fileName) {
         const zip = new window.JSZip();
         zip.file(fileName, pdfBlob);
@@ -1326,38 +1335,96 @@ export default class WcfFormPreview extends LightningElement {
         const usedNames = new Set();
         usedNames.add(fileName);
 
+        const omitted = [];
+
         const fetchPromises = allAtts.map(async (att) => {
+            let base64Data = null;
+            let blobData = null;
+
+            // Attempt 1: Fetch base64 via Apex
             try {
                 const res = await getFileBase64({ contentVersionId: att.contentVersionId });
                 if (res && res.base64) {
-                    let baseName = att.fileName || res.title || 'Document';
-                    const ext = (att.fileExtension || res.fileType || '').replace(/^\./, '');
-                    if (ext && !baseName.toLowerCase().endsWith('.' + ext.toLowerCase())) {
-                        baseName += '.' + ext;
-                    }
-                    baseName = baseName.replace(/[/\\?%*:|"<>]/g, '_');
-
-                    let uniqueName = baseName;
-                    let counter = 1;
-                    while (usedNames.has(uniqueName)) {
-                        const dotIdx = baseName.lastIndexOf('.');
-                        if (dotIdx !== -1) {
-                            uniqueName = `${baseName.substring(0, dotIdx)}_${counter}${baseName.substring(dotIdx)}`;
-                        } else {
-                            uniqueName = `${baseName}_${counter}`;
-                        }
-                        counter++;
-                    }
-                    usedNames.add(uniqueName);
-
-                    zip.file(uniqueName, res.base64, { base64: true });
+                    base64Data = res.base64;
                 }
-            } catch (err) {
-                console.warn(`Could not bundle attachment in zip: ${att.fileName}`, err);
+            } catch (apexErr) {
+                console.warn(`Apex getFileBase64 failed for ${att.fileName} (likely heap limit for large file):`, apexErr);
+            }
+
+            // Attempt 2: If Apex failed (e.g. file > 3.5 MB), try direct servlet fetch
+            if (!base64Data && (!att.fileSizeMB || att.fileSizeMB <= 25)) {
+                try {
+                    const servletUrl = '/sfc/servlet.shepherd/version/download/' + att.contentVersionId;
+                    const resp = await fetch(servletUrl, { credentials: 'same-origin' });
+                    if (resp.ok) {
+                        blobData = await resp.blob();
+                    }
+                } catch (fetchErr) {
+                    console.warn(`Direct servlet fetch failed for ${att.fileName}:`, fetchErr);
+                }
+            }
+
+            if (base64Data || blobData) {
+                let baseName = att.fileName || att.name || 'Document';
+                const ext = (att.fileExtension || '').replace(/^\./, '');
+                if (ext && !baseName.toLowerCase().endsWith('.' + ext.toLowerCase())) {
+                    baseName += '.' + ext;
+                }
+                baseName = baseName.replace(/[/\\?%*:|"<>]/g, '_');
+
+                let uniqueName = baseName;
+                let counter = 1;
+                while (usedNames.has(uniqueName)) {
+                    const dotIdx = baseName.lastIndexOf('.');
+                    if (dotIdx !== -1) {
+                        uniqueName = `${baseName.substring(0, dotIdx)}_${counter}${baseName.substring(dotIdx)}`;
+                    } else {
+                        uniqueName = `${baseName}_${counter}`;
+                    }
+                    counter++;
+                }
+                usedNames.add(uniqueName);
+
+                if (base64Data) {
+                    zip.file(uniqueName, base64Data, { base64: true });
+                } else {
+                    zip.file(uniqueName, blobData);
+                }
+            } else {
+                omitted.push({
+                    name: att.fileName || att.name || 'Attachment',
+                    sizeLabel: att.sizeLabel || (att.fileSizeMB ? `${att.fileSizeMB} MB` : 'Large file')
+                });
             }
         });
 
         await Promise.all(fetchPromises);
+
+        // If any attachments were omitted, add a clear text notice inside the ZIP
+        if (omitted.length > 0) {
+            const orgTitle = this.orgName !== '—' ? this.orgName : (this._app?.Name || 'Applicant');
+            const noticeText = [
+                '========================================================================',
+                'WADHWANI GRANTS - ATTACHMENT DOWNLOAD NOTICE',
+                '========================================================================',
+                `Application: ${this._app?.Name || ''} (${orgTitle})`,
+                `Date: ${new Date().toLocaleDateString()}`,
+                '',
+                'The following attachment(s) exceeded the zip transfer size limit',
+                'and were not included in this ZIP archive:',
+                '',
+                ...omitted.map(f => `  • ${f.name} (${f.sizeLabel})`),
+                '',
+                'HOW TO ACCESS THESE FILES:',
+                'These files remain securely stored in the Wadhwani Grants portal.',
+                'You can view or download each file individually at any time by',
+                'clicking directly on the file name in the "Verification Report" or',
+                '"Supporting Documents" section of the Application Preview panel.',
+                '========================================================================'
+            ].join('\n');
+
+            zip.file('⚠️_LARGE_ATTACHMENTS_NOT_INCLUDED.txt', noticeText);
+        }
 
         const content = await zip.generateAsync({ type: 'blob' });
         const zipUrl = URL.createObjectURL(content);
@@ -1368,6 +1435,12 @@ export default class WcfFormPreview extends LightningElement {
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(zipUrl), 10000);
+
+        // Present on-screen notification if any files were omitted
+        if (omitted.length > 0) {
+            this.omittedFileList = omitted;
+            this.isOmittedModalOpen = true;
+        }
     }
 
     async handleDownloadPDF() {
@@ -1416,6 +1489,7 @@ export default class WcfFormPreview extends LightningElement {
             };
 
             const doc = new jsPDFLib();
+            const { fontFamily } = await preparePdfDoc(doc);
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             const marginX = 15;
@@ -1625,7 +1699,7 @@ export default class WcfFormPreview extends LightningElement {
                     head: [head],
                     body,
                     theme: 'striped',
-                    styles: { fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
+                    styles: { font: fontFamily, fontSize: 9, cellPadding: 3, textColor: [30, 30, 30] },
                     headStyles: { fillColor: NAVY, textColor: 255, fontStyle: 'bold' },
                     alternateRowStyles: { fillColor: LIGHT },
                     columnStyles: { 0: { fontStyle: 'bold', textColor: NAVY }, ...colStyles }
@@ -2161,9 +2235,9 @@ export default class WcfFormPreview extends LightningElement {
                 y += 4;
 
                 const livRows = [
-                    ['Households served during the year', o.livServedFY3, o.livServedFY2, o.livServedFY1],
-                    ['Households newly enrolled during the year', o.livEnrollFY3, o.livEnrollFY2, o.livEnrollFY1],
-                    ['Households meeting outcome criteria', o.livOutcomeFY3, o.livOutcomeFY2, o.livOutcomeFY1],
+                    ['Beneficiaries served during the year', o.livServedFY3, o.livServedFY2, o.livServedFY1],
+                    ['Beneficiaries newly enrolled during the year', o.livEnrollFY3, o.livEnrollFY2, o.livEnrollFY1],
+                    ['Beneficiaries meeting outcome criteria', o.livOutcomeFY3, o.livOutcomeFY2, o.livOutcomeFY1],
                     ['Avg. cost per outcome (USD)', o.livCostManualFY3, o.livCostManualFY2, o.livCostManualFY1]
                 ];
                 table(['Item', this.fyLabel3, this.fyLabel2, this.fyLabel1], livRows);
@@ -2180,9 +2254,9 @@ export default class WcfFormPreview extends LightningElement {
                 y += 4;
 
                 const livProjRows = [
-                    ['Households served during the year (projected)', o.livServedProj],
-                    ['Households newly enrolled during the year (projected)', o.livEnrollProj],
-                    ['Households expected to meet outcome criteria (projected)', o.livOutcomeProj],
+                    ['Beneficiaries served during the year (projected)', o.livServedProj],
+                    ['Beneficiaries newly enrolled during the year (projected)', o.livEnrollProj],
+                    ['Beneficiaries expected to meet outcome criteria (projected)', o.livOutcomeProj],
                     ['Avg. cost per outcome (USD) - projected', o.livCostManualProj]
                 ];
                 table(['Item', 'CFY (projected)'], livProjRows);
@@ -2214,7 +2288,7 @@ export default class WcfFormPreview extends LightningElement {
 
             // Q27: Operational Synergies — GenieAI
             simpleQRow(q.Q27, 'Operational Synergies: GenieAI', this.genieInterestLevel, true);
-            if (this.showSynergies && this.synergiesValue) richBoxUnder('How GenieAI could contribute', this.synergiesValue);
+               if (this.showSynergies && this.synergiesValue) richBoxUnder('How GenieAI could contribute', plainTextToHtml(this.synergiesValue));
 
             // Q28: Supporting Documents
             if (this.hasSupportingDocuments) {
@@ -2293,7 +2367,21 @@ export default class WcfFormPreview extends LightningElement {
 
             const fileName = `Wadhwani_Grants_Application_${this.orgName !== '—' ? this.orgName : (this._app?.Name || 'Preview')}.pdf`;
             const pdfBlob = doc.output('blob');
-            await this._buildCombinedZip(pdfBlob, fileName);
+
+            try {
+                await this._buildCombinedZip(pdfBlob, fileName);
+            } catch (zipErr) {
+                console.error('Combined zip failed, falling back to standalone PDF:', zipErr);
+                // Guaranteed Fallback: Download standalone PDF if zip generation fails
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                const a = document.createElement('a');
+                a.href = pdfUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
+            }
 
         } catch (e) {
             console.error('PDF generation error:', e?.message || String(e), e?.stack);

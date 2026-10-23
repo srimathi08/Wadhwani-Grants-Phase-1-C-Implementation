@@ -1,254 +1,269 @@
 <template>
 
-   <template if:true={showModal}>
-    <div class="modal-backdrop" onclick={handleBackdropClick}>
-        <div class="modal-box" onclick={stopProp}>
-            <div class="modal-header">
-                <span class="modal-title">{modalTitle}</span>
-                <button class="modal-close" onclick={closeModal}>✕</button>
-            </div>
-            <div class="modal-body">
-
-                <!-- Organisation -->
-                <div class="form-row">
-                    <label class="form-label">Organisation <span class="req">*</span></label>
-                    <select class="form-select" data-field="organisationId" onchange={handleFieldChange}>
-                        <option value="">Select Organisation</option>
-                        <template for:each={formattedOrgOptions} for:item="o">
-                            <option key={o.value} value={o.value} selected={o.selected}>{o.label}</option>
-                        </template>
-                    </select>
+    <template if:true={showModal}>
+        <div class="modal-backdrop" onclick={handleBackdropClick}>
+            <div class="modal-box" onclick={stopProp}>
+                <div class="modal-header">
+                    <span class="modal-title">{modalTitle}</span>
+                    <button class="modal-close" onclick={closeModal}>✕</button>
                 </div>
+                <div class="modal-body">
 
-                <!-- Linked Proposal Banner -->
-                <template if:true={form.organisationId}>
+                    <template if:true={formError}>
+                        <div class="form-row">
+                            <div class="form-error">{formError}</div>
+                        </div>
+                    </template>
+
+                    <!-- Organisation -->
                     <div class="form-row">
-                        <label class="form-label">Linked Proposal</label>
-                        <template if:true={isFetchingApp}>
-                            <div class="app-banner app-banner-loading">
-                                Fetching approved proposal…
-                            </div>
-                        </template>
-                        <template if:false={isFetchingApp}>
-                            <template if:true={hasLinkedApp}>
-                                <div class="app-banner app-banner-found">
-                                    <span>{form.applicationName}</span>
-                                    <span class="app-badge">Recommend for Fund</span>
+                        <label class="form-label">Organisation <span class="req">*</span></label>
+                        <select class="form-select" data-field="organisationId" onchange={handleFieldChange}>
+                            <option value="">Select Organisation</option>
+                            <template for:each={formattedOrgOptions} for:item="o">
+                                <option key={o.value} value={o.value} selected={o.selected}>{o.label}</option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <!-- Linked Proposal Banner -->
+                    <template if:true={form.organisationId}>
+                        <div class="form-row">
+                            <label class="form-label">Linked Proposal</label>
+                            <template if:true={isFetchingApp}>
+                                <div class="app-banner app-banner-loading">
+                                    Fetching approved proposal…
                                 </div>
                             </template>
-                            <template if:true={noLinkedApp}>
-                                <div class="app-banner app-banner-missing">
-                                    No approved proposal found for this organisation.
-                                    The request will be created without a proposal link.
-                                </div>
-                            </template>
-                        </template>
-                    </div>
-                </template>
-
-
-
-                <!-- Geography -->
-                <div class="form-row">
-                    <label class="form-label">Geography <span class="req">*</span></label>
-                    <select class="form-select" data-field="geography" onchange={handleFieldChange}>
-                        <option value="">Select</option>
-                        <option value="India">India</option>
-                        <option value="Mexico">Mexico</option>
-                        <option value="Brazil">Brazil</option>
-                        <option value="USA">USA</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <!-- Document Types -->
-                <div class="form-row">
-                    <label class="form-label">Document Types <span class="req">*</span></label>
-                    <div class="doc-type-grid">
-                        <template for:each={docTypeOptions} for:item="dt">
-                            <label key={dt.value} class="doc-type-label">
-                                <input type="checkbox"
-                                       value={dt.value}
-                                       checked={dt.checked}
-                                       data-dtype={dt.value}
-                                       onchange={handleDocTypeChange} />
-                                {dt.label}
-                            </label>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Requested Date / Due Date -->
-                <div class="form-row-2col">
-                    <div class="form-col">
-                        <label class="form-label">Requested Date</label>
-                        <input type="date" class="form-input" data-field="requestedDate"
-                               value={form.requestedDate} onchange={handleFieldChange} />
-                    </div>
-                    <div class="form-col">
-                        <label class="form-label">Due Date <span class="req">*</span></label>
-                        <input type="date" class="form-input" data-field="dueDate"
-                               value={form.dueDate} onchange={handleFieldChange} />
-                    </div>
-                </div>
-
-                <!-- NEW: inline date error, right under the date row -->
-<template if:true={dateError}>
-    <div class="form-row">
-        <div class="form-error form-error-inline">{dateError}</div>
-    </div>
-</template>
-
-                <!-- Priority only — Status removed -->
-                <div class="form-row">
-                    <label class="form-label">Priority</label>
-                    <select class="form-select" data-field="priority" onchange={handleFieldChange}>
-                        <option value="Normal">Normal</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                    </select>
-                </div>
-
-                <!-- Notes -->
-                <div class="form-row">
-                    <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" rows="3"
-                              data-field="notes"
-                              value={form.notes}
-                              onchange={handleFieldChange}
-                              placeholder="Optional: internal notes for tracking this request">
-                    </textarea>
-                </div>
-
-                
-
-            </div>
-
-        
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick={closeModal}>Cancel</button>
-                <button class="btn-save" onclick={handleSave} disabled={isSaving}>
-                    <template if:true={isSaving}>Saving…</template>
-                    <template if:false={isSaving}>{saveLabel}</template>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    
-</template>
-
-<template if:true={showReviewModal}>
-    <div class="modal-backdrop" onclick={handleReviewBackdropClick}>
-        <div class="modal-box" onclick={stopProp}>
-            <div class="modal-header">
-                <span class="modal-title">Review Documents: {reviewRequestId}</span>
-                <button class="modal-close" onclick={closeReviewModal}>✕</button>
-            </div>
-            <div class="modal-body">
-                <template if:true={isLoadingReviewItems}>
-                    <div class="preview-empty">Loading documents…</div>
-                </template>
-                <template if:false={isLoadingReviewItems}>
-                    <template for:each={reviewItems} for:item="doc">
-                        <div key={doc.documentLabel} class="review-doc-row">
-                            <div class="review-doc-header">
-                                <span class="review-doc-label">{doc.documentLabel}</span>
-                                <span class={doc.statusPillClass}>{doc.status}</span>
-                            </div>
-                             <template if:true={doc.hasFile}>
-                                 <div class="review-doc-file">
-                                     <a href="javascript:void(0);" data-version-id={doc.contentVersionId} data-file-name={doc.fileName} onclick={handlePreviewFile}>{doc.fileName}</a>
-                                 </div>
-                                 <template if:true={doc.reviewerNotes}>
-                                     <div class={doc.notesClass}><strong>Note:</strong> {doc.reviewerNotes}</div>
-                                 </template>
-                             </template>
-                            <template if:false={doc.hasFile}>
-                                <div class="review-doc-nofile">No document uploaded yet.</div>
+                            <template if:false={isFetchingApp}>
+                                <template if:true={hasLinkedApp}>
+                                    <div class="app-banner app-banner-found">
+                                        <span>{form.applicationName}</span>
+                                        <span class="app-badge">Recommend for Grant</span>
+                                    </div>
+                                </template>
+                                <template if:true={noLinkedApp}>
+                                    <div class="app-banner app-banner-missing">
+                                        No approved proposal found for this organisation.
+                                        The request will be created without a proposal link.
+                                    </div>
+                                </template>
                             </template>
                         </div>
                     </template>
-                </template>
 
-                <!-- ══ Decision panel — buttons first, form appears on click ══ -->
-               <div class="review-decision-panel">
 
-    <template if:true={formError}>
-        <div class="form-error">{formError}</div>
-    </template>
 
-    <template if:true={isDecisionLocked}>
-        <div class="review-locked-note">
-            All uploaded documents have a decision recorded. 
-        </div>
-        <template if:true={reviewRequestNotes}>
-            <div class="review-overall-notes">
-                <strong>Reviewer Note:</strong> {reviewRequestNotes}
-            </div>
-        </template>
-    </template>
+                    <!-- Geography -->
+                    <div class="form-row">
+                        <label class="form-label">Geography <span class="req">*</span></label>
+                        <select class="form-select" data-field="geography" onchange={handleFieldChange}>
+                            <option value="">Select</option>
+                            <option value="India">India</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="USA">USA</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
 
-    <template if:true={noDocsToReview}>
-        <div class="review-locked-note">
-            No documents have been uploaded yet, so there is nothing to review.
-        </div>
-    </template>
-            <template if:true={isAwaitingApplicant}>
-        <div class="review-locked-note">
-            Documents have been returned to the applicant. Actions are locked until the applicant re-uploads the returned documents.
-        </div>
-    </template>
-
-    <template if:true={showDecisionButtons}>
-        <template if:false={pendingDecision}>
-            <div class="review-decision-actions">
-                <button class="decision-btn decision-btn-pass"    data-decision="Pass"    onclick={handleChooseDecision}>Pass</button>
-                <button class="decision-btn decision-btn-return"  data-decision="Return"  onclick={handleChooseDecision}>Return</button>
-                <button class="decision-btn decision-btn-reject"  data-decision="Reject"  onclick={handleChooseDecision}>Reject</button>
-                <button class="decision-btn decision-btn-suspend" data-decision="Suspend" onclick={handleChooseDecision}>Suspend</button>
-            </div>
-        </template>
-
-        <template if:true={pendingDecision}>
-            <div class="review-decision-form">
-                <p class="review-picker-hint">Decision: <strong>{pendingDecision}</strong></p>
-
-                <template if:true={isReturnDecision}>
-                    <div class="review-return-picker">
-                        <p class="review-picker-hint">Select documents to return:</p>
-                        <template for:each={reviewItems} for:item="doc">
-                            <template if:true={doc.isOpen}>
-                                <label key={doc.documentLabel} class="doc-type-label">
-                                    <input type="checkbox" data-label={doc.documentLabel} onchange={handleReturnCheckboxChange} />
-                                    {doc.documentLabel}
+                    <!-- Document Types -->
+                    <div class="form-row">
+                        <label class="form-label">Document Types <span class="req">*</span></label>
+                        <div class="doc-type-grid">
+                            <template for:each={docTypeOptions} for:item="dt">
+                                <label key={dt.value} class="doc-type-label">
+                                    <input type="checkbox" value={dt.value} checked={dt.checked} data-dtype={dt.value}
+                                        onchange={handleDocTypeChange} />
+                                    {dt.label}
                                 </label>
                             </template>
-                        </template>
+                        </div>
                     </div>
-                </template>
 
-                <textarea class="form-textarea" rows="2"
-                    placeholder="Required decision comment"
-                    oninput={handleDecisionNoteInput}></textarea>
+                    <template if:true={docTypeError}>
+                        <div class="form-row">
+                            <div class="form-error form-error-inline">{docTypeError}</div>
+                        </div>
+                    </template>
 
-                <div class="review-decision-form-actions">
-                    <button class="btn-cancel" onclick={handleCancelDecision} disabled={isDeciding}>Cancel</button>
-                    <button class="btn-save" onclick={handleConfirmDecision} disabled={isDeciding}>Confirm: {pendingDecision}</button>
+                    <!-- Requested Date / Due Date -->
+                    <div class="form-row-2col">
+                        <div class="form-col">
+                            <label class="form-label">Requested Date</label>
+                            <input type="date" class="form-input" data-field="requestedDate" value={form.requestedDate}
+                                onchange={handleFieldChange} />
+                        </div>
+                        <div class="form-col">
+                            <label class="form-label">Due Date <span class="req">*</span></label>
+                            <input type="date" class="form-input" data-field="dueDate" value={form.dueDate}
+                                onchange={handleFieldChange} />
+                        </div>
+                    </div>
+
+                    <!-- NEW: inline date error, right under the date row -->
+                    <template if:true={dateError}>
+                        <div class="form-row">
+                            <div class="form-error form-error-inline">{dateError}</div>
+                        </div>
+                    </template>
+
+                    <!-- Priority only — Status removed -->
+                    <div class="form-row">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" data-field="priority" onchange={handleFieldChange}>
+                            <option value="Normal">Normal</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-row">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-textarea" rows="3" data-field="notes" value={form.notes}
+                            onchange={handleFieldChange}
+                            placeholder="Optional: internal notes for tracking this request">
+                    </textarea>
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick={closeModal}>Cancel</button>
+                    <button class="btn-save" onclick={handleSave} disabled={isSaving}>
+                        <template if:true={isSaving}>Saving…</template>
+                        <template if:false={isSaving}>{saveLabel}</template>
+                    </button>
                 </div>
             </div>
-        </template>
+        </div>
+
+
     </template>
 
-</div>
+    <template if:true={showReviewModal}>
+        <div class="modal-backdrop" onclick={handleReviewBackdropClick}>
+            <div class="modal-box" onclick={stopProp}>
+                <div class="modal-header">
+                    <span class="modal-title">Review Documents: {reviewRequestId}</span>
+                    <button class="modal-close" onclick={closeReviewModal}>✕</button>
+                </div>
+                <div class="modal-body">
+                    <template if:true={isLoadingReviewItems}>
+                        <div class="preview-empty">Loading documents…</div>
+                    </template>
+                    <template if:false={isLoadingReviewItems}>
+                        <template for:each={reviewItems} for:item="doc">
+                            <div key={doc.documentLabel} class="review-doc-row">
+                                <div class="review-doc-header">
+                                    <span class="review-doc-label">{doc.documentLabel}</span>
+                                    <span class={doc.statusPillClass}>{doc.status}</span>
+                                </div>
+                                <template if:true={doc.hasFile}>
+                                    <div class="review-doc-file">
+                                        <a href="javascript:void(0);" data-version-id={doc.contentVersionId}
+                                            data-file-name={doc.fileName} onclick={handlePreviewFile}>{doc.fileName}</a>
+                                    </div>
+                                    <template if:true={doc.reviewerNotes}>
+                                        <div class={doc.notesClass}><strong>Note:</strong> {doc.reviewerNotes}</div>
+                                    </template>
+                                </template>
+                                <template if:false={doc.hasFile}>
+                                    <div class="review-doc-nofile">No document uploaded yet.</div>
+                                </template>
+                            </div>
+                        </template>
+                    </template>
 
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick={closeReviewModal}>Close</button>
+                    <!-- ══ Decision panel — buttons first, form appears on click ══ -->
+                    <div class="review-decision-panel">
+
+                        <template if:true={formError}>
+                            <div class="form-error">{formError}</div>
+                        </template>
+
+                        <template if:true={isDecisionLocked}>
+                            <div class="review-locked-note">
+                                All uploaded documents have a decision recorded.
+                            </div>
+                            <template if:true={reviewRequestNotes}>
+                                <div class="review-overall-notes">
+                                    <strong>Reviewer Note:</strong> {reviewRequestNotes}
+                                </div>
+                            </template>
+                        </template>
+
+                        <template if:true={noDocsToReview}>
+                            <div class="review-locked-note">
+                                No documents have been uploaded yet, so there is nothing to review.
+                            </div>
+                        </template>
+                        <template if:true={isAwaitingApplicant}>
+                            <div class="review-locked-note">
+                                Documents have been returned to the applicant. Actions are locked until the applicant
+                                re-uploads the returned documents.
+                            </div>
+                        </template>
+
+                        <template if:true={showDecisionButtons}>
+                            <template if:false={pendingDecision}>
+                                <div class="review-decision-actions">
+                                    <button class="decision-btn decision-btn-pass" data-decision="Pass"
+                                        onclick={handleChooseDecision}>Pass</button>
+                                    <button class="decision-btn decision-btn-return" data-decision="Return"
+                                        onclick={handleChooseDecision}>Return</button>
+                                    <button class="decision-btn decision-btn-reject" data-decision="Reject"
+                                        onclick={handleChooseDecision}>Reject</button>
+                                    <button class="decision-btn decision-btn-suspend" data-decision="Suspend"
+                                        onclick={handleChooseDecision}>Suspend</button>
+                                </div>
+                            </template>
+
+                            <template if:true={pendingDecision}>
+                                <div class="review-decision-form">
+                                    <p class="review-picker-hint">Decision: <strong>{pendingDecision}</strong></p>
+
+                                    <template if:true={isReturnDecision}>
+                                        <div class="review-return-picker">
+                                            <p class="review-picker-hint">Select documents to return:</p>
+                                            <template for:each={reviewItems} for:item="doc">
+                                                <template if:true={doc.isOpen}>
+                                                    <label key={doc.documentLabel} class="doc-type-label">
+                                                        <input type="checkbox" data-label={doc.documentLabel}
+                                                            onchange={handleReturnCheckboxChange} />
+                                                        {doc.documentLabel}
+                                                    </label>
+                                                </template>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <textarea class="form-textarea" rows="2" placeholder="Required decision comment"
+                                        oninput={handleDecisionNoteInput}></textarea>
+
+                                    <div class="review-decision-form-actions">
+                                        <button class="btn-cancel" onclick={handleCancelDecision}
+                                            disabled={isDeciding}>Cancel</button>
+                                        <button class="btn-save" onclick={handleConfirmDecision}
+                                            disabled={isDeciding}>Confirm: {pendingDecision}</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick={closeReviewModal}>Close</button>
+                </div>
             </div>
         </div>
-    </div>
-</template>
+    </template>
     <!-- ══ END MODAL ══ -->
 
     <!-- ══ DEDICATED UPLOAD SIGNED GRANT AGREEMENT MODAL ══ -->
@@ -265,7 +280,8 @@
                 <div class="modal-body">
                     <template if:true={isReplacingAgreement}>
                         <div class="replace-warning-banner">
-                            Replacing this agreement will mark the existing version as <strong>Superseded</strong> and retain it for audit history.
+                            Replacing this agreement will mark the existing version as <strong>Superseded</strong> and
+                            retain it for audit history.
                         </div>
                     </template>
 
@@ -273,11 +289,13 @@
                     <div class="form-row-2col">
                         <div class="form-col">
                             <label class="form-label">Organisation (Account)</label>
-                            <input type="text" class="form-input form-input-readonly" value={agreementOrgName} readonly disabled />
+                            <input type="text" class="form-input form-input-readonly" value={agreementOrgName} readonly
+                                disabled />
                         </div>
                         <div class="form-col">
                             <label class="form-label">Application</label>
-                            <input type="text" class="form-input form-input-readonly" value={agreementAppName} readonly disabled />
+                            <input type="text" class="form-input form-input-readonly" value={agreementAppName} readonly
+                                disabled />
                         </div>
                     </div>
 
@@ -285,19 +303,16 @@
                     <div class="form-row">
                         <template if:false={uploadedAgreementFile}>
                             <label class="form-label">Signed Grant Agreement (PDF) <span class="req">*</span></label>
-                            <lightning-file-upload
-                                label="Upload Signed Grant Agreement"
-                                name="agreementUploader"
-                                accept=".pdf"
-                                record-id={agreementOrgId}
-                                onuploadfinished={handleAgreementFileUploaded}>
+                            <lightning-file-upload label="Upload Signed Grant Agreement" name="agreementUploader"
+                                accept=".pdf" record-id={agreementOrgId} onuploadfinished={handleAgreementFileUploaded}>
                             </lightning-file-upload>
                         </template>
                         <template if:true={uploadedAgreementFile}>
                             <div class="upload-success-box">
                                 <div class="upload-success-file-row">
                                     <span class="upload-file-icon">📄</span>
-                                    <span class="upload-file-name">{uploadedAgreementFile.name} &middot; {uploadedAgreementFile.size}</span>
+                                    <span class="upload-file-name">{uploadedAgreementFile.name} &middot;
+                                        {uploadedAgreementFile.size}</span>
                                 </div>
                                 <div class="upload-success-status">✓ Upload complete</div>
                                 <div class="upload-success-progress-bar"></div>
@@ -310,29 +325,28 @@
                         <div class="form-col">
                             <label class="form-label">Execution date <span class="req">*</span></label>
                             <input type="date" class="form-input" data-field="executionDate"
-                                   value={agreementExecutionDate} onchange={handleAgreementFieldChange} />
+                                value={agreementExecutionDate} onchange={handleAgreementFieldChange} />
                         </div>
                         <div class="form-col">
                             <label class="form-label">Effective date</label>
                             <input type="date" class="form-input" data-field="effectiveDate"
-                                   value={agreementEffectiveDate} onchange={handleAgreementFieldChange} />
+                                value={agreementEffectiveDate} onchange={handleAgreementFieldChange} />
                         </div>
                     </div>
 
                     <!-- Remarks (internal only) -->
                     <div class="form-row">
                         <label class="form-label">Remarks (internal only)</label>
-                        <textarea class="form-textarea" rows="2"
-                                  data-field="remarks"
-                                  placeholder="e.g. Signed offline, verified by Programme Lead"
-                                  value={agreementRemarks}
-                                  onchange={handleAgreementFieldChange}></textarea>
+                        <textarea class="form-textarea" rows="2" data-field="remarks"
+                            placeholder="e.g. Signed offline, verified by Programme Lead" value={agreementRemarks}
+                            onchange={handleAgreementFieldChange}></textarea>
                     </div>
 
                     <!-- Offline verification checkbox -->
                     <div class="form-row" style="margin-top: 10px;">
                         <label class="agreement-checkbox-label">
-                            <input type="checkbox" checked={isOfflineVerificationComplete} onchange={handleVerificationCheckboxChange} />
+                            <input type="checkbox" checked={isOfflineVerificationComplete}
+                                onchange={handleVerificationCheckboxChange} />
                             <span>Offline verification and signing are complete.</span>
                         </label>
                     </div>
@@ -344,7 +358,8 @@
 
                 <div class="modal-footer">
                     <button class="btn-cancel" onclick={closeAgreementModal}>Cancel</button>
-                    <button class="btn-save btn-upload-notify" onclick={handleSaveAndNotifyAgreement} disabled={isSaveAgreementDisabled}>
+                    <button class="btn-save btn-upload-notify" onclick={handleSaveAndNotifyAgreement}
+                        disabled={isSaveAgreementDisabled}>
                         <template if:true={isSavingAgreement}>Uploading…</template>
                         <template if:false={isSavingAgreement}>Upload & notify applicant</template>
                     </button>
@@ -398,127 +413,131 @@
 
     <!-- ══ DETAIL TABLE ══ -->
     <div class="sc-detail-header">
-    <div>
-        <div class="sc-detail-title">{tableTitle}</div>
-        <div class="sc-detail-sub">Sorted by due date (nearest first). Click a row to edit.</div>
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-        <input type="text"
-               class="search-input"
-               placeholder="Search by ID, org, or proposal…"
-               value={searchTerm}
-               onkeyup={handleSearchInput} />
-        <template if:true={activeFilter}>
-            <button class="filter-clear-btn" onclick={clearFilter}>✕ Clear filter</button>
-        </template>
-        <button class="btn-new-request" onclick={openNewModal}>+ New Request</button>
-    </div>
-</div>
-
-        <template if:true={isLoading}>
-            <div class="preview-empty" style="padding: 32px;">Loading…</div>
-        </template>
-        <template if:false={isLoading}>
-            <div class="table-responsive">
-                <table class="preview-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>REQUEST ID</th>
-                            <th>APPLICATION NUMBER</th>
-                            <th>ORGANISATION</th>
-                            <th>DOCUMENTS</th>
-                            <th>REQUESTED</th>
-                            <th>DUE</th>
-                            <th>PRIORITY</th>
-                            <th>COMPLIANCE</th>
-                            <th>AGREEMENT</th>
-                            <th class="col-action">ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={pagedRows} for:item="row">
-                            <tr key={row.recordId}>
-                                <td>{row.rowNum}</td>
-                                <td class="cell-id">{row.requestId}</td>
-                                <!-- NEW: hyperlink → read-only proposal + review view -->
-                                <td>
-                                    <template if:true={row.hasApplication}>
-                                        <a href="javascript:void(0);"
-                                           class="app-number-link"
-                                           title="View proposal and review"
-                                           data-id={row.applicationId}
-                                           onclick={handleViewApplication}>{row.applicationName}</a>
-                                    </template>
-                                    <template if:false={row.hasApplication}>
-                                        {row.applicationName}
-                                    </template>
-                                </td>
-                                <td class="cell-bold">{row.orgName}</td>
-                                <td>
-                                    <div class="doc-chip-row">
-                                        <template for:each={row.documents} for:item="doc">
-                                             <span key={doc} class="doc-chip">{doc}</span>
-                                        </template>
-                                    </div>
-                                </td>
-                                <td class="cell-muted">{row.requestedDate}</td>
-                                <td>
-                                    <span class={row.dueDateClass}>{row.dueDate}</span>
-                                </td>
-                                <td>
-                                    <span class={row.priorityClass}>{row.priority}</span>
-                                </td>
-                                <td>
-                                    <span class={row.statusClass}>{row.status}</span>
-                                </td>
-                                <td>
-                                    <template if:true={row.isAgreementLocked}>
-                                        <span class="status-pill status-pill-locked" title="All compliance documents must be Validated before uploading the Grant Agreement">Locked</span>
-                                    </template>
-                                    <template if:true={row.isAwaitingAgreement}>
-                                        <span class="status-pill status-pill-awaiting">Awaiting signed copy</span>
-                                    </template>
-                                    <template if:true={row.isAgreementExecuted}>
-                                        <span class="status-pill status-pill-validated">{row.agreementStatus}</span>
-                                    </template>
-                                </td>
-                                
-                                <td class="td c-action tc col-action">
-                                    <button class="preview-action-btn preview-action-validate" data-id={row.recordId} onclick={handleEdit}>Edit</button>
-                                    <button class="preview-action-btn preview-action-review-docs" data-id={row.recordId} onclick={handleOpenReview}>Review</button>
-
-                                    <template if:true={row.isAgreementLocked}>
-                                        <button class="preview-action-btn preview-action-disabled" disabled title="All compliance documents must be Validated before uploading the Grant Agreement">Upload</button>
-                                    </template>
-                                    <template if:true={row.isAwaitingAgreement}>
-                                        <button class="preview-action-btn preview-action-upload-agreement" data-id={row.recordId} onclick={handleOpenUploadAgreement}>Upload agreement</button>
-                                    </template>
-                                    <template if:true={row.isAgreementExecuted}>
-                                        <button class="preview-action-btn preview-action-view" data-doc-id={row.agreementContentDocumentId} onclick={handlePreviewGrantAgreement}>View</button>
-                                        <button class="preview-action-btn preview-action-replace" data-id={row.recordId} onclick={handleOpenReplaceAgreement}>Replace</button>
-                                    </template>
-                                </td>
-                            </tr>
-                        </template>
-                        <template if:true={noRows}>
-                            <tr>
-                                <td colspan="11" class="preview-empty">{emptyMessage}</td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination Controls -->
-            <template if:true={hasPagination}>
-                <div class="pagination-container">
-                    <button class="pagination-btn" onclick={handlePrevPage} disabled={isFirstPage}>Previous</button>
-                    <span class="pagination-info">Page {currentPage} of {totalPages}</span>
-                    <button class="pagination-btn" onclick={handleNextPage} disabled={isLastPage}>Next</button>
-                </div>
+        <div>
+            <div class="sc-detail-title">{tableTitle}</div>
+            <div class="sc-detail-sub">Sorted by due date (nearest first). Click a row to edit.</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <input type="text" class="search-input" placeholder="Search by ID, org, or proposal…" value={searchTerm}
+                onkeyup={handleSearchInput} />
+            <template if:true={activeFilter}>
+                <button class="filter-clear-btn" onclick={clearFilter}>✕ Clear filter</button>
             </template>
+            <button class="btn-new-request" onclick={openNewModal}>+ New Request</button>
+        </div>
+    </div>
+
+    <template if:true={isLoading}>
+        <div class="preview-empty" style="padding: 32px;">Loading…</div>
+    </template>
+    <template if:false={isLoading}>
+        <div class="table-responsive">
+            <table class="preview-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>REQUEST ID</th>
+                        <th>APPLICATION NUMBER</th>
+                        <th>ORGANISATION</th>
+                        <th>DOCUMENTS</th>
+                        <th>REQUESTED</th>
+                        <th>DUE</th>
+                        <th>PRIORITY</th>
+                        <th>COMPLIANCE</th>
+                        <th>AGREEMENT</th>
+                        <th class="col-action">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={pagedRows} for:item="row">
+                        <tr key={row.recordId}>
+                            <td>{row.rowNum}</td>
+                            <td class="cell-id">{row.requestId}</td>
+                            <!-- NEW: hyperlink → read-only proposal + review view -->
+                            <td>
+                                <template if:true={row.hasApplication}>
+                                    <a href="javascript:void(0);" class="app-number-link"
+                                        title="View proposal and review" data-id={row.applicationId}
+                                        onclick={handleViewApplication}>{row.applicationName}</a>
+                                </template>
+                                <template if:false={row.hasApplication}>
+                                    {row.applicationName}
+                                </template>
+                            </td>
+                            <td class="cell-bold">{row.orgName}</td>
+                            <td>
+                                <div class="doc-chip-row">
+                                    <template for:each={row.documents} for:item="doc">
+                                        <span key={doc} class="doc-chip">{doc}</span>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="cell-muted">{row.requestedDate}</td>
+                            <td>
+                                <span class={row.dueDateClass}>{row.dueDate}</span>
+                            </td>
+                            <td>
+                                <span class={row.priorityClass}>{row.priority}</span>
+                            </td>
+                            <td>
+                                <span class={row.statusClass}>{row.status}</span>
+                            </td>
+                            <td>
+                                <template if:true={row.isAgreementLocked}>
+                                    <span class="status-pill status-pill-locked"
+                                        title="All compliance documents must be Validated before uploading the Grant Agreement">Locked</span>
+                                </template>
+                                <template if:true={row.isAwaitingAgreement}>
+                                    <span class="status-pill status-pill-awaiting">Awaiting signed copy</span>
+                                </template>
+                                <template if:true={row.isAgreementExecuted}>
+                                    <span class="status-pill status-pill-validated">{row.agreementStatus}</span>
+                                </template>
+                            </td>
+
+                            <td class="td c-action tc col-action">
+                                <button class="preview-action-btn preview-action-validate" data-id={row.recordId}
+                                    onclick={handleEdit}>Edit</button>
+                                <button class="preview-action-btn preview-action-review-docs" data-id={row.recordId}
+                                    onclick={handleOpenReview}>Review</button>
+
+                                <template if:true={row.isAgreementLocked}>
+                                    <button class="preview-action-btn preview-action-disabled" disabled
+                                        title="All compliance documents must be Validated before uploading the Grant Agreement">Upload</button>
+                                </template>
+                                <template if:true={row.isAwaitingAgreement}>
+                                    <button class="preview-action-btn preview-action-upload-agreement"
+                                        data-id={row.recordId} onclick={handleOpenUploadAgreement}>Upload
+                                        agreement</button>
+                                </template>
+                                <template if:true={row.isAgreementExecuted}>
+                                    <button class="preview-action-btn preview-action-view"
+                                        data-doc-id={row.agreementContentDocumentId}
+                                        onclick={handlePreviewGrantAgreement}>View</button>
+                                    <button class="preview-action-btn preview-action-replace" data-id={row.recordId}
+                                        onclick={handleOpenReplaceAgreement}>Replace</button>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                    <template if:true={noRows}>
+                        <tr>
+                            <td colspan="11" class="preview-empty">{emptyMessage}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <template if:true={hasPagination}>
+            <div class="pagination-container">
+                <button class="pagination-btn" onclick={handlePrevPage} disabled={isFirstPage}>Previous</button>
+                <span class="pagination-info">Page {currentPage} of {totalPages}</span>
+                <button class="pagination-btn" onclick={handleNextPage} disabled={isLastPage}>Next</button>
+            </div>
         </template>
+    </template>
     <!-- ══ END TABLE ══ -->
 
 </template>

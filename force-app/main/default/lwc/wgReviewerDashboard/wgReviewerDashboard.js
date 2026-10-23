@@ -17,6 +17,7 @@ const TILE_DEFS = [
     { id: 'inProgress', label: 'In Progress', subtitle: 'Reviews started but not submitted', countKey: 'reviewerInProgress', tone: 'warning' },
     { id: 'reviewed', label: 'Reviewed', subtitle: 'Submitted review forms', countKey: 'reviewerReviewed', tone: 'success' },
     { id: 'returnedByApprover', label: 'Returned by Approver', subtitle: 'Awaiting your Approve / Return decision', countKey: 'reviewerReturnedByApprover', tone: 'brand', alertWhenPositive: true },
+    { id: 'backFromValidator', label: 'Back from Validator', subtitle: 'Revalidated, awaiting your decision to Approver', countKey: 'reviewerBackFromValidator', tone: 'warning', alertWhenPositive: true },
     { id: 'acceptedApplications', label: 'Accepted Applications', subtitle: 'Approver-accepted, ready for compliance docs', countKey: 'reviewerAcceptedCount', tone: 'success' }
 ];
 const ACCEPTED_PREVIEW_LIMIT = 5;
@@ -37,6 +38,7 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     @track reviewerInProgress = 0;
     @track reviewerNotStarted = 0;
     @track reviewerReturnedByApprover = 0;
+    @track reviewerBackFromValidator = 0;
     @track reviewerPreviewRows = [];
 
     @track reviewerAcceptedCount = 0;
@@ -68,7 +70,6 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
     connectedCallback() {
         this.loadReviewerCounts();
         this.loadReviewerPreview();
-        this.loadApproverReturnCount();
         this.loadAcceptedApplications();
     }
 
@@ -193,7 +194,7 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
             ]);
 
             const map = reviewMap || {};
-            let reviewed = 0, inProgress = 0, notStarted = 0;
+            let reviewed = 0, inProgress = 0, notStarted = 0, returnedByApprover = 0, backFromValidator = 0;
 
             for (const p of (proposals || [])) {
                 const info = map[p.Id] || {};
@@ -205,12 +206,22 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                 } else if (p.Status !== 'Returned by Approver') {
                     notStarted++;
                 }
+
+                if (p.Status === 'Returned by Approver') {
+                    if (info.isBackFromValidator) {
+                        backFromValidator++;
+                    } else {
+                        returnedByApprover++;
+                    }
+                }
             }
 
             this.reviewerTotal = (proposals || []).length;
             this.reviewerReviewed = reviewed;
             this.reviewerInProgress = inProgress;
             this.reviewerNotStarted = notStarted;
+            this.reviewerReturnedByApprover = returnedByApprover;
+            this.reviewerBackFromValidator = backFromValidator;
 
         } catch (e) {
             console.error('Reviewer counts error:', e);
@@ -235,10 +246,16 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                     : rtName.includes('Creation') ? 'JC' : 'JF';
                 const isInProgress = r.status === 'In Progress';
                 const dueDateRaw = r.dueDate || null;
+                const round = r.submissionRound || (r.status === 'Application Resubmitted' ? 2 : 1);
+                const revCount = r.revisionCount != null ? r.revisionCount : Math.max(0, round - 1);
+                const hasRevision = revCount > 0;
+                const revisionLabel = `Rev ${revCount}`;
                 return {
                     id: r.reviewId || r.appRecordId,
                     appId: r.appName,
                     appRecordId: r.appRecordId,
+                    hasRevision,
+                    revisionLabel,
                     reviewId: r.reviewId || null,
                     headquarters: r.headquarters || '',
                     account: r.accountName || '—',

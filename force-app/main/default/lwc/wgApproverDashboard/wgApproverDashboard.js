@@ -85,11 +85,18 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
         };
 
         const mapped = rows.map(row => {
+            const round = row.submissionRound || (row.applicationStatus === 'Application Resubmitted' ? 2 : 1);
+            const revCount = row.revisionCount != null ? row.revisionCount : Math.max(0, round - 1);
+            const hasRevision = revCount > 0;
+            const revisionLabel = `Rev ${revCount}`;
+
             const isClearedReturn =
                 row.existingDecision === 'Approved with Resubmission'
-                && row.applicationStatus !== 'Returned by Approver';
+                && (row.applicationStatus === 'Review Completed - Recommended'
+                    || row.applicationStatus === 'Review Completed - Not Recommended');
 
-            const hasDecision = !!row.existingDecision && !isClearedReturn;
+            const isRevoked   = row.existingDecision === 'Revoke';
+            const hasDecision = !!row.existingDecision && !isClearedReturn && !isRevoked;
             const isReady     = !!row.reviewId;
 
             const trackBadges = (row.track || '').split(',').filter(Boolean).map(code => {
@@ -114,9 +121,14 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
             } else if (row.existingDecision === 'Decline') {
                 statusPillClass = 'wg-pill wg-pill--error';
                 decisionLabel   = 'Declined';
+            } else if (isRevoked) {
+                statusPillClass = 'wg-pill wg-pill--warning';
+                decisionLabel   = 'Decision Revoked';
             } else if (row.existingDecision === 'Approved with Resubmission' && !isClearedReturn) {
                 statusPillClass = 'wg-pill wg-pill--returned';
-                decisionLabel   = 'Returned to Reviewer';
+                decisionLabel   = row.applicationStatus === 'Returned to Validator'
+                    ? 'Returned to Validator'
+                    : 'Returned to Reviewer';
             } else if (isClearedReturn) {
                 statusPillClass = 'wg-pill wg-pill--warning';
                 decisionLabel   = 'Back from Reviewer';
@@ -153,6 +165,8 @@ export default class WgApproverDashboard extends NavigationMixin(LightningElemen
                 ...row,
                 hasDecision,
                 isReady,
+                hasRevision,
+                revisionLabel,
                 trackBadges,
                 recPillClass,
                 statusPillClass,

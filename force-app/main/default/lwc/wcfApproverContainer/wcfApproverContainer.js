@@ -22,15 +22,21 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
     @track showModal        = false;
     @track isSubmitting     = false;
     @track existingDecision = null;
+    @track hasRevision      = false;
+    @track revisionLabel    = '';
 
     // ── Revoke state ──
     @track isRevokable     = false;
     @track decisionDate    = null;
     @track showRevokeModal = false;
     @track isRevoking      = false;
+    @track isRevoked       = false;
+    @track revokedDate     = null;
+    @track revokedComment  = '';
 
     // ── Return state ──
-    @track isReturned      = false;
+    @track isReturned         = false;
+    @track returnStatusLabel  = '';
 
     // ── Split-pane state ──
     @track leftCollapsed  = false;
@@ -105,18 +111,34 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
                 this.decisionDate       = dec.decisionDate;
                 this.isRevokable        = dec.isRevokable;
                 this.isReturned         = !!dec.isReturned;
+                this.returnStatusLabel  = dec.returnStatusLabel || 'Returned to Reviewer';
+                const round = dec.submissionRound || 1;
+                const revCount = dec.revisionCount != null ? dec.revisionCount : Math.max(0, round - 1);
+                this.hasRevision   = revCount > 0;
+                this.revisionLabel = `Rev ${revCount}`;
                 this.comment            = dec.comment || '';
                 this.isBackFromReviewer = !!dec.isBackFromReviewer;
                 this.priorReturnComment = dec.priorReturnComment || '';
                 this.priorReturnDate    = dec.priorReturnDate || null;
+                this.priorRejectionReasons = dec.priorRejectionReasons || '';
+                this.isRevoked          = !!dec.isRevoked;
+                this.revokedDate        = dec.isRevoked ? dec.decisionDate : null;
+                this.revokedComment     = dec.isRevoked ? (dec.comment || '') : '';
             } else {
                 this.existingDecision   = null;
                 this.decisionDate       = null;
                 this.isRevokable        = false;
                 this.isReturned         = false;
+                this.returnStatusLabel  = '';
+                this.hasRevision        = false;
+                this.revisionLabel      = '';
                 this.isBackFromReviewer = false;
                 this.priorReturnComment = '';
                 this.priorReturnDate    = null;
+                this.priorRejectionReasons = '';
+                this.isRevoked          = false;
+                this.revokedDate        = null;
+                this.revokedComment     = '';
             }
         } catch (e) {
             console.error('Could not load existing decision', e);
@@ -153,11 +175,19 @@ export default class WcfApproverContainer extends NavigationMixin(LightningEleme
 get priorReturnDateFormatted() {
     return this._formatDate(this.priorReturnDate);
 }
+get revokedDateFormatted() {
+    return this._formatDate(this.revokedDate);
+}
+get returnStatusMessage() {
+    const target = this.returnStatusLabel || 'Returned to Reviewer';
+    const who = target === 'Returned to Validator' ? 'Validator' : 'Reviewer';
+    return `${target} on ${this.returnedDateFormatted}. Awaiting ${who} review`;
+}
     get hasReviewerComment() {
         return !!this.reviewerComment;
     }
     get showConversationThread() {
-        return this.isBackFromReviewer || this.hasReviewerComment;
+        return this.isBackFromReviewer || this.hasReviewerComment || (this.isRevoked && !!this.revokedComment);
     }
     // ── Compact return conversation ──────────────────────────────
     handleToggleConvo() {
@@ -172,16 +202,21 @@ get priorReturnDateFormatted() {
 
     get convoMessageCount() {
         const n = (this.isBackFromReviewer && this.priorReturnComment ? 1 : 0)
-                + (this.hasReviewerComment ? 1 : 0);
+                + (this.hasReviewerComment ? 1 : 0)
+                + (this.isRevoked && this.revokedComment ? 1 : 0);
         return n === 1 ? '1 message' : `${n} messages`;
     }
 
     /** Latest message for the one-line preview: the Reviewer's reply if present, else your note. */
     get convoPreviewAuthor() {
-        return this.hasReviewerComment ? 'Reviewer' : 'You';
+        if (this.hasReviewerComment) return 'Reviewer';
+        if (this.isRevoked) return 'Revoked';
+        return 'You';
     }
     get convoPreviewText() {
-        return this.hasReviewerComment ? this.reviewerComment : this.priorReturnComment;
+        if (this.hasReviewerComment) return this.reviewerComment;
+        if (this.isRevoked) return this.revokedComment;
+        return this.priorReturnComment;
     }
 
     get priorRejectionReasonItems() {
@@ -413,12 +448,8 @@ get priorReturnDateFormatted() {
         try {
             await revokeDecision({ applicationId: this.applicationId });
 
-            this.existingDecision = null;
-            this.isRevokable      = false;
-            this.isReturned       = false;
-            this.decisionDate     = null;
-            this.comment          = '';
-            this.showRevokeModal  = false;
+            this.showRevokeModal = false;
+            await this._loadExistingDecision();
 
             this.dispatchEvent(new ShowToastEvent({
                 title:   'Decision Revoked',

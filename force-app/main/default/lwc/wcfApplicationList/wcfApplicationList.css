@@ -50,3 +50,26 @@
 .wcf-table td:nth-child(4) {
     min-width: 150px;
 }
+
+/* ── Duplicate Org / Error Badge ── */
+.wg-tag--error {
+    background: var(--wg-error-bg, #FCECEA);
+    color: var(--wg-error, #B3261E);
+    border: 1px solid var(--wg-error, #B3261E);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: help;
+}
+
+/* ── Inline Duplicate Match Note (no hover required) ── */
+.wg-dup-note {
+    font-size: 11px;
+    color: var(--wg-error, #B3261E);
+    font-weight: 500;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    word-break: break-word;
+}

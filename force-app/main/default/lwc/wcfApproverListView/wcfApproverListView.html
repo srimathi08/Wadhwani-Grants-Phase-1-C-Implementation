@@ -91,7 +91,14 @@
                                     <template for:each={paginatedItems} for:item="row">
                                         <tr key={row.applicationId} class={row.rowClass}>
                                             <td class="wg-col-index">{row.sno}</td>
-                                            <td class="wg-cell-id">{row.applicationName}</td>
+                                            <td class="wg-cell-id">
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <span>{row.applicationName}</span>
+                                                    <template lwc:if={row.hasRevision}>
+                                                        <span class="wg-tag wg-tag--warning">{row.revisionLabel}</span>
+                                                    </template>
+                                                </div>
+                                            </td>
                                             <td><span class="wcf-trunc" title={row.organizationName}>{row.organizationName}</span></td>
                                             <td><span class="wcf-trunc" title={row.headquarters}>{row.headquarters}</span></td>
                                             <td>

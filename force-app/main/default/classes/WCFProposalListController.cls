@@ -26,7 +26,9 @@ public without sharing class WCFProposalListController {
                     Status,
                     Assigned_reviewers__c,
                     CreatedDate,
-                    Validated__c
+                    Validated__c,
+                    Submission_Round__c,
+                    Last_Resubmission_Date__c
                 FROM IndividualApplication
                 WHERE Status IN (
                     'Under Review',
@@ -98,7 +100,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
             // ── Pass 1: WCF review record types → status, reviewId, DueDate if present ──
             for (ApplicationReview ar : [
                 SELECT Id, ApplicationId, Status, IsSubmitted, DueDate,
-                       Recommend_for_CEO_review__c
+                       Recommend_for_CEO_review__c, Reviewer_Return_Comment__c
                 FROM ApplicationReview
                 WHERE ApplicationId IN :underReviewIds
                 AND RecordTypeId IN :reviewerRtIds
@@ -114,6 +116,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
                     info.dueDate     = ar.DueDate != null ? String.valueOf(ar.DueDate) : null;
                     info.isFlagged   = false;
                     info.recommendation = ar.Recommend_for_CEO_review__c;   // NEW
+                    info.isBackFromValidator = String.isNotBlank(ar.Reviewer_Return_Comment__c);
                     resultMap.put(appId, info);
                 } else if (ar.DueDate != null && resultMap.get(appId).dueDate == null) {
                     resultMap.get(appId).dueDate = String.valueOf(ar.DueDate);
@@ -178,6 +181,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
             @AuraEnabled public String  decisionRationale;
             @AuraEnabled public String  otherConcern;
             @AuraEnabled public String  recommendation;   // NEW: Recommend_for_CEO_review__c
+            @AuraEnabled public Boolean isBackFromValidator;
         }
     
     // ── NEW: Update Flag__c on the validator's ApplicationReview ──
@@ -345,6 +349,7 @@ private static Map<Id, String> getComplianceStatusByApp(Set<Id> appIds) {
                 );
             }
             ar.Reviewer_Comment_to_Approver__c = reviewerComment;
+            ar.Reviewer_Return_Comment__c = null;
             ar.Status  = 'Review Submitted';
             app.Status = 'Review Completed - Recommended';
         } else if (action == 'ReturnToValidator') {
@@ -531,6 +536,7 @@ public static Map<String, Integer> getQueueSummary() {
         // have an ApplicationReview row.
         List<IndividualApplication> apps = [
             SELECT Id, Name, Account.Name, RecordType.Name, Headquarters_City_and_Country__c, Status,
+                   Submission_Round__c, Last_Resubmission_Date__c,
                    Organizational_Area_s_for_Funding_Inves__c, Organizational_Area_s_for_Funding_Inves1__c
             FROM IndividualApplication
            WHERE Status IN (
@@ -673,6 +679,14 @@ String rawTrack   = String.isNotBlank(ia.Organizational_Area_s_for_Funding_Inves
     ? ia.Organizational_Area_s_for_Funding_Inves1__c
     : ia.Organizational_Area_s_for_Funding_Inves__c;
 item.track        = WCF_ReviewFormJFController.resolveTrackCodes(rawTrack);
+
+Decimal round = ia.Submission_Round__c;
+if (round == null || round < 1) {
+    round = (ia.Status == 'Application Resubmitted' || ia.Last_Resubmission_Date__c != null) ? 2 : 1;
+}
+item.submissionRound = round.intValue();
+item.revisionCount   = Math.max(0, round.intValue() - 1);
+
             result.add(item);
             count++;
         }
@@ -690,5 +704,7 @@ item.track        = WCF_ReviewFormJFController.resolveTrackCodes(rawTrack);
         @AuraEnabled public String headquarters; // ADD THIS
         @AuraEnabled public Boolean isRejected;
         @AuraEnabled public String track;
+        @AuraEnabled public Integer submissionRound;
+        @AuraEnabled public Integer revisionCount;
     }
     }

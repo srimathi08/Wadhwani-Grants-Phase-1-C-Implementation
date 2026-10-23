@@ -2,14 +2,11 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Copy_1_of_Email_to_Validator_on_Application_submission</name>
-        <label>Copy 1 of Email to Validator on Application submission</label>
+        <label>Resubmission Email to Validator on Application submission</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_20</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -43,7 +40,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/New_Application_Validator_Queue</setupReference>
+                <setupReference>WCF_Folder/Resubmission_Application_Validator_Queue</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -137,9 +134,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_21</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -202,9 +196,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_22</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -267,9 +258,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_23</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -332,9 +320,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_24</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -462,9 +447,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_25</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -489,17 +471,30 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>useEmailTemplate</name>
+            <name>composeEmailContent</name>
             <value>
                 <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailTemplateName</name>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>Subject</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/The_reviewer_needs_more_information</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
+                <stringValue>{!Reviewer_needs_more_information}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
@@ -527,9 +522,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_26</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -592,9 +584,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_27</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -657,9 +646,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_28</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -694,6 +680,68 @@
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
                 <setupReference>WCF_Folder/Additional_Information_Reminder</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_E_58_Duplicate_Org_Alert_to_Validator</name>
+        <label>Send E-58 Duplicate Org Alert to Validator</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>$Record.Account.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Duplicate_Organization_Validator_Alert</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -787,9 +835,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_1</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -852,9 +897,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_29</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -982,9 +1024,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_31</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -1123,9 +1162,6 @@
         <label>Application Status change</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_32</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Draft</name>
@@ -1369,15 +1405,27 @@
             </connector>
             <label>Onboarded</label>
         </rules>
+        <rules>
+            <name>Duplicate_Organization_Match</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Is_Duplicate_Org_Match__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_E_58_Duplicate_Org_Alert_to_Validator</targetReference>
+            </connector>
+            <label>Duplicate Organization Match</label>
+        </rules>
     </decisions>
     <decisions>
         <name>Check_If_Still_Revision_Requested</name>
         <label>Check If Still Revision Requested</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_33</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Still_In_Revision_Requested_30_Days</name>
@@ -1400,9 +1448,6 @@
         <label>Check If Still Revision Requested 100</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_34</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Still_In_Revision_Requested_100_Days</name>
@@ -1475,9 +1520,6 @@
         <label>status equal to submitted</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_35</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Status_still_in_submitted</name>
@@ -1500,9 +1542,6 @@
         <label>to validator email alert</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_36</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>when_status_is_Submitted</name>
@@ -1525,9 +1564,6 @@
         <label>validator email alert after resubmission</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_37</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>when_status_is_ReSubmitted</name>
@@ -1546,106 +1582,21 @@
         </rules>
     </decisions>
     <description>Wcf related email</description>
-    <ends>
-        <name>END_ELEMENT_1</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_20</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_21</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_22</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_23</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_24</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_25</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_26</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_27</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_28</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_29</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_31</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_32</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_33</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_34</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_35</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_36</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_37</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_38</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
     <environments>Default</environments>
+    <formulas>
+        <name>CurrentYear</name>
+        <dataType>String</dataType>
+        <expression>TEXT(YEAR(TODAY()))</expression>
+    </formulas>
     <formulas>
         <name>RevisionDueDate</name>
         <dataType>Date</dataType>
         <expression>TODAY() + 5</expression>
+    </formulas>
+    <formulas>
+        <name>Subject</name>
+        <dataType>String</dataType>
+        <expression>&quot;Reviewer needs more information:&quot; &amp; {!$Record.ApplicationName}</expression>
     </formulas>
     <formulas>
         <name>SubmissionRoundPlusOne</name>
@@ -1945,9 +1896,6 @@
         <label>Mark Draft Email Send</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <connector>
-            <targetReference>END_ELEMENT_38</targetReference>
-        </connector>
         <inputAssignments>
             <field>Draft_Email_Sent__c</field>
             <value>
@@ -2093,6 +2041,11 @@
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Draft</status>
+    <textTemplates>
+        <name>Reviewer_needs_more_information</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot; style=&quot;background-color:#F4F4F5;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; style=&quot;padding:28px 12px;&quot;&gt;&lt;table width=&quot;640&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%;max-width:640px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:28px 32px;background-color:#BF2026;border-radius:8px 8px 0 0;&quot;&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;&quot;&gt;Returned for input&lt;/p&gt;&lt;h1 style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:26px;line-height:1.25;font-weight:700;color:#ffffff;&quot;&gt;Returned to you for input&lt;/h1&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#F9C9A8;&quot;&gt;Application {!$Record.ApplicationName} · {!$Record.Organization_Name__c}&lt;/p&gt;&lt;/td&gt;&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;140&quot; style=&quot;padding-left:16px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782557340000&quot; width=&quot;140&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:140px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;background-color:#F2672A;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:32px 32px 12px;&quot;&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Hi {!$Record.WG_Validator_Name__c},&lt;/p&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The reviewer has returned this application to you. They need more information before they can finish the evaluation.&lt;/p&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F7F2F2&quot; style=&quot;background:#F7F2F2;border-left:4px solid #F2672A;border-radius:4px;margin:8px 0 22px;&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:18px 22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6D6E71;&quot;&gt;What the reviewer asked for&lt;/p&gt;&lt;p style=&quot;margin:0 0 14px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;{!Get_Proposal_Review.Reviewer_Return_Comment__c}&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#6D6E71;&quot;&gt;Application round: {!$Record.Submission_Round__c}&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;font-weight:600;color:#414042;&quot;&gt;Two steps to close this:&lt;/p&gt;&lt;ol style=&quot;margin:0 0 16px;padding-left:22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;&lt;li style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Check whether the answer is already in the application. If it is, point the reviewer to the page and question where it sits.&lt;/li&gt;&lt;li style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;If it is genuinely missing, return the application to the applicant and ask for that detail.&lt;/li&gt;&lt;/ol&gt;&lt;p style=&quot;margin:0 0 20px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The applicant sees no change until you return it to them. Please act by &lt;strong&gt;{!$Record.Due_Date__c}&lt;/strong&gt;, so the evaluation is not held up.&lt;/p&gt;&lt;table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:4px 0 8px;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;background-color:#BF2026;border-radius:6px;&quot;&gt;&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:14px 34px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;&quot;&gt;Open the application&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:24px 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#414042;&quot;&gt;Wadhwani Grants Platform&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:0 32px;&quot;&gt;&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:8px 0 0;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:24px 32px 28px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782560396000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:136px;height:auto;margin:0 0 14px;border:0;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.&lt;/p&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email, and replies to this address are not read.&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</text>
+    </textTemplates>
     <variables>
         <name>HasWCFValidator</name>
         <dataType>Boolean</dataType>

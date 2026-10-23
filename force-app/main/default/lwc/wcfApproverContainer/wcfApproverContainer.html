@@ -12,18 +12,23 @@
                     <div class="ac-title-row">
                         <h2 class="ac-title">Approver decision</h2>
                     </div>
-                    <span class="ac-sub">{appName}</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="ac-sub">{appName}</span>
+                        <template lwc:if={hasRevision}>
+                            <span class="wg-tag wg-tag--warning">{revisionLabel}</span>
+                        </template>
+                    </div>
                 </div>
             </div>
 
             <div class="ac-topbar-right">
                 <template lwc:if={existingDecision}>
 
-                    <!-- Returned to Reviewer — waiting on the Reviewer -->
+                    <!-- Returned to Reviewer or Validator — waiting on them -->
                     <template lwc:if={isReturned}>
                         <span class="wg-pill wg-pill--returned ac-status-pill">
                             <lightning-icon icon-name="utility:reply" size="xx-small" alternative-text=""></lightning-icon>
-                            Returned to Reviewer on {returnedDateFormatted}. Awaiting Reviewer decision
+                            {returnStatusMessage}
                         </span>
                     </template>
 
@@ -52,6 +57,13 @@
                         </template>
                     </template>
 
+                </template>
+
+                <template lwc:elseif={isRevoked}>
+                    <span class="wg-pill wg-pill--warning ac-status-pill">
+                        <lightning-icon icon-name="utility:undo" size="xx-small" alternative-text=""></lightning-icon>
+                        Decision Revoked on {revokedDateFormatted} • Awaiting new decision
+                    </span>
                 </template>
             </div>
         </div>
@@ -83,6 +95,16 @@
 
                 <template lwc:if={isConvoExpanded}>
                     <div class="ac-convo-thread" id="ac-convo-thread">
+                        <template lwc:if={isRevoked}>
+                            <div class="ac-msg ac-msg--approver">
+                                <div class="ac-msg-meta">
+                                    <span class="ac-msg-author">You (Approver)</span>
+                                    <span class="ac-msg-date">{revokedDateFormatted}</span>
+                                </div>
+                                <p class="ac-msg-text">{revokedComment}</p>
+                            </div>
+                        </template>
+
                         <template lwc:if={isBackFromReviewer}>
                             <div class="ac-msg ac-msg--approver">
                                 <div class="ac-msg-meta">

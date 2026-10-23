@@ -604,7 +604,10 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
             return 'dash-track-badge dash-track-badge--active';
         }
         if (this.complianceTotal === 0) return 'dash-track-badge dash-track-badge--pending';
-        if (this.complianceUploaded >= this.complianceTotal) {
+        if (this.complianceStatus === 'Draft') {
+            return 'dash-track-badge dash-track-badge--inprogress';
+        }
+        if (this.complianceStatus === 'Pending Review' || this.complianceUploaded >= this.complianceTotal) {
             return 'dash-track-badge dash-track-badge--review';
         }
         if (this.complianceUploaded > 0) {
@@ -619,8 +622,16 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
         if (this.complianceStatus === 'Returned') return 'ACTION NEEDED';
         if (this.complianceStatus === 'Validated' || this.isOnboarded) return 'COMPLETE';
         if (this.complianceTotal === 0) return 'NOT STARTED';
-        if (this.complianceUploaded >= this.complianceTotal) return 'PENDING REVIEW';
+        if (this.complianceStatus === 'Draft') return 'DRAFT';
+        if (this.complianceStatus === 'Pending Review' || this.complianceUploaded >= this.complianceTotal) return 'PENDING REVIEW';
         return CL_IN_PROGRESS;
+    }
+
+    get complianceProgressText() {
+        if (this.complianceStatus === 'Draft') {
+            return `${this.complianceUploaded} of ${this.complianceTotal} documents uploaded`;
+        }
+        return `${this.complianceUploaded} of ${this.complianceTotal} ${this.labels.CL_documents_complete}`;
     }
 
     get isComplianceHalted() {

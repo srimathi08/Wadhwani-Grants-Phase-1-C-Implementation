@@ -167,7 +167,8 @@ public without sharing class WCFComplianceController {
         if (applicationId == null || String.isBlank(documentType)) {
             throw new AuraHandledException('Missing application or document type.');
         }
-        validateOwnership(applicationId);
+                validateOwnership(applicationId);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
@@ -333,12 +334,15 @@ public without sharing class WCFComplianceController {
             throw new AuraHandledException('Missing required upload details.');
         }
 
-        validateOwnership(applicationId);
+                validateOwnership(applicationId);
         validateFileSize(contentDocumentId, fileName);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
         assertEditable(items, findItem(items, documentType, null), false);
+
+        // Resolve the target record only from this application's documents
 
         // Resolve the target record only from this application's documents
         // (so a foreign existingRecordId can never be written to), and never
@@ -478,6 +482,7 @@ public without sharing class WCFComplianceController {
         Id applicationId = applicationIdOf(adHocRecordId);
         validateOwnership(applicationId);
         validateFileSize(contentDocumentId, fileName);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         WCF_Compliance_Document__c doc = findAdHocRequest(allDocs, adHocRecordId, documentLabel);
@@ -485,7 +490,7 @@ public without sharing class WCFComplianceController {
         List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
         assertEditable(items, findItem(items, documentLabel, adHocRecordId), false);
 
-        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+        Map<String, DocStatusEntry> statusMap = parseStatusMapStrict(doc.Document_Status_JSON__c);
         pinParentDecision(doc, statusMap);
 
         DocStatusEntry entry = statusMap.get(documentLabel);
@@ -538,8 +543,9 @@ public without sharing class WCFComplianceController {
             throw new AuraHandledException('Missing document reference.');
         }
 
-        Id applicationId = applicationIdOf(adHocRecordId);
+                Id applicationId = applicationIdOf(adHocRecordId);
         validateOwnership(applicationId);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         WCF_Compliance_Document__c doc = findAdHocRequest(allDocs, adHocRecordId, documentLabel);
@@ -547,8 +553,8 @@ public without sharing class WCFComplianceController {
         List<ComplianceChecklistItem> items = buildItems(allDocs, computeIsSubmitted(allDocs));
         assertEditable(items, findItem(items, documentLabel, adHocRecordId), true);
 
-        Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
-        pinParentDecision(doc, statusMap);
+        Map<String, DocStatusEntry> statusMap = parseStatusMapStrict(doc.Document_Status_JSON__c);       
+         pinParentDecision(doc, statusMap);
 
         DocStatusEntry entry = statusMap.get(documentLabel);
         if (entry != null && String.isNotBlank(entry.contentDocumentId)) {
@@ -628,7 +634,8 @@ public without sharing class WCFComplianceController {
         if (applicationId == null) {
             throw new AuraHandledException('Missing application ID.');
         }
-        validateOwnership(applicationId);
+                validateOwnership(applicationId);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         if (allDocs.isEmpty()) return;
@@ -650,7 +657,7 @@ public without sharing class WCFComplianceController {
                     docsToUpdate.add(doc);
                 }
             } else if (String.isNotBlank(doc.Document_Types__c)) {
-                Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+                                Map<String, DocStatusEntry> statusMap = parseStatusMapStrict(doc.Document_Status_JSON__c);
                 pinParentDecision(doc, statusMap);
                 Boolean changed = false;
                 for (String label : splitLabels(doc.Document_Types__c)) {
@@ -686,13 +693,13 @@ public without sharing class WCFComplianceController {
         if (applicationId == null) {
             throw new AuraHandledException('Missing application ID.');
         }
-        validateOwnership(applicationId);
+                validateOwnership(applicationId);
+        lockApplication(applicationId);                        // NEW
 
         List<WCF_Compliance_Document__c> allDocs = queryDocs(applicationId);
         if (allDocs.isEmpty()) {
             throw new AuraHandledException('No compliance request found for this application.');
         }
-
         Boolean isSubmitted = computeIsSubmitted(allDocs);
         List<ComplianceChecklistItem> items = buildItems(allDocs, isSubmitted);
         for (ComplianceChecklistItem i : items) {
@@ -712,7 +719,7 @@ public without sharing class WCFComplianceController {
         for (WCF_Compliance_Document__c doc : allDocs) {
             if (String.isNotBlank(doc.Document_Type__c) || String.isBlank(doc.Document_Types__c)) continue;
 
-            Map<String, DocStatusEntry> statusMap = parseStatusMap(doc.Document_Status_JSON__c);
+                       Map<String, DocStatusEntry> statusMap = parseStatusMapStrict(doc.Document_Status_JSON__c);
             pinParentDecision(doc, statusMap);
             Integer movedHere = 0;
 
@@ -791,6 +798,34 @@ public without sharing class WCFComplianceController {
         }
         return (totalRequired > 0 && totalValidated >= totalRequired) ? 'Onboarding Approved' : 'In Progress';
     }
+
+    /**
+ * Serialises all compliance writes for one application. Call it AFTER
+ * validateOwnership() and BEFORE queryDocs(), so a waiting transaction reads
+ * the rows the previous one committed instead of a stale copy.
+ */
+private static void lockApplication(Id applicationId) {
+    List<IndividualApplication> locked = [
+        SELECT Id
+        FROM   IndividualApplication
+        WHERE  Id = :applicationId
+        WITH   SYSTEM_MODE
+        FOR UPDATE
+    ];
+    if (locked.isEmpty()) {
+        throw new AuraHandledException('Application not found.');
+    }
+}
+
+/** Strict parse for write paths: a corrupt blob must never be saved back as an empty map. */
+private static Map<String, DocStatusEntry> parseStatusMapStrict(String jsonStr) {
+    if (String.isBlank(jsonStr)) return new Map<String, DocStatusEntry>();
+    try {
+        return (Map<String, DocStatusEntry>) JSON.deserialize(jsonStr, Map<String, DocStatusEntry>.class);
+    } catch (Exception e) {
+        throw new AuraHandledException('Could not read the document status. Please refresh the page and try again.');
+    }
+}
 
     // ═════════════════════════════════════════════════════════════════
     // Internals

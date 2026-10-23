@@ -95,7 +95,15 @@ const TRACK_LABEL = Object.freeze({
     JOB_CREATION: 'Job Creation',
     LIVELIHOOD: 'Livelihood Upliftment'
 });
-const MANDATE_SCOPE = `${TRACK_LABEL.JOB_FULFILLMENT} and ${TRACK_LABEL.JOB_CREATION}`;
+const ALL_TRACK_LABELS = [TRACK_LABEL.JOB_FULFILLMENT, TRACK_LABEL.JOB_CREATION, TRACK_LABEL.LIVELIHOOD];
+
+// "A", "A and B", "A, B and C" (conj = 'and' | 'or')
+const joinTracks = (list, conj = 'and') =>
+    list.length <= 1 ? (list[0] || '')
+        : `${list.slice(0, -1).join(', ')} ${conj} ${list[list.length - 1]}`;
+
+// Was: `${JOB_FULFILLMENT} and ${JOB_CREATION}`  ← the U85 root cause in code
+const MANDATE_SCOPE = joinTracks(ALL_TRACK_LABELS); // "Job Fulfillment, Job Creation and Livelihood Upliftment"
 
 // Display-only safety net for text coming from Apex/metadata. NEVER apply to stored values.
 const normalizeTerms = t =>
@@ -202,7 +210,14 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             this._wiredAppId = id;
         }
     }
-
+    // Text for {tracks}: the applicant's declared tracks, or all three if none detected
+get mandateTrackText() {
+    const declared = this.declaredTrackLabels;
+    return joinTracks(declared.length ? declared : ALL_TRACK_LABELS, 'or');
+}
+_fillTokens(t) {
+    return typeof t === 'string' ? t.replace(/\{tracks\}/g, this.mandateTrackText) : t;
+}
 
     get applicantName() { return this._applicationName || '—'; }
     get applicationId() { return this.recordId || this._urlRecordId || '—'; }
@@ -663,6 +678,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
 
         const mappedOptions = rawOpts.map(opt => {
             const val = opt.value || opt.val;
+            const catalogLabel = (OPTION_CATALOG[q.key] || []).find(c => c.value === val)?.label;
             const isSelected = this.formState[q.key] === val;
             let cls = '';
             if (isConfirmPill) {
@@ -674,7 +690,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             }
             return {
                 val: val,
-                label: normalizeTerms(opt.label),
+                 label: normalizeTerms(catalogLabel || opt.label),
                 sublabel: opt.sublabel || null,
                 cls: cls
             };
@@ -686,8 +702,8 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
         return {
             key: q.key,
             label: normalizeTerms(q.label),
-            questionText: normalizeTerms(q.questionText),
-            hintText: normalizeTerms(q.hintText),
+            questionText: normalizeTerms(this._fillTokens(q.questionText)),
+            hintText: normalizeTerms(this._fillTokens(q.hintText)),
             isRequired: q.isRequired,
             displayType: q.displayType,
             isConfirmPill,
@@ -733,7 +749,7 @@ export default class WcfValidatorForm extends NavigationMixin(LightningElement) 
             ? sec.questions.map(q => this._enrichQuestion(q))
             : [
                 this._enrichQuestion({ key: 's2_1', questionText: 'Geography: Does the applicant\'s primary geography fall within Wadhwani Grants\'s active operating clusters?', hintText: 'Active clusters: India, Latin America (Brazil / Mexico), Southeast Asia (Indonesia / Philippines). MENA = monitor only.', displayType: 'PicklistCard', isRequired: true }),
-                this._enrichQuestion({ key: 's2_2', questionText: `Mandate fit: Does the applicant's work fall credibly within ${TRACK_LABEL.JOB_FULFILLMENT}, ${TRACK_LABEL.JOB_CREATION}, or both, at first read?`, displayType: 'PicklistCard', isRequired: true }),
+                this._enrichQuestion({ key: 's2_2', questionText: 'Mandate fit: Does the applicant\'s work fall credibly within {tracks}, at first read?', displayType: 'PicklistCard', isRequired: true }),
                 this._enrichQuestion({ key: 's2_3', questionText: 'Blocking concern: Did your first-pass review surface any concern that could materially affect Reviewer evaluation?', hintText: 'Examples: sanctions / watchlist hit; contradicting outcome data; institutional credibility concerns. Most applicants: No.', displayType: 'BinaryRadio', isRequired: true }),
                 this._enrichQuestion({ key: 's2_3_text', questionText: 'Describe the blocking concern', displayType: 'TextArea', isRequired: true, wordLimit: 300, conditionalParentKey: 's2_3', conditionalParentValue: 'Yes' })
             ];

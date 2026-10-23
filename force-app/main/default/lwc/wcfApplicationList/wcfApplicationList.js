@@ -1,7 +1,7 @@
 import { LightningElement, track, wire, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getApplicationList from '@salesforce/apex/WCFValidatorController.getApplicationList';
-import getActionCounts    from '@salesforce/apex/WCFValidatorController.getActionCounts';
+import getActionCounts from '@salesforce/apex/WCFValidatorController.getActionCounts';
 import { refreshApex } from '@salesforce/apex';
 
 const PAGE_SIZE = 20;
@@ -11,30 +11,30 @@ const PAGE_SIZE = 20;
 // success = approved, returned = sent back, error = rejected,
 // neutral = draft / unknown
 const STATUS_PILL_MAP = {
-    'Draft'                              : 'wg-pill wg-pill--neutral',
-    'Submitted'                          : 'wg-pill wg-pill--info',
-    'Under Validation'                   : 'wg-pill wg-pill--info',
-    'Under Review'                       : 'wg-pill wg-pill--info',
-    'Under External Review'              : 'wg-pill wg-pill--info',
-    'Proposal Submitted to WIN Admin'    : 'wg-pill wg-pill--info',
-    'Proposal Submitted to COE Admin'    : 'wg-pill wg-pill--info',
-    'Approved - Level 1'                 : 'wg-pill wg-pill--success',
-    'Approved for Funding'               : 'wg-pill wg-pill--success',
+    'Draft': 'wg-pill wg-pill--neutral',
+    'Submitted': 'wg-pill wg-pill--info',
+    'Under Validation': 'wg-pill wg-pill--info',
+    'Under Review': 'wg-pill wg-pill--info',
+    'Under External Review': 'wg-pill wg-pill--info',
+    'Proposal Submitted to WIN Admin': 'wg-pill wg-pill--info',
+    'Proposal Submitted to COE Admin': 'wg-pill wg-pill--info',
+    'Approved - Level 1': 'wg-pill wg-pill--success',
+    'Approved for Funding': 'wg-pill wg-pill--success',
     'Asked for Resubmission by WIN Admin': 'wg-pill wg-pill--returned',
-    'Revision Requested'                 : 'wg-pill wg-pill--returned',
-    'Returned to Validator'              : 'wg-pill wg-pill--returned',
-    'Rejected'                           : 'wg-pill wg-pill--error',
+    'Revision Requested': 'wg-pill wg-pill--returned',
+    'Returned to Validator': 'wg-pill wg-pill--returned',
+    'Rejected': 'wg-pill wg-pill--error',
 };
 const DEFAULT_PILL = 'wg-pill wg-pill--neutral';
 
 // ── Summary buckets (order = display order) ───────────────────────
 const SUMMARY_BUCKETS = [
-    { id: 'validate',           label: 'To Validate',          countKey: 'validateCount',           tone: 'info'    },
-    { id: 'resume',             label: 'In Progress',          countKey: 'resumeCount',             tone: 'warning' },
-    { id: 'resubmit',           label: 'Revalidate',           countKey: 'resubmitCount',           tone: 'brand',   alertWhenPositive: true },
-    { id: 'returnedByReviewer', label: 'Returned by Reviewer', countKey: 'returnedByReviewerCount', tone: 'error',   alertWhenPositive: true },
-    { id: 'awaiting',           label: 'Awaiting Applicant',   countKey: 'awaitingApplicantCount',  tone: 'neutral' },
-    { id: 'validated',          label: 'Validated',            countKey: 'validatedCount',          tone: 'success' },
+    { id: 'validate', label: 'To Validate', countKey: 'validateCount', tone: 'info' },
+    { id: 'resume', label: 'In Progress', countKey: 'resumeCount', tone: 'warning' },
+    { id: 'resubmit', label: 'Revalidate', countKey: 'resubmitCount', tone: 'brand', alertWhenPositive: true },
+    { id: 'returnedByReviewer', label: 'Returned by Reviewer', countKey: 'returnedByReviewerCount', tone: 'error', alertWhenPositive: true },
+    { id: 'awaiting', label: 'Awaiting Applicant', countKey: 'awaitingApplicantCount', tone: 'neutral' },
+    { id: 'validated', label: 'Validated', countKey: 'validatedCount', tone: 'success' },
 ];
 
 export default class WcfApplicationList extends NavigationMixin(LightningElement) {
@@ -47,27 +47,27 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
     set statusFilter(value) {
         this._statusFilter = Array.isArray(value) ? value : (value ? [value] : null);
         this.activeFilter = '';   // clear stale internal filter whenever a new URL filter arrives
-        this.currentPage  = 1;
+        this.currentPage = 1;
     }
 
-    _rawData          = [];
+    _rawData = [];
     _wiredAppsResult;
 
     @track error;
-    @track isLoading      = true;
-    @track searchTerm     = '';
-    @track currentPage    = 1;
-    @track sortField      = 'AppliedDate';
-    @track sortDir        = 'desc';
-    @track activeFilter   = ''; // 'validated' | 'validate' | 'resume' | 'resubmit' | 'returnedByReviewer' | 'awaiting' | ''
+    @track isLoading = true;
+    @track searchTerm = '';
+    @track currentPage = 1;
+    @track sortField = 'AppliedDate';
+    @track sortDir = 'desc';
+    @track activeFilter = ''; // 'validated' | 'validate' | 'resume' | 'resubmit' | 'returnedByReviewer' | 'awaiting' | ''
 
     // ── Summary counts from Apex ─────────────────────────────────
-    @track validatedCount          = 0;
-    @track validateCount           = 0;
-    @track resumeCount             = 0;
-    @track resubmitCount           = 0;
+    @track validatedCount = 0;
+    @track validateCount = 0;
+    @track resumeCount = 0;
+    @track resubmitCount = 0;
     @track returnedByReviewerCount = 0;
-    @track awaitingApplicantCount  = 0;
+    @track awaitingApplicantCount = 0;
 
     // ── Wire: application list ───────────────────────────────────
     @wire(getApplicationList)
@@ -77,9 +77,9 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
         const { data, error } = result;
         if (data) {
             this._rawData = data;
-            this.error    = undefined;
+            this.error = undefined;
         } else if (error) {
-            this.error    = error.body?.message || 'Unknown error';
+            this.error = error.body?.message || 'Unknown error';
             this._rawData = [];
         }
     }
@@ -88,31 +88,31 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
     @wire(getActionCounts)
     wiredCounts({ data }) {
         if (data) {
-            this.validatedCount          = data.validated          || 0;
-            this.validateCount           = data.validate           || 0;
-            this.resumeCount             = data.resume             || 0;
-            this.resubmitCount           = data.resubmit           || 0;
+            this.validatedCount = data.validated || 0;
+            this.validateCount = data.validate || 0;
+            this.resumeCount = data.resume || 0;
+            this.resubmitCount = data.resubmit || 0;
             this.returnedByReviewerCount = data.returnedByReviewer || 0;
-            this.awaitingApplicantCount  = data.awaitingApplicant  || 0;
+            this.awaitingApplicantCount = data.awaitingApplicant || 0;
         }
     }
 
     // ── Summary bar click — filter table by action bucket ────────
     handleSummaryClick(evt) {
         const filter = evt.currentTarget.dataset.filter;
-        this.activeFilter  = (this.effectiveFilter === filter) ? '' : filter;
+        this.activeFilter = (this.effectiveFilter === filter) ? '' : filter;
         this._statusFilter = null;   // internal click takes priority, clear URL filter
-        this.currentPage   = 1;
+        this.currentPage = 1;
     }
 
     // ── Search ───────────────────────────────────────────────────
     handleSearch(evt) {
-        this.searchTerm  = evt.target.value.toLowerCase();
+        this.searchTerm = evt.target.value.toLowerCase();
         this.currentPage = 1;
     }
 
     handleSearchInput(evt) {
-        this.searchTerm  = evt.target.value.toLowerCase();
+        this.searchTerm = evt.target.value.toLowerCase();
         this.currentPage = 1;
     }
 
@@ -123,7 +123,7 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
             this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
         } else {
             this.sortField = field;
-            this.sortDir   = 'asc';
+            this.sortDir = 'asc';
         }
         this.currentPage = 1;
     }
@@ -134,11 +134,11 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
 
     handleRefresh() {
         this.isLoading = true;
-        this.error     = undefined;
+        this.error = undefined;
         refreshApex(this._wiredAppsResult)
             .then(() => { this.isLoading = false; })
-            .catch(e  => {
-                this.error     = e.body?.message || 'Refresh failed';
+            .catch(e => {
+                this.error = e.body?.message || 'Refresh failed';
                 this.isLoading = false;
             });
     }
@@ -155,11 +155,11 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
 
     // ── Validate / Resume / Revalidate → fire event to container ─
     handleValidate(evt) {
-        const id   = evt.currentTarget.dataset.id;
+        const id = evt.currentTarget.dataset.id;
         const name = evt.currentTarget.dataset.name;
         this.dispatchEvent(new CustomEvent('validateclick', {
-            detail  : { recordId: id, recordName: name },
-            bubbles : true,
+            detail: { recordId: id, recordName: name },
+            bubbles: true,
             composed: true
         }));
     }
@@ -174,7 +174,7 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
         const effectiveFilter = this.effectiveFilter;
 
         let rows = this._rawData.map(wrapper => {
-            const a        = wrapper.application;
+            const a = wrapper.application;
             const acctName = a.Account ? a.Account.Name : '';
 
             // ── Determine action bucket for this row ──
@@ -196,7 +196,7 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
 
             // ── Search filter ──
             const matchSearch = !this.searchTerm
-                || (a.Name   || '').toLowerCase().includes(this.searchTerm)
+                || (a.Name || '').toLowerCase().includes(this.searchTerm)
                 || acctName.toLowerCase().includes(this.searchTerm)
                 || (a.Status || '').toLowerCase().includes(this.searchTerm)
                 || (a.Application_ID__c || '').toLowerCase().includes(this.searchTerm);
@@ -215,26 +215,37 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
                 trackBadges.push({ label: 'Livelihood', class: 'wg-tag wg-tag--success' });
             }
 
+            const round = wrapper.submissionRound || a.Submission_Round__c || (wrapper.isResubmission ? 2 : 1);
+            const revCount = wrapper.revisionCount != null ? wrapper.revisionCount : Math.max(0, round - 1);
+            const hasRevision = revCount > 0;
+            const revisionLabel = `Rev ${revCount}`;
+
             return {
                 ...a,
-                isValidated         : wrapper.isValidated,
-                hasDraft            : wrapper.hasDraft,
-                isResubmission      : wrapper.isResubmission,
-                isAwaitingApplicant : wrapper.isAwaitingApplicant,
+                displayId: a.Application_ID__c || a.Name,
+                hasSubName: Boolean(a.Application_ID__c && a.Application_ID__c !== a.Name),
+                isValidated: wrapper.isValidated,
+                isDuplicateOrg: wrapper.isDuplicateOrg || a.Is_Duplicate_Org_Match__c,
+                duplicateOrgRefs: wrapper.duplicateOrgRefs || a.Duplicate_Org_Matched_Name__c,
+                hasDraft: wrapper.hasDraft,
+                isResubmission: wrapper.isResubmission,
+                isAwaitingApplicant: wrapper.isAwaitingApplicant,
                 isReturnedByReviewer: wrapper.isReturnedByReviewer,
+                hasRevision,
+                revisionLabel,
                 trackBadges,
-                hasTrackBadges      : trackBadges.length > 0,
-                rowClass            : wrapper.isReturnedByReviewer
+                hasTrackBadges: trackBadges.length > 0,
+                rowClass: wrapper.isReturnedByReviewer
                     ? 'wg-row--attention'
                     : wrapper.isValidated
                         ? 'wg-row--success'
                         : '',
-                formattedDueDate : a.Due_Date__c
+                formattedDueDate: a.Due_Date__c
                     ? new Date(a.Due_Date__c).toLocaleDateString('en-IN', {
                         day: '2-digit', month: 'short', year: 'numeric'
-                      })
+                    })
                     : '—',
-                statusClass      : STATUS_PILL_MAP[a.Status] || DEFAULT_PILL,
+                statusClass: STATUS_PILL_MAP[a.Status] || DEFAULT_PILL,
                 acctName,
             };
         }).filter(Boolean);
@@ -262,29 +273,29 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
     get summaryItems() {
         const active = this.effectiveFilter;
         return SUMMARY_BUCKETS.map(b => {
-            const count    = this[b.countKey] || 0;
+            const count = this[b.countKey] || 0;
             const isActive = active === b.id;
-            const isAlert  = b.alertWhenPositive && count > 0;
+            const isAlert = b.alertWhenPositive && count > 0;
             return {
-                id      : b.id,
-                label   : b.label,
+                id: b.id,
+                label: b.label,
                 count,
-                pressed : isActive ? 'true' : 'false',
-                cls     : 'wg-stat'
-                          + (isAlert  ? ' wg-stat--alert'  : '')
-                          + (isActive ? ' wg-stat--active' : ''),
-                dotCls  : 'wg-stat-dot wg-stat-dot--' + b.tone,
+                pressed: isActive ? 'true' : 'false',
+                cls: 'wg-stat'
+                    + (isAlert ? ' wg-stat--alert' : '')
+                    + (isActive ? ' wg-stat--active' : ''),
+                dotCls: 'wg-stat-dot wg-stat-dot--' + b.tone,
             };
         });
     }
 
     // ── Computed helpers ─────────────────────────────────────────
-    get isLoaded()       { return !this.isLoading; }
-    get applications()   { return this._rawData; }
-    get hasRecords()     { return this.allFiltered.length > 0; }
-    get totalPages()     { return Math.max(1, Math.ceil(this.allFiltered.length / PAGE_SIZE)); }
-    get pageStart()      { return (this.currentPage - 1) * PAGE_SIZE + 1; }
-    get pageEnd()        { return Math.min(this.currentPage * PAGE_SIZE, this.allFiltered.length); }
+    get isLoaded() { return !this.isLoading; }
+    get applications() { return this._rawData; }
+    get hasRecords() { return this.allFiltered.length > 0; }
+    get totalPages() { return Math.max(1, Math.ceil(this.allFiltered.length / PAGE_SIZE)); }
+    get pageStart() { return (this.currentPage - 1) * PAGE_SIZE + 1; }
+    get pageEnd() { return Math.min(this.currentPage * PAGE_SIZE, this.allFiltered.length); }
     get isPrevDisabled() { return this.currentPage <= 1; }
     get isNextDisabled() { return this.currentPage >= this.totalPages; }
 
@@ -292,7 +303,7 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
     get subtitle() {
         const total = (this._rawData || []).length;
         const shown = this.allFiltered.length;
-        const noun  = total === 1 ? 'proposal' : 'proposals';
+        const noun = total === 1 ? 'proposal' : 'proposals';
         return shown === total
             ? `${total} ${noun}`
             : `Showing ${shown} of ${total} ${noun}`;
@@ -312,13 +323,13 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
         return this.sortDir === 'asc' ? 'ascending' : 'descending';
     }
 
-    get sortIconId()       { return this._sortIcon('Application_ID__c'); }
-    get sortIconAccount()  { return this._sortIcon('Account.Name'); }
-    get sortIconDueDate()  { return this._sortIcon('Due_Date__c'); }
-    get sortClassId()      { return this._sortClass('Application_ID__c'); }
+    get sortIconId() { return this._sortIcon('Application_ID__c'); }
+    get sortIconAccount() { return this._sortIcon('Account.Name'); }
+    get sortIconDueDate() { return this._sortIcon('Due_Date__c'); }
+    get sortClassId() { return this._sortClass('Application_ID__c'); }
     get sortClassAccount() { return this._sortClass('Account.Name'); }
     get sortClassDueDate() { return this._sortClass('Due_Date__c'); }
-    get ariaSortId()       { return this._ariaSort('Application_ID__c'); }
-    get ariaSortAccount()  { return this._ariaSort('Account.Name'); }
-    get ariaSortDueDate()  { return this._ariaSort('Due_Date__c'); }
+    get ariaSortId() { return this._ariaSort('Application_ID__c'); }
+    get ariaSortAccount() { return this._ariaSort('Account.Name'); }
+    get ariaSortDueDate() { return this._ariaSort('Due_Date__c'); }
 }

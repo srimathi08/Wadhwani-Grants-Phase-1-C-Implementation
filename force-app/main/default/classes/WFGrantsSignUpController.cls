@@ -317,14 +317,50 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
         return pa.PersonContactId;
     }
 
+    private static final Map<String, List<Integer>> PHONE_LENGTH_BY_CC = new Map<String, List<Integer>>{
+        '1'   => new List<Integer>{ 10, 10 },
+        '20'  => new List<Integer>{ 9, 10 },
+        '234' => new List<Integer>{ 10, 10 },
+        '27'  => new List<Integer>{ 9, 9 },
+        '31'  => new List<Integer>{ 9, 9 },
+        '33'  => new List<Integer>{ 9, 9 },
+        '34'  => new List<Integer>{ 9, 9 },
+        '39'  => new List<Integer>{ 9, 10 },
+        '41'  => new List<Integer>{ 9, 9 },
+        '44'  => new List<Integer>{ 10, 10 },
+        '49'  => new List<Integer>{ 7, 11 },
+        '52'  => new List<Integer>{ 10, 10 },
+        '54'  => new List<Integer>{ 10, 11 },
+        '55'  => new List<Integer>{ 10, 11 },
+        '60'  => new List<Integer>{ 9, 10 },
+        '61'  => new List<Integer>{ 9, 9 },
+        '63'  => new List<Integer>{ 10, 10 },
+        '64'  => new List<Integer>{ 8, 10 },
+        '65'  => new List<Integer>{ 8, 8 },
+        '7'   => new List<Integer>{ 10, 10 },
+        '81'  => new List<Integer>{ 10, 10 },
+        '82'  => new List<Integer>{ 9, 10 },
+        '86'  => new List<Integer>{ 11, 11 },
+        '91'  => new List<Integer>{ 10, 10 },
+        '966' => new List<Integer>{ 9, 9 },
+        '971' => new List<Integer>{ 9, 9 }
+    };
+
     private static String formatPhone(String countryCode, String phone) {
         String cc  = String.isBlank(countryCode) ? '91' : countryCode.replaceAll('\\D', '');
         String raw = phone == null ? '' : phone.replaceAll('\\D', '');
-        if (raw.length() < 6) {
-            throw new AuraHandledException('Enter a valid phone number.');
-        }
         if (raw.startsWith(cc) && (raw.length() - cc.length()) >= 6) {
             raw = raw.substring(cc.length());
+        }
+        if (PHONE_LENGTH_BY_CC.containsKey(cc)) {
+            Integer minLen = PHONE_LENGTH_BY_CC.get(cc)[0];
+            Integer maxLen = PHONE_LENGTH_BY_CC.get(cc)[1];
+            if (raw.length() < minLen || raw.length() > maxLen) {
+                String expected = minLen == maxLen ? (minLen + ' digits') : (minLen + '–' + maxLen + ' digits');
+                throw new AuraHandledException('Enter a valid phone number for the selected country (expected ' + expected + ').');
+            }
+        } else if (raw.length() < 7) {
+            throw new AuraHandledException('Enter a valid phone number.');
         }
         return System.UserManagement.formatPhoneNumber(cc, raw);
     }
