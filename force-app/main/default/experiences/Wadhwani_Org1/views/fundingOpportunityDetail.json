@@ -1,0 +1,48 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "177904c2-10a5-41de-95dd-a019ef8c3634",
+  "label" : "Funding Opportunity Detail",
+  "regions" : [ {
+    "id" : "0aa5054b-afdf-4aa8-ae22-d3e9adea7873",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordDetail",
+      "id" : "8647f10f-97d9-463c-8c20-3f6b97a42b3e",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "3d020a45-a4c7-4764-9e89-39c40628436b",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "f9cc184b-d028-45ab-aece-654c5ef1a9bc",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "c4010f86-f711-45c5-af4f-66e8c753f5a5",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "9c69aa57-dc1a-4b49-8947-a51f0553ea0a",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-119"
+}

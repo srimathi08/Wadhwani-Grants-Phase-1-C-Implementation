@@ -76,11 +76,13 @@ public without sharing class WCFSuspensionService {
             }
         }
 
-        private void setFrozen(Set<Id> accountIds, Boolean freeze) {
+                    private void setFrozen(Set<Id> accountIds, Boolean freeze) {
+                        Set<String> partnerProfiles = new Set<String>{ 'WCF Site User', 'WG Partners' };
             Map<Id, User> partnerUsers = new Map<Id, User>([
                 SELECT Id
                 FROM User
                 WHERE IsPortalEnabled = true
+                AND Profile.Name IN :partnerProfiles
                   AND Contact.AccountId IN :accountIds
             ]);
             if (partnerUsers.isEmpty()) {
@@ -88,20 +90,26 @@ public without sharing class WCFSuspensionService {
             }
 
             List<UserLogin> logins = [
-                SELECT Id, IsFrozen
+                SELECT Id, IsFrozen, IsPasswordLocked
                 FROM UserLogin
                 WHERE UserId IN :partnerUsers.keySet()
-                  AND IsFrozen != :freeze
             ];
+            List<UserLogin> toUpdate = new List<UserLogin>();
             for (UserLogin ul : logins) {
-                ul.IsFrozen = freeze;
+                if (freeze && !ul.IsFrozen) {
+                    ul.IsFrozen = true;
+                    toUpdate.add(ul);
+                } else if (!freeze && (ul.IsFrozen || ul.IsPasswordLocked)) {
+                    ul.IsFrozen = false;
+                    ul.IsPasswordLocked = false;
+                    toUpdate.add(ul);
+                }
             }
-            if (!logins.isEmpty()) {
-                update logins;
+            if (!toUpdate.isEmpty()) {
+                update toUpdate;
             }
 
             if (freeze) {
-                // End sessions that are already open
                 List<AuthSession> sessions = [
                     SELECT Id FROM AuthSession WHERE UsersId IN :partnerUsers.keySet()
                 ];
@@ -113,6 +121,5 @@ public without sharing class WCFSuspensionService {
                     }
                 }
             }
-        }
-    }
+        }   }
 }

@@ -11,7 +11,8 @@ import getDraftReviewRecord from '@salesforce/apex/WCF_ReviewFormJFController.ge
 import saveDraftReview from '@salesforce/apex/WCF_ReviewFormJFController.saveDraftReview';
 import deleteUploadedFile from '@salesforce/apex/WCF_ReviewFormJFController.deleteUploadedFile';
 import getAttachedFiles from '@salesforce/apex/WCF_ReviewFormJFController.getAttachedFiles';
-import uploadSupportingDocument from '@salesforce/apex/WCF_ReviewFormJFController.uploadSupportingDocument';
+//import uploadSupportingDocument from '@salesforce/apex/WCF_ReviewFormJFController.uploadSupportingDocument';
+import linkUploadedFiles from '@salesforce/apex/WCF_ReviewFormJFController.linkUploadedFiles';
 import getRejectionReasonOptions from '@salesforce/apex/WCF_ReviewFormJFController.getRejectionReasonOptions';
 import createReviewRecord from '@salesforce/apex/WCFProposalListController.createReviewRecord';
 
@@ -188,7 +189,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
         }
     }
 
-    @track isUploadingFile = false;
+    //@track isUploadingFile = false;
 
     get acceptedFormats() {
         return ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
@@ -1317,7 +1318,7 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
             });
     }
 
-    handleTriggerFileInput() {
+   /*    handleTriggerFileInput() {
         const input = this.template.querySelector('input[data-id="fileInput"]');
         if (input) {
             input.click();
@@ -1429,21 +1430,46 @@ export default class WcfProposalReviewForm extends NavigationMixin(LightningElem
                 event.target.value = '';
             }
         }
-    }
+    } */
 
-    handleUploadFinished(event) {
-        const files = event.detail.files;
-        if (files && files.length > 0) {
-            this.uploadedFiles = [
-                ...this.uploadedFiles,
-                ...files.map(f => ({ documentId: f.documentId, name: f.name }))
-            ];
-            this.showToast('Success', `${files.length} file(s) attached successfully`, 'success');
-        }
-    }
+ handleUploadFinished(event) {
+    const files = event.detail.files || [];
+    if (!files.length || !this.reviewData.Id) return;
 
+    linkUploadedFiles({
+        reviewId: this.reviewData.Id,
+        documentIds: files.map(f => f.documentId)
+    })
+        .then(rejectedIds => {
+            const rejected = new Set(rejectedIds || []);
+
+            // Tell the user about each oversized file
+            files
+                .filter(f => rejected.has(f.documentId))
+                .forEach(f => this.showToast(
+                    'File Too Large',
+                    `${f.name} exceeds the 25 MB limit and was not attached.`,
+                    'error'
+                ));
+
+            // Add only the accepted files to the list
+            const existing = new Set(this.uploadedFiles.map(f => f.documentId));
+            const added = files
+                .filter(f => !rejected.has(f.documentId) && !existing.has(f.documentId))
+                .map(f => ({ documentId: f.documentId, name: f.name }));
+
+            if (added.length) {
+                this.uploadedFiles = [...this.uploadedFiles, ...added];
+                this.showToast('Success', `${added.length} file(s) attached successfully`, 'success');
+            }
+        })
+        .catch(err => {
+            console.error('Error linking files:', err);
+            this.showToast('Error', err?.body?.message || 'Files uploaded but could not be attached to the review.', 'error');
+        });
+}
     handleDeleteFile(event) {
-        const docId = event.target.dataset.id;
+        const docId = event.currentTarget.dataset.id;
         deleteUploadedFile({ contentDocumentId: docId })
             .then(() => {
                 this.uploadedFiles = this.uploadedFiles.filter(f => f.documentId !== docId);

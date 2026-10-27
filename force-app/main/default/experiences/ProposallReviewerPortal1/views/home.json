@@ -1,0 +1,258 @@
+{
+  "appPageId" : "19355793-0e2f-4f99-8e29-d05c68a767cf",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "7147f5c2-66c3-4179-87a3-0f58e43a8b66",
+  "label" : "Home",
+  "regions" : [ {
+    "id" : "ef3545cb-5594-4ade-9368-43654a7ff544",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "9b1ead75-86d0-4e4c-a067-b766ab529951",
+          "columns" : [ {
+            "UUID" : "baf10d32-e315-42b5-9b18-a6cc7699b43b",
+            "columnKey" : "col1",
+            "columnName" : "column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ {
+              "attributes" : {
+                "richTextValue" : "<p><strong style=\"font-size: 18px;\">Access to Nutritious Food</strong></p> <p>Provides resources to organizations working to improve access to healthy food options for communities facing hunger and poverty.</p>",
+                "sfdc:identifier" : "forceCommunity_richTextInline1"
+              },
+              "fqn" : "forceCommunity:richTextInline"
+            } ]
+          } ]
+        },
+        "sectionHeight" : 32
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "9b1ead75-86d0-4e4c-a067-b766ab529951",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><img class=\"sfdcCbImage\" alt=\"\" src=\"{!contentAsset.Screenshot_20250401_125049.1}\"></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "0d5e2530-e5ca-4fcc-9539-f1d5cbf24c07",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "baf10d32-e315-42b5-9b18-a6cc7699b43b",
+        "regionLabel" : "column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "background" : "background: rgba(255,255,255,0.91)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "ce72d1cb-16c3-4474-bcb4-87d3089b7fdd",
+          "columns" : [ {
+            "UUID" : "1004db8c-cce7-40a9-a031-540036681a51",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "6",
+            "seedComponents" : [ ]
+          }, {
+            "UUID" : "9513bddf-eacb-4a72-ba05-9eb9f0f9ccbb",
+            "columnKey" : "dac0c",
+            "columnName" : "Column 2",
+            "columnWidth" : "6",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 50
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "ce72d1cb-16c3-4474-bcb4-87d3089b7fdd",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><span style=\"font-size: 72px; font-family: sans-serif; color: rgb(161, 0, 0);\">About Us</span></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "ad2569aa-afa4-463f-bc49-9b12b1a6c1bb",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "1004db8c-cce7-40a9-a031-540036681a51",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<h3><span style=\"font-size: 20px; color: rgb(0, 0, 0);\">Wadhwani Foundation is a high-growth, not-for-profit tech organization dedicated to social good. Over two decades since its inception in 2001, the foundation with worldwide presence has focused on a simple, powerful mission: accelerating job growth and enabling millions to earn a family-sustaining wage and lead a dignified life.</span></h3><h3><br></h3><h3><span style=\"font-size: 20px; color: rgb(0, 0, 0);\">The Foundation is positively impacting the lives of millions of individuals across multiple countries in Asia, Africa, and Latin America through its four core initiatives:</span></h3>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "14e4de7a-6936-4854-a951-9aaeb0c047f3",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "9513bddf-eacb-4a72-ba05-9eb9f0f9ccbb",
+        "regionLabel" : "Column 2",
+        "regionName" : "dac0c",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "443e4384-73f7-4b6a-886d-bb8738c76c60",
+          "columns" : [ {
+            "UUID" : "89c55f39-0658-4545-8b51-e054dcb38d9e",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "3",
+            "seedComponents" : [ ]
+          }, {
+            "UUID" : "31a64823-3cb9-4077-9f7a-75f745ff9f71",
+            "columnKey" : "9c63e",
+            "columnName" : "Column 2",
+            "columnWidth" : "3",
+            "seedComponents" : [ ]
+          }, {
+            "UUID" : "44940c09-d656-4c4a-8526-8d62cf75c941",
+            "columnKey" : "751f7",
+            "columnName" : "Column 3",
+            "columnWidth" : "3",
+            "seedComponents" : [ ]
+          }, {
+            "UUID" : "ebd2cca2-d3f6-45dc-a7fd-97e5c6cf14ea",
+            "columnKey" : "da382",
+            "columnName" : "Column 4",
+            "columnWidth" : "3",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 215
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "443e4384-73f7-4b6a-886d-bb8738c76c60",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><img class=\"sfdcCbImage\" src=\"{!contentAsset.Screenshot_20250402_115921.1}\" alt=\"\"></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "ad0ad1fa-db66-43be-9a5c-e9c376cf1c93",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "89c55f39-0658-4545-8b51-e054dcb38d9e",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><img class=\"sfdcCbImage\" src=\"{!contentAsset.Screenshot_20250402_115831.1}\" alt=\"\"></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "177fa38c-6409-4603-a289-643edee49c67",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "31a64823-3cb9-4077-9f7a-75f745ff9f71",
+        "regionLabel" : "Column 2",
+        "regionName" : "9c63e",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><img class=\"sfdcCbImage\" src=\"{!contentAsset.Screenshot_20250402_120010.1}\" alt=\"\"></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "a0dbdfde-5f79-486c-b41b-1e3d264b4b75",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "44940c09-d656-4c4a-8526-8d62cf75c941",
+        "regionLabel" : "Column 3",
+        "regionName" : "751f7",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<p><img class=\"sfdcCbImage\" src=\"{!contentAsset.Screenshot_20250402_120101.1}\" alt=\"\"></p>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "466df2f0-1ca4-4eba-acac-65ce0de9d392",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "ebd2cca2-d3f6-45dc-a7fd-97e5c6cf14ea",
+        "regionLabel" : "Column 4",
+        "regionName" : "da382",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "b9bc968d-ff7d-42eb-979e-67c6939e4812",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "42d82f9c-cabf-405d-9717-3b7b762238e9",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "66d52378-34ae-47e1-8f77-1c0df28d73ca",
+    "regionName" : "sidebarAlt",
+    "type" : "region"
+  }, {
+    "id" : "3a497fe7-a9bb-4b24-8ea9-12c5dcbe2080",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Home"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "d878a618-7326-499c-82e8-858b123f9ecd",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "18272ed8-2ca5-4c62-a5f3-ed9cd5defa17",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Home",
+  "type" : "view",
+  "viewType" : "home"
+}

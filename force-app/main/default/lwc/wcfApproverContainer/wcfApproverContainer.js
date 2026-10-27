@@ -592,8 +592,8 @@ get returnStatusMessage() {
     // Reject = red (primary-btn).
     get decisionPanelButtonClass() {
         return this.pendingDecision === 'Accept'
-            ? 'success-btn accept-btn wg-btn-sm'
-            : 'primary-btn wg-btn-sm';
+            ? 'success-btn accept-btn'
+            : 'primary-btn';
     }
     get decisionPanelButtonIcon() {
         return this.pendingDecision === 'Accept' ? 'utility:check' : 'utility:reply';

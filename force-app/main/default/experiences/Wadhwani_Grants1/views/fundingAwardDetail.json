@@ -1,0 +1,214 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsTwoCol84SidebarFeaturedLayout",
+  "dataProviders" : [ ],
+  "id" : "449518b2-6433-4099-9469-e4da6a69452a",
+  "label" : "Funding Award Detail",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "38cd6da8-a1c1-42d1-a42c-c5da89ff0995",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "7fc42cf4-239a-488e-a160-eb8e539f99df",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "7b042759-8aca-480b-9420-702d8d024d2f",
+          "activeTab" : "tab1",
+          "tabs" : [ {
+            "UUID" : "7d50291f-2fdf-4bda-9938-3f8692c925c1",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : { },
+              "fqn" : "forceCommunity:recordDetail"
+            } ],
+            "tabKey" : "tab1",
+            "tabName" : "Details"
+          }, {
+            "UUID" : "46f70d99-d447-4086-b166-a661c6e2d975",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "customTitle" : "Requirements",
+                "parentRecordId" : "{!recordId}",
+                "relatedListName" : "FundingAwardRequirements",
+                "showBreadCrumbs" : "false",
+                "showCustomTitle" : "true",
+                "showManualRefreshButton" : "false",
+                "showRowNumbers" : "false"
+              },
+              "fqn" : "forceCommunity:relatedList"
+            } ],
+            "tabKey" : "tab2",
+            "tabName" : "Requirements"
+          }, {
+            "UUID" : "55a10975-93e6-4090-a574-5574b93afbc8",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "customTitle" : "Disbursements",
+                "parentRecordId" : "{!recordId}",
+                "relatedListName" : "FundingDisbursements",
+                "showBreadCrumbs" : "false",
+                "showCustomTitle" : "true",
+                "showManualRefreshButton" : "false",
+                "showRowNumbers" : "false"
+              },
+              "fqn" : "forceCommunity:relatedList"
+            } ],
+            "tabKey" : "tab3",
+            "tabName" : "Disbursements"
+          }, {
+            "UUID" : "55bef99c-6794-473f-b5af-04bc192d797e",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "customTitle" : "Amendments",
+                "parentRecordId" : "{!recordId}",
+                "relatedListName" : "FundingAwardAmendments",
+                "showBreadCrumbs" : "false",
+                "showCustomTitle" : "true",
+                "showManualRefreshButton" : "false",
+                "showRowNumbers" : "false"
+              },
+              "fqn" : "forceCommunity:relatedList"
+            } ],
+            "tabKey" : "tab4",
+            "tabName" : "Amendments"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "7b042759-8aca-480b-9420-702d8d024d2f",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "forceCommunity:recordDetail",
+          "id" : "a768ec97-9292-4644-bff8-ea32f9c84081",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "7d50291f-2fdf-4bda-9938-3f8692c925c1",
+        "regionLabel" : "Details",
+        "regionName" : "tab1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "customTitle" : "Requirements",
+            "parentRecordId" : "{!recordId}",
+            "relatedListName" : "FundingAwardRequirements",
+            "showBreadCrumbs" : false,
+            "showCustomTitle" : true,
+            "showManualRefreshButton" : false,
+            "showRowNumbers" : false
+          },
+          "componentName" : "forceCommunity:relatedList",
+          "id" : "e2895bb5-4da0-42d3-b8ce-dafd6564d455",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "46f70d99-d447-4086-b166-a661c6e2d975",
+        "regionLabel" : "Requirements",
+        "regionName" : "tab2",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "customTitle" : "Disbursements",
+            "parentRecordId" : "{!recordId}",
+            "relatedListName" : "FundingDisbursements",
+            "showBreadCrumbs" : false,
+            "showCustomTitle" : true,
+            "showManualRefreshButton" : false,
+            "showRowNumbers" : false
+          },
+          "componentName" : "forceCommunity:relatedList",
+          "id" : "7a6c42c1-4830-48ee-9dec-62743d4080b8",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "55a10975-93e6-4090-a574-5574b93afbc8",
+        "regionLabel" : "Disbursements",
+        "regionName" : "tab3",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "customTitle" : "Amendments",
+            "parentRecordId" : "{!recordId}",
+            "relatedListName" : "FundingAwardAmendments",
+            "showBreadCrumbs" : false,
+            "showCustomTitle" : true,
+            "showManualRefreshButton" : false,
+            "showRowNumbers" : false
+          },
+          "componentName" : "forceCommunity:relatedList",
+          "id" : "34058cff-adf5-4434-8a16-5f73b8a58b65",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "55bef99c-6794-473f-b5af-04bc192d797e",
+        "regionLabel" : "Amendments",
+        "regionName" : "tab4",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "7cd2e1d3-941e-487c-ae1f-75e39e3c2b1e",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "760e6e26-ebe0-49ae-aae9-80ee86a52bf6",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "2e35dd2e-54b0-47a1-a6be-6444e3d16b60",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "605f15cd-db7c-4865-ab10-bf60aae57040",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "444a9d0c-2b55-45d8-be2b-ba82f0ba5e0a",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-121"
+}

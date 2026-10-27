@@ -9,7 +9,7 @@
                 <p class="wg-page-subtitle">{todayDate}</p>
             </div>
             <div class="wg-page-actions">
-                <button class="primary-btn wg-btn-sm" onclick={handleViewAllReviewerQueue}>
+                <button class="primary-btn" onclick={handleViewAllReviewerQueue}>
                     <lightning-icon icon-name="utility:list" size="xx-small" alternative-text=""></lightning-icon>
                     View Proposals Queue
                 </button>
@@ -52,7 +52,7 @@
                                 <tr>
                                     <th class="wg-col-index" scope="col">#</th>
                                     <th scope="col">Application ID</th>
-                                    <th scope="col">Account</th>
+                                    <th scope="col">Organization</th>
                                     <th scope="col">Track</th>
                                     <th scope="col">Due date</th>
                                     <th scope="col">Status</th>
@@ -71,7 +71,7 @@
                                                 </template>
                                             </div>
                                         </td>
-                                        <td>{row.account}</td>
+                                        <td>{row.organizationName}</td>
                                         <td>
                                             <div class="rd-tags">
                                                 <template for:each={row.trackTags} for:item="tg">

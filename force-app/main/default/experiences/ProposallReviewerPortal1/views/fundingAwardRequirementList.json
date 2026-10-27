@@ -1,0 +1,46 @@
+{
+  "appPageId" : "19355793-0e2f-4f99-8e29-d05c68a767cf",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "61e45122-85a3-420f-b051-d8dd0f16c627",
+  "label" : "Funding Award Requirement List",
+  "regions" : [ {
+    "id" : "3fc47e78-9734-44a2-8833-1bbb9426c3f9",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "enableInlineEdit" : true,
+        "filterName" : "{!filterId}",
+        "layout" : "FULL",
+        "pageSize" : 25,
+        "scope" : "{!objectName}",
+        "showActionBar" : true,
+        "showChartsPanel" : true,
+        "showDisplay" : "showall",
+        "showFilterPanel" : true,
+        "showImageIcon" : true,
+        "showManualRefreshButton" : true,
+        "showObjectName" : true,
+        "showPinnedList" : true,
+        "showSearchBar" : true
+      },
+      "componentName" : "forceCommunity:objectHome",
+      "id" : "fa9b2c1d-410d-475f-a6a3-be99bdcc8be3",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "0e0fd6a9-f8ec-4376-a1fe-c844975929d3",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "fce82e52-f65f-41c5-85c9-069074895539",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "list-124"
+}

@@ -27,7 +27,7 @@
      :host below (flagged, pending port to commonStyleTheme).
    - Every class is prefixed .wg- (or extends a commonStyleTheme
      button name) so nothing collides with component classes.
-   - Buttons stay square, per commonStyleTheme's design decision.
+   - Buttons are pills (commonStyleTheme --wg-radius-pill, UAT ST-05).
    ============================================================ */
 
 :host {
@@ -50,7 +50,7 @@
        Applies to every <lightning-button variant="brand"> and
        neutral button inside a component that imports this file,
        so base components match the custom .primary-btn. */
-    --slds-c-button-radius-border: 0;
+    --slds-c-button-radius-border: var(--wg-radius-pill);
     --slds-c-button-brand-color-background: var(--wg-red);
     --slds-c-button-brand-color-border: var(--wg-red);
     --slds-c-button-brand-color-background-hover: var(--wg-red-deep);
@@ -58,8 +58,8 @@
     --slds-c-button-brand-color-background-active: var(--wg-red-deep);
     --slds-c-button-brand-text-color: var(--wg-white);
     --slds-c-button-brand-text-color-hover: var(--wg-white);
-    --slds-c-button-neutral-color-border: var(--wg-input-border);
-    --slds-c-button-text-color: var(--wg-gray);
+    --slds-c-button-neutral-color-border: var(--wg-red);
+    --slds-c-button-text-color: var(--wg-red);
 }
 
 /* ============================================================
@@ -112,7 +112,7 @@
 }
 
 .wg-page-title-accent {
-    color: var(--wg-red);
+    color: var(--wg-gray);
 }
 
 .wg-page-subtitle {
@@ -269,7 +269,7 @@
 /* Needs attention (e.g. resubmissions / returned by reviewer > 0) */
 .wg-stat--alert {
     background: var(--wg-error-bg);
-    border-left: var(--wg-border-width-banner) solid var(--wg-red);
+    border-left: var(--wg-border-width-banner) solid var(--wg-error);
 }
 
 .wg-stat-head {
@@ -459,7 +459,7 @@
 }
 
 .wg-row--attention td:first-child {
-    box-shadow: inset var(--wg-border-width-banner) 0 0 var(--wg-red);
+    box-shadow: inset var(--wg-border-width-banner) 0 0 var(--wg-error);
 }
 
 .wg-row--attention td {
@@ -568,31 +568,35 @@
    BUTTONS — extends commonStyleTheme's .primary-btn / .ghost-btn
    ============================================================ */
 
-/* Secondary neutral action (e.g. Resume) — same shape as .ghost-btn */
+/* Secondary action (e.g. Resume, View Review) — styled as the brand
+   secondary (ghost) button so Partner and staff match (U139, ST-06). */
 .neutral-btn,
 .success-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--wg-space-2);
-    padding: var(--wg-padding-button);
-    border-radius: 0;
+    padding: 0 26px; /* vertical comes from min-height + flex centring, so icons do not push it past 40px */
+    border-radius: var(--wg-radius-pill);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .neutral-btn {
     background: var(--wg-white);
-    color: var(--wg-gray);
-    border: var(--wg-border-width-thin) solid var(--wg-input-border);
+    color: var(--wg-red);
+    border: var(--wg-border-width-ghost) solid var(--wg-red);
 }
 
 .neutral-btn:hover:not(:disabled) {
-    background: var(--wg-surface-subtle);
-    border-color: var(--wg-text-muted);
+    background: var(--wg-error-bg);
+    border-color: var(--wg-red-deep);
 }
 
 .success-btn {
@@ -622,16 +626,17 @@
     height: var(--wg-control-height);
     min-width: 112px;
     padding: 0 var(--wg-space-4);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     white-space: nowrap;
     box-sizing: border-box;
+    min-height: 0;
 }
 
 /* Icons inside buttons follow the label color */
 .primary-btn lightning-icon,
 .success-btn lightning-icon  { --slds-c-icon-color-foreground-default: var(--wg-white); }
 .ghost-btn lightning-icon    { --slds-c-icon-color-foreground-default: var(--wg-red); }
-.neutral-btn lightning-icon  { --slds-c-icon-color-foreground-default: var(--wg-gray); }
+.neutral-btn lightning-icon  { --slds-c-icon-color-foreground-default: var(--wg-red); }
 
 .primary-btn lightning-icon,
 .ghost-btn lightning-icon,
@@ -652,7 +657,7 @@
     flex-shrink: 0;
     background: var(--wg-white);
     border: var(--wg-border-width-thin) solid var(--wg-input-border);
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     color: var(--wg-gray);
     cursor: pointer;
     box-sizing: border-box;
@@ -743,6 +748,7 @@
 .wg-pagination .wg-icon-btn {
     width: var(--wg-control-height);
     height: var(--wg-control-height);
+    font-size: var(--wg-font-size-button);
 }
 
 /* ============================================================
@@ -842,9 +848,9 @@
     min-height: 0;
     margin: 0;
     padding: 0 var(--wg-space-3);
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     line-height: 1;
     letter-spacing: normal;

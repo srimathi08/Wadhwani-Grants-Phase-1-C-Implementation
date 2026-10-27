@@ -1,0 +1,46 @@
+{
+  "appPageId" : "d9a94a5d-c6b3-4a79-9a4e-6a38b9200448",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "cb020794-df38-4bfe-9b9a-999fec86b791",
+  "label" : "Intake Form Section List",
+  "regions" : [ {
+    "id" : "17966b11-f8bc-4db6-8c7b-9fc8dcb7bdbc",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "enableInlineEdit" : true,
+        "filterName" : "{!filterId}",
+        "layout" : "FULL",
+        "pageSize" : 25,
+        "scope" : "{!objectName}",
+        "showActionBar" : true,
+        "showChartsPanel" : true,
+        "showDisplay" : "showall",
+        "showFilterPanel" : true,
+        "showImageIcon" : true,
+        "showManualRefreshButton" : true,
+        "showObjectName" : true,
+        "showPinnedList" : true,
+        "showSearchBar" : true
+      },
+      "componentName" : "forceCommunity:objectHome",
+      "id" : "f89e57df-b543-4c4d-bb87-09d983878c95",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "63def160-1f8e-4b05-8adb-8aef2d3be8c5",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "f92295bf-7031-4227-b049-179f97b42a51",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "list-1La"
+}

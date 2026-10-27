@@ -2006,7 +2006,7 @@ export default class WcfFormPreview extends LightningElement {
 
             // Q7: Top 3 Most Prominent Funders
             if (this.hasFunders) {
-                checkPage(10);
+                checkPage(45);
                 const topFundersTop = y;
                 drawQLabel(q.Q7, 'Top 3 Most Prominent Funders', topFundersTop);
                 y = topFundersTop + 10;
@@ -2018,7 +2018,7 @@ export default class WcfFormPreview extends LightningElement {
 
             // Q8: References for Outreach
             if (this.hasReferences) {
-                checkPage(10);
+                checkPage(45);
                 const refTop = y;
                 drawQLabel(q.Q8, 'References for Outreach', refTop);
                 y = refTop + 10;
@@ -2030,7 +2030,7 @@ export default class WcfFormPreview extends LightningElement {
             }
 
             // Q9: Historical Financial Data
-            checkPage(10);
+            checkPage(45);
             const finTrackTop = y;
             drawQLabel(q.Q9, 'Historical Financial Data', finTrackTop);
             y = finTrackTop + 10;
@@ -2050,7 +2050,7 @@ export default class WcfFormPreview extends LightningElement {
             ]);
 
             // Q10: Current Fiscal Year Data
-            checkPage(10);
+            checkPage(45);
             const cfyTop = y;
             drawQLabel(q.Q10, 'Current Fiscal Year Data', cfyTop);
             y = cfyTop + 10;
@@ -2081,7 +2081,7 @@ export default class WcfFormPreview extends LightningElement {
 
                 richQRow(q.Q11, 'Your Skilling Approach', this.skillingApproach);
                 if (this.hasSkillingDomains) {
-                    checkPage(10);
+                    checkPage(45);
                     const t = y;
                     drawQLabel(q.Q12, 'Skilling Domains Offered', t);
                     y = t + 10;
@@ -2090,7 +2090,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
 
                 const o = this.outcomeData;
-                checkPage(10);
+                checkPage(45);
                 const t13 = y;
                 drawQLabel(q.Q13, 'Job Fulfillment Outcomes (Actuals)', t13);
                 y = t13 + 10;
@@ -2109,7 +2109,7 @@ export default class WcfFormPreview extends LightningElement {
                 ];
                 table(['Item', this.fyLabel3, this.fyLabel2, this.fyLabel1], jfRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t14 = y;
                 drawQLabel(q.Q14, 'Job Fulfillment Outcomes (Projections)', t14);
                 y = t14 + 10;
@@ -2142,7 +2142,7 @@ export default class WcfFormPreview extends LightningElement {
                 richQRow(q.Q15, 'Your Job Creation Approach', this.jobCreationApproach);
 
                 if (this.hasBusinessSectors) {
-                    checkPage(10);
+                    checkPage(45);
                     const t = y;
                     drawQLabel(q.Q16, 'Business Sectors Served', t);
                     y = t + 10;
@@ -2151,7 +2151,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
 
                 const o = this.outcomeData;
-                checkPage(10);
+                checkPage(45);
                 const t17 = y;
                 drawQLabel(q.Q17, 'Job Creation Outcomes (Actuals)', t17);
                 y = t17 + 10;
@@ -2171,7 +2171,7 @@ export default class WcfFormPreview extends LightningElement {
                 ];
                 table(['Item', this.fyLabel3, this.fyLabel2, this.fyLabel1], jcRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t18 = y;
                 drawQLabel(q.Q18, 'Job Creation Outcomes (Projections)', t18);
                 y = t18 + 10;
@@ -2206,7 +2206,7 @@ export default class WcfFormPreview extends LightningElement {
                 richQRow(q.Q19, 'Your Livelihood Upliftment Approach', this.livelihoodApproach);
 
                 if (this.hasLivelihoodPrograms) {
-                    checkPage(10);
+                    checkPage(45);
                     const t20 = y;
                     drawQLabel(q.Q20, 'Key Programs / Initiatives', t20);
                     y = t20 + 10;
@@ -2215,7 +2215,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
 
                 if (this.hasCommunities) {
-                    checkPage(10);
+                    checkPage(45);
                     const t21 = y;
                     drawQLabel(q.Q21, 'Communities that you work in', t21);
                     y = t21 + 10;
@@ -2224,7 +2224,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
 
                 const o = this.outcomeData;
-                checkPage(10);
+                checkPage(45);
                 const t22 = y;
                 drawQLabel(q.Q22, 'Livelihood Outcomes (Actuals)', t22); y = t22 + 10;
 
@@ -2242,7 +2242,7 @@ export default class WcfFormPreview extends LightningElement {
                 ];
                 table(['Item', this.fyLabel3, this.fyLabel2, this.fyLabel1], livRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t23 = y;
                 drawQLabel(q.Q23, 'Livelihood Outcomes (Projections)', t23);
                 y = t23 + 10;
@@ -2292,7 +2292,7 @@ export default class WcfFormPreview extends LightningElement {
 
             // Q28: Supporting Documents
             if (this.hasSupportingDocuments) {
-                checkPage(10);
+                checkPage(45);
                 const docTop = y;
                 drawQLabel(q.Q28, 'Supporting Documents', docTop);
                 y = docTop + 10;
@@ -2312,7 +2312,7 @@ export default class WcfFormPreview extends LightningElement {
             // ══ Addendum — Reviewer Additional Info ══
             if (this.hasAdditionalInfoFiles) {
                 sectionHeader('Additional Information Requested by Reviewer', 'Addendum');
-                checkPage(14);
+                checkPage(45);
                 const tA1 = y;
                 drawQLabel('A1', 'Additional Documentation Provided', tA1);
                 y = tA1 + 10;

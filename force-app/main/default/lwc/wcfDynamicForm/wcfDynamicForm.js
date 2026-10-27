@@ -316,7 +316,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q4_JURISDICTION: 'Registration Jurisdiction (country)',
             Q4_INCORP_DATE: 'Registration / Incorporation Date (DD/MM/YYYY)',
             Q4_GOVERNANCE_DESC: 'Brief description (<100 words): governance and operational structure: board, leadership, key affiliations.',
-            Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure — board, leadership, key affiliations (<100 words).',
+            Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure: board, leadership, key affiliations (<100 words).',
 
             Q5_US_501C3: 'Do you have 501(c)(3) status or equivalent US tax-exempt determination?',
             Q5_ED_STATUS: 'Do you currently hold an active Equivalency Determination (ED) certificate?',
@@ -328,7 +328,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q6_FISCAL_DATE: 'Fiscal Year End Date',
 
             Q7_TOP_FUNDERS: 'Top 3 Prominent Funders',
-            Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders — the backers whose support is most material or most recognisable. All amounts in USD.',
+            Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognisable. All amounts in USD.',
             Q8_REFERENCES: 'Reference Contacts for Outreach',
             Q8_REFERENCES_DESC: 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.',
 
@@ -1109,12 +1109,9 @@ export default class WcfDynamicForm extends LightningElement {
                             this.hqSearchKey = this.formValues.Headquarters_City_and_Country__c;
                         }
 
-                        if ((!this.formValues.Attesting_User_Name__c || this.formValues.Attesting_User_Name__c.trim() === '') && this.formValues.Submitter_Name__c) {
-                            this.formValues.Attesting_User_Name__c = this.formValues.Submitter_Name__c;
-                        }
-                        if ((!this.formValues.Attesting_User_Title__c || this.formValues.Attesting_User_Title__c.trim() === '') && this.formValues.Job_Title__c) {
-                            this.formValues.Attesting_User_Title__c = this.formValues.Job_Title__c;
-                        }
+                        // Non-blank saved value = user chose it. Blank = keep following the submitter.
+                        this._attestNameEdited = !!String(this.formValues.Attesting_User_Name__c || '').trim();
+                        this._attestTitleEdited = !!String(this.formValues.Attesting_User_Title__c || '').trim();
 
                         // Sync native phone input DOM if ITI is already initialized
                         const phoneInput = this.template.querySelector('input[data-id="phone"]');
@@ -1551,6 +1548,8 @@ export default class WcfDynamicForm extends LightningElement {
     get isLastTab() { return this.dynamicTabs[this.dynamicTabs.length - 1]?.id === this.activeTabId; }
 
     @track isAttested = false;
+    _attestNameEdited = false;   // true only if the user typed it, or it came back from a saved draft
+    _attestTitleEdited = false;
 
     handleAttestationChange(event) {
         this.isAttested = event.target?.checked || false;
@@ -2532,7 +2531,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ]);
             }
             if (fundersList.length > 0) {
-                checkPage(10);
+                checkPage(45);
                 const topFundersTop = y;
                 drawQLabel(qn.Q7, 'Top 3 Most Prominent Funders', topFundersTop);
                 y = topFundersTop + 10;
@@ -2558,7 +2557,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ]);
             }
             if (refList.length > 0) {
-                checkPage(10);
+                checkPage(45);
                 const refTop = y;
                 drawQLabel(qn.Q8, 'References for Outreach', refTop);
                 y = refTop + 10;
@@ -2568,7 +2567,7 @@ export default class WcfDynamicForm extends LightningElement {
             }
 
             // Q9: Historical Financial Data
-            checkPage(10);
+            checkPage(45);
             const finTrackTop = y;
             drawQLabel(qn.Q9, 'Historical Financial Data', finTrackTop);
             y = finTrackTop + 10;
@@ -2587,7 +2586,7 @@ export default class WcfDynamicForm extends LightningElement {
             ]);
 
             // Q10: Current Fiscal Year Data
-            checkPage(10);
+            checkPage(45);
             const cfyTop = y;
             drawQLabel(qn.Q10, 'Current Fiscal Year Data', cfyTop);
             y = cfyTop + 10;
@@ -2619,7 +2618,7 @@ export default class WcfDynamicForm extends LightningElement {
                 richQRow(qn.Q11, 'Your Skilling Approach', form.Skilling_Approach__c);
 
                 if (this.hasSkillingDomainsForReview) {
-                    checkPage(10);
+                    checkPage(45);
                     const t12 = y;
                     drawQLabel(qn.Q12, 'Skilling Domains Offered', t12);
                     y = t12 + 10;
@@ -2635,7 +2634,7 @@ export default class WcfDynamicForm extends LightningElement {
                     simpleQRow(qn.Q12, 'Skilling Domains Offered', 'N/A');
                 }
 
-                checkPage(10);
+                checkPage(45);
                 const t13 = y;
                 drawQLabel(qn.Q13, 'Job Fulfillment Outcomes (Actuals)', t13);
                 y = t13 + 10;
@@ -2654,7 +2653,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ];
                 table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], jfRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t14 = y;
                 drawQLabel(qn.Q14, 'Job Fulfillment Outcomes (Projections)', t14);
                 y = t14 + 10;
@@ -2688,7 +2687,7 @@ export default class WcfDynamicForm extends LightningElement {
                 richQRow(qn.Q15, 'Your Job Creation Approach', form.Job_Creation_Approach__c);
 
                 if (this.hasBusinessSectorsForReview) {
-                    checkPage(10);
+                    checkPage(45);
                     const t16 = y;
                     drawQLabel(qn.Q16, 'Business Sectors Served', t16);
                     y = t16 + 10;
@@ -2703,7 +2702,7 @@ export default class WcfDynamicForm extends LightningElement {
                     simpleQRow(qn.Q16, 'Business Sectors Served', 'N/A');
                 }
 
-                checkPage(10);
+                checkPage(45);
                 const t17 = y;
                 drawQLabel(qn.Q17, 'Job Creation Outcomes (Actuals)', t17);
                 y = t17 + 10;
@@ -2723,7 +2722,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ];
                 table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], jcRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t18 = y;
                 drawQLabel(qn.Q18, 'Job Creation Outcomes (Projections)', t18);
                 y = t18 + 10;
@@ -2758,7 +2757,7 @@ export default class WcfDynamicForm extends LightningElement {
                 richQRow(qn.Q19, 'Your Livelihood Upliftment Approach', form.Livelihood_Approach__c);
 
                 if (this.hasLivelihoodProgramsForReview) {
-                    checkPage(10);
+                    checkPage(45);
                     const t20 = y;
                     drawQLabel(qn.Q20, 'Key Programs / Initiatives', t20);
                     y = t20 + 10;
@@ -2774,7 +2773,7 @@ export default class WcfDynamicForm extends LightningElement {
                 }
 
                 if (this.hasCommunityRowsForReview) {
-                    checkPage(10);
+                    checkPage(45);
                     const t21 = y;
                     drawQLabel(qn.Q21, 'Communities that you work in', t21);
                     y = t21 + 10;
@@ -2791,7 +2790,7 @@ export default class WcfDynamicForm extends LightningElement {
                     simpleQRow(qn.Q21, 'Communities that you work in', 'N/A');
                 }
 
-                checkPage(10);
+                checkPage(45);
                 const t22 = y;
                 drawQLabel(qn.Q22, 'Livelihood Outcomes (Actuals)', t22);
                 y = t22 + 10;
@@ -2810,7 +2809,7 @@ export default class WcfDynamicForm extends LightningElement {
                 ];
                 table(['Item', val(this.fiscalYears.fy3Label), val(this.fiscalYears.fy2Label), val(this.fiscalYears.fy1Label)], livRows);
 
-                checkPage(10);
+                checkPage(45);
                 const t23 = y;
                 drawQLabel(qn.Q23, 'Livelihood Outcomes (Projections)', t23);
                 y = t23 + 10;
@@ -2865,7 +2864,7 @@ export default class WcfDynamicForm extends LightningElement {
 
             // Q28: Supporting Documents
             if (this.q28UploadedFiles && this.q28UploadedFiles.length > 0) {
-                checkPage(10);
+                checkPage(45);
                 const docTop = y;
                 drawQLabel(qn.Q28, 'Supporting Documents', docTop);
                 y = docTop + 10;
@@ -2951,14 +2950,7 @@ export default class WcfDynamicForm extends LightningElement {
         this._syncRichTextFieldsFromDOM();
         const tabId = event.currentTarget.dataset.tabid;
         if (tabId) {
-            if (tabId === 'tabReviewSubmit') {
-                if (!this.formValues.Attesting_User_Name__c || this.formValues.Attesting_User_Name__c.trim() === '') {
-                    this.formValues.Attesting_User_Name__c = this.formValues.Submitter_Name__c || '';
-                }
-                if (!this.formValues.Attesting_User_Title__c || this.formValues.Attesting_User_Title__c.trim() === '') {
-                    this.formValues.Attesting_User_Title__c = this.formValues.Job_Title__c || '';
-                }
-            }
+
             this.activeTabId = tabId;
         }
     }
@@ -2973,14 +2965,7 @@ export default class WcfDynamicForm extends LightningElement {
         const index = tabs.findIndex(t => t.id === this.activeTabId);
         if (index !== -1 && index < tabs.length - 1) {
             const nextTab = tabs[index + 1];
-            if (nextTab.id === 'tabReviewSubmit') {
-                if (!this.formValues.Attesting_User_Name__c || this.formValues.Attesting_User_Name__c.trim() === '') {
-                    this.formValues.Attesting_User_Name__c = this.formValues.Submitter_Name__c || '';
-                }
-                if (!this.formValues.Attesting_User_Title__c || this.formValues.Attesting_User_Title__c.trim() === '') {
-                    this.formValues.Attesting_User_Title__c = this.formValues.Job_Title__c || '';
-                }
-            }
+
             this.activeTabId = nextTab.id;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -3009,6 +2994,9 @@ export default class WcfDynamicForm extends LightningElement {
         const idAttr = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
         const key = fldAttr || keyAttr || idAttr;
         if (!key) return;
+
+        if (key === 'Attesting_User_Name__c') this._attestNameEdited = true;
+        if (key === 'Attesting_User_Title__c') this._attestTitleEdited = true;
 
         this.isDirty = true;
 
@@ -5274,7 +5262,7 @@ export default class WcfDynamicForm extends LightningElement {
 
         // Q27 GenieAI interest & description
         const gEl = this.template.querySelector('[data-field="Operational_Synergies_with_WOF__c"]') ||
-                    this.template.querySelector('[data-id="Operational_Synergies_with_WOF__c"]');
+            this.template.querySelector('[data-id="Operational_Synergies_with_WOF__c"]');
         if (org.GenieAI_Interest_Level__c === 'Yes, interested' || org.GenieAI_Interest_Level__c === 'Maybe, want to learn more') {
             const desc = (org.Operational_Synergies_with_WOF__c || '').trim();
             const words = desc.split(/\s+/).filter(w => w.length > 0);
@@ -7734,6 +7722,9 @@ export default class WcfDynamicForm extends LightningElement {
         const q24DocIds = this.q24UploadedFiles.map(f => f.documentId);
         const q28DocIds = this.q28UploadedFiles.map(f => f.documentId);
         const syncedValues = this._syncCalculatedAndAliasFields();
+        // Persist attestation fields only if the user actually set them
+        syncedValues.Attesting_User_Name__c = this._attestNameEdited ? (this.formValues.Attesting_User_Name__c || '') : '';
+        syncedValues.Attesting_User_Title__c = this._attestTitleEdited ? (this.formValues.Attesting_User_Title__c || '') : '';
 
         const payload = {
             ...syncedValues,
@@ -7780,14 +7771,6 @@ export default class WcfDynamicForm extends LightningElement {
         if (this.isLoading) return;
         this._syncRichTextFieldsFromDOM();
 
-        // Auto-populate attestation fields from submitter contact if blank
-        if (!this.formValues.Attesting_User_Name__c || this.formValues.Attesting_User_Name__c.trim() === '') {
-            this.formValues.Attesting_User_Name__c = this.formValues.Submitter_Name__c || '';
-        }
-        if (!this.formValues.Attesting_User_Title__c || this.formValues.Attesting_User_Title__c.trim() === '') {
-            this.formValues.Attesting_User_Title__c = this.formValues.Job_Title__c || '';
-        }
-
         // Validate attestation on current review tab
         if (!this.validateTabReviewSubmit()) {
             return;
@@ -7819,6 +7802,9 @@ export default class WcfDynamicForm extends LightningElement {
         const q24DocIds = this.q24UploadedFiles.map(f => f.documentId);
         const q28DocIds = this.q28UploadedFiles.map(f => f.documentId);
         const syncedValues = this._syncCalculatedAndAliasFields();
+        // On submit, always send the effective values (typed value, or the live submitter name/title)
+        syncedValues.Attesting_User_Name__c = this.attestingUserName;
+        syncedValues.Attesting_User_Title__c = this.attestingUserTitle;
 
         const payload = {
             ...syncedValues,

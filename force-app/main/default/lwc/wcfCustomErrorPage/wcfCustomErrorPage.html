@@ -1,0 +1,28 @@
+<template>
+    <!-- Top Grey Tab Bar matching Mockup U-111 -->
+    <div class="portal-header-bar">
+        <div class="portal-tab">{currentPathDisplay}</div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="error-page-wrapper">
+        <div class="error-card">
+            <!-- Wadhwani Foundation Header Logo matching Mockup -->
+            <div class="brand-header">
+                <div class="brand-title">WADHWANI</div>
+                <div class="brand-subtitle">FOUNDATION</div>
+            </div>
+
+            <!-- Error Heading and Description -->
+            <h1 class="error-title">We could not find this page</h1>
+            <p class="error-subtitle">The link may be old, or typed wrong.</p>
+
+            <!-- Action Button -->
+            <div class="action-container">
+                <button type="button" class="home-button" onclick={handleGoHome}>
+                    Go to Home
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

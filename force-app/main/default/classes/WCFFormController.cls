@@ -1253,6 +1253,11 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
              @AuraEnabled public String  mouFileSize;
              @AuraEnabled public String  mouVolodyLink;
              @AuraEnabled public String  approvalDate;
+             @AuraEnabled public String  suspensionReason;
+             @AuraEnabled public String  suspensionDate;
+             @AuraEnabled public Boolean isDecisionRevoked;
+             @AuraEnabled public String  revocationDate;
+             @AuraEnabled public String  revocationComment;
         }
     
     
@@ -1314,6 +1319,8 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                        Last_Page__c,
                        LastModifiedDate,
                        CreatedDate,
+                       Suspension_Reason__c,
+                       Suspension_Date__c,
                        Owner.Name,
                        Owner.Email
                 FROM IndividualApplication
@@ -1338,6 +1345,8 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                        Last_Page__c,
                        LastModifiedDate,
                        CreatedDate,
+                       Suspension_Reason__c,
+                       Suspension_Date__c,
                        Owner.Name,
                        Owner.Email
                 FROM IndividualApplication
@@ -1382,6 +1391,8 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
     normalized = 'ReviewSubmitted';
 } else if (reviewerOnlyStatuses.contains(sfStatus)) {
     normalized = 'UnderReview';
+} else if (sfStatus == 'Application Suspended') {
+    normalized = 'ApplicationSuspended';
 } else if (sfStatus == 'Draft') {
                 normalized = 'Draft';
             } else if (sfStatus == 'Revision Requested') {
@@ -1429,6 +1440,12 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
                 normalized = 'InReview';
             } else if (sfStatus == 'Review Completed - Recommended') {
                 normalized = 'ReviewSubmitted';
+            } else if (sfStatus == 'Returned by Approver') {
+                // Approver rejected → returned to Reviewer; still in approval cycle (Step 5)
+                normalized = 'ReviewSubmitted';
+            } else if (sfStatus == 'Returned to Validator') {
+                // Reviewer routed back to Validator for revalidation (Step 4)
+                normalized = 'UnderReview';
             } else if (String.isNotBlank(sfStatus)) {
                 // Any other status that exists = at minimum Submitted
                 normalized = 'Submitted';
@@ -1437,9 +1454,11 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
             }
         
             result.status              = normalized;
-               result.rawStatus = reviewerOnlyStatuses.contains(sfStatus) ? null : sfStatus;
+            result.rawStatus = reviewerOnlyStatuses.contains(sfStatus) ? null : sfStatus;
             result.recordId            = app.Id;
             result.applicationName     = app.Name;
+            result.suspensionReason    = app.Suspension_Reason__c;
+            result.suspensionDate      = app.Suspension_Date__c != null ? String.valueOf(app.Suspension_Date__c) : null;
             String orgName = app.Organization_Name__c;
             if (String.isBlank(orgName) || (currentUser.Account != null && currentUser.Account.IsPersonAccount && orgName == currentUser.Account.Name && String.isNotBlank(currentUser.Account.WCF_Organizational_Name__c))) {
                 orgName = String.isNotBlank(currentUser.Account.WCF_Organizational_Name__c) ? currentUser.Account.WCF_Organizational_Name__c : '';
@@ -1449,7 +1468,9 @@ Operating_Expenditure_Budget__c, Operating_Expenditure_Projection__c, Operating_
             result.selectedFundingArea = String.isNotBlank(app.Organizational_Area_s_for_Funding_Inves1__c)
                                            ? app.Organizational_Area_s_for_Funding_Inves1__c
                                            : app.Organizational_Area_s_for_Funding_Inves__c;
-            result.submitterName       = app.Submitter_Name__c;
+           result.submitterName = (currentUser.Contact != null && String.isNotBlank(currentUser.Contact.FirstName))
+    ? currentUser.Contact.FirstName
+    : app.Submitter_Name__c;
             result.lastModified        = app.LastModifiedDate != null
                                            ? String.valueOf(app.LastModifiedDate) : null;
             result.createdDate         = app.CreatedDate != null
@@ -1793,6 +1814,22 @@ Set<String> uploadedStatuses = new Set<String>{
                             result.mouFileSize = '1.2 MB';
                         }
                     }
+                }
+
+                // Check if the latest approver decision was revoked
+                List<ApplicationDecision> latestDecisions = [
+                    SELECT Id, ApplicationDecision, Decision_Date__c, Comment
+                    FROM ApplicationDecision
+                    WHERE ApplicationId = :app.Id
+                    WITH SYSTEM_MODE
+                    ORDER BY Decision_Date__c DESC NULLS LAST, CreatedDate DESC
+                    LIMIT 1
+                ];
+                if (!latestDecisions.isEmpty() && latestDecisions[0].ApplicationDecision == 'Revoke') {
+                    result.isDecisionRevoked = true;
+                    result.revocationDate    = latestDecisions[0].Decision_Date__c != null 
+                                             ? latestDecisions[0].Decision_Date__c.format('dd MMM yyyy') : '';
+                    result.revocationComment = latestDecisions[0].Comment;
                 }
 
             } catch (Exception e) {

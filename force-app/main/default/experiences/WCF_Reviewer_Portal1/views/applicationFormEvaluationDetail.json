@@ -1,0 +1,136 @@
+{
+  "appPageId" : "d9a94a5d-c6b3-4a79-9a4e-6a38b9200448",
+  "componentName" : "siteforce:sldsTwoCol84SidebarFeaturedLayout",
+  "dataProviders" : [ ],
+  "id" : "35d4ede0-435d-4b51-979b-16d4dd3631de",
+  "label" : "Application Form Evaluation Detail",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "af1b83a9-ad66-4ee9-a025-94a8676dae77",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "087e430f-6a54-45a1-ae73-2ec6f0d59e18",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "ca45e775-12bb-4114-9564-227ffa71aff9",
+          "activeTab" : "application-review",
+          "tabs" : [ {
+            "UUID" : "8fb82329-9a39-4516-8e35-b350dd2100c2",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "ApplicationFormEvalSection",
+                "formSectionsPath" : "ApplicationFormEvaluation.Id|ApplicationFormEvalSection.ApplicationFormEvaluationId",
+                "groupRequiredSections" : "false",
+                "indicateRequiredOptionalSection" : "false",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formOverview"
+            } ],
+            "tabKey" : "application-review",
+            "tabName" : "{!$Label.GrantmakingSiteTemplate.appFormEvalSection_tab_review}"
+          }, {
+            "UUID" : "446c4c35-52ac-4710-82ce-2e00e8a8d62e",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "ApplicationFormEvalSection",
+                "formSectionsPath" : "ApplicationFormEvaluation.Id|ApplicationFormEvalSection.ApplicationFormEvaluationId",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formReview"
+            } ],
+            "tabKey" : "review-summary",
+            "tabName" : "{!$Label.GrantmakingSiteTemplate.appFormEvalSection_tab_summary}"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "ca45e775-12bb-4114-9564-227ffa71aff9",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "ApplicationFormEvalSection",
+            "formSectionsPath" : "ApplicationFormEvaluation.Id|ApplicationFormEvalSection.ApplicationFormEvaluationId",
+            "groupRequiredSections" : false,
+            "indicateRequiredOptionalSection" : false,
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formOverview",
+          "id" : "f0d12968-4119-4f13-8338-26c27c647b75",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "8fb82329-9a39-4516-8e35-b350dd2100c2",
+        "regionLabel" : "{!$Label.GrantmakingSiteTemplate.appFormEvalSection_tab_review}",
+        "regionName" : "application-review",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "ApplicationFormEvalSection",
+            "formSectionsPath" : "ApplicationFormEvaluation.Id|ApplicationFormEvalSection.ApplicationFormEvaluationId",
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formReview",
+          "id" : "3fc31015-3221-46a3-b932-342fb9cd8cc8",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "446c4c35-52ac-4710-82ce-2e00e8a8d62e",
+        "regionLabel" : "{!$Label.GrantmakingSiteTemplate.appFormEvalSection_tab_summary}",
+        "regionName" : "review-summary",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "378d50bd-35b1-4505-8cba-11ed3c682db2",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "a924af90-ae31-4186-b1cb-b4a6dc9b02eb",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "35bf96f4-66f3-4e9d-b5e3-0f94ed2230de",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "424107bc-0848-4ab1-b1a3-4a0852bcf60a",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "a4b4a940-8568-4d94-8ab9-3a1d30ce5e99",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-16e"
+}

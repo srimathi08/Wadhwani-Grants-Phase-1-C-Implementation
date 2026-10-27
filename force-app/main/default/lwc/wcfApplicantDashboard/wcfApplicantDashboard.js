@@ -132,6 +132,8 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     @track lastModified;
     @track createdDate;
     @track lastPage;
+    @track suspensionReason;
+    @track suspensionDate;
 
     // ── Programme Lead ────────────────────────────────────────────────
     @track programmeLeadName;
@@ -170,6 +172,11 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
     @track showFaqModal = false;
     @track rawStatus;
     @track reviewerReturnComment;
+
+    // ── Revoke state ──────────────────────────────────────────────────
+    @track isDecisionRevoked = false;
+    @track revocationDate = '';
+    @track revocationComment = '';
 
     // Fallback page order, used only when the selected tracks can't be read
     // from selectedFundingArea (see activePageSequence).
@@ -302,6 +309,11 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
                 this.programmeLeadName = result.programmeLeadName;
                 this.programmeLeadEmail = result.programmeLeadEmail;
                 this.rawStatus = result.rawStatus;
+                this.suspensionReason = result.suspensionReason;
+                this.suspensionDate = result.suspensionDate;
+                this.isDecisionRevoked = result.isDecisionRevoked === true;
+                this.revocationDate = result.revocationDate || '';
+                this.revocationComment = result.revocationComment || '';
 
                 // Revision data
                 if (result.reviewNotes) {
@@ -440,6 +452,47 @@ export default class WcfApplicantDashboard extends NavigationMixin(LightningElem
 
     get isDecided() {
         return this.normalizedStatus === 'Decided' && !this.isOverlayOpen;
+    }
+
+    get isApplicationSuspended() {
+        return (this.normalizedStatus === 'ApplicationSuspended' || this.rawStatus === 'Application Suspended') && !this.isOverlayOpen;
+    }
+
+    get isDraftSuspension() {
+        return this.isApplicationSuspended && (this.suspensionReason || '').toLowerCase().includes('draft');
+    }
+
+    get isRevisionSuspension() {
+        return this.isApplicationSuspended && (this.suspensionReason || '').toLowerCase().includes('revision');
+    }
+
+    get suspendedBannerTitle() {
+        if (this.isDraftSuspension) {
+            return 'Application Suspended — Inactivity';
+        } else if (this.isRevisionSuspension) {
+            return 'Application Suspended — Revision Overdue';
+        }
+        return 'Application Suspended';
+    }
+
+    get suspendedBannerMessage() {
+        if (this.isDraftSuspension) {
+            return 'Your application has been suspended because there was no activity or progress on your draft for 100 days. You can no longer resume or edit this application.';
+        } else if (this.isRevisionSuspension) {
+            return 'Your application has been suspended because the requested revisions were not submitted within 100 days. You can no longer edit or submit revisions for this application.';
+        }
+        return 'Your application has been suspended. For further details or questions, please contact grants.support@wadhwanifoundation.org.';
+    }
+
+    get suspensionReasonText() {
+        return this.suspensionReason || this.suspendedBannerMessage;
+    }
+
+    get timelineStatus() {
+        if (this.isApplicationSuspended) {
+            return 'ApplicationSuspended';
+        }
+        return this.normalizedStatus;
     }
 
     // ─────────────────────────────────────────────────────────────────

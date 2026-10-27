@@ -1,0 +1,121 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "4ce8b5e3-09de-41f9-8cdb-8692065ab73e",
+  "label" : "Topic Detail",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "b21c84f2-0ae4-45be-bbf8-368ca33dd959",
+          "columns" : [ {
+            "UUID" : "c8a6a530-5f35-4af8-9c1b-9691b088dfbe",
+            "columnKey" : "col1",
+            "columnName" : "column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ {
+              "attributes" : {
+                "bannerText" : "",
+                "pageType" : "topic",
+                "sfdc:identifier" : "forceCommunity_headline",
+                "topicId" : "{!recordId}"
+              },
+              "fqn" : "forceCommunity:headline"
+            } ]
+          } ]
+        },
+        "sectionHeight" : 32
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "b21c84f2-0ae4-45be-bbf8-368ca33dd959",
+      "regions" : [ {
+        "id" : "c8a6a530-5f35-4af8-9c1b-9691b088dfbe",
+        "regionLabel" : "column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "984a6d83-eb6d-40ae-9b0b-301888b141c8",
+          "columns" : [ {
+            "UUID" : "548c4987-e718-47c1-a1a5-8c56f2a0a30f",
+            "columnKey" : "col1",
+            "columnName" : "column 1",
+            "columnWidth" : "8",
+            "seedComponents" : [ {
+              "attributes" : {
+                "activeTab" : "{!selectedTab}",
+                "sfdc:identifier" : "forceCommunity_resultsList",
+                "topicId" : "{!recordId}"
+              },
+              "fqn" : "forceCommunity:resultsList"
+            } ]
+          }, {
+            "UUID" : "d646c1c1-e0a6-45df-af2c-87cab17383ef",
+            "columnKey" : "col2",
+            "columnName" : "column 2",
+            "columnWidth" : "4",
+            "seedComponents" : [ {
+              "attributes" : {
+                "sfdc:identifier" : "forceCommunity_askCommunity"
+              },
+              "fqn" : "forceCommunity:askCommunity"
+            } ]
+          } ]
+        },
+        "sectionHeight" : 32
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "984a6d83-eb6d-40ae-9b0b-301888b141c8",
+      "regions" : [ {
+        "id" : "548c4987-e718-47c1-a1a5-8c56f2a0a30f",
+        "regionLabel" : "column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "id" : "d646c1c1-e0a6-45df-af2c-87cab17383ef",
+        "regionLabel" : "column 2",
+        "regionName" : "col2",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "c936d9e1-213e-4d18-bfb0-306d3b099418",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "{!Record.Description}",
+        "title" : "{!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "896df060-eaf8-4b7e-ae67-be47150699c6",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "16743c81-fdfe-41c7-9b39-af62c3090ca1",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "topic"
+}

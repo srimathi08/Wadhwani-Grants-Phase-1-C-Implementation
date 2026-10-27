@@ -1,0 +1,58 @@
+{
+  "appPageId" : "d9a94a5d-c6b3-4a79-9a4e-6a38b9200448",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "cae48eba-dbca-408a-8526-1be3fcd6c88c",
+  "label" : "wg Reviewer Queue",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "homeUrl" : "/",
+        "logoUrl" : "/sfsites/c/resource/WIN_Logo",
+        "logoutUrl" : ""
+      },
+      "componentName" : "c:wcfPortalHeader",
+      "id" : "f0986ed1-6a47-4423-a571-c0c0c344e9f5",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "3390c7cd-873b-408b-a8a8-30bcf0612719",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : { },
+      "componentName" : "c:wcfProposalListView",
+      "id" : "08c8b0b1-baba-445d-a8b5-5ae6eb9cc0cc",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "2d3e4ca8-9846-4682-af26-15212a2e31b5",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "7ab77f20-7ca2-49ae-8969-4325b7a7c5af",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "wg Reviewer Queue"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "15c8e014-8fa8-4a99-a391-794f8f9b5ec8",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "f509913c-e951-45a3-b8ac-982b34f66bdd",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-wg-reviewer-queue"
+}

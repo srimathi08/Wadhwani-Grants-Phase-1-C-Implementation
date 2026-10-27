@@ -1,0 +1,39 @@
+{
+  "appPageId" : "19355793-0e2f-4f99-8e29-d05c68a767cf",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "5f52c440-7566-4b38-8092-f2856991d3a6",
+  "label" : "Funding Award Requirement Section Related List",
+  "regions" : [ {
+    "id" : "e30dd345-bbdb-4ea1-a766-2a1934982ec5",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customTitle" : "",
+        "parentRecordId" : "{!recordId}",
+        "relatedListName" : "{!relationshipApiName}",
+        "showBreadCrumbs" : true,
+        "showCustomTitle" : false,
+        "showManualRefreshButton" : true,
+        "showRowNumbers" : true
+      },
+      "componentName" : "forceCommunity:relatedList",
+      "id" : "29fd9bc3-126c-4ca7-afe5-04b7ce5ea946",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "f8f993bf-dcbe-44c0-8c74-5e995a8be131",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "856cd0df-ee73-4d74-a282-bda4ab95a1a1",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "relatedlist-1EK"
+}

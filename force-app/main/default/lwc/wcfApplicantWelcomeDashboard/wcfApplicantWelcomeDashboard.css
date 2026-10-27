@@ -96,12 +96,15 @@
     background: var(--wg-red, #BF2026);
     color: var(--wg-white, #ffffff);
     border: none;
-    border-radius: 0;
-    padding: 10px 18px;
+    border-radius: 24px; /* pill (Color System v1, UAT ST-05; U138) */
+    padding: 11px 26px;
     font-size: var(--wg-font-size-body, 14px);
     font-weight: var(--wg-weight-semibold, 600);
     font-family: var(--wg-font-heading, 'Barlow', sans-serif) !important;
     cursor: pointer;
+    min-height: 40px;
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-primary:hover {

@@ -7,9 +7,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_5</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -85,9 +82,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_11</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -163,9 +157,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_13</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -241,9 +232,6 @@
         <label>Validator Status Decision</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_8</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Validated_Status</name>
@@ -277,26 +265,6 @@
         </rules>
     </decisions>
     <description>Reviewer Email Alerts for Wadhwani Grants</description>
-    <ends>
-        <name>END_ELEMENT_11</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_13</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_5</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_8</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
     <environments>Default</environments>
     <formulas>
         <name>CurrentYear</name>

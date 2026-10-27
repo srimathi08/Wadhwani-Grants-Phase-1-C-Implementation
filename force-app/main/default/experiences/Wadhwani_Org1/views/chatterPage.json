@@ -1,0 +1,70 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "39d40b55-38c5-4759-bf24-117b8e7a3cb4",
+  "label" : "Chatter page",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "9d83d627-47b6-41c8-9302-225f5f674acc",
+          "columns" : [ {
+            "UUID" : "2ac155e3-fde6-4343-9d3a-fe7f232d97c6",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 300
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "9d83d627-47b6-41c8-9302-225f5f674acc",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "c:level1Form",
+          "id" : "8ca53598-662d-4c7c-be07-9e80cc9bba47",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "2ac155e3-fde6-4343-9d3a-fe7f232d97c6",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "50b4cece-caf0-410b-8c72-4b577e491565",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "ChatPage"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "b07287d5-552b-4d7a-ade6-2298ad4c82fa",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "429646b9-9d1c-4e22-91eb-acaa093e677e",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-chatter-page"
+}

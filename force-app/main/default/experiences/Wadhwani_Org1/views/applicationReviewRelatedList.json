@@ -1,0 +1,39 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "2a69ed91-e2bb-49eb-b3c6-073d8443551d",
+  "label" : "Application Review Related List",
+  "regions" : [ {
+    "id" : "cdef2149-1c9c-4d0d-baa4-af509ba00891",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customTitle" : "",
+        "parentRecordId" : "{!recordId}",
+        "relatedListName" : "{!relationshipApiName}",
+        "showBreadCrumbs" : true,
+        "showCustomTitle" : false,
+        "showManualRefreshButton" : true,
+        "showRowNumbers" : true
+      },
+      "componentName" : "forceCommunity:relatedList",
+      "id" : "9f681617-fef9-4993-93c2-a6b4a1500f13",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "78647664-a00c-4599-b488-8d18853ed702",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "ce384810-ebee-45e7-be52-daec27fc4b79",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "relatedlist-0vx"
+}

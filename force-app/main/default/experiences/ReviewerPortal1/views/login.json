@@ -1,0 +1,66 @@
+{
+  "appPageId" : "7b8286a1-908e-43cc-aa1e-52b122c75b8c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "7f9ef072-3464-4438-9420-bffee808e725",
+  "label" : "Login",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : { },
+      "componentName" : "salesforceIdentity:communityLogo2",
+      "id" : "f905372a-99a1-4018-8ebb-8e042641e635",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "forgotPasswordLabel" : "Forgot your password?",
+        "forgotPasswordUrl" : "/ForgotPassword",
+        "loginButtonLabel" : "Log in",
+        "passwordLabel" : "Password",
+        "selfRegisterLabel" : "Sign Up",
+        "selfRegisterUrl" : "/SelfRegister",
+        "startUrl" : "",
+        "usernameLabel" : "Username"
+      },
+      "componentName" : "salesforceIdentity:loginForm2",
+      "id" : "868405e5-3dcb-4d73-bbba-009a732700d2",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "41ad4fbe-94ce-4e5c-b381-b1bbdd5daf6c",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Login"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "456820f3-e0e4-47b3-a058-bbdf1663c32a",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "cd264cea-0506-4123-a405-72dfd367cc16",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  }, {
+    "id" : "0a6f8ad3-c010-454a-b7e1-6045f05f5fc5",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "id" : "7c3d2c57-a251-40e7-b05f-133a85647517",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "f9617263-babb-4644-bc66-fcf81eef449a",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Login",
+  "type" : "view",
+  "viewType" : "login-home"
+}

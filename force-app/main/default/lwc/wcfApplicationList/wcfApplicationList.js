@@ -175,7 +175,9 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
 
         let rows = this._rawData.map(wrapper => {
             const a = wrapper.application;
-            const acctName = a.Account ? a.Account.Name : '';
+            const acctName = a.Account
+    ? (a.Account.WCF_Organizational_Name__c || a.Account.Name || '')
+    : '';
 
             // ── Determine action bucket for this row ──
             // isAwaitingApplicant MUST be checked ahead of isValidated/hasDraft,
@@ -219,7 +221,10 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
             const revCount = wrapper.revisionCount != null ? wrapper.revisionCount : Math.max(0, round - 1);
             const hasRevision = revCount > 0;
             const revisionLabel = `Rev ${revCount}`;
-
+            // Add this line right before "return {"
+            const rawDueDate = (wrapper.isResubmission && a.Due_Date_for_Resubmission__c)
+                ? a.Due_Date_for_Resubmission__c
+                : a.Due_Date__c;
             return {
                 ...a,
                 displayId: a.Application_ID__c || a.Name,
@@ -240,8 +245,8 @@ export default class WcfApplicationList extends NavigationMixin(LightningElement
                     : wrapper.isValidated
                         ? 'wg-row--success'
                         : '',
-                formattedDueDate: a.Due_Date__c
-                    ? new Date(a.Due_Date__c).toLocaleDateString('en-IN', {
+                formattedDueDate: rawDueDate
+                    ? new Date(rawDueDate).toLocaleDateString('en-IN', {
                         day: '2-digit', month: 'short', year: 'numeric'
                     })
                     : '—',

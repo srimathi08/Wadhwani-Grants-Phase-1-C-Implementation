@@ -1,0 +1,69 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "65e3f5f7-2b10-426a-a004-a4732a169324",
+  "label" : "Proposal List",
+  "regions" : [ {
+    "id" : "a8de3e54-d74d-4c80-8570-ca02da0cfa11",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "bannerBackgroundColor" : "",
+        "bannerPosition" : "top",
+        "bannerSizePercent" : 35,
+        "borderRadius" : 20,
+        "boxShadow" : true,
+        "haveBanner" : false,
+        "iconBackgroundColor" : "rgb(255,255,255)",
+        "iconSize" : "medium",
+        "noImageColor" : "rgb(192, 32, 38)",
+        "overlay" : "rgba(0,0,0,0.01)",
+        "templateType" : "full",
+        "tileMenuEditor" : "Apply_now_menu",
+        "titleColor" : "",
+        "titleFontSize" : "medium",
+        "titleHorizontalAlign" : "center"
+      },
+      "componentName" : "community_navigation:tileMenu",
+      "id" : "484861cd-4885-498b-8cae-47c10dd99bec",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "enableInlineEdit" : false,
+        "filterName" : "WCF_Proposal",
+        "layout" : "FULL",
+        "pageSize" : 25,
+        "scope" : "IndividualApplication",
+        "showActionBar" : false,
+        "showChartsPanel" : false,
+        "showDisplay" : "showall",
+        "showFilterPanel" : false,
+        "showImageIcon" : false,
+        "showManualRefreshButton" : false,
+        "showObjectName" : false,
+        "showPinnedList" : false,
+        "showSearchBar" : false
+      },
+      "componentName" : "forceCommunity:objectHome",
+      "id" : "6f80ef23-bece-467b-97ec-c968c4eb74a4",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "1cfa95e9-d70a-4549-8e8b-648c7c8d6927",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "e5d587b4-84c7-40c4-96dc-9ddf7339d452",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "list-0iT"
+}

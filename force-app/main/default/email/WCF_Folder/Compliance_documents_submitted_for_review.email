@@ -48,13 +48,13 @@ Compliance documents submitted
 </p>
 
 <h1 class="hdr-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;">
-Application {!WCF_Compliance_Document__c.Application_Number__c} - {!WCF_Compliance_Document__c.Application_Org_Name__c} 
+Application {!WCF_Compliance_Document__c.Application_Number__c}.{!WCF_Compliance_Document__c.Application_Org_Name__c} 
 </h1>
 </td>
 
 <!-- RIGHT: logo -->
 <td align="right" valign="middle" width="136" style="padding-left:16px;">
-<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="136" class="logo-hdr" style="display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;">
+<img src="https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="136" class="logo-hdr" style="display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;">
 </td>
 
 </tr>
@@ -80,9 +80,6 @@ Hi {!WCF_Compliance_Document__c.Application_Reviewer__c},
 {!WCF_Compliance_Document__c.Application_Org_Name__c} has submitted the compliance documents you requested on application {!WCF_Compliance_Document__c.Application_Number__c}.
 </p>
 
-<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;">
-What has come in:
-</p>
 
 <!-- PANEL -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;">
@@ -107,7 +104,7 @@ This is separate from your evaluation of the application. The decision already r
 <table role="presentation" class="btn" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 6px;">
 <tr>
 <td align="center" bgcolor="#BF2026" style="border-radius:4px;">
-<a href="{{review_link}}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
+<a href="https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite" target="_blank" style="display:inline-block;padding:13px 30px;font-family:'Barlow','Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">
 Review documents
 </a>
 </td>
@@ -133,7 +130,7 @@ Wadhwani Grants Platform
 <tr>
 <td class="pad" style="padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;">
 
-<img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&oid=00DF6000000APXN&lastMod=1782560396000"
+<img src="https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&oid=00DF6000000APXN&lastMod=1782560396000"
 width="132"alt="Wadhwani Grants" class="logo-ftr" style="display:block;width:132px;height:auto;margin:0 0 12px;"/>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
@@ -141,7 +138,7 @@ Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-You are receiving this because you are the reviewer assigned to application {{application_number}}.
+You are receiving this because you are the reviewer assigned to application {!WCF_Compliance_Document__c.Application_Number__c}.
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
@@ -149,7 +146,7 @@ An automated notice from the Wadhwani Grants Platform. The applicant is not copi
 </p>
 
 <p style="margin:0 0 4px;font-family:'Open Sans','Segoe UI',Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;">
-&copy; {{year}} Wadhwani Charitable Foundation. All rights reserved.
+© {!YEAR(TODAY())} Wadhwani Charitable Foundation. All rights reserved.
 </p>
 
 </td>

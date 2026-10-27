@@ -72,8 +72,10 @@ const UI_TEXT = {
     revisionBody: 'Our team reviewed your application and returned it with feedback.',
     revisionNote: 'Review the comments, update the flagged answers and resubmit.',
     notRecommendedTitle: 'Application Not Selected',
-    notRecommendedBody: 'After careful review, your application was not selected for funding at this time. Please reach out to your Programme Lead if you have questions.'
-
+    notRecommendedBody: 'After careful review, your application was not selected for funding at this time. Please reach out to your Programme Lead if you have questions.',
+    suspendedTitle: 'Application Suspended',
+    suspendedBody: 'Your application has been suspended due to 100 days of inactivity.',
+    suspendedNote: 'This application is closed and can no longer be edited or resumed.'
 };
 
 const fmt = (tpl, ...args) => args.reduce((s, a, i) => s.replace(`{${i}}`, a), tpl);
@@ -106,6 +108,7 @@ const STATUS_TO_STEP_INDEX = {
     NotStarted: 0,                 // Not Started
     RevisionRequested: 1,          // In Progress (editing again)
     Draft: 1,                      // In Progress  (was 2)
+    ApplicationSuspended: 1,
 
     Submitted: 2,                  // Completeness Check  (was 3)
     Sealed: 2,                     // Completeness Check  (was 3)
@@ -127,7 +130,7 @@ const STATUS_TO_STEP_INDEX = {
     Onboarded: 10                  // Complete
 };
 
-const ALERT_STATUSES = new Set(['Rejected', 'Suspended', 'OnboardingRejected', 'OnboardingSuspended']);
+const ALERT_STATUSES = new Set(['Rejected', 'Suspended', 'OnboardingRejected', 'OnboardingSuspended', 'ApplicationSuspended']);
 
 // Compliance doc status → activeIndex (the step now in progress).
 const COMPLIANCE_TO_STEP_INDEX = {
@@ -158,7 +161,8 @@ const STATUS_ALIASES = {
     'Passed for Onboarding': 'Approved',
     'Passed for Onboarded': 'Onboarded',
     'Onboarding Suspended': 'OnboardingSuspended',
-    'Onboarding Rejected': 'OnboardingRejected'
+    'Onboarding Rejected': 'OnboardingRejected',
+    'Application Suspended': 'ApplicationSuspended'
 };
 
 const STATUS_LOOKUP = {};
@@ -354,7 +358,7 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
     get exceptionLevel() {
         if (this.statusKey === 'revisionrequested') return 'warning';
         if (this.statusKey === 'rejected' || this.statusKey === 'onboardingrejected') return 'danger';
-        if (this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended') return 'warning';
+        if (this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended' || this.statusKey === 'applicationsuspended') return 'warning';
         const k = this.complianceKey;
         if (k === 'rejected') return 'danger';
         if (k === 'returned' || k === 'suspended') return 'warning';
@@ -368,6 +372,9 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
         const lvl = this.exceptionLevel;
         if (lvl === 'danger') return UI_TEXT.actionNeeded;
         if (lvl === 'warning') {
+            if (this.statusKey === 'applicationsuspended') {
+                return 'SUSPENDED';
+            }
             return this.complianceKey === 'suspended' || this.statusKey === 'suspended' || this.statusKey === 'onboardingsuspended'
                 ? UI_TEXT.onHold
                 : UI_TEXT.actionNeeded;
@@ -404,6 +411,10 @@ export default class WcfApplicationTimeline extends NavigationMixin(LightningEle
                 if (this.isNotRecommended && i === 5) {
                     label = UI_TEXT.notRecommendedTitle;
                     tooltip = UI_TEXT.notRecommendedBody;
+                } else if (this.statusKey === 'applicationsuspended') {
+                    label = UI_TEXT.suspendedTitle;
+                    tooltip = UI_TEXT.suspendedBody;
+                    subLabel = UI_TEXT.suspendedNote;
                 } else if (isRevision) {
                     label = UI_TEXT.revisionTitle;
                     tooltip = UI_TEXT.revisionBody;

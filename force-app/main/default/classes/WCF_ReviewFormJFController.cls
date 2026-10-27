@@ -4,6 +4,7 @@ public without sharing class WCF_ReviewFormJFController {
     private static final String OUTCOME_JC   = 'WCF_Job_Creation_Review';
     private static final String OUTCOME_LU   = 'WCF_Livelihood_Upliftment';
     private static final String OUTCOME_BOTH = 'WCF_Job_Fulfillment_Job_Creation';
+    private static final Integer MAX_FILE_BYTES = 25 * 1024 * 1024; // 25 MB
 
     // ── Recommend_for_CEO_review__c: values that mean "recommended" ──
     // Legacy 'Yes' is kept so existing records keep working.
@@ -587,6 +588,60 @@ AND  RecordTypeId IN :reviewerRtIds
         }
         return result;
     }
+   @AuraEnabled
+public static List<Id> linkUploadedFiles(Id reviewId, List<Id> documentIds) {
+    if (reviewId == null || documentIds == null || documentIds.isEmpty()) {
+        throw new AuraHandledException('Missing review or file information.');
+    }
+    try {
+        // Only consider files the current user actually uploaded
+        List<ContentDocument> owned = [
+            SELECT Id, ContentSize
+            FROM ContentDocument
+            WHERE Id IN :documentIds AND OwnerId = :UserInfo.getUserId()
+        ];
+
+        List<ContentDocument> tooLarge = new List<ContentDocument>();
+        List<Id> rejectedIds = new List<Id>();
+        Set<Id> validIds = new Set<Id>();
+
+        for (ContentDocument d : owned) {
+            if (d.ContentSize > MAX_FILE_BYTES) {
+                tooLarge.add(d);
+                rejectedIds.add(d.Id);
+            } else {
+                validIds.add(d.Id);
+            }
+        }
+
+        // Remove oversized files so they don't use storage
+        if (!tooLarge.isEmpty()) delete tooLarge;
+
+        Set<Id> alreadyLinked = new Set<Id>();
+        for (ContentDocumentLink l : [
+            SELECT ContentDocumentId FROM ContentDocumentLink
+            WHERE LinkedEntityId = :reviewId AND ContentDocumentId IN :validIds
+        ]) {
+            alreadyLinked.add(l.ContentDocumentId);
+        }
+
+        List<ContentDocumentLink> links = new List<ContentDocumentLink>();
+        for (Id docId : validIds) {
+            if (alreadyLinked.contains(docId)) continue;
+            links.add(new ContentDocumentLink(
+                ContentDocumentId = docId,
+                LinkedEntityId    = reviewId,
+                ShareType         = 'V',
+                Visibility        = 'AllUsers'
+            ));
+        }
+        if (!links.isEmpty()) insert links;
+
+        return rejectedIds;
+    } catch (Exception e) {
+        throw new AuraHandledException('Error linking files: ' + e.getMessage());
+    }
+}
 
     @AuraEnabled
     public static Map<String, String> uploadSupportingDocument(Id reviewId, String fileName, String base64Data) {

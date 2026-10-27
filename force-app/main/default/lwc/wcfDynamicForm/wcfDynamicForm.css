@@ -734,12 +734,16 @@ c-wcf-application-faq-modal {
     border: 1px dashed var(--wg-red);
     background: var(--wg-white);
     color: var(--wg-red);
-    padding: 8px 16px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     font-weight: var(--wg-weight-semibold);
-    font-size: 0.85rem;
+    font-size: var(--wg-font-size-button);
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: var(--wg-font-heading);
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .mockup-add-btn:hover {
@@ -867,11 +871,13 @@ lightning-textarea:focus-within {
     border: 1px solid #d8c8ff;
     background: #f9f4ff;
     color: #6e43d6;
-    border-radius: 0;
-    padding: 6px 14px;
-    font-size: 0.82rem;
+    border-radius: var(--wg-radius-pill);
+    padding: 0 14px;
+    font-size: var(--wg-font-size-button);
     cursor: pointer;
     transition: all 0.2s ease;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .modern-ai-btn:hover {
@@ -1004,11 +1010,14 @@ lightning-textarea:focus-within {
     font-family: var(--wg-font-heading);
     font-weight: var(--wg-weight-semibold);
     font-size: var(--wg-font-size-button);
-    padding: 10px 28px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     border: none;
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 /* Tab-nav variant — added alongside .btn-primary-red ONLY on the "Next"
@@ -1046,14 +1055,17 @@ lightning-textarea:focus-within {
     font-family: var(--wg-font-heading);
     font-weight: var(--wg-weight-semibold);
     font-size: var(--wg-font-size-button);
-    padding: 10px 22px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     border: 1.5px solid var(--wg-red);
     display: inline-flex;
     align-items: center;
     gap: 6px;
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-secondary-grey:hover {
@@ -1061,27 +1073,35 @@ lightning-textarea:focus-within {
 }
 
 .btn-submit-green {
-    background: var(--wg-success);
+    /* Primary CTA: Wadhwani Red pill (Color System v1, UAT ST-05; U138).
+       Class name kept so the JS/HTML stay unchanged. */
+    background: var(--wg-red);
     color: var(--wg-white);
     font-family: var(--wg-font-heading);
     font-weight: var(--wg-weight-semibold);
     font-size: var(--wg-font-size-button);
-    padding: 10px 30px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     border: none;
     cursor: pointer;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-secondary-outline {
     background: transparent;
-    border: 1px solid var(--wg-red);
+    border: 1.5px solid var(--wg-red);
     color: var(--wg-red);
     font-family: var(--wg-font-heading);
     font-weight: var(--wg-weight-semibold);
     font-size: var(--wg-font-size-button);
-    padding: 6px 16px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     cursor: pointer;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-save-draft {
@@ -1091,9 +1111,12 @@ lightning-textarea:focus-within {
     font-family: var(--wg-font-heading);
     font-weight: var(--wg-weight-semibold);
     font-size: var(--wg-font-size-button);
-    padding: 6px 18px;
-    border-radius: 0;
+    padding: var(--wg-padding-button);
+    border-radius: var(--wg-radius-pill);
     cursor: pointer;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .tagline-footer-banner {
@@ -1829,20 +1852,23 @@ lightning-textarea:focus-within {
 }
 
 .btn-submit-green {
-    background-color: var(--wg-success);
+    background-color: var(--wg-red);
     color: var(--wg-white);
     border: none;
-    border-radius: 0;
-    padding: 12px 28px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background-color 0.2s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-submit-green:hover:not(:disabled) {
-    background-color: var(--wg-success-deep);
+    background-color: var(--wg-red-deep);
 }
 
 .btn-submit-green:disabled {
@@ -1866,13 +1892,16 @@ lightning-textarea:focus-within {
     background: var(--wg-red);
     color: var(--wg-white);
     border: none;
-    border-radius: 0;
-    padding: 8px 18px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.2s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-download-pdf:hover {

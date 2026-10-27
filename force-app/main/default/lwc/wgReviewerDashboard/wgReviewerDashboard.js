@@ -258,7 +258,7 @@ export default class WgReviewerDashboard extends NavigationMixin(LightningElemen
                     revisionLabel,
                     reviewId: r.reviewId || null,
                     headquarters: r.headquarters || '',
-                    account: r.accountName || '—',
+                    organizationName: r.organizationName || r.accountName || '—',
                     track,
                     trackTags: this._trackTags(track),
                     dueDateRaw,

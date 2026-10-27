@@ -1,0 +1,97 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "31c39026-a764-457c-9640-8b27c5e53f30",
+  "label" : "Logged In Home",
+  "regions" : [ {
+    "id" : "a5a360aa-73bc-4c74-a984-2f7c98c8d04f",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgb(255,247,240)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "47ab4441-44cb-46e2-a348-0070a193dc56",
+          "columns" : [ {
+            "UUID" : "94907cc3-10c4-44af-ac45-c5bf39e6e621",
+            "columnKey" : "col1",
+            "columnName" : "column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ {
+              "attributes" : {
+                "richTextValue" : "<p><strong style=\"font-size: 18px;\">Access to Nutritious Food</strong></p> <p>Provides resources to organizations working to improve access to healthy food options for communities facing hunger and poverty.</p>",
+                "sfdc:identifier" : "forceCommunity_richTextInline1"
+              },
+              "fqn" : "forceCommunity:richTextInline"
+            } ]
+          } ]
+        },
+        "sectionHeight" : 32
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "47ab4441-44cb-46e2-a348-0070a193dc56",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : { },
+          "componentName" : "c:coepath",
+          "id" : "7f100c6f-2760-449f-83ab-74e2e38a5eca",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : { },
+          "componentName" : "c:coeProposalDashboardComponent",
+          "id" : "2ee7f660-01be-4990-937c-b2bb71f1fee6",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "94907cc3-10c4-44af-ac45-c5bf39e6e621",
+        "regionLabel" : "column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "a5aa5dd4-bc26-480f-9e4d-95a863dcc7f7",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "308ac7b9-16ac-46aa-956e-19d6b296f8a1",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "f7384939-1693-4603-893c-52babb6a2526",
+    "regionName" : "sidebarAlt",
+    "type" : "region"
+  }, {
+    "id" : "50808942-01d8-4aa7-b365-ed045f6835ba",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Home"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "d8ce64e6-10c5-4802-b947-71c629065d1a",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "b430eb27-6faf-4786-9937-9521901aa89b",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Home",
+  "type" : "view",
+  "viewType" : "home"
+}

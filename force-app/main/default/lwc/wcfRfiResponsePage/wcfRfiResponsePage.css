@@ -29,7 +29,7 @@
     max-width: none;
     box-sizing: border-box;
     margin: 0;
-    padding: var(--wg-space-6) var(--wg-space-4);
+    padding: var(--wg-space-6) var(--wg-space-4) 90px var(--wg-space-4);
     font-family: var(--wg-font-body);
     color: var(--rfi-text);
 }
@@ -121,6 +121,8 @@
 @media (max-width: 768px) {
     .rfi-grid-two, .rfi-grid-three, .rfi-grid-four { grid-template-columns: 1fr; }
     .rfi-field-area { padding: 18px 14px; }
+    .rfi-footer-bar { padding: 12px 16px; }
+    .rfi-response-wrapper { padding-bottom: 80px; }
 }
 
 /* ── Q1 track cards (read-only) ── */
@@ -203,14 +205,16 @@
 .rfi-remove-btn {
     background: transparent;
     border: var(--wg-border-width-thin) solid var(--rfi-error);
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     color: var(--rfi-error);
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-caption);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
-    padding: 4px 10px;
+    padding: 0 12px;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
+    height: 32px;
+    box-sizing: border-box;
 }
 .rfi-remove-btn:hover { background: var(--wg-error-bg); color: var(--wg-red-deep); }
 
@@ -218,15 +222,18 @@
 .rfi-add-btn {
     background: var(--wg-white);
     border: 1px dashed var(--rfi-brand);
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     color: var(--rfi-brand);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
-    padding: 8px 16px;
+    padding: var(--wg-padding-button);
     cursor: pointer;
     margin-top: var(--wg-space-2);
     transition: background 0.2s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .rfi-add-btn:hover { background: var(--rfi-brand-tint); }
 
@@ -440,6 +447,15 @@ lightning-textarea:focus-within {
 .rfi-richtext-footer .rfi-word-count { margin-left: auto; }
 .rfi-word-count { font-size: var(--wg-font-size-label); color: var(--rfi-muted); }
 .rfi-word-count--over { color: var(--rfi-error); font-weight: var(--wg-weight-bold); }
+.rfi-field-error-message {
+    color: var(--wg-error);
+    font-size: var(--wg-font-size-label);
+    font-weight: var(--wg-weight-semibold);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
 /* ── Radio ── */
 .rfi-radio-group { display: flex; gap: var(--wg-space-5); margin-top: 6px; }
@@ -545,26 +561,37 @@ lightning-textarea:focus-within {
 .location-city { font-size: var(--wg-font-size-label); font-weight: var(--wg-weight-semibold); color: var(--wg-gray); }
 .location-detail { font-size: var(--wg-font-size-caption); color: var(--rfi-muted); margin-top: 2px; }
 
-/* ── Footer buttons (same as the form's Save Draft / Next buttons) ── */
+/* ── Footer buttons (fixed action bar at bottom of viewport) ── */
 .rfi-footer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--wg-white);
+    padding: 14px 32px;
+    border-top: var(--wg-border-width-thin) solid var(--rfi-border-soft);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: var(--wg-space-3);
-    margin-top: 28px;
-    padding-top: var(--wg-space-5);
-    border-top: var(--wg-border-width-thin) solid var(--rfi-border-soft);
+    margin-top: 0;
 }
 .btn-primary-red {
     background: var(--rfi-brand);
     color: var(--wg-white);
     border: none;
-    border-radius: 0;
-    padding: 10px 28px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .btn-primary-red:hover { background: var(--rfi-brand-dark); }
 .btn-primary-red:disabled {
@@ -577,13 +604,16 @@ lightning-textarea:focus-within {
     background: var(--wg-white);
     color: var(--rfi-brand);
     border: var(--wg-border-width-ghost) solid var(--rfi-brand);
-    border-radius: 0;
-    padding: 10px 22px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .btn-secondary-outline:hover { background: var(--wg-error-bg); }
 
@@ -635,12 +665,14 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
     border: 1px solid #d8c8ff;
     background: #f9f4ff;
     color: #6e43d6;
-    border-radius: 0;
-    padding: 6px 14px;
+    border-radius: var(--wg-radius-pill);
+    padding: 0 14px;
     font-family: var(--wg-font-body);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     cursor: pointer;
     transition: all 0.2s ease;
+    height: 32px;
+    box-sizing: border-box;
 }
 .modern-ai-btn:hover { background: #f0e6ff; }
 

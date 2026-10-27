@@ -187,6 +187,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Legal_Structure__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Legal_Structure__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Legal_Structure__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
     <button type="button" class="modern-ai-btn" data-id="Legal_Structure__c" onclick={handleAIClick}>✦ AI Feedback</button>
     <span class={wordCountClass.Legal_Structure__c}>{wordCountDisplay.Legal_Structure__c}</span>
@@ -386,6 +391,11 @@
                                                 </div>
                                                 <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                     data-field="Revenue_Explanation__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                                <template if:true={isOverLimit.Revenue_Explanation__c}>
+                                                    <div class="rfi-field-error-message">
+                                                        ⚠️ {wordLimitErrors.Revenue_Explanation__c}
+                                                    </div>
+                                                </template>
                                                 <div class="rfi-richtext-footer">
                                                     
                                                     <span class={wordCountClass.Revenue_Explanation__c}>{wordCountDisplay.Revenue_Explanation__c}</span>
@@ -406,6 +416,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Skilling_Approach__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Skilling_Approach__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Skilling_Approach__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
                                                 <button type="button" class="modern-ai-btn" data-id="Skilling_Approach__c" onclick={handleAIClick}>✦ AI Feedback</button>
                                                 <span class={wordCountClass.Skilling_Approach__c}>{wordCountDisplay.Skilling_Approach__c}</span>
@@ -463,6 +478,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Job_Creation_Approach__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Job_Creation_Approach__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Job_Creation_Approach__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
                                                 <button type="button" class="modern-ai-btn" data-id="Job_Creation_Approach__c" onclick={handleAIClick}>✦ AI Feedback</button>
                                                 <span class={wordCountClass.Job_Creation_Approach__c}>{wordCountDisplay.Job_Creation_Approach__c}</span>
@@ -543,6 +563,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Livelihood_Approach__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Livelihood_Approach__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Livelihood_Approach__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
                                                 <button type="button" class="modern-ai-btn" data-id="Livelihood_Approach__c" onclick={handleAIClick}>✦ AI Feedback</button>
                                                 <span class={wordCountClass.Livelihood_Approach__c}>{wordCountDisplay.Livelihood_Approach__c}</span>
@@ -644,16 +669,17 @@
                                                 <lightning-input label="Who conducted the verification?"
                                                     value={formValues.Details_of_Ethical_Received__c}
                                                     data-field="Details_of_Ethical_Received__c"
-                                                    onchange={handleFieldChange} required></lightning-input>
+                                                    onchange={handleFieldChange} onblur={handleQ24DetailsBlur} required></lightning-input>
                                             </div>
                                             <div class="rfi-upload-container">
                                                 <label class="rfi-field-label">Upload verification report <span class="required">*</span></label>
-                                                <p class="subtext-muted">PDF only, max 10 MB.</p>
+                                                <p class="subtext-muted">PDF only, max 25 MB per file. You can select several files at once.</p>
                                                 <lightning-file-upload
                                                     label="Upload"
                                                     name="q24FileUpload"
                                                     record-id={recordId}
                                                     accept={pdfOnlyFormats}
+                                                    multiple
                                                     onuploadfinished={handleQ24UploadFinished}>
                                                 </lightning-file-upload>
                                                 <template if:true={hasQ24UploadedFiles}>
@@ -685,6 +711,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Organizational_Sustainability__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Organizational_Sustainability__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Organizational_Sustainability__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
                                                 <button type="button" class="modern-ai-btn" data-id="Organizational_Sustainability__c" onclick={handleAIClick}>✦ AI Feedback</button>
                                                 <span class={wordCountClass.Organizational_Sustainability__c}>{wordCountDisplay.Organizational_Sustainability__c}</span>
@@ -704,6 +735,11 @@
                                             </div>
                                             <div class="modern-richtext-area" contenteditable="true" lwc:dom="manual"
                                                 data-field="Use_of_Additional_Funding__c" oninput={handleRichTextInput} onpaste={handlePaste}></div>
+                                            <template if:true={isOverLimit.Use_of_Additional_Funding__c}>
+                                                <div class="rfi-field-error-message">
+                                                    ⚠️ {wordLimitErrors.Use_of_Additional_Funding__c}
+                                                </div>
+                                            </template>
                                             <div class="rfi-richtext-footer">
                                                 <button type="button" class="modern-ai-btn" data-id="Use_of_Additional_Funding__c" onclick={handleAIClick}>✦ AI Feedback</button>
                                                 <span class={wordCountClass.Use_of_Additional_Funding__c}>{wordCountDisplay.Use_of_Additional_Funding__c}</span>
@@ -734,6 +770,11 @@
                                                     data-field="Operational_Synergies_with_WOF__c"
                                                     onchange={handleFieldChange}
                                                     required></lightning-textarea>
+                                                <template if:true={isOverLimit.Operational_Synergies_with_WOF__c}>
+                                                    <div class="rfi-field-error-message">
+                                                        ⚠️ {wordLimitErrors.Operational_Synergies_with_WOF__c}
+                                                    </div>
+                                                </template>
                                                 <div class="rfi-richtext-footer">
                                                     <span class={genieWordCountClass}>{genieWordCountDisplay}</span>
                                                 </div>
@@ -744,7 +785,7 @@
                                     <!-- ═════════ Q28: Supporting documents (optional) ═════════ -->
                                     <template if:true={q.isQ28}>
                                         <p class="rfi-field-hint">{descriptions.Q28}</p>
-                                        <p class="subtext-muted">PDF, Word, PowerPoint, or Excel (up to 50 MB per file).</p>
+                                        <p class="subtext-muted">PDF, Word, PowerPoint, or Excel (up to 25 MB per file). You can select several files at once.</p>
                                         <div class="rfi-upload-container">
                                             <lightning-file-upload
                                                 label="Upload Supporting Document"

@@ -1,0 +1,65 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "8c31ab01-383f-4639-8b33-56faf4bad810",
+  "label" : "Applicant Portal",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "addHomeMenuItem" : true,
+        "includeImageUrls" : false,
+        "linkSetMasterLabel" : "Default Navigation"
+      },
+      "componentName" : "c:navigationMenu",
+      "id" : "5c2d646d-39ea-4f5b-877e-47686cdf2df7",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "09303d8a-0ab7-452e-9a73-219dfc14c031",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : { },
+      "componentName" : "c:wcfApplicantDashboard",
+      "id" : "489cced4-857b-4632-8cff-7535f54b0b99",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : { },
+      "componentName" : "c:navigateRecordPage",
+      "id" : "464fc663-67c9-44c1-8223-598a5f2e9823",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "5c8fa021-3704-41d8-8e9c-89a1c5d37865",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "41b134a5-999f-43f8-866a-568739fa3925",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Applicant Portal"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "ad58629f-75ba-46b8-9e3a-a47d4e3366fa",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "7a7f3186-4f9f-44ac-9c10-22cb1b5929c3",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-applicant-portal"
+}

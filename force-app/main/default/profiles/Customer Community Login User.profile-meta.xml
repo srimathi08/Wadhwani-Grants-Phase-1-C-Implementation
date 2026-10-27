@@ -279,6 +279,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>AutocreatedHeadlessSelfReg1793037026748</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>AwardeeModuleController</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -432,6 +436,18 @@
     </classAccesses>
     <classAccesses>
         <apexClass>CurrentFiscalYearDataControllerTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>E39PasswordNotifier</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>E39PasswordNotifierScheduler</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>E39Tests</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1008,6 +1024,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>WCFReviewerMetadataControllerTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>WCFSuspensionService</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -2380,6 +2400,11 @@
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>ApplicationReview.D2_LU_Distinctiveness_Comment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>ApplicationReview.D2_LU_Distinctiveness_Rating__c</field>
         <readable>false</readable>
@@ -2475,14 +2500,29 @@
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>ApplicationReview.D3_LU_ConversionRate_Comment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>ApplicationReview.D3_LU_ConversionRate_Rating__c</field>
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>ApplicationReview.D3_LU_CostPerOutcome_Comment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>ApplicationReview.D3_LU_CostPerOutcome_Rating__c</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ApplicationReview.D3_LU_ScaleRecord_Comment__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
@@ -8470,6 +8510,11 @@
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Approver_returned_to_reviewer_due_date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>IndividualApplication.Asked_for_Resubmission_by_COE_on__c</field>
         <readable>false</readable>
@@ -8693,6 +8738,11 @@
         <editable>false</editable>
         <field>IndividualApplication.Due_Date_for_Resubmission__c</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Duplicate_Org_Matched_Name__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
@@ -8923,6 +8973,11 @@
         <editable>false</editable>
         <field>IndividualApplication.IsSubmitted</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Is_Duplicate_Org_Match__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
@@ -9405,6 +9460,11 @@
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Revision_Requested_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>IndividualApplication.Selected_Funding_Tracks__c</field>
         <readable>false</readable>
@@ -9503,6 +9563,16 @@
         <editable>false</editable>
         <field>IndividualApplication.Submitter_Name__c</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Suspension_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>IndividualApplication.Suspension_Reason__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
@@ -10027,66 +10097,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Location.VisitorAddressId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.AccountId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.ContactId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.HasInitialResponseSent</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.IsOptedOut</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.Language</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.LeadId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingEndUser.MessagingExternalUserKey</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingSession.CampaignId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingSession.CaseId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingSession.EndUserLanguage</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingSession.LeadId</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>MessagingSession.OpportunityId</field>
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -15656,6 +15666,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>User.Pwd_Notified_Through__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>User.Pwd_Notify_Error__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>User.expcloud__Portal_Username__c</field>
         <readable>false</readable>
     </fieldPermissions>
@@ -15936,6 +15956,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>WCF_Compliance_Document__c.Draft_Email_Sent__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>WCF_Compliance_Document__c.Due_Date__c</field>
         <readable>false</readable>
     </fieldPermissions>
@@ -15997,41 +16022,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>WCF_Compliance_Document__c.Uploaded_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.AgreementmType__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.Executed_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.Expiry_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.Has_Signed_PDF__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.IndividualApplication__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>WCF_Executed_Agreement_c__c.Volody_Link__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -17474,9 +17464,6 @@
         <layout>WCF_Compliance_Document__c-WCF Compliance Document Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>WCF_Executed_Agreement_c__c-WCF Executed Agreement Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
         <layout>WCF_Livelihood_Program__c-WCF Livelihood Program Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
@@ -17970,10 +17957,6 @@
     </tabVisibilities>
     <tabVisibilities>
         <tab>WCF_Compliance_Document__c</tab>
-        <visibility>DefaultOn</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
-        <tab>WCF_Executed_Agreement_c__c</tab>
         <visibility>DefaultOn</visibility>
     </tabVisibilities>
     <tabVisibilities>
@@ -18606,14 +18589,6 @@
     </tabVisibilities>
     <tabVisibilities>
         <tab>standard-MarketSegmentActivation</tab>
-        <visibility>DefaultOn</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
-        <tab>standard-MessagingEndUser</tab>
-        <visibility>DefaultOn</visibility>
-    </tabVisibilities>
-    <tabVisibilities>
-        <tab>standard-MessagingSession</tab>
         <visibility>DefaultOn</visibility>
     </tabVisibilities>
     <tabVisibilities>

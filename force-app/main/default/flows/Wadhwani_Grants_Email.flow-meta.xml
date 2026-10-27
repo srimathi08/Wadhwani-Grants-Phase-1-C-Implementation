@@ -128,6 +128,68 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
+        <name>Duplicate_Org_eail_to_validator</name>
+        <label>Duplicate Org eail to validator</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>WCFValidatorContactIds</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Duplicate_Organization_Validator_Alert</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>WCFValidatorContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
         <name>Email_to_alert_validator_on_due_near_ending</name>
         <label>Email to alert validator on due near ending</label>
         <locationX>0</locationX>
@@ -344,17 +406,30 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>useEmailTemplate</name>
+            <name>composeEmailContent</name>
             <value>
                 <stringValue>True</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailTemplateName</name>
+            <name>emailSubject</name>
+            <value>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+                <stringValue>Your Wadhwani Grants application was NOT approved </stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Application_Decision_Declined</setupReference>
-                <setupReferenceType>EmailTemplate</setupReferenceType>
+                <stringValue>{!ApplicationDeclined}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>true</booleanValue>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
         <inputParameters>
@@ -383,7 +458,7 @@
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <connector>
-            <targetReference>resubmission_Round_assignment</targetReference>
+            <targetReference>Update_Resubmission_round</targetReference>
         </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -679,7 +754,7 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Additional_Information_Reminder</setupReference>
+                <setupReference>WCF_Folder/Additional_Information_Reminder_30day</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -702,8 +777,8 @@
         <versionString>3.0.1</versionString>
     </actionCalls>
     <actionCalls>
-        <name>Send_E_58_Duplicate_Org_Alert_to_Validator</name>
-        <label>Send E-58 Duplicate Org Alert to Validator</label>
+        <name>Send_60_Day_Revision_Reminder_Email</name>
+        <label>Send 60 Day Revision Reminder Email</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -741,7 +816,69 @@
             <name>emailTemplateName</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <setupReference>WCF_Folder/Duplicate_Organization_Validator_Alert</setupReference>
+                <setupReference>WCF_Folder/Additional_Information_Reminder_60days</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>$Record.Account.PersonContactId</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_90_Day_Revision_Reminder_Email</name>
+        <label>Send 90 Day Revision Reminder Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>$Record.Account.PersonEmail</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Additional_Information_Reminder_90days</setupReference>
                 <setupReferenceType>EmailTemplate</setupReferenceType>
             </value>
         </inputParameters>
@@ -1141,22 +1278,6 @@
             <targetReference>Loop_1</targetReference>
         </connector>
     </assignments>
-    <assignments>
-        <name>resubmission_Round_assignment</name>
-        <label>resubmission Round assignment</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>NewSubmissionRound</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>SubmissionRoundPlusOne</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Update_Resubmission_round</targetReference>
-        </connector>
-    </assignments>
     <decisions>
         <name>Application_Status_change</name>
         <label>Application Status change</label>
@@ -1379,7 +1500,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Returned_by_Approver_Email_to_Reviewer</targetReference>
+                <targetReference>Set_Approver_Returned_Due_Date</targetReference>
             </connector>
             <label>Returned by Approver</label>
         </rules>
@@ -1404,21 +1525,6 @@
                 <targetReference>Send_Onboarding_Complete_Email_to_Applicant</targetReference>
             </connector>
             <label>Onboarded</label>
-        </rules>
-        <rules>
-            <name>Duplicate_Organization_Match</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Is_Duplicate_Org_Match__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Send_E_58_Duplicate_Org_Alert_to_Validator</targetReference>
-            </connector>
-            <label>Duplicate Organization Match</label>
         </rules>
     </decisions>
     <decisions>
@@ -1463,6 +1569,50 @@
                 <targetReference>Send_100_Day_Closure_Email</targetReference>
             </connector>
             <label>Still In Revision Requested 100 Days</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_If_Still_Revision_Requested_at_60days</name>
+        <label>Check If Still Revision Requested at 60days</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Still_In_Revision_Requested_60_Days</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Latest_Record_For_Reminder_at_60days.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Revision Requested</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_60_Day_Revision_Reminder_Email</targetReference>
+            </connector>
+            <label>Still In Revision Requested 60 Days</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_If_Still_Revision_Requested_at_90days</name>
+        <label>Check If Still Revision Requested at 90days</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Still_In_Revision_Requested_90_Days</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Latest_Record_For_Reminder_at_90days.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Revision Requested</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_90_Day_Revision_Reminder_Email</targetReference>
+            </connector>
+            <label>Still In Revision Requested 90 Days</label>
         </rules>
     </decisions>
     <decisions>
@@ -1544,6 +1694,28 @@
         <locationY>0</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
+            <name>Duplicate_organization_match</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>HasWCFValidator</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Is_Duplicate_Org_Match__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Duplicate_Org_eail_to_validator</targetReference>
+            </connector>
+            <label>Duplicate organization match</label>
+        </rules>
+        <rules>
             <name>when_status_is_Submitted</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
@@ -1584,6 +1756,15 @@
     <description>Wcf related email</description>
     <environments>Default</environments>
     <formulas>
+        <name>ApproverReturnedReviewerDueDate</name>
+        <dataType>Date</dataType>
+        <expression>CASE(WEEKDAY(TODAY()),
+  1, TODAY() + 12,
+  7, TODAY() + 13,
+  TODAY() + 14
+)</expression>
+    </formulas>
+    <formulas>
         <name>CurrentYear</name>
         <dataType>String</dataType>
         <expression>TEXT(YEAR(TODAY()))</expression>
@@ -1591,12 +1772,16 @@
     <formulas>
         <name>RevisionDueDate</name>
         <dataType>Date</dataType>
-        <expression>TODAY() + 5</expression>
+        <expression>CASE(WEEKDAY(TODAY()),
+  1, TODAY() + 5,
+  7, TODAY() + 6,
+  TODAY() + 7
+)</expression>
     </formulas>
     <formulas>
         <name>Subject</name>
         <dataType>String</dataType>
-        <expression>&quot;Reviewer needs more information:&quot; &amp; {!$Record.ApplicationName}</expression>
+        <expression>&quot;Reviewer needs more information:&quot; &amp; {!$Record.Name}</expression>
     </formulas>
     <formulas>
         <name>SubmissionRoundPlusOne</name>
@@ -1827,6 +2012,48 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
+        <name>Get_Latest_Record_For_Reminder_at_60days</name>
+        <label>Get Latest Record For Reminder at 60days</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_If_Still_Revision_Requested_at_60days</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>IndividualApplication</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Latest_Record_For_Reminder_at_90days</name>
+        <label>Get Latest Record For Reminder at 90days</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_If_Still_Revision_Requested_at_90days</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>IndividualApplication</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Get_Proposal_Review</name>
         <label>Get Proposal Review</label>
         <locationX>0</locationX>
@@ -1892,6 +2119,22 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
+        <name>Due_Date_for_Resubmission</name>
+        <label>Due_Date_for_Resubmission</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>validator_email_alert_after_resubmission</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Due_Date_for_Resubmission__c</field>
+            <value>
+                <elementReference>RevisionDueDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
         <name>Mark_Draft_Email_Send</name>
         <label>Mark Draft Email Send</label>
         <locationX>0</locationX>
@@ -1905,13 +2148,35 @@
         <inputReference>$Record</inputReference>
     </recordUpdates>
     <recordUpdates>
+        <name>Set_Approver_Returned_Due_Date</name>
+        <label>Set Approver Returned Due Date</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Send_Returned_by_Approver_Email_to_Reviewer</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Approver_returned_to_reviewer_due_date__c</field>
+            <value>
+                <elementReference>ApproverReturnedReviewerDueDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
         <name>Update_Due_Date</name>
         <label>Update Due Date</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Update_Return_Commends</targetReference>
+            <targetReference>Revision_Request_mail_to_applicant</targetReference>
         </connector>
+        <inputAssignments>
+            <field>Consalidated__c</field>
+            <value>
+                <elementReference>Get_Proposal_Review.Consolidated_Return_Comments__c</elementReference>
+            </value>
+        </inputAssignments>
         <inputAssignments>
             <field>Due_Date_for_Resubmission__c</field>
             <value>
@@ -1926,28 +2191,12 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>validator_email_alert_after_resubmission</targetReference>
+            <targetReference>Due_Date_for_Resubmission</targetReference>
         </connector>
         <inputAssignments>
             <field>Submission_Round__c</field>
             <value>
                 <elementReference>NewSubmissionRound</elementReference>
-            </value>
-        </inputAssignments>
-        <inputReference>$Record</inputReference>
-    </recordUpdates>
-    <recordUpdates>
-        <name>Update_Return_Commends</name>
-        <label>Update Return Commends and Validator, Reviewer name</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <connector>
-            <targetReference>Revision_Request_mail_to_applicant</targetReference>
-        </connector>
-        <inputAssignments>
-            <field>Consalidated__c</field>
-            <value>
-                <elementReference>Get_Proposal_Review.Consolidated_Return_Comments__c</elementReference>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -2011,7 +2260,7 @@
                 <targetReference>Get_Latest_Record</targetReference>
             </connector>
             <label>80% due validate</label>
-            <offsetNumber>8</offsetNumber>
+            <offsetNumber>3</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Initial_Submission_Date__c</recordField>
             <timeSource>RecordField</timeSource>
@@ -2022,9 +2271,9 @@
                 <targetReference>Get_Latest_Record_For_Reminder</targetReference>
             </connector>
             <label>30 Days Revision Reminder</label>
-            <offsetNumber>30</offsetNumber>
+            <offsetNumber>29</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>Initial_Submission_Date__c</recordField>
+            <recordField>Revision_Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <scheduledPaths>
@@ -2033,18 +2282,384 @@
                 <targetReference>Get_Latest_Record_For_Closure</targetReference>
             </connector>
             <label>100 Days Revision Closure</label>
-            <offsetNumber>100</offsetNumber>
+            <offsetNumber>99</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>Initial_Submission_Date__c</recordField>
+            <recordField>Revision_Requested_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <scheduledPaths>
+            <name>X60_Days_Revision_Remainder</name>
+            <connector>
+                <targetReference>Get_Latest_Record_For_Reminder_at_60days</targetReference>
+            </connector>
+            <label>60 Days Revision Remainder</label>
+            <offsetNumber>59</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>Revision_Requested_Date__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <scheduledPaths>
+            <name>X90_Days_Revision_Remainder</name>
+            <connector>
+                <targetReference>Get_Latest_Record_For_Reminder_at_90days</targetReference>
+            </connector>
+            <label>90 Days Revision Remainder</label>
+            <offsetNumber>89</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>Revision_Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Draft</status>
+    <status>Obsolete</status>
+    <textTemplates>
+        <description>Action required: update your application-E-04</description>
+        <name>Actionrequired_updateyourapplication</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;/&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;/&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;/&gt;
+&lt;meta name=&quot;color-scheme&quot; content=&quot;light&quot;/&gt;
+&lt;meta name=&quot;supported-color-schemes&quot; content=&quot;light&quot;/&gt;
+&lt;title&gt;{!Get_Account_Details.WCF_Organizational_Name__c} Action required: please update your application&lt;/title&gt;
+
+&lt;style&gt;
+html,body{margin:0 !important;padding:0 !important;width:100% !important;}
+body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table{border-collapse:collapse !important;mso-table-lspace:0pt !important;mso-table-rspace:0pt !important;}
+img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none;}
+a{color:#BF2026;}
+div[style*=&quot;margin: 16px 0&quot;]{margin:0 !important;}
+
+@media only screen and (max-width:620px){
+.frame{padding:0 !important;}
+.container{width:100% !important;max-width:100% !important;border-radius:0 !important;border-left:0 !important;border-right:0 !important;}
+.pad{padding-left:22px !important;padding-right:22px !important;}
+.hdr{padding:20px 22px !important;}
+.logo-hdr{width:100px !important;}
+.logo-ftr{width:114px !important;}
+.btn{width:100% !important;}
+.btn a{display:block !important;}
+.bh{font-size:19px !important;line-height:1.25 !important;}
+}
+&lt;/style&gt;
+
+&lt;/head&gt;
+
+&lt;body width=&quot;100%&quot; bgcolor=&quot;#F4F4F5&quot; style=&quot;margin:0;padding:0 !important;background-color:#F4F4F5;&quot;&gt;
+&lt;center role=&quot;article&quot; aria-roledescription=&quot;email&quot; lang=&quot;en&quot; style=&quot;width:100%;background-color:#F4F4F5;&quot;&gt;
+
+&lt;!-- PREHEADER (hidden) --&gt;
+&lt;div style=&quot;display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;color:#F4F4F5;&quot;&gt;
+{!Get_Account_Details.WCF_Organizational_Name__c} &amp;middot; A few items need updating before your application can move ahead.
+&lt;/div&gt;
+
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot;&gt;
+&lt;tr&gt;
+&lt;td class=&quot;frame&quot; align=&quot;center&quot; style=&quot;padding:24px 12px;&quot;&gt;
+
+&lt;table role=&quot;presentation&quot; class=&quot;container&quot; align=&quot;center&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%;max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;
+
+&lt;!-- HEADER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;hdr&quot; bgcolor=&quot;#BF2026&quot; style=&quot;padding:24px 32px;border-radius:8px 8px 0 0;&quot;&gt;
+
+&lt;!-- Header: text left, logo right (same row) --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 6px;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;&quot;&gt;
+A few updates needed.
+&lt;/p&gt;
+
+&lt;h1 class=&quot;bh&quot; style=&quot;margin:0;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;&quot;&gt;
+Application {!$Record.Name}- {!$Record.Organization_Name__c}
+&lt;/h1&gt;
+
+&lt;/td&gt;
+&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding-left:16px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Grants&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- ORANGE DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;background:#F2672A;&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- BODY --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:28px 32px 10px;&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Hi {!$Record.Account.Name},
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Thank you for your application for {!$Record.Account.WCF_Organizational_Name__c}. We have checked it for completeness, and a few items are missing or need correcting before it can go to review. Your application has not been rejected.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+What we need
+&lt;/p&gt;
+
+&lt;!-- PANEL --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
+What we need: {!Get_Proposal_Review.Consolidated_Return_Comments__c}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Sign in, update the items listed above, and submit your application again by {!$Record.Due_Date_for_Resubmission__c}. Everything else you entered is saved, so you only need to change these items.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+If we do not hear from you, we will send you a reminder after 30 days. If we still have not heard from you 100 days from now, we will close the application, and you would be welcome to apply again.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+In case of any queries, please write to us at grants.support@wadhwanifoundation.org
+&lt;/p&gt;
+
+&lt;!-- BUTTON --&gt;
+&lt;table role=&quot;presentation&quot; class=&quot;btn&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:8px 0 6px;&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;border-radius:4px;&quot;&gt;
+&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/wcf/s/login/&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:13px 30px;font-family:&apos;Barlow&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;&quot;&gt;
+Update your application
+&lt;/a&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:18px 0 8px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#414042;&quot;&gt;
+Kind Regards,&lt;br/&gt;
+{!$Record.WG_Validator_Name__c}&lt;br/&gt;
+Wadhwani Grants, application checks
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;
+&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;/&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- FOOTER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot; width=&quot;132&quot; alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;/&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Questions? Just reply to this email; it reaches me and the Wadhwani Grants team at
+&lt;a href=&quot;mailto:grants.support@wadhwanifoundation.org&quot; style=&quot;color:#6D6E71;text-decoration:underline;&quot;&gt;grants.support@wadhwanifoundation.org&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <description>Application not Approved</description>
+        <name>ApplicationDeclined</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;/&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;/&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;/&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;/&gt;
+&lt;title&gt;Your Wadhwani Grants application was NOT approved&lt;/title&gt;
+
+&lt;style&gt;
+html,body{margin:0 !important;padding:0 !important;width:100% !important;}
+body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table{border-collapse:collapse !important;}
+img{border:0;outline:none;text-decoration:none;}
+a{color:#BF2026;}
+
+@media only screen and (max-width:620px){
+.container{width:100% !important;max-width:100% !important;}
+.pad{padding-left:22px !important;padding-right:22px !important;}
+.logo-hdr{width:100px !important;}
+.logo-ftr{width:114px !important;}
+.hdr-text{font-size:19px !important;}
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body style=&quot;margin:0;padding:0;background-color:#F4F4F5;&quot;&gt;
+
+&lt;!-- PREHEADER (hidden) --&gt;
+&lt;div style=&quot;display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;&quot;&gt;
+{!$Record.Organization_Name__c} &amp;middot; Your application was NOT approved. The reasons are below.
+&lt;/div&gt;
+
+&lt;center style=&quot;width:100%;background-color:#F4F4F5;&quot;&gt;
+
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot;&gt;
+&lt;tr&gt;
+&lt;td align=&quot;center&quot; style=&quot;padding:24px 12px;&quot;&gt;
+
+&lt;table class=&quot;container&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;
+
+&lt;!-- HEADER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:24px 32px;border-radius:8px 8px 0 0;&quot;&gt;
+
+&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+&lt;tr&gt;
+
+&lt;!-- LEFT: text --&gt;
+&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;
+&lt;p style=&quot;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;text-align:left;&quot;&gt;
+Application decision
+&lt;/p&gt;
+
+&lt;h1 class=&quot;hdr-text&quot; style=&quot;margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:1.25;font-weight:700;color:#ffffff;text-align:left;&quot;&gt;
+Your application was NOT approved
+&lt;/h1&gt;
+
+&lt;p style=&quot;margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.4;color:#F9C9A8;text-align:left;&quot;&gt;
+Application {!$Record.Name} &amp;middot; {!$Record.Organization_Name__c}
+&lt;/p&gt;
+&lt;/td&gt;
+
+&lt;!-- RIGHT: logo --&gt;
+&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;136&quot; style=&quot;padding-left:16px;&quot;&gt;
+&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;oid=00DF6000000APXN&amp;lastMod=1782557340000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Grants&quot; class=&quot;logo-hdr&quot; style=&quot;display:block;width:136px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;
+&lt;/td&gt;
+
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- ORANGE DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- BODY --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:14px 32px 10px;&quot;&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Hi {!$Record.Account.Name},
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Your application to Wadhwani Grants has NOT been approved.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+What our reviewers recorded:
+&lt;/p&gt;
+
+&lt;!-- PANEL --&gt;
+&lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;background:#F7F2F2;border-left:3px solid #F2672A;border-radius:3px;margin:4px 0 18px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding:16px 20px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:14.5px;line-height:1.6;color:#414042;&quot;&gt;
+&lt;strong&gt;What our reviewers recorded:&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;
+{!Get_Proposal_Review.Rejection_Comment__c}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+The decision is on this application. It is not a reflection of your work or your organization.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Thank you for the time and care your team put into the application, and for sharing your work with us.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.62;color:#414042;&quot;&gt;
+Kind Regards,&lt;br/&gt;
+The Wadhwani Grants Team
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- DIVIDER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:0 32px;&quot;&gt;
+&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:6px 0 0;&quot;/&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;!-- FOOTER --&gt;
+&lt;tr&gt;
+&lt;td class=&quot;pad&quot; style=&quot;padding:22px 32px 26px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;
+
+&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;oid=00DF6000000APXN&amp;lastMod=1782560396000&quot; width=&quot;132&quot; alt=&quot;Wadhwani Grants&quot; class=&quot;logo-ftr&quot; style=&quot;display:block;width:132px;height:auto;margin:0 0 12px;&quot;/&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+Questions? Just reply to this email; it reaches the Wadhwani Grants team at
+&lt;a href=&quot;mailto:grants.support@wadhwanifoundation.org&quot; style=&quot;color:#6D6E71;text-decoration:underline;&quot;&gt;grants.support@wadhwanifoundation.org&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p style=&quot;margin:0 0 4px;font-family:&apos;Open Sans&apos;,&apos;Segoe UI&apos;,Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#6D6E71;&quot;&gt;
+&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.
+&lt;/p&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</text>
+    </textTemplates>
     <textTemplates>
         <name>Reviewer_needs_more_information</name>
         <isViewedAsPlainText>false</isViewedAsPlainText>
-        <text>&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot; style=&quot;background-color:#F4F4F5;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; style=&quot;padding:28px 12px;&quot;&gt;&lt;table width=&quot;640&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%;max-width:640px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:28px 32px;background-color:#BF2026;border-radius:8px 8px 0 0;&quot;&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;&quot;&gt;Returned for input&lt;/p&gt;&lt;h1 style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:26px;line-height:1.25;font-weight:700;color:#ffffff;&quot;&gt;Returned to you for input&lt;/h1&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#F9C9A8;&quot;&gt;Application {!$Record.ApplicationName} · {!$Record.Organization_Name__c}&lt;/p&gt;&lt;/td&gt;&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;140&quot; style=&quot;padding-left:16px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782557340000&quot; width=&quot;140&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:140px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;background-color:#F2672A;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:32px 32px 12px;&quot;&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Hi {!$Record.WG_Validator_Name__c},&lt;/p&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The reviewer has returned this application to you. They need more information before they can finish the evaluation.&lt;/p&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F7F2F2&quot; style=&quot;background:#F7F2F2;border-left:4px solid #F2672A;border-radius:4px;margin:8px 0 22px;&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:18px 22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6D6E71;&quot;&gt;What the reviewer asked for&lt;/p&gt;&lt;p style=&quot;margin:0 0 14px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;{!Get_Proposal_Review.Reviewer_Return_Comment__c}&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#6D6E71;&quot;&gt;Application round: {!$Record.Submission_Round__c}&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;font-weight:600;color:#414042;&quot;&gt;Two steps to close this:&lt;/p&gt;&lt;ol style=&quot;margin:0 0 16px;padding-left:22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;&lt;li style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Check whether the answer is already in the application. If it is, point the reviewer to the page and question where it sits.&lt;/li&gt;&lt;li style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;If it is genuinely missing, return the application to the applicant and ask for that detail.&lt;/li&gt;&lt;/ol&gt;&lt;p style=&quot;margin:0 0 20px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The applicant sees no change until you return it to them. Please act by &lt;strong&gt;{!$Record.Due_Date__c}&lt;/strong&gt;, so the evaluation is not held up.&lt;/p&gt;&lt;table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:4px 0 8px;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;background-color:#BF2026;border-radius:6px;&quot;&gt;&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:14px 34px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;&quot;&gt;Open the application&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:24px 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#414042;&quot;&gt;Wadhwani Grants Platform&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:0 32px;&quot;&gt;&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:8px 0 0;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:24px 32px 28px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782560396000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:136px;height:auto;margin:0 0 14px;border:0;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.&lt;/p&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email, and replies to this address are not read.&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</text>
+        <text>&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F4F4F5&quot; style=&quot;background-color:#F4F4F5;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; style=&quot;padding:28px 12px;&quot;&gt;&lt;table width=&quot;640&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%;max-width:640px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;&quot;&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#BF2026&quot; style=&quot;padding:28px 32px;background-color:#BF2026;border-radius:8px 8px 0 0;&quot;&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td align=&quot;left&quot; valign=&quot;middle&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;&quot;&gt;Returned for input&lt;/p&gt;&lt;h1 style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:26px;line-height:1.25;font-weight:700;color:#ffffff;&quot;&gt;Returned to you for input&lt;/h1&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#F9C9A8;&quot;&gt;Application {!$Record.Name} · {!$Record.Organization_Name__c}&lt;/p&gt;&lt;/td&gt;&lt;td align=&quot;right&quot; valign=&quot;middle&quot; width=&quot;140&quot; style=&quot;padding-left:16px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782557340000&quot; width=&quot;140&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:140px;height:auto;border:0;outline:none;text-decoration:none;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td bgcolor=&quot;#F2672A&quot; height=&quot;4&quot; style=&quot;height:4px;font-size:4px;line-height:4px;background-color:#F2672A;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:32px 32px 12px;&quot;&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Hi {!$Record.WG_Validator_Name__c},&lt;/p&gt;&lt;p style=&quot;margin:0 0 16px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The reviewer has returned this application to you. They need more information before they can finish the evaluation.&lt;/p&gt;&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#F7F2F2&quot; style=&quot;background:#F7F2F2;border-left:4px solid #F2672A;border-radius:4px;margin:8px 0 22px;&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:18px 22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6D6E71;&quot;&gt;What the reviewer asked for&lt;/p&gt;&lt;p style=&quot;margin:0 0 14px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#414042;&quot;&gt;{!Get_Proposal_Review.Reviewer_Return_Comment__c}&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;color:#6D6E71;&quot;&gt;Application round: {!$Record.Submission_Round__c}&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:0 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;font-weight:600;color:#414042;&quot;&gt;Two steps to close this:&lt;/p&gt;&lt;ol style=&quot;margin:0 0 16px;padding-left:22px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;&lt;li style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;Check whether the answer is already in the application. If it is, point the reviewer to the page and question where it sits.&lt;/li&gt;&lt;li style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;If it is genuinely missing, return the application to the applicant and ask for that detail.&lt;/li&gt;&lt;/ol&gt;&lt;p style=&quot;margin:0 0 20px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#414042;&quot;&gt;The applicant sees no change until you return it to them. Please act by &lt;strong&gt;{!$Record.Due_Date__c}&lt;/strong&gt;, so the evaluation is not held up.&lt;/p&gt;&lt;table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;margin:4px 0 8px;&quot;&gt;&lt;tr&gt;&lt;td align=&quot;center&quot; bgcolor=&quot;#BF2026&quot; style=&quot;background-color:#BF2026;border-radius:6px;&quot;&gt;&lt;a href=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.site.com/reviewersite&quot; target=&quot;_blank&quot; style=&quot;display:inline-block;padding:14px 34px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;&quot;&gt;Open the application&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p style=&quot;margin:24px 0 10px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#414042;&quot;&gt;Wadhwani Grants Platform&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:0 32px;&quot;&gt;&lt;hr style=&quot;border:none;border-top:1px solid #E6E6E6;margin:8px 0 0;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:24px 32px 28px;background:#ffffff;border-radius:0 0 8px 8px;&quot;&gt;&lt;img src=&quot;https://wadhwanifoundation--wgsandbox.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020VVh&amp;amp;oid=00DF6000000APXN&amp;amp;lastMod=1782560396000&quot; width=&quot;136&quot; alt=&quot;Wadhwani Grants&quot; style=&quot;display:block;width:136px;height:auto;margin:0 0 14px;border:0;&quot;&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.&lt;/p&gt;&lt;p style=&quot;margin:0 0 8px;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;An automated notice from the Wadhwani Grants Platform. The applicant is not copied on this email, and replies to this address are not read.&lt;/p&gt;&lt;p style=&quot;margin:0;font-family:&apos;Segoe UI&apos;,Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:#6D6E71;&quot;&gt;&amp;copy; {!CurrentYear} Wadhwani Charitable Foundation. All rights reserved.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</text>
     </textTemplates>
     <variables>
         <name>HasWCFValidator</name>

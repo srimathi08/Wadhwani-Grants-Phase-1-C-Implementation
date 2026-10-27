@@ -62,6 +62,22 @@ public without sharing class WFGrantsSignUpController {
         new Set<String>{ 'en_US', 'pt_BR', 'es' };
     private static final String DEFAULT_LANGUAGE = 'en_US';
 
+    // Name rules (must mirror the client in wFGrantsSignUp.js, which gives the
+    // user instant inline feedback; this is the authoritative check because
+    // client-side validation can always be bypassed):
+    //   • letters in any script (\p{L}) and combining marks (\p{M}, needed for
+    //     Indic scripts), spaces, hyphens, straight apostrophe (') and curly
+    //     apostrophe (U+2019). NO digits.
+    //   • at most NAME_MAX_LENGTH characters (U07: downstream Submitter Name
+    //     is capped at 30 — confirm with QB and keep both sides in sync).
+    private static final Integer NAME_MAX_LENGTH = 30;
+    private static final Pattern NAME_PATTERN =
+        Pattern.compile('^[\\p{L}\\p{M} \'\\x{2019}-]+$');
+    private static final Pattern NAME_HAS_LETTER =
+        Pattern.compile('.*\\p{L}.*');
+    private static final Pattern NAME_HAS_DIGIT =
+        Pattern.compile('.*\\p{Nd}.*');
+
     // ─────────────────────────────────────────────────────────────
     // STEP 1 – duplicate check + start standard self-registration
     // ─────────────────────────────────────────────────────────────
@@ -73,18 +89,28 @@ public without sharing class WFGrantsSignUpController {
 
         Map<String, String> result = new Map<String, String>();
         try {
-            email = normalizeEmail(email);
+            email     = normalizeEmail(email);
+            firstName = firstName == null ? '' : firstName.trim();
+            lastName  = lastName  == null ? '' : lastName.trim();
 
             if (String.isBlank(firstName) || String.isBlank(lastName)
                     || String.isBlank(email) || String.isBlank(phone)) {
                 return err(result, 'All fields are required.');
             }
+
+            // Authoritative name validation (digits / special characters / length).
+            String firstNameError = validateName('First name', firstName);
+            if (firstNameError != null) return err(result, firstNameError);
+            String lastNameError = validateName('Last name', lastName);
+            if (lastNameError != null) return err(result, lastNameError);
+
             if (!Pattern.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', email)) {
                 return err(result, 'Enter a valid email address.');
             }
-		String orgError = validateOrganizationName(organizationName);
-if (orgError != null) return err(result, orgError);
-organizationName = organizationName.trim().replaceAll('\\s+', ' ');
+
+            String orgError = validateOrganizationName(organizationName);
+            if (orgError != null) return err(result, orgError);
+            organizationName = organizationName.trim().replaceAll('\\s+', ' ');
 
             // Terms of Use + Privacy Policy consent is mandatory (compendium §12).
             // Enforced server-side too so signup can't complete unchecked even if
@@ -129,7 +155,7 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
                 FirstName         = firstName,
                 LastName          = lastName,
                 MobilePhone       = formattedPhone,
-				 CompanyName       = String.isNotBlank(organizationName) ? organizationName.left(80) : null,   // <--- ADD THIS
+                CompanyName       = String.isNotBlank(organizationName) ? organizationName.left(80) : null,
                 ProfileId         = prf.Id,
                 ContactId         = personContactId,
                 Alias             = buildAlias(firstName, lastName),
@@ -230,12 +256,31 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
     // Helpers
     // ─────────────────────────────────────────────────────────────
 
+    // Returns null when the name is acceptable, otherwise a user-facing
+    // message. Wording matches the client (wFGrantsSignUp.js _nameError).
+    @TestVisible
+    private static String validateName(String label, String value) {
+        String v = value == null ? '' : value.trim();
+        if (String.isBlank(v)) {
+            return 'Enter your ' + label.toLowerCase() + '.';
+        }
+        if (v.length() > NAME_MAX_LENGTH) {
+            return label + ' can be at most ' + NAME_MAX_LENGTH + ' characters.';
+        }
+        if (NAME_HAS_DIGIT.matcher(v).matches()) {
+            return label + ' can\'t contain numbers.';
+        }
+        if (!NAME_PATTERN.matcher(v).matches() || !NAME_HAS_LETTER.matcher(v).matches()) {
+            return label + ' can contain only letters, spaces, hyphens (-) and apostrophes (\').';
+        }
+        return null;
+    }
+
     // Creates a Person Account for the new registrant and returns its
     // PersonContactId — required by initSelfRegistration in a person-account org.
     private static Id createPersonAccount(String firstName, String lastName,
             String email, String phone, String organizationName,
             Boolean acceptedTerms, String language) {
-
 
         // Owner assigned directly on insert (rather than a separate update)
         // avoids a moment where the guest user owns the record.
@@ -292,8 +337,6 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
             personRtId = rt.Id;
         }
 
-
-
         Account pa = new Account(
             FirstName                    = firstName,
             LastName                     = lastName,
@@ -349,9 +392,22 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
     private static String formatPhone(String countryCode, String phone) {
         String cc  = String.isBlank(countryCode) ? '91' : countryCode.replaceAll('\\D', '');
         String raw = phone == null ? '' : phone.replaceAll('\\D', '');
+
+        // Strip a leading dial code ONLY when the number is not already a valid
+        // length as typed. A valid national number can legitimately start with
+        // the same digits as the dial code (e.g. Indian mobiles beginning 91…),
+        // and must not be mangled.
         if (raw.startsWith(cc) && (raw.length() - cc.length()) >= 6) {
-            raw = raw.substring(cc.length());
+            Boolean validAsTyped = false;
+            if (PHONE_LENGTH_BY_CC.containsKey(cc)) {
+                List<Integer> r = PHONE_LENGTH_BY_CC.get(cc);
+                validAsTyped = raw.length() >= r[0] && raw.length() <= r[1];
+            }
+            if (!validAsTyped) {
+                raw = raw.substring(cc.length());
+            }
         }
+
         if (PHONE_LENGTH_BY_CC.containsKey(cc)) {
             Integer minLen = PHONE_LENGTH_BY_CC.get(cc)[0];
             Integer maxLen = PHONE_LENGTH_BY_CC.get(cc)[1];
@@ -417,30 +473,31 @@ organizationName = organizationName.trim().replaceAll('\\s+', ' ');
         result.put('message', message);
         return result;
     }
-private static final Set<String> FAKE_ORG_NAMES = new Set<String>{
-    'test','testing','demo','sample','asdf','qwerty','abc','xyz',
-    'na','n/a','none','null','nil','nothing','unknown','dummy','fake'
-};
 
-private static String validateOrganizationName(String name) {
-    String v = String.isBlank(name) ? '' : name.trim().replaceAll('\\s+', ' ');
-    if (v.length() < 2 || v.length() > 80) {
-        return 'Organization name must be between 2 and 80 characters.';
+    private static final Set<String> FAKE_ORG_NAMES = new Set<String>{
+        'test','testing','demo','sample','asdf','qwerty','abc','xyz',
+        'na','n/a','none','null','nil','nothing','unknown','dummy','fake'
+    };
+
+    private static String validateOrganizationName(String name) {
+        String v = String.isBlank(name) ? '' : name.trim().replaceAll('\\s+', ' ');
+        if (v.length() < 2 || v.length() > 80) {
+            return 'Organization name must be between 2 and 80 characters.';
+        }
+        if (v.containsAny('@$#')) {
+            return 'Organization name cannot contain @, $, # or emojis.';
+        }
+        // Letters/marks/digits/space and . , & ' ( ) / -  (emojis fail this check)
+        if (!Pattern.matches('^[\\p{L}\\p{M}\\p{N} .,&\'()/\\-]+$', v)) {
+            return 'Organization name contains unsupported characters.';
+        }
+        if (!Pattern.compile('.*\\p{L}.*\\p{L}.*').matcher(v).matches()) {
+            return 'Enter a valid organization name.';
+        }
+        if (Pattern.compile('.*(.)\\1{3,}.*').matcher(v).matches()
+                || FAKE_ORG_NAMES.contains(v.toLowerCase())) {
+            return 'Enter your real organization name.';
+        }
+        return null;
     }
-    if (v.containsAny('@$#')) {
-        return 'Organization name cannot contain @, $, # or emojis.';
-    }
-    // Letters/marks/digits/space and . , & ' ( ) / -  (emojis fail this check)
-    if (!Pattern.matches('^[\\p{L}\\p{M}\\p{N} .,&\'()/\\-]+$', v)) {
-        return 'Organization name contains unsupported characters.';
-    }
-    if (!Pattern.compile('.*\\p{L}.*\\p{L}.*').matcher(v).matches()) {
-        return 'Enter a valid organization name.';
-    }
-    if (Pattern.compile('.*(.)\\1{3,}.*').matcher(v).matches()
-            || FAKE_ORG_NAMES.contains(v.toLowerCase())) {
-        return 'Enter your real organization name.';
-    }
-    return null;
-}
 }

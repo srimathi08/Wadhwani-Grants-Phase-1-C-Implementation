@@ -7,6 +7,9 @@ import searchHQLocation from '@salesforce/apex/OpenStreetMapService.searchLocati
 import getFormMetadata from '@salesforce/apex/WCFFormMetadataController.getFormMetadata';
 import upsertAIFeedback from '@salesforce/apex/WCFFormController.upsertAIFeedback';
 import getAIFeedbackRecord from '@salesforce/apex/WCFFormController.getAIFeedbackRecord';
+import tagUploadedFile from '@salesforce/apex/WCFFormEngineController.tagUploadedFile';
+import saveRevisionQ24Answer from '@salesforce/apex/WCFFormEngineController.saveRevisionQ24Answer';
+import getUploadedFileDetails from '@salesforce/apex/WCFFormEngineController.getUploadedFileDetails';
 // ═════════════════════════════════════════════════════════════════════════════
 // Constants
 // ═════════════════════════════════════════════════════════════════════════════
@@ -26,8 +29,8 @@ const RICH_TEXT_LIMITS = {
 };
 
 const GENIE_TEXT_LIMIT = 200;
-const MAX_Q24_SIZE = 10 * 1024 * 1024;
-const MAX_Q28_SIZE = 50 * 1024 * 1024;
+const MAX_Q24_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_Q28_SIZE = 25 * 1024 * 1024; // 25 MB
 // ── AI Feedback (same mapping as wcfDynamicForm) ──
 const AI_WAIT_MS = 6000;
 
@@ -374,6 +377,11 @@ export default class WcfRfiResponsePage extends LightningElement {
 
                 const merged = { ...this.formValues, ...(result.formValues || {}) };
                 this.formValues = this._hydrateFormValues(merged);
+
+                                if (result.q24Files && result.q24Files.length > 0
+                    && this.formValues.Q24_VERIFIED__c !== 'Yes') {
+                    this._setField('Q24_VERIFIED__c', 'Yes');
+                }
 
                 this.skillingDomainRows = this._mapSkillingRows(result.skillingDomains);
                 this.businessSectorRows = this._mapSectorRows(result.businessSectors);
@@ -1326,6 +1334,32 @@ export default class WcfRfiResponsePage extends LightningElement {
         return out;
     }
 
+    get isOverLimit() {
+        const out = {};
+        Object.keys(RICH_TEXT_LIMITS).forEach(f => {
+            out[f] = this._countWords(this.formValues[f]) > RICH_TEXT_LIMITS[f];
+        });
+        out.Operational_Synergies_with_WOF__c =
+            this._countWords(this.formValues.Operational_Synergies_with_WOF__c) > GENIE_TEXT_LIMIT;
+        return out;
+    }
+
+    get wordLimitErrors() {
+        const out = {};
+        Object.keys(RICH_TEXT_LIMITS).forEach(f => {
+            const count = this._countWords(this.formValues[f]);
+            const limit = RICH_TEXT_LIMITS[f];
+            out[f] = count > limit
+                ? `Word limit exceeded (${count} / ${limit} words). Please shorten your text.`
+                : '';
+        });
+        const genieCount = this._countWords(this.formValues.Operational_Synergies_with_WOF__c);
+        out.Operational_Synergies_with_WOF__c = genieCount > GENIE_TEXT_LIMIT
+            ? `Word limit exceeded (${genieCount} / ${GENIE_TEXT_LIMIT} words). Please shorten your text.`
+            : '';
+        return out;
+    }
+
     preventFocusLoss(event) {
         // Keeps the caret/selection inside the editor when a toolbar button is pressed
         event.preventDefault();
@@ -1619,17 +1653,43 @@ export default class WcfRfiResponsePage extends LightningElement {
         return this.q28UploadedFiles.length > 0;
     }
 
-    _acceptUploads(uploaded, currentFiles, maxSize, limitLabel) {
+    async _fetchUploadedFileSizes(files) {
+        const sizeByDocId = {};
+        const docIds = (files || []).map(f => f.documentId).filter(Boolean);
+        if (docIds.length === 0) return sizeByDocId;
+        try {
+            const details = await getUploadedFileDetails({ contentDocumentIds: docIds });
+            (details || []).forEach(d => {
+                if (d && d.documentId) {
+                    sizeByDocId[String(d.documentId).substring(0, 15)] = Number(d.sizeInBytes) || 0;
+                }
+            });
+        } catch (err) {
+            console.error('Could not verify uploaded file size:', err);
+        }
+        return sizeByDocId;
+    }
+
+    async _acceptUploads(uploaded, currentFiles, maxSize, limitLabel) {
         const valid = [];
         const dupes = [];
         const oversized = [];
+        const sizeByDocId = await this._fetchUploadedFileSizes(uploaded);
+
         (uploaded || []).forEach(f => {
-            const size = f.size || f.sizeInBytes || 0;
+            const key = f.documentId ? String(f.documentId).substring(0, 15) : '';
+            const size = sizeByDocId[key];
             const lower = (f.name || '').toLowerCase();
             const isDup = currentFiles.some(e => (e.name || '').toLowerCase() === lower)
                 || valid.some(v => (v.name || '').toLowerCase() === lower);
-            if (size > maxSize || isDup) {
-                (size > maxSize ? oversized : dupes).push(f.name);
+            if (size === undefined || size > maxSize) {
+                oversized.push(f.name);
+                if (f.documentId) {
+                    deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
+                        .catch(err => console.warn('Upload cleanup warning:', err));
+                }
+            } else if (isDup) {
+                dupes.push(f.name);
                 if (f.documentId) {
                     deleteUploadedFile({ documentId: f.documentId, recordId: this.recordId })
                         .catch(err => console.warn('Upload cleanup warning:', err));
@@ -1638,21 +1698,43 @@ export default class WcfRfiResponsePage extends LightningElement {
                 valid.push({ name: f.name, documentId: f.documentId, contentVersionId: f.contentVersionId });
             }
         });
-        if (oversized.length) this._toast('File Size Limit Exceeded', `"${oversized.join(', ')}" exceeds the ${limitLabel} limit.`, 'error');
-        if (dupes.length) this._toast('Duplicate File', `"${dupes.join(', ')}" is already uploaded.`, 'warning');
+        if (oversized.length) {
+            this._toast('File Size Limit Exceeded', `File "${oversized.join(', ')}" exceeds the ${limitLabel} per-file limit and was not uploaded.`, 'error');
+        }
+        if (dupes.length) {
+            this._toast('Duplicate File', `File "${dupes.join(', ')}" is already uploaded. Duplicate files are not allowed.`, 'warning');
+        }
         return valid;
     }
 
-    handleQ24UploadFinished(event) {
-        const valid = this._acceptUploads(event.detail.files, this.q24UploadedFiles, MAX_Q24_SIZE, '10 MB');
+    async handleQ24UploadFinished(event) {
+        const valid = await this._acceptUploads(event.detail.files, this.q24UploadedFiles, MAX_Q24_SIZE, '25 MB');
         if (valid.length) {
             this.q24UploadedFiles = [...this.q24UploadedFiles, ...valid];
+            valid.forEach(f => {
+                tagUploadedFile({ contentDocumentId: f.documentId, recordId: this.recordId, tag: 'Q24' })
+                    .catch(err => console.warn('Q24 tag warning:', err));
+            });
+            saveRevisionQ24Answer({
+                recordId: this.recordId,
+                verified: 'Yes',
+                details: this.formValues.Details_of_Ethical_Received__c || null
+            }).catch(err => console.warn('Q24 answer save warning:', err));
             this._toast('File Uploaded', 'Verification Report uploaded successfully.', 'success');
         }
     }
 
+    handleQ24DetailsBlur(event) {
+        if (this.q24UploadedFiles.length === 0) return;
+        saveRevisionQ24Answer({
+            recordId: this.recordId,
+            verified: 'Yes',
+            details: event.target.value || null
+        }).catch(err => console.warn('Q24 details save warning:', err));
+    }
+
     handleRemoveQ24File(event) {
-        const docId = event.currentTarget?.dataset?.id;
+        const docId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
         this.q24UploadedFiles = this.q24UploadedFiles.filter(f => f.documentId !== docId);
         if (docId) {
             deleteUploadedFile({ documentId: docId, recordId: this.recordId })
@@ -1660,16 +1742,20 @@ export default class WcfRfiResponsePage extends LightningElement {
         }
     }
 
-    handleQ28UploadFinished(event) {
-        const valid = this._acceptUploads(event.detail.files, this.q28UploadedFiles, MAX_Q28_SIZE, '50 MB');
+    async handleQ28UploadFinished(event) {
+        const valid = await this._acceptUploads(event.detail.files, this.q28UploadedFiles, MAX_Q28_SIZE, '25 MB');
         if (valid.length) {
             this.q28UploadedFiles = [...this.q28UploadedFiles, ...valid];
+            valid.forEach(f => {
+                tagUploadedFile({ contentDocumentId: f.documentId, recordId: this.recordId, tag: 'Q28' })
+                    .catch(err => console.warn('Q28 tag warning:', err));
+            });
             this._toast('File Uploaded', 'Supporting Document uploaded successfully.', 'success');
         }
     }
 
     handleRemoveQ28File(event) {
-        const docId = event.currentTarget?.dataset?.id;
+        const docId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
         this.q28UploadedFiles = this.q28UploadedFiles.filter(f => f.documentId !== docId);
         if (docId) {
             deleteUploadedFile({ documentId: docId, recordId: this.recordId })
@@ -1710,7 +1796,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         const words = this._countWords(this.formValues[field]);
         if (required && words === 0) return `${label} is required.`;
         const limit = RICH_TEXT_LIMITS[field];
-        if (limit && words > limit) return `${label} exceeds the ${limit}-word limit (currently ${words} words).`;
+        if (limit && words > limit) return `Word limit exceeded (${words} / ${limit} words). Please shorten your text.`;
         return null;
     }
 
@@ -1899,7 +1985,7 @@ export default class WcfRfiResponsePage extends LightningElement {
                 if (this.showSynergiesTextBox) {
                     const words = this._countWords(fv.Operational_Synergies_with_WOF__c);
                     if (words === 0) return 'Please describe how GenieAI could contribute, or change your interest level to "Not at this time".';
-                    if (words > GENIE_TEXT_LIMIT) return `GenieAI description exceeds the ${GENIE_TEXT_LIMIT}-word limit (currently ${words} words).`;
+                    if (words > GENIE_TEXT_LIMIT) return `Word limit exceeded (${words} / ${GENIE_TEXT_LIMIT} words). Please shorten your text.`;
                 }
                 return null;
             default:

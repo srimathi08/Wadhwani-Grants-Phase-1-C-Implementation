@@ -13,7 +13,7 @@
     color: var(--wg-gray);
 
     /* lightning-button / lightning-input styling hooks → brand look
-       (square red buttons, orange focus), same as the form's buttons */
+       (red pill buttons, orange focus), same as the form's buttons */
     --slds-c-button-brand-color-background: var(--wg-red);
     --slds-c-button-brand-color-border: var(--wg-red);
     --slds-c-button-brand-color-background-hover: var(--wg-red-deep);
@@ -23,7 +23,7 @@
     --slds-c-button-neutral-color-background-hover: var(--wg-error-bg);
     --slds-c-button-text-color: var(--wg-red);
     --slds-c-button-text-color-hover: var(--wg-red-deep);
-    --slds-c-button-radius-border: 0;
+    --slds-c-button-radius-border: var(--wg-radius-pill);
     --slds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
     --sds-c-button-brand-color-background: var(--wg-red);
     --sds-c-button-brand-color-border: var(--wg-red);
@@ -31,8 +31,15 @@
     --sds-c-button-brand-color-border-hover: var(--wg-red-deep);
     --sds-c-button-neutral-color-border: var(--wg-red);
     --sds-c-button-text-color: var(--wg-red);
-    --sds-c-button-radius-border: 0;
+    --sds-c-button-radius-border: var(--wg-radius-pill);
     --sds-c-button-shadow-focus: 0 0 3px var(--wg-orange);
+}
+
+/* Button labels in Barlow SemiBold (Color System v1, UAT ST-04/ST-05) */
+lightning-button,
+lightning-file-upload {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
 }
 
 lightning-input {
@@ -464,4 +471,17 @@ lightning-input {
         top: 10px;
         width: calc(100vw - 20px);
     }
+}
+
+/* Regular button size (Color System v1, UAT ST-05/ST-06): 40px, 14px, 26px sides.
+   Scoped to the action rows so the text-style buttons (Cancel, Replace, Delete) keep their size. */
+.comp-upload-row lightning-button,
+.comp-footer-actions lightning-button {
+    --slds-c-button-line-height: 37px; /* + 1.5px border x2 = 40px */
+    --slds-c-button-sizing-border: 1.5px;
+    --slds-c-button-neutral-spacing-inline-start: 26px;
+    --slds-c-button-neutral-spacing-inline-end: 26px;
+    --slds-c-button-brand-spacing-inline-start: 26px;
+    --slds-c-button-brand-spacing-inline-end: 26px;
+    font-size: 14px;
 }

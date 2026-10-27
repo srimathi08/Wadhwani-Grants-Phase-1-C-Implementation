@@ -7,9 +7,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_7</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -85,9 +82,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_8</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -163,9 +157,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_9</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -241,9 +232,6 @@
         <label>Check Approver Found (Scheduled)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_10</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>No Approver Found</defaultConnectorLabel>
         <rules>
             <name>Approver_Found_Scheduled</name>
@@ -266,9 +254,6 @@
         <label>Check If Decision Recorded</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_11</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Decision Already Recorded</defaultConnectorLabel>
         <rules>
             <name>No_Decision_Recorded</name>
@@ -291,9 +276,6 @@
         <label>Check Recommendation</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_12</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Recommend_for_CEO_Yes</name>
@@ -355,36 +337,6 @@
         </rules>
     </decisions>
     <description>WCF Approver Email Alert Flow for Ready for Decision (E-22), Decline Recommended (E-47), and Decision Overdue (E-55)</description>
-    <ends>
-        <name>END_ELEMENT_10</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_11</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_12</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_7</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_8</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_9</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
     <environments>Default</environments>
     <formulas>
         <name>currentyear</name>
@@ -621,10 +573,10 @@ TEXT({!$Record.Due_Date_For_Approver__c})</expression>
             <connector>
                 <targetReference>Get_Application_Decision</targetReference>
             </connector>
-            <label>Decision Overdue Reminder (3 Days)</label>
-            <offsetNumber>3</offsetNumber>
+            <label>Decision Overdue Reminder (10 Days)</label>
+            <offsetNumber>10</offsetNumber>
             <offsetUnit>Days</offsetUnit>
-            <recordField>LastModifiedDate</recordField>
+            <recordField>Evaluation_Completed__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
@@ -965,7 +917,7 @@ An automated notice from the Wadhwani Grants Platform. The applicant is not copi
     </textTemplates>
     <textTemplates>
         <name>Overdue_decision</name>
-        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
         <text>&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
 &lt;head&gt;

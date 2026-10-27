@@ -1,0 +1,166 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "42c1db25-c5d7-4687-ae28-554f5781c3d0",
+  "label" : "Application Review List",
+  "regions" : [ {
+    "id" : "33fd69eb-01ed-41d8-b02f-966d1b241e07",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "richTextValue" : "<p><strong style=\"font-size: 24px;\">Application Reviews</strong></p>"
+      },
+      "componentName" : "forceCommunity:richTextInline",
+      "id" : "18754eae-e414-4d3f-a3e5-d27b4b702a18",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "7fe5ff24-e30f-4d61-96c1-01d95b150385",
+          "activeTab" : "in-progress-tab",
+          "tabs" : [ {
+            "UUID" : "0be629a5-a153-4919-89ac-8fbf68a23ac7",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "richTextValue" : "",
+                "sfdc:identifier" : "forceCommunity_richTextInline_myinprogress"
+              },
+              "fqn" : "forceCommunity:richTextInline"
+            }, {
+              "attributes" : {
+                "filterName" : "MyInProgressApplicationReviews",
+                "layout" : "STANDARD",
+                "scope" : "ApplicationReview",
+                "sfdc:identifier" : "forceCommunity_objectHome_myinprogress"
+              },
+              "fqn" : "forceCommunity:objectHome"
+            } ],
+            "tabKey" : "in-progress-tab",
+            "tabName" : "In Progress"
+          }, {
+            "UUID" : "82c94fb6-b629-40b0-ad29-9c40a40f8ac2",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "richTextValue" : "",
+                "sfdc:identifier" : "forceCommunity_richTextInline_mysubmitted"
+              },
+              "fqn" : "forceCommunity:richTextInline"
+            }, {
+              "attributes" : {
+                "filterName" : "MySubmittedApplicationReviews",
+                "layout" : "STANDARD",
+                "scope" : "ApplicationReview",
+                "sfdc:identifier" : "forceCommunity_objectHome_mysubmitted"
+              },
+              "fqn" : "forceCommunity:objectHome"
+            } ],
+            "tabKey" : "submitted-tab",
+            "tabName" : "Submitted"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "7fe5ff24-e30f-4d61-96c1-01d95b150385",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : ""
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "1d0b080f-ab24-4c38-9b78-b438be29e680",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : {
+            "enableInlineEdit" : true,
+            "filterName" : "MyInProgressApplicationReviews",
+            "layout" : "STANDARD",
+            "pageSize" : 25,
+            "scope" : "ApplicationReview",
+            "showActionBar" : true,
+            "showChartsPanel" : true,
+            "showDisplay" : "showall",
+            "showFilterPanel" : true,
+            "showImageIcon" : true,
+            "showManualRefreshButton" : true,
+            "showObjectName" : true,
+            "showPinnedList" : true,
+            "showSearchBar" : true
+          },
+          "componentName" : "forceCommunity:objectHome",
+          "id" : "0fb13ce2-1e20-4f5b-9ba3-8557c59cf410",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "0be629a5-a153-4919-89ac-8fbf68a23ac7",
+        "regionLabel" : "In Progress",
+        "regionName" : "in-progress-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : ""
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "9a022fd4-2122-4ec8-ae9c-ca4ec9d5e831",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : {
+            "enableInlineEdit" : true,
+            "filterName" : "MySubmittedApplicationReviews",
+            "layout" : "STANDARD",
+            "pageSize" : 25,
+            "scope" : "ApplicationReview",
+            "showActionBar" : true,
+            "showChartsPanel" : true,
+            "showDisplay" : "showall",
+            "showFilterPanel" : true,
+            "showImageIcon" : true,
+            "showManualRefreshButton" : true,
+            "showObjectName" : true,
+            "showPinnedList" : true,
+            "showSearchBar" : true
+          },
+          "componentName" : "forceCommunity:objectHome",
+          "id" : "fbc38226-74f1-454a-9be3-2f965ce86887",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "82c94fb6-b629-40b0-ad29-9c40a40f8ac2",
+        "regionLabel" : "Submitted",
+        "regionName" : "submitted-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "1c7d405d-2c3f-4e99-929b-3713c34f002e",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "9909dcf3-0ae9-4bfe-bec9-e10c61c07fa8",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "list-0vx"
+}

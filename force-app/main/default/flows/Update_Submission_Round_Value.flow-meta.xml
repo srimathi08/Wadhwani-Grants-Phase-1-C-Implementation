@@ -3,19 +3,6 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
-        <name>Assign_Value_Resubmitted</name>
-        <label>Assign Value(Resubmitted)</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>$Record.Submission_Round__c</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <numberValue>1.0</numberValue>
-            </value>
-        </assignmentItems>
-    </assignments>
-    <assignments>
         <name>Assign_Value_Submitted</name>
         <label>Assign Value(Submitted)</label>
         <locationX>0</locationX>
@@ -55,28 +42,6 @@
                 <targetReference>Assign_Value_Submitted</targetReference>
             </connector>
             <label>Submitted</label>
-        </rules>
-        <rules>
-            <name>Resubmitted</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Status</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Application Resubmitted</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record__Prior.Status</leftValueReference>
-                <operator>NotEqualTo</operator>
-                <rightValue>
-                    <stringValue>Application Resubmitted</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Assign_Value_Resubmitted</targetReference>
-            </connector>
-            <label>Resubmitted</label>
         </rules>
     </decisions>
     <description>Wadhwani Grants(WCF)</description>
@@ -148,5 +113,5 @@
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Active</status>
+    <status>Obsolete</status>
 </Flow>

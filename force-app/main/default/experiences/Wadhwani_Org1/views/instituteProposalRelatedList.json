@@ -1,0 +1,39 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "21bd92c4-980f-4533-a7e3-26b545068726",
+  "label" : "Institute Proposal Related List",
+  "regions" : [ {
+    "id" : "d1510383-7ae0-4786-81f9-5876078e2efc",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customTitle" : "",
+        "parentRecordId" : "{!recordId}",
+        "relatedListName" : "{!relationshipApiName}",
+        "showBreadCrumbs" : true,
+        "showCustomTitle" : false,
+        "showManualRefreshButton" : true,
+        "showRowNumbers" : true
+      },
+      "componentName" : "forceCommunity:relatedList",
+      "id" : "d47bd101-715f-402b-bf30-be1a5023acb4",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "da787956-004d-4695-a0c0-595453d4cf03",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "903dbdf1-8700-4aeb-b168-38bb56833e1c",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "relatedlist-a0J"
+}

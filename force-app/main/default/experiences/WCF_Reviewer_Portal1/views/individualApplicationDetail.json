@@ -1,0 +1,221 @@
+{
+  "appPageId" : "d9a94a5d-c6b3-4a79-9a4e-6a38b9200448",
+  "componentName" : "siteforce:sldsTwoCol84Layout",
+  "dataProviders" : [ ],
+  "id" : "e7953a0b-a9c3-4fad-92d2-035ca7ddfb06",
+  "label" : "Individual Application Detail",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "4867dba8-34f0-42a9-a466-9948b4f51499",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "c:wcfPdfGeneration",
+      "id" : "4727603b-0f26-4cd6-9c1d-8ea4a690d953",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "21e2360e-3b62-46ee-a0db-06389931fa37",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "f9c16233-9131-48df-9f33-9c10d1cc1adb",
+          "activeTab" : "application-tab",
+          "tabs" : [ {
+            "UUID" : "09f7f544-0e39-4c6b-be47-07f18337e3c7",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "IndividualApplicationTask",
+                "formSectionsPath" : "Id.IndividualApplicationId",
+                "groupRequiredSections" : "false",
+                "indicateRequiredOptionalSection" : "false",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formOverview"
+            } ],
+            "tabKey" : "application-tab",
+            "tabName" : "Application"
+          }, {
+            "UUID" : "4c5aa3a8-6720-4154-9cf6-1a4fb2bd6456",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "IndividualApplicationTask",
+                "formSectionsPath" : "Id.IndividualApplicationId",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formReview"
+            } ],
+            "tabKey" : "review-application-tab",
+            "tabName" : "Historical Data"
+          }, {
+            "UUID" : "6a2e56df-a04f-4d87-a307-c7694fe0eef8",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : { },
+              "fqn" : "forceCommunity:relatedRecords"
+            } ],
+            "tabKey" : "related-tab",
+            "tabName" : "Current Fiscal Year Data"
+          }, {
+            "UUID" : "8a4035ac-d341-4593-ad8d-a12d538b8511",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "01b12",
+            "tabName" : "Outcome data"
+          }, {
+            "UUID" : "1903218e-2efb-4d1c-b703-62003e5a719b",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "28635",
+            "tabName" : "Documents"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "f9c16233-9131-48df-9f33-9c10d1cc1adb",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "forceCommunity:recordDetail",
+          "id" : "e86710e4-ebf4-49fb-8e73-5d38a059aba4",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "09f7f544-0e39-4c6b-be47-07f18337e3c7",
+        "regionLabel" : "Application",
+        "regionName" : "application-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "c:historicalDataTable",
+          "id" : "ed359651-7f90-4cd3-a947-b8ed7a54813f",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "4c5aa3a8-6720-4154-9cf6-1a4fb2bd6456",
+        "regionLabel" : "Historical Data",
+        "regionName" : "review-application-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "c:currentFiscalYearDataTable",
+          "id" : "fc1d650e-dbd0-4c72-8744-efa6b50e5a05",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "6a2e56df-a04f-4d87-a307-c7694fe0eef8",
+        "regionLabel" : "Current Fiscal Year Data",
+        "regionName" : "related-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "c:outcomeDataTable",
+          "id" : "ac2f4475-5ccf-4295-b1a9-62943979260d",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "8a4035ac-d341-4593-ad8d-a12d538b8511",
+        "regionLabel" : "Outcome data",
+        "regionName" : "01b12",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "c:outcomeDataFiles",
+          "id" : "e209b954-a9ec-4801-a7c1-e37513297ca3",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "1903218e-2efb-4d1c-b703-62003e5a719b",
+        "regionLabel" : "Documents",
+        "regionName" : "28635",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "97ef3abe-9a43-4b3e-92d0-2b0dd48e0bc2",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "c:translateProposal_lwc",
+      "id" : "77815384-73e2-4e0c-8164-cc2f5e032c8e",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "4969eea3-1fa8-4071-8fe8-ef7135bf2324",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "4d564e76-8d5a-4a94-be6e-85156a91c2c0",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "76917772-041e-497c-9694-a773d648a8ce",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "9301a9c5-22e2-4e9a-9083-01f1146a0878",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-0iT"
+}

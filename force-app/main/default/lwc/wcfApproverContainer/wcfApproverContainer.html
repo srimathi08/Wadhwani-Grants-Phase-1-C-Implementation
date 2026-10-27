@@ -4,7 +4,7 @@
         <!-- ══ TOP BAR ═════════════════════════════════════════ -->
         <div class="ac-topbar">
             <div class="ac-topbar-left">
-                <button class="neutral-btn wg-btn-sm" onclick={handleBack}>
+                <button class="neutral-btn" onclick={handleBack}>
                     <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text=""></lightning-icon>
                     Back to queue
                 </button>
@@ -43,7 +43,7 @@
                                 <lightning-icon icon-name="utility:clock" size="xx-small" alternative-text=""></lightning-icon>
                                 {daysRemaining} day(s) left to revoke
                             </span>
-                            <button class="ghost-btn wg-btn-sm" onclick={handleRevokeClick}>
+                            <button class="ghost-btn" onclick={handleRevokeClick}>
                                 <lightning-icon icon-name="utility:undo" size="xx-small" alternative-text=""></lightning-icon>
                                 Revoke decision
                             </button>
@@ -216,7 +216,7 @@
                     </template>
 
                     <div class="btn-group">
-                        <button class="neutral-btn wg-btn-sm" onclick={handleCancelDecisionPanel}>
+                        <button class="neutral-btn" onclick={handleCancelDecisionPanel}>
                             Cancel
                         </button>
                         <button class={decisionPanelButtonClass} onclick={handleDecisionPanelContinue}>
@@ -229,11 +229,11 @@
                 <!-- Default: Accept / Reject -->
                 <template lwc:else>
                     <div class="btn-group">
-                        <button class="primary-btn wg-btn-sm ac-reject-btn" onclick={handleReturn} disabled={isDecisionMade}>
+                        <button class="primary-btn ac-reject-btn" onclick={handleReturn} disabled={isDecisionMade}>
                             <lightning-icon icon-name="utility:reply" size="xx-small" alternative-text=""></lightning-icon>
                             Reject
                         </button>
-                        <button class="success-btn accept-btn wg-btn-sm" onclick={handleApprove} disabled={isDecisionMade}>
+                        <button class="success-btn accept-btn" onclick={handleApprove} disabled={isDecisionMade}>
                             <lightning-icon icon-name="utility:check" size="xx-small" alternative-text=""></lightning-icon>
                             Accept
                         </button>
@@ -259,7 +259,7 @@
                         </template>
                     </div>
                     <div class="modal-footer">
-                        <button class="neutral-btn wg-btn-sm"
+                        <button class="neutral-btn"
                                 onclick={handleModalCancel}
                                 disabled={isSubmitting}>
                             Cancel
@@ -290,7 +290,7 @@
     <p>Are you sure you want to revoke the&#160;<strong class="revoke-decision-text">{existingDecision}</strong>&#160;decision for {appName}? This marks the decision as Revoked and allows a new one to be submitted.</p>
 </div>
                     <div class="modal-footer">
-                        <button class="neutral-btn wg-btn-sm"
+                        <button class="neutral-btn"
                                 onclick={handleRevokeCancel}
                                 disabled={isRevoking}>
                             Cancel

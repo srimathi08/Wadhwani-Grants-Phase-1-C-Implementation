@@ -1,0 +1,56 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "b4c686e6-3c9e-4c32-ac86-3b15739b739d",
+  "label" : "User Profile",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "homeUrl" : "/",
+        "loginUrl" : "",
+        "logoUrl" : "/sfsites/c/resource/WIN_Logo",
+        "logoutUrl" : ""
+      },
+      "componentName" : "c:wcfPortalHeader",
+      "id" : "b18398ff-76d3-4488-9561-8233c72b1ec9",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "08df179e-5a38-4ac6-88dc-5e599183afd0",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "richTextValue" : "<h1><span style=\"font-size: 21px; color: rgb(45, 45, 45);\">My Profile</span></h1>"
+      },
+      "componentName" : "forceCommunity:richTextInline",
+      "id" : "79ccbdea-c1bc-4b38-b0f9-88c959b212eb",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "783756e4-78ac-4bda-ae25-aa229275fab8",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "id" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:userProfileDetail",
+      "id" : "3f3dc29b-8c6b-4005-882c-2bc67f09bfe0",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "24b5bc25-8cd0-45be-aa7b-da22f0498126",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-005"
+}

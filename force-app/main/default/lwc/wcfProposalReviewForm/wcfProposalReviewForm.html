@@ -397,25 +397,14 @@
                             </div>
                             <template if:true={uploadTargetRecordId}>
                                 <div class="upload-control-wrap">
-                                    <input type="file" accept={acceptedFormatsString} multiple
-                                        onchange={handleCustomFileUpload} data-id="fileInput" style="display: none;" />
-                                    <div class="upload-dropzone" onclick={handleTriggerFileInput}
-                                        ondragover={handleDragOver} ondrop={handleFileDrop}>
-                                        <button class="btn btn-secondary upload-trigger-btn" type="button">
-                                            <lightning-icon icon-name="utility:upload" size="x-small"
-                                                class="upload-icon-prefix"></lightning-icon>
-                                            Upload Files
-                                        </button>
-                                        <span class="upload-dropzone-label">Or drop files</span>
-                                    </div>
-                                </div>
-                                <template if:true={isUploadingFile}>
-                                    <div class="upload-loading-bar">
-                                        <lightning-spinner alternative-text="Uploading file..."
-                                            size="small"></lightning-spinner>
-                                        <span class="upload-loading-text">Uploading file(s)...</span>
-                                    </div>
-                                </template>
+    <lightning-file-upload
+        label="Upload files"
+        name="reviewDocs"
+        accept={acceptedFormats}
+        multiple
+        onuploadfinished={handleUploadFinished}>
+    </lightning-file-upload>
+</div>
                                 <template if:true={uploadedFiles.length}>
                                     <div class="uploaded-list">
                                         <template for:each={uploadedFiles} for:item="f">

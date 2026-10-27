@@ -72,10 +72,8 @@
     --wg-radius-md: 8px;      /* swatch cards, the "note" info box */
     --wg-radius-card: 10px;   /* comparison / content panels */
     --wg-radius-badge: 20px;  /* status tag / badge pills */
-    --wg-radius-pill: 24px;   /* defined per the brand book's pill-button spec, but
-                                 currently unused — .primary-btn/.ghost-btn below
-                                 use a square shape instead by design decision.
-                                 Kept in case pill buttons are reinstated later. */
+    --wg-radius-pill: 24px;   /* pill-button spec (Color System v1, UAT ST-05):
+                                 used by .primary-btn / .ghost-btn below. */
 
     /* ---- Border widths ---- */
     --wg-border-width-thin: 1px;      /* default card/swatch/note/input borders */
@@ -97,6 +95,7 @@
     /* ---- Component-specific padding — exact values from the signed-off mockup ---- */
     --wg-padding-input: 9px 11px;
     --wg-padding-button: 11px 26px;
+    --wg-button-height: 40px;              /* regular button height (Color System v1; UAT ST-05/ST-06) */
     --wg-padding-banner: 11px 13px;
     --wg-padding-note: 14px 16px;
     --wg-padding-tag: 3px 10px;
@@ -128,7 +127,7 @@
 }
 
 /* ---- Buttons ----
-   Square by design decision (not the brand book's pill spec) —
+   Pill shape per Color System v1 (UAT ST-05, defect U138) —
    this is the shared default for every component that imports
    commonStyleTheme, not just wfGrantsSignup. ---- */
 .primary-btn {
@@ -136,9 +135,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: var(--wg-padding-button);
+    padding: 0 26px; /* vertical comes from min-height + flex centring, so icons do not push it past 40px */
     border: 0;
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     background: var(--wg-red);
     color: var(--wg-white);
     font-family: var(--wg-font-heading);
@@ -146,6 +145,9 @@
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease, transform 0.05s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .primary-btn:hover:not(:disabled)  { background: var(--wg-red-deep); }
 .primary-btn:active:not(:disabled) { background: var(--wg-red-deep); transform: translateY(1px); }
@@ -156,15 +158,15 @@
 }
 
 /* ---- Ghost / secondary button (brand doc: white bg, red text + 1.5px
-   border) — same square-by-design shape as .primary-btn above. ---- */
+   border) — same pill shape as .primary-btn above. ---- */
 .ghost-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: var(--wg-padding-button);
+    padding: 0 26px; /* vertical comes from min-height + flex centring, so icons do not push it past 40px */
     border: var(--wg-border-width-ghost) solid var(--wg-red);
-    border-radius: 0;
+    border-radius: var(--wg-radius-pill);
     background: var(--wg-white);
     color: var(--wg-red);
     font-family: var(--wg-font-heading);
@@ -172,6 +174,9 @@
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .ghost-btn:hover:not(:disabled) { background: var(--wg-error-bg); }
 .ghost-btn:disabled { opacity: 0.6; cursor: not-allowed; }

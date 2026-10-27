@@ -34,12 +34,18 @@
                             <input id="firstNameInput" class="email-input" type="text" autocomplete="given-name"
                                 placeholder="First name" value={firstName} data-field="firstName"
                                 oninput={handleTextInput} />
+                            <template if:true={firstNameError}>
+                                <p class="field-error" role="alert">{firstNameError}</p>
+                            </template>
                         </div>
                         <div class="field-group">
                             <label class="field-label" for="lastNameInput">Last name</label>
                             <input id="lastNameInput" class="email-input" type="text" autocomplete="family-name"
                                 placeholder="Last name" value={lastName} data-field="lastName"
                                 oninput={handleTextInput} />
+                            <template if:true={lastNameError}>
+                                <p class="field-error" role="alert">{lastNameError}</p>
+                            </template>
                         </div>
                     </div>
 
@@ -254,10 +260,9 @@
                         <template if:false={isVerifying}>Verify &amp; Create account</template>
                     </button>
 
-                    <!-- SMS verification (disabled for now) used to show this helper text,
-                         pointing users to click a separate email confirmation link:
-                         "After sign up, we'll email a verification link to {email} — click it to verify your email address."
-                         Not needed now since the code above IS the email verification. -->
+                    <p class="card-subtitle" style="margin-top: 10px; margin-bottom: 0; font-size: 12px; color: var(--color-text-muted);">
+                        Your verification code is valid for 24 hours.
+                    </p>
 
                     <div class="otp-actions">
                         <template if:false={canResend}>

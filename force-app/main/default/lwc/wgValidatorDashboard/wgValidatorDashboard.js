@@ -91,7 +91,7 @@ export default class WgValidatorDashboard extends NavigationMixin(LightningEleme
                     return {
                         id: app.Id,
                         appId: app.Name,
-                        account: app.Account?.Name ?? '—',
+                        orgName: app.Account?.WCF_Organizational_Name__c || app.Account?.Name || '—',
                         hasDraft: w.hasDraft,
                         isResubmission: w.isResubmission,
                         hasRevision,

@@ -10,7 +10,6 @@ export default class WFGrantsSignUp extends LightningElement {
     // ── Assets ────────────────────────────────────────────────────────────────
     logoimg = logo;
     @track logoFailed = false;
-    @track orgNameError = '';
 
     handleLogoError() {
         this.logoFailed = true;
@@ -46,10 +45,43 @@ export default class WFGrantsSignUp extends LightningElement {
     localPhone = '';
     countryCode = '';
 
-    // Inline (onblur) field-level validation messages
+    // Inline field-level validation messages
+    @track firstNameError = '';
+    @track lastNameError = '';
+    @track orgNameError = '';
     @track phoneError = '';
     @track emailError = '';
     @track passwordError = '';
+
+    // Standard country-specific phone validation rules aligned with wcfDynamicForm
+    PHONE_LENGTH_BY_COUNTRY_CODE = {
+        '+1': { min: 10, max: 10, example: '2025551234' },
+        '+20': { min: 9, max: 10, example: '1001234567' },
+        '+234': { min: 10, max: 10, example: '8031234567' },
+        '+27': { min: 9, max: 9, example: '821234567' },
+        '+31': { min: 9, max: 9, example: '612345678' },
+        '+33': { min: 9, max: 9, example: '612345678' },
+        '+34': { min: 9, max: 9, example: '612345678' },
+        '+39': { min: 9, max: 10, example: '3123456789' },
+        '+41': { min: 9, max: 9, example: '781234567' },
+        '+44': { min: 10, max: 10, example: '7123456789' },
+        '+49': { min: 7, max: 11, example: '15123456789' },
+        '+52': { min: 10, max: 10, example: '5512345678' },
+        '+54': { min: 10, max: 11, example: '91123456789' },
+        '+55': { min: 10, max: 11, example: '11987654321' },
+        '+60': { min: 9, max: 10, example: '123456789' },
+        '+61': { min: 9, max: 9, example: '412345678' },
+        '+63': { min: 10, max: 10, example: '9171234567' },
+        '+64': { min: 8, max: 10, example: '211234567' },
+        '+65': { min: 8, max: 8, example: '81234567' },
+        '+7': { min: 10, max: 10, example: '9123456789' },
+        '+81': { min: 10, max: 10, example: '9012345678' },
+        '+82': { min: 9, max: 10, example: '1012345678' },
+        '+86': { min: 11, max: 11, example: '13123456789' },
+        '+91': { min: 10, max: 10, example: '9812345678' },
+        '+966': { min: 9, max: 9, example: '512345678' },
+        '+971': { min: 9, max: 9, example: '501234567' }
+    };
 
     // ── Flow state ────────────────────────────────────────────────────────────
     @track token = '';   // self-registration token from initSelfRegistration
@@ -198,6 +230,15 @@ export default class WFGrantsSignUp extends LightningElement {
             }
         }
 
+        input.addEventListener('countrychange', () => {
+            const p = this._readPhone();
+            if (p && p.localPhone) {
+                this.phoneError = this._validatePhoneNumber(p.countryCode, p.localPhone);
+            } else {
+                this.phoneError = '';
+            }
+        });
+
         this.itiInitialized = true;
     }
 
@@ -221,29 +262,101 @@ export default class WFGrantsSignUp extends LightningElement {
         return { countryCode: '91', localPhone: input.value.replace(/\D/g, '') };
     }
 
+    _validatePhoneNumber(countryCode, localPhone) {
+        if (!localPhone) return '';
+        const digitsOnly = String(localPhone).replace(/\D/g, '');
+        if (!digitsOnly) return '';
+
+        const cc = String(countryCode || '91').replace(/\D/g, '');
+        const dialKey = '+' + cc;
+        const rule = this.PHONE_LENGTH_BY_COUNTRY_CODE[dialKey];
+
+        // The dial code is shown separately (separateDialCode), so the input
+        // normally holds only the national number. Strip a leading dial code
+        // ONLY when the number is not already a valid length as typed: a valid
+        // national number can legitimately start with the same digits as the
+        // dial code (e.g. Indian mobiles beginning 91…).
+        let cleanDigits = digitsOnly;
+        if (cleanDigits.startsWith(cc) && cleanDigits.length > cc.length) {
+            const validAsTyped = rule
+                ? (cleanDigits.length >= rule.min && cleanDigits.length <= rule.max)
+                : false;
+            if (!validAsTyped) {
+                cleanDigits = cleanDigits.substring(cc.length);   // NB: .length is a property, not a function
+            }
+        }
+
+        if (rule) {
+            if (cleanDigits.length < rule.min || cleanDigits.length > rule.max) {
+                const expected = rule.min === rule.max
+                    ? `${rule.min} digits`
+                    : `${rule.min}–${rule.max} digits`;
+                return `Enter a valid phone number for the selected country (expected ${expected}, e.g. ${dialKey} ${rule.example}).`;
+            }
+            return '';
+        }
+
+        const itiValid = (this.iti && typeof this.iti.isValidNumber === 'function')
+            ? this.iti.isValidNumber()
+            : cleanDigits.length >= 7;
+        if (!itiValid || cleanDigits.length < 6) {
+            return 'Enter a valid phone number for the selected country.';
+        }
+        return '';
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Input handlers
     // ─────────────────────────────────────────────────────────────────────────
-    // First/Last name may contain only letters, spaces, hyphens and apostrophes.
-    // Unicode-aware so accented names (e.g. José, Nişantaşı) are allowed.
-    NAME_ALLOWED = /[^\p{L} '-]/gu;
+
+    // Name rules (Unicode-aware, so José, Nişantaşı and Tamil/Hindi names work).
+    //   • \p{L}  letters in any script
+    //   • \p{M}  combining marks. REQUIRED for Indic scripts (Tamil, Hindi, …),
+    //            where vowel signs are marks, not letters; also covers accents
+    //            typed in decomposed form.
+    //   • space, hyphen, straight apostrophe (') and curly apostrophe (’,
+    //            which mobile keyboards insert automatically)
+    // Digits are NOT allowed. Instead of silently deleting them, we leave the
+    // value as typed and show an inline message, so the user can fix it
+    // (and pasted text is never altered behind their back).
+    NAME_VALID = /^[\p{L}\p{M} '\u2019-]+$/u;
+    NAME_HAS_LETTER = /\p{L}/u;
+    NAME_HAS_DIGIT = /\p{Nd}/u;
+    // Downstream limit (U07: Submitter Name is max 30). Confirm with QB and
+    // keep in sync with WFGrantsSignUpController.NAME_MAX_LENGTH.
+    NAME_MAX_LENGTH = 30;
+
+    // Returns '' when valid, otherwise a user-facing message. Empty values are
+    // not flagged here; "required" is enforced on Continue.
+    _nameError(label, rawValue) {
+        const value = (rawValue || '').trim();
+        if (!value) return '';
+        if (value.length > this.NAME_MAX_LENGTH) {
+            return `${label} can be at most ${this.NAME_MAX_LENGTH} characters.`;
+        }
+        if (this.NAME_HAS_DIGIT.test(value)) {
+            return `${label} can't contain numbers.`;
+        }
+        if (!this.NAME_VALID.test(value) || !this.NAME_HAS_LETTER.test(value)) {
+            return `${label} can contain only letters, spaces, hyphens (-) and apostrophes (').`;
+        }
+        return '';
+    }
 
     handleTextInput(event) {
         const field = event.target.dataset.field;
         let value = event.target.value;
 
-        if (field === 'firstName' || field === 'lastName') {
-            // Strip unsupported special characters as they are typed
-            const cleaned = value.replace(this.NAME_ALLOWED, '');
-            if (cleaned !== value) {
-                value = cleaned;
-                event.target.value = cleaned;   // reflect back into the input
-            }
-        } else if (field === 'email') {
+        if (field === 'email') {
             value = value.trim();
         }
 
         this[field] = value;
+
+        // Live, non-destructive name validation: nothing is removed from what
+        // the user typed; the inline message appears and clears as they edit.
+        if (field === 'firstName') this.firstNameError = this._nameError('First name', value);
+        if (field === 'lastName') this.lastNameError = this._nameError('Last name', value);
 
         // Clear the inline error for this field while the user is correcting it
         if (field === 'email') this.emailError = '';
@@ -269,19 +382,12 @@ export default class WFGrantsSignUp extends LightningElement {
     // Validate the phone number when the field loses focus (onblur is the usual
     // pattern — validate once the user finishes entering, not on every keystroke).
     handlePhoneBlur() {
-        const input = this.template.querySelector('[data-id="phone"]');
-        if (!input) return;
-
-        const raw = (input.value || '').replace(/\D/g, '');
-        if (!raw) { this.phoneError = ''; return; }   // empty is caught on Continue
-
-        const valid = (this.iti && typeof this.iti.isValidNumber === 'function')
-            ? this.iti.isValidNumber()
-            : raw.length >= 6;
-
-        this.phoneError = valid
-            ? ''
-            : 'Enter a valid phone number for the selected country.';
+        const phone = this._readPhone();
+        if (!phone || !phone.localPhone) {
+            this.phoneError = '';
+            return;
+        }
+        this.phoneError = this._validatePhoneNumber(phone.countryCode, phone.localPhone);
     }
 
     // Validate email once the user leaves the field (empty is caught on Continue)
@@ -292,6 +398,7 @@ export default class WFGrantsSignUp extends LightningElement {
             ? ''
             : 'Enter a valid email address.';
     }
+
     // Letters (any language), marks, digits, space and . , & ' ( ) / -
     // Emojis, @, $, # and other symbols are NOT in this set, so they are rejected.
     ORG_ALLOWED = /^[\p{L}\p{M}\p{N} .,&'()\/-]+$/u;
@@ -452,14 +559,12 @@ export default class WFGrantsSignUp extends LightningElement {
 
         if (!this.firstName.trim()) { this.showError('Enter your first name.'); return; }
         if (!this.lastName.trim()) { this.showError('Enter your last name.'); return; }
-        if (!/^[\p{L} '-]+$/u.test(this.firstName.trim())) {
-            this.showError("First name can contain only letters, spaces, hyphens (-), and apostrophes (').");
-            return;
-        }
-        if (!/^[\p{L} '-]+$/u.test(this.lastName.trim())) {
-            this.showError("Last name can contain only letters, spaces, hyphens (-), and apostrophes (').");
-            return;
-        }
+
+        this.firstNameError = this._nameError('First name', this.firstName);
+        if (this.firstNameError) { this.showError(this.firstNameError); return; }
+        this.lastNameError = this._nameError('Last name', this.lastName);
+        if (this.lastNameError) { this.showError(this.lastNameError); return; }
+
         const orgErr = this._validateOrgName(this.organizationName);
         if (orgErr) {
             this.orgNameError = orgErr;
@@ -475,12 +580,15 @@ export default class WFGrantsSignUp extends LightningElement {
         this.emailError = '';
 
         const phone = this._readPhone();
-        const phoneValid = (this.iti && typeof this.iti.isValidNumber === 'function')
-            ? this.iti.isValidNumber()
-            : (phone && phone.localPhone.length >= 6);
-        if (!phone || !phone.localPhone || !phoneValid) {
-            this.phoneError = 'Enter a valid phone number for the selected country.';
+        if (!phone || !phone.localPhone) {
+            this.phoneError = 'Enter a valid phone number.';
             this.showError('Enter a valid phone number.');
+            return;
+        }
+        const phoneValidationErr = this._validatePhoneNumber(phone.countryCode, phone.localPhone);
+        if (phoneValidationErr) {
+            this.phoneError = phoneValidationErr;
+            this.showError(phoneValidationErr);
             return;
         }
         this.phoneError = '';
@@ -536,8 +644,8 @@ export default class WFGrantsSignUp extends LightningElement {
                         this._destroyIti();
                         this.step = 'phoneOtp';
                     } else {
-                        // Resend path — confirm to the user a new code was sent
-                        this.showSuccess('A new verification code has been sent to your email.');
+                        // Resend path — confirm to the user the code was resent
+                        this.showSuccess('The verification code has been resent to your email.');
                     }
                     this._startTimer();
                 } else {

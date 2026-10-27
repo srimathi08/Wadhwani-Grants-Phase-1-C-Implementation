@@ -86,7 +86,7 @@
     padding: var(--wg-space-4) var(--wg-space-5);
     background: var(--wg-white);
     border-bottom: var(--wg-border-width-thin) solid var(--wg-border);
-    border-left: var(--wg-border-width-banner) solid var(--wg-red);
+    border-left: var(--wg-border-width-banner) solid var(--wg-gray); /* decorative accent: no brand red outside buttons (ST-04, U140) */
 }
 
 .rv-section-step {
@@ -834,4 +834,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* lightning-button labels in Barlow semibold like the other buttons (ST-05, U138) */
+lightning-button {
+    font-family: var(--wg-font-heading);
+    font-weight: var(--wg-weight-semibold);
+}
+
+/* Regular button size (Color System v1, UAT ST-05/ST-06): 40px, 14px, 26px sides.
+   The text-style "Open" links (.rv-doc-open) keep their size. */
+lightning-button:not(.rv-doc-open) {
+    --slds-c-button-line-height: 37px; /* + 1.5px border x2 = 40px */
+    --slds-c-button-sizing-border: 1.5px;
+    --slds-c-button-neutral-spacing-inline-start: 26px;
+    --slds-c-button-neutral-spacing-inline-end: 26px;
+    --slds-c-button-brand-spacing-inline-start: 26px;
+    --slds-c-button-brand-spacing-inline-end: 26px;
+    font-size: 14px;
 }

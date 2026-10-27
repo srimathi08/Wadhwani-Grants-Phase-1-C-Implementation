@@ -3,14 +3,28 @@
     <fullName>Due_Date__c</fullName>
     <formula>IF(
   ISBLANK(Last_Resubmission_Date__c),
-  
   DATEVALUE(Initial_Submission_Date__c) +
-  CASE(MOD(WEEKDAY(DATEVALUE(Initial_Submission_Date__c)) - 1, 7),
-    0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 9, 6, 8, 7),
-  
+  CASE(WEEKDAY(DATEVALUE(Initial_Submission_Date__c)),
+    1, 5, /* Sunday    -&gt; Due Friday   (+5 days) */
+    2, 4, /* Monday    -&gt; Due Friday   (+4 days) */
+    3, 6, /* Tuesday   -&gt; Due Monday   (+6 days) */
+    4, 6, /* Wednesday -&gt; Due Tuesday  (+6 days) */
+    5, 6, /* Thursday  -&gt; Due Wednesday(+6 days) */
+    6, 6, /* Friday    -&gt; Due Thursday (+6 days) */
+    7, 6, /* Saturday  -&gt; Due Friday   (+6 days) */
+    5
+  ),
   DATEVALUE(Last_Resubmission_Date__c) +
-  CASE(MOD(WEEKDAY(DATEVALUE(Last_Resubmission_Date__c)) - 1, 7),
-    0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 9, 6, 8, 7)
+  CASE(WEEKDAY(DATEVALUE(Last_Resubmission_Date__c)),
+    1, 5, /* Sunday    -&gt; Due Friday   (+5 days) */
+    2, 4, /* Monday    -&gt; Due Friday   (+4 days) */
+    3, 6, /* Tuesday   -&gt; Due Monday   (+6 days) */
+    4, 6, /* Wednesday -&gt; Due Tuesday  (+6 days) */
+    5, 6, /* Thursday  -&gt; Due Wednesday(+6 days) */
+    6, 6, /* Friday    -&gt; Due Thursday (+6 days) */
+    7, 6, /* Saturday  -&gt; Due Friday   (+6 days) */
+    5
+  )
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Due Date</label>

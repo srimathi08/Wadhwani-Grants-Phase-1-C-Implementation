@@ -1,0 +1,68 @@
+{
+  "appPageId" : "19355793-0e2f-4f99-8e29-d05c68a767cf",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "811c954a-6cf1-4178-a081-15c291fbdbdd",
+  "label" : "Reviewer-registration-form",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "f2f757cc-d2fd-482b-a236-75db61b338d2",
+          "columns" : [ {
+            "UUID" : "6ddfefa4-151a-474a-bcf9-a51b19ad13d1",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 300
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "f2f757cc-d2fd-482b-a236-75db61b338d2",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : { },
+          "componentName" : "c:externalReviewerRegForm",
+          "id" : "35b9f2eb-805d-4147-a693-d6dd56ccdfa1",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "6ddfefa4-151a-474a-bcf9-a51b19ad13d1",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "27e49409-54a7-453d-a285-0b776c554ba6",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Reviewer-registration-form"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "f9d40aa3-afd9-4872-808f-6a8a30e6cc4b",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "2daa57bd-4b45-4658-a6f5-902d26b9cad6",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-reviewer-registration-form"
+}

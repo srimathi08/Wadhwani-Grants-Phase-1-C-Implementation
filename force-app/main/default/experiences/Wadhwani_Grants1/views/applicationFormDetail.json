@@ -1,0 +1,162 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsTwoCol84SidebarFeaturedLayout",
+  "dataProviders" : [ ],
+  "id" : "c937a0a9-af48-4783-b5e2-6594c065e57a",
+  "label" : "Application Form Detail",
+  "regions" : [ {
+    "id" : "1ef590ab-875b-46d9-86bd-62af6d6f1632",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "c5ebf3f0-72f6-461a-badb-e7ed851eb205",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "3be1ebcf-776e-4069-99ad-cd55e3a3f3db",
+          "activeTab" : "application-tab",
+          "tabs" : [ {
+            "UUID" : "63b45d3e-89db-49f4-95d7-0292a74c8985",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "IntakeFormSection",
+                "formSectionsPath" : "ApplicationForm.Id|IntakeFormSection.ReferenceRecordId",
+                "groupRequiredSections" : "false",
+                "indicateRequiredOptionalSection" : "false",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formOverview"
+            } ],
+            "tabKey" : "application-tab",
+            "tabName" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_application}"
+          }, {
+            "UUID" : "3bcb6cdb-e379-42e4-9971-6c504e8c8b60",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : { },
+              "fqn" : "forceCommunity:relatedRecords"
+            } ],
+            "tabKey" : "related-tab",
+            "tabName" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_related}"
+          }, {
+            "UUID" : "e4e71949-2c0e-462c-897e-09b6a3862e03",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "IntakeFormSection",
+                "formSectionsPath" : "ApplicationForm.Id|IntakeFormSection.ReferenceRecordId",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formReview"
+            } ],
+            "tabKey" : "review-application-tab",
+            "tabName" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_reviewapp}"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "3be1ebcf-776e-4069-99ad-cd55e3a3f3db",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "IntakeFormSection",
+            "formSectionsPath" : "ApplicationForm.Id|IntakeFormSection.ReferenceRecordId",
+            "groupRequiredSections" : false,
+            "indicateRequiredOptionalSection" : false,
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formOverview",
+          "id" : "c689b3d0-9296-4beb-a2c9-7aab0160d2c9",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "63b45d3e-89db-49f4-95d7-0292a74c8985",
+        "regionLabel" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_application}",
+        "regionName" : "application-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:relatedRecords",
+          "id" : "15ae077b-e6d4-4239-935d-d4548fb69c8f",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "3bcb6cdb-e379-42e4-9971-6c504e8c8b60",
+        "regionLabel" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_related}",
+        "regionName" : "related-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "IntakeFormSection",
+            "formSectionsPath" : "ApplicationForm.Id|IntakeFormSection.ReferenceRecordId",
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formReview",
+          "id" : "a70a8102-52bb-4fba-be7f-94be9c608767",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "e4e71949-2c0e-462c-897e-09b6a3862e03",
+        "regionLabel" : "{!$Label.GrantmakingSiteTemplate.applicationForm_tab_reviewapp}",
+        "regionName" : "review-application-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "509715f3-a491-44bb-a4b6-be8e29ec6e1d",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "bbe1088c-e69c-4d4a-804b-0f4c78d55caf",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "26447f60-5f1b-448c-8bce-5df5aba4b30d",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "312158af-9d70-4c27-a4b3-574f25d41489",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "6389c956-f6fa-4902-b3d6-25a470c0b912",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-13X"
+}

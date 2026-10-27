@@ -787,9 +787,15 @@ public static void saveComplianceRequestDecision(Id recordId, String decision, S
     } else {
         request.Status__c = targetStatus;
     }
-    request.Reviewer_Notes__c       = reviewerNotes;
+    if (decision == 'Return') {
+        String returnedDocsList = String.join(new List<String>(targets), ', ');
+        request.Reviewer_Notes__c = 'Document(s) needing revision: ' + returnedDocsList 
+                                  + '\n\nNote: ' + reviewerNotes;
+    } else {
+        request.Reviewer_Notes__c = reviewerNotes;
+    }
     request.Document_Status_JSON__c = JSON.serialize(statusMap);
-    update request;
+ update request;
 
     if (!docsToUpdate.isEmpty()) update docsToUpdate;
 

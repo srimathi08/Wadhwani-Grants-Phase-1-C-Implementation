@@ -22,7 +22,7 @@
     font-size: 28px;
     font-weight: 700;
     margin: 0;
-    color: #1a1a1a;
+    color: #414041;
 }
 
 .dash-subtitle {
@@ -120,7 +120,7 @@
     font-size: 18px;
     font-weight: 700;
     margin: 0 0 4px 0;
-    color: #1a1a1a;
+    color: #414041;
 }
 
 .dash-meta {
@@ -237,7 +237,7 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #555;
+    color: #414041;
     margin: 0 0 8px 0;
 }
 
@@ -245,7 +245,7 @@
     margin: 0;
     padding-left: 18px;
     font-size: 13px;
-    color: #333;
+    color: #414041;
 }
 
 .dash-note-list li {
@@ -270,7 +270,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #555;
+    color: #414041;
     margin: 0 0 12px 0;
 }
 
@@ -298,7 +298,7 @@
 .dash-pl-name {
     font-size: 15px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #414041;
     margin: 0 0 4px 0;
 }
 
@@ -375,7 +375,7 @@
 .dash-track-title {
     font-size: 15px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #414041;
 }
 
 .dash-track-desc {
@@ -624,14 +624,17 @@
 
 .dash-btn-view-doc {
     background: #ffffff;
-    color: var(--wg-red, #c8102e);
-    border: 1px solid var(--wg-red, #c8102e);
-    border-radius: 3px;
-    padding: 6px 14px;
-    font-size: 13px;
+    color: var(--wg-red, #BF2026);
+    border: 1.5px solid var(--wg-red, #BF2026);
+    border-radius: var(--wg-radius-pill, 24px);
+    padding: 0 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
+    font-family: 'Barlow', Arial, sans-serif;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .dash-btn-view-doc:hover {
@@ -639,15 +642,18 @@
 }
 
 .dash-btn-download-doc {
-    background: var(--wg-red, #c8102e);
+    background: var(--wg-red, #BF2026);
     color: #ffffff;
-    border: 1px solid var(--wg-red, #c8102e);
-    border-radius: 3px;
-    padding: 6px 14px;
-    font-size: 13px;
+    border: 1px solid var(--wg-red, #BF2026);
+    border-radius: var(--wg-radius-pill, 24px);
+    padding: 0 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s ease;
+    font-family: 'Barlow', Arial, sans-serif;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .dash-btn-download-doc:hover {
@@ -658,4 +664,36 @@
 .dash-track-badge--review {
     background: #fdf0e1;
     color: #8a4b08;
+}
+
+/* ── Buttons: brand pill spec (Color System v1, UAT ST-05/ST-06; U138/U139) ──
+   The dashboard's lightning-buttons (Resume application, Open and respond,
+   View submission, Manage compliance documents, Back to dashboard) otherwise
+   take the site theme's square grey style. SLDS styling hooks restyle them to
+   match the staff portal: brand = red fill, neutral = white with red text and
+   a 1.5px red border, both 24px pills in Barlow. */
+:host {
+    --slds-c-button-radius-border: 24px;
+    --slds-c-button-brand-color-background: #BF2026;
+    --slds-c-button-brand-color-border: #BF2026;
+    --slds-c-button-brand-color-background-hover: #A3181D;
+    --slds-c-button-brand-color-border-hover: #A3181D;
+    --slds-c-button-brand-text-color: #FFFFFF;
+    --slds-c-button-neutral-color-background: #FFFFFF;
+    --slds-c-button-neutral-color-border: #BF2026;
+    --slds-c-button-neutral-color-background-hover: #FCECEA;
+    --slds-c-button-text-color: #BF2026;
+    --slds-c-button-text-color-hover: #A3181D;
+    --slds-c-button-sizing-border: 1.5px;
+    --slds-c-button-line-height: 37px;
+    --slds-c-button-neutral-spacing-inline-start: 26px;
+    --slds-c-button-neutral-spacing-inline-end: 26px;
+    --slds-c-button-brand-spacing-inline-start: 26px;
+    --slds-c-button-brand-spacing-inline-end: 26px;
+}
+
+lightning-button {
+    font-family: 'Barlow', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
 }

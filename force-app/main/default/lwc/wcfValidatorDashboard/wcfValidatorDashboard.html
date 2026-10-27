@@ -46,7 +46,7 @@
                                 <tr>
                                     <th class="wg-col-index" scope="col">#</th>
                                     <th scope="col">Application ID</th>
-                                    <th scope="col">Account</th>
+                                    <th scope="col">Organization</th>
                                     <th scope="col">Due date</th>
                                     <th scope="col">Status</th>
                                     <th class="wg-col-action" scope="col">Action</th>
@@ -57,7 +57,7 @@
                                     <tr key={row.id} class={row.rowClass}>
                                         <td class="wg-col-index">{row.rowNum}</td>
                                         <td class="wg-cell-id">{row.appId}</td>
-                                        <td>{row.account}</td>
+                                        <td>{row.orgName}</td>
                                         <td><span class={row.dueDateClass}>{row.dueDate}</span></td>
                                         <td><span class={row.statusClass}>{row.status}</span></td>
                                         <td class="wg-col-action">

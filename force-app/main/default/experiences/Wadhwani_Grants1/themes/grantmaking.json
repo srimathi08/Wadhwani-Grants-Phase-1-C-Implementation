@@ -1,0 +1,358 @@
+{
+  "activeBrandingSetId" : "74d428f4-4d43-48c2-a6f2-7d81aa5a401b",
+  "customCSS" : ".inverseTextColor{\n    color:#000!important;\n}\n\n.comm-tile-menu__item-tile {\n    font-size: 16px;\n     \n    height: auto !important;\n    min-height: 28px;\n    padding: 10px;\n    white-space: normal;\n    word-wrap: break-word;\n    text-align: center;\n    display: flex\n;\n    align-items: center;\n    justify-content: center;\n    width: 300px;\n    max-width: 100%;\n}\n\n.slds-grid_align-center, .slds-grid--align-center {\n    justify-content: right!important;\n}\n\n:root{\n  -wcf-red:#BF2026;\n  -wcf-orange:#F2672A;\n  -wcf-white:#FFFFFF;\n  -wcf-gray:#414041;\n\n  -wcf-err:#B3261E;      -wcf-err-bg:#FCECEA;\n  -wcf-warn:#F68720;     -wcf-warn-bg:#FEF3E6;\n  -wcf-ok:#2E7D32;       -wcf-ok-bg:#EAF4EB;\n  -wcf-info:#2380D1;     -wcf-info-bg:#E9F2FB;\n  -wcf-line:#E4E4E4;\n}\n\n@font-face { font-family: 'Barlow'; src: url('/sfsites/c/resource/MyCustomFonts/MyFonts/Barlow-Bold.ttf') format('truetype'); font-weight: 700; }\n@font-face { font-family: 'Barlow'; src: url('/sfsites/c/resource/MyCustomFonts/MyFonts/Barlow-SemiBold.ttf') format('truetype'); font-weight: 600; }\n@font-face { font-family: 'Open Sans'; src: url('/sfsites/c/resource/MyCustomFonts/MyFonts/OpenSans-Regular.ttf') format('truetype'); font-weight: 400; }\n@font-face { font-family: 'Open Sans'; src: url('/sfsites/c/resource/MyCustomFonts/MyFonts/OpenSans-SemiBold.ttf') format('truetype'); font-weight: 600; }\n@font-face { font-family: 'Open Sans'; src: url('/sfsites/c/resource/MyCustomFonts/MyFonts/OpenSans-Bold.ttf') format('truetype'); font-weight: 700; }\n\nbody {\n    font-family: 'Open Sans', sans-serif;\n}\n\n/* WG Color System v1 (U138/ST-05): pill login/forgot-password buttons */\n.salesforceIdentityLoginForm2 .loginButton, .salesforceIdentityForgotPassword2 .loginButton { border-radius: 24px !important; font-weight: 600 !important; height: 40px !important; padding: 0 26px !important; font-size: 14px !important; line-height: 1 !important; box-sizing: border-box !important; }",
+  "developerName" : "grantmaking",
+  "id" : "41e372b4-653e-4264-a499-7c90f5cf2f29",
+  "label" : "Grantmaking",
+  "layouts" : {
+    "Home" : "684a01a6-ae2f-43cd-ab6c-3ea9ae6600c5",
+    "Inner" : "8522d01a-1bfc-4e69-be0d-347461ea3fef",
+    "Login" : "232e4031-082c-463d-b0ae-a8cb33068081",
+    "ServiceNotAvailable" : "36f78137-00f2-43aa-a1cf-b4c85d9cfe0f"
+  },
+  "type" : "theme",
+  "views" : [ {
+    "componentAttributes" : { },
+    "componentName" : "salesforceIdentity:loginBody2",
+    "id" : "232e4031-082c-463d-b0ae-a8cb33068081",
+    "label" : "Login",
+    "regions" : [ {
+      "id" : "11ff0932-ed4e-4e22-96f5-264dbff77878",
+      "regionName" : "header",
+      "type" : "region"
+    }, {
+      "id" : "8f3c5d02-5c9e-435f-a407-ec54af6ca2cb",
+      "regionName" : "content",
+      "type" : "region"
+    }, {
+      "id" : "67db52b9-a746-4f97-928c-17ffcb186405",
+      "regionName" : "footer",
+      "type" : "region"
+    } ],
+    "type" : "view"
+  }, {
+    "componentAttributes" : {
+      "fixedPageWidth" : 1799,
+      "headerBgColor" : "rgba(0, 0, 0, 0)",
+      "isHeaderPinned" : false,
+      "isHeroUnderHeader" : false,
+      "isPageWidthFixed" : false,
+      "showHeader" : false,
+      "showHero" : false
+    },
+    "componentName" : "siteforce:themeLayoutStarter",
+    "id" : "8522d01a-1bfc-4e69-be0d-347461ea3fef",
+    "label" : "Default",
+    "regions" : [ {
+      "components" : [ {
+        "componentAttributes" : {
+          "background" : "background: rgb(255,255,255)",
+          "backgroundOverlayColor" : "rgba(0, 0, 0, 0.3)",
+          "borderBottomColor" : "rgba(0, 0, 0, 0.5)",
+          "centerAlignLogo" : false,
+          "collapseNavMenu" : false,
+          "containHeader" : true,
+          "containHeaderWidth" : 1440,
+          "dropdownBackgroundColor" : "#FFFFFF",
+          "dropdownBackgroundHoverColor" : "",
+          "dropdownBorderColor" : "#F0F0F0",
+          "dropdownTextColor" : "",
+          "dropdownTextHoverColor" : "",
+          "headerHeight" : 5,
+          "linkActiveBorderColor" : "#28A9E0",
+          "linkColor" : "rgb(0, 0, 0)",
+          "linkHoverColor" : "rgb(0, 0, 0)",
+          "linkTextShadowColor" : "rgba(6, 6, 6, 0)",
+          "logoWidth" : 120,
+          "searchStyle" : "expanded",
+          "showAppLauncher" : false,
+          "showNavMenuOnLeft" : true,
+          "showNotifications" : false,
+          "showProfileMenu" : true,
+          "showSearch" : false
+        },
+        "componentName" : "forceCommunity:themeHeaderCompact",
+        "id" : "008f8b1b-c36c-4279-b8a6-55a17ff77743",
+        "regions" : [ {
+          "components" : [ {
+            "componentAttributes" : {
+              "buttonBackgroundColor" : "",
+              "buttonBackgroundHoverColor" : "",
+              "buttonBorderColor" : "rgba(255, 255, 255, 1)",
+              "buttonBorderRadius" : 15,
+              "buttonText" : "Log in",
+              "buttonTextColor" : "",
+              "buttonTextHoverColor" : "",
+              "customizableUserProfileMenuEditor" : "Default_User_Profile_Menu2",
+              "menuStyleSettings" : "{\"selectedMenuStyleSetting\":\"iconAndName\",\"selectedIconSetting\":\"userAvatar\",\"includeCompanyName\":false,\"selectedTextOrientationSetting\":\"right\"}"
+            },
+            "componentName" : "forceCommunity:customizableUserProfileMenu",
+            "id" : "d8d7553b-f8bb-420e-9b6e-64ea454d1da3",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "662ea6a9-3e1e-4f00-8faf-a4ff858037d6",
+          "regionName" : "themeHeaderProfileMenu",
+          "type" : "region"
+        }, {
+          "components" : [ {
+            "componentAttributes" : {
+              "backgroundColor" : "rgba(86, 91, 97, 1)",
+              "borderColor" : "rgba(0, 0, 0, 0.8)",
+              "borderRadius" : 20,
+              "borderStyle" : "outline",
+              "buttonColor" : "",
+              "buttonHoverColor" : "",
+              "crossObjectTypeaheadApiNames" : [ {
+                "isPublic" : false,
+                "name" : "FundingOpportunity"
+              } ],
+              "iconColor" : "rgba(255, 255, 255, 0.8)",
+              "placeholderText" : "Search...",
+              "placeholderTextColor" : "rgba(255, 255, 255, 0.6)",
+              "showInputFocusOutline" : true,
+              "showSearchButton" : false,
+              "textColor" : "rgba(255, 255, 255, 0.8)",
+              "typeaheadResultMax" : 5,
+              "useTypeahead" : true
+            },
+            "componentName" : "forceCommunity:themeSearch",
+            "id" : "c5dab3fd-5f7c-4d91-8aeb-652f500305c5",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "22de6f27-a19a-4988-8b38-ce44fcc6023a",
+          "regionName" : "search",
+          "type" : "region"
+        }, {
+          "components" : [ {
+            "componentAttributes" : {
+              "NavigationMenuEditorRefresh" : "",
+              "alignment" : "left",
+              "showAppLauncher" : false,
+              "showBackLabel" : false,
+              "showHomeLink" : true
+            },
+            "componentName" : "forceCommunity:multiLevelNavigationWrapper",
+            "id" : "7a8b6fe6-e6a5-46fa-a927-6915675ff357",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "6f604fe2-f151-4f0d-b7a9-c4f67e94355a",
+          "regionName" : "nav",
+          "type" : "region"
+        } ],
+        "renditionMap" : { },
+        "type" : "component"
+      } ],
+      "id" : "22b3dce2-d2b8-454b-9718-37c1fff3657c",
+      "regionName" : "themeHeader",
+      "type" : "region"
+    }, {
+      "id" : "0db2d50c-6f95-4d89-a5be-4e8fc4b13ca0",
+      "regionName" : "themeHero",
+      "type" : "region"
+    }, {
+      "id" : "64816247-b061-45d8-ab44-93bf9acb0a44",
+      "regionName" : "themeFooter",
+      "type" : "region"
+    } ],
+    "type" : "view"
+  }, {
+    "componentAttributes" : {
+      "fixedPageWidth" : 1920,
+      "headerBgColor" : "rgba(0, 0, 0, 0)",
+      "isHeaderPinned" : false,
+      "isHeroUnderHeader" : false,
+      "isPageWidthFixed" : false,
+      "showHeader" : true,
+      "showHero" : false
+    },
+    "componentName" : "siteforce:themeLayoutStarter",
+    "id" : "684a01a6-ae2f-43cd-ab6c-3ea9ae6600c5",
+    "label" : "Home",
+    "regions" : [ {
+      "components" : [ {
+        "componentAttributes" : {
+          "background" : "background: rgb(255,255,255)",
+          "backgroundOverlayColor" : "rgba(0, 0, 0, 0)",
+          "borderBottomColor" : "rgba(0, 0, 0, 0)",
+          "centerAlignLogo" : false,
+          "collapseNavMenu" : false,
+          "containHeader" : true,
+          "containHeaderWidth" : 1920,
+          "dropdownBackgroundColor" : "rgba(251, 249, 249, 0)",
+          "dropdownBackgroundHoverColor" : "",
+          "dropdownBorderColor" : "rgb(0, 0, 0)",
+          "dropdownTextColor" : "",
+          "dropdownTextHoverColor" : "",
+          "headerHeight" : 5,
+          "linkActiveBorderColor" : "rgb(0, 0, 0)",
+          "linkColor" : "rgb(0, 0, 0)",
+          "linkHoverColor" : "rgb(0, 0, 0)",
+          "linkTextShadowColor" : "rgba(0, 0, 0, 0)",
+          "logoWidth" : 150,
+          "searchStyle" : "expanded",
+          "showAppLauncher" : false,
+          "showNavMenuOnLeft" : true,
+          "showNotifications" : true,
+          "showProfileMenu" : true,
+          "showSearch" : false
+        },
+        "componentName" : "forceCommunity:themeHeaderCompact",
+        "id" : "49f451e4-7a21-4b47-a9d6-78cd96656ac2",
+        "regions" : [ {
+          "components" : [ {
+            "componentAttributes" : {
+              "buttonBackgroundColor" : "inherit",
+              "buttonBackgroundHoverColor" : "inherit",
+              "buttonBorderColor" : "transparent",
+              "buttonBorderRadius" : 5,
+              "buttonText" : "Log in",
+              "buttonTextColor" : "#fff",
+              "buttonTextHoverColor" : "#0099de",
+              "customizableUserProfileMenuEditor" : "Default_User_Profile_Menu2",
+              "menuStyleSettings" : ""
+            },
+            "componentName" : "forceCommunity:customizableUserProfileMenu",
+            "id" : "855ce117-3d4a-42a2-a3a1-2ff25de47c34",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "47b1d2e1-497f-4f88-b0fc-f029208e372d",
+          "regionName" : "themeHeaderProfileMenu",
+          "type" : "region"
+        }, {
+          "components" : [ {
+            "componentAttributes" : {
+              "backgroundColor" : "#fff",
+              "borderColor" : "transparent",
+              "borderRadius" : 0,
+              "borderStyle" : "outline",
+              "buttonColor" : "rgba(255,255,255,1)",
+              "buttonHoverColor" : "rgba(0,0,0,0.2)",
+              "crossObjectTypeaheadApiNames" : [ {
+                "isPublic" : true,
+                "name" : "FeedItem"
+              } ],
+              "iconColor" : "#000",
+              "placeholderText" : "Search...",
+              "placeholderTextColor" : "#000",
+              "showInputFocusOutline" : false,
+              "showSearchButton" : false,
+              "textColor" : "#000",
+              "typeaheadResultMax" : 6,
+              "useTypeahead" : false
+            },
+            "componentName" : "forceCommunity:themeSearch",
+            "id" : "d03f7591-0a11-495c-a122-0c7901897adf",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "084096ba-a297-4f27-805c-10858e1699e6",
+          "regionName" : "search",
+          "type" : "region"
+        }, {
+          "components" : [ {
+            "componentAttributes" : {
+              "navAlignment" : "left",
+              "navItemThreshold" : 5,
+              "navigationMenuEditorRefresh" : "Default_Navigation4"
+            },
+            "componentName" : "forceCommunity:themeNav",
+            "id" : "8cb92a0f-1c55-4d65-b54b-fa9287ba5116",
+            "renditionMap" : { },
+            "type" : "component"
+          } ],
+          "id" : "394745c5-cc3a-4c76-9ff8-ea8290dbc977",
+          "regionName" : "nav",
+          "type" : "region"
+        } ],
+        "renditionMap" : { },
+        "type" : "component"
+      } ],
+      "id" : "6e407b7c-96a8-4b10-9951-0eda00f8042d",
+      "regionName" : "themeHeader",
+      "type" : "region"
+    }, {
+      "components" : [ {
+        "componentAttributes" : {
+          "bgImage" : "background: #FFFFFF",
+          "bgOverlayColor" : "rgba(31, 31, 34, 0.8)",
+          "captionText" : "Our Mission",
+          "captionTextColor" : "#FFF",
+          "captionTextShadowColor" : "rgba(0, 0, 0, 0)",
+          "contentAlignment" : "right",
+          "contentWidth" : 25,
+          "ctaBtnOneBgColor" : "rgb(192, 32, 38)",
+          "ctaBtnOneBgHoverColor" : "rgb(251, 251, 251)",
+          "ctaBtnOneBorderColor" : "rgb(192, 32, 38)",
+          "ctaBtnOneOpenNewTab" : true,
+          "ctaBtnOneText" : "SignUp",
+          "ctaBtnOneTextColor" : "rgb(0, 0, 0)",
+          "ctaBtnOneTextHoverColor" : "rgba(255, 255, 255, 1)",
+          "ctaBtnOneUrl" : "https://wadhwanifoundation--wfdev.sandbox.my.site.com/wcf/s/login/SelfRegister",
+          "ctaBtnRadius" : 0,
+          "ctaBtnTwoBgColor" : "rgba(255, 255, 255, 1)",
+          "ctaBtnTwoBgHoverColor" : "rgba(0, 0, 255, 1)",
+          "ctaBtnTwoBorderColor" : "rgba(0, 0, 0, 1)",
+          "ctaBtnTwoOpenNewTab" : false,
+          "ctaBtnTwoText" : "Help",
+          "ctaBtnTwoTextColor" : "rgba(0, 0, 0, 1)",
+          "ctaBtnTwoTextHoverColor" : "rgba(255, 255, 255, 1)",
+          "ctaBtnTwoUrl" : "",
+          "ctaShowBtnOne" : false,
+          "ctaShowBtnTwo" : false,
+          "fixedHeroWidth" : false,
+          "heroHeight" : 0,
+          "heroWidth" : 640,
+          "showCaption" : false,
+          "showSubtitle" : false,
+          "showTitle" : false,
+          "subtitleText" : "Are you ready?",
+          "subtitleTextColor" : "rgba(0, 0, 0, 0.8)",
+          "subtitleTextShadowColor" : "rgba(0, 0, 0, 0)",
+          "titleText" : "Empowering communities to rise above inequity, hunger, and poverty",
+          "titleTextColor" : "#FFF",
+          "titleTextShadowColor" : "rgba(0, 0, 0, 0)",
+          "type" : "callToAction"
+        },
+        "componentName" : "forceCommunity:themeHeroStarter",
+        "id" : "d19e0b4b-3ff8-4e7e-a812-f5943d075409",
+        "renditionMap" : { },
+        "type" : "component"
+      } ],
+      "id" : "fcc5940a-0078-4d6b-8f43-c12c151d4053",
+      "regionName" : "themeHero",
+      "type" : "region"
+    }, {
+      "id" : "cd1f5f11-4baf-43e9-bf45-24e8cb10aaaf",
+      "regionName" : "themeFooter",
+      "type" : "region"
+    } ],
+    "type" : "view"
+  }, {
+    "componentAttributes" : {
+      "fixedPageWidth" : 1170,
+      "headerBgColor" : "rgba(0, 0, 0, 0)",
+      "isHeaderPinned" : false,
+      "isHeroUnderHeader" : false,
+      "isPageWidthFixed" : true,
+      "showHeader" : true,
+      "showHero" : true
+    },
+    "componentName" : "siteforce:themeLayoutStarter",
+    "id" : "36f78137-00f2-43aa-a1cf-b4c85d9cfe0f",
+    "label" : "ServiceNotAvailable",
+    "regions" : [ {
+      "id" : "d4ffb896-e22b-4ab9-b65b-bae24499aed6",
+      "regionName" : "themeHeader",
+      "type" : "region"
+    }, {
+      "id" : "bb152658-2dc9-43a0-aecb-9fded120ef53",
+      "regionName" : "themeFooter",
+      "type" : "region"
+    } ],
+    "type" : "view"
+  } ]
+}

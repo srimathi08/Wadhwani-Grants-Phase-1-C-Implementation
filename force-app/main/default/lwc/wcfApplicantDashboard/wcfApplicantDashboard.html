@@ -223,6 +223,18 @@
                     <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
                 </div>
 
+                <template if:true={isDecisionRevoked}>
+                    <div class="dash-action-banner">
+                        <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                        <div>
+                            <strong>Decision Revoked — Under Further Review</strong>
+                            <p>
+                                The prior approval decision on your application has been recalled for further deliberation by the Grant Committee. Your application is currently back under active review. No action is required from you at this time.
+                            </p>
+                        </div>
+                    </div>
+                </template>
+
                 <div class="dash-grid">
                     <div class="dash-card dash-card--main">
                         <span class="dash-badge dash-badge--review">{labels.CL_UNDER_REVIEW}</span>
@@ -253,6 +265,18 @@
                     <h1>Hello, {submitterFirstName}.</h1>
                     <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
                 </div>
+
+                <template if:true={isDecisionRevoked}>
+                    <div class="dash-action-banner">
+                        <lightning-icon icon-name="utility:warning" size="small" variant="warning"></lightning-icon>
+                        <div>
+                            <strong>Decision Revoked — Under Further Review</strong>
+                            <p>
+                                The prior approval decision on your application has been recalled for further deliberation by the Grant Committee. Your application is currently back under active review. No action is required from you at this time.
+                            </p>
+                        </div>
+                    </div>
+                </template>
 
                 <div class="dash-grid">
                     <div class="dash-card dash-card--main">
@@ -604,6 +628,48 @@
 
                     <c-wcf-application-timeline class="dash-card dash-card--side" current-status={normalizedStatus}
                         decision-outcome={rawStatus}>
+                    </c-wcf-application-timeline>
+                </div>
+            </template>
+
+            <!-- =======================================================
+             VIEW: APPLICATION SUSPENDED — Draft or Revision 100 days inactivity
+            ======================================================== -->
+            <template if:true={isApplicationSuspended}>
+                <div class="dash-greeting">
+                    <h1>Hello, {submitterFirstName}.</h1>
+                    <p class="dash-subtitle">{organizationName} &middot; {headquarters}</p>
+                </div>
+
+                <div class="dash-action-banner">
+                    <lightning-icon icon-name="utility:lock" size="small" variant="warning"></lightning-icon>
+                    <div>
+                        <strong>{suspendedBannerTitle}</strong>
+                        <p>{suspendedBannerMessage}</p>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <div class="dash-card dash-card--main">
+                        <span class="dash-badge dash-badge--decided">APPLICATION SUSPENDED</span>
+
+                        <div class="dash-card-row">
+                            <div>
+                                <h2 class="dash-app-name">{organizationName}: {selectedFundingArea}</h2>
+                                <p class="dash-meta">
+                                    Status: Suspended &middot; Read-only
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="dash-info-banner">
+                            <strong>Reason for Suspension</strong>
+                            <p>{suspensionReasonText}</p>
+                        </div>
+                    </div>
+
+                    <c-wcf-application-timeline class="dash-card dash-card--side" current-status={timelineStatus}
+                        programme-lead-name={programmeLeadName} programme-lead-email={programmeLeadEmail}>
                     </c-wcf-application-timeline>
                 </div>
             </template>

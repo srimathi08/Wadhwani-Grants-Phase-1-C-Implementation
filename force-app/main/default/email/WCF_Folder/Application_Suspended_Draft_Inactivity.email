@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<title>Draft Application Suspended: {!IndividualApplication.Name}</title>
+<style>
+  html,body{margin:0 !important;padding:0 !important;width:100% !important;background-color:#F4F4F5;font-family:Arial,Helvetica,sans-serif;}
+  body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+  table{border-collapse:collapse !important;}
+  img{border:0;outline:none;text-decoration:none;}
+  a{color:#BF2026;}
+  @media only screen and (max-width:620px){
+    .container{width:100% !important;max-width:100% !important;}
+    .pad{padding-left:20px !important;padding-right:20px !important;}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#F4F4F5;">
+<center style="width:100%;background-color:#F4F4F5;">
+<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+Your draft grant application has been suspended due to 100 days of inactivity.
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F5">
+  <tr><td align="center" style="padding:24px 12px;">
+    <table class="container" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #E6E6E6;border-radius:8px;">
+      <tr>
+        <td bgcolor="#BF2026" style="padding:18px 32px;border-radius:8px 8px 0 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td align="left" valign="middle" style="font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F9C9A8;">Application Notice · Inactivity</td>
+            <td align="right" valign="middle" width="110">
+              <img src="https://wadhwanifoundation--wfdev.sandbox.my.salesforce.com/servlet/servlet.ImageServer?id=015e10000020UmX&oid=00DF6000000APXN&lastMod=1782557340000" width="110" alt="Wadhwani Grants" style="display:block;border:0;width:110px;height:auto;"/>
+            </td>
+          </tr></table>
+        </td>
+      </tr>
+      <tr><td bgcolor="#F2672A" height="4" style="height:4px;background:#F2672A;"></td></tr>
+      <tr>
+        <td class="pad" style="padding:16px 32px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FBF4F4;border:1px solid #E6E6E6;border-radius:4px;">
+            <tr><td style="padding:8px 14px;font-family:Arial,sans-serif;font-size:12.5px;font-weight:600;color:#6D6E71;">
+              Application {!IndividualApplication.Name} &middot; {!IndividualApplication.Organization_Name__c}
+            </td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="pad" style="padding:20px 32px 0;">
+          <h1 style="margin:0 0 14px;font-family:Arial,sans-serif;font-size:22px;line-height:1.3;font-weight:700;color:#414042;">Application Suspended</h1>
+        </td>
+      </tr>
+      <tr>
+        <td class="pad" style="padding:0 32px 14px;">
+          <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#414042;">Hello <strong>{!Contact.FirstName}</strong>,</p>
+          <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#414042;">
+            We are writing to notify you that your draft grant application <strong>{!IndividualApplication.Name}</strong> for <strong>{!IndividualApplication.Organization_Name__c}</strong> has been suspended.
+          </p>
+          
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFDE7;border-left:4px solid #FBC02D;border-radius:4px;margin:16px 0;">
+            <tr><td style="padding:14px 18px;font-family:Arial,sans-serif;font-size:14px;line-height:1.55;color:#555;">
+              <strong style="color:#8A6D3B;">Reason for Suspension:</strong><br/>
+              There has been <strong>no activity or progress on this draft application for 100 consecutive days</strong>. Under Wadhwani Grants platform policy, draft applications with no progress for 100 days are automatically suspended and closed.
+            </td></tr>
+          </table>
+
+          <p style="margin:0 0 12px;font-size:14.5px;line-height:1.6;color:#414042;">
+            <strong>What this means:</strong><br/>
+            &bull; This application is now closed and can no longer be edited or resumed.<br/>
+            &bull; Your applicant portal account remains active for any future funding opportunities.
+          </p>
+
+          <p style="margin:16px 0 0;font-size:14.5px;line-height:1.6;color:#414042;">
+            If you have questions or believe this was done in error, please reach out to our team at <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#BF2026;">grants.support@wadhwanifoundation.org</a>.
+          </p>
+          <p style="margin:20px 0 4px;font-size:14px;color:#414042;">Wadhwani Grants Platform</p>
+        </td>
+      </tr>
+      <tr><td style="padding:0 32px;"><hr style="border:none;border-top:1px solid #E6E6E6;margin:6px 0;"/></td></tr>
+      <tr>
+        <td style="padding:16px 32px 24px;font-size:11.5px;color:#6D6E71;line-height:1.5;">
+          Wadhwani Grants, the grant-making arm of the Wadhwani Foundation.<br/>
+          Questions? Reply to this email or reach us at <a href="mailto:grants.support@wadhwanifoundation.org" style="color:#6D6E71;">grants.support@wadhwanifoundation.org</a>.
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</center>
+</body>
+</html>

@@ -60,7 +60,7 @@ export default class WcfValidatorDashboard extends NavigationMixin(LightningElem
                     return {
                         id:             app.Id,
                         appId:          app.Name,
-                        account:        app.Account?.Name ?? '—',
+                        orgName:        app.Account?.WCF_Organizational_Name__c || app.Account?.Name || '—',
                         hasDraft:       w.hasDraft,
                         isResubmission: w.isResubmission,
                         dueDateRaw,

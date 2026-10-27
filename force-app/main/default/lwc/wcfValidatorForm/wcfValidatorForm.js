@@ -145,6 +145,15 @@ const FLAG_REASONS = Object.freeze([
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const pad2 = n => String(n).padStart(2, '0');
+// File size for display: B / KB / MB (never "0 MB" for a small file)
+const formatFileSize = (bytes, mbFallback) => {
+    if (bytes == null) {
+        return mbFallback != null ? `${mbFallback} MB` : '';
+    }
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 export default class WcfValidatorForm extends NavigationMixin(LightningElement) {
 
@@ -874,19 +883,19 @@ get attachmentSummary() { return this.verificationStatus.message; }
 
     get s3_1Options() {
         const meta = {
-            [DECISION_PASS]: {
-                badgeCls: 'wcf-dec-badge wcf-dec-badge-pass',
-                desc: 'Application advances to Reviewers as-is. Stage 3 begins.'
-            },
-            [DECISION_RETURN]: {
-                badgeCls: 'wcf-dec-badge wcf-dec-badge-return',
-                desc: 'Application returns to the Partner via the Submission Revision Pattern.'
-            },
-            [DECISION_FLAG]: {
-                badgeCls: 'wcf-dec-badge wcf-dec-badge-flag',
-                desc: 'Advances to Reviewers with a structured concern picklist attached.'
-            }
-        };
+    [DECISION_PASS]: {
+        badgeCls: 'wcf-dec-badge wcf-dec-badge-pass',
+        desc: 'The application moves on to the Reviewers.'
+    },
+    [DECISION_RETURN]: {
+        badgeCls: 'wcf-dec-badge wcf-dec-badge-return',
+        desc: 'The application goes back to the Partner so they can make changes.'
+    },
+    [DECISION_FLAG]: {
+        badgeCls: 'wcf-dec-badge wcf-dec-badge-flag',
+        desc: 'The application moves on to the Reviewers, with your flagged concerns attached.'
+    }
+};
         const rawList = (this._s3_1Options && this._s3_1Options.length > 0)
             ? this._s3_1Options
             : [
@@ -1322,7 +1331,8 @@ get verificationStatus() {
 
     const fileList = files.map(a => {
         const ext = a.fileExtension ? '.' + a.fileExtension : '';
-        const size = a.fileSizeMB != null ? ` (${a.fileSizeMB} MB)` : '';
+        const sizeText = formatFileSize(a.fileSizeBytes, a.fileSizeMB);
+        const size = sizeText ? ` (${sizeText})` : '';
         return `${a.fileName}${ext}${size}`;
     }).join(', ');
 

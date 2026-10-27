@@ -1,15 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
+        <name>Application_rejected_E_10</name>
+        <label>Application rejected (E-10)</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recipientAddresses</name>
+            <value>
+                <collectionElements>
+                    <elementReference>Get_Applicant_Email.Email</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>grants.support@wadhwanifoundation.org</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateName</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <setupReference>WCF_Folder/Application_Decision_Declined</setupReference>
+                <setupReferenceType>EmailTemplate</setupReferenceType>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_Applicant_Email.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>3.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
         <name>Approved_Email</name>
         <label>Compliance documents approved (E-63)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_1</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -72,9 +131,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_24</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -137,9 +193,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_25</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -202,9 +255,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_26</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -267,9 +317,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_27</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -332,9 +379,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_29</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -397,9 +441,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_5</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -592,9 +633,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_32</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -657,9 +695,6 @@
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
-        <connector>
-            <targetReference>END_ELEMENT_34</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recipientAddresses</name>
@@ -722,9 +757,6 @@
         <label>Check Applicant For Approved</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_35</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Applicant_Found_For_Approved</name>
@@ -743,13 +775,32 @@
         </rules>
     </decisions>
     <decisions>
+        <name>Check_Applicant_For_Rejected</name>
+        <label>Check Applicant For Rejected</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Applicant_Found_For_Rejected</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Application_rejected_E_10</targetReference>
+            </connector>
+            <label>Applicant Found For Rejected</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Check_Applicant_For_Revision</name>
         <label>Check Applicant For Revision</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_37</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Applicant_Found_For_Revision</name>
@@ -772,9 +823,6 @@
         <label>Check Applicant For Suspended</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_38</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Applicant_Found_For_Suspended</name>
@@ -797,9 +845,6 @@
         <label>Check Contact 100</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_5</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Contact_Found_100</name>
@@ -822,9 +867,6 @@
         <label>Check Contact 30</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_40</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Contact_Found_30</name>
@@ -847,9 +889,6 @@
         <label>Check Contact 60</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_41</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Contact_Found_60</name>
@@ -872,9 +911,6 @@
         <label>Check Contact 90</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_42</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Contact_Found_90</name>
@@ -897,9 +933,6 @@
         <label>Check for Reviewer</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_29</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Reviewer_Exist</name>
@@ -922,9 +955,6 @@
         <label>Check Pending Submission 100</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_5</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_on_100</name>
@@ -947,9 +977,6 @@
         <label>Check Pending Submission 30</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_43</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_30_Rule</name>
@@ -972,9 +999,6 @@
         <label>Check Pending Submission 60</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_44</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_60_Rule</name>
@@ -997,9 +1021,6 @@
         <label>Check Pending Submission 90</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_45</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_90_Rule</name>
@@ -1022,13 +1043,10 @@
         <label>STATUS change</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>END_ELEMENT_46</targetReference>
-        </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Pending_Submission_Rule</name>
-            <conditionLogic>1 AND 2</conditionLogic>
+            <conditionLogic>1 AND 2 AND (3 OR 4 OR 5)</conditionLogic>
             <conditions>
                 <leftValueReference>Get_Applicant_Email.Id</leftValueReference>
                 <operator>IsNull</operator>
@@ -1041,6 +1059,27 @@
                 <operator>EqualTo</operator>
                 <rightValue>
                     <stringValue>Pending Submission</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Document_Types__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Status__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
@@ -1165,107 +1204,22 @@
             </connector>
             <label>Return</label>
         </rules>
+        <rules>
+            <name>Reject</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Rejected</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_IA_To_Onboarding_Rejected</targetReference>
+            </connector>
+            <label>Reject</label>
+        </rules>
     </decisions>
-    <ends>
-        <name>END_ELEMENT_1</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_24</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_25</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_26</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_27</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_29</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_30</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_32</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_34</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_35</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_37</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_38</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_40</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_41</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_42</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_43</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_44</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_45</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_46</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
-    <ends>
-        <name>END_ELEMENT_5</name>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-    </ends>
     <environments>Default</environments>
     <interviewLabel>WF Compliance Document flow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>WF Compliance Document flow</label>
@@ -1643,9 +1597,6 @@
         <label>Draft email send</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <connector>
-            <targetReference>END_ELEMENT_30</targetReference>
-        </connector>
         <inputAssignments>
             <field>Draft_Email_Sent__c</field>
             <value>
@@ -1703,6 +1654,30 @@
         <object>IndividualApplication</object>
     </recordUpdates>
     <recordUpdates>
+        <name>Update_IA_To_Onboarding_Rejected</name>
+        <label>Update IA To Onboarding Rejected</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Applicant_For_Rejected</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.IndividualApplication__c</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Onboarding Rejected</stringValue>
+            </value>
+        </inputAssignments>
+        <object>IndividualApplication</object>
+    </recordUpdates>
+    <recordUpdates>
         <name>Update_IA_To_Onboarding_Suspended</name>
         <label>Update IA To Onboarding Suspended</label>
         <locationX>0</locationX>
@@ -1740,7 +1715,7 @@
                 <targetReference>Get_Latest_Doc_30</targetReference>
             </connector>
             <label>30 Days Compliance Reminder</label>
-            <offsetNumber>30</offsetNumber>
+            <offsetNumber>29</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
@@ -1751,7 +1726,7 @@
                 <targetReference>Get_Latest_Doc_60</targetReference>
             </connector>
             <label>60 Days Compliance Reminder</label>
-            <offsetNumber>60</offsetNumber>
+            <offsetNumber>59</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
@@ -1762,7 +1737,7 @@
                 <targetReference>Get_Latest_Doc_90</targetReference>
             </connector>
             <label>90 Days Compliance Reminder</label>
-            <offsetNumber>90</offsetNumber>
+            <offsetNumber>89</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>
@@ -1773,7 +1748,7 @@
                 <targetReference>Doc_100_days</targetReference>
             </connector>
             <label>100 Days Compliance Paused</label>
-            <offsetNumber>100</offsetNumber>
+            <offsetNumber>99</offsetNumber>
             <offsetUnit>Days</offsetUnit>
             <recordField>Requested_Date__c</recordField>
             <timeSource>RecordField</timeSource>

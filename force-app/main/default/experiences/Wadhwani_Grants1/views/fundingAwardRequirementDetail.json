@@ -1,0 +1,162 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsTwoCol84SidebarFeaturedLayout",
+  "dataProviders" : [ ],
+  "id" : "74859207-c038-497f-b6ae-3c9baa8de182",
+  "label" : "Funding Award Requirement Detail",
+  "regions" : [ {
+    "id" : "66ef9bc6-f481-4b38-a602-a6485d85059b",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "af155b36-7749-4d5f-b7e8-1702da589be0",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "986c8cdb-b7b0-4721-8073-d67efb9523d9",
+          "activeTab" : "progress-report-tab",
+          "tabs" : [ {
+            "UUID" : "04cae448-499b-4eea-abdb-ce95861dcee3",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "FundingAwardRqmtSection",
+                "formSectionsPath" : "Id.FundingAwardRequirementId",
+                "groupRequiredSections" : "false",
+                "indicateRequiredOptionalSection" : "false",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formOverview"
+            } ],
+            "tabKey" : "progress-report-tab",
+            "tabName" : "Progress Report"
+          }, {
+            "UUID" : "1597035e-50cd-4c66-9fa3-a054f997889e",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : { },
+              "fqn" : "forceCommunity:relatedRecords"
+            } ],
+            "tabKey" : "related-tab",
+            "tabName" : "Related"
+          }, {
+            "UUID" : "d450348f-d1e8-461c-857a-3dba654ca3e4",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "FundingAwardRqmtSection",
+                "formSectionsPath" : "Id.FundingAwardRequirementId",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formReview"
+            } ],
+            "tabKey" : "review-progress-report-tab",
+            "tabName" : "Review Progress Report"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "986c8cdb-b7b0-4721-8073-d67efb9523d9",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "FundingAwardRqmtSection",
+            "formSectionsPath" : "Id.FundingAwardRequirementId",
+            "groupRequiredSections" : false,
+            "indicateRequiredOptionalSection" : false,
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formOverview",
+          "id" : "21dee948-3144-4cf7-aa22-f19fc76b2f58",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "04cae448-499b-4eea-abdb-ce95861dcee3",
+        "regionLabel" : "Progress Report",
+        "regionName" : "progress-report-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:relatedRecords",
+          "id" : "7f60077a-7471-4c8b-a388-2d1dd45de8d9",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "1597035e-50cd-4c66-9fa3-a054f997889e",
+        "regionLabel" : "Related",
+        "regionName" : "related-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "FundingAwardRqmtSection",
+            "formSectionsPath" : "Id.FundingAwardRequirementId",
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formReview",
+          "id" : "ceb2ff96-84ff-41f9-8b4b-278e6cd7f10b",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "d450348f-d1e8-461c-857a-3dba654ca3e4",
+        "regionLabel" : "Review Progress Report",
+        "regionName" : "review-progress-report-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "3e1967a5-4400-47c5-8cab-dcac05f790e6",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "7b4b55da-7e27-4f83-be52-9a698b5d8189",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "82371edd-1a7a-4f79-9632-bd3dad71482f",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "2b603b40-6f55-4fe6-9a47-6db7cac20230",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "657a91d5-73d5-462d-ac54-56e655306894",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-124"
+}

@@ -1,0 +1,39 @@
+{
+  "appPageId" : "4d9e2410-9322-46fb-8a28-bfe52d007f32",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "1575e42f-b04a-43b9-b7ea-9dd7b318838f",
+  "label" : "Current fiscal year data Related List",
+  "regions" : [ {
+    "id" : "54228ed9-4c1e-4fcf-a25a-91d9c4258943",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customTitle" : "",
+        "parentRecordId" : "{!recordId}",
+        "relatedListName" : "{!relationshipApiName}",
+        "showBreadCrumbs" : true,
+        "showCustomTitle" : false,
+        "showManualRefreshButton" : true,
+        "showRowNumbers" : true
+      },
+      "componentName" : "forceCommunity:relatedList",
+      "id" : "8146768a-23cb-4e6c-b2a2-52992dab1ecf",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "feb05114-7ac7-4f27-b9de-c2c04357bedc",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "592c9bb0-e7b8-42b3-8a42-bca13ae8163f",
+    "regionName" : "footer",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "relatedlist-a0O"
+}

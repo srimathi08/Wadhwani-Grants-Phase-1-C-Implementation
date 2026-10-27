@@ -11,7 +11,7 @@
             <div class="wg-page-actions">
                 <div class="wg-search">
                     <lightning-icon icon-name="utility:search" size="x-small" alternative-text=""></lightning-icon>
-                    <input type="text" placeholder="Search by ID, account, status…" aria-label="Search proposals"
+                    <input type="text" placeholder="Search by ID, Organization, status…" aria-label="Search proposals"
                         value={searchTerm} oninput={handleSearchInput} />
                 </div>
                 <button class="wg-icon-btn" onclick={handleRefresh} title="Refresh" aria-label="Refresh list">
@@ -79,7 +79,7 @@
                                         <th scope="col" aria-sort={ariaSortAccount}>
                                             <button class={sortClassAccount} data-field="Account.Name"
                                                 onclick={handleSort}>
-                                                Account
+                                                Organization
                                                 <lightning-icon icon-name={sortIconAccount} size="xx-small"
                                                     alternative-text=""></lightning-icon>
                                             </button>

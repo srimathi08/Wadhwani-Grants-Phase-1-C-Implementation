@@ -1,0 +1,286 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "7756ec02-c815-44dd-a90e-cf9ffa36db60",
+  "label" : "IndividualApplication_Detail_page_PI",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "68373c8d-87fb-4c76-8bcd-276bf2156e87",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "df5cffe0-6687-4d3b-8e48-493d4b3b904f",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "c:pdfGenerator",
+      "id" : "385e787c-b41a-4bff-bc0f-d21835445a67",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "c:proposalPathWinComponent",
+      "id" : "86e9e2e0-4006-4bc0-92e2-00e3ce4c9e99",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "95fe9821-d3ab-4c51-b86c-b4554a5a2d26",
+          "activeTab" : "application-tab",
+          "tabs" : [ {
+            "UUID" : "b084a523-8ed6-4417-b44b-2fa1513defcb",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : {
+                "formSectionConfiguration" : "IndividualApplicationTask",
+                "formSectionsPath" : "Id.IndividualApplicationId",
+                "groupRequiredSections" : "false",
+                "indicateRequiredOptionalSection" : "false",
+                "recordId" : "{!recordId}"
+              },
+              "fqn" : "runtime_industries_application:formOverview"
+            } ],
+            "tabKey" : "application-tab",
+            "tabName" : "Application"
+          }, {
+            "UUID" : "f7d4fa74-32b6-44b0-9add-94c2e1324850",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ {
+              "attributes" : { },
+              "fqn" : "forceCommunity:relatedRecords"
+            } ],
+            "tabKey" : "related-tab",
+            "tabName" : "Budgets"
+          }, {
+            "UUID" : "15f7a0b2-e5e2-4077-b95f-d2a1bc1bbb22",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "ba4ce",
+            "tabName" : "Milestone"
+          }, {
+            "UUID" : "ead5fc17-b708-4fc2-a21e-d3baeae85e6e",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "516b4",
+            "tabName" : "Documents"
+          }, {
+            "UUID" : "aa3d3a11-0172-439d-a283-92c8d3fa4994",
+            "allowGuestUser" : true,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "16306",
+            "tabName" : "Approval History"
+          }, {
+            "UUID" : "f8d9c929-b52e-4871-a61f-8a999cde15b0",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "382a0",
+            "tabName" : "FA"
+          }, {
+            "UUID" : "59e77bf6-9bb0-4c5a-9732-289c702b4e02",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "76287",
+            "tabName" : "Proposal Reviews"
+          } ],
+          "useOverflowMenu" : false
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "95fe9821-d3ab-4c51-b86c-b4554a5a2d26",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "forceCommunity:recordDetail",
+          "id" : "f9e9cd00-6780-43b2-9210-da79ef7e3ec0",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : {
+            "formSectionConfiguration" : "IndividualApplicationTask",
+            "formSectionsPath" : "Id.IndividualApplicationId",
+            "groupRequiredSections" : false,
+            "indicateRequiredOptionalSection" : false,
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "runtime_industries_application:formOverview",
+          "id" : "49d7cd00-5079-40d1-bd18-044290696711",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "b084a523-8ed6-4417-b44b-2fa1513defcb",
+        "regionLabel" : "Application",
+        "regionName" : "application-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "Budgets__r",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "27521343-a03f-40ad-aceb-9af884717ccf",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "f7d4fa74-32b6-44b0-9add-94c2e1324850",
+        "regionLabel" : "Budgets",
+        "regionName" : "related-tab",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "Milestones__r",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "cac3fada-b56f-4067-99fd-a2326ffe319c",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "15f7a0b2-e5e2-4077-b95f-d2a1bc1bbb22",
+        "regionLabel" : "Milestone",
+        "regionName" : "ba4ce",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "AttachedContentDocuments",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "5d2044e1-0b99-4f5d-8f65-32974e13f5c3",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "ead5fc17-b708-4fc2-a21e-d3baeae85e6e",
+        "regionLabel" : "Documents",
+        "regionName" : "516b4",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "flowArguments" : "[{\"label\":\"recordId\",\"dataType\":\"String\",\"supportsRecordId\":true,\"value\":\"{!Record.Id}\"}]",
+            "flowName" : "Approval_History_DataTable"
+          },
+          "componentName" : "forceCommunity:flowCommunity",
+          "id" : "11a09d3b-2109-4bb4-8beb-cddc8925550e",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "aa3d3a11-0172-439d-a283-92c8d3fa4994",
+        "regionLabel" : "Approval History",
+        "regionName" : "16306",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "FundingAwards",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "ae72b352-fa32-42af-a3a0-d4f9d9f34021",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : { },
+          "componentName" : "c:fundingAwardDetail",
+          "id" : "bfe0761c-e0b9-4838-8ae3-b948bd5e06bc",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "f8d9c929-b52e-4871-a61f-8a999cde15b0",
+        "regionLabel" : "FA",
+        "regionName" : "382a0",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : { },
+          "componentName" : "c:coeProposalReviewDetail",
+          "id" : "2121fe3c-0ab9-4238-83da-76dec94ee053",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "59e77bf6-9bb0-4c5a-9732-289c702b4e02",
+        "regionLabel" : "Proposal Reviews",
+        "regionName" : "76287",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "f466d7b3-2bea-44a7-9bf1-447c18ded2fa",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "939a02ff-439d-4325-8b7b-e284cdb43179",
+    "regionName" : "sidebar",
+    "type" : "region"
+  }, {
+    "id" : "699f63bd-8a4b-4971-bd0e-d152c5dcac25",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "8856dc18-7e55-4b7b-a3bb-ad4ce4ccb50a",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "6c11f427-92ef-432b-bb91-c823722ed80d",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-0iT"
+}

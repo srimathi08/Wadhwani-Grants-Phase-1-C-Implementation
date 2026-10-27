@@ -1,0 +1,77 @@
+{
+  "appPageId" : "19355793-0e2f-4f99-8e29-d05c68a767cf",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "6b62e75d-cf36-4b9c-9d8d-a7feb9176809",
+  "label" : "Logged In Home",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "405996ac-025c-424f-a9f4-c84fcaed3ec4",
+          "columns" : [ {
+            "UUID" : "a0e3a9f4-2ab3-427a-851b-c908914eeee5",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 300
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "405996ac-025c-424f-a9f4-c84fcaed3ec4",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "richTextValue" : "<h1 style=\"text-align: center;\"><strong style=\"color: rgb(161, 0, 0); font-family: sans-serif;\">Welcome ! {!CurrentUser.name}</strong></h1>"
+          },
+          "componentName" : "forceCommunity:richTextInline",
+          "id" : "b4b77f4b-0807-455e-b8b0-fee98325265a",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        }, {
+          "componentAttributes" : { },
+          "componentName" : "c:reviewerDashboard",
+          "id" : "8a3b5db5-000d-4b73-8d8b-61b49fc3812b",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "a0e3a9f4-2ab3-427a-851b-c908914eeee5",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "6ae2f08f-e4ba-40b6-a977-8fb33c4ff1f2",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Home"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "09c77858-da6e-4c96-ad9d-7b5ee9434773",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "a738b19e-08b7-422c-ae05-6d9453f1d44c",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Home",
+  "type" : "view",
+  "viewType" : "home"
+}

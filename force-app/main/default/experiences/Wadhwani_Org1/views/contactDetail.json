@@ -1,0 +1,81 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "b3585093-fa05-4a01-9e73-16a514f7a2b5",
+  "label" : "Contact Detail",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordHeadline",
+      "id" : "bfcce0aa-2f2a-4b54-9289-61509b014c37",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "2b3d4ef5-aa9b-46cb-9f66-06fd7d357e42",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "forceCommunity:recordDetail",
+      "id" : "6d5f33a8-ede6-4b63-a7fd-e547872016ad",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "6d8ed1ae-d9e5-45c6-974f-e0e416f1a592",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "2f5fa8f0-93a5-41f9-abb3-3f4b7225ca82",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "eaa56c42-26a1-4131-ac67-27f546c77cad",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "c84ffb03-8aaa-440b-9238-5d2051f14e03",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "detailsTabLabel" : "Details",
+        "engagementManagersOnly" : true,
+        "engagementTabLabel" : "Engagement",
+        "feedTabLabel" : "Feed",
+        "recordId" : "{!recordId}",
+        "relatedTabLabel" : "Related"
+      },
+      "componentName" : "forceCommunity:groupRecordHomeTabs",
+      "id" : "184366cc-a40f-4caf-9a28-d54709de96a5",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "0ea43315-ecfd-4ce2-9e0a-049df0bef242",
+    "regionName" : "featured",
+    "type" : "region"
+  }, {
+    "id" : "47c2352d-916a-4b6d-b375-b7167216fd2a",
+    "regionName" : "sidebar",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail-003"
+}

@@ -1,0 +1,68 @@
+{
+  "appPageId" : "ba93178a-0b68-4546-b125-795bc94f7e3c",
+  "componentName" : "siteforce:dynamicLayout",
+  "dataProviders" : [ ],
+  "id" : "320e6a44-2646-425a-8960-f0eeb3b419ab",
+  "label" : "draftformsb",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "background" : "background: rgba(0,0,0,0)",
+        "backgroundOverlay" : "rgba(0,0,0,0.5)",
+        "contentAreaWidth" : 100,
+        "sectionConfig" : {
+          "UUID" : "15c177af-b13c-4a4e-9579-15f5fa8fbc49",
+          "columns" : [ {
+            "UUID" : "b1234579-911a-43e4-b1f5-e4be840ff390",
+            "columnKey" : "1",
+            "columnName" : "Column 1",
+            "columnWidth" : "12",
+            "seedComponents" : [ ]
+          } ]
+        },
+        "sectionHeight" : 300
+      },
+      "componentName" : "forceCommunity:section",
+      "id" : "15c177af-b13c-4a4e-9579-15f5fa8fbc49",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : { },
+          "componentName" : "c:resumeDraftSandbox",
+          "id" : "2df714f1-269e-4354-8a96-d2c4ac16d8a4",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "b1234579-911a-43e4-b1f5-e4be840ff390",
+        "regionLabel" : "Column 1",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "dfdf061b-bf92-456a-b5b1-49f7792cc36b",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "draftformsb"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "bdff8cfc-639f-477c-981e-5ea6668a3338",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "b975123c-6071-44fb-98e6-a61fb02170d0",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-draftformsb"
+}

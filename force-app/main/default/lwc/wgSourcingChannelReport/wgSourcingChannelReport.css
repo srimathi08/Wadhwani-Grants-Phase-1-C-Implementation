@@ -3,11 +3,11 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .sc-page {
-    font-family: 'Inter', 'Salesforce Sans', Arial, sans-serif;
+    font-family: 'Open Sans', Arial, sans-serif; /* body font per Color System v1 (ST-03) */
     background: #f5f6fa;
     min-height: 100vh;
     padding: 0 0 48px 0;
-    color: #1B2A4A;
+    color: #414041;
 }
 
 .sc-relative { position: relative; }
@@ -30,14 +30,15 @@
 }
 
 .greeting-title {
+    font-family: 'Barlow', Arial, sans-serif; /* heading per Color System v1 (ST-01/ST-03) */
     font-size: 28px;
     font-weight: 700;
-    color: #1B2A4A;
+    color: #414041;
     margin: 0 0 4px;
     line-height: 1.2;
 }
 
-.greeting-title .accent { color: #C8391D; }
+.greeting-title .accent { color: #414041; } /* no red outside buttons (ST-04, U140) */
 
 .greeting-sub {
     font-size: 13px;
@@ -81,21 +82,26 @@
 }
 
 .sc-reset-btn {
+    /* Brand secondary pill (Color System v1, UAT ST-05/ST-06; U138/U139) */
     background: #fff;
-    border: 1px solid #d5d9e2;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 12px;
+    border: 1.5px solid #BF2026;
+    border-radius: 24px;
+    padding: 11px 26px;
+    font-size: 14px;
     font-weight: 600;
-    color: #1B2A4A;
+    font-family: 'Barlow', Arial, sans-serif;
+    color: #BF2026;
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
+    min-height: 40px;
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .sc-reset-btn:hover {
-    background: #f5f6fa;
-    border-color: #C8391D;
-    color: #C8391D;
+    background: #FCECEA;
+    border-color: #A3181D;
+    color: #A3181D;
 }
 
 /* ── Summary strip ────────────────────────────────────────────── */

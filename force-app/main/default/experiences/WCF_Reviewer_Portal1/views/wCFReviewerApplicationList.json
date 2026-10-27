@@ -1,0 +1,57 @@
+{
+  "appPageId" : "d9a94a5d-c6b3-4a79-9a4e-6a38b9200448",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "5bfc8a20-f4b1-43ff-ac83-feabc0b44373",
+  "label" : "WCF Reviewer Application List",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "homeUrl" : "/",
+        "logoUrl" : "/sfsites/c/resource/WIN_Logo",
+        "logoutUrl" : ""
+      },
+      "componentName" : "c:wcfPortalHeader",
+      "id" : "0ba65a8a-9f77-4573-9e5c-a0d6d2c3182d",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    }, {
+      "componentAttributes" : { },
+      "componentName" : "c:wcfProposalListView",
+      "id" : "1a814739-bae6-4cc6-aa82-3cc13b98203d",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "ac5e21fc-6f79-4ca2-a26c-d2c8d0279bb7",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "id" : "79a601b8-aed9-4173-ba89-728c495ad871",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "4f3e1e1c-1c54-4de2-a876-c26ad8ec7f48",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "WCF Reviewer Application List"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "c84f1b26-41e0-4d19-8d14-25e72ee98697",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "690d392d-eb87-491d-b17f-517bdee2b4ca",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-wcf-reviewer-application-list"
+}

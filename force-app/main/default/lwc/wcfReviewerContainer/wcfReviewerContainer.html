@@ -21,7 +21,7 @@
                 <div class="rc-topbar-left">
                     <!-- NEW: same "Back to proposals" button as the Validator screen.
                          Opens the Review Proposals list (reviewer queue). -->
-                    <button class="neutral-btn wg-btn-sm" onclick={handleBackToProposals}>
+                    <button class="neutral-btn" onclick={handleBackToProposals}>
                         <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text=""></lightning-icon>
                         Back to proposals
                     </button>
@@ -32,14 +32,14 @@
                 </div>
 
                 <template if:false={showPreview}>
-                    <button class="ghost-btn wg-btn-sm" onclick={handleShowPreview}>
+                    <button class="ghost-btn" onclick={handleShowPreview}>
                         <lightning-icon icon-name="utility:open_folder" size="xx-small" alternative-text=""></lightning-icon>
                         View RFI application
                     </button>
                 </template>
 
                 <template if:true={showPreview}>
-                    <button class="neutral-btn wg-btn-sm" onclick={handleHidePreview}>
+                    <button class="neutral-btn" onclick={handleHidePreview}>
                         <lightning-icon icon-name="utility:close" size="xx-small" alternative-text=""></lightning-icon>
                         Close RFI
                     </button>
@@ -135,7 +135,7 @@
 
                                     <!-- FIX: buttons now sit in an actions row (they had no wrapper) -->
                                     <div class="rc-notice-actions">
-                                        <button class="ghost-btn wg-btn-sm"
+                                        <button class="ghost-btn"
                                                 onclick={handleReviewerReturnToValidator}
                                                 disabled={isReturnToApproverBusy}
                                                 aria-busy={isReturnToValidatorBusy}>
@@ -144,7 +144,7 @@
                                             <template if:true={isReturnToValidatorBusy}>Saving…</template>
                                         </button>
 
-                                        <button class="primary-btn wg-btn-sm"
+                                        <button class="primary-btn"
                                                 onclick={handleApproverReturnApprove}
                                                 disabled={isReturnToValidatorBusy}
                                                 aria-busy={isReturnToApproverBusy}>
@@ -250,7 +250,7 @@
                     <lightning-icon icon-name="utility:warning" size="medium" alternative-text=""></lightning-icon>
                     <p class="wg-empty-title">No application selected</p>
                     <p class="wg-empty-text">Open a proposal from the Review Proposals list to begin your review.</p>
-                    <button class="primary-btn wg-btn-sm rc-empty-btn" onclick={handleBack}>Browse proposals</button>
+                    <button class="primary-btn rc-empty-btn" onclick={handleBack}>Browse proposals</button>
                 </div>
             </div>
         </div>

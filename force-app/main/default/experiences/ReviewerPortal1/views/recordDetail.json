@@ -1,0 +1,127 @@
+{
+  "appPageId" : "e2101912-0ea2-47b2-a472-93471f3d375d",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "ca19c0d4-93ca-4404-8e89-45460e948e96",
+  "label" : "Record Detail",
+  "regions" : [ {
+    "id" : "29cb58ef-79f4-4a60-a8bd-d6a70f21ce1e",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "tabsetConfig" : {
+          "UUID" : "620ebda9-1a14-4d06-b148-59f491a9b626",
+          "activeTab" : "",
+          "tabs" : [ {
+            "UUID" : "f88197bc-a762-4b61-bd83-0c853dab70fc",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "1",
+            "tabName" : "Details"
+          }, {
+            "UUID" : "5363d027-1d82-4ec9-9455-529fa756d858",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "2",
+            "tabName" : "Files"
+          }, {
+            "UUID" : "dff410cf-5092-4925-b1f0-0f3ef5756fa1",
+            "allowGuestUser" : false,
+            "locked" : false,
+            "seedComponents" : [ ],
+            "tabKey" : "b2c2c",
+            "tabName" : "Milestones"
+          } ],
+          "useOverflowMenu" : true
+        }
+      },
+      "componentName" : "forceCommunity:tabLayout",
+      "id" : "620ebda9-1a14-4d06-b148-59f491a9b626",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "recordId" : "{!recordId}"
+          },
+          "componentName" : "forceCommunity:recordDetail",
+          "id" : "cbda687d-b416-4761-b247-f75cc8bd5fe0",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "f88197bc-a762-4b61-bd83-0c853dab70fc",
+        "regionLabel" : "Details",
+        "regionName" : "1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "AttachedContentDocuments",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "261e62be-b6ff-4d9b-b0fa-bfac77bfe5a8",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "5363d027-1d82-4ec9-9455-529fa756d858",
+        "regionLabel" : "Files",
+        "regionName" : "2",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "relatedListApiName" : "Milestones__r",
+            "relatedListComponentOverride" : "GRID",
+            "width" : "MEDIUM"
+          },
+          "componentName" : "forceCommunity:responsiveRelatedListSingle",
+          "id" : "cb007cb3-f936-4aea-95df-e5ce8218bc14",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "dff410cf-5092-4925-b1f0-0f3ef5756fa1",
+        "regionLabel" : "Milestones",
+        "regionName" : "b2c2c",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "f4b1559b-fe9c-4fc1-937c-eacd32aa0edd",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "1d6e3f59-2950-47a5-9593-3ecf78093fc8",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "{!Record._Object}: {!Record._Title}"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "44f346fb-1c9d-419b-acf4-a8d67a436447",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "c82a2704-3cfe-49fc-a520-474175fc5b08",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "detail"
+}

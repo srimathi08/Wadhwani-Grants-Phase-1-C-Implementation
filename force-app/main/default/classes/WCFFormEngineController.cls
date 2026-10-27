@@ -10,12 +10,13 @@ public without sharing class WCFFormEngineController {
 
     private static Set<String> buildClearableAppFields() {
         Set<String> s = new Set<String>{
-            'leader_tenure__c',
-            'legal_type_other__c', 'registration_jurisdiction_other__c',
-            'revenue_explanation__c',
-            'details_of_ethical_received__c', 'q24_report_url__c',
-            'genieai_interest_level__c', 'operational_synergies_with_wof__c'
-        };
+    'leader_tenure__c',
+    'legal_type_other__c', 'registration_jurisdiction_other__c',
+    'revenue_explanation__c',
+    'details_of_ethical_received__c', 'q24_report_url__c',
+    'genieai_interest_level__c', 'operational_synergies_with_wof__c',
+    'attesting_user_name__c', 'attesting_user_title__c'
+};
         for (Integer i = 1; i <= 3; i++) {
             for (String p : new List<String>{ 'name', 'amount', 'period_start', 'period_end', 'type' }) {
                 s.add('funder_' + i + '_' + p + '__c');
@@ -600,6 +601,12 @@ public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDo
                     fv.put(qKey, fv.get(q.Field_API_Name__c));
                 }
             }
+
+            // Attestation follows the current submitter until the applicant sets it themselves
+if (app.Status == 'Draft') {
+    fv.remove('Attesting_User_Name__c');
+    fv.remove('Attesting_User_Title__c');
+}
 
             // Always sync fresh submitter/org fields from current User/Contact (Bug 17)
             if (String.isNotBlank(defaultSubName)) {
@@ -1311,6 +1318,50 @@ public static List<UploadedFileDetail> getUploadedFileDetails(List<Id> contentDo
                 app.Status = 'Draft';
             }
         }
+        // ── Duplicate Organization Check on Submission ──
+        if ((targetStatus == 'Submitted' || targetStatus == 'Application Resubmitted') && String.isNotBlank(app.Organization_Name__c)) {
+            String orgTrimmed = app.Organization_Name__c.trim();
+            
+            // 1. Check if another IndividualApplication already exists with this organization name
+            List<IndividualApplication> dupApps = [
+                SELECT Id, Name, Organization_Name__c, Account.Name 
+                FROM IndividualApplication 
+                WHERE Organization_Name__c = :orgTrimmed 
+                  AND AccountId != :app.AccountId
+                  AND Id != :app.Id
+                WITH SYSTEM_MODE
+                ORDER BY CreatedDate ASC
+                LIMIT 5
+            ];
+            
+            if (!dupApps.isEmpty()) {
+                app.Is_Duplicate_Org_Match__c = true;
+                List<String> dupRefs = new List<String>();
+                for (IndividualApplication d : dupApps) {
+                    dupRefs.add(d.Name + (d.Account != null ? ' (' + d.Account.Name + ')' : ''));
+                }
+                app.Duplicate_Org_Matched_Name__c = String.join(dupRefs, ', ');
+            } else {
+                // 2. Also check if another Account exists with this organization name
+                List<Account> dupAccs = [
+                    SELECT Id, Name, WCF_Organizational_Name__c 
+                    FROM Account 
+                    WHERE WCF_Organizational_Name__c = :orgTrimmed 
+                      AND Id != :app.AccountId
+                    WITH SYSTEM_MODE
+                    LIMIT 5
+                ];
+                if (!dupAccs.isEmpty()) {
+                    app.Is_Duplicate_Org_Match__c = true;
+                    List<String> accRefs = new List<String>();
+                    for (Account da : dupAccs) {
+                        accRefs.add(da.Name);
+                    }
+                    app.Duplicate_Org_Matched_Name__c = String.join(accRefs, ', ');
+                }
+            }
+        }
+
         upsert app;
 
         // Persist Q5 compliance fields to Account if applicable (Bug 10)

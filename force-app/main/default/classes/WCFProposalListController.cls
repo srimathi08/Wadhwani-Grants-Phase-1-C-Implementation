@@ -535,7 +535,8 @@ public static Map<String, Integer> getQueueSummary() {
         // ("Not Started") are still included, not just ones that already
         // have an ApplicationReview row.
         List<IndividualApplication> apps = [
-            SELECT Id, Name, Account.Name, RecordType.Name, Headquarters_City_and_Country__c, Status,
+            SELECT Id, Name, Account.Name, Account.WCF_Organizational_Name__c,
+                   RecordType.Name, Headquarters_City_and_Country__c, Status,
                    Submission_Round__c, Last_Resubmission_Date__c,
                    Organizational_Area_s_for_Funding_Inves__c, Organizational_Area_s_for_Funding_Inves1__c
             FROM IndividualApplication
@@ -663,6 +664,9 @@ item.reviewId       = (ar != null) ? ar.Id : null;
 item.appRecordId    = ia.Id;
 item.appName        = ia.Name;
 item.accountName    = ia.Account != null ? ia.Account.Name : null;
+item.organizationName = (ia.Account != null && String.isNotBlank(ia.Account.WCF_Organizational_Name__c))
+                            ? ia.Account.WCF_Organizational_Name__c
+                            : (ia.Account != null ? ia.Account.Name : null);
 item.recordTypeName = ia.RecordType != null ? ia.RecordType.Name : null;
 
 if (ia.Status == 'Reviewer Rejected') {
@@ -693,11 +697,12 @@ item.revisionCount   = Math.max(0, round.intValue() - 1);
         return result;
     }   
 
-    public class ReviewerPreviewItem {
+       public class ReviewerPreviewItem {
         @AuraEnabled public String reviewId;
         @AuraEnabled public String appRecordId;
         @AuraEnabled public String appName;
         @AuraEnabled public String accountName;
+        @AuraEnabled public String organizationName;
         @AuraEnabled public String recordTypeName;
         @AuraEnabled public String status;
         @AuraEnabled public String dueDate;

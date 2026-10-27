@@ -32,14 +32,17 @@
     background: var(--wg-red);
     color: var(--wg-white);
     border: none;
-    border-radius: 0;
-    padding: 10px 18px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     white-space: nowrap;
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-new-request:hover {
@@ -97,7 +100,7 @@
 
 .kpi-dot-blue   { background: var(--wg-info); }
 .kpi-dot-amber  { background: var(--wg-warning); }
-.kpi-dot-red    { background: var(--wg-red); }
+.kpi-dot-red    { background: var(--wg-error); } /* Overdue = functional error, brand red is buttons-only (ST-04, U140) */
 .kpi-dot-green  { background: var(--wg-success); }
 .kpi-dot-grey   { background: var(--wg-text-muted); }
 
@@ -148,14 +151,17 @@
 .filter-clear-btn {
     background: var(--wg-white);
     border: var(--wg-border-width-ghost) solid var(--wg-red);
-    border-radius: 0;
-    padding: 6px 12px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     color: var(--wg-red);
     white-space: nowrap;
     cursor: pointer;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .filter-clear-btn:hover {
@@ -312,13 +318,16 @@
 /* ── Row action buttons (Edit = ghost, Review = primary) ──── */
 .preview-action-btn {
     border: none;
-    border-radius: 0;
-    padding: 6px 12px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .preview-action-validate {
@@ -370,12 +379,14 @@
 .td.c-action.tc .preview-action-btn {
     white-space: nowrap;
     flex-shrink: 0;
-    padding: 6px 12px;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 32px;
     box-sizing: border-box;
+    min-height: 0;
+    font-size: var(--wg-font-size-button);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -454,13 +465,16 @@
     background: var(--wg-white);
     border: var(--wg-border-width-ghost) solid var(--wg-red);
     color: var(--wg-red);
-    border-radius: 0;
-    padding: 9px 16px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-cancel:hover {
@@ -477,13 +491,16 @@
     background: var(--wg-red);
     border: none;
     color: var(--wg-white);
-    border-radius: 0;
-    padding: 9px 18px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
     font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .btn-save:hover {
@@ -678,14 +695,17 @@
 /* Decision buttons — square, status colors */
 .decision-btn {
     border: none;
-    border-radius: 0;
-    padding: 6px 14px;
+    border-radius: var(--wg-radius-pill);
+    padding: var(--wg-padding-button);
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     color: var(--wg-white);
     transition: filter 0.15s ease;
+    min-height: var(--wg-button-height);
+    box-sizing: border-box;
+    line-height: 1;
 }
 .decision-btn:hover { filter: brightness(0.92); }
 .decision-btn-pass    { background: var(--wg-success); }
@@ -770,13 +790,15 @@
     background: var(--wg-white);
     border: var(--wg-border-width-ghost) solid var(--wg-red);
     color: var(--wg-red);
-    border-radius: 0;
-    padding: 6px 12px;
+    border-radius: var(--wg-radius-pill);
+    padding: 0 12px;
     font-family: var(--wg-font-heading);
-    font-size: var(--wg-font-size-label);
+    font-size: var(--wg-font-size-button);
     font-weight: var(--wg-weight-semibold);
     cursor: pointer;
     transition: all 0.15s ease;
+    height: var(--wg-control-height, 32px);
+    box-sizing: border-box;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -841,7 +863,7 @@ a:focus-visible,
     }
 }
 .app-number-link {
-    color: #c8102e;
+    color: var(--wg-red); /* was off-palette #c8102e; matches shared .wg-link (U140) */
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -862,7 +884,7 @@ a:focus-visible,
     background: #f9fafb;
     color: #9ca3af;
     border: var(--wg-border-width-thin) solid #e5e7eb;
-    border-radius: 2px;
+    border-radius: var(--wg-radius-pill);
     cursor: not-allowed;
 }
 
@@ -870,7 +892,7 @@ a:focus-visible,
     background: var(--wg-red);
     color: #ffffff;
     border: var(--wg-border-width-ghost) solid var(--wg-red);
-    border-radius: 2px;
+    border-radius: var(--wg-radius-pill);
     font-weight: 600;
 }
 .preview-action-btn.preview-action-upload-agreement:hover {
@@ -882,7 +904,7 @@ a:focus-visible,
     background: #ffffff;
     color: var(--wg-red);
     border: var(--wg-border-width-ghost) solid var(--wg-red);
-    border-radius: 2px;
+    border-radius: var(--wg-radius-pill);
     font-weight: 600;
 }
 .preview-action-btn.preview-action-view:hover {
@@ -893,7 +915,7 @@ a:focus-visible,
     background: #ffffff;
     color: var(--wg-red);
     border: var(--wg-border-width-ghost) solid var(--wg-red);
-    border-radius: 2px;
+    border-radius: var(--wg-radius-pill);
     font-weight: 600;
 }
 .preview-action-btn.preview-action-replace:hover {

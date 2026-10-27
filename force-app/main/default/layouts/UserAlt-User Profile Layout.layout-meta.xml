@@ -8,23 +8,15 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Username</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>AccountId</field>
+                <field>Name</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>Email</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Required</behavior>
-                <field>CommunityNickname</field>
-            </layoutItems>
-            <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Address</field>
+                <field>CompanyName</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -38,7 +30,12 @@
         <detailHeading>false</detailHeading>
         <editHeading>true</editHeading>
         <label>About</label>
-        <layoutColumns/>
+        <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Pwd_Notified_Through__c</field>
+            </layoutItems>
+        </layoutColumns>
         <layoutColumns/>
         <style>TwoColumnsLeftToRight</style>
     </layoutSections>

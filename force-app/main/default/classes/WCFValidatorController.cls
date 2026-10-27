@@ -10,11 +10,12 @@ public without sharing class WCFValidatorController {
 
         List<IndividualApplication> apps = [
             SELECT
-                Id, Name, AccountId, Account.Name,
+                Id, Name, AccountId, Account.Name,Account.WCF_Organizational_Name__c,
                 Status, AppliedDate, Funding_Year__c,
                 Category, ApplicationType, RecordType.Name, Due_Date__c,
                 Submission_Round__c, Last_Resubmission_Date__c,
-                Organizational_Area_s_for_Funding_Inves1__c, Organizational_Area_s_for_Funding_Inves__c
+                Organizational_Area_s_for_Funding_Inves1__c, Organizational_Area_s_for_Funding_Inves__c,Due_Date_for_Resubmission__c,
+ Is_Duplicate_Org_Match__c, Duplicate_Org_Matched_Name__c
             FROM IndividualApplication
             WHERE RecordTypeId IN :allowedTypeIds
             AND Status IN (
@@ -75,6 +76,9 @@ public without sharing class WCFValidatorController {
             w.isResubmission       = isResubmission;
             w.isAwaitingApplicant  = isAwaitingApplicant;
             w.isReturnedByReviewer = isReturnedByReviewer;
+            w.isDuplicateOrg   = (app.Is_Duplicate_Org_Match__c == true);
+            w.duplicateOrgRefs = app.Duplicate_Org_Matched_Name__c;
+
 
             Decimal round = app.Submission_Round__c;
             if (round == null || round < 1) {
@@ -325,6 +329,9 @@ public without sharing class WCFValidatorController {
         @AuraEnabled public String reviewStatus;
         @AuraEnabled public Integer submissionRound;
         @AuraEnabled public Integer revisionCount;
+        @AuraEnabled public Boolean isDuplicateOrg;
+        @AuraEnabled public String duplicateOrgRefs;
+
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -965,6 +972,8 @@ wrapper.attestationDateTime = lockedAttestation;
                 if (arFields.containsKey(fName)) review.put(fName, txt);
             }
 
+ upsert as system review;
+
             if (status == 'Validated' && appId != null) {
                 IndividualApplication currentApp = [
                     SELECT Status FROM IndividualApplication WHERE Id = :appId WITH SYSTEM_MODE LIMIT 1
@@ -979,6 +988,8 @@ wrapper.attestationDateTime = lockedAttestation;
                     }
                 } else if (decision == 'Return') {
                     app.Status = 'Revision Requested';
+                    app.Revision_Requested_Date__c = System.now();
+app.Consalidated__c = review.Consolidated_Return_Comments__c; 
                 }
                 app.WG_Validator_Name__c = UserInfo.getName();
 
@@ -999,7 +1010,7 @@ wrapper.attestationDateTime = lockedAttestation;
                 }
             }
 
-            upsert as system review;
+           
 
             return review.Id;
 
@@ -1380,13 +1391,14 @@ wrapper.attestationDateTime = lockedAttestation;
         };
     }
 
-    @AuraEnabled(cacheable=true)
+       @AuraEnabled(cacheable=true)
     public static List<ApplicationWrapper> getValidatorPreview(Integer maxRows) {
         Set<Id> allowedTypeIds = RecordTypeHelper.individualApplicationAllowedIds();
         Id validatorRtId = getWCFValidatorRecordTypeId();
 
         List<IndividualApplication> apps = [
-            SELECT Id, Name, Account.Name, Status, AppliedDate, RecordType.Name, Due_Date__c,
+            SELECT Id, Name, AccountId, Account.Name, Account.WCF_Organizational_Name__c,
+                   Status, AppliedDate, RecordType.Name, Due_Date__c, Due_Date_for_Resubmission__c,
                    Submission_Round__c, Last_Resubmission_Date__c
             FROM IndividualApplication
             WHERE RecordTypeId IN :allowedTypeIds
