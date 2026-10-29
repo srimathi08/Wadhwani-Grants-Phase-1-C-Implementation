@@ -1006,13 +1006,13 @@ export default class WcfFormPreview extends LightningElement {
         return this._val(this._app?.Attesting_User_Title__c || this._app?.Job_Title__c || this._app?.CreatedBy?.Title);
     }
     get attestingDate() {
-    return this._fmtDateTime(
-        this._app?.Last_Resubmission_Date__c ||
-        this._app?.Initial_Submission_Date__c ||
-        this._app?.Attestation_Date__c ||
-        this._app?.CreatedDate
-    );
-}
+        return this._fmtDateTime(
+            this._app?.Last_Resubmission_Date__c ||
+            this._app?.Initial_Submission_Date__c ||
+            this._app?.Attestation_Date__c ||
+            this._app?.CreatedDate
+        );
+    }
 
     // ── Preview & Document Download Handling ─────────────────────────────────
     async handlePreview(event) {
@@ -2151,7 +2151,7 @@ export default class WcfFormPreview extends LightningElement {
                 }
 
                 const o = this.outcomeData;
-                checkPage(45);
+                checkPage(70);
                 const t17 = y;
                 drawQLabel(q.Q17, 'Job Creation Outcomes (Actuals)', t17);
                 y = t17 + 10;
@@ -2288,7 +2288,7 @@ export default class WcfFormPreview extends LightningElement {
 
             // Q27: Operational Synergies — GenieAI
             simpleQRow(q.Q27, 'Operational Synergies: GenieAI', this.genieInterestLevel, true);
-               if (this.showSynergies && this.synergiesValue) richBoxUnder('How GenieAI could contribute', plainTextToHtml(this.synergiesValue));
+            if (this.showSynergies && this.synergiesValue) richBoxUnder('How GenieAI could contribute', plainTextToHtml(this.synergiesValue));
 
             // Q28: Supporting Documents
             if (this.hasSupportingDocuments) {

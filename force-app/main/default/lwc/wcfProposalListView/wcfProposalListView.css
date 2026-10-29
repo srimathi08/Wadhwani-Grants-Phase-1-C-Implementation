@@ -56,6 +56,30 @@
 .wcf-trunc-wide {
     max-width: 260px;
 }
+/* ── Flag reason column ──
+   Keeps a readable width, wraps at word boundaries and shows at most three
+   lines; the full reason is in the hover title. */
+.wcf-flag-cell {
+    min-width: 240px;
+    max-width: 320px;
+}
+
+.wcf-flag-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.wcf-flag-reason {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+    line-height: 1.4;
+}
 
 .wcf-rq-tags {
     display: flex;

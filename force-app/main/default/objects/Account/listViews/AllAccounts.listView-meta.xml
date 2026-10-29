@@ -12,5 +12,10 @@
     <columns>WCF_Validator__pc</columns>
     <columns>WCF_Approver__c</columns>
     <filterScope>Everything</filterScope>
+    <filters>
+        <field>ACCOUNT.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>PersonAccount.Reviewer</value>
+    </filters>
     <label>All Accounts</label>
 </ListView>

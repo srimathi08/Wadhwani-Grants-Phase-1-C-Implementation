@@ -292,9 +292,11 @@ private static final Set<String> CLOSED_STATUSES =
         ApplicationLinkDTO dto = new ApplicationLinkDTO();
         dto.recordId        = chosenApp.Id;
         dto.applicationName = chosenApp.Name;
-        String geoRaw = (chosenApp.Account != null && String.isNotBlank(chosenApp.Account.BillingCountry))
-            ? chosenApp.Account.BillingCountry
-            : chosenApp.Headquarters_City_and_Country__c;
+        // Applicant-entered headquarters first (same source as the applicant's checklist);
+        // the Account's Billing Country is only a fallback.
+        String geoRaw = String.isNotBlank(chosenApp.Headquarters_City_and_Country__c)
+            ? chosenApp.Headquarters_City_and_Country__c
+            : (chosenApp.Account != null ? chosenApp.Account.BillingCountry : null);
         dto.geography       = resolveGeography(geoRaw);
         return dto;
     }
@@ -325,11 +327,17 @@ private static final Set<String> CLOSED_STATUSES =
         String orgName = '';
         String geoRaw = '';
 
+        // Applicant-entered headquarters first (same source as the applicant's checklist);
+        // the Account's Billing Country is only a fallback.
+        if (String.isNotBlank(app.Headquarters_City_and_Country__c)) {
+            geoRaw = app.Headquarters_City_and_Country__c;
+        }
+
         if (app.Account != null) {
             orgName = String.isNotBlank(app.Account.WCF_Organizational_Name__c)
                 ? app.Account.WCF_Organizational_Name__c
                 : app.Account.Name;
-            if (String.isNotBlank(app.Account.BillingCountry)) {
+            if (String.isBlank(geoRaw) && String.isNotBlank(app.Account.BillingCountry)) {
                 geoRaw = app.Account.BillingCountry;
             }
         }

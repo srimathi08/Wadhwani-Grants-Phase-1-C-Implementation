@@ -41,6 +41,9 @@
  */
 public without sharing class WFGrantsSignUpController {
 
+    // Account record type (DeveloperName) used for partners created by sign-up.
+    private static final String PARTNER_ACCOUNT_RECORD_TYPE = 'WCFECF';
+
     // Profile assigned to self-registered site users. Production uses
     // 'WG Partners'; the sandbox still carries the older 'WCF Site User'
     // profile. Both names are accepted so the same code runs in either org.
@@ -233,6 +236,29 @@ public without sharing class WFGrantsSignUpController {
             if (!created.isEmpty()) {
                 System.setPassword(created[0].Id, password);
 
+                // Record this sign-up password as the starting point for the
+                // password-change notifier (E39PasswordNotifier), so only later
+                // changes send a "password changed" email. Must never block sign-up.
+                try {
+                    Datetime baseline = System.now();
+                    for (User pwdUser : [
+                            SELECT LastPasswordChangeDate FROM User
+                            WHERE Id = :created[0].Id
+                            WITH SYSTEM_MODE LIMIT 1]) {
+                        if (pwdUser.LastPasswordChangeDate != null
+                                && pwdUser.LastPasswordChangeDate > baseline) {
+                            baseline = pwdUser.LastPasswordChangeDate;
+                        }
+                    }
+                    update new User(
+                        Id = created[0].Id,
+                        Pwd_Notified_Through__c = baseline
+                    );
+                } catch (Exception baselineEx) {
+                    System.debug(LoggingLevel.WARN,
+                        'Password notifier baseline not recorded: ' + baselineEx.getMessage());
+                }
+
                 // ── SMS flow used to send a separate email confirmation link
                 // here. Not needed while EMAIL is the verified channel.
                 // System.UserManagement.sendAsyncEmailConfirmation(
@@ -328,13 +354,22 @@ public without sharing class WFGrantsSignUpController {
             return existing.PersonContactId;
         }
 
+        // Partners are stored on the 'WCF' Person Account record type (API name WCFECF).
+        // If that record type is ever missing or inactive, fall back to the first
+        // active Person Account record type (the previous behaviour), so sign-up never fails.
         Id personRtId = null;
         for (RecordType rt : [
-                SELECT Id FROM RecordType
-                WHERE SObjectType = 'Account' AND IsPersonType = true
+                SELECT Id, DeveloperName FROM RecordType
+                WHERE SObjectType = 'Account' AND IsPersonType = true AND IsActive = true
                 WITH SYSTEM_MODE
-                ORDER BY DeveloperName LIMIT 1]) {
-            personRtId = rt.Id;
+                ORDER BY DeveloperName]) {
+            if (rt.DeveloperName == PARTNER_ACCOUNT_RECORD_TYPE) {
+                personRtId = rt.Id;
+                break;
+            }
+            if (personRtId == null) {
+                personRtId = rt.Id;
+            }
         }
 
         Account pa = new Account(

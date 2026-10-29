@@ -143,8 +143,8 @@
                                                 </td>
                                             </template>
                                             <template lwc:if={isFlaggedFilterActive}>
-                                                <td>
-                                                    <div style="display: flex; align-items: flex-start; gap: 6px; max-width: 360px;">
+                                                <td class="wcf-flag-cell">
+                                                    <div class="wcf-flag-wrap">
                                                         <template lwc:if={p.isFlagged}>
                                                             <lightning-icon
                                                                 icon-name="utility:priority"
@@ -154,7 +154,7 @@
                                                                 alternative-text="Flagged">
                                                             </lightning-icon>
                                                         </template>
-                                                        <span style="white-space: normal; line-height: 1.4; word-break: break-word;" title={p.flagReason}>
+                                                        <span class="wcf-flag-reason" title={p.flagReason}>
                                                             {p.flagReason}
                                                         </span>
                                                     </div>
