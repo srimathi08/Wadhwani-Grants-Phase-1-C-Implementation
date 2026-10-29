@@ -226,8 +226,11 @@ export default class WFGrantsSignUp extends LightningElement {
             try {
                 this.iti.setNumber('+' + this.countryCode + this.localPhone);
             } catch (e) {
-                input.value = this.localPhone;
+                // ignore
             }
+            // iti.setNumber formats into national format which may prepend '0' (e.g. for India, UK).
+            // Strip leading '0' so the input holds only the clean national digits.
+            input.value = this._normalizePhoneNumber(this.localPhone, this.countryCode);
         }
 
         input.addEventListener('countrychange', () => {
@@ -250,41 +253,43 @@ export default class WFGrantsSignUp extends LightningElement {
         }
     }
 
+    _normalizePhoneNumber(raw, dialCode) {
+        if (!raw) return '';
+        let digits = String(raw).replace(/\D/g, '');
+        if (!digits) return '';
+
+        const cc = dialCode ? String(dialCode).replace(/\D/g, '') : '';
+        if (cc && digits.length > cc.length && digits.startsWith(cc)) {
+            const dialKey = '+' + cc;
+            const rule = this.PHONE_LENGTH_BY_COUNTRY_CODE[dialKey];
+            const rest = digits.slice(cc.length);
+            if (!rule || rest.length >= rule.min) {
+                digits = rest;
+            }
+        }
+        return digits.replace(/^0+/, '');
+    }
+
     _readPhone() {
         const input = this.template.querySelector('[data-id="phone"]');
         if (!input) return null;
         if (this.iti) {
             const countryData = this.iti.getSelectedCountryData();
             const countryCode = (countryData && countryData.dialCode) ? countryData.dialCode : '91';
-            const localPhone = input.value.replace(/\D/g, '');
+            const localPhone = this._normalizePhoneNumber(input.value, countryCode);
             return { countryCode, localPhone };
         }
-        return { countryCode: '91', localPhone: input.value.replace(/\D/g, '') };
+        return { countryCode: '91', localPhone: this._normalizePhoneNumber(input.value, '91') };
     }
 
     _validatePhoneNumber(countryCode, localPhone) {
         if (!localPhone) return '';
-        const digitsOnly = String(localPhone).replace(/\D/g, '');
-        if (!digitsOnly) return '';
+        const cleanDigits = this._normalizePhoneNumber(localPhone, countryCode);
+        if (!cleanDigits) return '';
 
         const cc = String(countryCode || '91').replace(/\D/g, '');
         const dialKey = '+' + cc;
         const rule = this.PHONE_LENGTH_BY_COUNTRY_CODE[dialKey];
-
-        // The dial code is shown separately (separateDialCode), so the input
-        // normally holds only the national number. Strip a leading dial code
-        // ONLY when the number is not already a valid length as typed: a valid
-        // national number can legitimately start with the same digits as the
-        // dial code (e.g. Indian mobiles beginning 91…).
-        let cleanDigits = digitsOnly;
-        if (cleanDigits.startsWith(cc) && cleanDigits.length > cc.length) {
-            const validAsTyped = rule
-                ? (cleanDigits.length >= rule.min && cleanDigits.length <= rule.max)
-                : false;
-            if (!validAsTyped) {
-                cleanDigits = cleanDigits.substring(cc.length);   // NB: .length is a property, not a function
-            }
-        }
 
         if (rule) {
             if (cleanDigits.length < rule.min || cleanDigits.length > rule.max) {
@@ -361,7 +366,13 @@ export default class WFGrantsSignUp extends LightningElement {
         // Clear the inline error for this field while the user is correcting it
         if (field === 'email') this.emailError = '';
         if (field === 'password') this.passwordError = '';
-        if (field === 'organizationName') this.orgNameError = '';
+        if (field === 'organizationName') {
+            if (value && value.length > 80) {
+                this.orgNameError = 'Organization name must be between 2 and 80 characters.';
+            } else {
+                this.orgNameError = '';
+            }
+        }
 
         this.clearError();
     }
@@ -386,6 +397,10 @@ export default class WFGrantsSignUp extends LightningElement {
         if (!phone || !phone.localPhone) {
             this.phoneError = '';
             return;
+        }
+        const input = this.template.querySelector('[data-id="phone"]');
+        if (input && input.value) {
+            input.value = phone.localPhone;
         }
         this.phoneError = this._validatePhoneNumber(phone.countryCode, phone.localPhone);
     }

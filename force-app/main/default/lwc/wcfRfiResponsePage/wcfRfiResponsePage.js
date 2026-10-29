@@ -221,7 +221,7 @@ const DEFAULT_DESCRIPTIONS = {
     SEC6_DESC: 'When does your fiscal year close? This helps us align all financial and outcome metrics. (DD/MM/YYYY)',
     Q4_GOVERNANCE_DESC: 'Describe your governance structure and key governing bodies.',
     Q4_GOVERNANCE_HELPER: 'Briefly describe your governance and operational structure: board, leadership, key affiliations (<100 words).',
-    Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognisable. All amounts in USD.',
+    Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognizable. All amounts in USD.',
     Q8_REFERENCES_DESC: 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.',
     Q9_HIST_FINANCIALS_DESC: 'Enter your historical figures across the three prior fiscal years. Starting balance for the earliest year and revenue/expense are inputs; year-end balances are computed automatically.',
     Q10_CURRENT_FY_DESC: 'Your current fiscal year budget, latest projection, and explanation of any deviation.',
@@ -339,7 +339,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     @track isSearchingLocation = false;
     searchTimeout = null;
     _uidCounter = 0;
-        // ── AI Feedback modal state ──
+    // ── AI Feedback modal state ──
     @track isAIModalOpen = false;
     @track aiModalTitle = 'AI Feedback';
     @track isAiLoading = false;
@@ -361,7 +361,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         }
     }
 
-       disconnectedCallback() {
+    disconnectedCallback() {
         if (this.searchTimeout) clearTimeout(this.searchTimeout);
         if (this._aiTimeout) clearTimeout(this._aiTimeout);
     }
@@ -378,7 +378,7 @@ export default class WcfRfiResponsePage extends LightningElement {
                 const merged = { ...this.formValues, ...(result.formValues || {}) };
                 this.formValues = this._hydrateFormValues(merged);
 
-                                if (result.q24Files && result.q24Files.length > 0
+                if (result.q24Files && result.q24Files.length > 0
                     && this.formValues.Q24_VERIFIED__c !== 'Yes') {
                     this._setField('Q24_VERIFIED__c', 'Yes');
                 }
@@ -557,7 +557,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         return { uid: this._newUid(), id: this._newRowId(), state: '', district: '', fy3: '', fy2: '', fy1: '', proj: '' };
     }
 
-        _rowsForSubmit(rows, numericFields) {
+    _rowsForSubmit(rows, numericFields) {
         return this._stripUi(rows).map(r => {
             const out = { ...r };
             numericFields.forEach(f => {
@@ -571,7 +571,7 @@ export default class WcfRfiResponsePage extends LightningElement {
         });
     }
 
-        _stripUi(rows) {
+    _stripUi(rows) {
         // eslint-disable-next-line no-unused-vars
         return (rows || []).map(({ uid, ...rest }) => rest);
     }
@@ -593,7 +593,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     }
 
     /** Formats a raw numeric string with thousands separators, preserving a partly-typed decimal. */
-       _fmtNum(v) {
+    _fmtNum(v) {
         if (this._isBlank(v)) return '';
         const s = String(v).replace(/,/g, '').trim();
         const m = s.match(/^(-?)(\d*)(\.\d*)?$/);
@@ -1369,7 +1369,7 @@ export default class WcfRfiResponsePage extends LightningElement {
     handleItalic() { document.execCommand('italic', false, null); }
     handleUnderline() { document.execCommand('underline', false, null); }
 
-        // ── AI Feedback ─────────────────────────────────────────────────────────
+    // ── AI Feedback ─────────────────────────────────────────────────────────
     handleAIClick(event) {
         const fieldApiName = event.currentTarget.dataset.id;
         if (!fieldApiName || this.isAiLoading) return;
@@ -2029,7 +2029,7 @@ export default class WcfRfiResponsePage extends LightningElement {
             f[`Projected_Learner_placement_${db}__c`] = pct;
             f[`Actual_Learner_placement_${db}__c`] = pct;
         });
-            f.Projected_Learner_placement_CFY__c = this._pctValue('JF_ENROLL_PROJ', 'JF_PLACE_PROJ');
+        f.Projected_Learner_placement_CFY__c = this._pctValue('JF_ENROLL_PROJ', 'JF_PLACE_PROJ');
 
         // Cleared numeric/date answers go to Apex as null, never ''
         Object.keys(f).forEach(k => {
@@ -2085,7 +2085,7 @@ export default class WcfRfiResponsePage extends LightningElement {
             const payload = {
                 ...values,
                 activeTabId: 'tabReviewSubmit',
-                                skillingDomains: this._rowsForSubmit(this.skillingDomainRows, ROW_NUMERIC_FIELDS.skilling),
+                skillingDomains: this._rowsForSubmit(this.skillingDomainRows, ROW_NUMERIC_FIELDS.skilling),
                 businessSectors: this._rowsForSubmit(this.businessSectorRows, ROW_NUMERIC_FIELDS.sector),
                 livelihoodPrograms: this._rowsForSubmit(this.livelihoodProgramRows, ROW_NUMERIC_FIELDS.program),
                 communities: this._rowsForSubmit(this.communityRows, ROW_NUMERIC_FIELDS.community),

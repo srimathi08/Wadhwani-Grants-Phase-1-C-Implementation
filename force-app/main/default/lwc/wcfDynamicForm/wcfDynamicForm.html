@@ -1175,20 +1175,23 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
-                                                        <div class="computed-cell"><strong>{reviewEndFY3}</strong>
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
+                                                        <div class="computed-cell"><strong>{computedEndFY3}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
-                                                        <div class="computed-cell"><strong>{reviewEndFY2}</strong>
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
+                                                        <div class="computed-cell"><strong>{computedEndFY2}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
-                                                        <div class="computed-cell"><strong>{reviewEndFY1}</strong>
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
+                                                        <div class="computed-cell"><strong>{computedEndFY1}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1240,9 +1243,10 @@
                                                             data-key="CFY_REV_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
                                                         <div class="computed-cell">
-                                                            <strong>{reviewRevDeviation}</strong>
+                                                            <strong>{computedRevDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1266,9 +1270,10 @@
                                                             data-key="CFY_CAP_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
                                                         <div class="computed-cell">
-                                                            <strong>{reviewCapDeviation}</strong>
+                                                            <strong>{computedCapDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1292,9 +1297,10 @@
                                                             data-key="CFY_OP_PROJ"></lightning-input></div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
                                                         <div class="computed-cell">
-                                                            <strong>{reviewOpDeviation}</strong>
+                                                            <strong>{computedOpDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1305,22 +1311,25 @@
                                                     <div class="subtext-muted">Auto-computed</div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
-                                                        <div class="computed-cell"><strong>{reviewNetBudget}</strong>
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
+                                                        <div class="computed-cell"><strong>{computedNetBudget}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
                                                         <div class="computed-cell">
-                                                            <strong>{reviewNetProjection}</strong>
+                                                            <strong>{computedNetProjection}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="currency-input-cell">
+                                                    <div class="currency-input-cell"><span
+                                                            class="currency-prefix">$</span>
                                                         <div class="computed-cell">
-                                                            <strong>{reviewNetDeviation}</strong>
+                                                            <strong>{computedNetDeviation}</strong>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1555,10 +1564,11 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input type="number" class="wcf-number-input"
-                                                            value={row.enrollment} data-id={row.id}
-                                                            data-field="enrollment" min="0"
-                                                            onchange={handleSkillingDomainChange} />
+                                                        <input type="text" inputmode="numeric" class="wcf-number-input"
+                                                            value={row.formattedEnrollment} data-id={row.id}
+                                                            data-field="enrollment"
+                                                            oninput={handleSkillingDomainEnrollmentInput}
+                                                            onblur={handleSkillingDomainEnrollmentBlur} />
                                                     </td>
                                                     <td style="text-align: center; vertical-align: middle;">
                                                         <template if:true={canRemoveSkillingDomainRow}>
@@ -1962,9 +1972,11 @@
                                         <div class="modern-field" style="margin-top: 16px; max-width: 250px;">
                                             <label class="field-label-bold"><span class="required">*</span> Yearly
                                                 Enrolment</label>
-                                            <input type="number" class="wcf-number-input" value={sec.enrollment}
-                                                data-id={sec.id} data-field="enrollment" min="0"
-                                                onchange={handleBusinessSectorChange} />
+                                            <input type="text" inputmode="numeric" class="wcf-number-input"
+                                                value={sec.formattedEnrollment}
+                                                data-id={sec.id} data-field="enrollment"
+                                                oninput={handleBusinessSectorEnrollmentInput}
+                                                onblur={handleBusinessSectorEnrollmentBlur} />
                                         </div>
                                     </div>
                                 </template>

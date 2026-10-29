@@ -149,10 +149,10 @@ export default class WcfDynamicForm extends LightningElement {
 
     // ── Dynamic Child Grids & File State ─────────────────────────────────
     @track skillingDomainRows = [
-        { id: 1, name: '', hours: '', duration: '', whenStarted: '', enrollment: '', displayWhenStarted: '' }
+        { id: 1, name: '', hours: '', duration: '', whenStarted: '', enrollment: '', formattedEnrollment: '', displayWhenStarted: '' }
     ];
     @track businessSectorRows = [
-        { id: 1, sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', enterprises: '', jobs: '', displayWhenBegan: '' }
+        { id: 1, sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', enterprises: '', jobs: '', enrollment: '', formattedEnrollment: '', displayWhenBegan: '' }
     ];
     @track livelihoodProgramRows = [
         { id: 1, name: '', supportType: '', manHours: '', enrollment: '' }
@@ -328,7 +328,7 @@ export default class WcfDynamicForm extends LightningElement {
             Q6_FISCAL_DATE: 'Fiscal Year End Date',
 
             Q7_TOP_FUNDERS: 'Top 3 Prominent Funders',
-            Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognisable. All amounts in USD.',
+            Q7_TOP_FUNDERS_DESC: 'Optionally share up to three of your most prominent funders: the backers whose support is most material or most recognizable. All amounts in USD.',
             Q8_REFERENCES: 'Reference Contacts for Outreach',
             Q8_REFERENCES_DESC: 'Sharing 1-2 contacts who can speak to your work (funders, board members, partners, or peer leaders) gives us a valuable external reference point. This is optional; it is not required and will not affect your application.',
 
@@ -1148,6 +1148,7 @@ export default class WcfDynamicForm extends LightningElement {
                     if (result.skillingDomains && result.skillingDomains.length > 0) {
                         this.skillingDomainRows = result.skillingDomains.map(d => ({
                             ...d,
+                            formattedEnrollment: this._formatNumberWithCommas(d.enrollment),
                             displayWhenStarted: d.whenStarted ? this._formatDateDDMMYYYY(d.whenStarted) : ''
                         }));
                     }
@@ -1155,6 +1156,7 @@ export default class WcfDynamicForm extends LightningElement {
                     if (result.businessSectors && result.businessSectors.length > 0) {
                         this.businessSectorRows = result.businessSectors.map(s => ({
                             ...s,
+                            formattedEnrollment: this._formatNumberWithCommas(s.enrollment),
                             displayWhenBegan: s.whenBegan ? this._formatDateDDMMYYYY(s.whenBegan) : ''
                         }));
                     }
@@ -1836,6 +1838,7 @@ export default class WcfDynamicForm extends LightningElement {
             .filter(r => r && r.name && r.name.trim() !== '')
             .map(r => ({
                 ...r,
+                enrollment: (r.enrollment !== null && r.enrollment !== undefined && r.enrollment !== '') ? this._formatNumberWithCommas(r.enrollment) : 'N/A',
                 displayWhenStarted: r.displayWhenStarted || (r.whenStarted ? this._formatDateDDMMYYYY(r.whenStarted) : 'N/A')
             }));
     }
@@ -1855,6 +1858,7 @@ export default class WcfDynamicForm extends LightningElement {
                 }
                 return {
                     ...r,
+                    enrollment: (r.enrollment !== null && r.enrollment !== undefined && r.enrollment !== '') ? this._formatNumberWithCommas(r.enrollment) : 'N/A',
                     sectorDisplay: sectorName,
                     supportTypesDisplay: typesArr.length > 0 ? typesArr.join(', ') : 'N/A',
                     displayWhenBegan: r.displayWhenBegan || (r.whenBegan ? this._formatDateDDMMYYYY(r.whenBegan) : 'N/A')
@@ -4046,6 +4050,9 @@ export default class WcfDynamicForm extends LightningElement {
 
     _getLabelForFieldKey(key) {
         if (!key) return '';
+        const fy3 = this.fiscalYears?.fy3Label || 'FY2024';
+        const fy2 = this.fiscalYears?.fy2Label || 'FY2025';
+        const fy1 = this.fiscalYears?.fy1Label || 'FY2026';
         const specMap = {
             Organization_Name__c: 'Organization Name',
             Headquarters_City_and_Country__c: 'Headquarters City and Country',
@@ -4092,16 +4099,16 @@ export default class WcfDynamicForm extends LightningElement {
             Reference_2_Role__c: 'Reference 2 Role',
             Reference_2_Email__c: 'Reference 2 Email',
             // Q9 Historical Financials
-            START_FY3: 'Historical Balance - Start of FY-3',
-            REV_FY3: 'Historical Revenue - FY-3',
-            REV_FY2: 'Historical Revenue - FY-2',
-            REV_FY1: 'Historical Revenue - FY-1',
-            CAP_FY3: 'Historical Capital Expenditure - FY-3',
-            CAP_FY2: 'Historical Capital Expenditure - FY-2',
-            CAP_FY1: 'Historical Capital Expenditure - FY-1',
-            OP_FY3: 'Historical Operating Expenditure - FY-3',
-            OP_FY2: 'Historical Operating Expenditure - FY-2',
-            OP_FY1: 'Historical Operating Expenditure - FY-1',
+            START_FY3: `Historical Balance - Start of ${fy3}`,
+            REV_FY3: `Historical Revenue - ${fy3}`,
+            REV_FY2: `Historical Revenue - ${fy2}`,
+            REV_FY1: `Historical Revenue - ${fy1}`,
+            CAP_FY3: `Historical Capital Expenditure - ${fy3}`,
+            CAP_FY2: `Historical Capital Expenditure - ${fy2}`,
+            CAP_FY1: `Historical Capital Expenditure - ${fy1}`,
+            OP_FY3: `Historical Operating Expenditure - ${fy3}`,
+            OP_FY2: `Historical Operating Expenditure - ${fy2}`,
+            OP_FY1: `Historical Operating Expenditure - ${fy1}`,
             // Q10 Current FY Financials
             CFY_REV_BUDGET: 'Current FY Revenue (Budget)',
             CFY_REV_PROJ: 'Current FY Revenue (Projection)',
@@ -4564,6 +4571,27 @@ export default class WcfDynamicForm extends LightningElement {
             }
         });
 
+        // Q7 Duplicate Funder check
+        const f1Name = (org.Funder_1_Name__c || '').trim().toLowerCase();
+        const f2Name = (this.showFunder2 && org.Funder_2_Name__c ? org.Funder_2_Name__c : '').trim().toLowerCase();
+        const f3Name = (this.showFunder3 && org.Funder_3_Name__c ? org.Funder_3_Name__c : '').trim().toLowerCase();
+
+        if (this.showFunder2 && f2Name) {
+            if (f1Name && f2Name === f1Name) {
+                this._showLightningError('Funder_2_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+                isValid = false;
+            }
+        }
+        if (this.showFunder3 && f3Name) {
+            if (f1Name && f3Name === f1Name) {
+                this._showLightningError('Funder_3_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+                isValid = false;
+            } else if (f2Name && f3Name === f2Name) {
+                this._showLightningError('Funder_3_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+                isValid = false;
+            }
+        }
+
         // References (Q8) partial-fill and sequential check
         const ref1Values = [org.Reference_1_Name__c, org.Reference_1_Role__c, org.Reference_1_Email__c];
         const hasRef1Data = ref1Values.some(v => v !== '' && v !== null && v !== undefined);
@@ -4643,6 +4671,23 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             }
         });
+
+        // Q8 Duplicate Reference check
+        const r1Name = (org.Reference_1_Name__c || '').trim().toLowerCase();
+        const r2Name = (this.showReference2 && org.Reference_2_Name__c ? org.Reference_2_Name__c : '').trim().toLowerCase();
+        const r1Email = (org.Reference_1_Email__c || '').trim().toLowerCase();
+        const r2Email = (this.showReference2 && org.Reference_2_Email__c ? org.Reference_2_Email__c : '').trim().toLowerCase();
+
+        if (this.showReference2) {
+            if (r1Name && r2Name && r1Name === r2Name) {
+                this._showLightningError('Reference_2_Name__c', 'Duplicate reference name entered. Please provide a different contact.');
+                isValid = false;
+            }
+            if (r1Email && r2Email && r1Email === r2Email) {
+                this._showLightningError('Reference_2_Email__c', 'Duplicate reference email entered. Please provide a unique email address.');
+                isValid = false;
+            }
+        }
 
         // Q9 Historical Financials: required and non-negative
         const histNumKeys = [
@@ -4940,10 +4985,20 @@ export default class WcfDynamicForm extends LightningElement {
                             this._registerInvalid(otherSupportEl);
                         }
                         isValid = false;
-                    } else if (otherSupportEl?.setCustomValidity) {
-                        otherSupportEl.setCustomValidity('');
-                        otherSupportEl.reportValidity();
-                        this._invalidElements = this._invalidElements.filter(x => x !== otherSupportEl);
+                    } else {
+                        const err = this._validateNameLikeField(row.supportTypeOther, 'Type of support');
+                        if (err) {
+                            if (otherSupportEl?.setCustomValidity) {
+                                otherSupportEl.setCustomValidity(err);
+                                otherSupportEl.reportValidity();
+                                this._registerInvalid(otherSupportEl);
+                            }
+                            isValid = false;
+                        } else if (otherSupportEl?.setCustomValidity) {
+                            otherSupportEl.setCustomValidity('');
+                            otherSupportEl.reportValidity();
+                            this._invalidElements = this._invalidElements.filter(x => x !== otherSupportEl);
+                        }
                     }
                 }
             }
@@ -6118,7 +6173,7 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     addSkillingDomainRow() {
-        this.skillingDomainRows = [...this.skillingDomainRows, { id: Date.now(), name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '' }];
+        this.skillingDomainRows = [...this.skillingDomainRows, { id: Date.now(), name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '', formattedEnrollment: '' }];
     }
     handleSkillingDomainChange(event) {
         const rawId = event.target?.dataset?.id || event.currentTarget?.dataset?.id;
@@ -6129,6 +6184,11 @@ export default class WcfDynamicForm extends LightningElement {
                 const updated = { ...r, [field]: val };
                 if (field === 'whenStarted') {
                     updated.displayWhenStarted = this._formatDateDDMMYYYY(val);
+                }
+                if (field === 'enrollment') {
+                    const clean = val ? String(val).replace(/\D/g, '') : '';
+                    updated.enrollment = clean;
+                    updated.formattedEnrollment = this._formatNumberWithCommas(clean);
                 }
                 return updated;
             }
@@ -6204,7 +6264,7 @@ export default class WcfDynamicForm extends LightningElement {
         if (this.skillingDomainRows.length > 1) {
             this.skillingDomainRows = this.skillingDomainRows.filter(r => String(r.id) !== String(rawId));
         } else {
-            this.skillingDomainRows = [{ id: Date.now(), name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '' }];
+            this.skillingDomainRows = [{ id: Date.now(), name: '', hours: '', duration: '', whenStarted: '', displayWhenStarted: '', enrollment: '', formattedEnrollment: '' }];
         }
     }
 
@@ -6213,7 +6273,7 @@ export default class WcfDynamicForm extends LightningElement {
     }
 
     addBusinessSectorRow() {
-        this.businessSectorRows = [...this.businessSectorRows, { id: Date.now(), sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', displayWhenBegan: '', enrollment: '' }];
+        this.businessSectorRows = [...this.businessSectorRows, { id: Date.now(), sector: '', sectorOther: '', supportTypes: [], supportTypeOther: '', whenBegan: '', displayWhenBegan: '', enrollment: '', formattedEnrollment: '' }];
     }
     handleBusinessSectorChange(event) {
         const rawId = event.target?.dataset?.id || event.currentTarget?.dataset?.id;
@@ -6228,12 +6288,49 @@ export default class WcfDynamicForm extends LightningElement {
                 if (field === 'sector' && val !== 'Other') {
                     updated.sectorOther = '';
                 }
+                if (field === 'enrollment') {
+                    const clean = val ? String(val).replace(/\D/g, '') : '';
+                    updated.enrollment = clean;
+                    updated.formattedEnrollment = this._formatNumberWithCommas(clean);
+                }
                 return updated;
             }
             return r;
         });
         if (event.target) {
-            if (field === 'whenBegan') {
+            if (field === 'sectorOther') {
+                const err = val ? this._validateNameLikeField(val, 'Business sector') : null;
+                if (err) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(err);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else if (field === 'supportTypeOther') {
+                const err = val ? this._validateNameLikeField(val, 'Type of support') : null;
+                if (err) {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity(err);
+                        event.target.reportValidity();
+                        this._registerInvalid(event.target);
+                    }
+                } else {
+                    if (event.target.setCustomValidity) {
+                        event.target.setCustomValidity('');
+                        event.target.reportValidity();
+                    }
+                    this._clearNativeError(event.target);
+                    this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+                }
+            } else if (field === 'whenBegan') {
                 const incorp = this.formValues.Incorporation_Date__c || this.savedOrgData?.Incorporation_Date__c;
                 const today = this.todayDateString;
                 if (val && incorp && val < incorp) {
@@ -6269,6 +6366,98 @@ export default class WcfDynamicForm extends LightningElement {
             }
         }
     }
+
+    handleSkillingDomainEnrollmentInput(event) {
+        const rawId = event.target?.dataset?.id;
+        const raw = event.target.value;
+        const digits = raw ? String(raw).replace(/\D/g, '') : '';
+        const formatted = this._formatNumberWithCommas(digits);
+        if (event.target.value !== formatted) {
+            event.target.value = formatted;
+        }
+        this.skillingDomainRows = this.skillingDomainRows.map(r => {
+            if (String(r.id) === String(rawId)) {
+                return { ...r, enrollment: digits, formattedEnrollment: formatted };
+            }
+            return r;
+        });
+        const err = digits ? this._validateIntegerCount(digits, 'Annual Enrollment') : null;
+        if (err) {
+            this._showNativeError(event.target, err);
+            this._registerInvalid(event.target);
+        } else {
+            this._clearNativeError(event.target);
+            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+        }
+    }
+
+    handleSkillingDomainEnrollmentBlur(event) {
+        const rawId = event.target?.dataset?.id;
+        const raw = event.target.value;
+        const digits = raw ? String(raw).replace(/\D/g, '') : '';
+        const formatted = this._formatNumberWithCommas(digits);
+        event.target.value = formatted;
+        this.skillingDomainRows = this.skillingDomainRows.map(r => {
+            if (String(r.id) === String(rawId)) {
+                return { ...r, enrollment: digits, formattedEnrollment: formatted };
+            }
+            return r;
+        });
+        const err = digits ? this._validateIntegerCount(digits, 'Annual Enrollment') : null;
+        if (err) {
+            this._showNativeError(event.target, err);
+            this._registerInvalid(event.target);
+        } else {
+            this._clearNativeError(event.target);
+            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+        }
+    }
+
+    handleBusinessSectorEnrollmentInput(event) {
+        const rawId = event.target?.dataset?.id;
+        const raw = event.target.value;
+        const digits = raw ? String(raw).replace(/\D/g, '') : '';
+        const formatted = this._formatNumberWithCommas(digits);
+        if (event.target.value !== formatted) {
+            event.target.value = formatted;
+        }
+        this.businessSectorRows = this.businessSectorRows.map(r => {
+            if (String(r.id) === String(rawId)) {
+                return { ...r, enrollment: digits, formattedEnrollment: formatted };
+            }
+            return r;
+        });
+        const err = digits ? this._validateIntegerCount(digits, 'Yearly Enrolment') : null;
+        if (err) {
+            this._showNativeError(event.target, err);
+            this._registerInvalid(event.target);
+        } else {
+            this._clearNativeError(event.target);
+            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+        }
+    }
+
+    handleBusinessSectorEnrollmentBlur(event) {
+        const rawId = event.target?.dataset?.id;
+        const raw = event.target.value;
+        const digits = raw ? String(raw).replace(/\D/g, '') : '';
+        const formatted = this._formatNumberWithCommas(digits);
+        event.target.value = formatted;
+        this.businessSectorRows = this.businessSectorRows.map(r => {
+            if (String(r.id) === String(rawId)) {
+                return { ...r, enrollment: digits, formattedEnrollment: formatted };
+            }
+            return r;
+        });
+        const err = digits ? this._validateIntegerCount(digits, 'Yearly Enrolment') : null;
+        if (err) {
+            this._showNativeError(event.target, err);
+            this._registerInvalid(event.target);
+        } else {
+            this._clearNativeError(event.target);
+            this._invalidElements = this._invalidElements.filter(x => x !== event.target);
+        }
+    }
     handleSupportTypeChip(event) {
         const rawId = event.currentTarget?.dataset?.id || event.target?.dataset?.id;
         const chipVal = event.currentTarget?.dataset?.chip || event.target?.dataset?.chip;
@@ -6283,6 +6472,14 @@ export default class WcfDynamicForm extends LightningElement {
                 let supportTypeOtherVal = r.supportTypeOther;
                 if (!current.includes('Other')) {
                     supportTypeOtherVal = '';
+                    const otherInput = this.template.querySelector(`lightning-input[data-id="${rawId}"][data-field="supportTypeOther"]`);
+                    if (otherInput) {
+                        if (otherInput.setCustomValidity) {
+                            otherInput.setCustomValidity('');
+                            otherInput.reportValidity();
+                        }
+                        this._invalidElements = this._invalidElements.filter(x => x !== otherInput);
+                    }
                 }
                 return { ...r, supportTypes: current, supportTypeOther: supportTypeOtherVal };
             }
@@ -6884,6 +7081,24 @@ export default class WcfDynamicForm extends LightningElement {
                 } catch (_) { /* ignore */ }
             }
         });
+
+        // Q7 Duplicate Funder check
+        const f1Name = (org.Funder_1_Name__c || '').trim().toLowerCase();
+        const f2Name = (this.showFunder2 && org.Funder_2_Name__c ? org.Funder_2_Name__c : '').trim().toLowerCase();
+        const f3Name = (this.showFunder3 && org.Funder_3_Name__c ? org.Funder_3_Name__c : '').trim().toLowerCase();
+
+        if (this.showFunder2 && f2Name) {
+            if (f1Name && f2Name === f1Name) {
+                this._showLightningError('Funder_2_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+            }
+        }
+        if (this.showFunder3 && f3Name) {
+            if (f1Name && f3Name === f1Name) {
+                this._showLightningError('Funder_3_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+            } else if (f2Name && f3Name === f2Name) {
+                this._showLightningError('Funder_3_Name__c', 'Duplicate funder name entered. Please enter a unique funder.');
+            }
+        }
     }
 
     // ── Reference Card Toggle & Validation Methods (Q8) ───────────────────
@@ -6983,6 +7198,21 @@ export default class WcfDynamicForm extends LightningElement {
                 }
             }
         });
+
+        // Q8 Duplicate Reference check
+        const r1Name = (org.Reference_1_Name__c || '').trim().toLowerCase();
+        const r2Name = (this.showReference2 && org.Reference_2_Name__c ? org.Reference_2_Name__c : '').trim().toLowerCase();
+        const r1Email = (org.Reference_1_Email__c || '').trim().toLowerCase();
+        const r2Email = (this.showReference2 && org.Reference_2_Email__c ? org.Reference_2_Email__c : '').trim().toLowerCase();
+
+        if (this.showReference2) {
+            if (r1Name && r2Name && r1Name === r2Name) {
+                this._showLightningError('Reference_2_Name__c', 'Duplicate reference name entered. Please provide a different contact.');
+            }
+            if (r1Email && r2Email && r1Email === r2Email) {
+                this._showLightningError('Reference_2_Email__c', 'Duplicate reference email entered. Please provide a unique email address.');
+            }
+        }
     }
 
     // ── Q5 Legal and Tax Compliance Validation Helper ─────────────────────
